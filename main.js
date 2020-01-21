@@ -12,10 +12,6 @@ function Car(i) {
     this.tower = null;
     this.tower1 = null;
     this.tower2 = null;
-    let x = locations[i % locations.length];
-    this.pos = {}
-    this.pos['lat'] = x.lat;
-    this.pos['lng'] = x.lng;
     this.delta = 0;
 }
 var cars = [];
@@ -36,12 +32,12 @@ function initMap() {
     }
 
     //Create cars
-    for (let i = 0; i < locations.length; i++) {
+    for (let i = 0; i < config.NUM_CARS; i++) {
         var car = new Car(i);
         car.marker = new google.maps.Marker({
             map: map,
             //position: config.LOC,
-            position: car.pos,
+            position: locations[i % locations.length],
             title: "Car" + car.num,
             icon: {
                 path: config.CAR_ICON,
@@ -56,22 +52,26 @@ function initMap() {
     }
 
     //Create towers
-    for (let i = 0; i < config.NUM_TOWERS; i++) {
-        var tower = new Tower();
-        let color = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
-        tower.marker = (new google.maps.Marker({
-            map: map,
-            position: randomLatLng(config.LOC),
-            title: "Tower",
-            icon: {
-                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: 4,
-                strokeColor: color,
-                fillColor: color,
-                fillOpacity: 1,
-            }
-        }));
-        towers.push(tower);
+    var topLeft = {lat: config.LOC.lat - 0.03*3, lng: config.LOC.lng - 0.05*3};
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            var tower = new Tower();
+            let color = getRandomColor();
+            let pos = {lat: topLeft.lat + 0.03*r, lng: topLeft.lng + 0.05*c};
+            tower.marker = (new google.maps.Marker({
+                map: map,
+                position: pos,
+                title: "Tower",
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    scale: 4,
+                    strokeColor: color,
+                    fillColor: color,
+                    fillOpacity: 1,
+                }
+            }));
+            towers.push(tower);
+        }
     }
 
     directionsService = new google.maps.DirectionsService();
@@ -82,10 +82,10 @@ function initMap() {
     function moveIt(i) {
         moveCarToRoute(
             cars[i],
-            locations[locations.length - i - 1],
-            locations[i]);
+            locations[i % locations.length],
+            locations[getRandomIntInclusive(0, locations.length - 1)]);
 
-        if (i == config.NUM_CARS - 1) {
+        if (i == cars.length - 1) {
             return;
         } else {
             setTimeout(moveIt, 1000, ++i)
@@ -113,26 +113,21 @@ function initMap() {
             map: map,
             path: [car.marker.getPosition(), car.tower.marker.getPosition()],
             strokeWeight: 1})
-        transition(car, path, 0);
+        moveMarker(car, path, 0, 0);
     }
 
-    function transition(car, path, pos) {
-        car.delta = 0;
-        car.pos.lat = (path[pos].lat() - car.marker.getPosition().lat()) / config.NUM_DELTAS;
-        car.pos.lng = (path[pos].lng() - car.marker.getPosition().lng()) / config.NUM_DELTAS;
-        let radian = Math.atan2(car.pos.lng, car.pos.lat);
+    function moveMarker(car, path, pos, delta) {
+        var incr = {}
+        incr.lat = (path[pos].lat() - car.marker.getPosition().lat()) / config.NUM_DELTAS;
+        incr.lng = (path[pos].lng() - car.marker.getPosition().lng()) / config.NUM_DELTAS;
+        let radian = Math.atan2(incr.lng, incr.lat);
 
         car.marker.getIcon().rotation = radians_to_degrees(radian);
         car.marker.getIcon().scale = map.zoom * .035;
         car.marker.setIcon(car.marker.getIcon())
-
-        moveMarker(car, path, pos);
-    }
-
-    function moveMarker(car, path, pos) {
         car.marker.setPosition({
-            lat: car.marker.getPosition().lat() + car.pos.lat,
-            lng: car.marker.getPosition().lng() + car.pos.lng
+            lat: car.marker.getPosition().lat() + incr.lat,
+            lng: car.marker.getPosition().lng() + incr.lng
         });
         car.tower = findClosestTower(car);
         car.line.setOptions({
@@ -143,9 +138,8 @@ function initMap() {
         })
         car.marker.getIcon().fillColor = car.tower.marker.getIcon().strokeColor;
         car.marker.setIcon(car.marker.getIcon());
-        if (car.delta != config.NUM_DELTAS) {
-            car.delta++;
-            setTimeout(moveMarker, config.UPDATE_DELAY, car, path, pos);
+        if (delta != config.NUM_DELTAS) {
+            setTimeout(moveMarker, config.UPDATE_DELAY, car, path, pos, ++delta);
         } else {
             if (pos == path.length - 1) {
                 // Reached destination
@@ -158,7 +152,7 @@ function initMap() {
                 return;
             } else {
                 // Move car to next position in path
-                transition(car, path, pos + 1);
+                moveMarker(car, path, pos + 1, 0);
             }
         }
     }
