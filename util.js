@@ -19,7 +19,8 @@ function radians_to_degrees(radians) {
 *Generates a random latlng value in 1000 meter radius of loc
 */
 function randomLatLng(loc) {
-    var r = 10000 / 111300 // = 100 meters
+    //var r = 10000 / 111300 // = 100 meters
+    var r = 5000 / 111300 // = 100 meters
     var y0 = loc.lat;
     var x0 = loc.lng;
     var u = Math.random();

@@ -1,10 +1,4 @@
 
-
-function Tower() {
-    this.marker = null;
-}
-var towers = [];
-
 function Car(i) {
     this.num = i;
     this.marker = null;
@@ -17,19 +11,17 @@ function Car(i) {
 var cars = [];
 
 var map;
-var locations = [];
 
 function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
         center: config.LOC,
-        zoom: 11
+        zoom: 12
     });
 
-    //Create random location
-    for (let i = 0; i < config.NUM_LOCS; i++) {
-        locations.push(randomLatLng(config.LOC));
-    }
+    initTowers();
+
+    initLocations();
 
     //Create cars
     for (let i = 0; i < config.NUM_CARS; i++) {
@@ -37,11 +29,11 @@ function initMap() {
         car.marker = new google.maps.Marker({
             map: map,
             //position: config.LOC,
-            position: locations[i % locations.length],
+            position: getStartingLocation(i),
             title: "Car" + car.num,
             icon: {
                 path: config.CAR_ICON,
-                scale: map.zoom * .03,
+                scale: map.zoom * .025,
                 fillColor: undefined,
                 anchor: new google.maps.Point(25, 25),
                 fillOpacity: 1,
@@ -49,29 +41,6 @@ function initMap() {
             }
         });
         cars.push(car);
-    }
-
-    //Create towers
-    var topLeft = {lat: config.LOC.lat - 0.03*3, lng: config.LOC.lng - 0.05*3};
-    for (let r = 0; r < 6; r++) {
-        for (let c = 0; c < 6; c++) {
-            var tower = new Tower();
-            let color = getRandomColor();
-            let pos = {lat: topLeft.lat + 0.03*r, lng: topLeft.lng + 0.05*c};
-            tower.marker = (new google.maps.Marker({
-                map: map,
-                position: pos,
-                title: "Tower",
-                icon: {
-                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                    scale: 4,
-                    strokeColor: color,
-                    fillColor: color,
-                    fillOpacity: 1,
-                }
-            }));
-            towers.push(tower);
-        }
     }
 
     directionsService = new google.maps.DirectionsService();
@@ -82,8 +51,8 @@ function initMap() {
     function moveIt(i) {
         moveCarToRoute(
             cars[i],
-            locations[i % locations.length],
-            locations[getRandomIntInclusive(0, locations.length - 1)]);
+            cars[i].marker.getPosition(),
+            getRandomLocation());
 
         if (i == cars.length - 1) {
             return;
@@ -123,7 +92,7 @@ function initMap() {
         let radian = Math.atan2(incr.lng, incr.lat);
 
         car.marker.getIcon().rotation = radians_to_degrees(radian);
-        car.marker.getIcon().scale = map.zoom * .035;
+        car.marker.getIcon().scale = map.zoom * .025;
         car.marker.setIcon(car.marker.getIcon())
         car.marker.setPosition({
             lat: car.marker.getPosition().lat() + incr.lat,
@@ -146,7 +115,7 @@ function initMap() {
                 moveCarToRoute(
                     car,
                     car.marker.getPosition(),
-                    locations[getRandomIntInclusive(0, locations.length - 1)]);
+                    getRandomLocation());
                 car.line.setMap(undefined);
                 car.line.setPath([]);
                 return;
@@ -156,17 +125,4 @@ function initMap() {
             }
         }
     }
-
-  function findClosestTower(car) {
-    var closestTower = towers[0];
-      var closestDistance = distanceTo(car.marker.getPosition(), towers[0].marker.getPosition());
-    for (let i = 0; i < towers.length; i++) {
-      var distance = distanceTo(car.marker.getPosition(), towers[i].marker.getPosition());
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestTower = towers[i];
-      }
-    }
-    return closestTower;
-  }
 }
