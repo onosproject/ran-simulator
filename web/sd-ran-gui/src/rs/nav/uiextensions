@@ -1,0 +1,14 @@
+[
+    {
+        "id": "mapview",
+        "icon": "nav_topo",
+        "cat": "NETWORK",
+        "label": "MapView"
+    },
+    {
+        "id": "config/models",
+        "icon": "nav_models",
+        "cat": "CONFIG",
+        "label": "Models"
+    }
+]
