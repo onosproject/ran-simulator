@@ -49,13 +49,14 @@ function initMap() {
 
     function moveCar(car, path, pos, delta) {
 
-        // Move car in a delta increment along path towards pos(ition) 
+        // Move car in a delta increment along path towards pos(ition)
         incrMoveCar(car, path, pos)
+
+        attachCar(car)
 
         if (delta != config.NUM_DELTAS) {
             setTimeout(moveCar, config.UPDATE_DELAY, car, path, pos, ++delta)
         } else {
-            attachCar(car)
             if (pos == path.length - 1) {
                 // Reached destination - Start a new journey
                 moveCarToRoute(

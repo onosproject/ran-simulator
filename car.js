@@ -3,9 +3,7 @@ function Car(i) {
     this.num = i
     this.marker = null
     this.line = null
-    this.tower = null
-    this.tower1 = null
-    this.tower2 = null
+    this.tower = {}
     this.delta = 0
 }
 var cars = []
@@ -54,8 +52,8 @@ function incrMoveCar(car, path, pos) {
 function attachCar(car) {
     car.tower = findClosestTower(car)
     car.line.setOptions({
-        path: [car.marker.getPosition(), car.tower.marker.getPosition()],
-        strokeColor: car.tower.marker.getIcon().strokeColor
+        path: [car.marker.getPosition(), car.tower.serving.marker.getPosition()],
+        strokeColor: car.tower.serving.marker.getIcon().strokeColor
     })
-    car.marker.getIcon().fillColor = car.tower.marker.getIcon().strokeColor
+    car.marker.getIcon().fillColor = car.tower.serving.marker.getIcon().strokeColor
 }

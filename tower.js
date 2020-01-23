@@ -34,14 +34,35 @@ function initTowers() {
 }
 
 function findClosestTower(car) {
-    var closestTower = towers[0]
-    var closestDistance = distanceTo(car.marker.getPosition(), towers[0].marker.getPosition())
+    var serving
+    var candidate1
+    var candidate2
+    var servingDist = Number.MAX_SAFE_INTEGER
+    var candidate1Dist = Number.MAX_SAFE_INTEGER
+    var candidate2Dist = Number.MAX_SAFE_INTEGER
+
     for (let i = 0; i < towers.length; i++) {
         var distance = distanceTo(car.marker.getPosition(), towers[i].marker.getPosition())
-        if (distance < closestDistance) {
-            closestDistance = distance
-            closestTower = towers[i]
+        if (distance < servingDist) {
+            candidate2 = candidate1
+            candidate2Dist = candidate1Dist
+            candidate1 = serving
+            candidate1Dist = servingDist
+            serving = towers[i]
+            servingDist = distance
+        } else if (distance < candidate1Dist) {
+            candidate2 = candidate1
+            candidate2Dist = candidate1Dist
+            candidate1 = towers[i]
+            candidate1Dist = distance
+        } else if (distance < candidate1Dist) {
+            candidate2 = towers[i]
+            candidate2Dist = distance
         }
     }
-    return closestTower
+    return {
+        serving: serving,
+        candidate1: candidate1,
+        candidate2: candidate2,
+    }
 }
