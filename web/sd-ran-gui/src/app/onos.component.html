@@ -1,0 +1,8 @@
+<div style="text-align:center">
+  <onos-mast [username]="'onos'"></onos-mast>
+  <onos-nav></onos-nav>
+  <onos-veil #veil></onos-veil>
+  <div>{{ connectivity.setVeilDelegate(veil) }}</div>
+</div>
+
+<router-outlet></router-outlet>
