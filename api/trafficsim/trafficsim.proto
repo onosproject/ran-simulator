@@ -1,0 +1,82 @@
+/*
+Copyright 2020-present Open Networking Foundation.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+syntax = "proto3";
+
+package ran.trafficsim;
+
+import "github.com/OpenNetworkingFoundation/gmap-ran/api/types/types.proto";
+
+message ListTowersRequest {
+}
+
+message ListRoutesRequest {
+    // subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
+    // after all routes have been streamed to the client
+    bool subscribe = 1;
+
+    // option to request only changes that happen after the call
+    bool withoutReplay = 2;
+}
+
+message ListRoutesResponse {
+    // route is the route change on which the event occurred
+    ran.trafficsim.types.Route route = 1;
+
+    // type is a qualification of the type of change being made
+    Type type = 2;
+}
+
+message ListUesRequest {
+    // subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
+    // after all routes have been streamed to the client
+    bool subscribe = 1;
+
+    // option to request only changes that happen after the call
+    bool withoutReplay = 2;
+}
+
+message ListUesResponse {
+    // Ue is the UserEquipment change on which the event occurred
+    ran.trafficsim.types.Ue ue = 1;
+
+    // type is a qualification of the type of change being made
+    Type type = 2;
+}
+
+// Traffic - provides a stream of traffic data to GUI
+service Traffic {
+    rpc ListTowers(ListTowersRequest) returns (stream ran.trafficsim.types.Tower);
+
+    rpc ListRoutes(ListRoutesRequest) returns (stream ListRoutesResponse);
+
+    rpc ListUes(ListUesRequest) returns (stream ListUesResponse);
+}
+
+// Change event type
+enum Type {
+    // NONE indicates this response does not represent a modification of the Change
+    NONE = 0;
+
+    // ADDED is an event which occurs when a Change is added to the topology
+    ADDED = 1;
+
+    // UPDATED is an event which occurs when a Change is updated
+    UPDATED = 2;
+
+    // REMOVED is an event which occurs when a Change is removed from the configuration
+    REMOVED = 3;
+}

@@ -7,7 +7,9 @@ import {
 } from '@angular/core';
 import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {Utils} from '../utils';
-import {Observable, Subscriber} from 'rxjs';
+import {Observable, Subscriber, Subscription} from 'rxjs';
+import {OnosSdranTrafficsimService} from '../proto/onos-sdran-trafficsim.service';
+import {trafficSimUrl} from '../../../environments/environment';
 
 export const LOC = {lat: 52.5200, lng: 13.4050} as google.maps.LatLngLiteral; // Ich bin ein Berliner
 export const NUM_CARS = 10;
@@ -50,9 +52,11 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
     locations: google.maps.LatLng[] = [];
     cars: Car[] = [];
     count = 0;
+    towerSub: Subscription;
 
     constructor(
-        private directionsService: google.maps.DirectionsService
+        private directionsService: google.maps.DirectionsService,
+        private trafficSimService: OnosSdranTrafficsimService
     ) {
     }
 
@@ -133,6 +137,19 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cars.forEach((c: Car) => {
             c.route.setVisible(update);
         });
+
+        if (update) {
+            console.log('Connecting to', trafficSimUrl);
+            this.towerSub = this.trafficSimService.requestListTowers().subscribe((tower) => {
+                console.log('Tower', tower);
+            }, error => {
+                console.error('Tower', error);
+            });
+        } else {
+            if (this.towerSub !== undefined) {
+                this.towerSub.unsubscribe();
+            }
+        }
     }
 
     updateMap(update: boolean) {
