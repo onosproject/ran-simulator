@@ -1,0 +1,18 @@
+linters:
+  enable:
+    - gofmt
+    - gocyclo
+    - golint
+    - misspell
+    - typecheck
+    - errcheck
+    - dogsled
+    - unconvert
+    - nakedret
+    - scopelint
+issues:
+  exclude-use-default: false
+  exclude:
+    - Error return value of `.*Close` is not checked
+    - Error return value of `.*Flush` is not checked
+    - Error return value of `.*Write` is not checked

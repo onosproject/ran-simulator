@@ -4,6 +4,8 @@ import {MapviewComponent} from './mapview/mapview.component';
 import {RouterModule} from '@angular/router';
 import {GoogleMapsModule} from '@angular/google-maps';
 import {FormsModule} from '@angular/forms';
+import {OnosSdranTrafficsimService} from './proto/onos-sdran-trafficsim.service';
+import {trafficSimUrl} from '../../environments/environment';
 
 @NgModule({
     declarations: [MapviewComponent],
@@ -14,7 +16,14 @@ import {FormsModule} from '@angular/forms';
         RouterModule.forChild([{path: '', component: MapviewComponent}]),
     ],
     providers: [
-        google.maps.DirectionsService
+        {
+            provide: google.maps.DirectionsService,
+            useClass: google.maps.DirectionsService
+        },
+        {
+            provide: OnosSdranTrafficsimService,
+            useValue: new OnosSdranTrafficsimService(trafficSimUrl)
+        }
     ]
 })
 export class OnosSdranModule {

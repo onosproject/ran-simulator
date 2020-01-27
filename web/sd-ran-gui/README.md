@@ -9,6 +9,8 @@ This foundation was just copied over from ONOS GUI, and can be discarded when th
 The main application happens inside the `web/sd-ran-gui/src/app/onos-sdran` folder.
 It uses the new [Google Maps Angular Component]
 
+The original JavaScript only application is in the `web/sd-ran-gui/originalJs` directory
+
 To see how to install NodeJS and Angular CLI on your system follow the
 [Development Prerequisites](https://docs.onosproject.org/onos-gui/docs/prerequisites/)
 of the ONOS GUI project.

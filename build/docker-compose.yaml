@@ -1,0 +1,37 @@
+version: "3.2"
+services:
+  trafficsim:
+    image: onosproject/trafficsim:latest
+    hostname: trafficsim
+    volumes:
+      - type: bind
+        source: ./trafficsim/certs
+        target: /etc/ssl/certs
+    ports:
+      - "15150:5150" #Only needed to for attaching for debug
+    command: -certPath=/etc/ssl/certs/trafficsim.crt -keyPath=/etc/ssl/certs/trafficsim.key -caPath=/etc/ssl/certs/onfca.crt
+  envoy-proxy:
+    hostname: envoy-proxy
+    ports:
+      - "18080:8080" #Only needed for 'ng serve' development mode
+      - "19901:9901"
+    image: envoyproxy/envoy-alpine:v1.11.1
+    volumes:
+      - type: bind
+        source: ./envoy-proxy
+        target: /etc/envoy-proxy/
+    command: /usr/local/bin/envoy -c /etc/envoy-proxy/envoy-proxy.yaml
+  sd-ran-gui:
+    image: nginx:stable-alpine
+    hostname: sd-ran-gui
+    volumes:
+      - type: bind
+        source: ./sd-ran-gui
+        target: /etc/nginx/conf.d
+      - type: bind
+        source: ../web/sd-ran-gui/dist/sd-ran-gui
+        target: /usr/share/nginx/html/
+    ports:
+      - "4200:80" #Make sure to add 'onos-gui' to your /etc/hosts at 127.0.0.1 and access with http://onos-gui/index.html
+    labels:
+      description: "ONOS SD RAN GUI"
