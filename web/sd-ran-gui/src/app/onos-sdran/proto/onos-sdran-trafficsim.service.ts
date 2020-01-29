@@ -18,7 +18,11 @@ import {Inject, Injectable} from '@angular/core';
 import {TrafficClient} from './github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsimServiceClientPb';
 import {Observable, Subscriber} from 'rxjs';
 import {Tower} from './github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
-import {ListTowersRequest} from './github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim_pb';
+import {
+    ListRoutesRequest,
+    ListRoutesResponse,
+    ListTowersRequest
+} from './github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim_pb';
 import * as grpcWeb from 'grpc-web';
 
 @Injectable()
@@ -29,12 +33,11 @@ export class OnosSdranTrafficsimService {
     constructor(@Inject('trafficSimUrl') private trafficSimUrl: string) {
         this.trafficClient = new TrafficClient(trafficSimUrl);
 
-        console.log('Config Admin Url ', trafficSimUrl);
+        console.log('TrafficSim grpc-web Url ', trafficSimUrl);
     }
 
     requestListTowers(): Observable<Tower> {
-        console.log('Calling on', this.trafficSimUrl, ' to list towers');
-        const stream = this.trafficClient.listTowers(new ListTowersRequest());
+        const stream = this.trafficClient.listTowers(new ListTowersRequest(), {});
 
         const listTowersObs = new Observable<Tower>((observer: Subscriber<Tower>) => {
             stream.on('data', (tower: Tower) => {
@@ -46,11 +49,32 @@ export class OnosSdranTrafficsimService {
             stream.on('end', () => {
                 observer.complete();
             });
-            stream.on('status', (status: grpcWeb.Status) => {
-                console.log('ListTowersRequest status', status.code, status.details, status.metadata);
-            });
-            return stream.cancel();
+            // stream.on('status', (status: grpcWeb.Status) => {
+            //     console.log('ListTowersRequest status', status.code, status.details, status.metadata);
+            // });
+            return () => stream.cancel();
         });
         return listTowersObs;
+    }
+
+    requestListRoutes(): Observable<ListRoutesResponse> {
+        const routeReq = new ListRoutesRequest();
+        routeReq.setSubscribe(false);
+        const stream = this.trafficClient.listRoutes(routeReq, {});
+
+        const listRoutesObs = new Observable<ListRoutesResponse>((observer: Subscriber<ListRoutesResponse>) => {
+            stream.on('data', (resp: ListRoutesResponse) => {
+                observer.next(resp);
+            });
+            stream.on('error', (error: grpcWeb.Error) => {
+                observer.error(error);
+            });
+            stream.on('end', () => {
+                observer.complete();
+            });
+            return () => stream.cancel();
+        });
+
+        return listRoutesObs;
     }
 }

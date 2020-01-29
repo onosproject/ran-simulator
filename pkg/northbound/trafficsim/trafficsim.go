@@ -45,6 +45,18 @@ type Server struct {
 }
 
 func (s *Server) ListRoutes(req *trafficsim.ListRoutesRequest, stream trafficsim.Traffic_ListRoutesServer) error {
+	for _, route := range manager.GetManager().Routes {
+		resp := &trafficsim.ListRoutesResponse{
+			Route: route,
+			Type:  trafficsim.Type_NONE,
+		}
+
+		err := stream.Send(resp)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

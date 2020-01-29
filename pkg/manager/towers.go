@@ -32,7 +32,7 @@ type TowerIf interface {
 	GetPosition() types.Point
 }
 
-func NewTowers(params TowersParams) (map[string]*types.Tower) {
+func newTowers(params TowersParams) map[string]*types.Tower {
 	topLeft := types.Point{
 		Lat: params.MapCenterLat + params.TowerSpacingVert * float32(params.TowerRows) / 2,
 		Lng: params.MapCenterLng - params.TowerSpacingHoriz * float32(params.TowerCols) / 2,
