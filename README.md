@@ -17,6 +17,17 @@ HTTP 1.1). The services available to it are
 This is an [Angular] appliation and written in [TypeScript] in `web/sd-ran-gui`.
 See the [README.md](web/sd-ran-gui/README.md) in that folder for more info.
 
+## Building the application
+```bash
+make all
+```
+
+Prerequisites:
+```bash
+npm i grpc-web
+npm i google-protobuf
+```
+
 ## Running the application
 To run the App use docker compose
 ```bash

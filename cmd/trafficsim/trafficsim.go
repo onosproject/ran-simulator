@@ -30,7 +30,9 @@ package main
 
 import (
 	"flag"
+
 	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/manager"
+	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/northbound/e2"
 	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/northbound/trafficsim"
 	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/service"
 	log "k8s.io/klog"
@@ -98,6 +100,7 @@ func main() {
 func startServer(caPath string, keyPath string, certPath string) error {
 	s := service.NewServer(service.NewServerConfig(caPath, keyPath, certPath))
 	s.AddService(trafficsim.Service{})
+	s.AddService(e2.Service{})
 
 	return s.Serve(func(started string) {
 		log.Info("Started NBI on ", started)
