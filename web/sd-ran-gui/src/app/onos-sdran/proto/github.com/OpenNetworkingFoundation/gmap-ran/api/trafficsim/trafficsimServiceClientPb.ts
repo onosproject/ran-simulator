@@ -16,7 +16,8 @@ import {
   ListRoutesResponse,
   ListTowersRequest,
   ListUesRequest,
-  ListUesResponse} from './trafficsim_pb';
+  ListUesResponse,
+  MapLayoutRequest} from './trafficsim_pb';
 
 export class TrafficClient {
   client_: grpcWeb.AbstractClientBase;
@@ -35,6 +36,28 @@ export class TrafficClient {
     this.hostname_ = hostname;
     this.credentials_ = credentials;
     this.options_ = options;
+  }
+
+  methodInfoGetMapLayout = new grpcWeb.AbstractClientBase.MethodInfo(
+    github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.MapLayout,
+    (request: MapLayoutRequest) => {
+      return request.serializeBinary();
+    },
+    github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.MapLayout.deserializeBinary
+  );
+
+  getMapLayout(
+    request: MapLayoutRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.MapLayout) => void) {
+    return this.client_.rpcCall(
+      this.hostname_ +
+        '/ran.trafficsim.Traffic/GetMapLayout',
+      request,
+      metadata || {},
+      this.methodInfoGetMapLayout,
+      callback);
   }
 
   methodInfoListTowers = new grpcWeb.AbstractClientBase.MethodInfo(

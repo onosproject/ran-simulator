@@ -20,6 +20,9 @@ package ran.trafficsim;
 
 import "github.com/OpenNetworkingFoundation/gmap-ran/api/types/types.proto";
 
+message MapLayoutRequest {
+}
+
 message ListTowersRequest {
 }
 
@@ -59,6 +62,8 @@ message ListUesResponse {
 
 // Traffic - provides a stream of traffic data to GUI
 service Traffic {
+    rpc GetMapLayout(MapLayoutRequest) returns (ran.trafficsim.types.MapLayout);
+
     rpc ListTowers(ListTowersRequest) returns (stream ran.trafficsim.types.Tower);
 
     rpc ListRoutes(ListRoutesRequest) returns (stream ListRoutesResponse);

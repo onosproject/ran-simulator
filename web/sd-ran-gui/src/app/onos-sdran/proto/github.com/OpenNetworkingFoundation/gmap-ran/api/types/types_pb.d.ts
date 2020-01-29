@@ -31,8 +31,8 @@ export class Route extends jspb.Message {
   clearWaypointsList(): void;
   addWaypoints(value?: Point, index?: number): Point;
 
-  getLengthm(): number;
-  setLengthm(value: number): void;
+  getColor(): string;
+  setColor(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Route.AsObject;
@@ -46,7 +46,7 @@ export namespace Route {
   export type AsObject = {
     name: string,
     waypointsList: Array<Point.AsObject>,
-    lengthm: number,
+    color: string,
   }
 }
 
@@ -56,9 +56,6 @@ export class Ue extends jspb.Message {
 
   getType(): string;
   setType(value: string): void;
-
-  getColor(): string;
-  setColor(value: string): void;
 
   getPosition(): Point | undefined;
   setPosition(value?: Point): void;
@@ -74,6 +71,12 @@ export class Ue extends jspb.Message {
   getTower(): string;
   setTower(value: string): void;
 
+  getTower2(): string;
+  setTower2(value: string): void;
+
+  getTower3(): string;
+  setTower3(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Ue.AsObject;
   static toObject(includeInstance: boolean, msg: Ue): Ue.AsObject;
@@ -86,11 +89,12 @@ export namespace Ue {
   export type AsObject = {
     name: string,
     type: string,
-    color: string,
     position?: Point.AsObject,
     rotation: number,
     route: string,
     tower: string,
+    tower2: string,
+    tower3: string,
   }
 }
 
@@ -102,6 +106,9 @@ export class Tower extends jspb.Message {
   setLocation(value?: Point): void;
   hasLocation(): boolean;
   clearLocation(): void;
+
+  getColor(): string;
+  setColor(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Tower.AsObject;
@@ -115,6 +122,39 @@ export namespace Tower {
   export type AsObject = {
     name: string,
     location?: Point.AsObject,
+    color: string,
+  }
+}
+
+export class MapLayout extends jspb.Message {
+  getCenter(): Point | undefined;
+  setCenter(value?: Point): void;
+  hasCenter(): boolean;
+  clearCenter(): void;
+
+  getZoom(): number;
+  setZoom(value: number): void;
+
+  getFade(): boolean;
+  setFade(value: boolean): void;
+
+  getShowroutes(): boolean;
+  setShowroutes(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): MapLayout.AsObject;
+  static toObject(includeInstance: boolean, msg: MapLayout): MapLayout.AsObject;
+  static serializeBinaryToWriter(message: MapLayout, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): MapLayout;
+  static deserializeBinaryFromReader(message: MapLayout, reader: jspb.BinaryReader): MapLayout;
+}
+
+export namespace MapLayout {
+  export type AsObject = {
+    center?: Point.AsObject,
+    zoom: number,
+    fade: boolean,
+    showroutes: boolean,
   }
 }
 

@@ -29,11 +29,11 @@ type Location struct {
 	Position types.Point
 }
 
-func newLocations(params LocationsParams, towersParams TowersParams) map[string]*Location {
+func newLocations(params LocationsParams, towersParams TowersParams, mapLayout types.MapLayout) map[string]*Location {
 	locations := make(map[string]*Location)
 
 	for l := 0; l < params.NumLocations; l++ {
-		pos := randomLatLng(towersParams.MapCenterLat, towersParams.MapCenterLng)
+		pos := randomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng())
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{
 			Name:     name,
