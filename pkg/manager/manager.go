@@ -31,14 +31,22 @@ func NewManager() (*Manager, error) {
 
 // Manager single point of entry for the trafficsim system.
 type Manager struct {
-	Towers map[string]*types.Tower
+	Towers    map[string]*types.Tower
+	Locations map[string]*Location
+	Routes    map[string]*types.Route
 }
 
 // Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(towerparams TowersParams) {
-	log.Infof("Starting Manager with %v", towerparams)
-	m.Towers = NewTowers(towerparams)
-	// Start the main dispatcher system
+func (m *Manager) Run(towerparams TowersParams, locParams LocationsParams, routesParams RoutesParams) {
+	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
+	m.Towers = newTowers(towerparams)
+	m.Locations = newLocations(locParams, towerparams)
+
+	var err error
+	m.Routes, err = m.newRoutes(routesParams)
+	if err != nil {
+		log.Fatalf("Error calculating routes", err)
+	}
 }
 
 //Close kills the channels and manager related objects

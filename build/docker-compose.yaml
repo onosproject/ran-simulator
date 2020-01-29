@@ -9,7 +9,7 @@ services:
         target: /etc/ssl/certs
     ports:
       - "15150:5150" #Only needed to for attaching for debug
-    command: -certPath=/etc/ssl/certs/trafficsim.crt -keyPath=/etc/ssl/certs/trafficsim.key -caPath=/etc/ssl/certs/onfca.crt
+    command: -googleApiKey YOUR_API_KEY_HERE -certPath=/etc/ssl/certs/trafficsim.crt -keyPath=/etc/ssl/certs/trafficsim.key -caPath=/etc/ssl/certs/onfca.crt
   envoy-proxy:
     hostname: envoy-proxy
     ports:

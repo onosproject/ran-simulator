@@ -1,15 +1,10 @@
-import {
-    AfterViewInit,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewChild, ViewChildren
-} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {Utils} from '../utils';
 import {Observable, Subscriber, Subscription} from 'rxjs';
 import {OnosSdranTrafficsimService} from '../proto/onos-sdran-trafficsim.service';
-import {trafficSimUrl} from '../../../environments/environment';
+import {Point, Route, Tower} from '../proto/github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
+import {Type} from '../proto/github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim_pb';
 
 export const LOC = {lat: 52.5200, lng: 13.4050} as google.maps.LatLngLiteral; // Ich bin ein Berliner
 export const NUM_CARS = 10;
@@ -50,20 +45,49 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
     center = LOC;
     towers: google.maps.Marker[] = [];
     locations: google.maps.LatLng[] = [];
+    routes: Map<string, google.maps.Polyline>;
     cars: Car[] = [];
     count = 0;
     towerSub: Subscription;
+    routesSub: Subscription;
 
     constructor(
         private directionsService: google.maps.DirectionsService,
         private trafficSimService: OnosSdranTrafficsimService
     ) {
+        this.routes = new Map<string, google.maps.Polyline>();
     }
 
     ngOnInit() {
-        this.initTowers(NUM_TOWER_ROWS, NUM_TOWER_COLS, this.zoom);
-        this.initLocations(NUM_LOCS);
-        this.initCars(NUM_CARS);
+        this.towerSub = this.trafficSimService.requestListTowers().subscribe((tower) => {
+            this.initTower(tower, this.zoom);
+        }, error => {
+            console.error('Tower', error);
+        }, () => {
+            console.log(this.towers.length, 'towers retrieved');
+        });
+
+        this.routesSub = this.trafficSimService.requestListRoutes().subscribe((resp) => {
+            if (resp.getType() === Type.NONE || resp.getType() === Type.ADDED) {
+                const path: google.maps.LatLng[] = [];
+                resp.getRoute().getWaypointsList().forEach((point: Point) => {
+                    const latLng = new google.maps.LatLng(point.getLat(), point.getLng());
+                    path.push(latLng);
+                });
+                const polyline = new google.maps.Polyline();
+                polyline.setPath(path);
+                polyline.setMap(this.googleMap._googleMap);
+                this.routes.set(resp.getRoute().getName(), polyline);
+            } else {
+                console.warn('Unhandled Route response type', resp.getType(), 'for', resp.getRoute().getName());
+            }
+        }, error => {
+            console.error('Tower', error);
+        }, () => {
+            console.log(this.routes.size, 'routes retrieved');
+        });
+        // this.initLocations(NUM_LOCS);
+        // this.initCars(NUM_CARS);
     }
 
     ngAfterViewInit(): void {
@@ -131,25 +155,15 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cars.length = 0;
         this.locations.length = 0;
         this.towers.length = 0;
+        if (this.towerSub !== undefined) {
+            this.towerSub.unsubscribe();
+        }
     }
 
     updateRoutes(update: boolean) {
         this.cars.forEach((c: Car) => {
             c.route.setVisible(update);
         });
-
-        if (update) {
-            console.log('Connecting to', trafficSimUrl);
-            this.towerSub = this.trafficSimService.requestListTowers().subscribe((tower) => {
-                console.log('Tower', tower);
-            }, error => {
-                console.error('Tower', error);
-            });
-        } else {
-            if (this.towerSub !== undefined) {
-                this.towerSub.unsubscribe();
-            }
-        }
     }
 
     updateMap(update: boolean) {
@@ -167,38 +181,24 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         this.infoWindow.open(tower);
     }
 
-    private initTowers(rows: number, cols: number, zoom: number): void {
-        const topLeft = {lat: LOC.lat + 0.02 * rows / 2, lng: LOC.lng - 0.03 * cols / 2};
-        let towerNum = 0;
+    private initTower(tower: Tower, zoom: number): void {
+        const color = Utils.getRandomColor();
+        const pos = {lat: tower.getLocation().getLat(), lng: tower.getLocation().getLng()};
+        const marker = new google.maps.Marker();
+        marker.setPosition(pos);
+        marker.setTitle(tower.getName());
+        marker.setOptions({
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: zoom * .25,
+                strokeColor: 'blue',
+                strokeWeight: 1,
+                fillColor: color,
+                fillOpacity: 1,
+            }}
+        );
 
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++, towerNum++) {
-                const color = Utils.getRandomColor();
-                const pos = {lat: topLeft.lat - 0.03 * r, lng: topLeft.lng + 0.05 * c};
-                const marker = new google.maps.Marker();
-                marker.setPosition(pos);
-                marker.setTitle('Tower' + towerNum);
-                marker.setOptions({
-                    icon: {
-                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                        scale: zoom * .25,
-                        strokeColor: 'blue',
-                        strokeWeight: 1,
-                        fillColor: color,
-                        fillOpacity: 1,
-                    }}
-                );
-
-                this.towers.push(marker);
-            }
-        }
-    }
-
-    private initLocations(numLocations: number): void {
-        for (let i = 0; i < numLocations; i++) {
-            const loc = Utils.randomLatLng(LOC);
-            this.locations.push(loc);
-        }
+        this.towers.push(marker);
     }
 
     private initCars(numCars: number): void {

@@ -59,7 +59,7 @@ trafficsim-docker: trafficsim-base-docker # @HELP build trafficsim Docker image
 		-t onosproject/trafficsim:${GMAP_RAN_VERSION}
 
 images: # @HELP build all Docker images
-images: build trafficsim-docker build-gui
+images: trafficsim-docker build-gui
 
 kind: # @HELP build Docker images and add them to the currently configured kind cluster
 kind: images

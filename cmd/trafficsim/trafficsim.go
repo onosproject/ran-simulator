@@ -43,12 +43,15 @@ func main() {
 	caPath := flag.String("caPath", "", "path to CA certificate")
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
+	googleApiKey := flag.String("googleApiKey", "", "your google maps api key")
 	towerRows := flag.Int("towerRows", 3, "Number of rows of towers")
 	towerCols := flag.Int("towerCols", 3, "Number of columns of towers")
 	mapCenterLat := flag.Float64("mapCenterLat", 52.5200, "Map center latitude")
 	mapCenterLng := flag.Float64("mapCenterLng", 13.4050, "Map center longitude") // Berlin
 	towerSpacingVert := flag.Float64("towerSpacingVert", 0.02, "Tower spacing vert in degrees latitude")
 	towerSpacingHoriz := flag.Float64("towerSpacingHoriz", 0.02, "Tower spacing horiz in degrees longitude")
+	numLocations := flag.Int("numLocations", 10, "Number of locations")
+	numRoutes := flag.Int("numRoutes", 3, "Number of routes")
 
 	//lines 93-109 are implemented according to
 	// https://github.com/kubernetes/klog/blob/master/examples/coexist_glog/coexist_glog.go
@@ -82,13 +85,20 @@ func main() {
 		TowerSpacingHoriz: float32(*towerSpacingHoriz),
 	}
 
+	locationParams := manager.LocationsParams{NumLocations: *numLocations}
+
+	routesParams := manager.RoutesParams{
+		NumRoutes: *numRoutes,
+		ApiKey:    *googleApiKey,
+	}
+
 	log.Info("Starting trafficsim")
 
 	mgr, err := manager.NewManager()
 	if err != nil {
 		log.Fatal("Unable to load trafficsim ", err)
 	} else {
-		mgr.Run(towerParams)
+		mgr.Run(towerParams, locationParams, routesParams)
 		err = startServer(*caPath, *keyPath, *certPath)
 		if err != nil {
 			log.Fatal("Unable to start trafficsim ", err)
