@@ -15,9 +15,7 @@
 package e2
 
 import (
-	"context"
-
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/e2"
+	sb "github.com/OpenNetworkingFoundation/gmap-ran/api/e2"
 	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/service"
 	"github.com/onosproject/onos-config/pkg/utils/logging"
 	"google.golang.org/grpc"
@@ -38,15 +36,19 @@ type Service struct {
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
 	server := &Server{}
-	e2.RegisterE2Server(r, server)
+	sb.RegisterE2InterfaceServiceServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
 }
 
-// CellConfigRequest ...
-func (s *Server) CellConfigRequest(ctx context.Context, req *e2.E2CellConfigRequestAttribute) (*e2.E2CellConfigReportAttribute, error) {
-	// Return Cell config report
-	return nil, nil
+// SendTelemetry ...
+func (s *Server) SendTelemetry(req *sb.TelemetryRequest, stream sb.E2InterfaceService_SendTelemetryServer) error {
+	return nil
+}
+
+// SendControl ...
+func (s *Server) SendControl(stream sb.E2InterfaceService_SendControlServer) error {
+	return nil
 }
