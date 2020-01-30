@@ -16,9 +16,8 @@
 package trafficsim
 
 import (
-"xxx"
-	"context"
 	"fmt"
+	"context"
 	"github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim"
 	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
 	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/manager"
