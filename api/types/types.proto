@@ -29,15 +29,13 @@ message Route {
 
     repeated Point waypoints = 2;
 
-    uint64 lengthm = 3;
+    string color = 3;
 }
 
 message Ue {
     string name = 1;
 
     string type = 2;
-
-    string color = 3;
 
     Point position = 4;
 
@@ -46,10 +44,26 @@ message Ue {
     string route = 6;
 
     string tower = 7;
+
+    string tower2 = 8;
+
+    string tower3 = 9;
 }
 
 message Tower {
     string name = 1;
 
     Point location = 2;
+
+    string color = 3;
+}
+
+message MapLayout {
+    ran.trafficsim.types.Point center = 1;
+
+    float zoom = 2;
+
+    bool fade = 3;
+
+    bool showRoutes = 4;
 }

@@ -1,23 +1,20 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewChildren} from '@angular/core';
 import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
-import {Utils} from '../utils';
-import {Observable, Subscriber, Subscription} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {OnosSdranTrafficsimService} from '../proto/onos-sdran-trafficsim.service';
-import {Point, Route, Tower} from '../proto/github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
-import {Type} from '../proto/github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim_pb';
+import {Point, Route, Tower, Ue} from '../proto/github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
+import {ListUesResponse, Type} from '../proto/github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim_pb';
 
-export const LOC = {lat: 52.5200, lng: 13.4050} as google.maps.LatLngLiteral; // Ich bin ein Berliner
-export const NUM_CARS = 10;
-export const NUM_LOCS = 10;
-export const NUM_TOWER_ROWS = 3;
-export const NUM_TOWER_COLS = 3;
-export const NUM_DELTAS = 10;
-export const UPDATE_DELAY = 100;
 export const CAR_ICON = 'M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759 ' +
     'c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z ' +
     'M32.618,10.773c-1.016,3.9-2.219,8.51-2.219,8.51H16.631l-2.222-8.51C14.41,10.773,23.293,7.755,32.618,10.773z M15.741,21.713 ' +
     'v4.492l-2.73-0.349V14.502L15.741,21.713z M13.011,37.938V27.579l2.73,0.343v8.196L13.011,37.938z M14.568,40.882l2.218-3.336 ' +
     'h13.771l2.219,3.336H14.568z M31.321,35.805v-7.872l2.729-0.355v10.048L31.321,35.805';
+export const LINE_SYMBOL = {
+    path: 'M 0,-1 0,1',
+    strokeOpacity: 1,
+    scale: 2
+};
 
 export interface Car {
     num: number;
@@ -36,29 +33,36 @@ export interface Car {
 })
 export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('map', {static: false}) googleMap: GoogleMap;
-    @ViewChild(MapInfoWindow, { static: false }) infoWindow: MapInfoWindow;
-    @ViewChildren('carElem') carElems: MapMarker[];
+    @ViewChild(MapInfoWindow, {static: false}) infoWindow: MapInfoWindow;
     infoContent: string[];
     showRoutes = true;
     showMap = false;
-    zoom = 12;
-    center = LOC;
+    zoom = 12.0;
+    center: google.maps.LatLng;
     towers: google.maps.Marker[] = [];
-    locations: google.maps.LatLng[] = [];
     routes: Map<string, google.maps.Polyline>;
-    cars: Car[] = [];
-    count = 0;
+    carMap: Map<string, google.maps.Marker>;
+    carLineMap: Map<string, google.maps.Polyline>;
     towerSub: Subscription;
     routesSub: Subscription;
+    uesSub: Subscription;
 
     constructor(
-        private directionsService: google.maps.DirectionsService,
         private trafficSimService: OnosSdranTrafficsimService
     ) {
         this.routes = new Map<string, google.maps.Polyline>();
+        this.carMap = new Map<string, google.maps.Marker>();
+        this.carLineMap = new Map<string, google.maps.Polyline>();
     }
 
     ngOnInit() {
+        this.trafficSimService.requestGetMapLayout().subscribe((mapLayout) => {
+            this.center = new google.maps.LatLng(mapLayout.getCenter().getLat(), mapLayout.getCenter().getLng());
+            this.zoom = mapLayout.getZoom();
+            this.showRoutes = mapLayout.getShowroutes();
+            this.showMap = !mapLayout.getFade();
+        });
+
         this.towerSub = this.trafficSimService.requestListTowers().subscribe((tower) => {
             this.initTower(tower, this.zoom);
         }, error => {
@@ -67,27 +71,6 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
             console.log(this.towers.length, 'towers retrieved');
         });
 
-        this.routesSub = this.trafficSimService.requestListRoutes().subscribe((resp) => {
-            if (resp.getType() === Type.NONE || resp.getType() === Type.ADDED) {
-                const path: google.maps.LatLng[] = [];
-                resp.getRoute().getWaypointsList().forEach((point: Point) => {
-                    const latLng = new google.maps.LatLng(point.getLat(), point.getLng());
-                    path.push(latLng);
-                });
-                const polyline = new google.maps.Polyline();
-                polyline.setPath(path);
-                polyline.setMap(this.googleMap._googleMap);
-                this.routes.set(resp.getRoute().getName(), polyline);
-            } else {
-                console.warn('Unhandled Route response type', resp.getType(), 'for', resp.getRoute().getName());
-            }
-        }, error => {
-            console.error('Tower', error);
-        }, () => {
-            console.log(this.routes.size, 'routes retrieved');
-        });
-        // this.initLocations(NUM_LOCS);
-        // this.initCars(NUM_CARS);
     }
 
     ngAfterViewInit(): void {
@@ -99,70 +82,56 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         this.googleMap._googleMap.mapTypes.set('custom', bwMapStyle);
         this.googleMap._googleMap.setMapTypeId('custom');
 
-        // Attach the car's line to the map - this can only be done after the map is loaded
-        this.cars.forEach((c: Car, i: number) => {
-            c.line.setMap(this.googleMap._googleMap);
-            let carMarker: MapMarker;
-            this.carElems.forEach((m) => {
-                if (m.getTitle() === 'Car' + c.num) {
-                    carMarker = m;
-                }
-            });
+        // Get the list of routes - we're doing this here because we need to wait until `googleMap` object is populated
+        this.routesSub = this.trafficSimService.requestListRoutes().subscribe((resp) => {
+            if (resp.getType() === Type.NONE || resp.getType() === Type.ADDED) {
+                this.initRoute(resp.getRoute());
+            } else if (resp.getType() === Type.UPDATED) {
+                this.updateRoute(resp.getRoute());
+            } else if (resp.getType() === Type.REMOVED) {
+                this.routes.delete(resp.getRoute().getName());
+            } else {
+                console.warn('Unhandled Route response type', resp.getType(), 'for', resp.getRoute().getName());
+            }
+        }, error => {
+            console.error('Tower', error);
+        }, () => {
+            console.log(this.routes.size, 'routes retrieved');
+        });
 
-            carMarker._marker.setPosition(this.getStartingLocation(i));
-            carMarker._marker.setOptions({
-                icon: {
-                    path: CAR_ICON,
-                    scale: this.zoom * .025,
-                    fillColor: undefined,
-                    anchor: new google.maps.Point(25, 25),
-                    fillOpacity: 1,
-                    strokeWeight: 1
-                }
-            });
-            this.attachCar(c, carMarker);
-
-            this.retrieveRoute(carMarker.getPosition(), this.getRandomLocation(carMarker.getPosition())).subscribe(
-                (pos: google.maps.LatLng) => {
-                    c.route.getPath().push(pos);
-                },
-                (err) => {
-                    console.error('Could not get a route for car', c.num);
-                    c.route.getPath().clear();
-                    c.route.setMap(null);
-                },
-                () => {
-                    const numSteps = c.route.getPath().getLength();
-                    console.log('Route', c.num, 'has', numSteps, 'steps');
-                    c.route.setMap(this.googleMap._googleMap);
-                    let position = 1;
-                    const timer = setInterval(() => {
-                        this.moveCar(c, carMarker, position);
-                        position++;
-                        if (position === numSteps) {
-                            clearInterval(timer);
-                        }
-                    }, 1000);
-                }
-            );
+        this.uesSub = this.trafficSimService.requestListUes().subscribe((resp: ListUesResponse) => {
+            if (resp.getType() === Type.NONE || resp.getType() === Type.ADDED) {
+                this.initCar(resp.getUe());
+            } else if (resp.getType() === Type.UPDATED) {
+                this.updateCar(resp.getUe());
+            } else if (resp.getType() === Type.REMOVED) {
+                this.carMap.delete(resp.getUe().getName());
+                this.carLineMap.delete(resp.getUe().getName());
+            } else {
+                console.warn('Unhandled Ue response type', resp.getType(), 'for', resp.getUe().getName());
+            }
+        }, error => {
+            console.error('Tower', error);
+        }, () => {
+            console.log(this.routes.size, 'routes retrieved');
         });
     }
 
     ngOnDestroy(): void {
-        this.cars.forEach((c: Car) => {
-            c.line.setMap(null);
-        });
-        this.cars.length = 0;
-        this.locations.length = 0;
-        this.towers.length = 0;
         if (this.towerSub !== undefined) {
             this.towerSub.unsubscribe();
+        }
+        if (this.routesSub !== undefined) {
+            this.routesSub.unsubscribe();
+        }
+        if (this.uesSub !== undefined) {
+            this.uesSub.unsubscribe();
         }
     }
 
     updateRoutes(update: boolean) {
-        this.cars.forEach((c: Car) => {
-            c.route.setVisible(update);
+        this.routes.forEach((r) => {
+            r.setVisible(update);
         });
     }
 
@@ -171,160 +140,112 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         this.googleMap._googleMap.setOptions({disableDefaultUI: !update} as google.maps.MapOptions);
     }
 
-    openCarInfo(marker: MapMarker, car: Car) {
-        this.infoContent = ['Car' + car.num, car.tower.getTitle()];
-        this.infoWindow.open(marker);
-    }
-
     openTowerInfo(tower: MapMarker) {
         this.infoContent = [tower.getTitle(), 'Lat: ' + tower.getPosition().lat(), 'Lng: ' + tower.getPosition().lng()];
         this.infoWindow.open(tower);
     }
 
     private initTower(tower: Tower, zoom: number): void {
-        const color = Utils.getRandomColor();
         const pos = {lat: tower.getLocation().getLat(), lng: tower.getLocation().getLng()};
         const marker = new google.maps.Marker();
         marker.setPosition(pos);
         marker.setTitle(tower.getName());
         marker.setOptions({
-            icon: {
-                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: zoom * .25,
-                strokeColor: 'blue',
-                strokeWeight: 1,
-                fillColor: color,
-                fillOpacity: 1,
-            }}
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    scale: zoom * .25,
+                    strokeColor: 'blue',
+                    strokeWeight: 1,
+                    fillColor: tower.getColor(),
+                    fillOpacity: 1,
+                }
+            }
         );
 
         this.towers.push(marker);
     }
 
-    private initCars(numCars: number): void {
-        for (let i = 0; i < numCars; i++) {
-            const car = {num: i} as Car;
-            car.line = new google.maps.Polyline({
-                strokeWeight: 1
-            });
-            const lineSymbol = {
-                path: 'M 0,-1 0,1',
-                strokeOpacity: 1,
-                scale: 2
-            };
-            car.route = new google.maps.Polyline({
-                visible: this.showRoutes,
-                strokeWeight: 1,
-                strokeOpacity: 0,
-                icons: [{
-                    icon: lineSymbol,
-                    offset: '0',
-                    repeat: '10px'
-                }],
-            });
-
-            this.cars.push(car);
-        }
-    }
-
-    private getStartingLocation(carNum: number): google.maps.LatLng {
-        return this.locations[carNum % this.locations.length];
-    }
-
-    // Get a random location, whose position is other than 'exclude'
-    private getRandomLocation(exclude?: google.maps.LatLng): google.maps.LatLng {
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < this.locations.length; i++) {
-            const idx = Utils.getRandomIntInclusive(0, this.locations.length - 1);
-            if (this.locations[idx].lat() === exclude.lat() && this.locations[idx].lng() === exclude.lng()) {
-                continue;
-            }
-            return this.locations[idx];
-        }
-
-        // If we get to here it means there's only 1 location - take it
-        return this.locations[0];
-    }
-
-    private attachCar(car: Car, carMarker: MapMarker): void {
-        car.tower = this.findClosestTower(carMarker);
-        car.line.setOptions({
-            path: [carMarker.getPosition(), car.tower.getPosition()],
-            strokeColor: (car.tower.getIcon() as google.maps.ReadonlySymbol).fillColor
+    private initRoute(route: Route): void {
+        const path: google.maps.LatLng[] = [];
+        route.getWaypointsList().forEach((point: Point) => {
+            const latLng = new google.maps.LatLng(point.getLat(), point.getLng());
+            path.push(latLng);
+        });
+        const polyline = new google.maps.Polyline({
+            visible: this.showRoutes,
+            strokeWeight: 1,
+            strokeOpacity: 0,
+            strokeColor: route.getColor(),
+            icons: [{
+                icon: LINE_SYMBOL,
+                offset: '0',
+                repeat: '10px',
+            }],
         } as google.maps.PolylineOptions);
-        const towerColor = (car.tower.getIcon() as google.maps.ReadonlySymbol).fillColor;
-        const carIcon = carMarker._marker.getIcon() as google.maps.Symbol;
-        carIcon.fillColor = towerColor;
-        carMarker._marker.setIcon(carIcon);
-        car.route.set('strokeColor', towerColor);
+        polyline.setPath(path);
+        polyline.setMap(this.googleMap._googleMap);
+        this.routes.set(route.getName(), polyline);
     }
 
-    private findClosestTower(carMarker: MapMarker): google.maps.Marker {
-        let closestTower = this.towers[0];
-        let closestDistance = Utils.distanceTo(carMarker.getPosition(), closestTower.getPosition());
-        let closestTowerIdx = 0;
-        this.towers.forEach((t, i) => {
-            const distance = Utils.distanceTo(carMarker.getPosition(), t.getPosition());
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestTower = t;
-                closestTowerIdx = i;
+    private updateRoute(route: Route): void {
+        console.log('Updated route', route.getName());
+        const path: google.maps.LatLng[] = [];
+        route.getWaypointsList().forEach((point: Point) => {
+            const latLng = new google.maps.LatLng(point.getLat(), point.getLng());
+            path.push(latLng);
+        });
+        this.routes.get(route.getName()).setPath(path);
+    }
+
+    private initCar(car: Ue): void {
+        const nearestTower = this.towers.find((t) => t.getTitle() === car.getTower());
+
+        const carMarker = new google.maps.Marker({
+            icon: {
+                path: CAR_ICON,
+                scale: this.zoom * .025,
+                fillColor: (nearestTower.getIcon() as google.maps.ReadonlySymbol).fillColor,
+                anchor: new google.maps.Point(25, 25),
+                fillOpacity: 1,
+                rotation: 0,
+                strokeWeight: 1
             }
         });
-        return closestTower;
+        carMarker.setLabel(car.getName());
+        carMarker.setTitle(car.getName());
+        carMarker.setPosition(
+            new google.maps.LatLng(
+                car.getPosition().getLat(),
+                car.getPosition().getLng()));
+        carMarker.setMap(this.googleMap._googleMap);
+        this.carMap.set(car.getName(), carMarker);
+
+        // Now need a line from the car to the tower
+        const carPolyline = new google.maps.Polyline({
+            strokeColor: (nearestTower.getIcon() as google.maps.ReadonlySymbol).fillColor,
+            strokeWeight: 1
+        } as google.maps.PolylineOptions);
+        carPolyline.setPath([carMarker.getPosition(), nearestTower.getPosition()]);
+        carPolyline.setMap(this.googleMap._googleMap);
+        this.carLineMap.set(car.getName(), carPolyline);
     }
 
-    // Move car in a delta increment along path towards pos(ition)
-    private moveCar(car: Car, carMarker: MapMarker, pos: number, delta?: number): void {
-        const currLat = carMarker.getPosition().lat();
-        const currLng = carMarker.getPosition().lng();
-        const latIncr = (car.route.getPath().getAt(pos).lat() - currLat);
-        const lngIncr = (car.route.getPath().getAt(pos).lng() - currLng);
-        const newLat = currLat + latIncr;
-        const newLng = currLng + lngIncr;
-
-        const radian = Math.atan2(lngIncr, latIncr);
-        carMarker._marker.set('rotation', Utils.radians_to_degrees(radian));
-        carMarker._marker.set('scale', this.zoom * .025);
-        const newPos = new google.maps.LatLng(newLat, newLng);
-        carMarker._marker.setPosition(new google.maps.LatLng(newLat, newLng));
-
-        car.line.setPath([car.tower.getPosition(), newPos]);
-
-        // if (delta !== NUM_DELTAS) {
-        //     setTimeout(this.moveCar, UPDATE_DELAY, car, path, pos, ++delta);
-        // } else {
-        //     this.attachCar(car);
-        //     if (pos === path.length - 1) {
-        //         // Reached destination - Start a new journey
-        //         this.moveCarToRoute(
-        //             car,
-        //             car.marker.getPosition(),
-        //             this.getRandomLocation());
-        //     } else {
-        //         // Move car to next position in path
-        //         this.moveCar(car, path, pos + 1, 0);
-        //     }
-        // }
-    }
-
-    private retrieveRoute(start: google.maps.LatLng, end: google.maps.LatLng): Observable<google.maps.LatLng> {
-        const request = {
-            origin: start,
-            destination: end,
-            travelMode: 'DRIVING'
-        } as google.maps.DirectionsRequest;
-        const routeObs = new Observable<google.maps.LatLng>((observer: Subscriber<google.maps.LatLng>) => {
-            this.directionsService.route(request, (result, status) => {
-                if (status !== 'OK') {
-                    observer.error(new Error('Error getting directions' + status));
-                }
-                result.routes[0].overview_path.forEach((pos: google.maps.LatLng) => {
-                    observer.next(pos);
-                });
-                observer.complete();
-            });
-        });
-        return routeObs;
+    private updateCar(car: Ue): void {
+        const newPos = new google.maps.LatLng(car.getPosition().getLat(), car.getPosition().getLng());
+        if (this.carMap.get(car.getName()) !== undefined) {
+            this.carMap.get(car.getName()).setPosition(newPos);
+            this.carMap.get(car.getName()).get('icon').rotation = car.getRotation();
+            const icon: google.maps.Symbol = this.carMap.get(car.getName()).get('icon');
+            icon.rotation = 90 - car.getRotation();
+            this.carMap.get(car.getName()).setIcon(icon);
+        } else {
+            console.warn('Car', car.getName(), 'not found in "carMap"');
+        }
+        const tower = this.towers.find((t) => t.getTitle() === car.getTower());
+        if (this.carLineMap.get(car.getName()) !== undefined && tower !== undefined) {
+            this.carLineMap.get(car.getName()).setPath([newPos, tower.getPosition()]);
+        } else {
+            console.warn('Car', car.getName(), 'not found in "carLineMap"');
+        }
     }
 }

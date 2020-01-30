@@ -2,6 +2,20 @@ import * as jspb from "google-protobuf"
 
 import * as github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb from '../../../../../github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
 
+export class MapLayoutRequest extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): MapLayoutRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: MapLayoutRequest): MapLayoutRequest.AsObject;
+  static serializeBinaryToWriter(message: MapLayoutRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): MapLayoutRequest;
+  static deserializeBinaryFromReader(message: MapLayoutRequest, reader: jspb.BinaryReader): MapLayoutRequest;
+}
+
+export namespace MapLayoutRequest {
+  export type AsObject = {
+  }
+}
+
 export class ListTowersRequest extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListTowersRequest.AsObject;

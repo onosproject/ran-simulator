@@ -19,9 +19,5 @@
                 [options]="{icon: tower.getIcon()}"
                 (mapClick)="openTowerInfo(towerElem)">
     </map-marker>
-    <map-marker #carElem *ngFor="let car of cars"
-                [title]="'Car' + car.num"
-                (mapClick)="openCarInfo(carElem, car)">
-    </map-marker>
     <map-info-window #infoWindow>{{ infoContent }}</map-info-window>
 </google-map>

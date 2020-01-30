@@ -52,3 +52,23 @@ func roundToDecimal(value float64, decimals int) float32 {
 	intValue := value * math.Pow10(decimals)
 	return float32(math.Round(intValue) / math.Pow10(decimals))
 }
+
+func getRotationDegrees(pointA *types.Point, pointB *types.Point) float64 {
+	deltaX := float64(pointB.GetLng() - pointA.GetLng())
+	deltaY := float64(pointB.GetLat() - pointA.GetLat())
+
+	return math.Atan2(deltaY, deltaX) * 180 / math.Pi
+}
+
+func randomColor() string {
+	const letters = "0123456789ABCDEF";
+	color := make([]uint8, 7)
+	color[0] = '#'
+	for i := range color {
+		if i == 0 {
+			continue
+		}
+		color[i] = letters[rand.Intn(15)]
+	}
+	return string(color)
+}

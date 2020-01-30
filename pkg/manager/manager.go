@@ -17,36 +17,53 @@ package manager
 
 import (
 	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/dispatcher"
 	log "k8s.io/klog"
 )
 
 var mgr Manager
 
+// Manager single point of entry for the trafficsim system.
+type Manager struct {
+	MapLayout      types.MapLayout
+	Towers         map[string]*types.Tower
+	Locations      map[string]*Location
+	Routes         map[string]*types.Route
+	UserEquipments map[string]*types.Ue
+	Dispatcher     *dispatcher.Dispatcher
+	UeChannel      chan dispatcher.Event
+	RouteChannel   chan dispatcher.Event
+}
+
 // NewManager initializes the RAN subsystem.
 func NewManager() (*Manager, error) {
 	log.Info("Creating Manager")
-	mgr = Manager{}
+	mgr = Manager{
+		Dispatcher:   dispatcher.NewDispatcher(),
+		UeChannel:    make(chan dispatcher.Event),
+		RouteChannel: make(chan dispatcher.Event),
+	}
 	return &mgr, nil
 }
 
-// Manager single point of entry for the trafficsim system.
-type Manager struct {
-	Towers    map[string]*types.Tower
-	Locations map[string]*Location
-	Routes    map[string]*types.Route
-}
-
 // Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(towerparams TowersParams, locParams LocationsParams, routesParams RoutesParams) {
+func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams TowersParams, locParams LocationsParams, routesParams RoutesParams) {
 	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
-	m.Towers = newTowers(towerparams)
-	m.Locations = newLocations(locParams, towerparams)
+	m.MapLayout = mapLayoutParams
+	m.Towers = newTowers(towerparams, mapLayoutParams)
+	m.Locations = newLocations(locParams, towerparams, mapLayoutParams)
+
+	go m.Dispatcher.ListenUeEvents(m.UeChannel)
+	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
 
 	var err error
 	m.Routes, err = m.newRoutes(routesParams)
 	if err != nil {
-		log.Fatalf("Error calculating routes", err)
+		log.Fatalf("Error calculating routes %s", err.Error())
 	}
+	m.UserEquipments = m.newUserEquipments(routesParams)
+
+	go m.startMoving(routesParams)
 }
 
 //Close kills the channels and manager related objects

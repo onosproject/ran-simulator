@@ -19,14 +19,16 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
-	"github.com/prometheus/common/log"
 	"googlemaps.github.io/maps"
+	log "k8s.io/klog"
 	"net/http"
+	"time"
 )
 
 type RoutesParams struct {
 	NumRoutes int;
 	ApiKey    string;
+	StepDelay time.Duration
 }
 
 // Create new routes, by taking two random locations and asking Google for
@@ -39,56 +41,67 @@ func (m *Manager) newRoutes(params RoutesParams) (map[string]*types.Route, error
 		if err != nil {
 			return nil, err
 		}
-		endLoc, err := m.getRandomLocation(startLoc.Name)
+		// Colour is dependent on UE tower and is not known at this stage
+		route, err := m.newRoute(startLoc, r, params.ApiKey, "#000000")
 		if err != nil {
 			return nil, err
 		}
 
-		cfg := &tls.Config{
-			InsecureSkipVerify: true,
-		}
-		transport := &http.Transport{
-			TLSClientConfig: cfg,
-		}
-		client := &http.Client{Transport: transport}
-		googleMapsClient, err := maps.NewClient(maps.WithAPIKey(params.ApiKey), maps.WithHTTPClient(client))
-		if err != nil {
-			return nil, err
-		}
-
-		dirReq := &maps.DirectionsRequest{
-			Origin:      fmt.Sprintf("%f,%f", startLoc.Position.Lat, startLoc.Position.Lng),
-			Destination: fmt.Sprintf("%f,%f", endLoc.Position.Lat, endLoc.Position.Lng),
-		}
-
-		googleRoute, _, err := googleMapsClient.Directions(context.Background(), dirReq)
-		if err != nil {
-			return nil, err
-		}
-		points := make([]*types.Point, 0)
-		for _, groute := range googleRoute {
-			log.Infof("Google route %s", groute.Summary)
-			latLngs, err := groute.OverviewPolyline.Decode()
-			if err != nil {
-				return nil, err
-			}
-			for _, ll := range latLngs {
-				point := types.Point{
-					Lat: float32(ll.Lat),
-					Lng: float32(ll.Lng),
-				}
-				points = append(points, &point)
-			}
-		}
-
-		name := fmt.Sprintf("Route-%d", r)
-		route := types.Route{
-			Name:      name,
-			Waypoints: points,
-			Lengthm:   0,
-		}
-		routes[name] = &route
+		routes[route.Name] = route
 	}
 
 	return routes, nil
+}
+
+func (m *Manager) newRoute(startLoc *Location, r int, apiKey string, color string) (*types.Route, error) {
+	endLoc, err := m.getRandomLocation(startLoc.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := &tls.Config{
+		InsecureSkipVerify: true,
+	}
+	transport := &http.Transport{
+		TLSClientConfig: cfg,
+	}
+	client := &http.Client{Transport: transport}
+	googleMapsClient, err := maps.NewClient(maps.WithAPIKey(apiKey), maps.WithHTTPClient(client))
+	if err != nil {
+		return nil, err
+	}
+
+	dirReq := &maps.DirectionsRequest{
+		Origin:      fmt.Sprintf("%f,%f", startLoc.Position.Lat, startLoc.Position.Lng),
+		Destination: fmt.Sprintf("%f,%f", endLoc.Position.Lat, endLoc.Position.Lng),
+	}
+
+	googleRoute, _, err := googleMapsClient.Directions(context.Background(), dirReq)
+	if err != nil {
+		return nil, err
+	}
+	points := make([]*types.Point, 0)
+	for _, groute := range googleRoute {
+		latLngs, err := groute.OverviewPolyline.Decode()
+		if err != nil {
+			return nil, err
+		}
+		log.Infof("Route-%d is Google route %s #Points %d", r, groute.Summary, len(latLngs))
+		for _, ll := range latLngs {
+			point := types.Point{
+				Lat: float32(ll.Lat),
+				Lng: float32(ll.Lng),
+			}
+			points = append(points, &point)
+		}
+	}
+
+	name := fmt.Sprintf("Route-%d", r)
+	route := types.Route{
+		Name:      name,
+		Waypoints: points,
+		Color:     color,
+	}
+
+	return &route, nil
 }

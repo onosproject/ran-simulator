@@ -5,3 +5,4 @@ vendor
 coverage.txt
 *.coverprofile
 .idea
+api/e2/e2-interface.proto

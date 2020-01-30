@@ -17,11 +17,10 @@
 import {Inject, Injectable} from '@angular/core';
 import {TrafficClient} from './github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsimServiceClientPb';
 import {Observable, Subscriber} from 'rxjs';
-import {Tower} from './github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
+import {MapLayout, Tower} from './github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
 import {
-    ListRoutesRequest,
-    ListRoutesResponse,
-    ListTowersRequest
+    ListRoutesRequest, ListRoutesResponse,
+    ListTowersRequest, ListUesResponse, MapLayoutRequest
 } from './github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim_pb';
 import * as grpcWeb from 'grpc-web';
 
@@ -34,6 +33,25 @@ export class OnosSdranTrafficsimService {
         this.trafficClient = new TrafficClient(trafficSimUrl);
 
         console.log('TrafficSim grpc-web Url ', trafficSimUrl);
+    }
+
+    requestGetMapLayout(): Observable<MapLayout> {
+        const getMapLayoutObs = new Observable<MapLayout>( (observer: Subscriber<MapLayout>) => {
+            const call = this.trafficClient.getMapLayout(new MapLayoutRequest(), {}, ((err, response) => {
+                if (err) {
+                    observer.error(err);
+                } else {
+                    observer.next(response);
+                }
+                call.on('error', (error: grpcWeb.Error) => {
+                    observer.error(error);
+                });
+                call.on('end', () => {
+                    observer.complete();
+                });
+            }));
+        });
+        return getMapLayoutObs;
     }
 
     requestListTowers(): Observable<Tower> {
@@ -59,7 +77,8 @@ export class OnosSdranTrafficsimService {
 
     requestListRoutes(): Observable<ListRoutesResponse> {
         const routeReq = new ListRoutesRequest();
-        routeReq.setSubscribe(false);
+        routeReq.setSubscribe(true);
+        routeReq.setWithoutreplay(false);
         const stream = this.trafficClient.listRoutes(routeReq, {});
 
         const listRoutesObs = new Observable<ListRoutesResponse>((observer: Subscriber<ListRoutesResponse>) => {
@@ -76,5 +95,27 @@ export class OnosSdranTrafficsimService {
         });
 
         return listRoutesObs;
+    }
+
+    requestListUes(): Observable<ListUesResponse> {
+        const routeReq = new ListRoutesRequest();
+        routeReq.setSubscribe(true);
+        routeReq.setWithoutreplay(false);
+        const stream = this.trafficClient.listUes(routeReq, {});
+
+        const listUesObs = new Observable<ListUesResponse>((observer: Subscriber<ListUesResponse>) => {
+            stream.on('data', (resp: ListUesResponse) => {
+                observer.next(resp);
+            });
+            stream.on('error', (error: grpcWeb.Error) => {
+                observer.error(error);
+            });
+            stream.on('end', () => {
+                observer.complete();
+            });
+            return () => stream.cancel();
+        });
+
+        return listUesObs;
     }
 }
