@@ -30,13 +30,13 @@ package main
 
 import (
 	"flag"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	"github.com/onosproject/ran-simulator/api/types"
 	"time"
 
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/manager"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/northbound/e2"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/northbound/trafficsim"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/service"
+	"github.com/onosproject/ran-simulator/pkg/manager"
+	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
+	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
+	"github.com/onosproject/ran-simulator/pkg/service"
 	log "k8s.io/klog"
 )
 
@@ -45,7 +45,7 @@ func main() {
 	caPath := flag.String("caPath", "", "path to CA certificate")
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
-	googleApiKey := flag.String("googleApiKey", "", "your google maps api key")
+	googleAPIKey := flag.String("googleAPIKey", "", "your google maps api key")
 	towerRows := flag.Int("towerRows", 3, "Number of rows of towers")
 	towerCols := flag.Int("towerCols", 3, "Number of columns of towers")
 	mapCenterLat := flag.Float64("mapCenterLat", 52.5200, "Map center latitude")
@@ -87,9 +87,9 @@ func main() {
 			Lat: float32(*mapCenterLat),
 			Lng: float32(*mapCenterLng),
 		},
-		Zoom:         float32(*zoom),
-		ShowRoutes:   *showRoutes,
-		Fade:         *fade,
+		Zoom:       float32(*zoom),
+		ShowRoutes: *showRoutes,
+		Fade:       *fade,
 	}
 
 	towerParams := manager.TowersParams{
@@ -104,7 +104,7 @@ func main() {
 
 	routesParams := manager.RoutesParams{
 		NumRoutes: *numRoutes,
-		ApiKey:    *googleApiKey,
+		APIKey:    *googleAPIKey,
 		StepDelay: time.Duration(*stepDelayMs) * time.Millisecond,
 	}
 

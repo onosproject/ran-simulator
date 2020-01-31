@@ -6,7 +6,7 @@ package trafficsim
 import (
 	context "context"
 	fmt "fmt"
-	types "github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	types "github.com/onosproject/ran-simulator/api/types"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"

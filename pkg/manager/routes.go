@@ -18,16 +18,17 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	"github.com/onosproject/ran-simulator/api/types"
 	"googlemaps.github.io/maps"
 	log "k8s.io/klog"
 	"net/http"
 	"time"
 )
 
+// RoutesParams :
 type RoutesParams struct {
-	NumRoutes int;
-	ApiKey    string;
+	NumRoutes int
+	APIKey    string
 	StepDelay time.Duration
 }
 
@@ -42,7 +43,7 @@ func (m *Manager) newRoutes(params RoutesParams) (map[string]*types.Route, error
 			return nil, err
 		}
 		// Colour is dependent on UE tower and is not known at this stage
-		route, err := m.newRoute(startLoc, r, params.ApiKey, "#000000")
+		route, err := m.newRoute(startLoc, r, params.APIKey, "#000000")
 		if err != nil {
 			return nil, err
 		}

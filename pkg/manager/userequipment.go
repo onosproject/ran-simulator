@@ -16,9 +16,9 @@ package manager
 
 import (
 	"fmt"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/dispatcher"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
+	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	log "k8s.io/klog"
 	"strings"
 	"time"
@@ -71,7 +71,7 @@ func (m *Manager) startMoving(params RoutesParams) {
 				newRoute, err := m.newRoute(&Location{
 					Name:     "noname",
 					Position: *oldRouteFinish,
-				}, ueidx, params.ApiKey, m.getColorForUe(ueName))
+				}, ueidx, params.APIKey, m.getColorForUe(ueName))
 				if err != nil {
 					log.Fatalf("Error %s", err.Error())
 					breakout = true
@@ -88,7 +88,7 @@ func (m *Manager) startMoving(params RoutesParams) {
 		}
 		time.Sleep(params.StepDelay)
 		if breakout {
-			break;
+			break
 		}
 	}
 	log.Warningf("Stopped driving")
@@ -111,7 +111,7 @@ func (m *Manager) getColorForUe(ueName string) string {
 func moveUe(ue *types.Ue, route *types.Route, ueUpdateChan chan dispatcher.Event) error {
 	for idx, wp := range route.GetWaypoints() {
 		if ue.Position.GetLng() == wp.GetLng() && ue.Position.GetLat() == wp.GetLat() {
-			if idx + 1 == len(route.GetWaypoints()) {
+			if idx+1 == len(route.GetWaypoints()) {
 				return fmt.Errorf("end of route %s %d", route.GetName(), idx)
 			}
 			ue.Position = route.Waypoints[idx+1]

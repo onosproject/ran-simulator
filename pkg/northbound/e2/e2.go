@@ -15,13 +15,10 @@
 package e2
 
 import (
-	sb "github.com/OpenNetworkingFoundation/gmap-ran/api/e2"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/service"
-	"github.com/onosproject/onos-config/pkg/utils/logging"
+	sb "github.com/onosproject/ran-simulator/api/e2"
+	"github.com/onosproject/ran-simulator/pkg/service"
 	"google.golang.org/grpc"
 )
-
-var log = logging.GetLogger("northbound", "e2")
 
 // NewService returns a new trafficsim Service
 func NewService() (service.Service, error) {

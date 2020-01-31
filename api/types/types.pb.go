@@ -19,7 +19,7 @@ var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
+// A compilation error at this line likely means your cop	y of the
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 

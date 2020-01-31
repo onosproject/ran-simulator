@@ -16,16 +16,18 @@ package manager
 
 import (
 	"fmt"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	"github.com/onosproject/ran-simulator/api/types"
 	"math/rand"
 )
 
+// LocationsParams :
 type LocationsParams struct {
-	NumLocations int;
+	NumLocations int
 }
 
+// Location :
 type Location struct {
-	Name string
+	Name     string
 	Position types.Point
 }
 
