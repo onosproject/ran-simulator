@@ -15,13 +15,13 @@
  */
 
 import {Inject, Injectable} from '@angular/core';
-import {TrafficClient} from './github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsimServiceClientPb';
+import {TrafficClient} from './github.com/onosproject/ran-simulator/api/trafficsim/trafficsimServiceClientPb';
 import {Observable, Subscriber} from 'rxjs';
-import {MapLayout, Tower} from './github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
+import {MapLayout, Tower} from './github.com/onosproject/ran-simulator/api/types/types_pb';
 import {
     ListRoutesRequest, ListRoutesResponse,
     ListTowersRequest, ListUesResponse, MapLayoutRequest
-} from './github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim_pb';
+} from './github.com/onosproject/ran-simulator/api/trafficsim/trafficsim_pb';
 import * as grpcWeb from 'grpc-web';
 
 @Injectable()

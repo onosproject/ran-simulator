@@ -27,794 +27,794 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Definition of all message types in E2 interface
-type E2MessageType int32
+type MessageType int32
 
 const (
-	E2MessageType_E2_UNKNOWNMESSAGE          E2MessageType = 0
-	E2MessageType_E2_CELLCONFIGREQUEST       E2MessageType = 1
-	E2MessageType_E2_CELLCONFIGREPORT        E2MessageType = 2
-	E2MessageType_E2_UEADMISSIONREQUEST      E2MessageType = 3
-	E2MessageType_E2_UEADMISSIONRESPONSE     E2MessageType = 4
-	E2MessageType_E2_UEADMISSIONSTATUS       E2MessageType = 5
-	E2MessageType_E2_UECONTEXTUPDATE         E2MessageType = 6
-	E2MessageType_E2_UERECONFIGIND           E2MessageType = 7
-	E2MessageType_E2_UERELEASEIND            E2MessageType = 8
-	E2MessageType_E2_BEARERADMISSIONREQUEST  E2MessageType = 9
-	E2MessageType_E2_BEARERADMISSIONRESPONSE E2MessageType = 10
-	E2MessageType_E2_BEARERADMISSIONSTATUS   E2MessageType = 11
-	E2MessageType_E2_BEARERRELEASEIND        E2MessageType = 12
-	E2MessageType_E2_HOREQUEST               E2MessageType = 13
-	E2MessageType_E2_HOFAILURE               E2MessageType = 14
-	E2MessageType_E2_HOCOMPLETE              E2MessageType = 15
-	E2MessageType_E2_RXSIGMEASREPORT         E2MessageType = 16
-	E2MessageType_E2_L2MEASCONFIG            E2MessageType = 17
-	E2MessageType_E2_RADIOMEASREPORTPERUE    E2MessageType = 18
-	E2MessageType_E2_RADIOMEASREPORTPERCELL  E2MessageType = 19
-	E2MessageType_E2_SCHEDMEASREPORTPERUE    E2MessageType = 20
-	E2MessageType_E2_SCHEDMEASREPORTPERCELL  E2MessageType = 21
-	E2MessageType_E2_PDCPMEASREPORTPERUE     E2MessageType = 22
-	E2MessageType_E2_UECAPABILITYINFO        E2MessageType = 23
-	E2MessageType_E2_UECAPABILITYENQUIRY     E2MessageType = 24
-	E2MessageType_E2_SCELLADD                E2MessageType = 25
-	E2MessageType_E2_SCELLADDSTATUS          E2MessageType = 26
-	E2MessageType_E2_SCELLDELETE             E2MessageType = 27
-	E2MessageType_E2_RRMCONFIG               E2MessageType = 28
-	E2MessageType_E2_RRMCONFIGSTATUS         E2MessageType = 29
-	E2MessageType_E2_SENBADD                 E2MessageType = 30
-	E2MessageType_E2_SENBADDSTATUS           E2MessageType = 31
-	E2MessageType_E2_SENBDELETE              E2MessageType = 32
-	E2MessageType_E2_TRAFFICSPLITCONFIG      E2MessageType = 33
-	E2MessageType_E2_HOCAUSE                 E2MessageType = 34
-	E2MessageType_E2_RRCMEASCONFIG           E2MessageType = 35
+	MessageType_UNKNOWN_MESSAGE            MessageType = 0
+	MessageType_CELL_CONFIG_REQUEST        MessageType = 1
+	MessageType_CELL_CONFIG_REPORT         MessageType = 2
+	MessageType_UE_ADMISSION_REQUEST       MessageType = 3
+	MessageType_UE_ADMISSION_RESPONSE      MessageType = 4
+	MessageType_UE_ADMISSION_STATUS        MessageType = 5
+	MessageType_UE_CONTEXT_UPDATE          MessageType = 6
+	MessageType_UE_RECONFIG_IND            MessageType = 7
+	MessageType_UE_RELEASE_IND             MessageType = 8
+	MessageType_BEARER_ADMISSION_REQUEST   MessageType = 9
+	MessageType_BEARER_ADMISSION_RESPONSE  MessageType = 10
+	MessageType_BEARER_ADMISSION_STATUS    MessageType = 11
+	MessageType_BEARER_RELEASE_IND         MessageType = 12
+	MessageType_HO_REQUEST                 MessageType = 13
+	MessageType_HO_FAILURE                 MessageType = 14
+	MessageType_HO_COMPLETE                MessageType = 15
+	MessageType_RXSIG_MEAS_REPORT          MessageType = 16
+	MessageType_L2_MEAS_CONFIG             MessageType = 17
+	MessageType_RADIO_MEAS_REPORT_PER_UE   MessageType = 18
+	MessageType_RADIO_MEAS_REPORT_PER_CELL MessageType = 19
+	MessageType_SCHED_MEAS_REPORT_PER_UE   MessageType = 20
+	MessageType_SCHED_MEAS_REPORT_PER_CELL MessageType = 21
+	MessageType_PDCP_MEAS_REPORT_PER_UE    MessageType = 22
+	MessageType_UE_CAPABILITY_INFO         MessageType = 23
+	MessageType_UE_CAPABILITY_ENQUIRY      MessageType = 24
+	MessageType_SCELL_ADD                  MessageType = 25
+	MessageType_SCELL_ADD_STATUS           MessageType = 26
+	MessageType_SCELL_DELETE               MessageType = 27
+	MessageType_RRM_CONFIG                 MessageType = 28
+	MessageType_RRM_CONFIG_STATUS          MessageType = 29
+	MessageType_SENB_ADD                   MessageType = 30
+	MessageType_SENB_ADD_STATUS            MessageType = 31
+	MessageType_SENB_DELETE                MessageType = 32
+	MessageType_TRAFFIC_SPLIT_CONFIG       MessageType = 33
+	MessageType_HO_CAUSE                   MessageType = 34
+	MessageType_RRC_MEAS_CONFIG            MessageType = 35
 )
 
-var E2MessageType_name = map[int32]string{
-	0:  "E2_UNKNOWNMESSAGE",
-	1:  "E2_CELLCONFIGREQUEST",
-	2:  "E2_CELLCONFIGREPORT",
-	3:  "E2_UEADMISSIONREQUEST",
-	4:  "E2_UEADMISSIONRESPONSE",
-	5:  "E2_UEADMISSIONSTATUS",
-	6:  "E2_UECONTEXTUPDATE",
-	7:  "E2_UERECONFIGIND",
-	8:  "E2_UERELEASEIND",
-	9:  "E2_BEARERADMISSIONREQUEST",
-	10: "E2_BEARERADMISSIONRESPONSE",
-	11: "E2_BEARERADMISSIONSTATUS",
-	12: "E2_BEARERRELEASEIND",
-	13: "E2_HOREQUEST",
-	14: "E2_HOFAILURE",
-	15: "E2_HOCOMPLETE",
-	16: "E2_RXSIGMEASREPORT",
-	17: "E2_L2MEASCONFIG",
-	18: "E2_RADIOMEASREPORTPERUE",
-	19: "E2_RADIOMEASREPORTPERCELL",
-	20: "E2_SCHEDMEASREPORTPERUE",
-	21: "E2_SCHEDMEASREPORTPERCELL",
-	22: "E2_PDCPMEASREPORTPERUE",
-	23: "E2_UECAPABILITYINFO",
-	24: "E2_UECAPABILITYENQUIRY",
-	25: "E2_SCELLADD",
-	26: "E2_SCELLADDSTATUS",
-	27: "E2_SCELLDELETE",
-	28: "E2_RRMCONFIG",
-	29: "E2_RRMCONFIGSTATUS",
-	30: "E2_SENBADD",
-	31: "E2_SENBADDSTATUS",
-	32: "E2_SENBDELETE",
-	33: "E2_TRAFFICSPLITCONFIG",
-	34: "E2_HOCAUSE",
-	35: "E2_RRCMEASCONFIG",
+var MessageType_name = map[int32]string{
+	0:  "UNKNOWN_MESSAGE",
+	1:  "CELL_CONFIG_REQUEST",
+	2:  "CELL_CONFIG_REPORT",
+	3:  "UE_ADMISSION_REQUEST",
+	4:  "UE_ADMISSION_RESPONSE",
+	5:  "UE_ADMISSION_STATUS",
+	6:  "UE_CONTEXT_UPDATE",
+	7:  "UE_RECONFIG_IND",
+	8:  "UE_RELEASE_IND",
+	9:  "BEARER_ADMISSION_REQUEST",
+	10: "BEARER_ADMISSION_RESPONSE",
+	11: "BEARER_ADMISSION_STATUS",
+	12: "BEARER_RELEASE_IND",
+	13: "HO_REQUEST",
+	14: "HO_FAILURE",
+	15: "HO_COMPLETE",
+	16: "RXSIG_MEAS_REPORT",
+	17: "L2_MEAS_CONFIG",
+	18: "RADIO_MEAS_REPORT_PER_UE",
+	19: "RADIO_MEAS_REPORT_PER_CELL",
+	20: "SCHED_MEAS_REPORT_PER_UE",
+	21: "SCHED_MEAS_REPORT_PER_CELL",
+	22: "PDCP_MEAS_REPORT_PER_UE",
+	23: "UE_CAPABILITY_INFO",
+	24: "UE_CAPABILITY_ENQUIRY",
+	25: "SCELL_ADD",
+	26: "SCELL_ADD_STATUS",
+	27: "SCELL_DELETE",
+	28: "RRM_CONFIG",
+	29: "RRM_CONFIG_STATUS",
+	30: "SENB_ADD",
+	31: "SENB_ADD_STATUS",
+	32: "SENB_DELETE",
+	33: "TRAFFIC_SPLIT_CONFIG",
+	34: "HO_CAUSE",
+	35: "RRC_MEAS_CONFIG",
 }
 
-var E2MessageType_value = map[string]int32{
-	"E2_UNKNOWNMESSAGE":          0,
-	"E2_CELLCONFIGREQUEST":       1,
-	"E2_CELLCONFIGREPORT":        2,
-	"E2_UEADMISSIONREQUEST":      3,
-	"E2_UEADMISSIONRESPONSE":     4,
-	"E2_UEADMISSIONSTATUS":       5,
-	"E2_UECONTEXTUPDATE":         6,
-	"E2_UERECONFIGIND":           7,
-	"E2_UERELEASEIND":            8,
-	"E2_BEARERADMISSIONREQUEST":  9,
-	"E2_BEARERADMISSIONRESPONSE": 10,
-	"E2_BEARERADMISSIONSTATUS":   11,
-	"E2_BEARERRELEASEIND":        12,
-	"E2_HOREQUEST":               13,
-	"E2_HOFAILURE":               14,
-	"E2_HOCOMPLETE":              15,
-	"E2_RXSIGMEASREPORT":         16,
-	"E2_L2MEASCONFIG":            17,
-	"E2_RADIOMEASREPORTPERUE":    18,
-	"E2_RADIOMEASREPORTPERCELL":  19,
-	"E2_SCHEDMEASREPORTPERUE":    20,
-	"E2_SCHEDMEASREPORTPERCELL":  21,
-	"E2_PDCPMEASREPORTPERUE":     22,
-	"E2_UECAPABILITYINFO":        23,
-	"E2_UECAPABILITYENQUIRY":     24,
-	"E2_SCELLADD":                25,
-	"E2_SCELLADDSTATUS":          26,
-	"E2_SCELLDELETE":             27,
-	"E2_RRMCONFIG":               28,
-	"E2_RRMCONFIGSTATUS":         29,
-	"E2_SENBADD":                 30,
-	"E2_SENBADDSTATUS":           31,
-	"E2_SENBDELETE":              32,
-	"E2_TRAFFICSPLITCONFIG":      33,
-	"E2_HOCAUSE":                 34,
-	"E2_RRCMEASCONFIG":           35,
+var MessageType_value = map[string]int32{
+	"UNKNOWN_MESSAGE":            0,
+	"CELL_CONFIG_REQUEST":        1,
+	"CELL_CONFIG_REPORT":         2,
+	"UE_ADMISSION_REQUEST":       3,
+	"UE_ADMISSION_RESPONSE":      4,
+	"UE_ADMISSION_STATUS":        5,
+	"UE_CONTEXT_UPDATE":          6,
+	"UE_RECONFIG_IND":            7,
+	"UE_RELEASE_IND":             8,
+	"BEARER_ADMISSION_REQUEST":   9,
+	"BEARER_ADMISSION_RESPONSE":  10,
+	"BEARER_ADMISSION_STATUS":    11,
+	"BEARER_RELEASE_IND":         12,
+	"HO_REQUEST":                 13,
+	"HO_FAILURE":                 14,
+	"HO_COMPLETE":                15,
+	"RXSIG_MEAS_REPORT":          16,
+	"L2_MEAS_CONFIG":             17,
+	"RADIO_MEAS_REPORT_PER_UE":   18,
+	"RADIO_MEAS_REPORT_PER_CELL": 19,
+	"SCHED_MEAS_REPORT_PER_UE":   20,
+	"SCHED_MEAS_REPORT_PER_CELL": 21,
+	"PDCP_MEAS_REPORT_PER_UE":    22,
+	"UE_CAPABILITY_INFO":         23,
+	"UE_CAPABILITY_ENQUIRY":      24,
+	"SCELL_ADD":                  25,
+	"SCELL_ADD_STATUS":           26,
+	"SCELL_DELETE":               27,
+	"RRM_CONFIG":                 28,
+	"RRM_CONFIG_STATUS":          29,
+	"SENB_ADD":                   30,
+	"SENB_ADD_STATUS":            31,
+	"SENB_DELETE":                32,
+	"TRAFFIC_SPLIT_CONFIG":       33,
+	"HO_CAUSE":                   34,
+	"RRC_MEAS_CONFIG":            35,
 }
 
-func (x E2MessageType) String() string {
-	return proto.EnumName(E2MessageType_name, int32(x))
+func (x MessageType) String() string {
+	return proto.EnumName(MessageType_name, int32(x))
 }
 
-func (E2MessageType) EnumDescriptor() ([]byte, []int) {
+func (MessageType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{0}
 }
 
-type E2AdmEstCause int32
+type AdmEstCause int32
 
 const (
-	E2AdmEstCause_E2_EMERGENCY     E2AdmEstCause = 0
-	E2AdmEstCause_E2_HIGHHP_ACCESS E2AdmEstCause = 1
-	E2AdmEstCause_E2_MT_ACCESS     E2AdmEstCause = 2
-	E2AdmEstCause_E2_MO_SIGNALLING E2AdmEstCause = 3
-	E2AdmEstCause_E2_MO_DATA       E2AdmEstCause = 4
+	AdmEstCause_EMERGENCY     AdmEstCause = 0
+	AdmEstCause_HIGHHP_ACCESS AdmEstCause = 1
+	AdmEstCause_MT_ACCESS     AdmEstCause = 2
+	AdmEstCause_MO_SIGNALLING AdmEstCause = 3
+	AdmEstCause_MO_DATA       AdmEstCause = 4
 )
 
-var E2AdmEstCause_name = map[int32]string{
-	0: "E2_EMERGENCY",
-	1: "E2_HIGHHP_ACCESS",
-	2: "E2_MT_ACCESS",
-	3: "E2_MO_SIGNALLING",
-	4: "E2_MO_DATA",
+var AdmEstCause_name = map[int32]string{
+	0: "EMERGENCY",
+	1: "HIGHHP_ACCESS",
+	2: "MT_ACCESS",
+	3: "MO_SIGNALLING",
+	4: "MO_DATA",
 }
 
-var E2AdmEstCause_value = map[string]int32{
-	"E2_EMERGENCY":     0,
-	"E2_HIGHHP_ACCESS": 1,
-	"E2_MT_ACCESS":     2,
-	"E2_MO_SIGNALLING": 3,
-	"E2_MO_DATA":       4,
+var AdmEstCause_value = map[string]int32{
+	"EMERGENCY":     0,
+	"HIGHHP_ACCESS": 1,
+	"MT_ACCESS":     2,
+	"MO_SIGNALLING": 3,
+	"MO_DATA":       4,
 }
 
-func (x E2AdmEstCause) String() string {
-	return proto.EnumName(E2AdmEstCause_name, int32(x))
+func (x AdmEstCause) String() string {
+	return proto.EnumName(AdmEstCause_name, int32(x))
 }
 
-func (E2AdmEstCause) EnumDescriptor() ([]byte, []int) {
+func (AdmEstCause) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{1}
 }
 
-type E2SuccessOrFailure int32
+type SuccessOrFailure int32
 
 const (
-	E2SuccessOrFailure_E2_SUCCESS E2SuccessOrFailure = 0
-	E2SuccessOrFailure_E2_FAILURE E2SuccessOrFailure = 1
+	SuccessOrFailure_SUCCESS SuccessOrFailure = 0
+	SuccessOrFailure_FAILURE SuccessOrFailure = 1
 )
 
-var E2SuccessOrFailure_name = map[int32]string{
-	0: "E2_SUCCESS",
-	1: "E2_FAILURE",
+var SuccessOrFailure_name = map[int32]string{
+	0: "SUCCESS",
+	1: "FAILURE",
 }
 
-var E2SuccessOrFailure_value = map[string]int32{
-	"E2_SUCCESS": 0,
-	"E2_FAILURE": 1,
+var SuccessOrFailure_value = map[string]int32{
+	"SUCCESS": 0,
+	"FAILURE": 1,
 }
 
-func (x E2SuccessOrFailure) String() string {
-	return proto.EnumName(E2SuccessOrFailure_name, int32(x))
+func (x SuccessOrFailure) String() string {
+	return proto.EnumName(SuccessOrFailure_name, int32(x))
 }
 
-func (E2SuccessOrFailure) EnumDescriptor() ([]byte, []int) {
+func (SuccessOrFailure) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{2}
 }
 
-type E2ReconfigCause int32
+type ReconfigCause int32
 
 const (
-	E2ReconfigCause_E2_RECONFIG_RLF     E2ReconfigCause = 0
-	E2ReconfigCause_E2_RECONFIG_HO_FAIL E2ReconfigCause = 1
-	E2ReconfigCause_E2_RECONFIG_OTHERS  E2ReconfigCause = 2
+	ReconfigCause_RECONFIG_RLF     ReconfigCause = 0
+	ReconfigCause_RECONFIG_HO_FAIL ReconfigCause = 1
+	ReconfigCause_RECONFIG_OTHERS  ReconfigCause = 2
 )
 
-var E2ReconfigCause_name = map[int32]string{
-	0: "E2_RECONFIG_RLF",
-	1: "E2_RECONFIG_HO_FAIL",
-	2: "E2_RECONFIG_OTHERS",
+var ReconfigCause_name = map[int32]string{
+	0: "RECONFIG_RLF",
+	1: "RECONFIG_HO_FAIL",
+	2: "RECONFIG_OTHERS",
 }
 
-var E2ReconfigCause_value = map[string]int32{
-	"E2_RECONFIG_RLF":     0,
-	"E2_RECONFIG_HO_FAIL": 1,
-	"E2_RECONFIG_OTHERS":  2,
+var ReconfigCause_value = map[string]int32{
+	"RECONFIG_RLF":     0,
+	"RECONFIG_HO_FAIL": 1,
+	"RECONFIG_OTHERS":  2,
 }
 
-func (x E2ReconfigCause) String() string {
-	return proto.EnumName(E2ReconfigCause_name, int32(x))
+func (x ReconfigCause) String() string {
+	return proto.EnumName(ReconfigCause_name, int32(x))
 }
 
-func (E2ReconfigCause) EnumDescriptor() ([]byte, []int) {
+func (ReconfigCause) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{3}
 }
 
-type E2ReleaseCause int32
+type ReleaseCause int32
 
 const (
-	E2ReleaseCause_E2_RELEASE_INACTIVITY E2ReleaseCause = 0
-	E2ReleaseCause_E2_RELEASE_RLF        E2ReleaseCause = 1
-	E2ReleaseCause_E2_RELEASE_OTHERS     E2ReleaseCause = 2
+	ReleaseCause_RELEASE_INACTIVITY ReleaseCause = 0
+	ReleaseCause_RELEASE_RLF        ReleaseCause = 1
+	ReleaseCause_RELEASE_OTHERS     ReleaseCause = 2
 )
 
-var E2ReleaseCause_name = map[int32]string{
-	0: "E2_RELEASE_INACTIVITY",
-	1: "E2_RELEASE_RLF",
-	2: "E2_RELEASE_OTHERS",
+var ReleaseCause_name = map[int32]string{
+	0: "RELEASE_INACTIVITY",
+	1: "RELEASE_RLF",
+	2: "RELEASE_OTHERS",
 }
 
-var E2ReleaseCause_value = map[string]int32{
-	"E2_RELEASE_INACTIVITY": 0,
-	"E2_RELEASE_RLF":        1,
-	"E2_RELEASE_OTHERS":     2,
+var ReleaseCause_value = map[string]int32{
+	"RELEASE_INACTIVITY": 0,
+	"RELEASE_RLF":        1,
+	"RELEASE_OTHERS":     2,
 }
 
-func (x E2ReleaseCause) String() string {
-	return proto.EnumName(E2ReleaseCause_name, int32(x))
+func (x ReleaseCause) String() string {
+	return proto.EnumName(ReleaseCause_name, int32(x))
 }
 
-func (E2ReleaseCause) EnumDescriptor() ([]byte, []int) {
+func (ReleaseCause) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{4}
 }
 
-type E2ERABDirection int32
+type ERABDirection int32
 
 const (
-	E2ERABDirection_E2_DL   E2ERABDirection = 0
-	E2ERABDirection_E2_UL   E2ERABDirection = 1
-	E2ERABDirection_E2_BOTH E2ERABDirection = 2
+	ERABDirection_DL   ERABDirection = 0
+	ERABDirection_UL   ERABDirection = 1
+	ERABDirection_BOTH ERABDirection = 2
 )
 
-var E2ERABDirection_name = map[int32]string{
-	0: "E2_DL",
-	1: "E2_UL",
-	2: "E2_BOTH",
+var ERABDirection_name = map[int32]string{
+	0: "DL",
+	1: "UL",
+	2: "BOTH",
 }
 
-var E2ERABDirection_value = map[string]int32{
-	"E2_DL":   0,
-	"E2_UL":   1,
-	"E2_BOTH": 2,
+var ERABDirection_value = map[string]int32{
+	"DL":   0,
+	"UL":   1,
+	"BOTH": 2,
 }
 
-func (x E2ERABDirection) String() string {
-	return proto.EnumName(E2ERABDirection_name, int32(x))
+func (x ERABDirection) String() string {
+	return proto.EnumName(ERABDirection_name, int32(x))
 }
 
-func (E2ERABDirection) EnumDescriptor() ([]byte, []int) {
+func (ERABDirection) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{5}
 }
 
-type E2ERABType int32
+type ERABType int32
 
 const (
-	E2ERABType_E2_ERAB_DEFAULT   E2ERABType = 0
-	E2ERABType_E2_ERAB_DEDICATED E2ERABType = 1
+	ERABType_ERAB_DEFAULT   ERABType = 0
+	ERABType_ERAB_DEDICATED ERABType = 1
 )
 
-var E2ERABType_name = map[int32]string{
-	0: "E2_ERAB_DEFAULT",
-	1: "E2_ERAB_DEDICATED",
+var ERABType_name = map[int32]string{
+	0: "ERAB_DEFAULT",
+	1: "ERAB_DEDICATED",
 }
 
-var E2ERABType_value = map[string]int32{
-	"E2_ERAB_DEFAULT":   0,
-	"E2_ERAB_DEDICATED": 1,
+var ERABType_value = map[string]int32{
+	"ERAB_DEFAULT":   0,
+	"ERAB_DEDICATED": 1,
 }
 
-func (x E2ERABType) String() string {
-	return proto.EnumName(E2ERABType_name, int32(x))
+func (x ERABType) String() string {
+	return proto.EnumName(ERABType_name, int32(x))
 }
 
-func (E2ERABType) EnumDescriptor() ([]byte, []int) {
+func (ERABType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{6}
 }
 
-type E2ReportParamPR int32
+type ReportParamPR int32
 
 const (
-	E2ReportParamPR_E2_REPORTPARAM_PR_NOTHING   E2ReportParamPR = 0
-	E2ReportParamPR_E2_REPORTPARAM_PR_PER_PARAM E2ReportParamPR = 1
-	E2ReportParamPR_E2_REPORTPARAM_PR_A1PARAM   E2ReportParamPR = 2
-	E2ReportParamPR_E2_REPORTPARAM_PR_A2PARAM   E2ReportParamPR = 3
-	E2ReportParamPR_E2_REPORTPARAM_PR_A3PARAM   E2ReportParamPR = 4
-	E2ReportParamPR_E2_REPORTPARAM_PR_A4PARAM   E2ReportParamPR = 5
-	E2ReportParamPR_E2_REPORTPARAM_PR_A5PARAM   E2ReportParamPR = 6
-	E2ReportParamPR_E2_REPORTPARAM_PR_A6PARAM   E2ReportParamPR = 7
+	ReportParamPR_REPORT_PARAM_PR_NOTHING   ReportParamPR = 0
+	ReportParamPR_REPORT_PARAM_PR_PER_PARAM ReportParamPR = 1
+	ReportParamPR_REPORT_PARAM_PR_A1PARAM   ReportParamPR = 2
+	ReportParamPR_REPORT_PARAM_PR_A2PARAM   ReportParamPR = 3
+	ReportParamPR_REPORT_PARAM_PR_A3PARAM   ReportParamPR = 4
+	ReportParamPR_REPORT_PARAM_PR_A4PARAM   ReportParamPR = 5
+	ReportParamPR_REPORT_PARAM_PR_A5PARAM   ReportParamPR = 6
+	ReportParamPR_REPORT_PARAM_PR_A6PARAM   ReportParamPR = 7
 )
 
-var E2ReportParamPR_name = map[int32]string{
-	0: "E2_REPORTPARAM_PR_NOTHING",
-	1: "E2_REPORTPARAM_PR_PER_PARAM",
-	2: "E2_REPORTPARAM_PR_A1PARAM",
-	3: "E2_REPORTPARAM_PR_A2PARAM",
-	4: "E2_REPORTPARAM_PR_A3PARAM",
-	5: "E2_REPORTPARAM_PR_A4PARAM",
-	6: "E2_REPORTPARAM_PR_A5PARAM",
-	7: "E2_REPORTPARAM_PR_A6PARAM",
+var ReportParamPR_name = map[int32]string{
+	0: "REPORT_PARAM_PR_NOTHING",
+	1: "REPORT_PARAM_PR_PER_PARAM",
+	2: "REPORT_PARAM_PR_A1PARAM",
+	3: "REPORT_PARAM_PR_A2PARAM",
+	4: "REPORT_PARAM_PR_A3PARAM",
+	5: "REPORT_PARAM_PR_A4PARAM",
+	6: "REPORT_PARAM_PR_A5PARAM",
+	7: "REPORT_PARAM_PR_A6PARAM",
 }
 
-var E2ReportParamPR_value = map[string]int32{
-	"E2_REPORTPARAM_PR_NOTHING":   0,
-	"E2_REPORTPARAM_PR_PER_PARAM": 1,
-	"E2_REPORTPARAM_PR_A1PARAM":   2,
-	"E2_REPORTPARAM_PR_A2PARAM":   3,
-	"E2_REPORTPARAM_PR_A3PARAM":   4,
-	"E2_REPORTPARAM_PR_A4PARAM":   5,
-	"E2_REPORTPARAM_PR_A5PARAM":   6,
-	"E2_REPORTPARAM_PR_A6PARAM":   7,
+var ReportParamPR_value = map[string]int32{
+	"REPORT_PARAM_PR_NOTHING":   0,
+	"REPORT_PARAM_PR_PER_PARAM": 1,
+	"REPORT_PARAM_PR_A1PARAM":   2,
+	"REPORT_PARAM_PR_A2PARAM":   3,
+	"REPORT_PARAM_PR_A3PARAM":   4,
+	"REPORT_PARAM_PR_A4PARAM":   5,
+	"REPORT_PARAM_PR_A5PARAM":   6,
+	"REPORT_PARAM_PR_A6PARAM":   7,
 }
 
-func (x E2ReportParamPR) String() string {
-	return proto.EnumName(E2ReportParamPR_name, int32(x))
+func (x ReportParamPR) String() string {
+	return proto.EnumName(ReportParamPR_name, int32(x))
 }
 
-func (E2ReportParamPR) EnumDescriptor() ([]byte, []int) {
+func (ReportParamPR) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{7}
 }
 
-type E2PerParamReportIntervalMs int32
+type PerParamReportIntervalMs int32
 
 const (
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_120   E2PerParamReportIntervalMs = 0
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_240   E2PerParamReportIntervalMs = 1
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_480   E2PerParamReportIntervalMs = 2
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_640   E2PerParamReportIntervalMs = 3
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_1024  E2PerParamReportIntervalMs = 4
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_2048  E2PerParamReportIntervalMs = 5
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_5120  E2PerParamReportIntervalMs = 6
-	E2PerParamReportIntervalMs_E2_PERPARAM_MS_10240 E2PerParamReportIntervalMs = 7
-	E2PerParamReportIntervalMs_E2_PERPARAM_MIN_1    E2PerParamReportIntervalMs = 8
-	E2PerParamReportIntervalMs_E2_PERPARAM_MIN_6    E2PerParamReportIntervalMs = 9
-	E2PerParamReportIntervalMs_E2_PERPARAM_MIN_12   E2PerParamReportIntervalMs = 10
-	E2PerParamReportIntervalMs_E2_PERPARAM_MIN_30   E2PerParamReportIntervalMs = 11
-	E2PerParamReportIntervalMs_E2_PERPARAM_MIN_60   E2PerParamReportIntervalMs = 12
+	PerParamReportIntervalMs_PER_PARAM_MS_120   PerParamReportIntervalMs = 0
+	PerParamReportIntervalMs_PER_PARAM_MS_240   PerParamReportIntervalMs = 1
+	PerParamReportIntervalMs_PER_PARAM_MS_480   PerParamReportIntervalMs = 2
+	PerParamReportIntervalMs_PER_PARAM_MS_640   PerParamReportIntervalMs = 3
+	PerParamReportIntervalMs_PER_PARAM_MS_1024  PerParamReportIntervalMs = 4
+	PerParamReportIntervalMs_PER_PARAM_MS_2048  PerParamReportIntervalMs = 5
+	PerParamReportIntervalMs_PER_PARAM_MS_5120  PerParamReportIntervalMs = 6
+	PerParamReportIntervalMs_PER_PARAM_MS_10240 PerParamReportIntervalMs = 7
+	PerParamReportIntervalMs_PER_PARAM_MIN_1    PerParamReportIntervalMs = 8
+	PerParamReportIntervalMs_PER_PARAM_MIN_6    PerParamReportIntervalMs = 9
+	PerParamReportIntervalMs_PER_PARAM_MIN_12   PerParamReportIntervalMs = 10
+	PerParamReportIntervalMs_PER_PARAM_MIN_30   PerParamReportIntervalMs = 11
+	PerParamReportIntervalMs_PER_PARAM_MIN_60   PerParamReportIntervalMs = 12
 )
 
-var E2PerParamReportIntervalMs_name = map[int32]string{
-	0:  "E2_PERPARAM_MS_120",
-	1:  "E2_PERPARAM_MS_240",
-	2:  "E2_PERPARAM_MS_480",
-	3:  "E2_PERPARAM_MS_640",
-	4:  "E2_PERPARAM_MS_1024",
-	5:  "E2_PERPARAM_MS_2048",
-	6:  "E2_PERPARAM_MS_5120",
-	7:  "E2_PERPARAM_MS_10240",
-	8:  "E2_PERPARAM_MIN_1",
-	9:  "E2_PERPARAM_MIN_6",
-	10: "E2_PERPARAM_MIN_12",
-	11: "E2_PERPARAM_MIN_30",
-	12: "E2_PERPARAM_MIN_60",
+var PerParamReportIntervalMs_name = map[int32]string{
+	0:  "PER_PARAM_MS_120",
+	1:  "PER_PARAM_MS_240",
+	2:  "PER_PARAM_MS_480",
+	3:  "PER_PARAM_MS_640",
+	4:  "PER_PARAM_MS_1024",
+	5:  "PER_PARAM_MS_2048",
+	6:  "PER_PARAM_MS_5120",
+	7:  "PER_PARAM_MS_10240",
+	8:  "PER_PARAM_MIN_1",
+	9:  "PER_PARAM_MIN_6",
+	10: "PER_PARAM_MIN_12",
+	11: "PER_PARAM_MIN_30",
+	12: "PER_PARAM_MIN_60",
 }
 
-var E2PerParamReportIntervalMs_value = map[string]int32{
-	"E2_PERPARAM_MS_120":   0,
-	"E2_PERPARAM_MS_240":   1,
-	"E2_PERPARAM_MS_480":   2,
-	"E2_PERPARAM_MS_640":   3,
-	"E2_PERPARAM_MS_1024":  4,
-	"E2_PERPARAM_MS_2048":  5,
-	"E2_PERPARAM_MS_5120":  6,
-	"E2_PERPARAM_MS_10240": 7,
-	"E2_PERPARAM_MIN_1":    8,
-	"E2_PERPARAM_MIN_6":    9,
-	"E2_PERPARAM_MIN_12":   10,
-	"E2_PERPARAM_MIN_30":   11,
-	"E2_PERPARAM_MIN_60":   12,
+var PerParamReportIntervalMs_value = map[string]int32{
+	"PER_PARAM_MS_120":   0,
+	"PER_PARAM_MS_240":   1,
+	"PER_PARAM_MS_480":   2,
+	"PER_PARAM_MS_640":   3,
+	"PER_PARAM_MS_1024":  4,
+	"PER_PARAM_MS_2048":  5,
+	"PER_PARAM_MS_5120":  6,
+	"PER_PARAM_MS_10240": 7,
+	"PER_PARAM_MIN_1":    8,
+	"PER_PARAM_MIN_6":    9,
+	"PER_PARAM_MIN_12":   10,
+	"PER_PARAM_MIN_30":   11,
+	"PER_PARAM_MIN_60":   12,
 }
 
-func (x E2PerParamReportIntervalMs) String() string {
-	return proto.EnumName(E2PerParamReportIntervalMs_name, int32(x))
+func (x PerParamReportIntervalMs) String() string {
+	return proto.EnumName(PerParamReportIntervalMs_name, int32(x))
 }
 
-func (E2PerParamReportIntervalMs) EnumDescriptor() ([]byte, []int) {
+func (PerParamReportIntervalMs) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{8}
 }
 
-type E2ThresholdEUTRAPR int32
+type ThresholdEUTRAPR int32
 
 const (
-	E2ThresholdEUTRAPR_E2_THRESHOLDEUTRA_PR_NOTHING E2ThresholdEUTRAPR = 0
-	E2ThresholdEUTRAPR_E2_THRESHOLDEUTRA_PR_RSRP    E2ThresholdEUTRAPR = 1
-	E2ThresholdEUTRAPR_E2_THRESHOLDEUTRA_PR_RSRQ    E2ThresholdEUTRAPR = 2
+	ThresholdEUTRAPR_THRESHOLD_EUTRA_PR_NOTHING ThresholdEUTRAPR = 0
+	ThresholdEUTRAPR_THRESHOLD_EUTRA_PR_RSRP    ThresholdEUTRAPR = 1
+	ThresholdEUTRAPR_THRESHOLD_EUTRA_PR_RSRQ    ThresholdEUTRAPR = 2
 )
 
-var E2ThresholdEUTRAPR_name = map[int32]string{
-	0: "E2_THRESHOLDEUTRA_PR_NOTHING",
-	1: "E2_THRESHOLDEUTRA_PR_RSRP",
-	2: "E2_THRESHOLDEUTRA_PR_RSRQ",
+var ThresholdEUTRAPR_name = map[int32]string{
+	0: "THRESHOLD_EUTRA_PR_NOTHING",
+	1: "THRESHOLD_EUTRA_PR_RSRP",
+	2: "THRESHOLD_EUTRA_PR_RSRQ",
 }
 
-var E2ThresholdEUTRAPR_value = map[string]int32{
-	"E2_THRESHOLDEUTRA_PR_NOTHING": 0,
-	"E2_THRESHOLDEUTRA_PR_RSRP":    1,
-	"E2_THRESHOLDEUTRA_PR_RSRQ":    2,
+var ThresholdEUTRAPR_value = map[string]int32{
+	"THRESHOLD_EUTRA_PR_NOTHING": 0,
+	"THRESHOLD_EUTRA_PR_RSRP":    1,
+	"THRESHOLD_EUTRA_PR_RSRQ":    2,
 }
 
-func (x E2ThresholdEUTRAPR) String() string {
-	return proto.EnumName(E2ThresholdEUTRAPR_name, int32(x))
+func (x ThresholdEUTRAPR) String() string {
+	return proto.EnumName(ThresholdEUTRAPR_name, int32(x))
 }
 
-func (E2ThresholdEUTRAPR) EnumDescriptor() ([]byte, []int) {
+func (ThresholdEUTRAPR) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{9}
 }
 
-type E2TimeToTrigger int32
+type TimeToTrigger int32
 
 const (
-	E2TimeToTrigger_E2_TTT_MS0    E2TimeToTrigger = 0
-	E2TimeToTrigger_E2_TTT_MS40   E2TimeToTrigger = 1
-	E2TimeToTrigger_E2_TTT_MS64   E2TimeToTrigger = 2
-	E2TimeToTrigger_E2_TTT_MS80   E2TimeToTrigger = 3
-	E2TimeToTrigger_E2_TTT_MS100  E2TimeToTrigger = 4
-	E2TimeToTrigger_E2_TTT_MS128  E2TimeToTrigger = 5
-	E2TimeToTrigger_E2_TTT_MS160  E2TimeToTrigger = 6
-	E2TimeToTrigger_E2_TTT_MS256  E2TimeToTrigger = 7
-	E2TimeToTrigger_E2_TTT_MS320  E2TimeToTrigger = 8
-	E2TimeToTrigger_E2_TTT_MS480  E2TimeToTrigger = 9
-	E2TimeToTrigger_E2_TTT_MS512  E2TimeToTrigger = 10
-	E2TimeToTrigger_E2_TTT_MS640  E2TimeToTrigger = 11
-	E2TimeToTrigger_E2_TTT_MS1024 E2TimeToTrigger = 12
-	E2TimeToTrigger_E2_TTT_MS1280 E2TimeToTrigger = 13
-	E2TimeToTrigger_E2_TTT_MS2560 E2TimeToTrigger = 14
-	E2TimeToTrigger_E2_TTT_MS5120 E2TimeToTrigger = 15
+	TimeToTrigger_TTT_MS0    TimeToTrigger = 0
+	TimeToTrigger_TTT_MS40   TimeToTrigger = 1
+	TimeToTrigger_TTT_MS64   TimeToTrigger = 2
+	TimeToTrigger_TTT_MS80   TimeToTrigger = 3
+	TimeToTrigger_TTT_MS100  TimeToTrigger = 4
+	TimeToTrigger_TTT_MS128  TimeToTrigger = 5
+	TimeToTrigger_TTT_MS160  TimeToTrigger = 6
+	TimeToTrigger_TTT_MS256  TimeToTrigger = 7
+	TimeToTrigger_TTT_MS320  TimeToTrigger = 8
+	TimeToTrigger_TTT_MS480  TimeToTrigger = 9
+	TimeToTrigger_TTT_MS512  TimeToTrigger = 10
+	TimeToTrigger_TTT_MS640  TimeToTrigger = 11
+	TimeToTrigger_TTT_MS1024 TimeToTrigger = 12
+	TimeToTrigger_TTT_MS1280 TimeToTrigger = 13
+	TimeToTrigger_TTT_MS2560 TimeToTrigger = 14
+	TimeToTrigger_TTT_MS5120 TimeToTrigger = 15
 )
 
-var E2TimeToTrigger_name = map[int32]string{
-	0:  "E2_TTT_MS0",
-	1:  "E2_TTT_MS40",
-	2:  "E2_TTT_MS64",
-	3:  "E2_TTT_MS80",
-	4:  "E2_TTT_MS100",
-	5:  "E2_TTT_MS128",
-	6:  "E2_TTT_MS160",
-	7:  "E2_TTT_MS256",
-	8:  "E2_TTT_MS320",
-	9:  "E2_TTT_MS480",
-	10: "E2_TTT_MS512",
-	11: "E2_TTT_MS640",
-	12: "E2_TTT_MS1024",
-	13: "E2_TTT_MS1280",
-	14: "E2_TTT_MS2560",
-	15: "E2_TTT_MS5120",
+var TimeToTrigger_name = map[int32]string{
+	0:  "TTT_MS0",
+	1:  "TTT_MS40",
+	2:  "TTT_MS64",
+	3:  "TTT_MS80",
+	4:  "TTT_MS100",
+	5:  "TTT_MS128",
+	6:  "TTT_MS160",
+	7:  "TTT_MS256",
+	8:  "TTT_MS320",
+	9:  "TTT_MS480",
+	10: "TTT_MS512",
+	11: "TTT_MS640",
+	12: "TTT_MS1024",
+	13: "TTT_MS1280",
+	14: "TTT_MS2560",
+	15: "TTT_MS5120",
 }
 
-var E2TimeToTrigger_value = map[string]int32{
-	"E2_TTT_MS0":    0,
-	"E2_TTT_MS40":   1,
-	"E2_TTT_MS64":   2,
-	"E2_TTT_MS80":   3,
-	"E2_TTT_MS100":  4,
-	"E2_TTT_MS128":  5,
-	"E2_TTT_MS160":  6,
-	"E2_TTT_MS256":  7,
-	"E2_TTT_MS320":  8,
-	"E2_TTT_MS480":  9,
-	"E2_TTT_MS512":  10,
-	"E2_TTT_MS640":  11,
-	"E2_TTT_MS1024": 12,
-	"E2_TTT_MS1280": 13,
-	"E2_TTT_MS2560": 14,
-	"E2_TTT_MS5120": 15,
+var TimeToTrigger_value = map[string]int32{
+	"TTT_MS0":    0,
+	"TTT_MS40":   1,
+	"TTT_MS64":   2,
+	"TTT_MS80":   3,
+	"TTT_MS100":  4,
+	"TTT_MS128":  5,
+	"TTT_MS160":  6,
+	"TTT_MS256":  7,
+	"TTT_MS320":  8,
+	"TTT_MS480":  9,
+	"TTT_MS512":  10,
+	"TTT_MS640":  11,
+	"TTT_MS1024": 12,
+	"TTT_MS1280": 13,
+	"TTT_MS2560": 14,
+	"TTT_MS5120": 15,
 }
 
-func (x E2TimeToTrigger) String() string {
-	return proto.EnumName(E2TimeToTrigger_name, int32(x))
+func (x TimeToTrigger) String() string {
+	return proto.EnumName(TimeToTrigger_name, int32(x))
 }
 
-func (E2TimeToTrigger) EnumDescriptor() ([]byte, []int) {
+func (TimeToTrigger) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{10}
 }
 
-type E2TriggerQuantity int32
+type TriggerQuantity int32
 
 const (
-	E2TriggerQuantity_E2_TQ_RSRP E2TriggerQuantity = 0
-	E2TriggerQuantity_E2_TQ_RSRQ E2TriggerQuantity = 1
+	TriggerQuantity_TQ_RSRP TriggerQuantity = 0
+	TriggerQuantity_TQ_RSRQ TriggerQuantity = 1
 )
 
-var E2TriggerQuantity_name = map[int32]string{
-	0: "E2_TQ_RSRP",
-	1: "E2_TQ_RSRQ",
+var TriggerQuantity_name = map[int32]string{
+	0: "TQ_RSRP",
+	1: "TQ_RSRQ",
 }
 
-var E2TriggerQuantity_value = map[string]int32{
-	"E2_TQ_RSRP": 0,
-	"E2_TQ_RSRQ": 1,
+var TriggerQuantity_value = map[string]int32{
+	"TQ_RSRP": 0,
+	"TQ_RSRQ": 1,
 }
 
-func (x E2TriggerQuantity) String() string {
-	return proto.EnumName(E2TriggerQuantity_name, int32(x))
+func (x TriggerQuantity) String() string {
+	return proto.EnumName(TriggerQuantity_name, int32(x))
 }
 
-func (E2TriggerQuantity) EnumDescriptor() ([]byte, []int) {
+func (TriggerQuantity) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{11}
 }
 
-type E2ReportQuality int32
+type ReportQuality int32
 
 const (
-	E2ReportQuality_E2_RQ_SAME E2ReportQuality = 0
-	E2ReportQuality_E2_RQ_BOTH E2ReportQuality = 1
+	ReportQuality_RQ_SAME ReportQuality = 0
+	ReportQuality_RQ_BOTH ReportQuality = 1
 )
 
-var E2ReportQuality_name = map[int32]string{
-	0: "E2_RQ_SAME",
-	1: "E2_RQ_BOTH",
+var ReportQuality_name = map[int32]string{
+	0: "RQ_SAME",
+	1: "RQ_BOTH",
 }
 
-var E2ReportQuality_value = map[string]int32{
-	"E2_RQ_SAME": 0,
-	"E2_RQ_BOTH": 1,
+var ReportQuality_value = map[string]int32{
+	"RQ_SAME": 0,
+	"RQ_BOTH": 1,
 }
 
-func (x E2ReportQuality) String() string {
-	return proto.EnumName(E2ReportQuality_name, int32(x))
+func (x ReportQuality) String() string {
+	return proto.EnumName(ReportQuality_name, int32(x))
 }
 
-func (E2ReportQuality) EnumDescriptor() ([]byte, []int) {
+func (ReportQuality) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{12}
 }
 
-type E2MeasIdActionPR int32
+type MeasIdActionPR int32
 
 const (
-	E2MeasIdActionPR_E2_MEASIDACTION_PR_NOTHING    E2MeasIdActionPR = 0
-	E2MeasIdActionPR_E2_MEASIDACTION_PR_ADDMEASID  E2MeasIdActionPR = 1
-	E2MeasIdActionPR_E2_MEASIDACTION_PR_DELMEASID  E2MeasIdActionPR = 2
-	E2MeasIdActionPR_E2_MEASIDACTION_PR_HOTOTARGET E2MeasIdActionPR = 3
+	MeasIdActionPR_MEAS_ID_ACTION_PR_NOTHING    MeasIdActionPR = 0
+	MeasIdActionPR_MEAS_ID_ACTION_PR_ADDMEASID  MeasIdActionPR = 1
+	MeasIdActionPR_MEAS_ID_ACTION_PR_DELMEASID  MeasIdActionPR = 2
+	MeasIdActionPR_MEAS_ID_ACTION_PR_HOTOTARGET MeasIdActionPR = 3
 )
 
-var E2MeasIdActionPR_name = map[int32]string{
-	0: "E2_MEASIDACTION_PR_NOTHING",
-	1: "E2_MEASIDACTION_PR_ADDMEASID",
-	2: "E2_MEASIDACTION_PR_DELMEASID",
-	3: "E2_MEASIDACTION_PR_HOTOTARGET",
+var MeasIdActionPR_name = map[int32]string{
+	0: "MEAS_ID_ACTION_PR_NOTHING",
+	1: "MEAS_ID_ACTION_PR_ADDMEASID",
+	2: "MEAS_ID_ACTION_PR_DELMEASID",
+	3: "MEAS_ID_ACTION_PR_HOTOTARGET",
 }
 
-var E2MeasIdActionPR_value = map[string]int32{
-	"E2_MEASIDACTION_PR_NOTHING":    0,
-	"E2_MEASIDACTION_PR_ADDMEASID":  1,
-	"E2_MEASIDACTION_PR_DELMEASID":  2,
-	"E2_MEASIDACTION_PR_HOTOTARGET": 3,
+var MeasIdActionPR_value = map[string]int32{
+	"MEAS_ID_ACTION_PR_NOTHING":    0,
+	"MEAS_ID_ACTION_PR_ADDMEASID":  1,
+	"MEAS_ID_ACTION_PR_DELMEASID":  2,
+	"MEAS_ID_ACTION_PR_HOTOTARGET": 3,
 }
 
-func (x E2MeasIdActionPR) String() string {
-	return proto.EnumName(E2MeasIdActionPR_name, int32(x))
+func (x MeasIdActionPR) String() string {
+	return proto.EnumName(MeasIdActionPR_name, int32(x))
 }
 
-func (E2MeasIdActionPR) EnumDescriptor() ([]byte, []int) {
+func (MeasIdActionPR) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{13}
 }
 
-type E2L2MeasReportIntervals int32
+type L2MeasReportIntervals int32
 
 const (
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_NO_REPORT E2L2MeasReportIntervals = 0
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MS_10     E2L2MeasReportIntervals = 1
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MS_50     E2L2MeasReportIntervals = 2
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MS_100    E2L2MeasReportIntervals = 3
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MS_200    E2L2MeasReportIntervals = 4
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MS_500    E2L2MeasReportIntervals = 5
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MS_1024   E2L2MeasReportIntervals = 6
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_S_10      E2L2MeasReportIntervals = 7
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MIN_1     E2L2MeasReportIntervals = 8
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MIN_2     E2L2MeasReportIntervals = 9
-	E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_MIN_5     E2L2MeasReportIntervals = 10
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_NO_REPORT L2MeasReportIntervals = 0
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MS_10     L2MeasReportIntervals = 1
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MS_50     L2MeasReportIntervals = 2
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MS_100    L2MeasReportIntervals = 3
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MS_200    L2MeasReportIntervals = 4
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MS_500    L2MeasReportIntervals = 5
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MS_1024   L2MeasReportIntervals = 6
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_S_10      L2MeasReportIntervals = 7
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MIN_1     L2MeasReportIntervals = 8
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MIN_2     L2MeasReportIntervals = 9
+	L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_MIN_5     L2MeasReportIntervals = 10
 )
 
-var E2L2MeasReportIntervals_name = map[int32]string{
-	0:  "E2_L2MEASREPORTINTERVAL_NO_REPORT",
-	1:  "E2_L2MEASREPORTINTERVAL_MS_10",
-	2:  "E2_L2MEASREPORTINTERVAL_MS_50",
-	3:  "E2_L2MEASREPORTINTERVAL_MS_100",
-	4:  "E2_L2MEASREPORTINTERVAL_MS_200",
-	5:  "E2_L2MEASREPORTINTERVAL_MS_500",
-	6:  "E2_L2MEASREPORTINTERVAL_MS_1024",
-	7:  "E2_L2MEASREPORTINTERVAL_S_10",
-	8:  "E2_L2MEASREPORTINTERVAL_MIN_1",
-	9:  "E2_L2MEASREPORTINTERVAL_MIN_2",
-	10: "E2_L2MEASREPORTINTERVAL_MIN_5",
+var L2MeasReportIntervals_name = map[int32]string{
+	0:  "L2_MEAS_REPORT_INTERVAL_NO_REPORT",
+	1:  "L2_MEAS_REPORT_INTERVAL_MS_10",
+	2:  "L2_MEAS_REPORT_INTERVAL_MS_50",
+	3:  "L2_MEAS_REPORT_INTERVAL_MS_100",
+	4:  "L2_MEAS_REPORT_INTERVAL_MS_200",
+	5:  "L2_MEAS_REPORT_INTERVAL_MS_500",
+	6:  "L2_MEAS_REPORT_INTERVAL_MS_1024",
+	7:  "L2_MEAS_REPORT_INTERVAL_S_10",
+	8:  "L2_MEAS_REPORT_INTERVAL_MIN_1",
+	9:  "L2_MEAS_REPORT_INTERVAL_MIN_2",
+	10: "L2_MEAS_REPORT_INTERVAL_MIN_5",
 }
 
-var E2L2MeasReportIntervals_value = map[string]int32{
-	"E2_L2MEASREPORTINTERVAL_NO_REPORT": 0,
-	"E2_L2MEASREPORTINTERVAL_MS_10":     1,
-	"E2_L2MEASREPORTINTERVAL_MS_50":     2,
-	"E2_L2MEASREPORTINTERVAL_MS_100":    3,
-	"E2_L2MEASREPORTINTERVAL_MS_200":    4,
-	"E2_L2MEASREPORTINTERVAL_MS_500":    5,
-	"E2_L2MEASREPORTINTERVAL_MS_1024":   6,
-	"E2_L2MEASREPORTINTERVAL_S_10":      7,
-	"E2_L2MEASREPORTINTERVAL_MIN_1":     8,
-	"E2_L2MEASREPORTINTERVAL_MIN_2":     9,
-	"E2_L2MEASREPORTINTERVAL_MIN_5":     10,
+var L2MeasReportIntervals_value = map[string]int32{
+	"L2_MEAS_REPORT_INTERVAL_NO_REPORT": 0,
+	"L2_MEAS_REPORT_INTERVAL_MS_10":     1,
+	"L2_MEAS_REPORT_INTERVAL_MS_50":     2,
+	"L2_MEAS_REPORT_INTERVAL_MS_100":    3,
+	"L2_MEAS_REPORT_INTERVAL_MS_200":    4,
+	"L2_MEAS_REPORT_INTERVAL_MS_500":    5,
+	"L2_MEAS_REPORT_INTERVAL_MS_1024":   6,
+	"L2_MEAS_REPORT_INTERVAL_S_10":      7,
+	"L2_MEAS_REPORT_INTERVAL_MIN_1":     8,
+	"L2_MEAS_REPORT_INTERVAL_MIN_2":     9,
+	"L2_MEAS_REPORT_INTERVAL_MIN_5":     10,
 }
 
-func (x E2L2MeasReportIntervals) String() string {
-	return proto.EnumName(E2L2MeasReportIntervals_name, int32(x))
+func (x L2MeasReportIntervals) String() string {
+	return proto.EnumName(L2MeasReportIntervals_name, int32(x))
 }
 
-func (E2L2MeasReportIntervals) EnumDescriptor() ([]byte, []int) {
+func (L2MeasReportIntervals) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{14}
 }
 
-type E2XICICPA int32
+type XICICPA int32
 
 const (
-	E2XICICPA_E2_XICIC_PA_DB_MINUS6      E2XICICPA = 0
-	E2XICICPA_E2_XICIC_PA_DB_MINUX4DOT77 E2XICICPA = 1
-	E2XICICPA_E2_XICIC_PA_DB_MINUS3      E2XICICPA = 2
-	E2XICICPA_E2_XICIC_PA_DB_MINUS1DOT77 E2XICICPA = 3
-	E2XICICPA_E2_XICIC_PA_DB_0           E2XICICPA = 4
-	E2XICICPA_E2_XICIC_PA_DB_1           E2XICICPA = 5
-	E2XICICPA_E2_XICIC_PA_DB_2           E2XICICPA = 6
-	E2XICICPA_E2_XICIC_PA_DB_3           E2XICICPA = 7
+	XICICPA_XICIC_PA_DB_MINUS6      XICICPA = 0
+	XICICPA_XICIC_PA_DB_MINUX4DOT77 XICICPA = 1
+	XICICPA_XICIC_PA_DB_MINUS3      XICICPA = 2
+	XICICPA_XICIC_PA_DB_MINUS1DOT77 XICICPA = 3
+	XICICPA_XICIC_PA_DB_0           XICICPA = 4
+	XICICPA_XICIC_PA_DB_1           XICICPA = 5
+	XICICPA_XICIC_PA_DB_2           XICICPA = 6
+	XICICPA_XICIC_PA_DB_3           XICICPA = 7
 )
 
-var E2XICICPA_name = map[int32]string{
-	0: "E2_XICIC_PA_DB_MINUS6",
-	1: "E2_XICIC_PA_DB_MINUX4DOT77",
-	2: "E2_XICIC_PA_DB_MINUS3",
-	3: "E2_XICIC_PA_DB_MINUS1DOT77",
-	4: "E2_XICIC_PA_DB_0",
-	5: "E2_XICIC_PA_DB_1",
-	6: "E2_XICIC_PA_DB_2",
-	7: "E2_XICIC_PA_DB_3",
+var XICICPA_name = map[int32]string{
+	0: "XICIC_PA_DB_MINUS6",
+	1: "XICIC_PA_DB_MINUX4DOT77",
+	2: "XICIC_PA_DB_MINUS3",
+	3: "XICIC_PA_DB_MINUS1DOT77",
+	4: "XICIC_PA_DB_0",
+	5: "XICIC_PA_DB_1",
+	6: "XICIC_PA_DB_2",
+	7: "XICIC_PA_DB_3",
 }
 
-var E2XICICPA_value = map[string]int32{
-	"E2_XICIC_PA_DB_MINUS6":      0,
-	"E2_XICIC_PA_DB_MINUX4DOT77": 1,
-	"E2_XICIC_PA_DB_MINUS3":      2,
-	"E2_XICIC_PA_DB_MINUS1DOT77": 3,
-	"E2_XICIC_PA_DB_0":           4,
-	"E2_XICIC_PA_DB_1":           5,
-	"E2_XICIC_PA_DB_2":           6,
-	"E2_XICIC_PA_DB_3":           7,
+var XICICPA_value = map[string]int32{
+	"XICIC_PA_DB_MINUS6":      0,
+	"XICIC_PA_DB_MINUX4DOT77": 1,
+	"XICIC_PA_DB_MINUS3":      2,
+	"XICIC_PA_DB_MINUS1DOT77": 3,
+	"XICIC_PA_DB_0":           4,
+	"XICIC_PA_DB_1":           5,
+	"XICIC_PA_DB_2":           6,
+	"XICIC_PA_DB_3":           7,
 }
 
-func (x E2XICICPA) String() string {
-	return proto.EnumName(E2XICICPA_name, int32(x))
+func (x XICICPA) String() string {
+	return proto.EnumName(XICICPA_name, int32(x))
 }
 
-func (E2XICICPA) EnumDescriptor() ([]byte, []int) {
+func (XICICPA) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{15}
 }
 
-type E2CACapClassDl int32
+type CACapClassDl int32
 
 const (
-	E2CACapClassDl_E2_CACAP_CLASSDL_A E2CACapClassDl = 0
-	E2CACapClassDl_E2_CACAP_CLASSDL_B E2CACapClassDl = 1
-	E2CACapClassDl_E2_CACAP_CLASSDL_C E2CACapClassDl = 2
-	E2CACapClassDl_E2_CACAP_CLASSDL_D E2CACapClassDl = 3
-	E2CACapClassDl_E2_CACAP_CLASSDL_E E2CACapClassDl = 4
-	E2CACapClassDl_E2_CACAP_CLASSDL_F E2CACapClassDl = 5
+	CACapClassDl_CACAP_CLASSDL_A CACapClassDl = 0
+	CACapClassDl_CACAP_CLASSDL_B CACapClassDl = 1
+	CACapClassDl_CACAP_CLASSDL_C CACapClassDl = 2
+	CACapClassDl_CACAP_CLASSDL_D CACapClassDl = 3
+	CACapClassDl_CACAP_CLASSDL_E CACapClassDl = 4
+	CACapClassDl_CACAP_CLASSDL_F CACapClassDl = 5
 )
 
-var E2CACapClassDl_name = map[int32]string{
-	0: "E2_CACAP_CLASSDL_A",
-	1: "E2_CACAP_CLASSDL_B",
-	2: "E2_CACAP_CLASSDL_C",
-	3: "E2_CACAP_CLASSDL_D",
-	4: "E2_CACAP_CLASSDL_E",
-	5: "E2_CACAP_CLASSDL_F",
+var CACapClassDl_name = map[int32]string{
+	0: "CACAP_CLASSDL_A",
+	1: "CACAP_CLASSDL_B",
+	2: "CACAP_CLASSDL_C",
+	3: "CACAP_CLASSDL_D",
+	4: "CACAP_CLASSDL_E",
+	5: "CACAP_CLASSDL_F",
 }
 
-var E2CACapClassDl_value = map[string]int32{
-	"E2_CACAP_CLASSDL_A": 0,
-	"E2_CACAP_CLASSDL_B": 1,
-	"E2_CACAP_CLASSDL_C": 2,
-	"E2_CACAP_CLASSDL_D": 3,
-	"E2_CACAP_CLASSDL_E": 4,
-	"E2_CACAP_CLASSDL_F": 5,
+var CACapClassDl_value = map[string]int32{
+	"CACAP_CLASSDL_A": 0,
+	"CACAP_CLASSDL_B": 1,
+	"CACAP_CLASSDL_C": 2,
+	"CACAP_CLASSDL_D": 3,
+	"CACAP_CLASSDL_E": 4,
+	"CACAP_CLASSDL_F": 5,
 }
 
-func (x E2CACapClassDl) String() string {
-	return proto.EnumName(E2CACapClassDl_name, int32(x))
+func (x CACapClassDl) String() string {
+	return proto.EnumName(CACapClassDl_name, int32(x))
 }
 
-func (E2CACapClassDl) EnumDescriptor() ([]byte, []int) {
+func (CACapClassDl) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{16}
 }
 
-type E2CACapClassUl int32
+type CACapClassUl int32
 
 const (
-	E2CACapClassUl_E2_CACAP_CLASSUL_A E2CACapClassUl = 0
-	E2CACapClassUl_E2_CACAP_CLASSUL_B E2CACapClassUl = 1
-	E2CACapClassUl_E2_CACAP_CLASSUL_C E2CACapClassUl = 2
-	E2CACapClassUl_E2_CACAP_CLASSUL_D E2CACapClassUl = 3
-	E2CACapClassUl_E2_CACAP_CLASSUL_E E2CACapClassUl = 4
-	E2CACapClassUl_E2_CACAP_CLASSUL_F E2CACapClassUl = 5
+	CACapClassUl_CACAP_CLASSUL_A CACapClassUl = 0
+	CACapClassUl_CACAP_CLASSUL_B CACapClassUl = 1
+	CACapClassUl_CACAP_CLASSUL_C CACapClassUl = 2
+	CACapClassUl_CACAP_CLASSUL_D CACapClassUl = 3
+	CACapClassUl_CACAP_CLASSUL_E CACapClassUl = 4
+	CACapClassUl_CACAP_CLASSUL_F CACapClassUl = 5
 )
 
-var E2CACapClassUl_name = map[int32]string{
-	0: "E2_CACAP_CLASSUL_A",
-	1: "E2_CACAP_CLASSUL_B",
-	2: "E2_CACAP_CLASSUL_C",
-	3: "E2_CACAP_CLASSUL_D",
-	4: "E2_CACAP_CLASSUL_E",
-	5: "E2_CACAP_CLASSUL_F",
+var CACapClassUl_name = map[int32]string{
+	0: "CACAP_CLASSUL_A",
+	1: "CACAP_CLASSUL_B",
+	2: "CACAP_CLASSUL_C",
+	3: "CACAP_CLASSUL_D",
+	4: "CACAP_CLASSUL_E",
+	5: "CACAP_CLASSUL_F",
 }
 
-var E2CACapClassUl_value = map[string]int32{
-	"E2_CACAP_CLASSUL_A": 0,
-	"E2_CACAP_CLASSUL_B": 1,
-	"E2_CACAP_CLASSUL_C": 2,
-	"E2_CACAP_CLASSUL_D": 3,
-	"E2_CACAP_CLASSUL_E": 4,
-	"E2_CACAP_CLASSUL_F": 5,
+var CACapClassUl_value = map[string]int32{
+	"CACAP_CLASSUL_A": 0,
+	"CACAP_CLASSUL_B": 1,
+	"CACAP_CLASSUL_C": 2,
+	"CACAP_CLASSUL_D": 3,
+	"CACAP_CLASSUL_E": 4,
+	"CACAP_CLASSUL_F": 5,
 }
 
-func (x E2CACapClassUl) String() string {
-	return proto.EnumName(E2CACapClassUl_name, int32(x))
+func (x CACapClassUl) String() string {
+	return proto.EnumName(CACapClassUl_name, int32(x))
 }
 
-func (E2CACapClassUl) EnumDescriptor() ([]byte, []int) {
+func (CACapClassUl) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{17}
 }
 
-type E2DCCapDrbType int32
+type DCCapDrbType int32
 
 const (
-	E2DCCapDrbType_E2_DCCAP_DRBTYPE_SUPPORTED E2DCCapDrbType = 0
+	DCCapDrbType_DCCAP_DRBTYPE_SUPPORTED DCCapDrbType = 0
 )
 
-var E2DCCapDrbType_name = map[int32]string{
-	0: "E2_DCCAP_DRBTYPE_SUPPORTED",
+var DCCapDrbType_name = map[int32]string{
+	0: "DCCAP_DRBTYPE_SUPPORTED",
 }
 
-var E2DCCapDrbType_value = map[string]int32{
-	"E2_DCCAP_DRBTYPE_SUPPORTED": 0,
+var DCCapDrbType_value = map[string]int32{
+	"DCCAP_DRBTYPE_SUPPORTED": 0,
 }
 
-func (x E2DCCapDrbType) String() string {
-	return proto.EnumName(E2DCCapDrbType_name, int32(x))
+func (x DCCapDrbType) String() string {
+	return proto.EnumName(DCCapDrbType_name, int32(x))
 }
 
-func (E2DCCapDrbType) EnumDescriptor() ([]byte, []int) {
+func (DCCapDrbType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{18}
 }
 
-type E2CADirection int32
+type CADirection int32
 
 const (
-	E2CADirection_E2_CADIRECTION_DL   E2CADirection = 0
-	E2CADirection_E2_CADIRECTION_UL   E2CADirection = 1
-	E2CADirection_E2_CADIRECTION_BOTH E2CADirection = 2
+	CADirection_CADIRECTION_DL   CADirection = 0
+	CADirection_CADIRECTION_UL   CADirection = 1
+	CADirection_CADIRECTION_BOTH CADirection = 2
 )
 
-var E2CADirection_name = map[int32]string{
-	0: "E2_CADIRECTION_DL",
-	1: "E2_CADIRECTION_UL",
-	2: "E2_CADIRECTION_BOTH",
+var CADirection_name = map[int32]string{
+	0: "CADIRECTION_DL",
+	1: "CADIRECTION_UL",
+	2: "CADIRECTION_BOTH",
 }
 
-var E2CADirection_value = map[string]int32{
-	"E2_CADIRECTION_DL":   0,
-	"E2_CADIRECTION_UL":   1,
-	"E2_CADIRECTION_BOTH": 2,
+var CADirection_value = map[string]int32{
+	"CADIRECTION_DL":   0,
+	"CADIRECTION_UL":   1,
+	"CADIRECTION_BOTH": 2,
 }
 
-func (x E2CADirection) String() string {
-	return proto.EnumName(E2CADirection_name, int32(x))
+func (x CADirection) String() string {
+	return proto.EnumName(CADirection_name, int32(x))
 }
 
-func (E2CADirection) EnumDescriptor() ([]byte, []int) {
+func (CADirection) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{19}
 }
 
@@ -857,6 +857,13 @@ var xxx_messageInfo_TelemetryRequest proto.InternalMessageInfo
 
 // TelemetryMessage carries sensory data about the RAN environment.
 type TelemetryMessage struct {
+	MessageType MessageType `protobuf:"varint,1,opt,name=messageType,proto3,enum=interface.e2.MessageType" json:"messageType,omitempty"`
+	// Types that are valid to be assigned to S:
+	//	*TelemetryMessage_RadioMeasReportPerUE
+	//	*TelemetryMessage_RadioMeasReportPerCell
+	//	*TelemetryMessage_SchedMeasReportPerCell
+	//	*TelemetryMessage_PDCPMeasReportPerUe
+	S isTelemetryMessage_S `protobuf_oneof:"s"`
 }
 
 func (m *TelemetryMessage) Reset()         { *m = TelemetryMessage{} }
@@ -892,8 +899,97 @@ func (m *TelemetryMessage) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_TelemetryMessage proto.InternalMessageInfo
 
+type isTelemetryMessage_S interface {
+	isTelemetryMessage_S()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type TelemetryMessage_RadioMeasReportPerUE struct {
+	RadioMeasReportPerUE *RadioMeasReportPerUE `protobuf:"bytes,2,opt,name=radioMeasReportPerUE,proto3,oneof" json:"radioMeasReportPerUE,omitempty"`
+}
+type TelemetryMessage_RadioMeasReportPerCell struct {
+	RadioMeasReportPerCell *RadioMeasReportPerCell `protobuf:"bytes,3,opt,name=radioMeasReportPerCell,proto3,oneof" json:"radioMeasReportPerCell,omitempty"`
+}
+type TelemetryMessage_SchedMeasReportPerCell struct {
+	SchedMeasReportPerCell *SchedMeasReportPerCell `protobuf:"bytes,4,opt,name=schedMeasReportPerCell,proto3,oneof" json:"schedMeasReportPerCell,omitempty"`
+}
+type TelemetryMessage_PDCPMeasReportPerUe struct {
+	PDCPMeasReportPerUe *PDCPMeasReportPerUe `protobuf:"bytes,5,opt,name=pDCPMeasReportPerUe,proto3,oneof" json:"pDCPMeasReportPerUe,omitempty"`
+}
+
+func (*TelemetryMessage_RadioMeasReportPerUE) isTelemetryMessage_S()   {}
+func (*TelemetryMessage_RadioMeasReportPerCell) isTelemetryMessage_S() {}
+func (*TelemetryMessage_SchedMeasReportPerCell) isTelemetryMessage_S() {}
+func (*TelemetryMessage_PDCPMeasReportPerUe) isTelemetryMessage_S()    {}
+
+func (m *TelemetryMessage) GetS() isTelemetryMessage_S {
+	if m != nil {
+		return m.S
+	}
+	return nil
+}
+
+func (m *TelemetryMessage) GetMessageType() MessageType {
+	if m != nil {
+		return m.MessageType
+	}
+	return MessageType_UNKNOWN_MESSAGE
+}
+
+func (m *TelemetryMessage) GetRadioMeasReportPerUE() *RadioMeasReportPerUE {
+	if x, ok := m.GetS().(*TelemetryMessage_RadioMeasReportPerUE); ok {
+		return x.RadioMeasReportPerUE
+	}
+	return nil
+}
+
+func (m *TelemetryMessage) GetRadioMeasReportPerCell() *RadioMeasReportPerCell {
+	if x, ok := m.GetS().(*TelemetryMessage_RadioMeasReportPerCell); ok {
+		return x.RadioMeasReportPerCell
+	}
+	return nil
+}
+
+func (m *TelemetryMessage) GetSchedMeasReportPerCell() *SchedMeasReportPerCell {
+	if x, ok := m.GetS().(*TelemetryMessage_SchedMeasReportPerCell); ok {
+		return x.SchedMeasReportPerCell
+	}
+	return nil
+}
+
+func (m *TelemetryMessage) GetPDCPMeasReportPerUe() *PDCPMeasReportPerUe {
+	if x, ok := m.GetS().(*TelemetryMessage_PDCPMeasReportPerUe); ok {
+		return x.PDCPMeasReportPerUe
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*TelemetryMessage) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*TelemetryMessage_RadioMeasReportPerUE)(nil),
+		(*TelemetryMessage_RadioMeasReportPerCell)(nil),
+		(*TelemetryMessage_SchedMeasReportPerCell)(nil),
+		(*TelemetryMessage_PDCPMeasReportPerUe)(nil),
+	}
+}
+
 // ControlUpdate carries a class of asynchronous control messages initiated by the RAN environment.
 type ControlUpdate struct {
+	MessageType MessageType `protobuf:"varint,1,opt,name=messageType,proto3,enum=interface.e2.MessageType" json:"messageType,omitempty"`
+	// Types that are valid to be assigned to S:
+	//	*ControlUpdate_CellConfigReport
+	//	*ControlUpdate_RRMConfigStatus
+	//	*ControlUpdate_UEAdmissionRequest
+	//	*ControlUpdate_UEAdmissionStatus
+	//	*ControlUpdate_UEContextUpdate
+	//	*ControlUpdate_BearerAdmissionRequest
+	//	*ControlUpdate_BearerAdmissionStatus
+	//	*ControlUpdate_HOComplete
+	//	*ControlUpdate_HOFailure
+	//	*ControlUpdate_HOCause
+	S isControlUpdate_S `protobuf_oneof:"s"`
 }
 
 func (m *ControlUpdate) Reset()         { *m = ControlUpdate{} }
@@ -929,8 +1025,165 @@ func (m *ControlUpdate) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ControlUpdate proto.InternalMessageInfo
 
+type isControlUpdate_S interface {
+	isControlUpdate_S()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type ControlUpdate_CellConfigReport struct {
+	CellConfigReport *CellConfigReport `protobuf:"bytes,2,opt,name=cellConfigReport,proto3,oneof" json:"cellConfigReport,omitempty"`
+}
+type ControlUpdate_RRMConfigStatus struct {
+	RRMConfigStatus *RRMConfigStatus `protobuf:"bytes,3,opt,name=rRMConfigStatus,proto3,oneof" json:"rRMConfigStatus,omitempty"`
+}
+type ControlUpdate_UEAdmissionRequest struct {
+	UEAdmissionRequest *UEAdmissionRequest `protobuf:"bytes,4,opt,name=uEAdmissionRequest,proto3,oneof" json:"uEAdmissionRequest,omitempty"`
+}
+type ControlUpdate_UEAdmissionStatus struct {
+	UEAdmissionStatus *UEAdmissionStatus `protobuf:"bytes,5,opt,name=uEAdmissionStatus,proto3,oneof" json:"uEAdmissionStatus,omitempty"`
+}
+type ControlUpdate_UEContextUpdate struct {
+	UEContextUpdate *UEContextUpdate `protobuf:"bytes,6,opt,name=uEContextUpdate,proto3,oneof" json:"uEContextUpdate,omitempty"`
+}
+type ControlUpdate_BearerAdmissionRequest struct {
+	BearerAdmissionRequest *BearerAdmissionRequest `protobuf:"bytes,7,opt,name=bearerAdmissionRequest,proto3,oneof" json:"bearerAdmissionRequest,omitempty"`
+}
+type ControlUpdate_BearerAdmissionStatus struct {
+	BearerAdmissionStatus *BearerAdmissionStatus `protobuf:"bytes,8,opt,name=bearerAdmissionStatus,proto3,oneof" json:"bearerAdmissionStatus,omitempty"`
+}
+type ControlUpdate_HOComplete struct {
+	HOComplete *HOComplete `protobuf:"bytes,9,opt,name=hOComplete,proto3,oneof" json:"hOComplete,omitempty"`
+}
+type ControlUpdate_HOFailure struct {
+	HOFailure *HOFailure `protobuf:"bytes,10,opt,name=hOFailure,proto3,oneof" json:"hOFailure,omitempty"`
+}
+type ControlUpdate_HOCause struct {
+	HOCause *HOCause `protobuf:"bytes,11,opt,name=hOCause,proto3,oneof" json:"hOCause,omitempty"`
+}
+
+func (*ControlUpdate_CellConfigReport) isControlUpdate_S()       {}
+func (*ControlUpdate_RRMConfigStatus) isControlUpdate_S()        {}
+func (*ControlUpdate_UEAdmissionRequest) isControlUpdate_S()     {}
+func (*ControlUpdate_UEAdmissionStatus) isControlUpdate_S()      {}
+func (*ControlUpdate_UEContextUpdate) isControlUpdate_S()        {}
+func (*ControlUpdate_BearerAdmissionRequest) isControlUpdate_S() {}
+func (*ControlUpdate_BearerAdmissionStatus) isControlUpdate_S()  {}
+func (*ControlUpdate_HOComplete) isControlUpdate_S()             {}
+func (*ControlUpdate_HOFailure) isControlUpdate_S()              {}
+func (*ControlUpdate_HOCause) isControlUpdate_S()                {}
+
+func (m *ControlUpdate) GetS() isControlUpdate_S {
+	if m != nil {
+		return m.S
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetMessageType() MessageType {
+	if m != nil {
+		return m.MessageType
+	}
+	return MessageType_UNKNOWN_MESSAGE
+}
+
+func (m *ControlUpdate) GetCellConfigReport() *CellConfigReport {
+	if x, ok := m.GetS().(*ControlUpdate_CellConfigReport); ok {
+		return x.CellConfigReport
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetRRMConfigStatus() *RRMConfigStatus {
+	if x, ok := m.GetS().(*ControlUpdate_RRMConfigStatus); ok {
+		return x.RRMConfigStatus
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetUEAdmissionRequest() *UEAdmissionRequest {
+	if x, ok := m.GetS().(*ControlUpdate_UEAdmissionRequest); ok {
+		return x.UEAdmissionRequest
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetUEAdmissionStatus() *UEAdmissionStatus {
+	if x, ok := m.GetS().(*ControlUpdate_UEAdmissionStatus); ok {
+		return x.UEAdmissionStatus
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetUEContextUpdate() *UEContextUpdate {
+	if x, ok := m.GetS().(*ControlUpdate_UEContextUpdate); ok {
+		return x.UEContextUpdate
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetBearerAdmissionRequest() *BearerAdmissionRequest {
+	if x, ok := m.GetS().(*ControlUpdate_BearerAdmissionRequest); ok {
+		return x.BearerAdmissionRequest
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetBearerAdmissionStatus() *BearerAdmissionStatus {
+	if x, ok := m.GetS().(*ControlUpdate_BearerAdmissionStatus); ok {
+		return x.BearerAdmissionStatus
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetHOComplete() *HOComplete {
+	if x, ok := m.GetS().(*ControlUpdate_HOComplete); ok {
+		return x.HOComplete
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetHOFailure() *HOFailure {
+	if x, ok := m.GetS().(*ControlUpdate_HOFailure); ok {
+		return x.HOFailure
+	}
+	return nil
+}
+
+func (m *ControlUpdate) GetHOCause() *HOCause {
+	if x, ok := m.GetS().(*ControlUpdate_HOCause); ok {
+		return x.HOCause
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ControlUpdate) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ControlUpdate_CellConfigReport)(nil),
+		(*ControlUpdate_RRMConfigStatus)(nil),
+		(*ControlUpdate_UEAdmissionRequest)(nil),
+		(*ControlUpdate_UEAdmissionStatus)(nil),
+		(*ControlUpdate_UEContextUpdate)(nil),
+		(*ControlUpdate_BearerAdmissionRequest)(nil),
+		(*ControlUpdate_BearerAdmissionStatus)(nil),
+		(*ControlUpdate_HOComplete)(nil),
+		(*ControlUpdate_HOFailure)(nil),
+		(*ControlUpdate_HOCause)(nil),
+	}
+}
+
 // ControlResponse contains asynchronous responses to control updates, e.g. admission response.
 type ControlResponse struct {
+	MessageType MessageType `protobuf:"varint,1,opt,name=messageType,proto3,enum=interface.e2.MessageType" json:"messageType,omitempty"`
+	// Types that are valid to be assigned to S:
+	//	*ControlResponse_CellConfigRequest
+	//	*ControlResponse_RRMConfig
+	//	*ControlResponse_L2MeasConfig
+	//	*ControlResponse_UEAdmissionResponse
+	//	*ControlResponse_BearerAdmissionResponse
+	//	*ControlResponse_HORequest
+	S isControlResponse_S `protobuf_oneof:"s"`
 }
 
 func (m *ControlResponse) Reset()         { *m = ControlResponse{} }
@@ -966,584 +1219,123 @@ func (m *ControlResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ControlResponse proto.InternalMessageInfo
 
-// Message header
-type E2MessageHeader struct {
-	MessageType E2MessageType `protobuf:"varint,1,opt,name=messageType,proto3,enum=interface.e2.E2MessageType" json:"messageType,omitempty"`
-}
-
-func (m *E2MessageHeader) Reset()         { *m = E2MessageHeader{} }
-func (m *E2MessageHeader) String() string { return proto.CompactTextString(m) }
-func (*E2MessageHeader) ProtoMessage()    {}
-func (*E2MessageHeader) Descriptor() ([]byte, []int) {
-	return fileDescriptor_310687c643405aa4, []int{4}
-}
-func (m *E2MessageHeader) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *E2MessageHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_E2MessageHeader.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *E2MessageHeader) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2MessageHeader.Merge(m, src)
-}
-func (m *E2MessageHeader) XXX_Size() int {
-	return m.Size()
-}
-func (m *E2MessageHeader) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2MessageHeader.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_E2MessageHeader proto.InternalMessageInfo
-
-func (m *E2MessageHeader) GetMessageType() E2MessageType {
-	if m != nil {
-		return m.MessageType
-	}
-	return E2MessageType_E2_UNKNOWNMESSAGE
-}
-
-// Message payload; one of attributes defined below
-type E2MessagePayload struct {
-	// Types that are valid to be assigned to Attributes:
-	//	*E2MessagePayload_CellConfigRequestAttribute
-	//	*E2MessagePayload_CellConfigReportAttribute
-	//	*E2MessagePayload_UEAdmissionRequestAttribute
-	//	*E2MessagePayload_UEAdmissionResponseAttribute
-	//	*E2MessagePayload_UEAdmissionStatusAttribute
-	//	*E2MessagePayload_UEContextUpdateAttribute
-	//	*E2MessagePayload_UEReconfigIndAttribute
-	//	*E2MessagePayload_UEReleaseIndAttribute
-	//	*E2MessagePayload_BearerAdmissionRequestAttribute
-	//	*E2MessagePayload_BearerAdmissionResponseAttribute
-	//	*E2MessagePayload_BearerAdmissionStatusAttribute
-	//	*E2MessagePayload_BearerReleaseIndAttribute
-	//	*E2MessagePayload_HORequestAttribute
-	//	*E2MessagePayload_HOFailureAttribute
-	//	*E2MessagePayload_HOCompleteAttribute
-	//	*E2MessagePayload_HOCauseAttribute
-	//	*E2MessagePayload_RRCMeasConfigAttribute
-	//	*E2MessagePayload_RxSigMeasReportAttribute
-	//	*E2MessagePayload_L2MeasConfigAttribute
-	//	*E2MessagePayload_RadioMeasReportPerU
-	//	*E2MessagePayload_RadioMeasReportPerCellAttribute
-	//	*E2MessagePayload_SchedMeasReportPerUEAttribute
-	//	*E2MessagePayload_SchedMeasReportPerCellAttribute
-	//	*E2MessagePayload_PDCPMeasReportPerUeAttribute
-	//	*E2MessagePayload_RRMConfigAttribute
-	//	*E2MessagePayload_RRMConfigStatusAttribute
-	//	*E2MessagePayload_UECapabilityEnquiryAttribute
-	//	*E2MessagePayload_UECapabilityInfoAttribute
-	//	*E2MessagePayload_ScellAddAttribute
-	//	*E2MessagePayload_ScellAddStatusAttribute
-	//	*E2MessagePayload_ScellDeleteAttribute
-	//	*E2MessagePayload_SeNBAddAttribute
-	//	*E2MessagePayload_SeNBAddStatusAttribute
-	//	*E2MessagePayload_SeNBDeleteAttribute
-	//	*E2MessagePayload_TrafficSplitConfigAttribute
-	Attributes isE2MessagePayload_Attributes `protobuf_oneof:"attributes"`
-}
-
-func (m *E2MessagePayload) Reset()         { *m = E2MessagePayload{} }
-func (m *E2MessagePayload) String() string { return proto.CompactTextString(m) }
-func (*E2MessagePayload) ProtoMessage()    {}
-func (*E2MessagePayload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_310687c643405aa4, []int{5}
-}
-func (m *E2MessagePayload) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *E2MessagePayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_E2MessagePayload.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *E2MessagePayload) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2MessagePayload.Merge(m, src)
-}
-func (m *E2MessagePayload) XXX_Size() int {
-	return m.Size()
-}
-func (m *E2MessagePayload) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2MessagePayload.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_E2MessagePayload proto.InternalMessageInfo
-
-type isE2MessagePayload_Attributes interface {
-	isE2MessagePayload_Attributes()
+type isControlResponse_S interface {
+	isControlResponse_S()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type E2MessagePayload_CellConfigRequestAttribute struct {
-	CellConfigRequestAttribute *E2CellConfigRequestAttribute `protobuf:"bytes,1,opt,name=cellConfigRequestAttribute,proto3,oneof" json:"cellConfigRequestAttribute,omitempty"`
+type ControlResponse_CellConfigRequest struct {
+	CellConfigRequest *CellConfigRequest `protobuf:"bytes,2,opt,name=cellConfigRequest,proto3,oneof" json:"cellConfigRequest,omitempty"`
 }
-type E2MessagePayload_CellConfigReportAttribute struct {
-	CellConfigReportAttribute *E2CellConfigReportAttribute `protobuf:"bytes,2,opt,name=cellConfigReportAttribute,proto3,oneof" json:"cellConfigReportAttribute,omitempty"`
+type ControlResponse_RRMConfig struct {
+	RRMConfig *RRMConfig `protobuf:"bytes,3,opt,name=rRMConfig,proto3,oneof" json:"rRMConfig,omitempty"`
 }
-type E2MessagePayload_UEAdmissionRequestAttribute struct {
-	UEAdmissionRequestAttribute *E2UEAdmissionRequestAttribute `protobuf:"bytes,3,opt,name=uEAdmissionRequestAttribute,proto3,oneof" json:"uEAdmissionRequestAttribute,omitempty"`
+type ControlResponse_L2MeasConfig struct {
+	L2MeasConfig *L2MeasConfig `protobuf:"bytes,4,opt,name=l2MeasConfig,proto3,oneof" json:"l2MeasConfig,omitempty"`
 }
-type E2MessagePayload_UEAdmissionResponseAttribute struct {
-	UEAdmissionResponseAttribute *E2UEAdmissionResponseAttribute `protobuf:"bytes,4,opt,name=uEAdmissionResponseAttribute,proto3,oneof" json:"uEAdmissionResponseAttribute,omitempty"`
+type ControlResponse_UEAdmissionResponse struct {
+	UEAdmissionResponse *UEAdmissionResponse `protobuf:"bytes,5,opt,name=uEAdmissionResponse,proto3,oneof" json:"uEAdmissionResponse,omitempty"`
 }
-type E2MessagePayload_UEAdmissionStatusAttribute struct {
-	UEAdmissionStatusAttribute *E2UEAdmissionStatusAttribute `protobuf:"bytes,5,opt,name=uEAdmissionStatusAttribute,proto3,oneof" json:"uEAdmissionStatusAttribute,omitempty"`
+type ControlResponse_BearerAdmissionResponse struct {
+	BearerAdmissionResponse *BearerAdmissionResponse `protobuf:"bytes,6,opt,name=bearerAdmissionResponse,proto3,oneof" json:"bearerAdmissionResponse,omitempty"`
 }
-type E2MessagePayload_UEContextUpdateAttribute struct {
-	UEContextUpdateAttribute *E2UEContextUpdateAttribute `protobuf:"bytes,6,opt,name=uEContextUpdateAttribute,proto3,oneof" json:"uEContextUpdateAttribute,omitempty"`
-}
-type E2MessagePayload_UEReconfigIndAttribute struct {
-	UEReconfigIndAttribute *E2UEReconfigIndAttribute `protobuf:"bytes,7,opt,name=uEReconfigIndAttribute,proto3,oneof" json:"uEReconfigIndAttribute,omitempty"`
-}
-type E2MessagePayload_UEReleaseIndAttribute struct {
-	UEReleaseIndAttribute *E2UEReleaseIndAttribute `protobuf:"bytes,8,opt,name=uEReleaseIndAttribute,proto3,oneof" json:"uEReleaseIndAttribute,omitempty"`
-}
-type E2MessagePayload_BearerAdmissionRequestAttribute struct {
-	BearerAdmissionRequestAttribute *E2BearerAdmissionRequestAttribute `protobuf:"bytes,9,opt,name=bearerAdmissionRequestAttribute,proto3,oneof" json:"bearerAdmissionRequestAttribute,omitempty"`
-}
-type E2MessagePayload_BearerAdmissionResponseAttribute struct {
-	BearerAdmissionResponseAttribute *E2BearerAdmissionResponseAttribute `protobuf:"bytes,10,opt,name=bearerAdmissionResponseAttribute,proto3,oneof" json:"bearerAdmissionResponseAttribute,omitempty"`
-}
-type E2MessagePayload_BearerAdmissionStatusAttribute struct {
-	BearerAdmissionStatusAttribute *E2BearerAdmissionStatusAttribute `protobuf:"bytes,11,opt,name=bearerAdmissionStatusAttribute,proto3,oneof" json:"bearerAdmissionStatusAttribute,omitempty"`
-}
-type E2MessagePayload_BearerReleaseIndAttribute struct {
-	BearerReleaseIndAttribute *E2BearerReleaseIndAttribute `protobuf:"bytes,12,opt,name=bearerReleaseIndAttribute,proto3,oneof" json:"bearerReleaseIndAttribute,omitempty"`
-}
-type E2MessagePayload_HORequestAttribute struct {
-	HORequestAttribute *E2HORequestAttribute `protobuf:"bytes,13,opt,name=hORequestAttribute,proto3,oneof" json:"hORequestAttribute,omitempty"`
-}
-type E2MessagePayload_HOFailureAttribute struct {
-	HOFailureAttribute *E2HOFailureAttribute `protobuf:"bytes,14,opt,name=hOFailureAttribute,proto3,oneof" json:"hOFailureAttribute,omitempty"`
-}
-type E2MessagePayload_HOCompleteAttribute struct {
-	HOCompleteAttribute *E2HOCompleteAttribute `protobuf:"bytes,15,opt,name=hOCompleteAttribute,proto3,oneof" json:"hOCompleteAttribute,omitempty"`
-}
-type E2MessagePayload_HOCauseAttribute struct {
-	HOCauseAttribute *E2HOCauseAttribute `protobuf:"bytes,16,opt,name=hOCauseAttribute,proto3,oneof" json:"hOCauseAttribute,omitempty"`
-}
-type E2MessagePayload_RRCMeasConfigAttribute struct {
-	RRCMeasConfigAttribute *E2RRCMeasConfigAttribute `protobuf:"bytes,17,opt,name=rRCMeasConfigAttribute,proto3,oneof" json:"rRCMeasConfigAttribute,omitempty"`
-}
-type E2MessagePayload_RxSigMeasReportAttribute struct {
-	RxSigMeasReportAttribute *E2RxSigMeasReportAttribute `protobuf:"bytes,18,opt,name=rxSigMeasReportAttribute,proto3,oneof" json:"rxSigMeasReportAttribute,omitempty"`
-}
-type E2MessagePayload_L2MeasConfigAttribute struct {
-	L2MeasConfigAttribute *E2L2MeasConfigAttribute `protobuf:"bytes,19,opt,name=l2MeasConfigAttribute,proto3,oneof" json:"l2MeasConfigAttribute,omitempty"`
-}
-type E2MessagePayload_RadioMeasReportPerU struct {
-	RadioMeasReportPerU *E2RadioMeasReportPerUEAttribute `protobuf:"bytes,20,opt,name=radioMeasReportPerU,proto3,oneof" json:"radioMeasReportPerU,omitempty"`
-}
-type E2MessagePayload_RadioMeasReportPerCellAttribute struct {
-	RadioMeasReportPerCellAttribute *E2RadioMeasReportPerCellAttribute `protobuf:"bytes,21,opt,name=radioMeasReportPerCellAttribute,proto3,oneof" json:"radioMeasReportPerCellAttribute,omitempty"`
-}
-type E2MessagePayload_SchedMeasReportPerUEAttribute struct {
-	SchedMeasReportPerUEAttribute *E2SchedMeasReportPerUEAttribute `protobuf:"bytes,22,opt,name=schedMeasReportPerUEAttribute,proto3,oneof" json:"schedMeasReportPerUEAttribute,omitempty"`
-}
-type E2MessagePayload_SchedMeasReportPerCellAttribute struct {
-	SchedMeasReportPerCellAttribute *E2SchedMeasReportPerCellAttribute `protobuf:"bytes,23,opt,name=schedMeasReportPerCellAttribute,proto3,oneof" json:"schedMeasReportPerCellAttribute,omitempty"`
-}
-type E2MessagePayload_PDCPMeasReportPerUeAttribute struct {
-	PDCPMeasReportPerUeAttribute *E2PDCPMeasReportPerUeAttribute `protobuf:"bytes,24,opt,name=pDCPMeasReportPerUeAttribute,proto3,oneof" json:"pDCPMeasReportPerUeAttribute,omitempty"`
-}
-type E2MessagePayload_RRMConfigAttribute struct {
-	RRMConfigAttribute *E2RRMConfigAttribute `protobuf:"bytes,25,opt,name=rRMConfigAttribute,proto3,oneof" json:"rRMConfigAttribute,omitempty"`
-}
-type E2MessagePayload_RRMConfigStatusAttribute struct {
-	RRMConfigStatusAttribute *E2RRMConfigStatusAttribute `protobuf:"bytes,26,opt,name=rRMConfigStatusAttribute,proto3,oneof" json:"rRMConfigStatusAttribute,omitempty"`
-}
-type E2MessagePayload_UECapabilityEnquiryAttribute struct {
-	UECapabilityEnquiryAttribute *E2UECapabilityEnquiryAttribute `protobuf:"bytes,27,opt,name=uECapabilityEnquiryAttribute,proto3,oneof" json:"uECapabilityEnquiryAttribute,omitempty"`
-}
-type E2MessagePayload_UECapabilityInfoAttribute struct {
-	UECapabilityInfoAttribute *E2UECapabilityInfoAttribute `protobuf:"bytes,28,opt,name=uECapabilityInfoAttribute,proto3,oneof" json:"uECapabilityInfoAttribute,omitempty"`
-}
-type E2MessagePayload_ScellAddAttribute struct {
-	ScellAddAttribute *E2ScellAddAttribute `protobuf:"bytes,29,opt,name=scellAddAttribute,proto3,oneof" json:"scellAddAttribute,omitempty"`
-}
-type E2MessagePayload_ScellAddStatusAttribute struct {
-	ScellAddStatusAttribute *E2ScellAddStatusAttribute `protobuf:"bytes,30,opt,name=scellAddStatusAttribute,proto3,oneof" json:"scellAddStatusAttribute,omitempty"`
-}
-type E2MessagePayload_ScellDeleteAttribute struct {
-	ScellDeleteAttribute *E2ScellDeleteAttribute `protobuf:"bytes,31,opt,name=scellDeleteAttribute,proto3,oneof" json:"scellDeleteAttribute,omitempty"`
-}
-type E2MessagePayload_SeNBAddAttribute struct {
-	SeNBAddAttribute *E2SeNBAddAttribute `protobuf:"bytes,32,opt,name=seNBAddAttribute,proto3,oneof" json:"seNBAddAttribute,omitempty"`
-}
-type E2MessagePayload_SeNBAddStatusAttribute struct {
-	SeNBAddStatusAttribute *E2SeNBAddStatusAttribute `protobuf:"bytes,33,opt,name=seNBAddStatusAttribute,proto3,oneof" json:"seNBAddStatusAttribute,omitempty"`
-}
-type E2MessagePayload_SeNBDeleteAttribute struct {
-	SeNBDeleteAttribute *E2SeNBDeleteAttribute `protobuf:"bytes,34,opt,name=seNBDeleteAttribute,proto3,oneof" json:"seNBDeleteAttribute,omitempty"`
-}
-type E2MessagePayload_TrafficSplitConfigAttribute struct {
-	TrafficSplitConfigAttribute *E2TrafficSplitConfigAttribute `protobuf:"bytes,35,opt,name=trafficSplitConfigAttribute,proto3,oneof" json:"trafficSplitConfigAttribute,omitempty"`
+type ControlResponse_HORequest struct {
+	HORequest *HORequest `protobuf:"bytes,7,opt,name=hORequest,proto3,oneof" json:"hORequest,omitempty"`
 }
 
-func (*E2MessagePayload_CellConfigRequestAttribute) isE2MessagePayload_Attributes()       {}
-func (*E2MessagePayload_CellConfigReportAttribute) isE2MessagePayload_Attributes()        {}
-func (*E2MessagePayload_UEAdmissionRequestAttribute) isE2MessagePayload_Attributes()      {}
-func (*E2MessagePayload_UEAdmissionResponseAttribute) isE2MessagePayload_Attributes()     {}
-func (*E2MessagePayload_UEAdmissionStatusAttribute) isE2MessagePayload_Attributes()       {}
-func (*E2MessagePayload_UEContextUpdateAttribute) isE2MessagePayload_Attributes()         {}
-func (*E2MessagePayload_UEReconfigIndAttribute) isE2MessagePayload_Attributes()           {}
-func (*E2MessagePayload_UEReleaseIndAttribute) isE2MessagePayload_Attributes()            {}
-func (*E2MessagePayload_BearerAdmissionRequestAttribute) isE2MessagePayload_Attributes()  {}
-func (*E2MessagePayload_BearerAdmissionResponseAttribute) isE2MessagePayload_Attributes() {}
-func (*E2MessagePayload_BearerAdmissionStatusAttribute) isE2MessagePayload_Attributes()   {}
-func (*E2MessagePayload_BearerReleaseIndAttribute) isE2MessagePayload_Attributes()        {}
-func (*E2MessagePayload_HORequestAttribute) isE2MessagePayload_Attributes()               {}
-func (*E2MessagePayload_HOFailureAttribute) isE2MessagePayload_Attributes()               {}
-func (*E2MessagePayload_HOCompleteAttribute) isE2MessagePayload_Attributes()              {}
-func (*E2MessagePayload_HOCauseAttribute) isE2MessagePayload_Attributes()                 {}
-func (*E2MessagePayload_RRCMeasConfigAttribute) isE2MessagePayload_Attributes()           {}
-func (*E2MessagePayload_RxSigMeasReportAttribute) isE2MessagePayload_Attributes()         {}
-func (*E2MessagePayload_L2MeasConfigAttribute) isE2MessagePayload_Attributes()            {}
-func (*E2MessagePayload_RadioMeasReportPerU) isE2MessagePayload_Attributes()              {}
-func (*E2MessagePayload_RadioMeasReportPerCellAttribute) isE2MessagePayload_Attributes()  {}
-func (*E2MessagePayload_SchedMeasReportPerUEAttribute) isE2MessagePayload_Attributes()    {}
-func (*E2MessagePayload_SchedMeasReportPerCellAttribute) isE2MessagePayload_Attributes()  {}
-func (*E2MessagePayload_PDCPMeasReportPerUeAttribute) isE2MessagePayload_Attributes()     {}
-func (*E2MessagePayload_RRMConfigAttribute) isE2MessagePayload_Attributes()               {}
-func (*E2MessagePayload_RRMConfigStatusAttribute) isE2MessagePayload_Attributes()         {}
-func (*E2MessagePayload_UECapabilityEnquiryAttribute) isE2MessagePayload_Attributes()     {}
-func (*E2MessagePayload_UECapabilityInfoAttribute) isE2MessagePayload_Attributes()        {}
-func (*E2MessagePayload_ScellAddAttribute) isE2MessagePayload_Attributes()                {}
-func (*E2MessagePayload_ScellAddStatusAttribute) isE2MessagePayload_Attributes()          {}
-func (*E2MessagePayload_ScellDeleteAttribute) isE2MessagePayload_Attributes()             {}
-func (*E2MessagePayload_SeNBAddAttribute) isE2MessagePayload_Attributes()                 {}
-func (*E2MessagePayload_SeNBAddStatusAttribute) isE2MessagePayload_Attributes()           {}
-func (*E2MessagePayload_SeNBDeleteAttribute) isE2MessagePayload_Attributes()              {}
-func (*E2MessagePayload_TrafficSplitConfigAttribute) isE2MessagePayload_Attributes()      {}
+func (*ControlResponse_CellConfigRequest) isControlResponse_S()       {}
+func (*ControlResponse_RRMConfig) isControlResponse_S()               {}
+func (*ControlResponse_L2MeasConfig) isControlResponse_S()            {}
+func (*ControlResponse_UEAdmissionResponse) isControlResponse_S()     {}
+func (*ControlResponse_BearerAdmissionResponse) isControlResponse_S() {}
+func (*ControlResponse_HORequest) isControlResponse_S()               {}
 
-func (m *E2MessagePayload) GetAttributes() isE2MessagePayload_Attributes {
+func (m *ControlResponse) GetS() isControlResponse_S {
 	if m != nil {
-		return m.Attributes
+		return m.S
 	}
 	return nil
 }
 
-func (m *E2MessagePayload) GetCellConfigRequestAttribute() *E2CellConfigRequestAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_CellConfigRequestAttribute); ok {
-		return x.CellConfigRequestAttribute
+func (m *ControlResponse) GetMessageType() MessageType {
+	if m != nil {
+		return m.MessageType
+	}
+	return MessageType_UNKNOWN_MESSAGE
+}
+
+func (m *ControlResponse) GetCellConfigRequest() *CellConfigRequest {
+	if x, ok := m.GetS().(*ControlResponse_CellConfigRequest); ok {
+		return x.CellConfigRequest
 	}
 	return nil
 }
 
-func (m *E2MessagePayload) GetCellConfigReportAttribute() *E2CellConfigReportAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_CellConfigReportAttribute); ok {
-		return x.CellConfigReportAttribute
+func (m *ControlResponse) GetRRMConfig() *RRMConfig {
+	if x, ok := m.GetS().(*ControlResponse_RRMConfig); ok {
+		return x.RRMConfig
 	}
 	return nil
 }
 
-func (m *E2MessagePayload) GetUEAdmissionRequestAttribute() *E2UEAdmissionRequestAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UEAdmissionRequestAttribute); ok {
-		return x.UEAdmissionRequestAttribute
+func (m *ControlResponse) GetL2MeasConfig() *L2MeasConfig {
+	if x, ok := m.GetS().(*ControlResponse_L2MeasConfig); ok {
+		return x.L2MeasConfig
 	}
 	return nil
 }
 
-func (m *E2MessagePayload) GetUEAdmissionResponseAttribute() *E2UEAdmissionResponseAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UEAdmissionResponseAttribute); ok {
-		return x.UEAdmissionResponseAttribute
+func (m *ControlResponse) GetUEAdmissionResponse() *UEAdmissionResponse {
+	if x, ok := m.GetS().(*ControlResponse_UEAdmissionResponse); ok {
+		return x.UEAdmissionResponse
 	}
 	return nil
 }
 
-func (m *E2MessagePayload) GetUEAdmissionStatusAttribute() *E2UEAdmissionStatusAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UEAdmissionStatusAttribute); ok {
-		return x.UEAdmissionStatusAttribute
+func (m *ControlResponse) GetBearerAdmissionResponse() *BearerAdmissionResponse {
+	if x, ok := m.GetS().(*ControlResponse_BearerAdmissionResponse); ok {
+		return x.BearerAdmissionResponse
 	}
 	return nil
 }
 
-func (m *E2MessagePayload) GetUEContextUpdateAttribute() *E2UEContextUpdateAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UEContextUpdateAttribute); ok {
-		return x.UEContextUpdateAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetUEReconfigIndAttribute() *E2UEReconfigIndAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UEReconfigIndAttribute); ok {
-		return x.UEReconfigIndAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetUEReleaseIndAttribute() *E2UEReleaseIndAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UEReleaseIndAttribute); ok {
-		return x.UEReleaseIndAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetBearerAdmissionRequestAttribute() *E2BearerAdmissionRequestAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_BearerAdmissionRequestAttribute); ok {
-		return x.BearerAdmissionRequestAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetBearerAdmissionResponseAttribute() *E2BearerAdmissionResponseAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_BearerAdmissionResponseAttribute); ok {
-		return x.BearerAdmissionResponseAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetBearerAdmissionStatusAttribute() *E2BearerAdmissionStatusAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_BearerAdmissionStatusAttribute); ok {
-		return x.BearerAdmissionStatusAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetBearerReleaseIndAttribute() *E2BearerReleaseIndAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_BearerReleaseIndAttribute); ok {
-		return x.BearerReleaseIndAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetHORequestAttribute() *E2HORequestAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_HORequestAttribute); ok {
-		return x.HORequestAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetHOFailureAttribute() *E2HOFailureAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_HOFailureAttribute); ok {
-		return x.HOFailureAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetHOCompleteAttribute() *E2HOCompleteAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_HOCompleteAttribute); ok {
-		return x.HOCompleteAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetHOCauseAttribute() *E2HOCauseAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_HOCauseAttribute); ok {
-		return x.HOCauseAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetRRCMeasConfigAttribute() *E2RRCMeasConfigAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_RRCMeasConfigAttribute); ok {
-		return x.RRCMeasConfigAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetRxSigMeasReportAttribute() *E2RxSigMeasReportAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_RxSigMeasReportAttribute); ok {
-		return x.RxSigMeasReportAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetL2MeasConfigAttribute() *E2L2MeasConfigAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_L2MeasConfigAttribute); ok {
-		return x.L2MeasConfigAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetRadioMeasReportPerU() *E2RadioMeasReportPerUEAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_RadioMeasReportPerU); ok {
-		return x.RadioMeasReportPerU
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetRadioMeasReportPerCellAttribute() *E2RadioMeasReportPerCellAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_RadioMeasReportPerCellAttribute); ok {
-		return x.RadioMeasReportPerCellAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetSchedMeasReportPerUEAttribute() *E2SchedMeasReportPerUEAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_SchedMeasReportPerUEAttribute); ok {
-		return x.SchedMeasReportPerUEAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetSchedMeasReportPerCellAttribute() *E2SchedMeasReportPerCellAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_SchedMeasReportPerCellAttribute); ok {
-		return x.SchedMeasReportPerCellAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetPDCPMeasReportPerUeAttribute() *E2PDCPMeasReportPerUeAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_PDCPMeasReportPerUeAttribute); ok {
-		return x.PDCPMeasReportPerUeAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetRRMConfigAttribute() *E2RRMConfigAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_RRMConfigAttribute); ok {
-		return x.RRMConfigAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetRRMConfigStatusAttribute() *E2RRMConfigStatusAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_RRMConfigStatusAttribute); ok {
-		return x.RRMConfigStatusAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetUECapabilityEnquiryAttribute() *E2UECapabilityEnquiryAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UECapabilityEnquiryAttribute); ok {
-		return x.UECapabilityEnquiryAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetUECapabilityInfoAttribute() *E2UECapabilityInfoAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_UECapabilityInfoAttribute); ok {
-		return x.UECapabilityInfoAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetScellAddAttribute() *E2ScellAddAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_ScellAddAttribute); ok {
-		return x.ScellAddAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetScellAddStatusAttribute() *E2ScellAddStatusAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_ScellAddStatusAttribute); ok {
-		return x.ScellAddStatusAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetScellDeleteAttribute() *E2ScellDeleteAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_ScellDeleteAttribute); ok {
-		return x.ScellDeleteAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetSeNBAddAttribute() *E2SeNBAddAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_SeNBAddAttribute); ok {
-		return x.SeNBAddAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetSeNBAddStatusAttribute() *E2SeNBAddStatusAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_SeNBAddStatusAttribute); ok {
-		return x.SeNBAddStatusAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetSeNBDeleteAttribute() *E2SeNBDeleteAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_SeNBDeleteAttribute); ok {
-		return x.SeNBDeleteAttribute
-	}
-	return nil
-}
-
-func (m *E2MessagePayload) GetTrafficSplitConfigAttribute() *E2TrafficSplitConfigAttribute {
-	if x, ok := m.GetAttributes().(*E2MessagePayload_TrafficSplitConfigAttribute); ok {
-		return x.TrafficSplitConfigAttribute
+func (m *ControlResponse) GetHORequest() *HORequest {
+	if x, ok := m.GetS().(*ControlResponse_HORequest); ok {
+		return x.HORequest
 	}
 	return nil
 }
 
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*E2MessagePayload) XXX_OneofWrappers() []interface{} {
+func (*ControlResponse) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*E2MessagePayload_CellConfigRequestAttribute)(nil),
-		(*E2MessagePayload_CellConfigReportAttribute)(nil),
-		(*E2MessagePayload_UEAdmissionRequestAttribute)(nil),
-		(*E2MessagePayload_UEAdmissionResponseAttribute)(nil),
-		(*E2MessagePayload_UEAdmissionStatusAttribute)(nil),
-		(*E2MessagePayload_UEContextUpdateAttribute)(nil),
-		(*E2MessagePayload_UEReconfigIndAttribute)(nil),
-		(*E2MessagePayload_UEReleaseIndAttribute)(nil),
-		(*E2MessagePayload_BearerAdmissionRequestAttribute)(nil),
-		(*E2MessagePayload_BearerAdmissionResponseAttribute)(nil),
-		(*E2MessagePayload_BearerAdmissionStatusAttribute)(nil),
-		(*E2MessagePayload_BearerReleaseIndAttribute)(nil),
-		(*E2MessagePayload_HORequestAttribute)(nil),
-		(*E2MessagePayload_HOFailureAttribute)(nil),
-		(*E2MessagePayload_HOCompleteAttribute)(nil),
-		(*E2MessagePayload_HOCauseAttribute)(nil),
-		(*E2MessagePayload_RRCMeasConfigAttribute)(nil),
-		(*E2MessagePayload_RxSigMeasReportAttribute)(nil),
-		(*E2MessagePayload_L2MeasConfigAttribute)(nil),
-		(*E2MessagePayload_RadioMeasReportPerU)(nil),
-		(*E2MessagePayload_RadioMeasReportPerCellAttribute)(nil),
-		(*E2MessagePayload_SchedMeasReportPerUEAttribute)(nil),
-		(*E2MessagePayload_SchedMeasReportPerCellAttribute)(nil),
-		(*E2MessagePayload_PDCPMeasReportPerUeAttribute)(nil),
-		(*E2MessagePayload_RRMConfigAttribute)(nil),
-		(*E2MessagePayload_RRMConfigStatusAttribute)(nil),
-		(*E2MessagePayload_UECapabilityEnquiryAttribute)(nil),
-		(*E2MessagePayload_UECapabilityInfoAttribute)(nil),
-		(*E2MessagePayload_ScellAddAttribute)(nil),
-		(*E2MessagePayload_ScellAddStatusAttribute)(nil),
-		(*E2MessagePayload_ScellDeleteAttribute)(nil),
-		(*E2MessagePayload_SeNBAddAttribute)(nil),
-		(*E2MessagePayload_SeNBAddStatusAttribute)(nil),
-		(*E2MessagePayload_SeNBDeleteAttribute)(nil),
-		(*E2MessagePayload_TrafficSplitConfigAttribute)(nil),
+		(*ControlResponse_CellConfigRequest)(nil),
+		(*ControlResponse_RRMConfig)(nil),
+		(*ControlResponse_L2MeasConfig)(nil),
+		(*ControlResponse_UEAdmissionResponse)(nil),
+		(*ControlResponse_BearerAdmissionResponse)(nil),
+		(*ControlResponse_HORequest)(nil),
 	}
 }
 
-// Full message frame having one header and one payload
-type E2Message struct {
-	Header  *E2MessageHeader  `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
-	Payload *E2MessagePayload `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+// Message header
+type MessageHeader struct {
+	MessageType MessageType `protobuf:"varint,1,opt,name=messageType,proto3,enum=interface.e2.MessageType" json:"messageType,omitempty"`
 }
 
-func (m *E2Message) Reset()         { *m = E2Message{} }
-func (m *E2Message) String() string { return proto.CompactTextString(m) }
-func (*E2Message) ProtoMessage()    {}
-func (*E2Message) Descriptor() ([]byte, []int) {
-	return fileDescriptor_310687c643405aa4, []int{6}
+func (m *MessageHeader) Reset()         { *m = MessageHeader{} }
+func (m *MessageHeader) String() string { return proto.CompactTextString(m) }
+func (*MessageHeader) ProtoMessage()    {}
+func (*MessageHeader) Descriptor() ([]byte, []int) {
+	return fileDescriptor_310687c643405aa4, []int{4}
 }
-func (m *E2Message) XXX_Unmarshal(b []byte) error {
+func (m *MessageHeader) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MessageHeader) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2Message.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MessageHeader.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1553,26 +1345,587 @@ func (m *E2Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2Message) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2Message.Merge(m, src)
+func (m *MessageHeader) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MessageHeader.Merge(m, src)
 }
-func (m *E2Message) XXX_Size() int {
+func (m *MessageHeader) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2Message) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2Message.DiscardUnknown(m)
+func (m *MessageHeader) XXX_DiscardUnknown() {
+	xxx_messageInfo_MessageHeader.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2Message proto.InternalMessageInfo
+var xxx_messageInfo_MessageHeader proto.InternalMessageInfo
 
-func (m *E2Message) GetHeader() *E2MessageHeader {
+func (m *MessageHeader) GetMessageType() MessageType {
+	if m != nil {
+		return m.MessageType
+	}
+	return MessageType_UNKNOWN_MESSAGE
+}
+
+// Message payload; one of s defined below
+type MessagePayload struct {
+	// Types that are valid to be assigned to S:
+	//	*MessagePayload_CellConfigRequest
+	//	*MessagePayload_CellConfigReport
+	//	*MessagePayload_UEAdmissionRequest
+	//	*MessagePayload_UEAdmissionResponse
+	//	*MessagePayload_UEAdmissionStatus
+	//	*MessagePayload_UEContextUpdate
+	//	*MessagePayload_UEReconfigInd
+	//	*MessagePayload_UEReleaseInd
+	//	*MessagePayload_BearerAdmissionRequest
+	//	*MessagePayload_BearerAdmissionResponse
+	//	*MessagePayload_BearerAdmissionStatus
+	//	*MessagePayload_BearerReleaseInd
+	//	*MessagePayload_HORequest
+	//	*MessagePayload_HOFailure
+	//	*MessagePayload_HOComplete
+	//	*MessagePayload_HOCause
+	//	*MessagePayload_RRCMeasConfig
+	//	*MessagePayload_RxSigMeasReport
+	//	*MessagePayload_L2MeasConfig
+	//	*MessagePayload_RadioMeasReportPerU
+	//	*MessagePayload_RadioMeasReportPerCell
+	//	*MessagePayload_SchedMeasReportPerUE
+	//	*MessagePayload_SchedMeasReportPerCell
+	//	*MessagePayload_PDCPMeasReportPerUe
+	//	*MessagePayload_RRMConfig
+	//	*MessagePayload_RRMConfigStatus
+	//	*MessagePayload_UECapabilityEnquiry
+	//	*MessagePayload_UECapabilityInfo
+	//	*MessagePayload_ScellAdd
+	//	*MessagePayload_ScellAddStatus
+	//	*MessagePayload_ScellDelete
+	//	*MessagePayload_SeNBAdd
+	//	*MessagePayload_SeNBAddStatus
+	//	*MessagePayload_SeNBDelete
+	//	*MessagePayload_TrafficSplitConfig
+	S isMessagePayload_S `protobuf_oneof:"s"`
+}
+
+func (m *MessagePayload) Reset()         { *m = MessagePayload{} }
+func (m *MessagePayload) String() string { return proto.CompactTextString(m) }
+func (*MessagePayload) ProtoMessage()    {}
+func (*MessagePayload) Descriptor() ([]byte, []int) {
+	return fileDescriptor_310687c643405aa4, []int{5}
+}
+func (m *MessagePayload) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MessagePayload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MessagePayload.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MessagePayload) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MessagePayload.Merge(m, src)
+}
+func (m *MessagePayload) XXX_Size() int {
+	return m.Size()
+}
+func (m *MessagePayload) XXX_DiscardUnknown() {
+	xxx_messageInfo_MessagePayload.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MessagePayload proto.InternalMessageInfo
+
+type isMessagePayload_S interface {
+	isMessagePayload_S()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type MessagePayload_CellConfigRequest struct {
+	CellConfigRequest *CellConfigRequest `protobuf:"bytes,1,opt,name=cellConfigRequest,proto3,oneof" json:"cellConfigRequest,omitempty"`
+}
+type MessagePayload_CellConfigReport struct {
+	CellConfigReport *CellConfigReport `protobuf:"bytes,2,opt,name=cellConfigReport,proto3,oneof" json:"cellConfigReport,omitempty"`
+}
+type MessagePayload_UEAdmissionRequest struct {
+	UEAdmissionRequest *UEAdmissionRequest `protobuf:"bytes,3,opt,name=uEAdmissionRequest,proto3,oneof" json:"uEAdmissionRequest,omitempty"`
+}
+type MessagePayload_UEAdmissionResponse struct {
+	UEAdmissionResponse *UEAdmissionResponse `protobuf:"bytes,4,opt,name=uEAdmissionResponse,proto3,oneof" json:"uEAdmissionResponse,omitempty"`
+}
+type MessagePayload_UEAdmissionStatus struct {
+	UEAdmissionStatus *UEAdmissionStatus `protobuf:"bytes,5,opt,name=uEAdmissionStatus,proto3,oneof" json:"uEAdmissionStatus,omitempty"`
+}
+type MessagePayload_UEContextUpdate struct {
+	UEContextUpdate *UEContextUpdate `protobuf:"bytes,6,opt,name=uEContextUpdate,proto3,oneof" json:"uEContextUpdate,omitempty"`
+}
+type MessagePayload_UEReconfigInd struct {
+	UEReconfigInd *UEReconfigInd `protobuf:"bytes,7,opt,name=uEReconfigInd,proto3,oneof" json:"uEReconfigInd,omitempty"`
+}
+type MessagePayload_UEReleaseInd struct {
+	UEReleaseInd *UEReleaseInd `protobuf:"bytes,8,opt,name=uEReleaseInd,proto3,oneof" json:"uEReleaseInd,omitempty"`
+}
+type MessagePayload_BearerAdmissionRequest struct {
+	BearerAdmissionRequest *BearerAdmissionRequest `protobuf:"bytes,9,opt,name=bearerAdmissionRequest,proto3,oneof" json:"bearerAdmissionRequest,omitempty"`
+}
+type MessagePayload_BearerAdmissionResponse struct {
+	BearerAdmissionResponse *BearerAdmissionResponse `protobuf:"bytes,10,opt,name=bearerAdmissionResponse,proto3,oneof" json:"bearerAdmissionResponse,omitempty"`
+}
+type MessagePayload_BearerAdmissionStatus struct {
+	BearerAdmissionStatus *BearerAdmissionStatus `protobuf:"bytes,11,opt,name=bearerAdmissionStatus,proto3,oneof" json:"bearerAdmissionStatus,omitempty"`
+}
+type MessagePayload_BearerReleaseInd struct {
+	BearerReleaseInd *BearerReleaseInd `protobuf:"bytes,12,opt,name=bearerReleaseInd,proto3,oneof" json:"bearerReleaseInd,omitempty"`
+}
+type MessagePayload_HORequest struct {
+	HORequest *HORequest `protobuf:"bytes,13,opt,name=hORequest,proto3,oneof" json:"hORequest,omitempty"`
+}
+type MessagePayload_HOFailure struct {
+	HOFailure *HOFailure `protobuf:"bytes,14,opt,name=hOFailure,proto3,oneof" json:"hOFailure,omitempty"`
+}
+type MessagePayload_HOComplete struct {
+	HOComplete *HOComplete `protobuf:"bytes,15,opt,name=hOComplete,proto3,oneof" json:"hOComplete,omitempty"`
+}
+type MessagePayload_HOCause struct {
+	HOCause *HOCause `protobuf:"bytes,16,opt,name=hOCause,proto3,oneof" json:"hOCause,omitempty"`
+}
+type MessagePayload_RRCMeasConfig struct {
+	RRCMeasConfig *RRCMeasConfig `protobuf:"bytes,17,opt,name=rRCMeasConfig,proto3,oneof" json:"rRCMeasConfig,omitempty"`
+}
+type MessagePayload_RxSigMeasReport struct {
+	RxSigMeasReport *RxSigMeasReport `protobuf:"bytes,18,opt,name=rxSigMeasReport,proto3,oneof" json:"rxSigMeasReport,omitempty"`
+}
+type MessagePayload_L2MeasConfig struct {
+	L2MeasConfig *L2MeasConfig `protobuf:"bytes,19,opt,name=l2MeasConfig,proto3,oneof" json:"l2MeasConfig,omitempty"`
+}
+type MessagePayload_RadioMeasReportPerU struct {
+	RadioMeasReportPerU *RadioMeasReportPerUE `protobuf:"bytes,20,opt,name=radioMeasReportPerU,proto3,oneof" json:"radioMeasReportPerU,omitempty"`
+}
+type MessagePayload_RadioMeasReportPerCell struct {
+	RadioMeasReportPerCell *RadioMeasReportPerCell `protobuf:"bytes,21,opt,name=radioMeasReportPerCell,proto3,oneof" json:"radioMeasReportPerCell,omitempty"`
+}
+type MessagePayload_SchedMeasReportPerUE struct {
+	SchedMeasReportPerUE *SchedMeasReportPerUE `protobuf:"bytes,22,opt,name=schedMeasReportPerUE,proto3,oneof" json:"schedMeasReportPerUE,omitempty"`
+}
+type MessagePayload_SchedMeasReportPerCell struct {
+	SchedMeasReportPerCell *SchedMeasReportPerCell `protobuf:"bytes,23,opt,name=schedMeasReportPerCell,proto3,oneof" json:"schedMeasReportPerCell,omitempty"`
+}
+type MessagePayload_PDCPMeasReportPerUe struct {
+	PDCPMeasReportPerUe *PDCPMeasReportPerUe `protobuf:"bytes,24,opt,name=pDCPMeasReportPerUe,proto3,oneof" json:"pDCPMeasReportPerUe,omitempty"`
+}
+type MessagePayload_RRMConfig struct {
+	RRMConfig *RRMConfig `protobuf:"bytes,25,opt,name=rRMConfig,proto3,oneof" json:"rRMConfig,omitempty"`
+}
+type MessagePayload_RRMConfigStatus struct {
+	RRMConfigStatus *RRMConfigStatus `protobuf:"bytes,26,opt,name=rRMConfigStatus,proto3,oneof" json:"rRMConfigStatus,omitempty"`
+}
+type MessagePayload_UECapabilityEnquiry struct {
+	UECapabilityEnquiry *UECapabilityEnquiry `protobuf:"bytes,27,opt,name=uECapabilityEnquiry,proto3,oneof" json:"uECapabilityEnquiry,omitempty"`
+}
+type MessagePayload_UECapabilityInfo struct {
+	UECapabilityInfo *UECapabilityInfo `protobuf:"bytes,28,opt,name=uECapabilityInfo,proto3,oneof" json:"uECapabilityInfo,omitempty"`
+}
+type MessagePayload_ScellAdd struct {
+	ScellAdd *ScellAdd `protobuf:"bytes,29,opt,name=scellAdd,proto3,oneof" json:"scellAdd,omitempty"`
+}
+type MessagePayload_ScellAddStatus struct {
+	ScellAddStatus *ScellAddStatus `protobuf:"bytes,30,opt,name=scellAddStatus,proto3,oneof" json:"scellAddStatus,omitempty"`
+}
+type MessagePayload_ScellDelete struct {
+	ScellDelete *ScellDelete `protobuf:"bytes,31,opt,name=scellDelete,proto3,oneof" json:"scellDelete,omitempty"`
+}
+type MessagePayload_SeNBAdd struct {
+	SeNBAdd *SeNBAdd `protobuf:"bytes,32,opt,name=seNBAdd,proto3,oneof" json:"seNBAdd,omitempty"`
+}
+type MessagePayload_SeNBAddStatus struct {
+	SeNBAddStatus *SeNBAddStatus `protobuf:"bytes,33,opt,name=seNBAddStatus,proto3,oneof" json:"seNBAddStatus,omitempty"`
+}
+type MessagePayload_SeNBDelete struct {
+	SeNBDelete *SeNBDelete `protobuf:"bytes,34,opt,name=seNBDelete,proto3,oneof" json:"seNBDelete,omitempty"`
+}
+type MessagePayload_TrafficSplitConfig struct {
+	TrafficSplitConfig *TrafficSplitConfig `protobuf:"bytes,35,opt,name=trafficSplitConfig,proto3,oneof" json:"trafficSplitConfig,omitempty"`
+}
+
+func (*MessagePayload_CellConfigRequest) isMessagePayload_S()       {}
+func (*MessagePayload_CellConfigReport) isMessagePayload_S()        {}
+func (*MessagePayload_UEAdmissionRequest) isMessagePayload_S()      {}
+func (*MessagePayload_UEAdmissionResponse) isMessagePayload_S()     {}
+func (*MessagePayload_UEAdmissionStatus) isMessagePayload_S()       {}
+func (*MessagePayload_UEContextUpdate) isMessagePayload_S()         {}
+func (*MessagePayload_UEReconfigInd) isMessagePayload_S()           {}
+func (*MessagePayload_UEReleaseInd) isMessagePayload_S()            {}
+func (*MessagePayload_BearerAdmissionRequest) isMessagePayload_S()  {}
+func (*MessagePayload_BearerAdmissionResponse) isMessagePayload_S() {}
+func (*MessagePayload_BearerAdmissionStatus) isMessagePayload_S()   {}
+func (*MessagePayload_BearerReleaseInd) isMessagePayload_S()        {}
+func (*MessagePayload_HORequest) isMessagePayload_S()               {}
+func (*MessagePayload_HOFailure) isMessagePayload_S()               {}
+func (*MessagePayload_HOComplete) isMessagePayload_S()              {}
+func (*MessagePayload_HOCause) isMessagePayload_S()                 {}
+func (*MessagePayload_RRCMeasConfig) isMessagePayload_S()           {}
+func (*MessagePayload_RxSigMeasReport) isMessagePayload_S()         {}
+func (*MessagePayload_L2MeasConfig) isMessagePayload_S()            {}
+func (*MessagePayload_RadioMeasReportPerU) isMessagePayload_S()     {}
+func (*MessagePayload_RadioMeasReportPerCell) isMessagePayload_S()  {}
+func (*MessagePayload_SchedMeasReportPerUE) isMessagePayload_S()    {}
+func (*MessagePayload_SchedMeasReportPerCell) isMessagePayload_S()  {}
+func (*MessagePayload_PDCPMeasReportPerUe) isMessagePayload_S()     {}
+func (*MessagePayload_RRMConfig) isMessagePayload_S()               {}
+func (*MessagePayload_RRMConfigStatus) isMessagePayload_S()         {}
+func (*MessagePayload_UECapabilityEnquiry) isMessagePayload_S()     {}
+func (*MessagePayload_UECapabilityInfo) isMessagePayload_S()        {}
+func (*MessagePayload_ScellAdd) isMessagePayload_S()                {}
+func (*MessagePayload_ScellAddStatus) isMessagePayload_S()          {}
+func (*MessagePayload_ScellDelete) isMessagePayload_S()             {}
+func (*MessagePayload_SeNBAdd) isMessagePayload_S()                 {}
+func (*MessagePayload_SeNBAddStatus) isMessagePayload_S()           {}
+func (*MessagePayload_SeNBDelete) isMessagePayload_S()              {}
+func (*MessagePayload_TrafficSplitConfig) isMessagePayload_S()      {}
+
+func (m *MessagePayload) GetS() isMessagePayload_S {
+	if m != nil {
+		return m.S
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetCellConfigRequest() *CellConfigRequest {
+	if x, ok := m.GetS().(*MessagePayload_CellConfigRequest); ok {
+		return x.CellConfigRequest
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetCellConfigReport() *CellConfigReport {
+	if x, ok := m.GetS().(*MessagePayload_CellConfigReport); ok {
+		return x.CellConfigReport
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUEAdmissionRequest() *UEAdmissionRequest {
+	if x, ok := m.GetS().(*MessagePayload_UEAdmissionRequest); ok {
+		return x.UEAdmissionRequest
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUEAdmissionResponse() *UEAdmissionResponse {
+	if x, ok := m.GetS().(*MessagePayload_UEAdmissionResponse); ok {
+		return x.UEAdmissionResponse
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUEAdmissionStatus() *UEAdmissionStatus {
+	if x, ok := m.GetS().(*MessagePayload_UEAdmissionStatus); ok {
+		return x.UEAdmissionStatus
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUEContextUpdate() *UEContextUpdate {
+	if x, ok := m.GetS().(*MessagePayload_UEContextUpdate); ok {
+		return x.UEContextUpdate
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUEReconfigInd() *UEReconfigInd {
+	if x, ok := m.GetS().(*MessagePayload_UEReconfigInd); ok {
+		return x.UEReconfigInd
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUEReleaseInd() *UEReleaseInd {
+	if x, ok := m.GetS().(*MessagePayload_UEReleaseInd); ok {
+		return x.UEReleaseInd
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetBearerAdmissionRequest() *BearerAdmissionRequest {
+	if x, ok := m.GetS().(*MessagePayload_BearerAdmissionRequest); ok {
+		return x.BearerAdmissionRequest
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetBearerAdmissionResponse() *BearerAdmissionResponse {
+	if x, ok := m.GetS().(*MessagePayload_BearerAdmissionResponse); ok {
+		return x.BearerAdmissionResponse
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetBearerAdmissionStatus() *BearerAdmissionStatus {
+	if x, ok := m.GetS().(*MessagePayload_BearerAdmissionStatus); ok {
+		return x.BearerAdmissionStatus
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetBearerReleaseInd() *BearerReleaseInd {
+	if x, ok := m.GetS().(*MessagePayload_BearerReleaseInd); ok {
+		return x.BearerReleaseInd
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetHORequest() *HORequest {
+	if x, ok := m.GetS().(*MessagePayload_HORequest); ok {
+		return x.HORequest
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetHOFailure() *HOFailure {
+	if x, ok := m.GetS().(*MessagePayload_HOFailure); ok {
+		return x.HOFailure
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetHOComplete() *HOComplete {
+	if x, ok := m.GetS().(*MessagePayload_HOComplete); ok {
+		return x.HOComplete
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetHOCause() *HOCause {
+	if x, ok := m.GetS().(*MessagePayload_HOCause); ok {
+		return x.HOCause
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetRRCMeasConfig() *RRCMeasConfig {
+	if x, ok := m.GetS().(*MessagePayload_RRCMeasConfig); ok {
+		return x.RRCMeasConfig
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetRxSigMeasReport() *RxSigMeasReport {
+	if x, ok := m.GetS().(*MessagePayload_RxSigMeasReport); ok {
+		return x.RxSigMeasReport
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetL2MeasConfig() *L2MeasConfig {
+	if x, ok := m.GetS().(*MessagePayload_L2MeasConfig); ok {
+		return x.L2MeasConfig
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetRadioMeasReportPerU() *RadioMeasReportPerUE {
+	if x, ok := m.GetS().(*MessagePayload_RadioMeasReportPerU); ok {
+		return x.RadioMeasReportPerU
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetRadioMeasReportPerCell() *RadioMeasReportPerCell {
+	if x, ok := m.GetS().(*MessagePayload_RadioMeasReportPerCell); ok {
+		return x.RadioMeasReportPerCell
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetSchedMeasReportPerUE() *SchedMeasReportPerUE {
+	if x, ok := m.GetS().(*MessagePayload_SchedMeasReportPerUE); ok {
+		return x.SchedMeasReportPerUE
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetSchedMeasReportPerCell() *SchedMeasReportPerCell {
+	if x, ok := m.GetS().(*MessagePayload_SchedMeasReportPerCell); ok {
+		return x.SchedMeasReportPerCell
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetPDCPMeasReportPerUe() *PDCPMeasReportPerUe {
+	if x, ok := m.GetS().(*MessagePayload_PDCPMeasReportPerUe); ok {
+		return x.PDCPMeasReportPerUe
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetRRMConfig() *RRMConfig {
+	if x, ok := m.GetS().(*MessagePayload_RRMConfig); ok {
+		return x.RRMConfig
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetRRMConfigStatus() *RRMConfigStatus {
+	if x, ok := m.GetS().(*MessagePayload_RRMConfigStatus); ok {
+		return x.RRMConfigStatus
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUECapabilityEnquiry() *UECapabilityEnquiry {
+	if x, ok := m.GetS().(*MessagePayload_UECapabilityEnquiry); ok {
+		return x.UECapabilityEnquiry
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetUECapabilityInfo() *UECapabilityInfo {
+	if x, ok := m.GetS().(*MessagePayload_UECapabilityInfo); ok {
+		return x.UECapabilityInfo
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetScellAdd() *ScellAdd {
+	if x, ok := m.GetS().(*MessagePayload_ScellAdd); ok {
+		return x.ScellAdd
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetScellAddStatus() *ScellAddStatus {
+	if x, ok := m.GetS().(*MessagePayload_ScellAddStatus); ok {
+		return x.ScellAddStatus
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetScellDelete() *ScellDelete {
+	if x, ok := m.GetS().(*MessagePayload_ScellDelete); ok {
+		return x.ScellDelete
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetSeNBAdd() *SeNBAdd {
+	if x, ok := m.GetS().(*MessagePayload_SeNBAdd); ok {
+		return x.SeNBAdd
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetSeNBAddStatus() *SeNBAddStatus {
+	if x, ok := m.GetS().(*MessagePayload_SeNBAddStatus); ok {
+		return x.SeNBAddStatus
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetSeNBDelete() *SeNBDelete {
+	if x, ok := m.GetS().(*MessagePayload_SeNBDelete); ok {
+		return x.SeNBDelete
+	}
+	return nil
+}
+
+func (m *MessagePayload) GetTrafficSplitConfig() *TrafficSplitConfig {
+	if x, ok := m.GetS().(*MessagePayload_TrafficSplitConfig); ok {
+		return x.TrafficSplitConfig
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*MessagePayload) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*MessagePayload_CellConfigRequest)(nil),
+		(*MessagePayload_CellConfigReport)(nil),
+		(*MessagePayload_UEAdmissionRequest)(nil),
+		(*MessagePayload_UEAdmissionResponse)(nil),
+		(*MessagePayload_UEAdmissionStatus)(nil),
+		(*MessagePayload_UEContextUpdate)(nil),
+		(*MessagePayload_UEReconfigInd)(nil),
+		(*MessagePayload_UEReleaseInd)(nil),
+		(*MessagePayload_BearerAdmissionRequest)(nil),
+		(*MessagePayload_BearerAdmissionResponse)(nil),
+		(*MessagePayload_BearerAdmissionStatus)(nil),
+		(*MessagePayload_BearerReleaseInd)(nil),
+		(*MessagePayload_HORequest)(nil),
+		(*MessagePayload_HOFailure)(nil),
+		(*MessagePayload_HOComplete)(nil),
+		(*MessagePayload_HOCause)(nil),
+		(*MessagePayload_RRCMeasConfig)(nil),
+		(*MessagePayload_RxSigMeasReport)(nil),
+		(*MessagePayload_L2MeasConfig)(nil),
+		(*MessagePayload_RadioMeasReportPerU)(nil),
+		(*MessagePayload_RadioMeasReportPerCell)(nil),
+		(*MessagePayload_SchedMeasReportPerUE)(nil),
+		(*MessagePayload_SchedMeasReportPerCell)(nil),
+		(*MessagePayload_PDCPMeasReportPerUe)(nil),
+		(*MessagePayload_RRMConfig)(nil),
+		(*MessagePayload_RRMConfigStatus)(nil),
+		(*MessagePayload_UECapabilityEnquiry)(nil),
+		(*MessagePayload_UECapabilityInfo)(nil),
+		(*MessagePayload_ScellAdd)(nil),
+		(*MessagePayload_ScellAddStatus)(nil),
+		(*MessagePayload_ScellDelete)(nil),
+		(*MessagePayload_SeNBAdd)(nil),
+		(*MessagePayload_SeNBAddStatus)(nil),
+		(*MessagePayload_SeNBDelete)(nil),
+		(*MessagePayload_TrafficSplitConfig)(nil),
+	}
+}
+
+// Full message frame having one header and one payload
+type Message struct {
+	Header  *MessageHeader  `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
+	Payload *MessagePayload `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
+}
+
+func (m *Message) Reset()         { *m = Message{} }
+func (m *Message) String() string { return proto.CompactTextString(m) }
+func (*Message) ProtoMessage()    {}
+func (*Message) Descriptor() ([]byte, []int) {
+	return fileDescriptor_310687c643405aa4, []int{6}
+}
+func (m *Message) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Message) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Message.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Message) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Message.Merge(m, src)
+}
+func (m *Message) XXX_Size() int {
+	return m.Size()
+}
+func (m *Message) XXX_DiscardUnknown() {
+	xxx_messageInfo_Message.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Message proto.InternalMessageInfo
+
+func (m *Message) GetHeader() *MessageHeader {
 	if m != nil {
 		return m.Header
 	}
 	return nil
 }
 
-func (m *E2Message) GetPayload() *E2MessagePayload {
+func (m *Message) GetPayload() *MessagePayload {
 	if m != nil {
 		return m.Payload
 	}
@@ -1632,23 +1985,23 @@ func (m *ServiceResult) GetResultMessage() string {
 	return ""
 }
 
-type E2ECGI struct {
+type ECGI struct {
 	PlmnId string `protobuf:"bytes,1,opt,name=plmnId,proto3" json:"plmnId,omitempty"`
 	Ecid   string `protobuf:"bytes,2,opt,name=ecid,proto3" json:"ecid,omitempty"`
 }
 
-func (m *E2ECGI) Reset()         { *m = E2ECGI{} }
-func (m *E2ECGI) String() string { return proto.CompactTextString(m) }
-func (*E2ECGI) ProtoMessage()    {}
-func (*E2ECGI) Descriptor() ([]byte, []int) {
+func (m *ECGI) Reset()         { *m = ECGI{} }
+func (m *ECGI) String() string { return proto.CompactTextString(m) }
+func (*ECGI) ProtoMessage()    {}
+func (*ECGI) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{8}
 }
-func (m *E2ECGI) XXX_Unmarshal(b []byte) error {
+func (m *ECGI) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ECGI) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ECGI) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ECGI.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ECGI.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1658,49 +2011,49 @@ func (m *E2ECGI) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2ECGI) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ECGI.Merge(m, src)
+func (m *ECGI) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ECGI.Merge(m, src)
 }
-func (m *E2ECGI) XXX_Size() int {
+func (m *ECGI) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ECGI) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ECGI.DiscardUnknown(m)
+func (m *ECGI) XXX_DiscardUnknown() {
+	xxx_messageInfo_ECGI.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ECGI proto.InternalMessageInfo
+var xxx_messageInfo_ECGI proto.InternalMessageInfo
 
-func (m *E2ECGI) GetPlmnId() string {
+func (m *ECGI) GetPlmnId() string {
 	if m != nil {
 		return m.PlmnId
 	}
 	return ""
 }
 
-func (m *E2ECGI) GetEcid() string {
+func (m *ECGI) GetEcid() string {
 	if m != nil {
 		return m.Ecid
 	}
 	return ""
 }
 
-type E2CandScell struct {
+type CandScell struct {
 	Pci      string `protobuf:"bytes,1,opt,name=pci,proto3" json:"pci,omitempty"`
 	EarfcnDl string `protobuf:"bytes,2,opt,name=earfcnDl,proto3" json:"earfcnDl,omitempty"`
 }
 
-func (m *E2CandScell) Reset()         { *m = E2CandScell{} }
-func (m *E2CandScell) String() string { return proto.CompactTextString(m) }
-func (*E2CandScell) ProtoMessage()    {}
-func (*E2CandScell) Descriptor() ([]byte, []int) {
+func (m *CandScell) Reset()         { *m = CandScell{} }
+func (m *CandScell) String() string { return proto.CompactTextString(m) }
+func (*CandScell) ProtoMessage()    {}
+func (*CandScell) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{9}
 }
-func (m *E2CandScell) XXX_Unmarshal(b []byte) error {
+func (m *CandScell) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2CandScell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CandScell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2CandScell.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CandScell.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1710,26 +2063,26 @@ func (m *E2CandScell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (m *E2CandScell) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2CandScell.Merge(m, src)
+func (m *CandScell) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CandScell.Merge(m, src)
 }
-func (m *E2CandScell) XXX_Size() int {
+func (m *CandScell) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2CandScell) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2CandScell.DiscardUnknown(m)
+func (m *CandScell) XXX_DiscardUnknown() {
+	xxx_messageInfo_CandScell.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2CandScell proto.InternalMessageInfo
+var xxx_messageInfo_CandScell proto.InternalMessageInfo
 
-func (m *E2CandScell) GetPci() string {
+func (m *CandScell) GetPci() string {
 	if m != nil {
 		return m.Pci
 	}
 	return ""
 }
 
-func (m *E2CandScell) GetEarfcnDl() string {
+func (m *CandScell) GetEarfcnDl() string {
 	if m != nil {
 		return m.EarfcnDl
 	}
@@ -1737,22 +2090,22 @@ func (m *E2CandScell) GetEarfcnDl() string {
 }
 
 // CellConfigRequest message
-type E2CellConfigRequestAttribute struct {
-	Ecgi *E2ECGI `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+type CellConfigRequest struct {
+	Ecgi *ECGI `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
 }
 
-func (m *E2CellConfigRequestAttribute) Reset()         { *m = E2CellConfigRequestAttribute{} }
-func (m *E2CellConfigRequestAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2CellConfigRequestAttribute) ProtoMessage()    {}
-func (*E2CellConfigRequestAttribute) Descriptor() ([]byte, []int) {
+func (m *CellConfigRequest) Reset()         { *m = CellConfigRequest{} }
+func (m *CellConfigRequest) String() string { return proto.CompactTextString(m) }
+func (*CellConfigRequest) ProtoMessage()    {}
+func (*CellConfigRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{10}
 }
-func (m *E2CellConfigRequestAttribute) XXX_Unmarshal(b []byte) error {
+func (m *CellConfigRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2CellConfigRequestAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CellConfigRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2CellConfigRequestAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CellConfigRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1762,19 +2115,19 @@ func (m *E2CellConfigRequestAttribute) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (m *E2CellConfigRequestAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2CellConfigRequestAttribute.Merge(m, src)
+func (m *CellConfigRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CellConfigRequest.Merge(m, src)
 }
-func (m *E2CellConfigRequestAttribute) XXX_Size() int {
+func (m *CellConfigRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2CellConfigRequestAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2CellConfigRequestAttribute.DiscardUnknown(m)
+func (m *CellConfigRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CellConfigRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2CellConfigRequestAttribute proto.InternalMessageInfo
+var xxx_messageInfo_CellConfigRequest proto.InternalMessageInfo
 
-func (m *E2CellConfigRequestAttribute) GetEcgi() *E2ECGI {
+func (m *CellConfigRequest) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
@@ -1782,35 +2135,35 @@ func (m *E2CellConfigRequestAttribute) GetEcgi() *E2ECGI {
 }
 
 // CellConfigReport message
-type E2CellConfigReportAttribute struct {
-	Ecgi                   *E2ECGI        `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Pci                    string         `protobuf:"bytes,2,opt,name=pci,proto3" json:"pci,omitempty"`
-	CandScells             []*E2CandScell `protobuf:"bytes,3,rep,name=candScells,proto3" json:"candScells,omitempty"`
-	EarfcnDl               string         `protobuf:"bytes,4,opt,name=earfcnDl,proto3" json:"earfcnDl,omitempty"`
-	EarfcnUl               string         `protobuf:"bytes,5,opt,name=earfcnUl,proto3" json:"earfcnUl,omitempty"`
-	RbsPerTtiDl            string         `protobuf:"bytes,6,opt,name=rbsPerTtiDl,proto3" json:"rbsPerTtiDl,omitempty"`
-	RbsPerTtiUl            string         `protobuf:"bytes,7,opt,name=rbsPerTtiUl,proto3" json:"rbsPerTtiUl,omitempty"`
-	NumTxAntenna           string         `protobuf:"bytes,8,opt,name=numTxAntenna,proto3" json:"numTxAntenna,omitempty"`
-	DuplexMode             string         `protobuf:"bytes,9,opt,name=duplexMode,proto3" json:"duplexMode,omitempty"`
-	MaxNumConnectedUes     string         `protobuf:"bytes,10,opt,name=maxNumConnectedUes,proto3" json:"maxNumConnectedUes,omitempty"`
-	MaxNumConnectedBearers string         `protobuf:"bytes,11,opt,name=maxNumConnectedBearers,proto3" json:"maxNumConnectedBearers,omitempty"`
-	MaxNumUesSchedPerTtiDl string         `protobuf:"bytes,12,opt,name=maxNumUesSchedPerTtiDl,proto3" json:"maxNumUesSchedPerTtiDl,omitempty"`
-	MaxNumUesSchedPerTtiUl string         `protobuf:"bytes,13,opt,name=maxNumUesSchedPerTtiUl,proto3" json:"maxNumUesSchedPerTtiUl,omitempty"`
-	DlfsSchedEnable        string         `protobuf:"bytes,14,opt,name=dlfsSchedEnable,proto3" json:"dlfsSchedEnable,omitempty"`
+type CellConfigReport struct {
+	Ecgi                   *ECGI        `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Pci                    string       `protobuf:"bytes,2,opt,name=pci,proto3" json:"pci,omitempty"`
+	CandScells             []*CandScell `protobuf:"bytes,3,rep,name=candScells,proto3" json:"candScells,omitempty"`
+	EarfcnDl               string       `protobuf:"bytes,4,opt,name=earfcnDl,proto3" json:"earfcnDl,omitempty"`
+	EarfcnUl               string       `protobuf:"bytes,5,opt,name=earfcnUl,proto3" json:"earfcnUl,omitempty"`
+	RbsPerTtiDl            string       `protobuf:"bytes,6,opt,name=rbsPerTtiDl,proto3" json:"rbsPerTtiDl,omitempty"`
+	RbsPerTtiUl            string       `protobuf:"bytes,7,opt,name=rbsPerTtiUl,proto3" json:"rbsPerTtiUl,omitempty"`
+	NumTxAntenna           string       `protobuf:"bytes,8,opt,name=numTxAntenna,proto3" json:"numTxAntenna,omitempty"`
+	DuplexMode             string       `protobuf:"bytes,9,opt,name=duplexMode,proto3" json:"duplexMode,omitempty"`
+	MaxNumConnectedUes     string       `protobuf:"bytes,10,opt,name=maxNumConnectedUes,proto3" json:"maxNumConnectedUes,omitempty"`
+	MaxNumConnectedBearers string       `protobuf:"bytes,11,opt,name=maxNumConnectedBearers,proto3" json:"maxNumConnectedBearers,omitempty"`
+	MaxNumUesSchedPerTtiDl string       `protobuf:"bytes,12,opt,name=maxNumUesSchedPerTtiDl,proto3" json:"maxNumUesSchedPerTtiDl,omitempty"`
+	MaxNumUesSchedPerTtiUl string       `protobuf:"bytes,13,opt,name=maxNumUesSchedPerTtiUl,proto3" json:"maxNumUesSchedPerTtiUl,omitempty"`
+	DlfsSchedEnable        string       `protobuf:"bytes,14,opt,name=dlfsSchedEnable,proto3" json:"dlfsSchedEnable,omitempty"`
 }
 
-func (m *E2CellConfigReportAttribute) Reset()         { *m = E2CellConfigReportAttribute{} }
-func (m *E2CellConfigReportAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2CellConfigReportAttribute) ProtoMessage()    {}
-func (*E2CellConfigReportAttribute) Descriptor() ([]byte, []int) {
+func (m *CellConfigReport) Reset()         { *m = CellConfigReport{} }
+func (m *CellConfigReport) String() string { return proto.CompactTextString(m) }
+func (*CellConfigReport) ProtoMessage()    {}
+func (*CellConfigReport) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{11}
 }
-func (m *E2CellConfigReportAttribute) XXX_Unmarshal(b []byte) error {
+func (m *CellConfigReport) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2CellConfigReportAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CellConfigReport) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2CellConfigReportAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CellConfigReport.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1820,110 +2173,110 @@ func (m *E2CellConfigReportAttribute) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *E2CellConfigReportAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2CellConfigReportAttribute.Merge(m, src)
+func (m *CellConfigReport) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CellConfigReport.Merge(m, src)
 }
-func (m *E2CellConfigReportAttribute) XXX_Size() int {
+func (m *CellConfigReport) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2CellConfigReportAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2CellConfigReportAttribute.DiscardUnknown(m)
+func (m *CellConfigReport) XXX_DiscardUnknown() {
+	xxx_messageInfo_CellConfigReport.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2CellConfigReportAttribute proto.InternalMessageInfo
+var xxx_messageInfo_CellConfigReport proto.InternalMessageInfo
 
-func (m *E2CellConfigReportAttribute) GetEcgi() *E2ECGI {
+func (m *CellConfigReport) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2CellConfigReportAttribute) GetPci() string {
+func (m *CellConfigReport) GetPci() string {
 	if m != nil {
 		return m.Pci
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetCandScells() []*E2CandScell {
+func (m *CellConfigReport) GetCandScells() []*CandScell {
 	if m != nil {
 		return m.CandScells
 	}
 	return nil
 }
 
-func (m *E2CellConfigReportAttribute) GetEarfcnDl() string {
+func (m *CellConfigReport) GetEarfcnDl() string {
 	if m != nil {
 		return m.EarfcnDl
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetEarfcnUl() string {
+func (m *CellConfigReport) GetEarfcnUl() string {
 	if m != nil {
 		return m.EarfcnUl
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetRbsPerTtiDl() string {
+func (m *CellConfigReport) GetRbsPerTtiDl() string {
 	if m != nil {
 		return m.RbsPerTtiDl
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetRbsPerTtiUl() string {
+func (m *CellConfigReport) GetRbsPerTtiUl() string {
 	if m != nil {
 		return m.RbsPerTtiUl
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetNumTxAntenna() string {
+func (m *CellConfigReport) GetNumTxAntenna() string {
 	if m != nil {
 		return m.NumTxAntenna
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetDuplexMode() string {
+func (m *CellConfigReport) GetDuplexMode() string {
 	if m != nil {
 		return m.DuplexMode
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetMaxNumConnectedUes() string {
+func (m *CellConfigReport) GetMaxNumConnectedUes() string {
 	if m != nil {
 		return m.MaxNumConnectedUes
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetMaxNumConnectedBearers() string {
+func (m *CellConfigReport) GetMaxNumConnectedBearers() string {
 	if m != nil {
 		return m.MaxNumConnectedBearers
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetMaxNumUesSchedPerTtiDl() string {
+func (m *CellConfigReport) GetMaxNumUesSchedPerTtiDl() string {
 	if m != nil {
 		return m.MaxNumUesSchedPerTtiDl
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetMaxNumUesSchedPerTtiUl() string {
+func (m *CellConfigReport) GetMaxNumUesSchedPerTtiUl() string {
 	if m != nil {
 		return m.MaxNumUesSchedPerTtiUl
 	}
 	return ""
 }
 
-func (m *E2CellConfigReportAttribute) GetDlfsSchedEnable() string {
+func (m *CellConfigReport) GetDlfsSchedEnable() string {
 	if m != nil {
 		return m.DlfsSchedEnable
 	}
@@ -1931,24 +2284,24 @@ func (m *E2CellConfigReportAttribute) GetDlfsSchedEnable() string {
 }
 
 // UEAdmissionRequest message
-type E2UEAdmissionRequestAttribute struct {
-	Crnti             string        `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi              *E2ECGI       `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	AdmissionEstCause E2AdmEstCause `protobuf:"varint,3,opt,name=admissionEstCause,proto3,enum=interface.e2.E2AdmEstCause" json:"admissionEstCause,omitempty"`
+type UEAdmissionRequest struct {
+	Crnti             string      `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi              *ECGI       `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	AdmissionEstCause AdmEstCause `protobuf:"varint,3,opt,name=admissionEstCause,proto3,enum=interface.e2.AdmEstCause" json:"admissionEstCause,omitempty"`
 }
 
-func (m *E2UEAdmissionRequestAttribute) Reset()         { *m = E2UEAdmissionRequestAttribute{} }
-func (m *E2UEAdmissionRequestAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UEAdmissionRequestAttribute) ProtoMessage()    {}
-func (*E2UEAdmissionRequestAttribute) Descriptor() ([]byte, []int) {
+func (m *UEAdmissionRequest) Reset()         { *m = UEAdmissionRequest{} }
+func (m *UEAdmissionRequest) String() string { return proto.CompactTextString(m) }
+func (*UEAdmissionRequest) ProtoMessage()    {}
+func (*UEAdmissionRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{12}
 }
-func (m *E2UEAdmissionRequestAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UEAdmissionRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UEAdmissionRequestAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UEAdmissionRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UEAdmissionRequestAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UEAdmissionRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1958,58 +2311,58 @@ func (m *E2UEAdmissionRequestAttribute) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *E2UEAdmissionRequestAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UEAdmissionRequestAttribute.Merge(m, src)
+func (m *UEAdmissionRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UEAdmissionRequest.Merge(m, src)
 }
-func (m *E2UEAdmissionRequestAttribute) XXX_Size() int {
+func (m *UEAdmissionRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UEAdmissionRequestAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UEAdmissionRequestAttribute.DiscardUnknown(m)
+func (m *UEAdmissionRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_UEAdmissionRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UEAdmissionRequestAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UEAdmissionRequest proto.InternalMessageInfo
 
-func (m *E2UEAdmissionRequestAttribute) GetCrnti() string {
+func (m *UEAdmissionRequest) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2UEAdmissionRequestAttribute) GetEcgi() *E2ECGI {
+func (m *UEAdmissionRequest) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2UEAdmissionRequestAttribute) GetAdmissionEstCause() E2AdmEstCause {
+func (m *UEAdmissionRequest) GetAdmissionEstCause() AdmEstCause {
 	if m != nil {
 		return m.AdmissionEstCause
 	}
-	return E2AdmEstCause_E2_EMERGENCY
+	return AdmEstCause_EMERGENCY
 }
 
 // UEAdmissionResponse message
-type E2UEAdmissionResponseAttribute struct {
-	Crnti                string             `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi                 *E2ECGI            `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	AdmissionEstResponse E2SuccessOrFailure `protobuf:"varint,3,opt,name=admissionEstResponse,proto3,enum=interface.e2.E2SuccessOrFailure" json:"admissionEstResponse,omitempty"`
+type UEAdmissionResponse struct {
+	Crnti                string           `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi                 *ECGI            `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	AdmissionEstResponse SuccessOrFailure `protobuf:"varint,3,opt,name=admissionEstResponse,proto3,enum=interface.e2.SuccessOrFailure" json:"admissionEstResponse,omitempty"`
 }
 
-func (m *E2UEAdmissionResponseAttribute) Reset()         { *m = E2UEAdmissionResponseAttribute{} }
-func (m *E2UEAdmissionResponseAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UEAdmissionResponseAttribute) ProtoMessage()    {}
-func (*E2UEAdmissionResponseAttribute) Descriptor() ([]byte, []int) {
+func (m *UEAdmissionResponse) Reset()         { *m = UEAdmissionResponse{} }
+func (m *UEAdmissionResponse) String() string { return proto.CompactTextString(m) }
+func (*UEAdmissionResponse) ProtoMessage()    {}
+func (*UEAdmissionResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{13}
 }
-func (m *E2UEAdmissionResponseAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UEAdmissionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UEAdmissionResponseAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UEAdmissionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UEAdmissionResponseAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UEAdmissionResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2019,58 +2372,58 @@ func (m *E2UEAdmissionResponseAttribute) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *E2UEAdmissionResponseAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UEAdmissionResponseAttribute.Merge(m, src)
+func (m *UEAdmissionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UEAdmissionResponse.Merge(m, src)
 }
-func (m *E2UEAdmissionResponseAttribute) XXX_Size() int {
+func (m *UEAdmissionResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UEAdmissionResponseAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UEAdmissionResponseAttribute.DiscardUnknown(m)
+func (m *UEAdmissionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_UEAdmissionResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UEAdmissionResponseAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UEAdmissionResponse proto.InternalMessageInfo
 
-func (m *E2UEAdmissionResponseAttribute) GetCrnti() string {
+func (m *UEAdmissionResponse) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2UEAdmissionResponseAttribute) GetEcgi() *E2ECGI {
+func (m *UEAdmissionResponse) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2UEAdmissionResponseAttribute) GetAdmissionEstResponse() E2SuccessOrFailure {
+func (m *UEAdmissionResponse) GetAdmissionEstResponse() SuccessOrFailure {
 	if m != nil {
 		return m.AdmissionEstResponse
 	}
-	return E2SuccessOrFailure_E2_SUCCESS
+	return SuccessOrFailure_SUCCESS
 }
 
 // UEAdmissionStatus message
-type E2UEAdmissionStatusAttribute struct {
-	Crnti              string             `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi               *E2ECGI            `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	AdmissionEstStatus E2SuccessOrFailure `protobuf:"varint,3,opt,name=admissionEstStatus,proto3,enum=interface.e2.E2SuccessOrFailure" json:"admissionEstStatus,omitempty"`
+type UEAdmissionStatus struct {
+	Crnti              string           `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi               *ECGI            `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	AdmissionEstStatus SuccessOrFailure `protobuf:"varint,3,opt,name=admissionEstStatus,proto3,enum=interface.e2.SuccessOrFailure" json:"admissionEstStatus,omitempty"`
 }
 
-func (m *E2UEAdmissionStatusAttribute) Reset()         { *m = E2UEAdmissionStatusAttribute{} }
-func (m *E2UEAdmissionStatusAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UEAdmissionStatusAttribute) ProtoMessage()    {}
-func (*E2UEAdmissionStatusAttribute) Descriptor() ([]byte, []int) {
+func (m *UEAdmissionStatus) Reset()         { *m = UEAdmissionStatus{} }
+func (m *UEAdmissionStatus) String() string { return proto.CompactTextString(m) }
+func (*UEAdmissionStatus) ProtoMessage()    {}
+func (*UEAdmissionStatus) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{14}
 }
-func (m *E2UEAdmissionStatusAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UEAdmissionStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UEAdmissionStatusAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UEAdmissionStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UEAdmissionStatusAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UEAdmissionStatus.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2080,60 +2433,60 @@ func (m *E2UEAdmissionStatusAttribute) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (m *E2UEAdmissionStatusAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UEAdmissionStatusAttribute.Merge(m, src)
+func (m *UEAdmissionStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UEAdmissionStatus.Merge(m, src)
 }
-func (m *E2UEAdmissionStatusAttribute) XXX_Size() int {
+func (m *UEAdmissionStatus) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UEAdmissionStatusAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UEAdmissionStatusAttribute.DiscardUnknown(m)
+func (m *UEAdmissionStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_UEAdmissionStatus.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UEAdmissionStatusAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UEAdmissionStatus proto.InternalMessageInfo
 
-func (m *E2UEAdmissionStatusAttribute) GetCrnti() string {
+func (m *UEAdmissionStatus) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2UEAdmissionStatusAttribute) GetEcgi() *E2ECGI {
+func (m *UEAdmissionStatus) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2UEAdmissionStatusAttribute) GetAdmissionEstStatus() E2SuccessOrFailure {
+func (m *UEAdmissionStatus) GetAdmissionEstStatus() SuccessOrFailure {
 	if m != nil {
 		return m.AdmissionEstStatus
 	}
-	return E2SuccessOrFailure_E2_SUCCESS
+	return SuccessOrFailure_SUCCESS
 }
 
 // UEContextUpdate message
-type E2UEContextUpdateAttribute struct {
-	Crnti       string  `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi        *E2ECGI `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	MmeUeS1ApId string  `protobuf:"bytes,3,opt,name=mmeUeS1apId,proto3" json:"mmeUeS1apId,omitempty"`
-	EnbUeS1ApId string  `protobuf:"bytes,4,opt,name=enbUeS1apId,proto3" json:"enbUeS1apId,omitempty"`
-	Imsi        string  `protobuf:"bytes,5,opt,name=imsi,proto3" json:"imsi,omitempty"`
+type UEContextUpdate struct {
+	Crnti       string `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi        *ECGI  `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	MmeUeS1ApId string `protobuf:"bytes,3,opt,name=mmeUeS1apId,proto3" json:"mmeUeS1apId,omitempty"`
+	EnbUeS1ApId string `protobuf:"bytes,4,opt,name=enbUeS1apId,proto3" json:"enbUeS1apId,omitempty"`
+	Imsi        string `protobuf:"bytes,5,opt,name=imsi,proto3" json:"imsi,omitempty"`
 }
 
-func (m *E2UEContextUpdateAttribute) Reset()         { *m = E2UEContextUpdateAttribute{} }
-func (m *E2UEContextUpdateAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UEContextUpdateAttribute) ProtoMessage()    {}
-func (*E2UEContextUpdateAttribute) Descriptor() ([]byte, []int) {
+func (m *UEContextUpdate) Reset()         { *m = UEContextUpdate{} }
+func (m *UEContextUpdate) String() string { return proto.CompactTextString(m) }
+func (*UEContextUpdate) ProtoMessage()    {}
+func (*UEContextUpdate) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{15}
 }
-func (m *E2UEContextUpdateAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UEContextUpdate) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UEContextUpdateAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UEContextUpdate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UEContextUpdateAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UEContextUpdate.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2143,47 +2496,47 @@ func (m *E2UEContextUpdateAttribute) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *E2UEContextUpdateAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UEContextUpdateAttribute.Merge(m, src)
+func (m *UEContextUpdate) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UEContextUpdate.Merge(m, src)
 }
-func (m *E2UEContextUpdateAttribute) XXX_Size() int {
+func (m *UEContextUpdate) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UEContextUpdateAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UEContextUpdateAttribute.DiscardUnknown(m)
+func (m *UEContextUpdate) XXX_DiscardUnknown() {
+	xxx_messageInfo_UEContextUpdate.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UEContextUpdateAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UEContextUpdate proto.InternalMessageInfo
 
-func (m *E2UEContextUpdateAttribute) GetCrnti() string {
+func (m *UEContextUpdate) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2UEContextUpdateAttribute) GetEcgi() *E2ECGI {
+func (m *UEContextUpdate) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2UEContextUpdateAttribute) GetMmeUeS1ApId() string {
+func (m *UEContextUpdate) GetMmeUeS1ApId() string {
 	if m != nil {
 		return m.MmeUeS1ApId
 	}
 	return ""
 }
 
-func (m *E2UEContextUpdateAttribute) GetEnbUeS1ApId() string {
+func (m *UEContextUpdate) GetEnbUeS1ApId() string {
 	if m != nil {
 		return m.EnbUeS1ApId
 	}
 	return ""
 }
 
-func (m *E2UEContextUpdateAttribute) GetImsi() string {
+func (m *UEContextUpdate) GetImsi() string {
 	if m != nil {
 		return m.Imsi
 	}
@@ -2191,25 +2544,25 @@ func (m *E2UEContextUpdateAttribute) GetImsi() string {
 }
 
 // UEReconfigInd message
-type E2UEReconfigIndAttribute struct {
-	CrntiOld      string          `protobuf:"bytes,1,opt,name=crntiOld,proto3" json:"crntiOld,omitempty"`
-	Ecgi          *E2ECGI         `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	CrntiNew      string          `protobuf:"bytes,3,opt,name=crntiNew,proto3" json:"crntiNew,omitempty"`
-	ReconfigCause E2ReconfigCause `protobuf:"varint,4,opt,name=reconfigCause,proto3,enum=interface.e2.E2ReconfigCause" json:"reconfigCause,omitempty"`
+type UEReconfigInd struct {
+	CrntiOld      string        `protobuf:"bytes,1,opt,name=crntiOld,proto3" json:"crntiOld,omitempty"`
+	Ecgi          *ECGI         `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	CrntiNew      string        `protobuf:"bytes,3,opt,name=crntiNew,proto3" json:"crntiNew,omitempty"`
+	ReconfigCause ReconfigCause `protobuf:"varint,4,opt,name=reconfigCause,proto3,enum=interface.e2.ReconfigCause" json:"reconfigCause,omitempty"`
 }
 
-func (m *E2UEReconfigIndAttribute) Reset()         { *m = E2UEReconfigIndAttribute{} }
-func (m *E2UEReconfigIndAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UEReconfigIndAttribute) ProtoMessage()    {}
-func (*E2UEReconfigIndAttribute) Descriptor() ([]byte, []int) {
+func (m *UEReconfigInd) Reset()         { *m = UEReconfigInd{} }
+func (m *UEReconfigInd) String() string { return proto.CompactTextString(m) }
+func (*UEReconfigInd) ProtoMessage()    {}
+func (*UEReconfigInd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{16}
 }
-func (m *E2UEReconfigIndAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UEReconfigInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UEReconfigIndAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UEReconfigInd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UEReconfigIndAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UEReconfigInd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2219,65 +2572,65 @@ func (m *E2UEReconfigIndAttribute) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *E2UEReconfigIndAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UEReconfigIndAttribute.Merge(m, src)
+func (m *UEReconfigInd) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UEReconfigInd.Merge(m, src)
 }
-func (m *E2UEReconfigIndAttribute) XXX_Size() int {
+func (m *UEReconfigInd) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UEReconfigIndAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UEReconfigIndAttribute.DiscardUnknown(m)
+func (m *UEReconfigInd) XXX_DiscardUnknown() {
+	xxx_messageInfo_UEReconfigInd.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UEReconfigIndAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UEReconfigInd proto.InternalMessageInfo
 
-func (m *E2UEReconfigIndAttribute) GetCrntiOld() string {
+func (m *UEReconfigInd) GetCrntiOld() string {
 	if m != nil {
 		return m.CrntiOld
 	}
 	return ""
 }
 
-func (m *E2UEReconfigIndAttribute) GetEcgi() *E2ECGI {
+func (m *UEReconfigInd) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2UEReconfigIndAttribute) GetCrntiNew() string {
+func (m *UEReconfigInd) GetCrntiNew() string {
 	if m != nil {
 		return m.CrntiNew
 	}
 	return ""
 }
 
-func (m *E2UEReconfigIndAttribute) GetReconfigCause() E2ReconfigCause {
+func (m *UEReconfigInd) GetReconfigCause() ReconfigCause {
 	if m != nil {
 		return m.ReconfigCause
 	}
-	return E2ReconfigCause_E2_RECONFIG_RLF
+	return ReconfigCause_RECONFIG_RLF
 }
 
 // UEReleaseInd message
-type E2UEReleaseIndAttribute struct {
-	Crnti        string         `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi         *E2ECGI        `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	ReleaseCause E2ReleaseCause `protobuf:"varint,3,opt,name=releaseCause,proto3,enum=interface.e2.E2ReleaseCause" json:"releaseCause,omitempty"`
+type UEReleaseInd struct {
+	Crnti        string       `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi         *ECGI        `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	ReleaseCause ReleaseCause `protobuf:"varint,3,opt,name=releaseCause,proto3,enum=interface.e2.ReleaseCause" json:"releaseCause,omitempty"`
 }
 
-func (m *E2UEReleaseIndAttribute) Reset()         { *m = E2UEReleaseIndAttribute{} }
-func (m *E2UEReleaseIndAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UEReleaseIndAttribute) ProtoMessage()    {}
-func (*E2UEReleaseIndAttribute) Descriptor() ([]byte, []int) {
+func (m *UEReleaseInd) Reset()         { *m = UEReleaseInd{} }
+func (m *UEReleaseInd) String() string { return proto.CompactTextString(m) }
+func (*UEReleaseInd) ProtoMessage()    {}
+func (*UEReleaseInd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{17}
 }
-func (m *E2UEReleaseIndAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UEReleaseInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UEReleaseIndAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UEReleaseInd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UEReleaseIndAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UEReleaseInd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2287,56 +2640,56 @@ func (m *E2UEReleaseIndAttribute) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *E2UEReleaseIndAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UEReleaseIndAttribute.Merge(m, src)
+func (m *UEReleaseInd) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UEReleaseInd.Merge(m, src)
 }
-func (m *E2UEReleaseIndAttribute) XXX_Size() int {
+func (m *UEReleaseInd) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UEReleaseIndAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UEReleaseIndAttribute.DiscardUnknown(m)
+func (m *UEReleaseInd) XXX_DiscardUnknown() {
+	xxx_messageInfo_UEReleaseInd.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UEReleaseIndAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UEReleaseInd proto.InternalMessageInfo
 
-func (m *E2UEReleaseIndAttribute) GetCrnti() string {
+func (m *UEReleaseInd) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2UEReleaseIndAttribute) GetEcgi() *E2ECGI {
+func (m *UEReleaseInd) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2UEReleaseIndAttribute) GetReleaseCause() E2ReleaseCause {
+func (m *UEReleaseInd) GetReleaseCause() ReleaseCause {
 	if m != nil {
 		return m.ReleaseCause
 	}
-	return E2ReleaseCause_E2_RELEASE_INACTIVITY
+	return ReleaseCause_RELEASE_INACTIVITY
 }
 
-type E2UEAMBR struct {
+type UEAMBR struct {
 	AmbrDl string `protobuf:"bytes,1,opt,name=ambrDl,proto3" json:"ambrDl,omitempty"`
 	AmbrUl string `protobuf:"bytes,2,opt,name=ambrUl,proto3" json:"ambrUl,omitempty"`
 }
 
-func (m *E2UEAMBR) Reset()         { *m = E2UEAMBR{} }
-func (m *E2UEAMBR) String() string { return proto.CompactTextString(m) }
-func (*E2UEAMBR) ProtoMessage()    {}
-func (*E2UEAMBR) Descriptor() ([]byte, []int) {
+func (m *UEAMBR) Reset()         { *m = UEAMBR{} }
+func (m *UEAMBR) String() string { return proto.CompactTextString(m) }
+func (*UEAMBR) ProtoMessage()    {}
+func (*UEAMBR) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{18}
 }
-func (m *E2UEAMBR) XXX_Unmarshal(b []byte) error {
+func (m *UEAMBR) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UEAMBR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UEAMBR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UEAMBR.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UEAMBR.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2346,56 +2699,56 @@ func (m *E2UEAMBR) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2UEAMBR) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UEAMBR.Merge(m, src)
+func (m *UEAMBR) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UEAMBR.Merge(m, src)
 }
-func (m *E2UEAMBR) XXX_Size() int {
+func (m *UEAMBR) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UEAMBR) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UEAMBR.DiscardUnknown(m)
+func (m *UEAMBR) XXX_DiscardUnknown() {
+	xxx_messageInfo_UEAMBR.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UEAMBR proto.InternalMessageInfo
+var xxx_messageInfo_UEAMBR proto.InternalMessageInfo
 
-func (m *E2UEAMBR) GetAmbrDl() string {
+func (m *UEAMBR) GetAmbrDl() string {
 	if m != nil {
 		return m.AmbrDl
 	}
 	return ""
 }
 
-func (m *E2UEAMBR) GetAmbrUl() string {
+func (m *UEAMBR) GetAmbrUl() string {
 	if m != nil {
 		return m.AmbrUl
 	}
 	return ""
 }
 
-type E2ERABParamsItem struct {
-	Id        string          `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Direction E2ERABDirection `protobuf:"varint,2,opt,name=direction,proto3,enum=interface.e2.E2ERABDirection" json:"direction,omitempty"`
-	Type      E2ERABType      `protobuf:"varint,3,opt,name=type,proto3,enum=interface.e2.E2ERABType" json:"type,omitempty"`
-	Qci       string          `protobuf:"bytes,4,opt,name=qci,proto3" json:"qci,omitempty"`
-	Arp       string          `protobuf:"bytes,5,opt,name=arp,proto3" json:"arp,omitempty"`
-	GbrDl     string          `protobuf:"bytes,6,opt,name=gbrDl,proto3" json:"gbrDl,omitempty"`
-	GbrUl     string          `protobuf:"bytes,7,opt,name=gbrUl,proto3" json:"gbrUl,omitempty"`
-	MbrDl     string          `protobuf:"bytes,8,opt,name=mbrDl,proto3" json:"mbrDl,omitempty"`
-	MbrUl     string          `protobuf:"bytes,9,opt,name=mbrUl,proto3" json:"mbrUl,omitempty"`
+type ERABParamsItem struct {
+	Id        string        `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Direction ERABDirection `protobuf:"varint,2,opt,name=direction,proto3,enum=interface.e2.ERABDirection" json:"direction,omitempty"`
+	Type      ERABType      `protobuf:"varint,3,opt,name=type,proto3,enum=interface.e2.ERABType" json:"type,omitempty"`
+	Qci       string        `protobuf:"bytes,4,opt,name=qci,proto3" json:"qci,omitempty"`
+	Arp       string        `protobuf:"bytes,5,opt,name=arp,proto3" json:"arp,omitempty"`
+	GbrDl     string        `protobuf:"bytes,6,opt,name=gbrDl,proto3" json:"gbrDl,omitempty"`
+	GbrUl     string        `protobuf:"bytes,7,opt,name=gbrUl,proto3" json:"gbrUl,omitempty"`
+	MbrDl     string        `protobuf:"bytes,8,opt,name=mbrDl,proto3" json:"mbrDl,omitempty"`
+	MbrUl     string        `protobuf:"bytes,9,opt,name=mbrUl,proto3" json:"mbrUl,omitempty"`
 }
 
-func (m *E2ERABParamsItem) Reset()         { *m = E2ERABParamsItem{} }
-func (m *E2ERABParamsItem) String() string { return proto.CompactTextString(m) }
-func (*E2ERABParamsItem) ProtoMessage()    {}
-func (*E2ERABParamsItem) Descriptor() ([]byte, []int) {
+func (m *ERABParamsItem) Reset()         { *m = ERABParamsItem{} }
+func (m *ERABParamsItem) String() string { return proto.CompactTextString(m) }
+func (*ERABParamsItem) ProtoMessage()    {}
+func (*ERABParamsItem) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{19}
 }
-func (m *E2ERABParamsItem) XXX_Unmarshal(b []byte) error {
+func (m *ERABParamsItem) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ERABParamsItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ERABParamsItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ERABParamsItem.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ERABParamsItem.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2405,98 +2758,98 @@ func (m *E2ERABParamsItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *E2ERABParamsItem) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ERABParamsItem.Merge(m, src)
+func (m *ERABParamsItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ERABParamsItem.Merge(m, src)
 }
-func (m *E2ERABParamsItem) XXX_Size() int {
+func (m *ERABParamsItem) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ERABParamsItem) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ERABParamsItem.DiscardUnknown(m)
+func (m *ERABParamsItem) XXX_DiscardUnknown() {
+	xxx_messageInfo_ERABParamsItem.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ERABParamsItem proto.InternalMessageInfo
+var xxx_messageInfo_ERABParamsItem proto.InternalMessageInfo
 
-func (m *E2ERABParamsItem) GetId() string {
+func (m *ERABParamsItem) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *E2ERABParamsItem) GetDirection() E2ERABDirection {
+func (m *ERABParamsItem) GetDirection() ERABDirection {
 	if m != nil {
 		return m.Direction
 	}
-	return E2ERABDirection_E2_DL
+	return ERABDirection_DL
 }
 
-func (m *E2ERABParamsItem) GetType() E2ERABType {
+func (m *ERABParamsItem) GetType() ERABType {
 	if m != nil {
 		return m.Type
 	}
-	return E2ERABType_E2_ERAB_DEFAULT
+	return ERABType_ERAB_DEFAULT
 }
 
-func (m *E2ERABParamsItem) GetQci() string {
+func (m *ERABParamsItem) GetQci() string {
 	if m != nil {
 		return m.Qci
 	}
 	return ""
 }
 
-func (m *E2ERABParamsItem) GetArp() string {
+func (m *ERABParamsItem) GetArp() string {
 	if m != nil {
 		return m.Arp
 	}
 	return ""
 }
 
-func (m *E2ERABParamsItem) GetGbrDl() string {
+func (m *ERABParamsItem) GetGbrDl() string {
 	if m != nil {
 		return m.GbrDl
 	}
 	return ""
 }
 
-func (m *E2ERABParamsItem) GetGbrUl() string {
+func (m *ERABParamsItem) GetGbrUl() string {
 	if m != nil {
 		return m.GbrUl
 	}
 	return ""
 }
 
-func (m *E2ERABParamsItem) GetMbrDl() string {
+func (m *ERABParamsItem) GetMbrDl() string {
 	if m != nil {
 		return m.MbrDl
 	}
 	return ""
 }
 
-func (m *E2ERABParamsItem) GetMbrUl() string {
+func (m *ERABParamsItem) GetMbrUl() string {
 	if m != nil {
 		return m.MbrUl
 	}
 	return ""
 }
 
-type E2ERABResponseItem struct {
-	Id       string             `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Decision E2SuccessOrFailure `protobuf:"varint,2,opt,name=decision,proto3,enum=interface.e2.E2SuccessOrFailure" json:"decision,omitempty"`
+type ERABResponseItem struct {
+	Id       string           `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Decision SuccessOrFailure `protobuf:"varint,2,opt,name=decision,proto3,enum=interface.e2.SuccessOrFailure" json:"decision,omitempty"`
 }
 
-func (m *E2ERABResponseItem) Reset()         { *m = E2ERABResponseItem{} }
-func (m *E2ERABResponseItem) String() string { return proto.CompactTextString(m) }
-func (*E2ERABResponseItem) ProtoMessage()    {}
-func (*E2ERABResponseItem) Descriptor() ([]byte, []int) {
+func (m *ERABResponseItem) Reset()         { *m = ERABResponseItem{} }
+func (m *ERABResponseItem) String() string { return proto.CompactTextString(m) }
+func (*ERABResponseItem) ProtoMessage()    {}
+func (*ERABResponseItem) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{20}
 }
-func (m *E2ERABResponseItem) XXX_Unmarshal(b []byte) error {
+func (m *ERABResponseItem) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ERABResponseItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ERABResponseItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ERABResponseItem.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ERABResponseItem.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2506,53 +2859,53 @@ func (m *E2ERABResponseItem) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *E2ERABResponseItem) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ERABResponseItem.Merge(m, src)
+func (m *ERABResponseItem) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ERABResponseItem.Merge(m, src)
 }
-func (m *E2ERABResponseItem) XXX_Size() int {
+func (m *ERABResponseItem) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ERABResponseItem) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ERABResponseItem.DiscardUnknown(m)
+func (m *ERABResponseItem) XXX_DiscardUnknown() {
+	xxx_messageInfo_ERABResponseItem.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ERABResponseItem proto.InternalMessageInfo
+var xxx_messageInfo_ERABResponseItem proto.InternalMessageInfo
 
-func (m *E2ERABResponseItem) GetId() string {
+func (m *ERABResponseItem) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *E2ERABResponseItem) GetDecision() E2SuccessOrFailure {
+func (m *ERABResponseItem) GetDecision() SuccessOrFailure {
 	if m != nil {
 		return m.Decision
 	}
-	return E2SuccessOrFailure_E2_SUCCESS
+	return SuccessOrFailure_SUCCESS
 }
 
 // BearerAdmissionRequest message
-type E2BearerAdmissionRequestAttribute struct {
-	Crnti        string              `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi         *E2ECGI             `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	UeAmbr       *E2UEAMBR           `protobuf:"bytes,3,opt,name=ueAmbr,proto3" json:"ueAmbr,omitempty"`
-	NumErabsList string              `protobuf:"bytes,4,opt,name=numErabsList,proto3" json:"numErabsList,omitempty"`
-	ErabsParams  []*E2ERABParamsItem `protobuf:"bytes,5,rep,name=erabsParams,proto3" json:"erabsParams,omitempty"`
+type BearerAdmissionRequest struct {
+	Crnti        string            `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi         *ECGI             `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	UeAmbr       *UEAMBR           `protobuf:"bytes,3,opt,name=ueAmbr,proto3" json:"ueAmbr,omitempty"`
+	NumErabsList string            `protobuf:"bytes,4,opt,name=numErabsList,proto3" json:"numErabsList,omitempty"`
+	ErabsParams  []*ERABParamsItem `protobuf:"bytes,5,rep,name=erabsParams,proto3" json:"erabsParams,omitempty"`
 }
 
-func (m *E2BearerAdmissionRequestAttribute) Reset()         { *m = E2BearerAdmissionRequestAttribute{} }
-func (m *E2BearerAdmissionRequestAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2BearerAdmissionRequestAttribute) ProtoMessage()    {}
-func (*E2BearerAdmissionRequestAttribute) Descriptor() ([]byte, []int) {
+func (m *BearerAdmissionRequest) Reset()         { *m = BearerAdmissionRequest{} }
+func (m *BearerAdmissionRequest) String() string { return proto.CompactTextString(m) }
+func (*BearerAdmissionRequest) ProtoMessage()    {}
+func (*BearerAdmissionRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{21}
 }
-func (m *E2BearerAdmissionRequestAttribute) XXX_Unmarshal(b []byte) error {
+func (m *BearerAdmissionRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2BearerAdmissionRequestAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *BearerAdmissionRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2BearerAdmissionRequestAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_BearerAdmissionRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2562,47 +2915,47 @@ func (m *E2BearerAdmissionRequestAttribute) XXX_Marshal(b []byte, deterministic 
 		return b[:n], nil
 	}
 }
-func (m *E2BearerAdmissionRequestAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2BearerAdmissionRequestAttribute.Merge(m, src)
+func (m *BearerAdmissionRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BearerAdmissionRequest.Merge(m, src)
 }
-func (m *E2BearerAdmissionRequestAttribute) XXX_Size() int {
+func (m *BearerAdmissionRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2BearerAdmissionRequestAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2BearerAdmissionRequestAttribute.DiscardUnknown(m)
+func (m *BearerAdmissionRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BearerAdmissionRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2BearerAdmissionRequestAttribute proto.InternalMessageInfo
+var xxx_messageInfo_BearerAdmissionRequest proto.InternalMessageInfo
 
-func (m *E2BearerAdmissionRequestAttribute) GetCrnti() string {
+func (m *BearerAdmissionRequest) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2BearerAdmissionRequestAttribute) GetEcgi() *E2ECGI {
+func (m *BearerAdmissionRequest) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2BearerAdmissionRequestAttribute) GetUeAmbr() *E2UEAMBR {
+func (m *BearerAdmissionRequest) GetUeAmbr() *UEAMBR {
 	if m != nil {
 		return m.UeAmbr
 	}
 	return nil
 }
 
-func (m *E2BearerAdmissionRequestAttribute) GetNumErabsList() string {
+func (m *BearerAdmissionRequest) GetNumErabsList() string {
 	if m != nil {
 		return m.NumErabsList
 	}
 	return ""
 }
 
-func (m *E2BearerAdmissionRequestAttribute) GetErabsParams() []*E2ERABParamsItem {
+func (m *BearerAdmissionRequest) GetErabsParams() []*ERABParamsItem {
 	if m != nil {
 		return m.ErabsParams
 	}
@@ -2610,25 +2963,25 @@ func (m *E2BearerAdmissionRequestAttribute) GetErabsParams() []*E2ERABParamsItem
 }
 
 // BearerAdmissionResponse message
-type E2BearerAdmissionResponseAttribute struct {
-	Crnti        string                `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi         *E2ECGI               `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	NumErabsList string                `protobuf:"bytes,3,opt,name=numErabsList,proto3" json:"numErabsList,omitempty"`
-	ErabResponse []*E2ERABResponseItem `protobuf:"bytes,4,rep,name=erabResponse,proto3" json:"erabResponse,omitempty"`
+type BearerAdmissionResponse struct {
+	Crnti        string              `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi         *ECGI               `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	NumErabsList string              `protobuf:"bytes,3,opt,name=numErabsList,proto3" json:"numErabsList,omitempty"`
+	ErabResponse []*ERABResponseItem `protobuf:"bytes,4,rep,name=erabResponse,proto3" json:"erabResponse,omitempty"`
 }
 
-func (m *E2BearerAdmissionResponseAttribute) Reset()         { *m = E2BearerAdmissionResponseAttribute{} }
-func (m *E2BearerAdmissionResponseAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2BearerAdmissionResponseAttribute) ProtoMessage()    {}
-func (*E2BearerAdmissionResponseAttribute) Descriptor() ([]byte, []int) {
+func (m *BearerAdmissionResponse) Reset()         { *m = BearerAdmissionResponse{} }
+func (m *BearerAdmissionResponse) String() string { return proto.CompactTextString(m) }
+func (*BearerAdmissionResponse) ProtoMessage()    {}
+func (*BearerAdmissionResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{22}
 }
-func (m *E2BearerAdmissionResponseAttribute) XXX_Unmarshal(b []byte) error {
+func (m *BearerAdmissionResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2BearerAdmissionResponseAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *BearerAdmissionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2BearerAdmissionResponseAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_BearerAdmissionResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2638,40 +2991,40 @@ func (m *E2BearerAdmissionResponseAttribute) XXX_Marshal(b []byte, deterministic
 		return b[:n], nil
 	}
 }
-func (m *E2BearerAdmissionResponseAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2BearerAdmissionResponseAttribute.Merge(m, src)
+func (m *BearerAdmissionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BearerAdmissionResponse.Merge(m, src)
 }
-func (m *E2BearerAdmissionResponseAttribute) XXX_Size() int {
+func (m *BearerAdmissionResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2BearerAdmissionResponseAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2BearerAdmissionResponseAttribute.DiscardUnknown(m)
+func (m *BearerAdmissionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_BearerAdmissionResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2BearerAdmissionResponseAttribute proto.InternalMessageInfo
+var xxx_messageInfo_BearerAdmissionResponse proto.InternalMessageInfo
 
-func (m *E2BearerAdmissionResponseAttribute) GetCrnti() string {
+func (m *BearerAdmissionResponse) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2BearerAdmissionResponseAttribute) GetEcgi() *E2ECGI {
+func (m *BearerAdmissionResponse) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2BearerAdmissionResponseAttribute) GetNumErabsList() string {
+func (m *BearerAdmissionResponse) GetNumErabsList() string {
 	if m != nil {
 		return m.NumErabsList
 	}
 	return ""
 }
 
-func (m *E2BearerAdmissionResponseAttribute) GetErabResponse() []*E2ERABResponseItem {
+func (m *BearerAdmissionResponse) GetErabResponse() []*ERABResponseItem {
 	if m != nil {
 		return m.ErabResponse
 	}
@@ -2679,25 +3032,25 @@ func (m *E2BearerAdmissionResponseAttribute) GetErabResponse() []*E2ERABResponse
 }
 
 // BearerAdmissionStatus message
-type E2BearerAdmissionStatusAttribute struct {
-	Crnti        string                `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi         *E2ECGI               `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	NumErabsList string                `protobuf:"bytes,3,opt,name=numErabsList,proto3" json:"numErabsList,omitempty"`
-	ErabStatus   []*E2ERABResponseItem `protobuf:"bytes,4,rep,name=erabStatus,proto3" json:"erabStatus,omitempty"`
+type BearerAdmissionStatus struct {
+	Crnti        string              `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi         *ECGI               `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	NumErabsList string              `protobuf:"bytes,3,opt,name=numErabsList,proto3" json:"numErabsList,omitempty"`
+	ErabStatus   []*ERABResponseItem `protobuf:"bytes,4,rep,name=erabStatus,proto3" json:"erabStatus,omitempty"`
 }
 
-func (m *E2BearerAdmissionStatusAttribute) Reset()         { *m = E2BearerAdmissionStatusAttribute{} }
-func (m *E2BearerAdmissionStatusAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2BearerAdmissionStatusAttribute) ProtoMessage()    {}
-func (*E2BearerAdmissionStatusAttribute) Descriptor() ([]byte, []int) {
+func (m *BearerAdmissionStatus) Reset()         { *m = BearerAdmissionStatus{} }
+func (m *BearerAdmissionStatus) String() string { return proto.CompactTextString(m) }
+func (*BearerAdmissionStatus) ProtoMessage()    {}
+func (*BearerAdmissionStatus) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{23}
 }
-func (m *E2BearerAdmissionStatusAttribute) XXX_Unmarshal(b []byte) error {
+func (m *BearerAdmissionStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2BearerAdmissionStatusAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *BearerAdmissionStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2BearerAdmissionStatusAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_BearerAdmissionStatus.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2707,40 +3060,40 @@ func (m *E2BearerAdmissionStatusAttribute) XXX_Marshal(b []byte, deterministic b
 		return b[:n], nil
 	}
 }
-func (m *E2BearerAdmissionStatusAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2BearerAdmissionStatusAttribute.Merge(m, src)
+func (m *BearerAdmissionStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BearerAdmissionStatus.Merge(m, src)
 }
-func (m *E2BearerAdmissionStatusAttribute) XXX_Size() int {
+func (m *BearerAdmissionStatus) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2BearerAdmissionStatusAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2BearerAdmissionStatusAttribute.DiscardUnknown(m)
+func (m *BearerAdmissionStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_BearerAdmissionStatus.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2BearerAdmissionStatusAttribute proto.InternalMessageInfo
+var xxx_messageInfo_BearerAdmissionStatus proto.InternalMessageInfo
 
-func (m *E2BearerAdmissionStatusAttribute) GetCrnti() string {
+func (m *BearerAdmissionStatus) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2BearerAdmissionStatusAttribute) GetEcgi() *E2ECGI {
+func (m *BearerAdmissionStatus) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2BearerAdmissionStatusAttribute) GetNumErabsList() string {
+func (m *BearerAdmissionStatus) GetNumErabsList() string {
 	if m != nil {
 		return m.NumErabsList
 	}
 	return ""
 }
 
-func (m *E2BearerAdmissionStatusAttribute) GetErabStatus() []*E2ERABResponseItem {
+func (m *BearerAdmissionStatus) GetErabStatus() []*ERABResponseItem {
 	if m != nil {
 		return m.ErabStatus
 	}
@@ -2748,25 +3101,25 @@ func (m *E2BearerAdmissionStatusAttribute) GetErabStatus() []*E2ERABResponseItem
 }
 
 // BearerReleaseInd message
-type E2BearerReleaseIndAttribute struct {
+type BearerReleaseInd struct {
 	Crnti        string   `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi         *E2ECGI  `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Ecgi         *ECGI    `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
 	NumErabsList string   `protobuf:"bytes,3,opt,name=numErabsList,proto3" json:"numErabsList,omitempty"`
 	ErabIds      []string `protobuf:"bytes,4,rep,name=erabIds,proto3" json:"erabIds,omitempty"`
 }
 
-func (m *E2BearerReleaseIndAttribute) Reset()         { *m = E2BearerReleaseIndAttribute{} }
-func (m *E2BearerReleaseIndAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2BearerReleaseIndAttribute) ProtoMessage()    {}
-func (*E2BearerReleaseIndAttribute) Descriptor() ([]byte, []int) {
+func (m *BearerReleaseInd) Reset()         { *m = BearerReleaseInd{} }
+func (m *BearerReleaseInd) String() string { return proto.CompactTextString(m) }
+func (*BearerReleaseInd) ProtoMessage()    {}
+func (*BearerReleaseInd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{24}
 }
-func (m *E2BearerReleaseIndAttribute) XXX_Unmarshal(b []byte) error {
+func (m *BearerReleaseInd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2BearerReleaseIndAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *BearerReleaseInd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2BearerReleaseIndAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_BearerReleaseInd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2776,40 +3129,40 @@ func (m *E2BearerReleaseIndAttribute) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *E2BearerReleaseIndAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2BearerReleaseIndAttribute.Merge(m, src)
+func (m *BearerReleaseInd) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BearerReleaseInd.Merge(m, src)
 }
-func (m *E2BearerReleaseIndAttribute) XXX_Size() int {
+func (m *BearerReleaseInd) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2BearerReleaseIndAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2BearerReleaseIndAttribute.DiscardUnknown(m)
+func (m *BearerReleaseInd) XXX_DiscardUnknown() {
+	xxx_messageInfo_BearerReleaseInd.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2BearerReleaseIndAttribute proto.InternalMessageInfo
+var xxx_messageInfo_BearerReleaseInd proto.InternalMessageInfo
 
-func (m *E2BearerReleaseIndAttribute) GetCrnti() string {
+func (m *BearerReleaseInd) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2BearerReleaseIndAttribute) GetEcgi() *E2ECGI {
+func (m *BearerReleaseInd) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2BearerReleaseIndAttribute) GetNumErabsList() string {
+func (m *BearerReleaseInd) GetNumErabsList() string {
 	if m != nil {
 		return m.NumErabsList
 	}
 	return ""
 }
 
-func (m *E2BearerReleaseIndAttribute) GetErabIds() []string {
+func (m *BearerReleaseInd) GetErabIds() []string {
 	if m != nil {
 		return m.ErabIds
 	}
@@ -2817,24 +3170,24 @@ func (m *E2BearerReleaseIndAttribute) GetErabIds() []string {
 }
 
 // HORequest message
-type E2HORequestAttribute struct {
-	Crnti string  `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	EcgiS *E2ECGI `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
-	EcgiT *E2ECGI `protobuf:"bytes,3,opt,name=ecgiT,proto3" json:"ecgiT,omitempty"`
+type HORequest struct {
+	Crnti string `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	EcgiS *ECGI  `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
+	EcgiT *ECGI  `protobuf:"bytes,3,opt,name=ecgiT,proto3" json:"ecgiT,omitempty"`
 }
 
-func (m *E2HORequestAttribute) Reset()         { *m = E2HORequestAttribute{} }
-func (m *E2HORequestAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2HORequestAttribute) ProtoMessage()    {}
-func (*E2HORequestAttribute) Descriptor() ([]byte, []int) {
+func (m *HORequest) Reset()         { *m = HORequest{} }
+func (m *HORequest) String() string { return proto.CompactTextString(m) }
+func (*HORequest) ProtoMessage()    {}
+func (*HORequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{25}
 }
-func (m *E2HORequestAttribute) XXX_Unmarshal(b []byte) error {
+func (m *HORequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2HORequestAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *HORequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2HORequestAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_HORequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2844,33 +3197,33 @@ func (m *E2HORequestAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *E2HORequestAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2HORequestAttribute.Merge(m, src)
+func (m *HORequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HORequest.Merge(m, src)
 }
-func (m *E2HORequestAttribute) XXX_Size() int {
+func (m *HORequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2HORequestAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2HORequestAttribute.DiscardUnknown(m)
+func (m *HORequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_HORequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2HORequestAttribute proto.InternalMessageInfo
+var xxx_messageInfo_HORequest proto.InternalMessageInfo
 
-func (m *E2HORequestAttribute) GetCrnti() string {
+func (m *HORequest) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2HORequestAttribute) GetEcgiS() *E2ECGI {
+func (m *HORequest) GetEcgiS() *ECGI {
 	if m != nil {
 		return m.EcgiS
 	}
 	return nil
 }
 
-func (m *E2HORequestAttribute) GetEcgiT() *E2ECGI {
+func (m *HORequest) GetEcgiT() *ECGI {
 	if m != nil {
 		return m.EcgiT
 	}
@@ -2878,24 +3231,24 @@ func (m *E2HORequestAttribute) GetEcgiT() *E2ECGI {
 }
 
 // HOFailure message
-type E2HOFailureAttribute struct {
-	Crnti          string  `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	EcgiS          *E2ECGI `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
-	HoFailureCause string  `protobuf:"bytes,3,opt,name=hoFailureCause,proto3" json:"hoFailureCause,omitempty"`
+type HOFailure struct {
+	Crnti          string `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	EcgiS          *ECGI  `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
+	HoFailureCause string `protobuf:"bytes,3,opt,name=hoFailureCause,proto3" json:"hoFailureCause,omitempty"`
 }
 
-func (m *E2HOFailureAttribute) Reset()         { *m = E2HOFailureAttribute{} }
-func (m *E2HOFailureAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2HOFailureAttribute) ProtoMessage()    {}
-func (*E2HOFailureAttribute) Descriptor() ([]byte, []int) {
+func (m *HOFailure) Reset()         { *m = HOFailure{} }
+func (m *HOFailure) String() string { return proto.CompactTextString(m) }
+func (*HOFailure) ProtoMessage()    {}
+func (*HOFailure) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{26}
 }
-func (m *E2HOFailureAttribute) XXX_Unmarshal(b []byte) error {
+func (m *HOFailure) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2HOFailureAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *HOFailure) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2HOFailureAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_HOFailure.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2905,33 +3258,33 @@ func (m *E2HOFailureAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *E2HOFailureAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2HOFailureAttribute.Merge(m, src)
+func (m *HOFailure) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HOFailure.Merge(m, src)
 }
-func (m *E2HOFailureAttribute) XXX_Size() int {
+func (m *HOFailure) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2HOFailureAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2HOFailureAttribute.DiscardUnknown(m)
+func (m *HOFailure) XXX_DiscardUnknown() {
+	xxx_messageInfo_HOFailure.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2HOFailureAttribute proto.InternalMessageInfo
+var xxx_messageInfo_HOFailure proto.InternalMessageInfo
 
-func (m *E2HOFailureAttribute) GetCrnti() string {
+func (m *HOFailure) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2HOFailureAttribute) GetEcgiS() *E2ECGI {
+func (m *HOFailure) GetEcgiS() *ECGI {
 	if m != nil {
 		return m.EcgiS
 	}
 	return nil
 }
 
-func (m *E2HOFailureAttribute) GetHoFailureCause() string {
+func (m *HOFailure) GetHoFailureCause() string {
 	if m != nil {
 		return m.HoFailureCause
 	}
@@ -2939,24 +3292,24 @@ func (m *E2HOFailureAttribute) GetHoFailureCause() string {
 }
 
 // HOComplete message
-type E2HOCompleteAttribute struct {
-	CrntiNew string  `protobuf:"bytes,1,opt,name=crntiNew,proto3" json:"crntiNew,omitempty"`
-	EcgiS    *E2ECGI `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
-	EcgiT    *E2ECGI `protobuf:"bytes,3,opt,name=ecgiT,proto3" json:"ecgiT,omitempty"`
+type HOComplete struct {
+	CrntiNew string `protobuf:"bytes,1,opt,name=crntiNew,proto3" json:"crntiNew,omitempty"`
+	EcgiS    *ECGI  `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
+	EcgiT    *ECGI  `protobuf:"bytes,3,opt,name=ecgiT,proto3" json:"ecgiT,omitempty"`
 }
 
-func (m *E2HOCompleteAttribute) Reset()         { *m = E2HOCompleteAttribute{} }
-func (m *E2HOCompleteAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2HOCompleteAttribute) ProtoMessage()    {}
-func (*E2HOCompleteAttribute) Descriptor() ([]byte, []int) {
+func (m *HOComplete) Reset()         { *m = HOComplete{} }
+func (m *HOComplete) String() string { return proto.CompactTextString(m) }
+func (*HOComplete) ProtoMessage()    {}
+func (*HOComplete) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{27}
 }
-func (m *E2HOCompleteAttribute) XXX_Unmarshal(b []byte) error {
+func (m *HOComplete) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2HOCompleteAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *HOComplete) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2HOCompleteAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_HOComplete.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -2966,33 +3319,33 @@ func (m *E2HOCompleteAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *E2HOCompleteAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2HOCompleteAttribute.Merge(m, src)
+func (m *HOComplete) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HOComplete.Merge(m, src)
 }
-func (m *E2HOCompleteAttribute) XXX_Size() int {
+func (m *HOComplete) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2HOCompleteAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2HOCompleteAttribute.DiscardUnknown(m)
+func (m *HOComplete) XXX_DiscardUnknown() {
+	xxx_messageInfo_HOComplete.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2HOCompleteAttribute proto.InternalMessageInfo
+var xxx_messageInfo_HOComplete proto.InternalMessageInfo
 
-func (m *E2HOCompleteAttribute) GetCrntiNew() string {
+func (m *HOComplete) GetCrntiNew() string {
 	if m != nil {
 		return m.CrntiNew
 	}
 	return ""
 }
 
-func (m *E2HOCompleteAttribute) GetEcgiS() *E2ECGI {
+func (m *HOComplete) GetEcgiS() *ECGI {
 	if m != nil {
 		return m.EcgiS
 	}
 	return nil
 }
 
-func (m *E2HOCompleteAttribute) GetEcgiT() *E2ECGI {
+func (m *HOComplete) GetEcgiT() *ECGI {
 	if m != nil {
 		return m.EcgiT
 	}
@@ -3000,26 +3353,26 @@ func (m *E2HOCompleteAttribute) GetEcgiT() *E2ECGI {
 }
 
 // HOCause message
-type E2HOCauseAttribute struct {
-	Crnti     string           `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	EcgiS     *E2ECGI          `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
-	EcgiT     *E2ECGI          `protobuf:"bytes,3,opt,name=ecgiT,proto3" json:"ecgiT,omitempty"`
-	HoCause   string           `protobuf:"bytes,4,opt,name=hoCause,proto3" json:"hoCause,omitempty"`
-	HoTrigger []*E2RXSigReport `protobuf:"bytes,5,rep,name=hoTrigger,proto3" json:"hoTrigger,omitempty"`
+type HOCause struct {
+	Crnti     string         `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	EcgiS     *ECGI          `protobuf:"bytes,2,opt,name=ecgiS,proto3" json:"ecgiS,omitempty"`
+	EcgiT     *ECGI          `protobuf:"bytes,3,opt,name=ecgiT,proto3" json:"ecgiT,omitempty"`
+	HoCause   string         `protobuf:"bytes,4,opt,name=hoCause,proto3" json:"hoCause,omitempty"`
+	HoTrigger []*RXSigReport `protobuf:"bytes,5,rep,name=hoTrigger,proto3" json:"hoTrigger,omitempty"`
 }
 
-func (m *E2HOCauseAttribute) Reset()         { *m = E2HOCauseAttribute{} }
-func (m *E2HOCauseAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2HOCauseAttribute) ProtoMessage()    {}
-func (*E2HOCauseAttribute) Descriptor() ([]byte, []int) {
+func (m *HOCause) Reset()         { *m = HOCause{} }
+func (m *HOCause) String() string { return proto.CompactTextString(m) }
+func (*HOCause) ProtoMessage()    {}
+func (*HOCause) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{28}
 }
-func (m *E2HOCauseAttribute) XXX_Unmarshal(b []byte) error {
+func (m *HOCause) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2HOCauseAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *HOCause) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2HOCauseAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_HOCause.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3029,70 +3382,70 @@ func (m *E2HOCauseAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *E2HOCauseAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2HOCauseAttribute.Merge(m, src)
+func (m *HOCause) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HOCause.Merge(m, src)
 }
-func (m *E2HOCauseAttribute) XXX_Size() int {
+func (m *HOCause) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2HOCauseAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2HOCauseAttribute.DiscardUnknown(m)
+func (m *HOCause) XXX_DiscardUnknown() {
+	xxx_messageInfo_HOCause.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2HOCauseAttribute proto.InternalMessageInfo
+var xxx_messageInfo_HOCause proto.InternalMessageInfo
 
-func (m *E2HOCauseAttribute) GetCrnti() string {
+func (m *HOCause) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2HOCauseAttribute) GetEcgiS() *E2ECGI {
+func (m *HOCause) GetEcgiS() *ECGI {
 	if m != nil {
 		return m.EcgiS
 	}
 	return nil
 }
 
-func (m *E2HOCauseAttribute) GetEcgiT() *E2ECGI {
+func (m *HOCause) GetEcgiT() *ECGI {
 	if m != nil {
 		return m.EcgiT
 	}
 	return nil
 }
 
-func (m *E2HOCauseAttribute) GetHoCause() string {
+func (m *HOCause) GetHoCause() string {
 	if m != nil {
 		return m.HoCause
 	}
 	return ""
 }
 
-func (m *E2HOCauseAttribute) GetHoTrigger() []*E2RXSigReport {
+func (m *HOCause) GetHoTrigger() []*RXSigReport {
 	if m != nil {
 		return m.HoTrigger
 	}
 	return nil
 }
 
-type E2MeasCell struct {
+type MeasCell struct {
 	Pci                  string `protobuf:"bytes,1,opt,name=pci,proto3" json:"pci,omitempty"`
 	CellIndividualOffset string `protobuf:"bytes,2,opt,name=cellIndividualOffset,proto3" json:"cellIndividualOffset,omitempty"`
 }
 
-func (m *E2MeasCell) Reset()         { *m = E2MeasCell{} }
-func (m *E2MeasCell) String() string { return proto.CompactTextString(m) }
-func (*E2MeasCell) ProtoMessage()    {}
-func (*E2MeasCell) Descriptor() ([]byte, []int) {
+func (m *MeasCell) Reset()         { *m = MeasCell{} }
+func (m *MeasCell) String() string { return proto.CompactTextString(m) }
+func (*MeasCell) ProtoMessage()    {}
+func (*MeasCell) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{29}
 }
-func (m *E2MeasCell) XXX_Unmarshal(b []byte) error {
+func (m *MeasCell) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2MeasCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MeasCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2MeasCell.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MeasCell.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3102,49 +3455,49 @@ func (m *E2MeasCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2MeasCell) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2MeasCell.Merge(m, src)
+func (m *MeasCell) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MeasCell.Merge(m, src)
 }
-func (m *E2MeasCell) XXX_Size() int {
+func (m *MeasCell) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2MeasCell) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2MeasCell.DiscardUnknown(m)
+func (m *MeasCell) XXX_DiscardUnknown() {
+	xxx_messageInfo_MeasCell.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2MeasCell proto.InternalMessageInfo
+var xxx_messageInfo_MeasCell proto.InternalMessageInfo
 
-func (m *E2MeasCell) GetPci() string {
+func (m *MeasCell) GetPci() string {
 	if m != nil {
 		return m.Pci
 	}
 	return ""
 }
 
-func (m *E2MeasCell) GetCellIndividualOffset() string {
+func (m *MeasCell) GetCellIndividualOffset() string {
 	if m != nil {
 		return m.CellIndividualOffset
 	}
 	return ""
 }
 
-type E2MeasObject struct {
-	DlFreq    string        `protobuf:"bytes,1,opt,name=dlFreq,proto3" json:"dlFreq,omitempty"`
-	MeasCells []*E2MeasCell `protobuf:"bytes,2,rep,name=measCells,proto3" json:"measCells,omitempty"`
+type MeasObject struct {
+	DlFreq    string      `protobuf:"bytes,1,opt,name=dlFreq,proto3" json:"dlFreq,omitempty"`
+	MeasCells []*MeasCell `protobuf:"bytes,2,rep,name=measCells,proto3" json:"measCells,omitempty"`
 }
 
-func (m *E2MeasObject) Reset()         { *m = E2MeasObject{} }
-func (m *E2MeasObject) String() string { return proto.CompactTextString(m) }
-func (*E2MeasObject) ProtoMessage()    {}
-func (*E2MeasObject) Descriptor() ([]byte, []int) {
+func (m *MeasObject) Reset()         { *m = MeasObject{} }
+func (m *MeasObject) String() string { return proto.CompactTextString(m) }
+func (*MeasObject) ProtoMessage()    {}
+func (*MeasObject) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{30}
 }
-func (m *E2MeasObject) XXX_Unmarshal(b []byte) error {
+func (m *MeasObject) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2MeasObject) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MeasObject) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2MeasObject.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MeasObject.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3154,56 +3507,56 @@ func (m *E2MeasObject) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-func (m *E2MeasObject) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2MeasObject.Merge(m, src)
+func (m *MeasObject) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MeasObject.Merge(m, src)
 }
-func (m *E2MeasObject) XXX_Size() int {
+func (m *MeasObject) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2MeasObject) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2MeasObject.DiscardUnknown(m)
+func (m *MeasObject) XXX_DiscardUnknown() {
+	xxx_messageInfo_MeasObject.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2MeasObject proto.InternalMessageInfo
+var xxx_messageInfo_MeasObject proto.InternalMessageInfo
 
-func (m *E2MeasObject) GetDlFreq() string {
+func (m *MeasObject) GetDlFreq() string {
 	if m != nil {
 		return m.DlFreq
 	}
 	return ""
 }
 
-func (m *E2MeasObject) GetMeasCells() []*E2MeasCell {
+func (m *MeasObject) GetMeasCells() []*MeasCell {
 	if m != nil {
 		return m.MeasCells
 	}
 	return nil
 }
 
-type E2ReportParamChoice struct {
+type ReportParamChoice struct {
 	// Types that are valid to be assigned to Choice:
-	//	*E2ReportParamChoice_PerParam
-	//	*E2ReportParamChoice_A1Param
-	//	*E2ReportParamChoice_A2Param
-	//	*E2ReportParamChoice_A3Param
-	//	*E2ReportParamChoice_A4Param
-	//	*E2ReportParamChoice_A5Param
-	//	*E2ReportParamChoice_A6Param
-	Choice isE2ReportParamChoice_Choice `protobuf_oneof:"choice"`
+	//	*ReportParamChoice_PerParam
+	//	*ReportParamChoice_A1Param
+	//	*ReportParamChoice_A2Param
+	//	*ReportParamChoice_A3Param
+	//	*ReportParamChoice_A4Param
+	//	*ReportParamChoice_A5Param
+	//	*ReportParamChoice_A6Param
+	Choice isReportParamChoice_Choice `protobuf_oneof:"choice"`
 }
 
-func (m *E2ReportParamChoice) Reset()         { *m = E2ReportParamChoice{} }
-func (m *E2ReportParamChoice) String() string { return proto.CompactTextString(m) }
-func (*E2ReportParamChoice) ProtoMessage()    {}
-func (*E2ReportParamChoice) Descriptor() ([]byte, []int) {
+func (m *ReportParamChoice) Reset()         { *m = ReportParamChoice{} }
+func (m *ReportParamChoice) String() string { return proto.CompactTextString(m) }
+func (*ReportParamChoice) ProtoMessage()    {}
+func (*ReportParamChoice) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{31}
 }
-func (m *E2ReportParamChoice) XXX_Unmarshal(b []byte) error {
+func (m *ReportParamChoice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ReportParamChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ReportParamChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ReportParamChoice.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ReportParamChoice.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3213,142 +3566,142 @@ func (m *E2ReportParamChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *E2ReportParamChoice) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ReportParamChoice.Merge(m, src)
+func (m *ReportParamChoice) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ReportParamChoice.Merge(m, src)
 }
-func (m *E2ReportParamChoice) XXX_Size() int {
+func (m *ReportParamChoice) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ReportParamChoice) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ReportParamChoice.DiscardUnknown(m)
+func (m *ReportParamChoice) XXX_DiscardUnknown() {
+	xxx_messageInfo_ReportParamChoice.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ReportParamChoice proto.InternalMessageInfo
+var xxx_messageInfo_ReportParamChoice proto.InternalMessageInfo
 
-type isE2ReportParamChoice_Choice interface {
-	isE2ReportParamChoice_Choice()
+type isReportParamChoice_Choice interface {
+	isReportParamChoice_Choice()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type E2ReportParamChoice_PerParam struct {
-	PerParam *E2PerParam `protobuf:"bytes,1,opt,name=perParam,proto3,oneof" json:"perParam,omitempty"`
+type ReportParamChoice_PerParam struct {
+	PerParam *PerParam `protobuf:"bytes,1,opt,name=perParam,proto3,oneof" json:"perParam,omitempty"`
 }
-type E2ReportParamChoice_A1Param struct {
-	A1Param *E2A1Param `protobuf:"bytes,2,opt,name=a1Param,proto3,oneof" json:"a1Param,omitempty"`
+type ReportParamChoice_A1Param struct {
+	A1Param *A1Param `protobuf:"bytes,2,opt,name=a1Param,proto3,oneof" json:"a1Param,omitempty"`
 }
-type E2ReportParamChoice_A2Param struct {
-	A2Param *E2A2Param `protobuf:"bytes,3,opt,name=a2Param,proto3,oneof" json:"a2Param,omitempty"`
+type ReportParamChoice_A2Param struct {
+	A2Param *A2Param `protobuf:"bytes,3,opt,name=a2Param,proto3,oneof" json:"a2Param,omitempty"`
 }
-type E2ReportParamChoice_A3Param struct {
-	A3Param *E2A3Param `protobuf:"bytes,4,opt,name=a3Param,proto3,oneof" json:"a3Param,omitempty"`
+type ReportParamChoice_A3Param struct {
+	A3Param *A3Param `protobuf:"bytes,4,opt,name=a3Param,proto3,oneof" json:"a3Param,omitempty"`
 }
-type E2ReportParamChoice_A4Param struct {
-	A4Param *E2A4Param `protobuf:"bytes,5,opt,name=a4Param,proto3,oneof" json:"a4Param,omitempty"`
+type ReportParamChoice_A4Param struct {
+	A4Param *A4Param `protobuf:"bytes,5,opt,name=a4Param,proto3,oneof" json:"a4Param,omitempty"`
 }
-type E2ReportParamChoice_A5Param struct {
-	A5Param *E2A5Param `protobuf:"bytes,6,opt,name=a5Param,proto3,oneof" json:"a5Param,omitempty"`
+type ReportParamChoice_A5Param struct {
+	A5Param *A5Param `protobuf:"bytes,6,opt,name=a5Param,proto3,oneof" json:"a5Param,omitempty"`
 }
-type E2ReportParamChoice_A6Param struct {
-	A6Param *E2A6Param `protobuf:"bytes,7,opt,name=a6Param,proto3,oneof" json:"a6Param,omitempty"`
+type ReportParamChoice_A6Param struct {
+	A6Param *A6Param `protobuf:"bytes,7,opt,name=a6Param,proto3,oneof" json:"a6Param,omitempty"`
 }
 
-func (*E2ReportParamChoice_PerParam) isE2ReportParamChoice_Choice() {}
-func (*E2ReportParamChoice_A1Param) isE2ReportParamChoice_Choice()  {}
-func (*E2ReportParamChoice_A2Param) isE2ReportParamChoice_Choice()  {}
-func (*E2ReportParamChoice_A3Param) isE2ReportParamChoice_Choice()  {}
-func (*E2ReportParamChoice_A4Param) isE2ReportParamChoice_Choice()  {}
-func (*E2ReportParamChoice_A5Param) isE2ReportParamChoice_Choice()  {}
-func (*E2ReportParamChoice_A6Param) isE2ReportParamChoice_Choice()  {}
+func (*ReportParamChoice_PerParam) isReportParamChoice_Choice() {}
+func (*ReportParamChoice_A1Param) isReportParamChoice_Choice()  {}
+func (*ReportParamChoice_A2Param) isReportParamChoice_Choice()  {}
+func (*ReportParamChoice_A3Param) isReportParamChoice_Choice()  {}
+func (*ReportParamChoice_A4Param) isReportParamChoice_Choice()  {}
+func (*ReportParamChoice_A5Param) isReportParamChoice_Choice()  {}
+func (*ReportParamChoice_A6Param) isReportParamChoice_Choice()  {}
 
-func (m *E2ReportParamChoice) GetChoice() isE2ReportParamChoice_Choice {
+func (m *ReportParamChoice) GetChoice() isReportParamChoice_Choice {
 	if m != nil {
 		return m.Choice
 	}
 	return nil
 }
 
-func (m *E2ReportParamChoice) GetPerParam() *E2PerParam {
-	if x, ok := m.GetChoice().(*E2ReportParamChoice_PerParam); ok {
+func (m *ReportParamChoice) GetPerParam() *PerParam {
+	if x, ok := m.GetChoice().(*ReportParamChoice_PerParam); ok {
 		return x.PerParam
 	}
 	return nil
 }
 
-func (m *E2ReportParamChoice) GetA1Param() *E2A1Param {
-	if x, ok := m.GetChoice().(*E2ReportParamChoice_A1Param); ok {
+func (m *ReportParamChoice) GetA1Param() *A1Param {
+	if x, ok := m.GetChoice().(*ReportParamChoice_A1Param); ok {
 		return x.A1Param
 	}
 	return nil
 }
 
-func (m *E2ReportParamChoice) GetA2Param() *E2A2Param {
-	if x, ok := m.GetChoice().(*E2ReportParamChoice_A2Param); ok {
+func (m *ReportParamChoice) GetA2Param() *A2Param {
+	if x, ok := m.GetChoice().(*ReportParamChoice_A2Param); ok {
 		return x.A2Param
 	}
 	return nil
 }
 
-func (m *E2ReportParamChoice) GetA3Param() *E2A3Param {
-	if x, ok := m.GetChoice().(*E2ReportParamChoice_A3Param); ok {
+func (m *ReportParamChoice) GetA3Param() *A3Param {
+	if x, ok := m.GetChoice().(*ReportParamChoice_A3Param); ok {
 		return x.A3Param
 	}
 	return nil
 }
 
-func (m *E2ReportParamChoice) GetA4Param() *E2A4Param {
-	if x, ok := m.GetChoice().(*E2ReportParamChoice_A4Param); ok {
+func (m *ReportParamChoice) GetA4Param() *A4Param {
+	if x, ok := m.GetChoice().(*ReportParamChoice_A4Param); ok {
 		return x.A4Param
 	}
 	return nil
 }
 
-func (m *E2ReportParamChoice) GetA5Param() *E2A5Param {
-	if x, ok := m.GetChoice().(*E2ReportParamChoice_A5Param); ok {
+func (m *ReportParamChoice) GetA5Param() *A5Param {
+	if x, ok := m.GetChoice().(*ReportParamChoice_A5Param); ok {
 		return x.A5Param
 	}
 	return nil
 }
 
-func (m *E2ReportParamChoice) GetA6Param() *E2A6Param {
-	if x, ok := m.GetChoice().(*E2ReportParamChoice_A6Param); ok {
+func (m *ReportParamChoice) GetA6Param() *A6Param {
+	if x, ok := m.GetChoice().(*ReportParamChoice_A6Param); ok {
 		return x.A6Param
 	}
 	return nil
 }
 
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*E2ReportParamChoice) XXX_OneofWrappers() []interface{} {
+func (*ReportParamChoice) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*E2ReportParamChoice_PerParam)(nil),
-		(*E2ReportParamChoice_A1Param)(nil),
-		(*E2ReportParamChoice_A2Param)(nil),
-		(*E2ReportParamChoice_A3Param)(nil),
-		(*E2ReportParamChoice_A4Param)(nil),
-		(*E2ReportParamChoice_A5Param)(nil),
-		(*E2ReportParamChoice_A6Param)(nil),
+		(*ReportParamChoice_PerParam)(nil),
+		(*ReportParamChoice_A1Param)(nil),
+		(*ReportParamChoice_A2Param)(nil),
+		(*ReportParamChoice_A3Param)(nil),
+		(*ReportParamChoice_A4Param)(nil),
+		(*ReportParamChoice_A5Param)(nil),
+		(*ReportParamChoice_A6Param)(nil),
 	}
 }
 
-type E2ThresholdEUTRAChoice struct {
+type ThresholdEUTRAChoice struct {
 	// Types that are valid to be assigned to Choice:
-	//	*E2ThresholdEUTRAChoice_ThresholdRSRP
-	//	*E2ThresholdEUTRAChoice_ThresholdRSRQ
-	Choice isE2ThresholdEUTRAChoice_Choice `protobuf_oneof:"choice"`
+	//	*ThresholdEUTRAChoice_ThresholdRSRP
+	//	*ThresholdEUTRAChoice_ThresholdRSRQ
+	Choice isThresholdEUTRAChoice_Choice `protobuf_oneof:"choice"`
 }
 
-func (m *E2ThresholdEUTRAChoice) Reset()         { *m = E2ThresholdEUTRAChoice{} }
-func (m *E2ThresholdEUTRAChoice) String() string { return proto.CompactTextString(m) }
-func (*E2ThresholdEUTRAChoice) ProtoMessage()    {}
-func (*E2ThresholdEUTRAChoice) Descriptor() ([]byte, []int) {
+func (m *ThresholdEUTRAChoice) Reset()         { *m = ThresholdEUTRAChoice{} }
+func (m *ThresholdEUTRAChoice) String() string { return proto.CompactTextString(m) }
+func (*ThresholdEUTRAChoice) ProtoMessage()    {}
+func (*ThresholdEUTRAChoice) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{32}
 }
-func (m *E2ThresholdEUTRAChoice) XXX_Unmarshal(b []byte) error {
+func (m *ThresholdEUTRAChoice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ThresholdEUTRAChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ThresholdEUTRAChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ThresholdEUTRAChoice.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ThresholdEUTRAChoice.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3358,80 +3711,80 @@ func (m *E2ThresholdEUTRAChoice) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *E2ThresholdEUTRAChoice) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ThresholdEUTRAChoice.Merge(m, src)
+func (m *ThresholdEUTRAChoice) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ThresholdEUTRAChoice.Merge(m, src)
 }
-func (m *E2ThresholdEUTRAChoice) XXX_Size() int {
+func (m *ThresholdEUTRAChoice) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ThresholdEUTRAChoice) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ThresholdEUTRAChoice.DiscardUnknown(m)
+func (m *ThresholdEUTRAChoice) XXX_DiscardUnknown() {
+	xxx_messageInfo_ThresholdEUTRAChoice.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ThresholdEUTRAChoice proto.InternalMessageInfo
+var xxx_messageInfo_ThresholdEUTRAChoice proto.InternalMessageInfo
 
-type isE2ThresholdEUTRAChoice_Choice interface {
-	isE2ThresholdEUTRAChoice_Choice()
+type isThresholdEUTRAChoice_Choice interface {
+	isThresholdEUTRAChoice_Choice()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type E2ThresholdEUTRAChoice_ThresholdRSRP struct {
+type ThresholdEUTRAChoice_ThresholdRSRP struct {
 	ThresholdRSRP string `protobuf:"bytes,1,opt,name=thresholdRSRP,proto3,oneof" json:"thresholdRSRP,omitempty"`
 }
-type E2ThresholdEUTRAChoice_ThresholdRSRQ struct {
+type ThresholdEUTRAChoice_ThresholdRSRQ struct {
 	ThresholdRSRQ string `protobuf:"bytes,2,opt,name=thresholdRSRQ,proto3,oneof" json:"thresholdRSRQ,omitempty"`
 }
 
-func (*E2ThresholdEUTRAChoice_ThresholdRSRP) isE2ThresholdEUTRAChoice_Choice() {}
-func (*E2ThresholdEUTRAChoice_ThresholdRSRQ) isE2ThresholdEUTRAChoice_Choice() {}
+func (*ThresholdEUTRAChoice_ThresholdRSRP) isThresholdEUTRAChoice_Choice() {}
+func (*ThresholdEUTRAChoice_ThresholdRSRQ) isThresholdEUTRAChoice_Choice() {}
 
-func (m *E2ThresholdEUTRAChoice) GetChoice() isE2ThresholdEUTRAChoice_Choice {
+func (m *ThresholdEUTRAChoice) GetChoice() isThresholdEUTRAChoice_Choice {
 	if m != nil {
 		return m.Choice
 	}
 	return nil
 }
 
-func (m *E2ThresholdEUTRAChoice) GetThresholdRSRP() string {
-	if x, ok := m.GetChoice().(*E2ThresholdEUTRAChoice_ThresholdRSRP); ok {
+func (m *ThresholdEUTRAChoice) GetThresholdRSRP() string {
+	if x, ok := m.GetChoice().(*ThresholdEUTRAChoice_ThresholdRSRP); ok {
 		return x.ThresholdRSRP
 	}
 	return ""
 }
 
-func (m *E2ThresholdEUTRAChoice) GetThresholdRSRQ() string {
-	if x, ok := m.GetChoice().(*E2ThresholdEUTRAChoice_ThresholdRSRQ); ok {
+func (m *ThresholdEUTRAChoice) GetThresholdRSRQ() string {
+	if x, ok := m.GetChoice().(*ThresholdEUTRAChoice_ThresholdRSRQ); ok {
 		return x.ThresholdRSRQ
 	}
 	return ""
 }
 
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*E2ThresholdEUTRAChoice) XXX_OneofWrappers() []interface{} {
+func (*ThresholdEUTRAChoice) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*E2ThresholdEUTRAChoice_ThresholdRSRP)(nil),
-		(*E2ThresholdEUTRAChoice_ThresholdRSRQ)(nil),
+		(*ThresholdEUTRAChoice_ThresholdRSRP)(nil),
+		(*ThresholdEUTRAChoice_ThresholdRSRQ)(nil),
 	}
 }
 
-type E2ThreasholdEUTRA struct {
-	Present E2ThresholdEUTRAPR      `protobuf:"varint,1,opt,name=present,proto3,enum=interface.e2.E2ThresholdEUTRAPR" json:"present,omitempty"`
-	Choice  *E2ThresholdEUTRAChoice `protobuf:"bytes,2,opt,name=choice,proto3" json:"choice,omitempty"`
+type ThreasholdEUTRA struct {
+	Present ThresholdEUTRAPR      `protobuf:"varint,1,opt,name=present,proto3,enum=interface.e2.ThresholdEUTRAPR" json:"present,omitempty"`
+	Choice  *ThresholdEUTRAChoice `protobuf:"bytes,2,opt,name=choice,proto3" json:"choice,omitempty"`
 }
 
-func (m *E2ThreasholdEUTRA) Reset()         { *m = E2ThreasholdEUTRA{} }
-func (m *E2ThreasholdEUTRA) String() string { return proto.CompactTextString(m) }
-func (*E2ThreasholdEUTRA) ProtoMessage()    {}
-func (*E2ThreasholdEUTRA) Descriptor() ([]byte, []int) {
+func (m *ThreasholdEUTRA) Reset()         { *m = ThreasholdEUTRA{} }
+func (m *ThreasholdEUTRA) String() string { return proto.CompactTextString(m) }
+func (*ThreasholdEUTRA) ProtoMessage()    {}
+func (*ThreasholdEUTRA) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{33}
 }
-func (m *E2ThreasholdEUTRA) XXX_Unmarshal(b []byte) error {
+func (m *ThreasholdEUTRA) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ThreasholdEUTRA) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ThreasholdEUTRA) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ThreasholdEUTRA.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ThreasholdEUTRA.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3441,48 +3794,48 @@ func (m *E2ThreasholdEUTRA) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *E2ThreasholdEUTRA) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ThreasholdEUTRA.Merge(m, src)
+func (m *ThreasholdEUTRA) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ThreasholdEUTRA.Merge(m, src)
 }
-func (m *E2ThreasholdEUTRA) XXX_Size() int {
+func (m *ThreasholdEUTRA) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ThreasholdEUTRA) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ThreasholdEUTRA.DiscardUnknown(m)
+func (m *ThreasholdEUTRA) XXX_DiscardUnknown() {
+	xxx_messageInfo_ThreasholdEUTRA.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ThreasholdEUTRA proto.InternalMessageInfo
+var xxx_messageInfo_ThreasholdEUTRA proto.InternalMessageInfo
 
-func (m *E2ThreasholdEUTRA) GetPresent() E2ThresholdEUTRAPR {
+func (m *ThreasholdEUTRA) GetPresent() ThresholdEUTRAPR {
 	if m != nil {
 		return m.Present
 	}
-	return E2ThresholdEUTRAPR_E2_THRESHOLDEUTRA_PR_NOTHING
+	return ThresholdEUTRAPR_THRESHOLD_EUTRA_PR_NOTHING
 }
 
-func (m *E2ThreasholdEUTRA) GetChoice() *E2ThresholdEUTRAChoice {
+func (m *ThreasholdEUTRA) GetChoice() *ThresholdEUTRAChoice {
 	if m != nil {
 		return m.Choice
 	}
 	return nil
 }
 
-type E2PerParam struct {
-	ReportIntervalMs E2PerParamReportIntervalMs `protobuf:"varint,1,opt,name=reportIntervalMs,proto3,enum=interface.e2.E2PerParamReportIntervalMs" json:"reportIntervalMs,omitempty"`
+type PerParam struct {
+	ReportIntervalMs PerParamReportIntervalMs `protobuf:"varint,1,opt,name=reportIntervalMs,proto3,enum=interface.e2.PerParamReportIntervalMs" json:"reportIntervalMs,omitempty"`
 }
 
-func (m *E2PerParam) Reset()         { *m = E2PerParam{} }
-func (m *E2PerParam) String() string { return proto.CompactTextString(m) }
-func (*E2PerParam) ProtoMessage()    {}
-func (*E2PerParam) Descriptor() ([]byte, []int) {
+func (m *PerParam) Reset()         { *m = PerParam{} }
+func (m *PerParam) String() string { return proto.CompactTextString(m) }
+func (*PerParam) ProtoMessage()    {}
+func (*PerParam) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{34}
 }
-func (m *E2PerParam) XXX_Unmarshal(b []byte) error {
+func (m *PerParam) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2PerParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PerParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2PerParam.Marshal(b, m, deterministic)
+		return xxx_messageInfo_PerParam.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3492,41 +3845,41 @@ func (m *E2PerParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2PerParam) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2PerParam.Merge(m, src)
+func (m *PerParam) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PerParam.Merge(m, src)
 }
-func (m *E2PerParam) XXX_Size() int {
+func (m *PerParam) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2PerParam) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2PerParam.DiscardUnknown(m)
+func (m *PerParam) XXX_DiscardUnknown() {
+	xxx_messageInfo_PerParam.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2PerParam proto.InternalMessageInfo
+var xxx_messageInfo_PerParam proto.InternalMessageInfo
 
-func (m *E2PerParam) GetReportIntervalMs() E2PerParamReportIntervalMs {
+func (m *PerParam) GetReportIntervalMs() PerParamReportIntervalMs {
 	if m != nil {
 		return m.ReportIntervalMs
 	}
-	return E2PerParamReportIntervalMs_E2_PERPARAM_MS_120
+	return PerParamReportIntervalMs_PER_PARAM_MS_120
 }
 
-type E2A1Param struct {
-	A1Threshold *E2ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a1Threshold,proto3" json:"a1Threshold,omitempty"`
+type A1Param struct {
+	A1Threshold *ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a1Threshold,proto3" json:"a1Threshold,omitempty"`
 }
 
-func (m *E2A1Param) Reset()         { *m = E2A1Param{} }
-func (m *E2A1Param) String() string { return proto.CompactTextString(m) }
-func (*E2A1Param) ProtoMessage()    {}
-func (*E2A1Param) Descriptor() ([]byte, []int) {
+func (m *A1Param) Reset()         { *m = A1Param{} }
+func (m *A1Param) String() string { return proto.CompactTextString(m) }
+func (*A1Param) ProtoMessage()    {}
+func (*A1Param) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{35}
 }
-func (m *E2A1Param) XXX_Unmarshal(b []byte) error {
+func (m *A1Param) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2A1Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *A1Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2A1Param.Marshal(b, m, deterministic)
+		return xxx_messageInfo_A1Param.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3536,41 +3889,41 @@ func (m *E2A1Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2A1Param) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2A1Param.Merge(m, src)
+func (m *A1Param) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_A1Param.Merge(m, src)
 }
-func (m *E2A1Param) XXX_Size() int {
+func (m *A1Param) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2A1Param) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2A1Param.DiscardUnknown(m)
+func (m *A1Param) XXX_DiscardUnknown() {
+	xxx_messageInfo_A1Param.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2A1Param proto.InternalMessageInfo
+var xxx_messageInfo_A1Param proto.InternalMessageInfo
 
-func (m *E2A1Param) GetA1Threshold() *E2ThreasholdEUTRA {
+func (m *A1Param) GetA1Threshold() *ThreasholdEUTRA {
 	if m != nil {
 		return m.A1Threshold
 	}
 	return nil
 }
 
-type E2A2Param struct {
-	A2Threshold *E2ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a2Threshold,proto3" json:"a2Threshold,omitempty"`
+type A2Param struct {
+	A2Threshold *ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a2Threshold,proto3" json:"a2Threshold,omitempty"`
 }
 
-func (m *E2A2Param) Reset()         { *m = E2A2Param{} }
-func (m *E2A2Param) String() string { return proto.CompactTextString(m) }
-func (*E2A2Param) ProtoMessage()    {}
-func (*E2A2Param) Descriptor() ([]byte, []int) {
+func (m *A2Param) Reset()         { *m = A2Param{} }
+func (m *A2Param) String() string { return proto.CompactTextString(m) }
+func (*A2Param) ProtoMessage()    {}
+func (*A2Param) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{36}
 }
-func (m *E2A2Param) XXX_Unmarshal(b []byte) error {
+func (m *A2Param) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2A2Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *A2Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2A2Param.Marshal(b, m, deterministic)
+		return xxx_messageInfo_A2Param.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3580,41 +3933,41 @@ func (m *E2A2Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2A2Param) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2A2Param.Merge(m, src)
+func (m *A2Param) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_A2Param.Merge(m, src)
 }
-func (m *E2A2Param) XXX_Size() int {
+func (m *A2Param) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2A2Param) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2A2Param.DiscardUnknown(m)
+func (m *A2Param) XXX_DiscardUnknown() {
+	xxx_messageInfo_A2Param.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2A2Param proto.InternalMessageInfo
+var xxx_messageInfo_A2Param proto.InternalMessageInfo
 
-func (m *E2A2Param) GetA2Threshold() *E2ThreasholdEUTRA {
+func (m *A2Param) GetA2Threshold() *ThreasholdEUTRA {
 	if m != nil {
 		return m.A2Threshold
 	}
 	return nil
 }
 
-type E2A3Param struct {
+type A3Param struct {
 	A3Offset string `protobuf:"bytes,1,opt,name=a3Offset,proto3" json:"a3Offset,omitempty"`
 }
 
-func (m *E2A3Param) Reset()         { *m = E2A3Param{} }
-func (m *E2A3Param) String() string { return proto.CompactTextString(m) }
-func (*E2A3Param) ProtoMessage()    {}
-func (*E2A3Param) Descriptor() ([]byte, []int) {
+func (m *A3Param) Reset()         { *m = A3Param{} }
+func (m *A3Param) String() string { return proto.CompactTextString(m) }
+func (*A3Param) ProtoMessage()    {}
+func (*A3Param) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{37}
 }
-func (m *E2A3Param) XXX_Unmarshal(b []byte) error {
+func (m *A3Param) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2A3Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *A3Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2A3Param.Marshal(b, m, deterministic)
+		return xxx_messageInfo_A3Param.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3624,41 +3977,41 @@ func (m *E2A3Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2A3Param) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2A3Param.Merge(m, src)
+func (m *A3Param) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_A3Param.Merge(m, src)
 }
-func (m *E2A3Param) XXX_Size() int {
+func (m *A3Param) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2A3Param) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2A3Param.DiscardUnknown(m)
+func (m *A3Param) XXX_DiscardUnknown() {
+	xxx_messageInfo_A3Param.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2A3Param proto.InternalMessageInfo
+var xxx_messageInfo_A3Param proto.InternalMessageInfo
 
-func (m *E2A3Param) GetA3Offset() string {
+func (m *A3Param) GetA3Offset() string {
 	if m != nil {
 		return m.A3Offset
 	}
 	return ""
 }
 
-type E2A4Param struct {
-	A4Threshold *E2ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a4Threshold,proto3" json:"a4Threshold,omitempty"`
+type A4Param struct {
+	A4Threshold *ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a4Threshold,proto3" json:"a4Threshold,omitempty"`
 }
 
-func (m *E2A4Param) Reset()         { *m = E2A4Param{} }
-func (m *E2A4Param) String() string { return proto.CompactTextString(m) }
-func (*E2A4Param) ProtoMessage()    {}
-func (*E2A4Param) Descriptor() ([]byte, []int) {
+func (m *A4Param) Reset()         { *m = A4Param{} }
+func (m *A4Param) String() string { return proto.CompactTextString(m) }
+func (*A4Param) ProtoMessage()    {}
+func (*A4Param) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{38}
 }
-func (m *E2A4Param) XXX_Unmarshal(b []byte) error {
+func (m *A4Param) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2A4Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *A4Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2A4Param.Marshal(b, m, deterministic)
+		return xxx_messageInfo_A4Param.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3668,42 +4021,42 @@ func (m *E2A4Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2A4Param) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2A4Param.Merge(m, src)
+func (m *A4Param) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_A4Param.Merge(m, src)
 }
-func (m *E2A4Param) XXX_Size() int {
+func (m *A4Param) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2A4Param) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2A4Param.DiscardUnknown(m)
+func (m *A4Param) XXX_DiscardUnknown() {
+	xxx_messageInfo_A4Param.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2A4Param proto.InternalMessageInfo
+var xxx_messageInfo_A4Param proto.InternalMessageInfo
 
-func (m *E2A4Param) GetA4Threshold() *E2ThreasholdEUTRA {
+func (m *A4Param) GetA4Threshold() *ThreasholdEUTRA {
 	if m != nil {
 		return m.A4Threshold
 	}
 	return nil
 }
 
-type E2A5Param struct {
-	A5Threshold1 *E2ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a5Threshold1,proto3" json:"a5Threshold1,omitempty"`
-	A5Threshold2 *E2ThreasholdEUTRA `protobuf:"bytes,2,opt,name=a5Threshold2,proto3" json:"a5Threshold2,omitempty"`
+type A5Param struct {
+	A5Threshold1 *ThreasholdEUTRA `protobuf:"bytes,1,opt,name=a5Threshold1,proto3" json:"a5Threshold1,omitempty"`
+	A5Threshold2 *ThreasholdEUTRA `protobuf:"bytes,2,opt,name=a5Threshold2,proto3" json:"a5Threshold2,omitempty"`
 }
 
-func (m *E2A5Param) Reset()         { *m = E2A5Param{} }
-func (m *E2A5Param) String() string { return proto.CompactTextString(m) }
-func (*E2A5Param) ProtoMessage()    {}
-func (*E2A5Param) Descriptor() ([]byte, []int) {
+func (m *A5Param) Reset()         { *m = A5Param{} }
+func (m *A5Param) String() string { return proto.CompactTextString(m) }
+func (*A5Param) ProtoMessage()    {}
+func (*A5Param) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{39}
 }
-func (m *E2A5Param) XXX_Unmarshal(b []byte) error {
+func (m *A5Param) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2A5Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *A5Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2A5Param.Marshal(b, m, deterministic)
+		return xxx_messageInfo_A5Param.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3713,48 +4066,48 @@ func (m *E2A5Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2A5Param) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2A5Param.Merge(m, src)
+func (m *A5Param) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_A5Param.Merge(m, src)
 }
-func (m *E2A5Param) XXX_Size() int {
+func (m *A5Param) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2A5Param) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2A5Param.DiscardUnknown(m)
+func (m *A5Param) XXX_DiscardUnknown() {
+	xxx_messageInfo_A5Param.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2A5Param proto.InternalMessageInfo
+var xxx_messageInfo_A5Param proto.InternalMessageInfo
 
-func (m *E2A5Param) GetA5Threshold1() *E2ThreasholdEUTRA {
+func (m *A5Param) GetA5Threshold1() *ThreasholdEUTRA {
 	if m != nil {
 		return m.A5Threshold1
 	}
 	return nil
 }
 
-func (m *E2A5Param) GetA5Threshold2() *E2ThreasholdEUTRA {
+func (m *A5Param) GetA5Threshold2() *ThreasholdEUTRA {
 	if m != nil {
 		return m.A5Threshold2
 	}
 	return nil
 }
 
-type E2A6Param struct {
+type A6Param struct {
 	A6Offset string `protobuf:"bytes,1,opt,name=a6Offset,proto3" json:"a6Offset,omitempty"`
 }
 
-func (m *E2A6Param) Reset()         { *m = E2A6Param{} }
-func (m *E2A6Param) String() string { return proto.CompactTextString(m) }
-func (*E2A6Param) ProtoMessage()    {}
-func (*E2A6Param) Descriptor() ([]byte, []int) {
+func (m *A6Param) Reset()         { *m = A6Param{} }
+func (m *A6Param) String() string { return proto.CompactTextString(m) }
+func (*A6Param) ProtoMessage()    {}
+func (*A6Param) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{40}
 }
-func (m *E2A6Param) XXX_Unmarshal(b []byte) error {
+func (m *A6Param) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2A6Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *A6Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2A6Param.Marshal(b, m, deterministic)
+		return xxx_messageInfo_A6Param.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3764,44 +4117,44 @@ func (m *E2A6Param) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2A6Param) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2A6Param.Merge(m, src)
+func (m *A6Param) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_A6Param.Merge(m, src)
 }
-func (m *E2A6Param) XXX_Size() int {
+func (m *A6Param) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2A6Param) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2A6Param.DiscardUnknown(m)
+func (m *A6Param) XXX_DiscardUnknown() {
+	xxx_messageInfo_A6Param.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2A6Param proto.InternalMessageInfo
+var xxx_messageInfo_A6Param proto.InternalMessageInfo
 
-func (m *E2A6Param) GetA6Offset() string {
+func (m *A6Param) GetA6Offset() string {
 	if m != nil {
 		return m.A6Offset
 	}
 	return ""
 }
 
-type E2ReportParam struct {
-	Present       E2ReportParamPR      `protobuf:"varint,1,opt,name=present,proto3,enum=interface.e2.E2ReportParamPR" json:"present,omitempty"`
-	Choice        *E2ReportParamChoice `protobuf:"bytes,2,opt,name=choice,proto3" json:"choice,omitempty"`
-	Hysteresis    string               `protobuf:"bytes,3,opt,name=hysteresis,proto3" json:"hysteresis,omitempty"`
-	Timetotrigger E2TimeToTrigger      `protobuf:"varint,4,opt,name=timetotrigger,proto3,enum=interface.e2.E2TimeToTrigger" json:"timetotrigger,omitempty"`
+type ReportParam struct {
+	Present       ReportParamPR      `protobuf:"varint,1,opt,name=present,proto3,enum=interface.e2.ReportParamPR" json:"present,omitempty"`
+	Choice        *ReportParamChoice `protobuf:"bytes,2,opt,name=choice,proto3" json:"choice,omitempty"`
+	Hysteresis    string             `protobuf:"bytes,3,opt,name=hysteresis,proto3" json:"hysteresis,omitempty"`
+	Timetotrigger TimeToTrigger      `protobuf:"varint,4,opt,name=timetotrigger,proto3,enum=interface.e2.TimeToTrigger" json:"timetotrigger,omitempty"`
 }
 
-func (m *E2ReportParam) Reset()         { *m = E2ReportParam{} }
-func (m *E2ReportParam) String() string { return proto.CompactTextString(m) }
-func (*E2ReportParam) ProtoMessage()    {}
-func (*E2ReportParam) Descriptor() ([]byte, []int) {
+func (m *ReportParam) Reset()         { *m = ReportParam{} }
+func (m *ReportParam) String() string { return proto.CompactTextString(m) }
+func (*ReportParam) ProtoMessage()    {}
+func (*ReportParam) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{41}
 }
-func (m *E2ReportParam) XXX_Unmarshal(b []byte) error {
+func (m *ReportParam) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ReportParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ReportParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ReportParam.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ReportParam.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3811,64 +4164,64 @@ func (m *E2ReportParam) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (m *E2ReportParam) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ReportParam.Merge(m, src)
+func (m *ReportParam) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ReportParam.Merge(m, src)
 }
-func (m *E2ReportParam) XXX_Size() int {
+func (m *ReportParam) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ReportParam) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ReportParam.DiscardUnknown(m)
+func (m *ReportParam) XXX_DiscardUnknown() {
+	xxx_messageInfo_ReportParam.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ReportParam proto.InternalMessageInfo
+var xxx_messageInfo_ReportParam proto.InternalMessageInfo
 
-func (m *E2ReportParam) GetPresent() E2ReportParamPR {
+func (m *ReportParam) GetPresent() ReportParamPR {
 	if m != nil {
 		return m.Present
 	}
-	return E2ReportParamPR_E2_REPORTPARAM_PR_NOTHING
+	return ReportParamPR_REPORT_PARAM_PR_NOTHING
 }
 
-func (m *E2ReportParam) GetChoice() *E2ReportParamChoice {
+func (m *ReportParam) GetChoice() *ReportParamChoice {
 	if m != nil {
 		return m.Choice
 	}
 	return nil
 }
 
-func (m *E2ReportParam) GetHysteresis() string {
+func (m *ReportParam) GetHysteresis() string {
 	if m != nil {
 		return m.Hysteresis
 	}
 	return ""
 }
 
-func (m *E2ReportParam) GetTimetotrigger() E2TimeToTrigger {
+func (m *ReportParam) GetTimetotrigger() TimeToTrigger {
 	if m != nil {
 		return m.Timetotrigger
 	}
-	return E2TimeToTrigger_E2_TTT_MS0
+	return TimeToTrigger_TTT_MS0
 }
 
-type E2ReportConfig struct {
-	ReportParams    *E2ReportParam    `protobuf:"bytes,1,opt,name=reportParams,proto3" json:"reportParams,omitempty"`
-	TriggerQuantity E2TriggerQuantity `protobuf:"varint,2,opt,name=triggerQuantity,proto3,enum=interface.e2.E2TriggerQuantity" json:"triggerQuantity,omitempty"`
-	ReportQuality   E2ReportQuality   `protobuf:"varint,3,opt,name=reportQuality,proto3,enum=interface.e2.E2ReportQuality" json:"reportQuality,omitempty"`
+type ReportConfig struct {
+	ReportParams    *ReportParam    `protobuf:"bytes,1,opt,name=reportParams,proto3" json:"reportParams,omitempty"`
+	TriggerQuantity TriggerQuantity `protobuf:"varint,2,opt,name=triggerQuantity,proto3,enum=interface.e2.TriggerQuantity" json:"triggerQuantity,omitempty"`
+	ReportQuality   ReportQuality   `protobuf:"varint,3,opt,name=reportQuality,proto3,enum=interface.e2.ReportQuality" json:"reportQuality,omitempty"`
 }
 
-func (m *E2ReportConfig) Reset()         { *m = E2ReportConfig{} }
-func (m *E2ReportConfig) String() string { return proto.CompactTextString(m) }
-func (*E2ReportConfig) ProtoMessage()    {}
-func (*E2ReportConfig) Descriptor() ([]byte, []int) {
+func (m *ReportConfig) Reset()         { *m = ReportConfig{} }
+func (m *ReportConfig) String() string { return proto.CompactTextString(m) }
+func (*ReportConfig) ProtoMessage()    {}
+func (*ReportConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{42}
 }
-func (m *E2ReportConfig) XXX_Unmarshal(b []byte) error {
+func (m *ReportConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ReportConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ReportConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ReportConfig.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ReportConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3878,55 +4231,55 @@ func (m *E2ReportConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *E2ReportConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ReportConfig.Merge(m, src)
+func (m *ReportConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ReportConfig.Merge(m, src)
 }
-func (m *E2ReportConfig) XXX_Size() int {
+func (m *ReportConfig) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ReportConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ReportConfig.DiscardUnknown(m)
+func (m *ReportConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_ReportConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ReportConfig proto.InternalMessageInfo
+var xxx_messageInfo_ReportConfig proto.InternalMessageInfo
 
-func (m *E2ReportConfig) GetReportParams() *E2ReportParam {
+func (m *ReportConfig) GetReportParams() *ReportParam {
 	if m != nil {
 		return m.ReportParams
 	}
 	return nil
 }
 
-func (m *E2ReportConfig) GetTriggerQuantity() E2TriggerQuantity {
+func (m *ReportConfig) GetTriggerQuantity() TriggerQuantity {
 	if m != nil {
 		return m.TriggerQuantity
 	}
-	return E2TriggerQuantity_E2_TQ_RSRP
+	return TriggerQuantity_TQ_RSRP
 }
 
-func (m *E2ReportConfig) GetReportQuality() E2ReportQuality {
+func (m *ReportConfig) GetReportQuality() ReportQuality {
 	if m != nil {
 		return m.ReportQuality
 	}
-	return E2ReportQuality_E2_RQ_SAME
+	return ReportQuality_RQ_SAME
 }
 
-type E2AddMeasId struct {
+type AddMeasId struct {
 	AddMeasId []string `protobuf:"bytes,1,rep,name=addMeasId,proto3" json:"addMeasId,omitempty"`
 }
 
-func (m *E2AddMeasId) Reset()         { *m = E2AddMeasId{} }
-func (m *E2AddMeasId) String() string { return proto.CompactTextString(m) }
-func (*E2AddMeasId) ProtoMessage()    {}
-func (*E2AddMeasId) Descriptor() ([]byte, []int) {
+func (m *AddMeasId) Reset()         { *m = AddMeasId{} }
+func (m *AddMeasId) String() string { return proto.CompactTextString(m) }
+func (*AddMeasId) ProtoMessage()    {}
+func (*AddMeasId) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{43}
 }
-func (m *E2AddMeasId) XXX_Unmarshal(b []byte) error {
+func (m *AddMeasId) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2AddMeasId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *AddMeasId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2AddMeasId.Marshal(b, m, deterministic)
+		return xxx_messageInfo_AddMeasId.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3936,41 +4289,41 @@ func (m *E2AddMeasId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (m *E2AddMeasId) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2AddMeasId.Merge(m, src)
+func (m *AddMeasId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddMeasId.Merge(m, src)
 }
-func (m *E2AddMeasId) XXX_Size() int {
+func (m *AddMeasId) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2AddMeasId) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2AddMeasId.DiscardUnknown(m)
+func (m *AddMeasId) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddMeasId.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2AddMeasId proto.InternalMessageInfo
+var xxx_messageInfo_AddMeasId proto.InternalMessageInfo
 
-func (m *E2AddMeasId) GetAddMeasId() []string {
+func (m *AddMeasId) GetAddMeasId() []string {
 	if m != nil {
 		return m.AddMeasId
 	}
 	return nil
 }
 
-type E2DelMeasId struct {
+type DelMeasId struct {
 	DelMeasId []string `protobuf:"bytes,1,rep,name=delMeasId,proto3" json:"delMeasId,omitempty"`
 }
 
-func (m *E2DelMeasId) Reset()         { *m = E2DelMeasId{} }
-func (m *E2DelMeasId) String() string { return proto.CompactTextString(m) }
-func (*E2DelMeasId) ProtoMessage()    {}
-func (*E2DelMeasId) Descriptor() ([]byte, []int) {
+func (m *DelMeasId) Reset()         { *m = DelMeasId{} }
+func (m *DelMeasId) String() string { return proto.CompactTextString(m) }
+func (*DelMeasId) ProtoMessage()    {}
+func (*DelMeasId) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{44}
 }
-func (m *E2DelMeasId) XXX_Unmarshal(b []byte) error {
+func (m *DelMeasId) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2DelMeasId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DelMeasId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2DelMeasId.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DelMeasId.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -3980,45 +4333,45 @@ func (m *E2DelMeasId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (m *E2DelMeasId) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2DelMeasId.Merge(m, src)
+func (m *DelMeasId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DelMeasId.Merge(m, src)
 }
-func (m *E2DelMeasId) XXX_Size() int {
+func (m *DelMeasId) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2DelMeasId) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2DelMeasId.DiscardUnknown(m)
+func (m *DelMeasId) XXX_DiscardUnknown() {
+	xxx_messageInfo_DelMeasId.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2DelMeasId proto.InternalMessageInfo
+var xxx_messageInfo_DelMeasId proto.InternalMessageInfo
 
-func (m *E2DelMeasId) GetDelMeasId() []string {
+func (m *DelMeasId) GetDelMeasId() []string {
 	if m != nil {
 		return m.DelMeasId
 	}
 	return nil
 }
 
-type E2MeasIdActionChoice struct {
+type MeasIdActionChoice struct {
 	// Types that are valid to be assigned to Choice:
-	//	*E2MeasIdActionChoice_AddMeasId
-	//	*E2MeasIdActionChoice_DelMeasId
-	//	*E2MeasIdActionChoice_Hototarget
-	Choice isE2MeasIdActionChoice_Choice `protobuf_oneof:"choice"`
+	//	*MeasIdActionChoice_AddMeasId
+	//	*MeasIdActionChoice_DelMeasId
+	//	*MeasIdActionChoice_Hototarget
+	Choice isMeasIdActionChoice_Choice `protobuf_oneof:"choice"`
 }
 
-func (m *E2MeasIdActionChoice) Reset()         { *m = E2MeasIdActionChoice{} }
-func (m *E2MeasIdActionChoice) String() string { return proto.CompactTextString(m) }
-func (*E2MeasIdActionChoice) ProtoMessage()    {}
-func (*E2MeasIdActionChoice) Descriptor() ([]byte, []int) {
+func (m *MeasIdActionChoice) Reset()         { *m = MeasIdActionChoice{} }
+func (m *MeasIdActionChoice) String() string { return proto.CompactTextString(m) }
+func (*MeasIdActionChoice) ProtoMessage()    {}
+func (*MeasIdActionChoice) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{45}
 }
-func (m *E2MeasIdActionChoice) XXX_Unmarshal(b []byte) error {
+func (m *MeasIdActionChoice) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2MeasIdActionChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MeasIdActionChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2MeasIdActionChoice.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MeasIdActionChoice.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4028,92 +4381,92 @@ func (m *E2MeasIdActionChoice) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *E2MeasIdActionChoice) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2MeasIdActionChoice.Merge(m, src)
+func (m *MeasIdActionChoice) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MeasIdActionChoice.Merge(m, src)
 }
-func (m *E2MeasIdActionChoice) XXX_Size() int {
+func (m *MeasIdActionChoice) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2MeasIdActionChoice) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2MeasIdActionChoice.DiscardUnknown(m)
+func (m *MeasIdActionChoice) XXX_DiscardUnknown() {
+	xxx_messageInfo_MeasIdActionChoice.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2MeasIdActionChoice proto.InternalMessageInfo
+var xxx_messageInfo_MeasIdActionChoice proto.InternalMessageInfo
 
-type isE2MeasIdActionChoice_Choice interface {
-	isE2MeasIdActionChoice_Choice()
+type isMeasIdActionChoice_Choice interface {
+	isMeasIdActionChoice_Choice()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type E2MeasIdActionChoice_AddMeasId struct {
-	AddMeasId *E2AddMeasId `protobuf:"bytes,1,opt,name=addMeasId,proto3,oneof" json:"addMeasId,omitempty"`
+type MeasIdActionChoice_AddMeasId struct {
+	AddMeasId *AddMeasId `protobuf:"bytes,1,opt,name=addMeasId,proto3,oneof" json:"addMeasId,omitempty"`
 }
-type E2MeasIdActionChoice_DelMeasId struct {
-	DelMeasId *E2DelMeasId `protobuf:"bytes,2,opt,name=delMeasId,proto3,oneof" json:"delMeasId,omitempty"`
+type MeasIdActionChoice_DelMeasId struct {
+	DelMeasId *DelMeasId `protobuf:"bytes,2,opt,name=delMeasId,proto3,oneof" json:"delMeasId,omitempty"`
 }
-type E2MeasIdActionChoice_Hototarget struct {
+type MeasIdActionChoice_Hototarget struct {
 	Hototarget string `protobuf:"bytes,3,opt,name=hototarget,proto3,oneof" json:"hototarget,omitempty"`
 }
 
-func (*E2MeasIdActionChoice_AddMeasId) isE2MeasIdActionChoice_Choice()  {}
-func (*E2MeasIdActionChoice_DelMeasId) isE2MeasIdActionChoice_Choice()  {}
-func (*E2MeasIdActionChoice_Hototarget) isE2MeasIdActionChoice_Choice() {}
+func (*MeasIdActionChoice_AddMeasId) isMeasIdActionChoice_Choice()  {}
+func (*MeasIdActionChoice_DelMeasId) isMeasIdActionChoice_Choice()  {}
+func (*MeasIdActionChoice_Hototarget) isMeasIdActionChoice_Choice() {}
 
-func (m *E2MeasIdActionChoice) GetChoice() isE2MeasIdActionChoice_Choice {
+func (m *MeasIdActionChoice) GetChoice() isMeasIdActionChoice_Choice {
 	if m != nil {
 		return m.Choice
 	}
 	return nil
 }
 
-func (m *E2MeasIdActionChoice) GetAddMeasId() *E2AddMeasId {
-	if x, ok := m.GetChoice().(*E2MeasIdActionChoice_AddMeasId); ok {
+func (m *MeasIdActionChoice) GetAddMeasId() *AddMeasId {
+	if x, ok := m.GetChoice().(*MeasIdActionChoice_AddMeasId); ok {
 		return x.AddMeasId
 	}
 	return nil
 }
 
-func (m *E2MeasIdActionChoice) GetDelMeasId() *E2DelMeasId {
-	if x, ok := m.GetChoice().(*E2MeasIdActionChoice_DelMeasId); ok {
+func (m *MeasIdActionChoice) GetDelMeasId() *DelMeasId {
+	if x, ok := m.GetChoice().(*MeasIdActionChoice_DelMeasId); ok {
 		return x.DelMeasId
 	}
 	return nil
 }
 
-func (m *E2MeasIdActionChoice) GetHototarget() string {
-	if x, ok := m.GetChoice().(*E2MeasIdActionChoice_Hototarget); ok {
+func (m *MeasIdActionChoice) GetHototarget() string {
+	if x, ok := m.GetChoice().(*MeasIdActionChoice_Hototarget); ok {
 		return x.Hototarget
 	}
 	return ""
 }
 
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*E2MeasIdActionChoice) XXX_OneofWrappers() []interface{} {
+func (*MeasIdActionChoice) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*E2MeasIdActionChoice_AddMeasId)(nil),
-		(*E2MeasIdActionChoice_DelMeasId)(nil),
-		(*E2MeasIdActionChoice_Hototarget)(nil),
+		(*MeasIdActionChoice_AddMeasId)(nil),
+		(*MeasIdActionChoice_DelMeasId)(nil),
+		(*MeasIdActionChoice_Hototarget)(nil),
 	}
 }
 
-type E2MeasIdAction struct {
-	Present E2MeasIdActionPR      `protobuf:"varint,1,opt,name=present,proto3,enum=interface.e2.E2MeasIdActionPR" json:"present,omitempty"`
-	Choice  *E2MeasIdActionChoice `protobuf:"bytes,2,opt,name=choice,proto3" json:"choice,omitempty"`
+type MeasIdAction struct {
+	Present MeasIdActionPR      `protobuf:"varint,1,opt,name=present,proto3,enum=interface.e2.MeasIdActionPR" json:"present,omitempty"`
+	Choice  *MeasIdActionChoice `protobuf:"bytes,2,opt,name=choice,proto3" json:"choice,omitempty"`
 }
 
-func (m *E2MeasIdAction) Reset()         { *m = E2MeasIdAction{} }
-func (m *E2MeasIdAction) String() string { return proto.CompactTextString(m) }
-func (*E2MeasIdAction) ProtoMessage()    {}
-func (*E2MeasIdAction) Descriptor() ([]byte, []int) {
+func (m *MeasIdAction) Reset()         { *m = MeasIdAction{} }
+func (m *MeasIdAction) String() string { return proto.CompactTextString(m) }
+func (*MeasIdAction) ProtoMessage()    {}
+func (*MeasIdAction) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{46}
 }
-func (m *E2MeasIdAction) XXX_Unmarshal(b []byte) error {
+func (m *MeasIdAction) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2MeasIdAction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MeasIdAction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2MeasIdAction.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MeasIdAction.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4123,50 +4476,50 @@ func (m *E2MeasIdAction) XXX_Marshal(b []byte, deterministic bool) ([]byte, erro
 		return b[:n], nil
 	}
 }
-func (m *E2MeasIdAction) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2MeasIdAction.Merge(m, src)
+func (m *MeasIdAction) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MeasIdAction.Merge(m, src)
 }
-func (m *E2MeasIdAction) XXX_Size() int {
+func (m *MeasIdAction) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2MeasIdAction) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2MeasIdAction.DiscardUnknown(m)
+func (m *MeasIdAction) XXX_DiscardUnknown() {
+	xxx_messageInfo_MeasIdAction.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2MeasIdAction proto.InternalMessageInfo
+var xxx_messageInfo_MeasIdAction proto.InternalMessageInfo
 
-func (m *E2MeasIdAction) GetPresent() E2MeasIdActionPR {
+func (m *MeasIdAction) GetPresent() MeasIdActionPR {
 	if m != nil {
 		return m.Present
 	}
-	return E2MeasIdActionPR_E2_MEASIDACTION_PR_NOTHING
+	return MeasIdActionPR_MEAS_ID_ACTION_PR_NOTHING
 }
 
-func (m *E2MeasIdAction) GetChoice() *E2MeasIdActionChoice {
+func (m *MeasIdAction) GetChoice() *MeasIdActionChoice {
 	if m != nil {
 		return m.Choice
 	}
 	return nil
 }
 
-type E2MeasID struct {
-	MeasObjectId   string          `protobuf:"bytes,1,opt,name=measObjectId,proto3" json:"measObjectId,omitempty"`
-	ReportConfigId string          `protobuf:"bytes,2,opt,name=reportConfigId,proto3" json:"reportConfigId,omitempty"`
-	Action         *E2MeasIdAction `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty"`
+type MeasID struct {
+	MeasObjectId   string        `protobuf:"bytes,1,opt,name=measObjectId,proto3" json:"measObjectId,omitempty"`
+	ReportConfigId string        `protobuf:"bytes,2,opt,name=reportConfigId,proto3" json:"reportConfigId,omitempty"`
+	Action         *MeasIdAction `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty"`
 }
 
-func (m *E2MeasID) Reset()         { *m = E2MeasID{} }
-func (m *E2MeasID) String() string { return proto.CompactTextString(m) }
-func (*E2MeasID) ProtoMessage()    {}
-func (*E2MeasID) Descriptor() ([]byte, []int) {
+func (m *MeasID) Reset()         { *m = MeasID{} }
+func (m *MeasID) String() string { return proto.CompactTextString(m) }
+func (*MeasID) ProtoMessage()    {}
+func (*MeasID) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{47}
 }
-func (m *E2MeasID) XXX_Unmarshal(b []byte) error {
+func (m *MeasID) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2MeasID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MeasID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2MeasID.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MeasID.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4176,33 +4529,33 @@ func (m *E2MeasID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2MeasID) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2MeasID.Merge(m, src)
+func (m *MeasID) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MeasID.Merge(m, src)
 }
-func (m *E2MeasID) XXX_Size() int {
+func (m *MeasID) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2MeasID) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2MeasID.DiscardUnknown(m)
+func (m *MeasID) XXX_DiscardUnknown() {
+	xxx_messageInfo_MeasID.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2MeasID proto.InternalMessageInfo
+var xxx_messageInfo_MeasID proto.InternalMessageInfo
 
-func (m *E2MeasID) GetMeasObjectId() string {
+func (m *MeasID) GetMeasObjectId() string {
 	if m != nil {
 		return m.MeasObjectId
 	}
 	return ""
 }
 
-func (m *E2MeasID) GetReportConfigId() string {
+func (m *MeasID) GetReportConfigId() string {
 	if m != nil {
 		return m.ReportConfigId
 	}
 	return ""
 }
 
-func (m *E2MeasID) GetAction() *E2MeasIdAction {
+func (m *MeasID) GetAction() *MeasIdAction {
 	if m != nil {
 		return m.Action
 	}
@@ -4210,26 +4563,26 @@ func (m *E2MeasID) GetAction() *E2MeasIdAction {
 }
 
 // RRCMeasConfig message
-type E2RRCMeasConfigAttribute struct {
-	Ecgi          *E2ECGI           `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Crnti         []string          `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
-	MeasObjects   []*E2MeasObject   `protobuf:"bytes,3,rep,name=measObjects,proto3" json:"measObjects,omitempty"`
-	ReportConfigs []*E2ReportConfig `protobuf:"bytes,4,rep,name=reportConfigs,proto3" json:"reportConfigs,omitempty"`
-	MeasIds       []*E2MeasID       `protobuf:"bytes,5,rep,name=measIds,proto3" json:"measIds,omitempty"`
+type RRCMeasConfig struct {
+	Ecgi          *ECGI           `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Crnti         []string        `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
+	MeasObjects   []*MeasObject   `protobuf:"bytes,3,rep,name=measObjects,proto3" json:"measObjects,omitempty"`
+	ReportConfigs []*ReportConfig `protobuf:"bytes,4,rep,name=reportConfigs,proto3" json:"reportConfigs,omitempty"`
+	MeasIds       []*MeasID       `protobuf:"bytes,5,rep,name=measIds,proto3" json:"measIds,omitempty"`
 }
 
-func (m *E2RRCMeasConfigAttribute) Reset()         { *m = E2RRCMeasConfigAttribute{} }
-func (m *E2RRCMeasConfigAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2RRCMeasConfigAttribute) ProtoMessage()    {}
-func (*E2RRCMeasConfigAttribute) Descriptor() ([]byte, []int) {
+func (m *RRCMeasConfig) Reset()         { *m = RRCMeasConfig{} }
+func (m *RRCMeasConfig) String() string { return proto.CompactTextString(m) }
+func (*RRCMeasConfig) ProtoMessage()    {}
+func (*RRCMeasConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{48}
 }
-func (m *E2RRCMeasConfigAttribute) XXX_Unmarshal(b []byte) error {
+func (m *RRCMeasConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RRCMeasConfigAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RRCMeasConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RRCMeasConfigAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RRCMeasConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4239,70 +4592,70 @@ func (m *E2RRCMeasConfigAttribute) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *E2RRCMeasConfigAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RRCMeasConfigAttribute.Merge(m, src)
+func (m *RRCMeasConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RRCMeasConfig.Merge(m, src)
 }
-func (m *E2RRCMeasConfigAttribute) XXX_Size() int {
+func (m *RRCMeasConfig) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RRCMeasConfigAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RRCMeasConfigAttribute.DiscardUnknown(m)
+func (m *RRCMeasConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_RRCMeasConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RRCMeasConfigAttribute proto.InternalMessageInfo
+var xxx_messageInfo_RRCMeasConfig proto.InternalMessageInfo
 
-func (m *E2RRCMeasConfigAttribute) GetEcgi() *E2ECGI {
+func (m *RRCMeasConfig) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RRCMeasConfigAttribute) GetCrnti() []string {
+func (m *RRCMeasConfig) GetCrnti() []string {
 	if m != nil {
 		return m.Crnti
 	}
 	return nil
 }
 
-func (m *E2RRCMeasConfigAttribute) GetMeasObjects() []*E2MeasObject {
+func (m *RRCMeasConfig) GetMeasObjects() []*MeasObject {
 	if m != nil {
 		return m.MeasObjects
 	}
 	return nil
 }
 
-func (m *E2RRCMeasConfigAttribute) GetReportConfigs() []*E2ReportConfig {
+func (m *RRCMeasConfig) GetReportConfigs() []*ReportConfig {
 	if m != nil {
 		return m.ReportConfigs
 	}
 	return nil
 }
 
-func (m *E2RRCMeasConfigAttribute) GetMeasIds() []*E2MeasID {
+func (m *RRCMeasConfig) GetMeasIds() []*MeasID {
 	if m != nil {
 		return m.MeasIds
 	}
 	return nil
 }
 
-type E2PCIARFCN struct {
+type PCIARFCN struct {
 	Pci      string `protobuf:"bytes,1,opt,name=pci,proto3" json:"pci,omitempty"`
 	EarfcnDl string `protobuf:"bytes,2,opt,name=earfcnDl,proto3" json:"earfcnDl,omitempty"`
 }
 
-func (m *E2PCIARFCN) Reset()         { *m = E2PCIARFCN{} }
-func (m *E2PCIARFCN) String() string { return proto.CompactTextString(m) }
-func (*E2PCIARFCN) ProtoMessage()    {}
-func (*E2PCIARFCN) Descriptor() ([]byte, []int) {
+func (m *PCIARFCN) Reset()         { *m = PCIARFCN{} }
+func (m *PCIARFCN) String() string { return proto.CompactTextString(m) }
+func (*PCIARFCN) ProtoMessage()    {}
+func (*PCIARFCN) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{49}
 }
-func (m *E2PCIARFCN) XXX_Unmarshal(b []byte) error {
+func (m *PCIARFCN) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2PCIARFCN) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PCIARFCN) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2PCIARFCN.Marshal(b, m, deterministic)
+		return xxx_messageInfo_PCIARFCN.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4312,51 +4665,51 @@ func (m *E2PCIARFCN) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2PCIARFCN) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2PCIARFCN.Merge(m, src)
+func (m *PCIARFCN) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PCIARFCN.Merge(m, src)
 }
-func (m *E2PCIARFCN) XXX_Size() int {
+func (m *PCIARFCN) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2PCIARFCN) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2PCIARFCN.DiscardUnknown(m)
+func (m *PCIARFCN) XXX_DiscardUnknown() {
+	xxx_messageInfo_PCIARFCN.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2PCIARFCN proto.InternalMessageInfo
+var xxx_messageInfo_PCIARFCN proto.InternalMessageInfo
 
-func (m *E2PCIARFCN) GetPci() string {
+func (m *PCIARFCN) GetPci() string {
 	if m != nil {
 		return m.Pci
 	}
 	return ""
 }
 
-func (m *E2PCIARFCN) GetEarfcnDl() string {
+func (m *PCIARFCN) GetEarfcnDl() string {
 	if m != nil {
 		return m.EarfcnDl
 	}
 	return ""
 }
 
-type E2RXSigReport struct {
-	PciArfcn *E2PCIARFCN `protobuf:"bytes,1,opt,name=pciArfcn,proto3" json:"pciArfcn,omitempty"`
-	Ecgi     *E2ECGI     `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Rsrp     string      `protobuf:"bytes,3,opt,name=rsrp,proto3" json:"rsrp,omitempty"`
-	Rsrq     string      `protobuf:"bytes,4,opt,name=rsrq,proto3" json:"rsrq,omitempty"`
+type RXSigReport struct {
+	PciArfcn *PCIARFCN `protobuf:"bytes,1,opt,name=pciArfcn,proto3" json:"pciArfcn,omitempty"`
+	Ecgi     *ECGI     `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Rsrp     string    `protobuf:"bytes,3,opt,name=rsrp,proto3" json:"rsrp,omitempty"`
+	Rsrq     string    `protobuf:"bytes,4,opt,name=rsrq,proto3" json:"rsrq,omitempty"`
 }
 
-func (m *E2RXSigReport) Reset()         { *m = E2RXSigReport{} }
-func (m *E2RXSigReport) String() string { return proto.CompactTextString(m) }
-func (*E2RXSigReport) ProtoMessage()    {}
-func (*E2RXSigReport) Descriptor() ([]byte, []int) {
+func (m *RXSigReport) Reset()         { *m = RXSigReport{} }
+func (m *RXSigReport) String() string { return proto.CompactTextString(m) }
+func (*RXSigReport) ProtoMessage()    {}
+func (*RXSigReport) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{50}
 }
-func (m *E2RXSigReport) XXX_Unmarshal(b []byte) error {
+func (m *RXSigReport) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RXSigReport) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RXSigReport) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RXSigReport.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RXSigReport.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4366,40 +4719,40 @@ func (m *E2RXSigReport) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (m *E2RXSigReport) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RXSigReport.Merge(m, src)
+func (m *RXSigReport) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RXSigReport.Merge(m, src)
 }
-func (m *E2RXSigReport) XXX_Size() int {
+func (m *RXSigReport) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RXSigReport) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RXSigReport.DiscardUnknown(m)
+func (m *RXSigReport) XXX_DiscardUnknown() {
+	xxx_messageInfo_RXSigReport.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RXSigReport proto.InternalMessageInfo
+var xxx_messageInfo_RXSigReport proto.InternalMessageInfo
 
-func (m *E2RXSigReport) GetPciArfcn() *E2PCIARFCN {
+func (m *RXSigReport) GetPciArfcn() *PCIARFCN {
 	if m != nil {
 		return m.PciArfcn
 	}
 	return nil
 }
 
-func (m *E2RXSigReport) GetEcgi() *E2ECGI {
+func (m *RXSigReport) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RXSigReport) GetRsrp() string {
+func (m *RXSigReport) GetRsrp() string {
 	if m != nil {
 		return m.Rsrp
 	}
 	return ""
 }
 
-func (m *E2RXSigReport) GetRsrq() string {
+func (m *RXSigReport) GetRsrq() string {
 	if m != nil {
 		return m.Rsrq
 	}
@@ -4407,24 +4760,24 @@ func (m *E2RXSigReport) GetRsrq() string {
 }
 
 // RxSigMeasReport message
-type E2RxSigMeasReportAttribute struct {
-	Crnti          []string         `protobuf:"bytes,1,rep,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi           *E2ECGI          `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	CellMeasReport []*E2RXSigReport `protobuf:"bytes,3,rep,name=cellMeasReport,proto3" json:"cellMeasReport,omitempty"`
+type RxSigMeasReport struct {
+	Crnti          []string       `protobuf:"bytes,1,rep,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi           *ECGI          `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	CellMeasReport []*RXSigReport `protobuf:"bytes,3,rep,name=cellMeasReport,proto3" json:"cellMeasReport,omitempty"`
 }
 
-func (m *E2RxSigMeasReportAttribute) Reset()         { *m = E2RxSigMeasReportAttribute{} }
-func (m *E2RxSigMeasReportAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2RxSigMeasReportAttribute) ProtoMessage()    {}
-func (*E2RxSigMeasReportAttribute) Descriptor() ([]byte, []int) {
+func (m *RxSigMeasReport) Reset()         { *m = RxSigMeasReport{} }
+func (m *RxSigMeasReport) String() string { return proto.CompactTextString(m) }
+func (*RxSigMeasReport) ProtoMessage()    {}
+func (*RxSigMeasReport) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{51}
 }
-func (m *E2RxSigMeasReportAttribute) XXX_Unmarshal(b []byte) error {
+func (m *RxSigMeasReport) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RxSigMeasReportAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RxSigMeasReport) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RxSigMeasReportAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RxSigMeasReport.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4434,59 +4787,59 @@ func (m *E2RxSigMeasReportAttribute) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *E2RxSigMeasReportAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RxSigMeasReportAttribute.Merge(m, src)
+func (m *RxSigMeasReport) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RxSigMeasReport.Merge(m, src)
 }
-func (m *E2RxSigMeasReportAttribute) XXX_Size() int {
+func (m *RxSigMeasReport) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RxSigMeasReportAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RxSigMeasReportAttribute.DiscardUnknown(m)
+func (m *RxSigMeasReport) XXX_DiscardUnknown() {
+	xxx_messageInfo_RxSigMeasReport.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RxSigMeasReportAttribute proto.InternalMessageInfo
+var xxx_messageInfo_RxSigMeasReport proto.InternalMessageInfo
 
-func (m *E2RxSigMeasReportAttribute) GetCrnti() []string {
+func (m *RxSigMeasReport) GetCrnti() []string {
 	if m != nil {
 		return m.Crnti
 	}
 	return nil
 }
 
-func (m *E2RxSigMeasReportAttribute) GetEcgi() *E2ECGI {
+func (m *RxSigMeasReport) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RxSigMeasReportAttribute) GetCellMeasReport() []*E2RXSigReport {
+func (m *RxSigMeasReport) GetCellMeasReport() []*RXSigReport {
 	if m != nil {
 		return m.CellMeasReport
 	}
 	return nil
 }
 
-type E2L2ReportInterval struct {
-	TRadioMeasReportPerUe   E2L2MeasReportIntervals `protobuf:"varint,1,opt,name=tRadioMeasReportPerUe,proto3,enum=interface.e2.E2L2MeasReportIntervals" json:"tRadioMeasReportPerUe,omitempty"`
-	TRadioMeasReportPerCell E2L2MeasReportIntervals `protobuf:"varint,2,opt,name=tRadioMeasReportPerCell,proto3,enum=interface.e2.E2L2MeasReportIntervals" json:"tRadioMeasReportPerCell,omitempty"`
-	TSchedMeasReportPerUe   E2L2MeasReportIntervals `protobuf:"varint,3,opt,name=tSchedMeasReportPerUe,proto3,enum=interface.e2.E2L2MeasReportIntervals" json:"tSchedMeasReportPerUe,omitempty"`
-	TSchedMeasReportPerCell E2L2MeasReportIntervals `protobuf:"varint,4,opt,name=tSchedMeasReportPerCell,proto3,enum=interface.e2.E2L2MeasReportIntervals" json:"tSchedMeasReportPerCell,omitempty"`
-	TPdcpMeasReportPerUe    E2L2MeasReportIntervals `protobuf:"varint,5,opt,name=tPdcpMeasReportPerUe,proto3,enum=interface.e2.E2L2MeasReportIntervals" json:"tPdcpMeasReportPerUe,omitempty"`
+type L2ReportInterval struct {
+	TRadioMeasReportPerUe   L2MeasReportIntervals `protobuf:"varint,1,opt,name=tRadioMeasReportPerUe,proto3,enum=interface.e2.L2MeasReportIntervals" json:"tRadioMeasReportPerUe,omitempty"`
+	TRadioMeasReportPerCell L2MeasReportIntervals `protobuf:"varint,2,opt,name=tRadioMeasReportPerCell,proto3,enum=interface.e2.L2MeasReportIntervals" json:"tRadioMeasReportPerCell,omitempty"`
+	TSchedMeasReportPerUe   L2MeasReportIntervals `protobuf:"varint,3,opt,name=tSchedMeasReportPerUe,proto3,enum=interface.e2.L2MeasReportIntervals" json:"tSchedMeasReportPerUe,omitempty"`
+	TSchedMeasReportPerCell L2MeasReportIntervals `protobuf:"varint,4,opt,name=tSchedMeasReportPerCell,proto3,enum=interface.e2.L2MeasReportIntervals" json:"tSchedMeasReportPerCell,omitempty"`
+	TPdcpMeasReportPerUe    L2MeasReportIntervals `protobuf:"varint,5,opt,name=tPdcpMeasReportPerUe,proto3,enum=interface.e2.L2MeasReportIntervals" json:"tPdcpMeasReportPerUe,omitempty"`
 }
 
-func (m *E2L2ReportInterval) Reset()         { *m = E2L2ReportInterval{} }
-func (m *E2L2ReportInterval) String() string { return proto.CompactTextString(m) }
-func (*E2L2ReportInterval) ProtoMessage()    {}
-func (*E2L2ReportInterval) Descriptor() ([]byte, []int) {
+func (m *L2ReportInterval) Reset()         { *m = L2ReportInterval{} }
+func (m *L2ReportInterval) String() string { return proto.CompactTextString(m) }
+func (*L2ReportInterval) ProtoMessage()    {}
+func (*L2ReportInterval) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{52}
 }
-func (m *E2L2ReportInterval) XXX_Unmarshal(b []byte) error {
+func (m *L2ReportInterval) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2L2ReportInterval) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *L2ReportInterval) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2L2ReportInterval.Marshal(b, m, deterministic)
+		return xxx_messageInfo_L2ReportInterval.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4496,72 +4849,72 @@ func (m *E2L2ReportInterval) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *E2L2ReportInterval) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2L2ReportInterval.Merge(m, src)
+func (m *L2ReportInterval) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_L2ReportInterval.Merge(m, src)
 }
-func (m *E2L2ReportInterval) XXX_Size() int {
+func (m *L2ReportInterval) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2L2ReportInterval) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2L2ReportInterval.DiscardUnknown(m)
+func (m *L2ReportInterval) XXX_DiscardUnknown() {
+	xxx_messageInfo_L2ReportInterval.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2L2ReportInterval proto.InternalMessageInfo
+var xxx_messageInfo_L2ReportInterval proto.InternalMessageInfo
 
-func (m *E2L2ReportInterval) GetTRadioMeasReportPerUe() E2L2MeasReportIntervals {
+func (m *L2ReportInterval) GetTRadioMeasReportPerUe() L2MeasReportIntervals {
 	if m != nil {
 		return m.TRadioMeasReportPerUe
 	}
-	return E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_NO_REPORT
+	return L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_NO_REPORT
 }
 
-func (m *E2L2ReportInterval) GetTRadioMeasReportPerCell() E2L2MeasReportIntervals {
+func (m *L2ReportInterval) GetTRadioMeasReportPerCell() L2MeasReportIntervals {
 	if m != nil {
 		return m.TRadioMeasReportPerCell
 	}
-	return E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_NO_REPORT
+	return L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_NO_REPORT
 }
 
-func (m *E2L2ReportInterval) GetTSchedMeasReportPerUe() E2L2MeasReportIntervals {
+func (m *L2ReportInterval) GetTSchedMeasReportPerUe() L2MeasReportIntervals {
 	if m != nil {
 		return m.TSchedMeasReportPerUe
 	}
-	return E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_NO_REPORT
+	return L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_NO_REPORT
 }
 
-func (m *E2L2ReportInterval) GetTSchedMeasReportPerCell() E2L2MeasReportIntervals {
+func (m *L2ReportInterval) GetTSchedMeasReportPerCell() L2MeasReportIntervals {
 	if m != nil {
 		return m.TSchedMeasReportPerCell
 	}
-	return E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_NO_REPORT
+	return L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_NO_REPORT
 }
 
-func (m *E2L2ReportInterval) GetTPdcpMeasReportPerUe() E2L2MeasReportIntervals {
+func (m *L2ReportInterval) GetTPdcpMeasReportPerUe() L2MeasReportIntervals {
 	if m != nil {
 		return m.TPdcpMeasReportPerUe
 	}
-	return E2L2MeasReportIntervals_E2_L2MEASREPORTINTERVAL_NO_REPORT
+	return L2MeasReportIntervals_L2_MEAS_REPORT_INTERVAL_NO_REPORT
 }
 
 // L2MeasConfig message
-type E2L2MeasConfigAttribute struct {
-	Ecgi            *E2ECGI             `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Crnti           []string            `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
-	ReportIntervals *E2L2ReportInterval `protobuf:"bytes,3,opt,name=reportIntervals,proto3" json:"reportIntervals,omitempty"`
+type L2MeasConfig struct {
+	Ecgi            *ECGI             `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Crnti           []string          `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
+	ReportIntervals *L2ReportInterval `protobuf:"bytes,3,opt,name=reportIntervals,proto3" json:"reportIntervals,omitempty"`
 }
 
-func (m *E2L2MeasConfigAttribute) Reset()         { *m = E2L2MeasConfigAttribute{} }
-func (m *E2L2MeasConfigAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2L2MeasConfigAttribute) ProtoMessage()    {}
-func (*E2L2MeasConfigAttribute) Descriptor() ([]byte, []int) {
+func (m *L2MeasConfig) Reset()         { *m = L2MeasConfig{} }
+func (m *L2MeasConfig) String() string { return proto.CompactTextString(m) }
+func (*L2MeasConfig) ProtoMessage()    {}
+func (*L2MeasConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{53}
 }
-func (m *E2L2MeasConfigAttribute) XXX_Unmarshal(b []byte) error {
+func (m *L2MeasConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2L2MeasConfigAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *L2MeasConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2L2MeasConfigAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_L2MeasConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4571,33 +4924,33 @@ func (m *E2L2MeasConfigAttribute) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *E2L2MeasConfigAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2L2MeasConfigAttribute.Merge(m, src)
+func (m *L2MeasConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_L2MeasConfig.Merge(m, src)
 }
-func (m *E2L2MeasConfigAttribute) XXX_Size() int {
+func (m *L2MeasConfig) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2L2MeasConfigAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2L2MeasConfigAttribute.DiscardUnknown(m)
+func (m *L2MeasConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_L2MeasConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2L2MeasConfigAttribute proto.InternalMessageInfo
+var xxx_messageInfo_L2MeasConfig proto.InternalMessageInfo
 
-func (m *E2L2MeasConfigAttribute) GetEcgi() *E2ECGI {
+func (m *L2MeasConfig) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2L2MeasConfigAttribute) GetCrnti() []string {
+func (m *L2MeasConfig) GetCrnti() []string {
 	if m != nil {
 		return m.Crnti
 	}
 	return nil
 }
 
-func (m *E2L2MeasConfigAttribute) GetReportIntervals() *E2L2ReportInterval {
+func (m *L2MeasConfig) GetReportIntervals() *L2ReportInterval {
 	if m != nil {
 		return m.ReportIntervals
 	}
@@ -4605,26 +4958,26 @@ func (m *E2L2MeasConfigAttribute) GetReportIntervals() *E2L2ReportInterval {
 }
 
 // L2MeasureReports (periodic) messages
-type E2RadioRepPerServCell struct {
-	Ecgi          *E2ECGI  `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+type RadioRepPerServCell struct {
+	Ecgi          *ECGI    `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
 	CqiHist       []string `protobuf:"bytes,2,rep,name=cqiHist,proto3" json:"cqiHist,omitempty"`
 	RiHist        []string `protobuf:"bytes,3,rep,name=riHist,proto3" json:"riHist,omitempty"`
 	PuschSinrHist []string `protobuf:"bytes,4,rep,name=puschSinrHist,proto3" json:"puschSinrHist,omitempty"`
 	PucchSinrHist []string `protobuf:"bytes,5,rep,name=pucchSinrHist,proto3" json:"pucchSinrHist,omitempty"`
 }
 
-func (m *E2RadioRepPerServCell) Reset()         { *m = E2RadioRepPerServCell{} }
-func (m *E2RadioRepPerServCell) String() string { return proto.CompactTextString(m) }
-func (*E2RadioRepPerServCell) ProtoMessage()    {}
-func (*E2RadioRepPerServCell) Descriptor() ([]byte, []int) {
+func (m *RadioRepPerServCell) Reset()         { *m = RadioRepPerServCell{} }
+func (m *RadioRepPerServCell) String() string { return proto.CompactTextString(m) }
+func (*RadioRepPerServCell) ProtoMessage()    {}
+func (*RadioRepPerServCell) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{54}
 }
-func (m *E2RadioRepPerServCell) XXX_Unmarshal(b []byte) error {
+func (m *RadioRepPerServCell) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RadioRepPerServCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RadioRepPerServCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RadioRepPerServCell.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RadioRepPerServCell.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4634,47 +4987,47 @@ func (m *E2RadioRepPerServCell) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *E2RadioRepPerServCell) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RadioRepPerServCell.Merge(m, src)
+func (m *RadioRepPerServCell) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RadioRepPerServCell.Merge(m, src)
 }
-func (m *E2RadioRepPerServCell) XXX_Size() int {
+func (m *RadioRepPerServCell) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RadioRepPerServCell) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RadioRepPerServCell.DiscardUnknown(m)
+func (m *RadioRepPerServCell) XXX_DiscardUnknown() {
+	xxx_messageInfo_RadioRepPerServCell.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RadioRepPerServCell proto.InternalMessageInfo
+var xxx_messageInfo_RadioRepPerServCell proto.InternalMessageInfo
 
-func (m *E2RadioRepPerServCell) GetEcgi() *E2ECGI {
+func (m *RadioRepPerServCell) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RadioRepPerServCell) GetCqiHist() []string {
+func (m *RadioRepPerServCell) GetCqiHist() []string {
 	if m != nil {
 		return m.CqiHist
 	}
 	return nil
 }
 
-func (m *E2RadioRepPerServCell) GetRiHist() []string {
+func (m *RadioRepPerServCell) GetRiHist() []string {
 	if m != nil {
 		return m.RiHist
 	}
 	return nil
 }
 
-func (m *E2RadioRepPerServCell) GetPuschSinrHist() []string {
+func (m *RadioRepPerServCell) GetPuschSinrHist() []string {
 	if m != nil {
 		return m.PuschSinrHist
 	}
 	return nil
 }
 
-func (m *E2RadioRepPerServCell) GetPucchSinrHist() []string {
+func (m *RadioRepPerServCell) GetPucchSinrHist() []string {
 	if m != nil {
 		return m.PucchSinrHist
 	}
@@ -4682,24 +5035,24 @@ func (m *E2RadioRepPerServCell) GetPucchSinrHist() []string {
 }
 
 // RadioMeasReportPerUE message
-type E2RadioMeasReportPerUEAttribute struct {
-	Ecgi                 *E2ECGI                  `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Crnti                string                   `protobuf:"bytes,2,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	RadioReportServCells []*E2RadioRepPerServCell `protobuf:"bytes,3,rep,name=radioReportServCells,proto3" json:"radioReportServCells,omitempty"`
+type RadioMeasReportPerUE struct {
+	Ecgi                 *ECGI                  `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Crnti                string                 `protobuf:"bytes,2,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	RadioReportServCells []*RadioRepPerServCell `protobuf:"bytes,3,rep,name=radioReportServCells,proto3" json:"radioReportServCells,omitempty"`
 }
 
-func (m *E2RadioMeasReportPerUEAttribute) Reset()         { *m = E2RadioMeasReportPerUEAttribute{} }
-func (m *E2RadioMeasReportPerUEAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2RadioMeasReportPerUEAttribute) ProtoMessage()    {}
-func (*E2RadioMeasReportPerUEAttribute) Descriptor() ([]byte, []int) {
+func (m *RadioMeasReportPerUE) Reset()         { *m = RadioMeasReportPerUE{} }
+func (m *RadioMeasReportPerUE) String() string { return proto.CompactTextString(m) }
+func (*RadioMeasReportPerUE) ProtoMessage()    {}
+func (*RadioMeasReportPerUE) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{55}
 }
-func (m *E2RadioMeasReportPerUEAttribute) XXX_Unmarshal(b []byte) error {
+func (m *RadioMeasReportPerUE) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RadioMeasReportPerUEAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RadioMeasReportPerUE) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RadioMeasReportPerUEAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RadioMeasReportPerUE.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4709,33 +5062,33 @@ func (m *E2RadioMeasReportPerUEAttribute) XXX_Marshal(b []byte, deterministic bo
 		return b[:n], nil
 	}
 }
-func (m *E2RadioMeasReportPerUEAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RadioMeasReportPerUEAttribute.Merge(m, src)
+func (m *RadioMeasReportPerUE) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RadioMeasReportPerUE.Merge(m, src)
 }
-func (m *E2RadioMeasReportPerUEAttribute) XXX_Size() int {
+func (m *RadioMeasReportPerUE) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RadioMeasReportPerUEAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RadioMeasReportPerUEAttribute.DiscardUnknown(m)
+func (m *RadioMeasReportPerUE) XXX_DiscardUnknown() {
+	xxx_messageInfo_RadioMeasReportPerUE.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RadioMeasReportPerUEAttribute proto.InternalMessageInfo
+var xxx_messageInfo_RadioMeasReportPerUE proto.InternalMessageInfo
 
-func (m *E2RadioMeasReportPerUEAttribute) GetEcgi() *E2ECGI {
+func (m *RadioMeasReportPerUE) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RadioMeasReportPerUEAttribute) GetCrnti() string {
+func (m *RadioMeasReportPerUE) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2RadioMeasReportPerUEAttribute) GetRadioReportServCells() []*E2RadioRepPerServCell {
+func (m *RadioMeasReportPerUE) GetRadioReportServCells() []*RadioRepPerServCell {
 	if m != nil {
 		return m.RadioReportServCells
 	}
@@ -4743,24 +5096,24 @@ func (m *E2RadioMeasReportPerUEAttribute) GetRadioReportServCells() []*E2RadioRe
 }
 
 // RadioMeasReportPerCell message
-type E2RadioMeasReportPerCellAttribute struct {
-	Ecgi               *E2ECGI  `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+type RadioMeasReportPerCell struct {
+	Ecgi               *ECGI    `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
 	PuschIntfPwrHist   []string `protobuf:"bytes,2,rep,name=puschIntfPwrHist,proto3" json:"puschIntfPwrHist,omitempty"`
 	PucchIntfPowerHist []string `protobuf:"bytes,3,rep,name=pucchIntfPowerHist,proto3" json:"pucchIntfPowerHist,omitempty"`
 }
 
-func (m *E2RadioMeasReportPerCellAttribute) Reset()         { *m = E2RadioMeasReportPerCellAttribute{} }
-func (m *E2RadioMeasReportPerCellAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2RadioMeasReportPerCellAttribute) ProtoMessage()    {}
-func (*E2RadioMeasReportPerCellAttribute) Descriptor() ([]byte, []int) {
+func (m *RadioMeasReportPerCell) Reset()         { *m = RadioMeasReportPerCell{} }
+func (m *RadioMeasReportPerCell) String() string { return proto.CompactTextString(m) }
+func (*RadioMeasReportPerCell) ProtoMessage()    {}
+func (*RadioMeasReportPerCell) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{56}
 }
-func (m *E2RadioMeasReportPerCellAttribute) XXX_Unmarshal(b []byte) error {
+func (m *RadioMeasReportPerCell) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RadioMeasReportPerCellAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RadioMeasReportPerCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RadioMeasReportPerCellAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RadioMeasReportPerCell.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4770,56 +5123,56 @@ func (m *E2RadioMeasReportPerCellAttribute) XXX_Marshal(b []byte, deterministic 
 		return b[:n], nil
 	}
 }
-func (m *E2RadioMeasReportPerCellAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RadioMeasReportPerCellAttribute.Merge(m, src)
+func (m *RadioMeasReportPerCell) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RadioMeasReportPerCell.Merge(m, src)
 }
-func (m *E2RadioMeasReportPerCellAttribute) XXX_Size() int {
+func (m *RadioMeasReportPerCell) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RadioMeasReportPerCellAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RadioMeasReportPerCellAttribute.DiscardUnknown(m)
+func (m *RadioMeasReportPerCell) XXX_DiscardUnknown() {
+	xxx_messageInfo_RadioMeasReportPerCell.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RadioMeasReportPerCellAttribute proto.InternalMessageInfo
+var xxx_messageInfo_RadioMeasReportPerCell proto.InternalMessageInfo
 
-func (m *E2RadioMeasReportPerCellAttribute) GetEcgi() *E2ECGI {
+func (m *RadioMeasReportPerCell) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RadioMeasReportPerCellAttribute) GetPuschIntfPwrHist() []string {
+func (m *RadioMeasReportPerCell) GetPuschIntfPwrHist() []string {
 	if m != nil {
 		return m.PuschIntfPwrHist
 	}
 	return nil
 }
 
-func (m *E2RadioMeasReportPerCellAttribute) GetPucchIntfPowerHist() []string {
+func (m *RadioMeasReportPerCell) GetPucchIntfPowerHist() []string {
 	if m != nil {
 		return m.PucchIntfPowerHist
 	}
 	return nil
 }
 
-type E2PRBUsage struct {
+type PRBUsage struct {
 	PrbUsageDl []string `protobuf:"bytes,1,rep,name=prbUsageDl,proto3" json:"prbUsageDl,omitempty"`
 	PrbUsageUl []string `protobuf:"bytes,2,rep,name=prbUsageUl,proto3" json:"prbUsageUl,omitempty"`
 }
 
-func (m *E2PRBUsage) Reset()         { *m = E2PRBUsage{} }
-func (m *E2PRBUsage) String() string { return proto.CompactTextString(m) }
-func (*E2PRBUsage) ProtoMessage()    {}
-func (*E2PRBUsage) Descriptor() ([]byte, []int) {
+func (m *PRBUsage) Reset()         { *m = PRBUsage{} }
+func (m *PRBUsage) String() string { return proto.CompactTextString(m) }
+func (*PRBUsage) ProtoMessage()    {}
+func (*PRBUsage) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{57}
 }
-func (m *E2PRBUsage) XXX_Unmarshal(b []byte) error {
+func (m *PRBUsage) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2PRBUsage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PRBUsage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2PRBUsage.Marshal(b, m, deterministic)
+		return xxx_messageInfo_PRBUsage.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4829,56 +5182,56 @@ func (m *E2PRBUsage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2PRBUsage) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2PRBUsage.Merge(m, src)
+func (m *PRBUsage) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PRBUsage.Merge(m, src)
 }
-func (m *E2PRBUsage) XXX_Size() int {
+func (m *PRBUsage) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2PRBUsage) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2PRBUsage.DiscardUnknown(m)
+func (m *PRBUsage) XXX_DiscardUnknown() {
+	xxx_messageInfo_PRBUsage.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2PRBUsage proto.InternalMessageInfo
+var xxx_messageInfo_PRBUsage proto.InternalMessageInfo
 
-func (m *E2PRBUsage) GetPrbUsageDl() []string {
+func (m *PRBUsage) GetPrbUsageDl() []string {
 	if m != nil {
 		return m.PrbUsageDl
 	}
 	return nil
 }
 
-func (m *E2PRBUsage) GetPrbUsageUl() []string {
+func (m *PRBUsage) GetPrbUsageUl() []string {
 	if m != nil {
 		return m.PrbUsageUl
 	}
 	return nil
 }
 
-type E2SchedMeasRepPerServCell struct {
-	Ecgi           *E2ECGI     `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	QciVals        []string    `protobuf:"bytes,2,rep,name=qciVals,proto3" json:"qciVals,omitempty"`
-	PrbUsage       *E2PRBUsage `protobuf:"bytes,3,opt,name=prbUsage,proto3" json:"prbUsage,omitempty"`
-	McsDl          []string    `protobuf:"bytes,4,rep,name=mcsDl,proto3" json:"mcsDl,omitempty"`
-	NumSchedTtisDl []string    `protobuf:"bytes,5,rep,name=numSchedTtisDl,proto3" json:"numSchedTtisDl,omitempty"`
-	McsUl          []string    `protobuf:"bytes,6,rep,name=mcsUl,proto3" json:"mcsUl,omitempty"`
-	NumSchedTtisUl []string    `protobuf:"bytes,7,rep,name=numSchedTtisUl,proto3" json:"numSchedTtisUl,omitempty"`
-	RankDl1        []string    `protobuf:"bytes,8,rep,name=rankDl1,proto3" json:"rankDl1,omitempty"`
-	RankDl2        []string    `protobuf:"bytes,9,rep,name=rankDl2,proto3" json:"rankDl2,omitempty"`
+type SchedMeasRepPerServCell struct {
+	Ecgi           *ECGI     `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	QciVals        []string  `protobuf:"bytes,2,rep,name=qciVals,proto3" json:"qciVals,omitempty"`
+	PrbUsage       *PRBUsage `protobuf:"bytes,3,opt,name=prbUsage,proto3" json:"prbUsage,omitempty"`
+	McsDl          []string  `protobuf:"bytes,4,rep,name=mcsDl,proto3" json:"mcsDl,omitempty"`
+	NumSchedTtisDl []string  `protobuf:"bytes,5,rep,name=numSchedTtisDl,proto3" json:"numSchedTtisDl,omitempty"`
+	McsUl          []string  `protobuf:"bytes,6,rep,name=mcsUl,proto3" json:"mcsUl,omitempty"`
+	NumSchedTtisUl []string  `protobuf:"bytes,7,rep,name=numSchedTtisUl,proto3" json:"numSchedTtisUl,omitempty"`
+	RankDl1        []string  `protobuf:"bytes,8,rep,name=rankDl1,proto3" json:"rankDl1,omitempty"`
+	RankDl2        []string  `protobuf:"bytes,9,rep,name=rankDl2,proto3" json:"rankDl2,omitempty"`
 }
 
-func (m *E2SchedMeasRepPerServCell) Reset()         { *m = E2SchedMeasRepPerServCell{} }
-func (m *E2SchedMeasRepPerServCell) String() string { return proto.CompactTextString(m) }
-func (*E2SchedMeasRepPerServCell) ProtoMessage()    {}
-func (*E2SchedMeasRepPerServCell) Descriptor() ([]byte, []int) {
+func (m *SchedMeasRepPerServCell) Reset()         { *m = SchedMeasRepPerServCell{} }
+func (m *SchedMeasRepPerServCell) String() string { return proto.CompactTextString(m) }
+func (*SchedMeasRepPerServCell) ProtoMessage()    {}
+func (*SchedMeasRepPerServCell) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{58}
 }
-func (m *E2SchedMeasRepPerServCell) XXX_Unmarshal(b []byte) error {
+func (m *SchedMeasRepPerServCell) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2SchedMeasRepPerServCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SchedMeasRepPerServCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2SchedMeasRepPerServCell.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SchedMeasRepPerServCell.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4888,75 +5241,75 @@ func (m *E2SchedMeasRepPerServCell) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *E2SchedMeasRepPerServCell) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2SchedMeasRepPerServCell.Merge(m, src)
+func (m *SchedMeasRepPerServCell) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SchedMeasRepPerServCell.Merge(m, src)
 }
-func (m *E2SchedMeasRepPerServCell) XXX_Size() int {
+func (m *SchedMeasRepPerServCell) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2SchedMeasRepPerServCell) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2SchedMeasRepPerServCell.DiscardUnknown(m)
+func (m *SchedMeasRepPerServCell) XXX_DiscardUnknown() {
+	xxx_messageInfo_SchedMeasRepPerServCell.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2SchedMeasRepPerServCell proto.InternalMessageInfo
+var xxx_messageInfo_SchedMeasRepPerServCell proto.InternalMessageInfo
 
-func (m *E2SchedMeasRepPerServCell) GetEcgi() *E2ECGI {
+func (m *SchedMeasRepPerServCell) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetQciVals() []string {
+func (m *SchedMeasRepPerServCell) GetQciVals() []string {
 	if m != nil {
 		return m.QciVals
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetPrbUsage() *E2PRBUsage {
+func (m *SchedMeasRepPerServCell) GetPrbUsage() *PRBUsage {
 	if m != nil {
 		return m.PrbUsage
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetMcsDl() []string {
+func (m *SchedMeasRepPerServCell) GetMcsDl() []string {
 	if m != nil {
 		return m.McsDl
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetNumSchedTtisDl() []string {
+func (m *SchedMeasRepPerServCell) GetNumSchedTtisDl() []string {
 	if m != nil {
 		return m.NumSchedTtisDl
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetMcsUl() []string {
+func (m *SchedMeasRepPerServCell) GetMcsUl() []string {
 	if m != nil {
 		return m.McsUl
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetNumSchedTtisUl() []string {
+func (m *SchedMeasRepPerServCell) GetNumSchedTtisUl() []string {
 	if m != nil {
 		return m.NumSchedTtisUl
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetRankDl1() []string {
+func (m *SchedMeasRepPerServCell) GetRankDl1() []string {
 	if m != nil {
 		return m.RankDl1
 	}
 	return nil
 }
 
-func (m *E2SchedMeasRepPerServCell) GetRankDl2() []string {
+func (m *SchedMeasRepPerServCell) GetRankDl2() []string {
 	if m != nil {
 		return m.RankDl2
 	}
@@ -4964,24 +5317,24 @@ func (m *E2SchedMeasRepPerServCell) GetRankDl2() []string {
 }
 
 // SchedMeasReportPerUE message
-type E2SchedMeasReportPerUEAttribute struct {
-	Ecgi                 *E2ECGI                      `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Crnti                string                       `protobuf:"bytes,2,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	SchedReportServCells []*E2SchedMeasRepPerServCell `protobuf:"bytes,3,rep,name=schedReportServCells,proto3" json:"schedReportServCells,omitempty"`
+type SchedMeasReportPerUE struct {
+	Ecgi                 *ECGI                      `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Crnti                string                     `protobuf:"bytes,2,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	SchedReportServCells []*SchedMeasRepPerServCell `protobuf:"bytes,3,rep,name=schedReportServCells,proto3" json:"schedReportServCells,omitempty"`
 }
 
-func (m *E2SchedMeasReportPerUEAttribute) Reset()         { *m = E2SchedMeasReportPerUEAttribute{} }
-func (m *E2SchedMeasReportPerUEAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2SchedMeasReportPerUEAttribute) ProtoMessage()    {}
-func (*E2SchedMeasReportPerUEAttribute) Descriptor() ([]byte, []int) {
+func (m *SchedMeasReportPerUE) Reset()         { *m = SchedMeasReportPerUE{} }
+func (m *SchedMeasReportPerUE) String() string { return proto.CompactTextString(m) }
+func (*SchedMeasReportPerUE) ProtoMessage()    {}
+func (*SchedMeasReportPerUE) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{59}
 }
-func (m *E2SchedMeasReportPerUEAttribute) XXX_Unmarshal(b []byte) error {
+func (m *SchedMeasReportPerUE) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2SchedMeasReportPerUEAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SchedMeasReportPerUE) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2SchedMeasReportPerUEAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SchedMeasReportPerUE.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -4991,33 +5344,33 @@ func (m *E2SchedMeasReportPerUEAttribute) XXX_Marshal(b []byte, deterministic bo
 		return b[:n], nil
 	}
 }
-func (m *E2SchedMeasReportPerUEAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2SchedMeasReportPerUEAttribute.Merge(m, src)
+func (m *SchedMeasReportPerUE) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SchedMeasReportPerUE.Merge(m, src)
 }
-func (m *E2SchedMeasReportPerUEAttribute) XXX_Size() int {
+func (m *SchedMeasReportPerUE) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2SchedMeasReportPerUEAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2SchedMeasReportPerUEAttribute.DiscardUnknown(m)
+func (m *SchedMeasReportPerUE) XXX_DiscardUnknown() {
+	xxx_messageInfo_SchedMeasReportPerUE.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2SchedMeasReportPerUEAttribute proto.InternalMessageInfo
+var xxx_messageInfo_SchedMeasReportPerUE proto.InternalMessageInfo
 
-func (m *E2SchedMeasReportPerUEAttribute) GetEcgi() *E2ECGI {
+func (m *SchedMeasReportPerUE) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2SchedMeasReportPerUEAttribute) GetCrnti() string {
+func (m *SchedMeasReportPerUE) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2SchedMeasReportPerUEAttribute) GetSchedReportServCells() []*E2SchedMeasRepPerServCell {
+func (m *SchedMeasReportPerUE) GetSchedReportServCells() []*SchedMeasRepPerServCell {
 	if m != nil {
 		return m.SchedReportServCells
 	}
@@ -5025,25 +5378,25 @@ func (m *E2SchedMeasReportPerUEAttribute) GetSchedReportServCells() []*E2SchedMe
 }
 
 // SchedMeasReportPerCell message
-type E2SchedMeasReportPerCellAttribute struct {
-	Ecgi          *E2ECGI     `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	QciVals       []string    `protobuf:"bytes,2,rep,name=qciVals,proto3" json:"qciVals,omitempty"`
-	PrbUsagePcell *E2PRBUsage `protobuf:"bytes,3,opt,name=prbUsagePcell,proto3" json:"prbUsagePcell,omitempty"`
-	PrbUsageScell *E2PRBUsage `protobuf:"bytes,4,opt,name=prbUsageScell,proto3" json:"prbUsageScell,omitempty"`
+type SchedMeasReportPerCell struct {
+	Ecgi          *ECGI     `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	QciVals       []string  `protobuf:"bytes,2,rep,name=qciVals,proto3" json:"qciVals,omitempty"`
+	PrbUsagePcell *PRBUsage `protobuf:"bytes,3,opt,name=prbUsagePcell,proto3" json:"prbUsagePcell,omitempty"`
+	PrbUsageScell *PRBUsage `protobuf:"bytes,4,opt,name=prbUsageScell,proto3" json:"prbUsageScell,omitempty"`
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) Reset()         { *m = E2SchedMeasReportPerCellAttribute{} }
-func (m *E2SchedMeasReportPerCellAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2SchedMeasReportPerCellAttribute) ProtoMessage()    {}
-func (*E2SchedMeasReportPerCellAttribute) Descriptor() ([]byte, []int) {
+func (m *SchedMeasReportPerCell) Reset()         { *m = SchedMeasReportPerCell{} }
+func (m *SchedMeasReportPerCell) String() string { return proto.CompactTextString(m) }
+func (*SchedMeasReportPerCell) ProtoMessage()    {}
+func (*SchedMeasReportPerCell) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{60}
 }
-func (m *E2SchedMeasReportPerCellAttribute) XXX_Unmarshal(b []byte) error {
+func (m *SchedMeasReportPerCell) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2SchedMeasReportPerCellAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SchedMeasReportPerCell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2SchedMeasReportPerCellAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SchedMeasReportPerCell.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5053,40 +5406,40 @@ func (m *E2SchedMeasReportPerCellAttribute) XXX_Marshal(b []byte, deterministic 
 		return b[:n], nil
 	}
 }
-func (m *E2SchedMeasReportPerCellAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2SchedMeasReportPerCellAttribute.Merge(m, src)
+func (m *SchedMeasReportPerCell) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SchedMeasReportPerCell.Merge(m, src)
 }
-func (m *E2SchedMeasReportPerCellAttribute) XXX_Size() int {
+func (m *SchedMeasReportPerCell) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2SchedMeasReportPerCellAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2SchedMeasReportPerCellAttribute.DiscardUnknown(m)
+func (m *SchedMeasReportPerCell) XXX_DiscardUnknown() {
+	xxx_messageInfo_SchedMeasReportPerCell.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2SchedMeasReportPerCellAttribute proto.InternalMessageInfo
+var xxx_messageInfo_SchedMeasReportPerCell proto.InternalMessageInfo
 
-func (m *E2SchedMeasReportPerCellAttribute) GetEcgi() *E2ECGI {
+func (m *SchedMeasReportPerCell) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) GetQciVals() []string {
+func (m *SchedMeasReportPerCell) GetQciVals() []string {
 	if m != nil {
 		return m.QciVals
 	}
 	return nil
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) GetPrbUsagePcell() *E2PRBUsage {
+func (m *SchedMeasReportPerCell) GetPrbUsagePcell() *PRBUsage {
 	if m != nil {
 		return m.PrbUsagePcell
 	}
 	return nil
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) GetPrbUsageScell() *E2PRBUsage {
+func (m *SchedMeasReportPerCell) GetPrbUsageScell() *PRBUsage {
 	if m != nil {
 		return m.PrbUsageScell
 	}
@@ -5094,8 +5447,8 @@ func (m *E2SchedMeasReportPerCellAttribute) GetPrbUsageScell() *E2PRBUsage {
 }
 
 // PdcpMeasReportPerUE message
-type E2PDCPMeasReportPerUeAttribute struct {
-	Ecgi             *E2ECGI  `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+type PDCPMeasReportPerUe struct {
+	Ecgi             *ECGI    `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
 	Crnti            string   `protobuf:"bytes,2,opt,name=crnti,proto3" json:"crnti,omitempty"`
 	QciVals          []string `protobuf:"bytes,3,rep,name=qciVals,proto3" json:"qciVals,omitempty"`
 	DataVolDl        []string `protobuf:"bytes,4,rep,name=dataVolDl,proto3" json:"dataVolDl,omitempty"`
@@ -5108,18 +5461,18 @@ type E2PDCPMeasReportPerUeAttribute struct {
 	ThroughputUl     []string `protobuf:"bytes,11,rep,name=throughputUl,proto3" json:"throughputUl,omitempty"`
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) Reset()         { *m = E2PDCPMeasReportPerUeAttribute{} }
-func (m *E2PDCPMeasReportPerUeAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2PDCPMeasReportPerUeAttribute) ProtoMessage()    {}
-func (*E2PDCPMeasReportPerUeAttribute) Descriptor() ([]byte, []int) {
+func (m *PDCPMeasReportPerUe) Reset()         { *m = PDCPMeasReportPerUe{} }
+func (m *PDCPMeasReportPerUe) String() string { return proto.CompactTextString(m) }
+func (*PDCPMeasReportPerUe) ProtoMessage()    {}
+func (*PDCPMeasReportPerUe) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{61}
 }
-func (m *E2PDCPMeasReportPerUeAttribute) XXX_Unmarshal(b []byte) error {
+func (m *PDCPMeasReportPerUe) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2PDCPMeasReportPerUeAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PDCPMeasReportPerUe) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2PDCPMeasReportPerUeAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_PDCPMeasReportPerUe.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5129,89 +5482,89 @@ func (m *E2PDCPMeasReportPerUeAttribute) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *E2PDCPMeasReportPerUeAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2PDCPMeasReportPerUeAttribute.Merge(m, src)
+func (m *PDCPMeasReportPerUe) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PDCPMeasReportPerUe.Merge(m, src)
 }
-func (m *E2PDCPMeasReportPerUeAttribute) XXX_Size() int {
+func (m *PDCPMeasReportPerUe) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2PDCPMeasReportPerUeAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2PDCPMeasReportPerUeAttribute.DiscardUnknown(m)
+func (m *PDCPMeasReportPerUe) XXX_DiscardUnknown() {
+	xxx_messageInfo_PDCPMeasReportPerUe.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2PDCPMeasReportPerUeAttribute proto.InternalMessageInfo
+var xxx_messageInfo_PDCPMeasReportPerUe proto.InternalMessageInfo
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetEcgi() *E2ECGI {
+func (m *PDCPMeasReportPerUe) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetCrnti() string {
+func (m *PDCPMeasReportPerUe) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetQciVals() []string {
+func (m *PDCPMeasReportPerUe) GetQciVals() []string {
 	if m != nil {
 		return m.QciVals
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetDataVolDl() []string {
+func (m *PDCPMeasReportPerUe) GetDataVolDl() []string {
 	if m != nil {
 		return m.DataVolDl
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetDataVolUl() []string {
+func (m *PDCPMeasReportPerUe) GetDataVolUl() []string {
 	if m != nil {
 		return m.DataVolUl
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetPktDelayDl() []string {
+func (m *PDCPMeasReportPerUe) GetPktDelayDl() []string {
 	if m != nil {
 		return m.PktDelayDl
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetPktDiscardRateDl() []string {
+func (m *PDCPMeasReportPerUe) GetPktDiscardRateDl() []string {
 	if m != nil {
 		return m.PktDiscardRateDl
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetPktLossRateDl() []string {
+func (m *PDCPMeasReportPerUe) GetPktLossRateDl() []string {
 	if m != nil {
 		return m.PktLossRateDl
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetPktLossRateUl() []string {
+func (m *PDCPMeasReportPerUe) GetPktLossRateUl() []string {
 	if m != nil {
 		return m.PktLossRateUl
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetThroughputDl() []string {
+func (m *PDCPMeasReportPerUe) GetThroughputDl() []string {
 	if m != nil {
 		return m.ThroughputDl
 	}
 	return nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) GetThroughputUl() []string {
+func (m *PDCPMeasReportPerUe) GetThroughputUl() []string {
 	if m != nil {
 		return m.ThroughputUl
 	}
@@ -5219,32 +5572,32 @@ func (m *E2PDCPMeasReportPerUeAttribute) GetThroughputUl() []string {
 }
 
 // RRMConfig message
-type E2RRMConfigAttribute struct {
-	Ecgi              *E2ECGI     `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Crnti             []string    `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
-	PciArfcn          *E2PCIARFCN `protobuf:"bytes,3,opt,name=pciArfcn,proto3" json:"pciArfcn,omitempty"`
-	PA                []E2XICICPA `protobuf:"varint,4,rep,packed,name=pA,proto3,enum=interface.e2.E2XICICPA" json:"pA,omitempty"`
-	StartPrbDl        []string    `protobuf:"bytes,5,rep,name=startPrbDl,proto3" json:"startPrbDl,omitempty"`
-	EndPrbDl          []string    `protobuf:"bytes,6,rep,name=endPrbDl,proto3" json:"endPrbDl,omitempty"`
-	SubFrameBitmaskDl []string    `protobuf:"bytes,7,rep,name=subFrameBitmaskDl,proto3" json:"subFrameBitmaskDl,omitempty"`
-	P0UePusch         []string    `protobuf:"bytes,8,rep,name=p0UePusch,proto3" json:"p0UePusch,omitempty"`
-	StartPrbUl        []string    `protobuf:"bytes,9,rep,name=startPrbUl,proto3" json:"startPrbUl,omitempty"`
-	EndPrbUl          []string    `protobuf:"bytes,10,rep,name=endPrbUl,proto3" json:"endPrbUl,omitempty"`
-	SubFrameBitmaskUl []string    `protobuf:"bytes,11,rep,name=subFrameBitmaskUl,proto3" json:"subFrameBitmaskUl,omitempty"`
+type RRMConfig struct {
+	Ecgi              *ECGI     `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Crnti             []string  `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
+	PciArfcn          *PCIARFCN `protobuf:"bytes,3,opt,name=pciArfcn,proto3" json:"pciArfcn,omitempty"`
+	PA                []XICICPA `protobuf:"varint,4,rep,packed,name=pA,proto3,enum=interface.e2.XICICPA" json:"pA,omitempty"`
+	StartPrbDl        []string  `protobuf:"bytes,5,rep,name=startPrbDl,proto3" json:"startPrbDl,omitempty"`
+	EndPrbDl          []string  `protobuf:"bytes,6,rep,name=endPrbDl,proto3" json:"endPrbDl,omitempty"`
+	SubFrameBitmaskDl []string  `protobuf:"bytes,7,rep,name=subFrameBitmaskDl,proto3" json:"subFrameBitmaskDl,omitempty"`
+	P0UePusch         []string  `protobuf:"bytes,8,rep,name=p0UePusch,proto3" json:"p0UePusch,omitempty"`
+	StartPrbUl        []string  `protobuf:"bytes,9,rep,name=startPrbUl,proto3" json:"startPrbUl,omitempty"`
+	EndPrbUl          []string  `protobuf:"bytes,10,rep,name=endPrbUl,proto3" json:"endPrbUl,omitempty"`
+	SubFrameBitmaskUl []string  `protobuf:"bytes,11,rep,name=subFrameBitmaskUl,proto3" json:"subFrameBitmaskUl,omitempty"`
 }
 
-func (m *E2RRMConfigAttribute) Reset()         { *m = E2RRMConfigAttribute{} }
-func (m *E2RRMConfigAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2RRMConfigAttribute) ProtoMessage()    {}
-func (*E2RRMConfigAttribute) Descriptor() ([]byte, []int) {
+func (m *RRMConfig) Reset()         { *m = RRMConfig{} }
+func (m *RRMConfig) String() string { return proto.CompactTextString(m) }
+func (*RRMConfig) ProtoMessage()    {}
+func (*RRMConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{62}
 }
-func (m *E2RRMConfigAttribute) XXX_Unmarshal(b []byte) error {
+func (m *RRMConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RRMConfigAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RRMConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RRMConfigAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RRMConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5254,89 +5607,89 @@ func (m *E2RRMConfigAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *E2RRMConfigAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RRMConfigAttribute.Merge(m, src)
+func (m *RRMConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RRMConfig.Merge(m, src)
 }
-func (m *E2RRMConfigAttribute) XXX_Size() int {
+func (m *RRMConfig) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RRMConfigAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RRMConfigAttribute.DiscardUnknown(m)
+func (m *RRMConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_RRMConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RRMConfigAttribute proto.InternalMessageInfo
+var xxx_messageInfo_RRMConfig proto.InternalMessageInfo
 
-func (m *E2RRMConfigAttribute) GetEcgi() *E2ECGI {
+func (m *RRMConfig) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetCrnti() []string {
+func (m *RRMConfig) GetCrnti() []string {
 	if m != nil {
 		return m.Crnti
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetPciArfcn() *E2PCIARFCN {
+func (m *RRMConfig) GetPciArfcn() *PCIARFCN {
 	if m != nil {
 		return m.PciArfcn
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetPA() []E2XICICPA {
+func (m *RRMConfig) GetPA() []XICICPA {
 	if m != nil {
 		return m.PA
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetStartPrbDl() []string {
+func (m *RRMConfig) GetStartPrbDl() []string {
 	if m != nil {
 		return m.StartPrbDl
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetEndPrbDl() []string {
+func (m *RRMConfig) GetEndPrbDl() []string {
 	if m != nil {
 		return m.EndPrbDl
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetSubFrameBitmaskDl() []string {
+func (m *RRMConfig) GetSubFrameBitmaskDl() []string {
 	if m != nil {
 		return m.SubFrameBitmaskDl
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetP0UePusch() []string {
+func (m *RRMConfig) GetP0UePusch() []string {
 	if m != nil {
 		return m.P0UePusch
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetStartPrbUl() []string {
+func (m *RRMConfig) GetStartPrbUl() []string {
 	if m != nil {
 		return m.StartPrbUl
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetEndPrbUl() []string {
+func (m *RRMConfig) GetEndPrbUl() []string {
 	if m != nil {
 		return m.EndPrbUl
 	}
 	return nil
 }
 
-func (m *E2RRMConfigAttribute) GetSubFrameBitmaskUl() []string {
+func (m *RRMConfig) GetSubFrameBitmaskUl() []string {
 	if m != nil {
 		return m.SubFrameBitmaskUl
 	}
@@ -5344,24 +5697,24 @@ func (m *E2RRMConfigAttribute) GetSubFrameBitmaskUl() []string {
 }
 
 // RRMConfigStatus message
-type E2RRMConfigStatusAttribute struct {
-	Ecgi   *E2ECGI              `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Crnti  []string             `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
-	Status []E2SuccessOrFailure `protobuf:"varint,3,rep,packed,name=status,proto3,enum=interface.e2.E2SuccessOrFailure" json:"status,omitempty"`
+type RRMConfigStatus struct {
+	Ecgi   *ECGI              `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Crnti  []string           `protobuf:"bytes,2,rep,name=crnti,proto3" json:"crnti,omitempty"`
+	Status []SuccessOrFailure `protobuf:"varint,3,rep,packed,name=status,proto3,enum=interface.e2.SuccessOrFailure" json:"status,omitempty"`
 }
 
-func (m *E2RRMConfigStatusAttribute) Reset()         { *m = E2RRMConfigStatusAttribute{} }
-func (m *E2RRMConfigStatusAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2RRMConfigStatusAttribute) ProtoMessage()    {}
-func (*E2RRMConfigStatusAttribute) Descriptor() ([]byte, []int) {
+func (m *RRMConfigStatus) Reset()         { *m = RRMConfigStatus{} }
+func (m *RRMConfigStatus) String() string { return proto.CompactTextString(m) }
+func (*RRMConfigStatus) ProtoMessage()    {}
+func (*RRMConfigStatus) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{63}
 }
-func (m *E2RRMConfigStatusAttribute) XXX_Unmarshal(b []byte) error {
+func (m *RRMConfigStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2RRMConfigStatusAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RRMConfigStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2RRMConfigStatusAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RRMConfigStatus.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5371,58 +5724,58 @@ func (m *E2RRMConfigStatusAttribute) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *E2RRMConfigStatusAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2RRMConfigStatusAttribute.Merge(m, src)
+func (m *RRMConfigStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RRMConfigStatus.Merge(m, src)
 }
-func (m *E2RRMConfigStatusAttribute) XXX_Size() int {
+func (m *RRMConfigStatus) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2RRMConfigStatusAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2RRMConfigStatusAttribute.DiscardUnknown(m)
+func (m *RRMConfigStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_RRMConfigStatus.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2RRMConfigStatusAttribute proto.InternalMessageInfo
+var xxx_messageInfo_RRMConfigStatus proto.InternalMessageInfo
 
-func (m *E2RRMConfigStatusAttribute) GetEcgi() *E2ECGI {
+func (m *RRMConfigStatus) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2RRMConfigStatusAttribute) GetCrnti() []string {
+func (m *RRMConfigStatus) GetCrnti() []string {
 	if m != nil {
 		return m.Crnti
 	}
 	return nil
 }
 
-func (m *E2RRMConfigStatusAttribute) GetStatus() []E2SuccessOrFailure {
+func (m *RRMConfigStatus) GetStatus() []SuccessOrFailure {
 	if m != nil {
 		return m.Status
 	}
 	return nil
 }
 
-type E2CACap struct {
-	Band              string         `protobuf:"bytes,1,opt,name=band,proto3" json:"band,omitempty"`
-	Caclassdl         E2CACapClassDl `protobuf:"varint,2,opt,name=caclassdl,proto3,enum=interface.e2.E2CACapClassDl" json:"caclassdl,omitempty"`
-	Caclassul         E2CACapClassUl `protobuf:"varint,3,opt,name=caclassul,proto3,enum=interface.e2.E2CACapClassUl" json:"caclassul,omitempty"`
-	CrossCarrierSched string         `protobuf:"bytes,4,opt,name=crossCarrierSched,proto3" json:"crossCarrierSched,omitempty"`
+type CACap struct {
+	Band              string       `protobuf:"bytes,1,opt,name=band,proto3" json:"band,omitempty"`
+	Caclassdl         CACapClassDl `protobuf:"varint,2,opt,name=caclassdl,proto3,enum=interface.e2.CACapClassDl" json:"caclassdl,omitempty"`
+	Caclassul         CACapClassUl `protobuf:"varint,3,opt,name=caclassul,proto3,enum=interface.e2.CACapClassUl" json:"caclassul,omitempty"`
+	CrossCarrierSched string       `protobuf:"bytes,4,opt,name=crossCarrierSched,proto3" json:"crossCarrierSched,omitempty"`
 }
 
-func (m *E2CACap) Reset()         { *m = E2CACap{} }
-func (m *E2CACap) String() string { return proto.CompactTextString(m) }
-func (*E2CACap) ProtoMessage()    {}
-func (*E2CACap) Descriptor() ([]byte, []int) {
+func (m *CACap) Reset()         { *m = CACap{} }
+func (m *CACap) String() string { return proto.CompactTextString(m) }
+func (*CACap) ProtoMessage()    {}
+func (*CACap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{64}
 }
-func (m *E2CACap) XXX_Unmarshal(b []byte) error {
+func (m *CACap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2CACap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *CACap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2CACap.Marshal(b, m, deterministic)
+		return xxx_messageInfo_CACap.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5432,62 +5785,62 @@ func (m *E2CACap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2CACap) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2CACap.Merge(m, src)
+func (m *CACap) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CACap.Merge(m, src)
 }
-func (m *E2CACap) XXX_Size() int {
+func (m *CACap) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2CACap) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2CACap.DiscardUnknown(m)
+func (m *CACap) XXX_DiscardUnknown() {
+	xxx_messageInfo_CACap.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2CACap proto.InternalMessageInfo
+var xxx_messageInfo_CACap proto.InternalMessageInfo
 
-func (m *E2CACap) GetBand() string {
+func (m *CACap) GetBand() string {
 	if m != nil {
 		return m.Band
 	}
 	return ""
 }
 
-func (m *E2CACap) GetCaclassdl() E2CACapClassDl {
+func (m *CACap) GetCaclassdl() CACapClassDl {
 	if m != nil {
 		return m.Caclassdl
 	}
-	return E2CACapClassDl_E2_CACAP_CLASSDL_A
+	return CACapClassDl_CACAP_CLASSDL_A
 }
 
-func (m *E2CACap) GetCaclassul() E2CACapClassUl {
+func (m *CACap) GetCaclassul() CACapClassUl {
 	if m != nil {
 		return m.Caclassul
 	}
-	return E2CACapClassUl_E2_CACAP_CLASSUL_A
+	return CACapClassUl_CACAP_CLASSUL_A
 }
 
-func (m *E2CACap) GetCrossCarrierSched() string {
+func (m *CACap) GetCrossCarrierSched() string {
 	if m != nil {
 		return m.CrossCarrierSched
 	}
 	return ""
 }
 
-type E2DCCap struct {
-	DrbTypeSplit E2DCCapDrbType `protobuf:"varint,1,opt,name=drbTypeSplit,proto3,enum=interface.e2.E2DCCapDrbType" json:"drbTypeSplit,omitempty"`
+type DCCap struct {
+	DrbTypeSplit DCCapDrbType `protobuf:"varint,1,opt,name=drbTypeSplit,proto3,enum=interface.e2.DCCapDrbType" json:"drbTypeSplit,omitempty"`
 }
 
-func (m *E2DCCap) Reset()         { *m = E2DCCap{} }
-func (m *E2DCCap) String() string { return proto.CompactTextString(m) }
-func (*E2DCCap) ProtoMessage()    {}
-func (*E2DCCap) Descriptor() ([]byte, []int) {
+func (m *DCCap) Reset()         { *m = DCCap{} }
+func (m *DCCap) String() string { return proto.CompactTextString(m) }
+func (*DCCap) ProtoMessage()    {}
+func (*DCCap) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{65}
 }
-func (m *E2DCCap) XXX_Unmarshal(b []byte) error {
+func (m *DCCap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2DCCap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *DCCap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2DCCap.Marshal(b, m, deterministic)
+		return xxx_messageInfo_DCCap.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5497,43 +5850,43 @@ func (m *E2DCCap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *E2DCCap) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2DCCap.Merge(m, src)
+func (m *DCCap) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DCCap.Merge(m, src)
 }
-func (m *E2DCCap) XXX_Size() int {
+func (m *DCCap) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2DCCap) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2DCCap.DiscardUnknown(m)
+func (m *DCCap) XXX_DiscardUnknown() {
+	xxx_messageInfo_DCCap.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2DCCap proto.InternalMessageInfo
+var xxx_messageInfo_DCCap proto.InternalMessageInfo
 
-func (m *E2DCCap) GetDrbTypeSplit() E2DCCapDrbType {
+func (m *DCCap) GetDrbTypeSplit() DCCapDrbType {
 	if m != nil {
 		return m.DrbTypeSplit
 	}
-	return E2DCCapDrbType_E2_DCCAP_DRBTYPE_SUPPORTED
+	return DCCapDrbType_DCCAP_DRBTYPE_SUPPORTED
 }
 
 // UECapabilityEnqyuiry message
-type E2UECapabilityEnquiryAttribute struct {
-	Crnti string  `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi  *E2ECGI `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+type UECapabilityEnquiry struct {
+	Crnti string `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi  *ECGI  `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
 }
 
-func (m *E2UECapabilityEnquiryAttribute) Reset()         { *m = E2UECapabilityEnquiryAttribute{} }
-func (m *E2UECapabilityEnquiryAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UECapabilityEnquiryAttribute) ProtoMessage()    {}
-func (*E2UECapabilityEnquiryAttribute) Descriptor() ([]byte, []int) {
+func (m *UECapabilityEnquiry) Reset()         { *m = UECapabilityEnquiry{} }
+func (m *UECapabilityEnquiry) String() string { return proto.CompactTextString(m) }
+func (*UECapabilityEnquiry) ProtoMessage()    {}
+func (*UECapabilityEnquiry) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{66}
 }
-func (m *E2UECapabilityEnquiryAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UECapabilityEnquiry) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UECapabilityEnquiryAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UECapabilityEnquiry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UECapabilityEnquiryAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UECapabilityEnquiry.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5543,26 +5896,26 @@ func (m *E2UECapabilityEnquiryAttribute) XXX_Marshal(b []byte, deterministic boo
 		return b[:n], nil
 	}
 }
-func (m *E2UECapabilityEnquiryAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UECapabilityEnquiryAttribute.Merge(m, src)
+func (m *UECapabilityEnquiry) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UECapabilityEnquiry.Merge(m, src)
 }
-func (m *E2UECapabilityEnquiryAttribute) XXX_Size() int {
+func (m *UECapabilityEnquiry) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UECapabilityEnquiryAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UECapabilityEnquiryAttribute.DiscardUnknown(m)
+func (m *UECapabilityEnquiry) XXX_DiscardUnknown() {
+	xxx_messageInfo_UECapabilityEnquiry.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UECapabilityEnquiryAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UECapabilityEnquiry proto.InternalMessageInfo
 
-func (m *E2UECapabilityEnquiryAttribute) GetCrnti() string {
+func (m *UECapabilityEnquiry) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2UECapabilityEnquiryAttribute) GetEcgi() *E2ECGI {
+func (m *UECapabilityEnquiry) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
@@ -5570,25 +5923,25 @@ func (m *E2UECapabilityEnquiryAttribute) GetEcgi() *E2ECGI {
 }
 
 // UECapabilityInfo message
-type E2UECapabilityInfoAttribute struct {
-	Crnti string   `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi  *E2ECGI  `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	CaCap *E2CACap `protobuf:"bytes,3,opt,name=caCap,proto3" json:"caCap,omitempty"`
-	DcCap *E2DCCap `protobuf:"bytes,4,opt,name=dcCap,proto3" json:"dcCap,omitempty"`
+type UECapabilityInfo struct {
+	Crnti string `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi  *ECGI  `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	CaCap *CACap `protobuf:"bytes,3,opt,name=caCap,proto3" json:"caCap,omitempty"`
+	DcCap *DCCap `protobuf:"bytes,4,opt,name=dcCap,proto3" json:"dcCap,omitempty"`
 }
 
-func (m *E2UECapabilityInfoAttribute) Reset()         { *m = E2UECapabilityInfoAttribute{} }
-func (m *E2UECapabilityInfoAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2UECapabilityInfoAttribute) ProtoMessage()    {}
-func (*E2UECapabilityInfoAttribute) Descriptor() ([]byte, []int) {
+func (m *UECapabilityInfo) Reset()         { *m = UECapabilityInfo{} }
+func (m *UECapabilityInfo) String() string { return proto.CompactTextString(m) }
+func (*UECapabilityInfo) ProtoMessage()    {}
+func (*UECapabilityInfo) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{67}
 }
-func (m *E2UECapabilityInfoAttribute) XXX_Unmarshal(b []byte) error {
+func (m *UECapabilityInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2UECapabilityInfoAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *UECapabilityInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2UECapabilityInfoAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_UECapabilityInfo.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5598,65 +5951,65 @@ func (m *E2UECapabilityInfoAttribute) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *E2UECapabilityInfoAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2UECapabilityInfoAttribute.Merge(m, src)
+func (m *UECapabilityInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UECapabilityInfo.Merge(m, src)
 }
-func (m *E2UECapabilityInfoAttribute) XXX_Size() int {
+func (m *UECapabilityInfo) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2UECapabilityInfoAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2UECapabilityInfoAttribute.DiscardUnknown(m)
+func (m *UECapabilityInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_UECapabilityInfo.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2UECapabilityInfoAttribute proto.InternalMessageInfo
+var xxx_messageInfo_UECapabilityInfo proto.InternalMessageInfo
 
-func (m *E2UECapabilityInfoAttribute) GetCrnti() string {
+func (m *UECapabilityInfo) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2UECapabilityInfoAttribute) GetEcgi() *E2ECGI {
+func (m *UECapabilityInfo) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2UECapabilityInfoAttribute) GetCaCap() *E2CACap {
+func (m *UECapabilityInfo) GetCaCap() *CACap {
 	if m != nil {
 		return m.CaCap
 	}
 	return nil
 }
 
-func (m *E2UECapabilityInfoAttribute) GetDcCap() *E2DCCap {
+func (m *UECapabilityInfo) GetDcCap() *DCCap {
 	if m != nil {
 		return m.DcCap
 	}
 	return nil
 }
 
-type E2PropScell struct {
-	PciArfcn                *E2PCIARFCN   `protobuf:"bytes,1,opt,name=pciArfcn,proto3" json:"pciArfcn,omitempty"`
-	CrossCarrierSchedEnable string        `protobuf:"bytes,2,opt,name=crossCarrierSchedEnable,proto3" json:"crossCarrierSchedEnable,omitempty"`
-	CaDirection             E2CADirection `protobuf:"varint,3,opt,name=caDirection,proto3,enum=interface.e2.E2CADirection" json:"caDirection,omitempty"`
-	DeactTimer              string        `protobuf:"bytes,4,opt,name=deactTimer,proto3" json:"deactTimer,omitempty"`
+type PropScell struct {
+	PciArfcn                *PCIARFCN   `protobuf:"bytes,1,opt,name=pciArfcn,proto3" json:"pciArfcn,omitempty"`
+	CrossCarrierSchedEnable string      `protobuf:"bytes,2,opt,name=crossCarrierSchedEnable,proto3" json:"crossCarrierSchedEnable,omitempty"`
+	CaDirection             CADirection `protobuf:"varint,3,opt,name=caDirection,proto3,enum=interface.e2.CADirection" json:"caDirection,omitempty"`
+	DeactTimer              string      `protobuf:"bytes,4,opt,name=deactTimer,proto3" json:"deactTimer,omitempty"`
 }
 
-func (m *E2PropScell) Reset()         { *m = E2PropScell{} }
-func (m *E2PropScell) String() string { return proto.CompactTextString(m) }
-func (*E2PropScell) ProtoMessage()    {}
-func (*E2PropScell) Descriptor() ([]byte, []int) {
+func (m *PropScell) Reset()         { *m = PropScell{} }
+func (m *PropScell) String() string { return proto.CompactTextString(m) }
+func (*PropScell) ProtoMessage()    {}
+func (*PropScell) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{68}
 }
-func (m *E2PropScell) XXX_Unmarshal(b []byte) error {
+func (m *PropScell) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2PropScell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *PropScell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2PropScell.Marshal(b, m, deterministic)
+		return xxx_messageInfo_PropScell.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5666,40 +6019,40 @@ func (m *E2PropScell) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (m *E2PropScell) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2PropScell.Merge(m, src)
+func (m *PropScell) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PropScell.Merge(m, src)
 }
-func (m *E2PropScell) XXX_Size() int {
+func (m *PropScell) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2PropScell) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2PropScell.DiscardUnknown(m)
+func (m *PropScell) XXX_DiscardUnknown() {
+	xxx_messageInfo_PropScell.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2PropScell proto.InternalMessageInfo
+var xxx_messageInfo_PropScell proto.InternalMessageInfo
 
-func (m *E2PropScell) GetPciArfcn() *E2PCIARFCN {
+func (m *PropScell) GetPciArfcn() *PCIARFCN {
 	if m != nil {
 		return m.PciArfcn
 	}
 	return nil
 }
 
-func (m *E2PropScell) GetCrossCarrierSchedEnable() string {
+func (m *PropScell) GetCrossCarrierSchedEnable() string {
 	if m != nil {
 		return m.CrossCarrierSchedEnable
 	}
 	return ""
 }
 
-func (m *E2PropScell) GetCaDirection() E2CADirection {
+func (m *PropScell) GetCaDirection() CADirection {
 	if m != nil {
 		return m.CaDirection
 	}
-	return E2CADirection_E2_CADIRECTION_DL
+	return CADirection_CADIRECTION_DL
 }
 
-func (m *E2PropScell) GetDeactTimer() string {
+func (m *PropScell) GetDeactTimer() string {
 	if m != nil {
 		return m.DeactTimer
 	}
@@ -5707,24 +6060,24 @@ func (m *E2PropScell) GetDeactTimer() string {
 }
 
 // ScellAdd message
-type E2ScellAddAttribute struct {
-	Crnti      string         `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi       *E2ECGI        `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	ScellsProp []*E2PropScell `protobuf:"bytes,3,rep,name=scellsProp,proto3" json:"scellsProp,omitempty"`
+type ScellAdd struct {
+	Crnti      string       `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi       *ECGI        `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	ScellsProp []*PropScell `protobuf:"bytes,3,rep,name=scellsProp,proto3" json:"scellsProp,omitempty"`
 }
 
-func (m *E2ScellAddAttribute) Reset()         { *m = E2ScellAddAttribute{} }
-func (m *E2ScellAddAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2ScellAddAttribute) ProtoMessage()    {}
-func (*E2ScellAddAttribute) Descriptor() ([]byte, []int) {
+func (m *ScellAdd) Reset()         { *m = ScellAdd{} }
+func (m *ScellAdd) String() string { return proto.CompactTextString(m) }
+func (*ScellAdd) ProtoMessage()    {}
+func (*ScellAdd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{69}
 }
-func (m *E2ScellAddAttribute) XXX_Unmarshal(b []byte) error {
+func (m *ScellAdd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ScellAddAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ScellAdd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ScellAddAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ScellAdd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5734,33 +6087,33 @@ func (m *E2ScellAddAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *E2ScellAddAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ScellAddAttribute.Merge(m, src)
+func (m *ScellAdd) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ScellAdd.Merge(m, src)
 }
-func (m *E2ScellAddAttribute) XXX_Size() int {
+func (m *ScellAdd) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ScellAddAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ScellAddAttribute.DiscardUnknown(m)
+func (m *ScellAdd) XXX_DiscardUnknown() {
+	xxx_messageInfo_ScellAdd.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ScellAddAttribute proto.InternalMessageInfo
+var xxx_messageInfo_ScellAdd proto.InternalMessageInfo
 
-func (m *E2ScellAddAttribute) GetCrnti() string {
+func (m *ScellAdd) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2ScellAddAttribute) GetEcgi() *E2ECGI {
+func (m *ScellAdd) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2ScellAddAttribute) GetScellsProp() []*E2PropScell {
+func (m *ScellAdd) GetScellsProp() []*PropScell {
 	if m != nil {
 		return m.ScellsProp
 	}
@@ -5768,25 +6121,25 @@ func (m *E2ScellAddAttribute) GetScellsProp() []*E2PropScell {
 }
 
 // ScellAddStatus message
-type E2ScellAddStatusAttribute struct {
-	Crnti     string               `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi      *E2ECGI              `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	ScellsInd []*E2PCIARFCN        `protobuf:"bytes,3,rep,name=scellsInd,proto3" json:"scellsInd,omitempty"`
-	Status    []E2SuccessOrFailure `protobuf:"varint,4,rep,packed,name=status,proto3,enum=interface.e2.E2SuccessOrFailure" json:"status,omitempty"`
+type ScellAddStatus struct {
+	Crnti     string             `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi      *ECGI              `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	ScellsInd []*PCIARFCN        `protobuf:"bytes,3,rep,name=scellsInd,proto3" json:"scellsInd,omitempty"`
+	Status    []SuccessOrFailure `protobuf:"varint,4,rep,packed,name=status,proto3,enum=interface.e2.SuccessOrFailure" json:"status,omitempty"`
 }
 
-func (m *E2ScellAddStatusAttribute) Reset()         { *m = E2ScellAddStatusAttribute{} }
-func (m *E2ScellAddStatusAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2ScellAddStatusAttribute) ProtoMessage()    {}
-func (*E2ScellAddStatusAttribute) Descriptor() ([]byte, []int) {
+func (m *ScellAddStatus) Reset()         { *m = ScellAddStatus{} }
+func (m *ScellAddStatus) String() string { return proto.CompactTextString(m) }
+func (*ScellAddStatus) ProtoMessage()    {}
+func (*ScellAddStatus) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{70}
 }
-func (m *E2ScellAddStatusAttribute) XXX_Unmarshal(b []byte) error {
+func (m *ScellAddStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ScellAddStatusAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ScellAddStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ScellAddStatusAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ScellAddStatus.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5796,40 +6149,40 @@ func (m *E2ScellAddStatusAttribute) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *E2ScellAddStatusAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ScellAddStatusAttribute.Merge(m, src)
+func (m *ScellAddStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ScellAddStatus.Merge(m, src)
 }
-func (m *E2ScellAddStatusAttribute) XXX_Size() int {
+func (m *ScellAddStatus) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ScellAddStatusAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ScellAddStatusAttribute.DiscardUnknown(m)
+func (m *ScellAddStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_ScellAddStatus.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ScellAddStatusAttribute proto.InternalMessageInfo
+var xxx_messageInfo_ScellAddStatus proto.InternalMessageInfo
 
-func (m *E2ScellAddStatusAttribute) GetCrnti() string {
+func (m *ScellAddStatus) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2ScellAddStatusAttribute) GetEcgi() *E2ECGI {
+func (m *ScellAddStatus) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2ScellAddStatusAttribute) GetScellsInd() []*E2PCIARFCN {
+func (m *ScellAddStatus) GetScellsInd() []*PCIARFCN {
 	if m != nil {
 		return m.ScellsInd
 	}
 	return nil
 }
 
-func (m *E2ScellAddStatusAttribute) GetStatus() []E2SuccessOrFailure {
+func (m *ScellAddStatus) GetStatus() []SuccessOrFailure {
 	if m != nil {
 		return m.Status
 	}
@@ -5837,24 +6190,24 @@ func (m *E2ScellAddStatusAttribute) GetStatus() []E2SuccessOrFailure {
 }
 
 // ScellDelete message
-type E2ScellDeleteAttribute struct {
-	Crnti     string        `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi      *E2ECGI       `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	ScellsInd []*E2PCIARFCN `protobuf:"bytes,3,rep,name=scellsInd,proto3" json:"scellsInd,omitempty"`
+type ScellDelete struct {
+	Crnti     string      `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi      *ECGI       `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	ScellsInd []*PCIARFCN `protobuf:"bytes,3,rep,name=scellsInd,proto3" json:"scellsInd,omitempty"`
 }
 
-func (m *E2ScellDeleteAttribute) Reset()         { *m = E2ScellDeleteAttribute{} }
-func (m *E2ScellDeleteAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2ScellDeleteAttribute) ProtoMessage()    {}
-func (*E2ScellDeleteAttribute) Descriptor() ([]byte, []int) {
+func (m *ScellDelete) Reset()         { *m = ScellDelete{} }
+func (m *ScellDelete) String() string { return proto.CompactTextString(m) }
+func (*ScellDelete) ProtoMessage()    {}
+func (*ScellDelete) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{71}
 }
-func (m *E2ScellDeleteAttribute) XXX_Unmarshal(b []byte) error {
+func (m *ScellDelete) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2ScellDeleteAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ScellDelete) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2ScellDeleteAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ScellDelete.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5864,33 +6217,33 @@ func (m *E2ScellDeleteAttribute) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *E2ScellDeleteAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2ScellDeleteAttribute.Merge(m, src)
+func (m *ScellDelete) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ScellDelete.Merge(m, src)
 }
-func (m *E2ScellDeleteAttribute) XXX_Size() int {
+func (m *ScellDelete) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2ScellDeleteAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2ScellDeleteAttribute.DiscardUnknown(m)
+func (m *ScellDelete) XXX_DiscardUnknown() {
+	xxx_messageInfo_ScellDelete.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2ScellDeleteAttribute proto.InternalMessageInfo
+var xxx_messageInfo_ScellDelete proto.InternalMessageInfo
 
-func (m *E2ScellDeleteAttribute) GetCrnti() string {
+func (m *ScellDelete) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2ScellDeleteAttribute) GetEcgi() *E2ECGI {
+func (m *ScellDelete) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2ScellDeleteAttribute) GetScellsInd() []*E2PCIARFCN {
+func (m *ScellDelete) GetScellsInd() []*PCIARFCN {
 	if m != nil {
 		return m.ScellsInd
 	}
@@ -5898,24 +6251,24 @@ func (m *E2ScellDeleteAttribute) GetScellsInd() []*E2PCIARFCN {
 }
 
 // SeNBAdd message
-type E2SeNBAddAttribute struct {
-	Crnti string  `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	MEcgi *E2ECGI `protobuf:"bytes,2,opt,name=mEcgi,proto3" json:"mEcgi,omitempty"`
-	SEcgi *E2ECGI `protobuf:"bytes,3,opt,name=sEcgi,proto3" json:"sEcgi,omitempty"`
+type SeNBAdd struct {
+	Crnti string `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	MEcgi *ECGI  `protobuf:"bytes,2,opt,name=mEcgi,proto3" json:"mEcgi,omitempty"`
+	SEcgi *ECGI  `protobuf:"bytes,3,opt,name=sEcgi,proto3" json:"sEcgi,omitempty"`
 }
 
-func (m *E2SeNBAddAttribute) Reset()         { *m = E2SeNBAddAttribute{} }
-func (m *E2SeNBAddAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2SeNBAddAttribute) ProtoMessage()    {}
-func (*E2SeNBAddAttribute) Descriptor() ([]byte, []int) {
+func (m *SeNBAdd) Reset()         { *m = SeNBAdd{} }
+func (m *SeNBAdd) String() string { return proto.CompactTextString(m) }
+func (*SeNBAdd) ProtoMessage()    {}
+func (*SeNBAdd) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{72}
 }
-func (m *E2SeNBAddAttribute) XXX_Unmarshal(b []byte) error {
+func (m *SeNBAdd) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2SeNBAddAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SeNBAdd) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2SeNBAddAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SeNBAdd.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5925,33 +6278,33 @@ func (m *E2SeNBAddAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *E2SeNBAddAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2SeNBAddAttribute.Merge(m, src)
+func (m *SeNBAdd) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SeNBAdd.Merge(m, src)
 }
-func (m *E2SeNBAddAttribute) XXX_Size() int {
+func (m *SeNBAdd) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2SeNBAddAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2SeNBAddAttribute.DiscardUnknown(m)
+func (m *SeNBAdd) XXX_DiscardUnknown() {
+	xxx_messageInfo_SeNBAdd.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2SeNBAddAttribute proto.InternalMessageInfo
+var xxx_messageInfo_SeNBAdd proto.InternalMessageInfo
 
-func (m *E2SeNBAddAttribute) GetCrnti() string {
+func (m *SeNBAdd) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2SeNBAddAttribute) GetMEcgi() *E2ECGI {
+func (m *SeNBAdd) GetMEcgi() *ECGI {
 	if m != nil {
 		return m.MEcgi
 	}
 	return nil
 }
 
-func (m *E2SeNBAddAttribute) GetSEcgi() *E2ECGI {
+func (m *SeNBAdd) GetSEcgi() *ECGI {
 	if m != nil {
 		return m.SEcgi
 	}
@@ -5959,24 +6312,24 @@ func (m *E2SeNBAddAttribute) GetSEcgi() *E2ECGI {
 }
 
 // SeNBAddStatus message
-type E2SeNBAddStatusAttribute struct {
-	Crnti  string             `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi   *E2ECGI            `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	Status E2SuccessOrFailure `protobuf:"varint,3,opt,name=status,proto3,enum=interface.e2.E2SuccessOrFailure" json:"status,omitempty"`
+type SeNBAddStatus struct {
+	Crnti  string           `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi   *ECGI            `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Status SuccessOrFailure `protobuf:"varint,3,opt,name=status,proto3,enum=interface.e2.SuccessOrFailure" json:"status,omitempty"`
 }
 
-func (m *E2SeNBAddStatusAttribute) Reset()         { *m = E2SeNBAddStatusAttribute{} }
-func (m *E2SeNBAddStatusAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2SeNBAddStatusAttribute) ProtoMessage()    {}
-func (*E2SeNBAddStatusAttribute) Descriptor() ([]byte, []int) {
+func (m *SeNBAddStatus) Reset()         { *m = SeNBAddStatus{} }
+func (m *SeNBAddStatus) String() string { return proto.CompactTextString(m) }
+func (*SeNBAddStatus) ProtoMessage()    {}
+func (*SeNBAddStatus) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{73}
 }
-func (m *E2SeNBAddStatusAttribute) XXX_Unmarshal(b []byte) error {
+func (m *SeNBAddStatus) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2SeNBAddStatusAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SeNBAddStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2SeNBAddStatusAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SeNBAddStatus.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -5986,58 +6339,58 @@ func (m *E2SeNBAddStatusAttribute) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *E2SeNBAddStatusAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2SeNBAddStatusAttribute.Merge(m, src)
+func (m *SeNBAddStatus) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SeNBAddStatus.Merge(m, src)
 }
-func (m *E2SeNBAddStatusAttribute) XXX_Size() int {
+func (m *SeNBAddStatus) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2SeNBAddStatusAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2SeNBAddStatusAttribute.DiscardUnknown(m)
+func (m *SeNBAddStatus) XXX_DiscardUnknown() {
+	xxx_messageInfo_SeNBAddStatus.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2SeNBAddStatusAttribute proto.InternalMessageInfo
+var xxx_messageInfo_SeNBAddStatus proto.InternalMessageInfo
 
-func (m *E2SeNBAddStatusAttribute) GetCrnti() string {
+func (m *SeNBAddStatus) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2SeNBAddStatusAttribute) GetEcgi() *E2ECGI {
+func (m *SeNBAddStatus) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2SeNBAddStatusAttribute) GetStatus() E2SuccessOrFailure {
+func (m *SeNBAddStatus) GetStatus() SuccessOrFailure {
 	if m != nil {
 		return m.Status
 	}
-	return E2SuccessOrFailure_E2_SUCCESS
+	return SuccessOrFailure_SUCCESS
 }
 
 // SeNBDelete message
-type E2SeNBDeleteAttribute struct {
-	Crnti string  `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	MEcgi *E2ECGI `protobuf:"bytes,2,opt,name=mEcgi,proto3" json:"mEcgi,omitempty"`
-	SEcgi *E2ECGI `protobuf:"bytes,3,opt,name=sEcgi,proto3" json:"sEcgi,omitempty"`
+type SeNBDelete struct {
+	Crnti string `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	MEcgi *ECGI  `protobuf:"bytes,2,opt,name=mEcgi,proto3" json:"mEcgi,omitempty"`
+	SEcgi *ECGI  `protobuf:"bytes,3,opt,name=sEcgi,proto3" json:"sEcgi,omitempty"`
 }
 
-func (m *E2SeNBDeleteAttribute) Reset()         { *m = E2SeNBDeleteAttribute{} }
-func (m *E2SeNBDeleteAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2SeNBDeleteAttribute) ProtoMessage()    {}
-func (*E2SeNBDeleteAttribute) Descriptor() ([]byte, []int) {
+func (m *SeNBDelete) Reset()         { *m = SeNBDelete{} }
+func (m *SeNBDelete) String() string { return proto.CompactTextString(m) }
+func (*SeNBDelete) ProtoMessage()    {}
+func (*SeNBDelete) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{74}
 }
-func (m *E2SeNBDeleteAttribute) XXX_Unmarshal(b []byte) error {
+func (m *SeNBDelete) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2SeNBDeleteAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SeNBDelete) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2SeNBDeleteAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SeNBDelete.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -6047,57 +6400,57 @@ func (m *E2SeNBDeleteAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *E2SeNBDeleteAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2SeNBDeleteAttribute.Merge(m, src)
+func (m *SeNBDelete) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SeNBDelete.Merge(m, src)
 }
-func (m *E2SeNBDeleteAttribute) XXX_Size() int {
+func (m *SeNBDelete) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2SeNBDeleteAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2SeNBDeleteAttribute.DiscardUnknown(m)
+func (m *SeNBDelete) XXX_DiscardUnknown() {
+	xxx_messageInfo_SeNBDelete.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2SeNBDeleteAttribute proto.InternalMessageInfo
+var xxx_messageInfo_SeNBDelete proto.InternalMessageInfo
 
-func (m *E2SeNBDeleteAttribute) GetCrnti() string {
+func (m *SeNBDelete) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2SeNBDeleteAttribute) GetMEcgi() *E2ECGI {
+func (m *SeNBDelete) GetMEcgi() *ECGI {
 	if m != nil {
 		return m.MEcgi
 	}
 	return nil
 }
 
-func (m *E2SeNBDeleteAttribute) GetSEcgi() *E2ECGI {
+func (m *SeNBDelete) GetSEcgi() *ECGI {
 	if m != nil {
 		return m.SEcgi
 	}
 	return nil
 }
 
-type E2TrafficSplitPercentage struct {
-	Ecgi                *E2ECGI `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	TrafficPercentageDl string  `protobuf:"bytes,2,opt,name=trafficPercentageDl,proto3" json:"trafficPercentageDl,omitempty"`
-	TrafficPercentageUl string  `protobuf:"bytes,3,opt,name=trafficPercentageUl,proto3" json:"trafficPercentageUl,omitempty"`
+type TrafficSplitPercentage struct {
+	Ecgi                *ECGI  `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	TrafficPercentageDl string `protobuf:"bytes,2,opt,name=trafficPercentageDl,proto3" json:"trafficPercentageDl,omitempty"`
+	TrafficPercentageUl string `protobuf:"bytes,3,opt,name=trafficPercentageUl,proto3" json:"trafficPercentageUl,omitempty"`
 }
 
-func (m *E2TrafficSplitPercentage) Reset()         { *m = E2TrafficSplitPercentage{} }
-func (m *E2TrafficSplitPercentage) String() string { return proto.CompactTextString(m) }
-func (*E2TrafficSplitPercentage) ProtoMessage()    {}
-func (*E2TrafficSplitPercentage) Descriptor() ([]byte, []int) {
+func (m *TrafficSplitPercentage) Reset()         { *m = TrafficSplitPercentage{} }
+func (m *TrafficSplitPercentage) String() string { return proto.CompactTextString(m) }
+func (*TrafficSplitPercentage) ProtoMessage()    {}
+func (*TrafficSplitPercentage) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{75}
 }
-func (m *E2TrafficSplitPercentage) XXX_Unmarshal(b []byte) error {
+func (m *TrafficSplitPercentage) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2TrafficSplitPercentage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TrafficSplitPercentage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2TrafficSplitPercentage.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TrafficSplitPercentage.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -6107,33 +6460,33 @@ func (m *E2TrafficSplitPercentage) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *E2TrafficSplitPercentage) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2TrafficSplitPercentage.Merge(m, src)
+func (m *TrafficSplitPercentage) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TrafficSplitPercentage.Merge(m, src)
 }
-func (m *E2TrafficSplitPercentage) XXX_Size() int {
+func (m *TrafficSplitPercentage) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2TrafficSplitPercentage) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2TrafficSplitPercentage.DiscardUnknown(m)
+func (m *TrafficSplitPercentage) XXX_DiscardUnknown() {
+	xxx_messageInfo_TrafficSplitPercentage.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2TrafficSplitPercentage proto.InternalMessageInfo
+var xxx_messageInfo_TrafficSplitPercentage proto.InternalMessageInfo
 
-func (m *E2TrafficSplitPercentage) GetEcgi() *E2ECGI {
+func (m *TrafficSplitPercentage) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2TrafficSplitPercentage) GetTrafficPercentageDl() string {
+func (m *TrafficSplitPercentage) GetTrafficPercentageDl() string {
 	if m != nil {
 		return m.TrafficPercentageDl
 	}
 	return ""
 }
 
-func (m *E2TrafficSplitPercentage) GetTrafficPercentageUl() string {
+func (m *TrafficSplitPercentage) GetTrafficPercentageUl() string {
 	if m != nil {
 		return m.TrafficPercentageUl
 	}
@@ -6141,24 +6494,24 @@ func (m *E2TrafficSplitPercentage) GetTrafficPercentageUl() string {
 }
 
 // TrafficSplitConfig message
-type E2TrafficSplitConfigAttribute struct {
-	Crnti                  string                      `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
-	Ecgi                   *E2ECGI                     `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
-	TrafficSplitPercentage []*E2TrafficSplitPercentage `protobuf:"bytes,3,rep,name=trafficSplitPercentage,proto3" json:"trafficSplitPercentage,omitempty"`
+type TrafficSplitConfig struct {
+	Crnti                  string                    `protobuf:"bytes,1,opt,name=crnti,proto3" json:"crnti,omitempty"`
+	Ecgi                   *ECGI                     `protobuf:"bytes,2,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	TrafficSplitPercentage []*TrafficSplitPercentage `protobuf:"bytes,3,rep,name=trafficSplitPercentage,proto3" json:"trafficSplitPercentage,omitempty"`
 }
 
-func (m *E2TrafficSplitConfigAttribute) Reset()         { *m = E2TrafficSplitConfigAttribute{} }
-func (m *E2TrafficSplitConfigAttribute) String() string { return proto.CompactTextString(m) }
-func (*E2TrafficSplitConfigAttribute) ProtoMessage()    {}
-func (*E2TrafficSplitConfigAttribute) Descriptor() ([]byte, []int) {
+func (m *TrafficSplitConfig) Reset()         { *m = TrafficSplitConfig{} }
+func (m *TrafficSplitConfig) String() string { return proto.CompactTextString(m) }
+func (*TrafficSplitConfig) ProtoMessage()    {}
+func (*TrafficSplitConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_310687c643405aa4, []int{76}
 }
-func (m *E2TrafficSplitConfigAttribute) XXX_Unmarshal(b []byte) error {
+func (m *TrafficSplitConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *E2TrafficSplitConfigAttribute) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *TrafficSplitConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_E2TrafficSplitConfigAttribute.Marshal(b, m, deterministic)
+		return xxx_messageInfo_TrafficSplitConfig.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -6168,33 +6521,33 @@ func (m *E2TrafficSplitConfigAttribute) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *E2TrafficSplitConfigAttribute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_E2TrafficSplitConfigAttribute.Merge(m, src)
+func (m *TrafficSplitConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TrafficSplitConfig.Merge(m, src)
 }
-func (m *E2TrafficSplitConfigAttribute) XXX_Size() int {
+func (m *TrafficSplitConfig) XXX_Size() int {
 	return m.Size()
 }
-func (m *E2TrafficSplitConfigAttribute) XXX_DiscardUnknown() {
-	xxx_messageInfo_E2TrafficSplitConfigAttribute.DiscardUnknown(m)
+func (m *TrafficSplitConfig) XXX_DiscardUnknown() {
+	xxx_messageInfo_TrafficSplitConfig.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_E2TrafficSplitConfigAttribute proto.InternalMessageInfo
+var xxx_messageInfo_TrafficSplitConfig proto.InternalMessageInfo
 
-func (m *E2TrafficSplitConfigAttribute) GetCrnti() string {
+func (m *TrafficSplitConfig) GetCrnti() string {
 	if m != nil {
 		return m.Crnti
 	}
 	return ""
 }
 
-func (m *E2TrafficSplitConfigAttribute) GetEcgi() *E2ECGI {
+func (m *TrafficSplitConfig) GetEcgi() *ECGI {
 	if m != nil {
 		return m.Ecgi
 	}
 	return nil
 }
 
-func (m *E2TrafficSplitConfigAttribute) GetTrafficSplitPercentage() []*E2TrafficSplitPercentage {
+func (m *TrafficSplitConfig) GetTrafficSplitPercentage() []*TrafficSplitPercentage {
 	if m != nil {
 		return m.TrafficSplitPercentage
 	}
@@ -6202,442 +6555,441 @@ func (m *E2TrafficSplitConfigAttribute) GetTrafficSplitPercentage() []*E2Traffic
 }
 
 func init() {
-	proto.RegisterEnum("interface.e2.E2MessageType", E2MessageType_name, E2MessageType_value)
-	proto.RegisterEnum("interface.e2.E2AdmEstCause", E2AdmEstCause_name, E2AdmEstCause_value)
-	proto.RegisterEnum("interface.e2.E2SuccessOrFailure", E2SuccessOrFailure_name, E2SuccessOrFailure_value)
-	proto.RegisterEnum("interface.e2.E2ReconfigCause", E2ReconfigCause_name, E2ReconfigCause_value)
-	proto.RegisterEnum("interface.e2.E2ReleaseCause", E2ReleaseCause_name, E2ReleaseCause_value)
-	proto.RegisterEnum("interface.e2.E2ERABDirection", E2ERABDirection_name, E2ERABDirection_value)
-	proto.RegisterEnum("interface.e2.E2ERABType", E2ERABType_name, E2ERABType_value)
-	proto.RegisterEnum("interface.e2.E2ReportParamPR", E2ReportParamPR_name, E2ReportParamPR_value)
-	proto.RegisterEnum("interface.e2.E2PerParamReportIntervalMs", E2PerParamReportIntervalMs_name, E2PerParamReportIntervalMs_value)
-	proto.RegisterEnum("interface.e2.E2ThresholdEUTRAPR", E2ThresholdEUTRAPR_name, E2ThresholdEUTRAPR_value)
-	proto.RegisterEnum("interface.e2.E2TimeToTrigger", E2TimeToTrigger_name, E2TimeToTrigger_value)
-	proto.RegisterEnum("interface.e2.E2TriggerQuantity", E2TriggerQuantity_name, E2TriggerQuantity_value)
-	proto.RegisterEnum("interface.e2.E2ReportQuality", E2ReportQuality_name, E2ReportQuality_value)
-	proto.RegisterEnum("interface.e2.E2MeasIdActionPR", E2MeasIdActionPR_name, E2MeasIdActionPR_value)
-	proto.RegisterEnum("interface.e2.E2L2MeasReportIntervals", E2L2MeasReportIntervals_name, E2L2MeasReportIntervals_value)
-	proto.RegisterEnum("interface.e2.E2XICICPA", E2XICICPA_name, E2XICICPA_value)
-	proto.RegisterEnum("interface.e2.E2CACapClassDl", E2CACapClassDl_name, E2CACapClassDl_value)
-	proto.RegisterEnum("interface.e2.E2CACapClassUl", E2CACapClassUl_name, E2CACapClassUl_value)
-	proto.RegisterEnum("interface.e2.E2DCCapDrbType", E2DCCapDrbType_name, E2DCCapDrbType_value)
-	proto.RegisterEnum("interface.e2.E2CADirection", E2CADirection_name, E2CADirection_value)
+	proto.RegisterEnum("interface.e2.MessageType", MessageType_name, MessageType_value)
+	proto.RegisterEnum("interface.e2.AdmEstCause", AdmEstCause_name, AdmEstCause_value)
+	proto.RegisterEnum("interface.e2.SuccessOrFailure", SuccessOrFailure_name, SuccessOrFailure_value)
+	proto.RegisterEnum("interface.e2.ReconfigCause", ReconfigCause_name, ReconfigCause_value)
+	proto.RegisterEnum("interface.e2.ReleaseCause", ReleaseCause_name, ReleaseCause_value)
+	proto.RegisterEnum("interface.e2.ERABDirection", ERABDirection_name, ERABDirection_value)
+	proto.RegisterEnum("interface.e2.ERABType", ERABType_name, ERABType_value)
+	proto.RegisterEnum("interface.e2.ReportParamPR", ReportParamPR_name, ReportParamPR_value)
+	proto.RegisterEnum("interface.e2.PerParamReportIntervalMs", PerParamReportIntervalMs_name, PerParamReportIntervalMs_value)
+	proto.RegisterEnum("interface.e2.ThresholdEUTRAPR", ThresholdEUTRAPR_name, ThresholdEUTRAPR_value)
+	proto.RegisterEnum("interface.e2.TimeToTrigger", TimeToTrigger_name, TimeToTrigger_value)
+	proto.RegisterEnum("interface.e2.TriggerQuantity", TriggerQuantity_name, TriggerQuantity_value)
+	proto.RegisterEnum("interface.e2.ReportQuality", ReportQuality_name, ReportQuality_value)
+	proto.RegisterEnum("interface.e2.MeasIdActionPR", MeasIdActionPR_name, MeasIdActionPR_value)
+	proto.RegisterEnum("interface.e2.L2MeasReportIntervals", L2MeasReportIntervals_name, L2MeasReportIntervals_value)
+	proto.RegisterEnum("interface.e2.XICICPA", XICICPA_name, XICICPA_value)
+	proto.RegisterEnum("interface.e2.CACapClassDl", CACapClassDl_name, CACapClassDl_value)
+	proto.RegisterEnum("interface.e2.CACapClassUl", CACapClassUl_name, CACapClassUl_value)
+	proto.RegisterEnum("interface.e2.DCCapDrbType", DCCapDrbType_name, DCCapDrbType_value)
+	proto.RegisterEnum("interface.e2.CADirection", CADirection_name, CADirection_value)
 	proto.RegisterType((*TelemetryRequest)(nil), "interface.e2.TelemetryRequest")
 	proto.RegisterType((*TelemetryMessage)(nil), "interface.e2.TelemetryMessage")
 	proto.RegisterType((*ControlUpdate)(nil), "interface.e2.ControlUpdate")
 	proto.RegisterType((*ControlResponse)(nil), "interface.e2.ControlResponse")
-	proto.RegisterType((*E2MessageHeader)(nil), "interface.e2.E2MessageHeader")
-	proto.RegisterType((*E2MessagePayload)(nil), "interface.e2.E2MessagePayload")
-	proto.RegisterType((*E2Message)(nil), "interface.e2.E2Message")
+	proto.RegisterType((*MessageHeader)(nil), "interface.e2.MessageHeader")
+	proto.RegisterType((*MessagePayload)(nil), "interface.e2.MessagePayload")
+	proto.RegisterType((*Message)(nil), "interface.e2.Message")
 	proto.RegisterType((*ServiceResult)(nil), "interface.e2.ServiceResult")
-	proto.RegisterType((*E2ECGI)(nil), "interface.e2.E2ECGI")
-	proto.RegisterType((*E2CandScell)(nil), "interface.e2.E2CandScell")
-	proto.RegisterType((*E2CellConfigRequestAttribute)(nil), "interface.e2.E2CellConfigRequestAttribute")
-	proto.RegisterType((*E2CellConfigReportAttribute)(nil), "interface.e2.E2CellConfigReportAttribute")
-	proto.RegisterType((*E2UEAdmissionRequestAttribute)(nil), "interface.e2.E2UEAdmissionRequestAttribute")
-	proto.RegisterType((*E2UEAdmissionResponseAttribute)(nil), "interface.e2.E2UEAdmissionResponseAttribute")
-	proto.RegisterType((*E2UEAdmissionStatusAttribute)(nil), "interface.e2.E2UEAdmissionStatusAttribute")
-	proto.RegisterType((*E2UEContextUpdateAttribute)(nil), "interface.e2.E2UEContextUpdateAttribute")
-	proto.RegisterType((*E2UEReconfigIndAttribute)(nil), "interface.e2.E2UEReconfigIndAttribute")
-	proto.RegisterType((*E2UEReleaseIndAttribute)(nil), "interface.e2.E2UEReleaseIndAttribute")
-	proto.RegisterType((*E2UEAMBR)(nil), "interface.e2.E2UEAMBR")
-	proto.RegisterType((*E2ERABParamsItem)(nil), "interface.e2.E2ERABParamsItem")
-	proto.RegisterType((*E2ERABResponseItem)(nil), "interface.e2.E2ERABResponseItem")
-	proto.RegisterType((*E2BearerAdmissionRequestAttribute)(nil), "interface.e2.E2BearerAdmissionRequestAttribute")
-	proto.RegisterType((*E2BearerAdmissionResponseAttribute)(nil), "interface.e2.E2BearerAdmissionResponseAttribute")
-	proto.RegisterType((*E2BearerAdmissionStatusAttribute)(nil), "interface.e2.E2BearerAdmissionStatusAttribute")
-	proto.RegisterType((*E2BearerReleaseIndAttribute)(nil), "interface.e2.E2BearerReleaseIndAttribute")
-	proto.RegisterType((*E2HORequestAttribute)(nil), "interface.e2.E2HORequestAttribute")
-	proto.RegisterType((*E2HOFailureAttribute)(nil), "interface.e2.E2HOFailureAttribute")
-	proto.RegisterType((*E2HOCompleteAttribute)(nil), "interface.e2.E2HOCompleteAttribute")
-	proto.RegisterType((*E2HOCauseAttribute)(nil), "interface.e2.E2HOCauseAttribute")
-	proto.RegisterType((*E2MeasCell)(nil), "interface.e2.E2MeasCell")
-	proto.RegisterType((*E2MeasObject)(nil), "interface.e2.E2MeasObject")
-	proto.RegisterType((*E2ReportParamChoice)(nil), "interface.e2.E2ReportParamChoice")
-	proto.RegisterType((*E2ThresholdEUTRAChoice)(nil), "interface.e2.E2ThresholdEUTRAChoice")
-	proto.RegisterType((*E2ThreasholdEUTRA)(nil), "interface.e2.E2ThreasholdEUTRA")
-	proto.RegisterType((*E2PerParam)(nil), "interface.e2.E2PerParam")
-	proto.RegisterType((*E2A1Param)(nil), "interface.e2.E2A1Param")
-	proto.RegisterType((*E2A2Param)(nil), "interface.e2.E2A2Param")
-	proto.RegisterType((*E2A3Param)(nil), "interface.e2.E2A3Param")
-	proto.RegisterType((*E2A4Param)(nil), "interface.e2.E2A4Param")
-	proto.RegisterType((*E2A5Param)(nil), "interface.e2.E2A5Param")
-	proto.RegisterType((*E2A6Param)(nil), "interface.e2.E2A6Param")
-	proto.RegisterType((*E2ReportParam)(nil), "interface.e2.E2ReportParam")
-	proto.RegisterType((*E2ReportConfig)(nil), "interface.e2.E2ReportConfig")
-	proto.RegisterType((*E2AddMeasId)(nil), "interface.e2.E2AddMeasId")
-	proto.RegisterType((*E2DelMeasId)(nil), "interface.e2.E2DelMeasId")
-	proto.RegisterType((*E2MeasIdActionChoice)(nil), "interface.e2.E2MeasIdActionChoice")
-	proto.RegisterType((*E2MeasIdAction)(nil), "interface.e2.E2MeasIdAction")
-	proto.RegisterType((*E2MeasID)(nil), "interface.e2.E2MeasID")
-	proto.RegisterType((*E2RRCMeasConfigAttribute)(nil), "interface.e2.E2RRCMeasConfigAttribute")
-	proto.RegisterType((*E2PCIARFCN)(nil), "interface.e2.E2PCIARFCN")
-	proto.RegisterType((*E2RXSigReport)(nil), "interface.e2.E2RXSigReport")
-	proto.RegisterType((*E2RxSigMeasReportAttribute)(nil), "interface.e2.E2RxSigMeasReportAttribute")
-	proto.RegisterType((*E2L2ReportInterval)(nil), "interface.e2.E2L2ReportInterval")
-	proto.RegisterType((*E2L2MeasConfigAttribute)(nil), "interface.e2.E2L2MeasConfigAttribute")
-	proto.RegisterType((*E2RadioRepPerServCell)(nil), "interface.e2.E2RadioRepPerServCell")
-	proto.RegisterType((*E2RadioMeasReportPerUEAttribute)(nil), "interface.e2.E2RadioMeasReportPerUEAttribute")
-	proto.RegisterType((*E2RadioMeasReportPerCellAttribute)(nil), "interface.e2.E2RadioMeasReportPerCellAttribute")
-	proto.RegisterType((*E2PRBUsage)(nil), "interface.e2.E2PRBUsage")
-	proto.RegisterType((*E2SchedMeasRepPerServCell)(nil), "interface.e2.E2SchedMeasRepPerServCell")
-	proto.RegisterType((*E2SchedMeasReportPerUEAttribute)(nil), "interface.e2.E2SchedMeasReportPerUEAttribute")
-	proto.RegisterType((*E2SchedMeasReportPerCellAttribute)(nil), "interface.e2.E2SchedMeasReportPerCellAttribute")
-	proto.RegisterType((*E2PDCPMeasReportPerUeAttribute)(nil), "interface.e2.E2PDCPMeasReportPerUeAttribute")
-	proto.RegisterType((*E2RRMConfigAttribute)(nil), "interface.e2.E2RRMConfigAttribute")
-	proto.RegisterType((*E2RRMConfigStatusAttribute)(nil), "interface.e2.E2RRMConfigStatusAttribute")
-	proto.RegisterType((*E2CACap)(nil), "interface.e2.E2CACap")
-	proto.RegisterType((*E2DCCap)(nil), "interface.e2.E2DCCap")
-	proto.RegisterType((*E2UECapabilityEnquiryAttribute)(nil), "interface.e2.E2UECapabilityEnquiryAttribute")
-	proto.RegisterType((*E2UECapabilityInfoAttribute)(nil), "interface.e2.E2UECapabilityInfoAttribute")
-	proto.RegisterType((*E2PropScell)(nil), "interface.e2.E2PropScell")
-	proto.RegisterType((*E2ScellAddAttribute)(nil), "interface.e2.E2ScellAddAttribute")
-	proto.RegisterType((*E2ScellAddStatusAttribute)(nil), "interface.e2.E2ScellAddStatusAttribute")
-	proto.RegisterType((*E2ScellDeleteAttribute)(nil), "interface.e2.E2ScellDeleteAttribute")
-	proto.RegisterType((*E2SeNBAddAttribute)(nil), "interface.e2.E2SeNBAddAttribute")
-	proto.RegisterType((*E2SeNBAddStatusAttribute)(nil), "interface.e2.E2SeNBAddStatusAttribute")
-	proto.RegisterType((*E2SeNBDeleteAttribute)(nil), "interface.e2.E2SeNBDeleteAttribute")
-	proto.RegisterType((*E2TrafficSplitPercentage)(nil), "interface.e2.E2TrafficSplitPercentage")
-	proto.RegisterType((*E2TrafficSplitConfigAttribute)(nil), "interface.e2.E2TrafficSplitConfigAttribute")
+	proto.RegisterType((*ECGI)(nil), "interface.e2.ECGI")
+	proto.RegisterType((*CandScell)(nil), "interface.e2.CandScell")
+	proto.RegisterType((*CellConfigRequest)(nil), "interface.e2.CellConfigRequest")
+	proto.RegisterType((*CellConfigReport)(nil), "interface.e2.CellConfigReport")
+	proto.RegisterType((*UEAdmissionRequest)(nil), "interface.e2.UEAdmissionRequest")
+	proto.RegisterType((*UEAdmissionResponse)(nil), "interface.e2.UEAdmissionResponse")
+	proto.RegisterType((*UEAdmissionStatus)(nil), "interface.e2.UEAdmissionStatus")
+	proto.RegisterType((*UEContextUpdate)(nil), "interface.e2.UEContextUpdate")
+	proto.RegisterType((*UEReconfigInd)(nil), "interface.e2.UEReconfigInd")
+	proto.RegisterType((*UEReleaseInd)(nil), "interface.e2.UEReleaseInd")
+	proto.RegisterType((*UEAMBR)(nil), "interface.e2.UEAMBR")
+	proto.RegisterType((*ERABParamsItem)(nil), "interface.e2.ERABParamsItem")
+	proto.RegisterType((*ERABResponseItem)(nil), "interface.e2.ERABResponseItem")
+	proto.RegisterType((*BearerAdmissionRequest)(nil), "interface.e2.BearerAdmissionRequest")
+	proto.RegisterType((*BearerAdmissionResponse)(nil), "interface.e2.BearerAdmissionResponse")
+	proto.RegisterType((*BearerAdmissionStatus)(nil), "interface.e2.BearerAdmissionStatus")
+	proto.RegisterType((*BearerReleaseInd)(nil), "interface.e2.BearerReleaseInd")
+	proto.RegisterType((*HORequest)(nil), "interface.e2.HORequest")
+	proto.RegisterType((*HOFailure)(nil), "interface.e2.HOFailure")
+	proto.RegisterType((*HOComplete)(nil), "interface.e2.HOComplete")
+	proto.RegisterType((*HOCause)(nil), "interface.e2.HOCause")
+	proto.RegisterType((*MeasCell)(nil), "interface.e2.MeasCell")
+	proto.RegisterType((*MeasObject)(nil), "interface.e2.MeasObject")
+	proto.RegisterType((*ReportParamChoice)(nil), "interface.e2.ReportParamChoice")
+	proto.RegisterType((*ThresholdEUTRAChoice)(nil), "interface.e2.ThresholdEUTRAChoice")
+	proto.RegisterType((*ThreasholdEUTRA)(nil), "interface.e2.ThreasholdEUTRA")
+	proto.RegisterType((*PerParam)(nil), "interface.e2.PerParam")
+	proto.RegisterType((*A1Param)(nil), "interface.e2.A1Param")
+	proto.RegisterType((*A2Param)(nil), "interface.e2.A2Param")
+	proto.RegisterType((*A3Param)(nil), "interface.e2.A3Param")
+	proto.RegisterType((*A4Param)(nil), "interface.e2.A4Param")
+	proto.RegisterType((*A5Param)(nil), "interface.e2.A5Param")
+	proto.RegisterType((*A6Param)(nil), "interface.e2.A6Param")
+	proto.RegisterType((*ReportParam)(nil), "interface.e2.ReportParam")
+	proto.RegisterType((*ReportConfig)(nil), "interface.e2.ReportConfig")
+	proto.RegisterType((*AddMeasId)(nil), "interface.e2.AddMeasId")
+	proto.RegisterType((*DelMeasId)(nil), "interface.e2.DelMeasId")
+	proto.RegisterType((*MeasIdActionChoice)(nil), "interface.e2.MeasIdActionChoice")
+	proto.RegisterType((*MeasIdAction)(nil), "interface.e2.MeasIdAction")
+	proto.RegisterType((*MeasID)(nil), "interface.e2.MeasID")
+	proto.RegisterType((*RRCMeasConfig)(nil), "interface.e2.RRCMeasConfig")
+	proto.RegisterType((*PCIARFCN)(nil), "interface.e2.PCIARFCN")
+	proto.RegisterType((*RXSigReport)(nil), "interface.e2.RXSigReport")
+	proto.RegisterType((*RxSigMeasReport)(nil), "interface.e2.RxSigMeasReport")
+	proto.RegisterType((*L2ReportInterval)(nil), "interface.e2.L2ReportInterval")
+	proto.RegisterType((*L2MeasConfig)(nil), "interface.e2.L2MeasConfig")
+	proto.RegisterType((*RadioRepPerServCell)(nil), "interface.e2.RadioRepPerServCell")
+	proto.RegisterType((*RadioMeasReportPerUE)(nil), "interface.e2.RadioMeasReportPerUE")
+	proto.RegisterType((*RadioMeasReportPerCell)(nil), "interface.e2.RadioMeasReportPerCell")
+	proto.RegisterType((*PRBUsage)(nil), "interface.e2.PRBUsage")
+	proto.RegisterType((*SchedMeasRepPerServCell)(nil), "interface.e2.SchedMeasRepPerServCell")
+	proto.RegisterType((*SchedMeasReportPerUE)(nil), "interface.e2.SchedMeasReportPerUE")
+	proto.RegisterType((*SchedMeasReportPerCell)(nil), "interface.e2.SchedMeasReportPerCell")
+	proto.RegisterType((*PDCPMeasReportPerUe)(nil), "interface.e2.PDCPMeasReportPerUe")
+	proto.RegisterType((*RRMConfig)(nil), "interface.e2.RRMConfig")
+	proto.RegisterType((*RRMConfigStatus)(nil), "interface.e2.RRMConfigStatus")
+	proto.RegisterType((*CACap)(nil), "interface.e2.CACap")
+	proto.RegisterType((*DCCap)(nil), "interface.e2.DCCap")
+	proto.RegisterType((*UECapabilityEnquiry)(nil), "interface.e2.UECapabilityEnquiry")
+	proto.RegisterType((*UECapabilityInfo)(nil), "interface.e2.UECapabilityInfo")
+	proto.RegisterType((*PropScell)(nil), "interface.e2.PropScell")
+	proto.RegisterType((*ScellAdd)(nil), "interface.e2.ScellAdd")
+	proto.RegisterType((*ScellAddStatus)(nil), "interface.e2.ScellAddStatus")
+	proto.RegisterType((*ScellDelete)(nil), "interface.e2.ScellDelete")
+	proto.RegisterType((*SeNBAdd)(nil), "interface.e2.SeNBAdd")
+	proto.RegisterType((*SeNBAddStatus)(nil), "interface.e2.SeNBAddStatus")
+	proto.RegisterType((*SeNBDelete)(nil), "interface.e2.SeNBDelete")
+	proto.RegisterType((*TrafficSplitPercentage)(nil), "interface.e2.TrafficSplitPercentage")
+	proto.RegisterType((*TrafficSplitConfig)(nil), "interface.e2.TrafficSplitConfig")
 }
 
 func init() { proto.RegisterFile("api/e2/e2-interface.proto", fileDescriptor_310687c643405aa4) }
 
 var fileDescriptor_310687c643405aa4 = []byte{
-	// 5320 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x7c, 0x4b, 0x6c, 0x24, 0x49,
-	0x5a, 0x70, 0x65, 0x95, 0x5f, 0x15, 0xb6, 0xbb, 0xb3, 0xa3, 0xdd, 0xdd, 0xee, 0x97, 0xdb, 0x9d,
-	0x33, 0x3b, 0xd3, 0xbf, 0x77, 0xb6, 0xa7, 0x9c, 0x7e, 0x4c, 0xcf, 0xec, 0xec, 0xcf, 0xa4, 0xb3,
-	0xd2, 0x5d, 0xc5, 0xda, 0x55, 0xe5, 0xc8, 0xcc, 0x9e, 0x19, 0x56, 0x6c, 0x6d, 0xba, 0x2a, 0xbb,
-	0x9d, 0x4c, 0xd6, 0xa3, 0x33, 0xb3, 0x66, 0xba, 0x05, 0x42, 0x08, 0x01, 0x12, 0x5a, 0x40, 0x73,
-	0x60, 0x17, 0x21, 0x2e, 0x80, 0x84, 0x78, 0x9c, 0xf6, 0x80, 0x00, 0xed, 0x81, 0x15, 0x42, 0x48,
-	0x2b, 0x24, 0xd0, 0x9e, 0x58, 0x90, 0x38, 0xc0, 0xcc, 0x01, 0x24, 0x2e, 0x5c, 0xb9, 0xa1, 0x78,
-	0xe4, 0x3b, 0xb2, 0xec, 0x6e, 0xc3, 0x70, 0xab, 0xf8, 0xde, 0x11, 0xf1, 0xc5, 0xf7, 0xc5, 0x17,
-	0xf9, 0xd9, 0xe0, 0xba, 0x35, 0x76, 0xde, 0xb4, 0xe5, 0x37, 0x6d, 0xf9, 0x2b, 0xce, 0x30, 0xb0,
-	0xbd, 0xc7, 0x56, 0xcf, 0xbe, 0x3f, 0xf6, 0x46, 0xc1, 0x08, 0x2e, 0xc5, 0x00, 0x5b, 0x96, 0x20,
-	0x10, 0x0d, 0xdb, 0xb5, 0x07, 0x76, 0xe0, 0x3d, 0x47, 0xf6, 0xd3, 0x89, 0xed, 0x07, 0x29, 0xd8,
-	0xa1, 0xed, 0xfb, 0xd6, 0x13, 0x5b, 0xba, 0x08, 0x96, 0xd5, 0xd1, 0x30, 0xf0, 0x46, 0xae, 0x39,
-	0xee, 0x5b, 0x81, 0x2d, 0x5d, 0x02, 0x17, 0x19, 0x00, 0xd9, 0xfe, 0x78, 0x34, 0xf4, 0x6d, 0xa9,
-	0x03, 0x2e, 0x6a, 0x32, 0x63, 0x68, 0xd8, 0x56, 0xdf, 0xf6, 0xe0, 0xd7, 0xc0, 0xe2, 0x80, 0x02,
-	0x8c, 0xe7, 0x63, 0x7b, 0x55, 0x58, 0x17, 0xee, 0x5d, 0x90, 0x6f, 0xde, 0x4f, 0x9a, 0x70, 0x3f,
-	0xe2, 0xc1, 0x24, 0x28, 0x49, 0x2f, 0xfd, 0xed, 0x2d, 0x20, 0x46, 0xe8, 0x8e, 0xf5, 0xdc, 0x1d,
-	0x59, 0x7d, 0xe8, 0x82, 0x1b, 0x3d, 0xdb, 0x75, 0xd5, 0xd1, 0xf0, 0xb1, 0xf3, 0x84, 0xd9, 0xac,
-	0x04, 0x81, 0xe7, 0x1c, 0x4f, 0x02, 0xaa, 0x62, 0x51, 0xde, 0xc8, 0xaa, 0x50, 0x0b, 0x39, 0x1a,
-	0x25, 0x34, 0x45, 0x1e, 0x74, 0xc0, 0xf5, 0x24, 0x76, 0x3c, 0xf2, 0x12, 0xca, 0xca, 0x44, 0xd9,
-	0xff, 0x9b, 0xa6, 0x2c, 0xc5, 0xd0, 0x28, 0xa1, 0x62, 0x69, 0x70, 0x04, 0x6e, 0x4e, 0x34, 0xa5,
-	0x3f, 0x70, 0x7c, 0xdf, 0x19, 0x0d, 0x73, 0x33, 0xab, 0x10, 0x65, 0x5f, 0xce, 0x2a, 0x33, 0x8b,
-	0x59, 0x1a, 0x25, 0x34, 0x4d, 0x22, 0xf4, 0xc0, 0xad, 0x14, 0x9a, 0xee, 0x63, 0xac, 0x71, 0x86,
-	0x68, 0x7c, 0x63, 0xaa, 0xc6, 0x0c, 0x4f, 0xa3, 0x84, 0xa6, 0xca, 0xc4, 0xbb, 0x97, 0xc0, 0xeb,
-	0x81, 0x15, 0x4c, 0xfc, 0x58, 0xe3, 0x2c, 0x7f, 0xf7, 0xcc, 0x42, 0x0e, 0xbc, 0x7b, 0xc5, 0xf2,
-	0xe0, 0x63, 0xb0, 0x3a, 0xd1, 0xb0, 0x9f, 0xda, 0xcf, 0x02, 0xea, 0xb8, 0xb1, 0xae, 0x39, 0xa2,
-	0xeb, 0x5e, 0x5e, 0x17, 0x9f, 0xbe, 0x51, 0x42, 0x85, 0xb2, 0xe0, 0xb7, 0xc0, 0xd5, 0x89, 0x86,
-	0xec, 0x1e, 0xd9, 0xd7, 0xe6, 0xb0, 0x1f, 0x6b, 0x99, 0x27, 0x5a, 0x5e, 0xcb, 0x6b, 0xe1, 0x51,
-	0x37, 0x4a, 0xa8, 0x40, 0x0e, 0xfc, 0x69, 0x70, 0x05, 0x63, 0x5c, 0xdb, 0xf2, 0xed, 0x94, 0x82,
-	0x05, 0xa2, 0xe0, 0x4b, 0x3c, 0x05, 0x39, 0xe2, 0x46, 0x09, 0xf1, 0xa5, 0xc0, 0x9f, 0x05, 0x77,
-	0x8e, 0x6d, 0xcb, 0xb3, 0xbd, 0x62, 0xff, 0xab, 0x12, 0x45, 0x6f, 0x66, 0x15, 0xed, 0x4d, 0x67,
-	0x6b, 0x94, 0xd0, 0x69, 0x92, 0xe1, 0xcf, 0x83, 0xf5, 0x1c, 0x49, 0xd6, 0x17, 0x01, 0xd1, 0x5e,
-	0x3b, 0x55, 0x7b, 0xde, 0x1f, 0x4f, 0x95, 0x0d, 0x9f, 0x81, 0xb5, 0x0c, 0x4d, 0xd6, 0x2f, 0x17,
-	0x89, 0xf6, 0xfb, 0xa7, 0x68, 0xcf, 0xfb, 0xe6, 0x29, 0x72, 0x71, 0x74, 0xa1, 0x14, 0xbc, 0x9d,
-	0x5d, 0xe2, 0x47, 0x97, 0xbd, 0x22, 0x06, 0x1c, 0x5d, 0x0a, 0xa5, 0x41, 0x03, 0xc0, 0x93, 0x76,
-	0x6e, 0x53, 0x97, 0x89, 0x0e, 0x29, 0xab, 0xa3, 0xd1, 0xe6, 0xec, 0x23, 0x87, 0x9f, 0x4a, 0xdd,
-	0xb7, 0x1c, 0x77, 0xe2, 0x25, 0x36, 0xeb, 0x42, 0x91, 0xd4, 0x2c, 0x25, 0x95, 0x9a, 0x85, 0xc2,
-	0xf7, 0xc1, 0xe5, 0x93, 0xb6, 0x3a, 0x1a, 0x8c, 0x5d, 0x3b, 0x79, 0x62, 0x2f, 0x12, 0xb1, 0xaf,
-	0xe4, 0xc5, 0xe6, 0x48, 0x1b, 0x25, 0xc4, 0x93, 0x00, 0x5b, 0x40, 0x3c, 0x69, 0xab, 0xd6, 0x24,
-	0xe9, 0x59, 0x22, 0x91, 0xba, 0xce, 0x91, 0x9a, 0xa2, 0x6b, 0x94, 0x50, 0x8e, 0x17, 0x9f, 0x7b,
-	0x0f, 0xa9, 0x87, 0xb6, 0xe5, 0xd3, 0x90, 0x1e, 0x4b, 0xbd, 0xc4, 0x3f, 0xf7, 0x88, 0x4b, 0x8d,
-	0xcf, 0x3d, 0x5f, 0x0e, 0x8e, 0x60, 0xde, 0x33, 0xdd, 0x79, 0x82, 0x71, 0xd9, 0xf4, 0x03, 0xf9,
-	0x11, 0x0c, 0x15, 0xd0, 0xe3, 0x08, 0x56, 0x24, 0x0b, 0xc7, 0x17, 0x57, 0xe6, 0x4d, 0xe4, 0x32,
-	0x3f, 0xbe, 0x1c, 0xc8, 0xfc, 0x79, 0xf0, 0xa5, 0x40, 0x0b, 0x5c, 0xf6, 0xac, 0xbe, 0x33, 0x8a,
-	0x55, 0x77, 0x6c, 0xcf, 0x5c, 0x5d, 0x21, 0xc2, 0xbf, 0x92, 0x9b, 0x41, 0x9e, 0x54, 0x4b, 0xed,
-	0x2d, 0x47, 0x16, 0x0e, 0x61, 0x79, 0x30, 0x4e, 0xc5, 0xf1, 0x5c, 0xae, 0xf0, 0x43, 0x18, 0x9a,
-	0xce, 0x86, 0x43, 0xd8, 0x29, 0x92, 0xe1, 0x04, 0xdc, 0xf6, 0x7b, 0x27, 0x76, 0xbf, 0xc8, 0xe8,
-	0xd5, 0xab, 0xfc, 0x99, 0xea, 0xd3, 0x98, 0x1a, 0x25, 0x34, 0x5d, 0x2a, 0x9e, 0x73, 0x9e, 0x20,
-	0x3d, 0xe7, 0x6b, 0xfc, 0x39, 0xeb, 0xd3, 0xd9, 0xf0, 0x9c, 0x4f, 0x91, 0x8c, 0xaf, 0x0f, 0xe3,
-	0xba, 0xda, 0x49, 0x1b, 0x97, 0x38, 0x58, 0xab, 0xfc, 0xeb, 0x43, 0x67, 0x0a, 0x0f, 0xbe, 0x3e,
-	0x4c, 0x93, 0x89, 0xe3, 0x8d, 0x87, 0x0e, 0xb3, 0x3e, 0x7a, 0x9d, 0x1f, 0x6f, 0x50, 0x8e, 0x12,
-	0xc7, 0x9b, 0x3c, 0x3f, 0x39, 0x64, 0x21, 0x34, 0x1b, 0xfa, 0x6f, 0x14, 0x1c, 0xb2, 0x02, 0x7a,
-	0x72, 0xc8, 0x0a, 0x70, 0xf4, 0xc2, 0xa5, 0x5a, 0x63, 0xeb, 0xd8, 0x71, 0x9d, 0xe0, 0xb9, 0x36,
-	0x7c, 0x3a, 0x71, 0xbc, 0xe7, 0xb1, 0xae, 0x9b, 0x45, 0x17, 0xae, 0x62, 0x1e, 0x7a, 0xe1, 0x2a,
-	0xc6, 0xe3, 0x14, 0x93, 0xc4, 0x37, 0x87, 0x8f, 0x47, 0xb1, 0xc2, 0x5b, 0xfc, 0x14, 0x63, 0x16,
-	0x31, 0xe0, 0x14, 0x53, 0x28, 0x0d, 0x1e, 0x81, 0x4b, 0x3e, 0xbe, 0xde, 0x2a, 0xfd, 0x44, 0x16,
-	0xbb, 0x4d, 0x54, 0xdc, 0xcd, 0xfb, 0x5f, 0x86, 0xb0, 0x51, 0x42, 0x79, 0x6e, 0xd8, 0x03, 0xd7,
-	0x42, 0x60, 0x76, 0x63, 0xd6, 0x88, 0xe0, 0xd7, 0x8b, 0x04, 0xe7, 0xf7, 0xa5, 0x48, 0x12, 0xfc,
-	0x29, 0xb0, 0x42, 0x50, 0x75, 0x3b, 0x9d, 0x6f, 0xee, 0x10, 0x0d, 0xaf, 0x72, 0x35, 0x64, 0x68,
-	0x1b, 0x25, 0xc4, 0x95, 0x81, 0x33, 0x8e, 0x6f, 0xb7, 0xf6, 0x52, 0x4b, 0xb2, 0xce, 0xcf, 0x38,
-	0x7a, 0x86, 0x0e, 0x67, 0x9c, 0x2c, 0x2f, 0xce, 0x38, 0x0c, 0x96, 0x5d, 0x8f, 0xbb, 0xfc, 0x8c,
-	0xa3, 0x73, 0xa9, 0x71, 0xc6, 0xe1, 0xcb, 0xc1, 0xc9, 0x17, 0x63, 0xb2, 0x8b, 0x21, 0xf1, 0x93,
-	0xaf, 0x9e, 0x27, 0xc5, 0x01, 0x9a, 0x23, 0x01, 0xd7, 0x37, 0x81, 0x67, 0x3d, 0x7e, 0xec, 0xf4,
-	0xf4, 0xb1, 0xeb, 0x04, 0xd9, 0x43, 0xfc, 0x0a, 0xbf, 0xbe, 0x31, 0x8a, 0x59, 0x70, 0x7d, 0x33,
-	0x45, 0xe2, 0xde, 0x12, 0x00, 0x56, 0x38, 0xf0, 0xa5, 0x9f, 0x03, 0xd5, 0xa8, 0x96, 0x84, 0x3b,
-	0x60, 0xee, 0x84, 0x94, 0xa8, 0xac, 0x60, 0xbc, 0x5d, 0x50, 0x93, 0xd2, 0x3a, 0x16, 0x31, 0x62,
-	0xf8, 0x00, 0xcc, 0x8f, 0x69, 0x19, 0xca, 0x6a, 0xbf, 0xb5, 0x02, 0x3e, 0x56, 0xac, 0xa2, 0x90,
-	0x5c, 0x32, 0xc1, 0xb2, 0x6e, 0x7b, 0x1f, 0x3b, 0x3d, 0x1b, 0xd9, 0xfe, 0xc4, 0x0d, 0xe0, 0x1a,
-	0x00, 0x1e, 0xf9, 0xa5, 0x8e, 0xfa, 0xb4, 0x6c, 0x9d, 0x45, 0x09, 0x08, 0x7c, 0x15, 0x2c, 0xd3,
-	0x11, 0x93, 0x48, 0x14, 0x56, 0x51, 0x1a, 0x28, 0x6d, 0x83, 0x39, 0x4d, 0xd6, 0xd4, 0x87, 0x4d,
-	0x78, 0x15, 0xcc, 0x8d, 0xdd, 0xc1, 0xb0, 0xd9, 0x27, 0xb2, 0xaa, 0x88, 0x8d, 0x20, 0x04, 0x33,
-	0x76, 0xcf, 0xe9, 0x33, 0x76, 0xf2, 0x5b, 0xfa, 0x2a, 0x58, 0xd4, 0x64, 0xd5, 0x1a, 0xf6, 0x89,
-	0x2b, 0x43, 0x11, 0x54, 0xc6, 0x3d, 0x87, 0xf1, 0xe1, 0x9f, 0xf0, 0x06, 0x58, 0xb0, 0x2d, 0xef,
-	0x71, 0x6f, 0x58, 0x77, 0x19, 0x63, 0x34, 0x96, 0x1a, 0xe0, 0xd6, 0xb4, 0x7a, 0x1a, 0xde, 0xc3,
-	0x0a, 0x9f, 0x38, 0x6c, 0x61, 0x57, 0xb2, 0x0b, 0x84, 0x8d, 0x45, 0x84, 0x42, 0xfa, 0x87, 0x19,
-	0x70, 0x73, 0x4a, 0xb5, 0x7c, 0x76, 0x49, 0xe1, 0x0c, 0xca, 0xf1, 0x0c, 0xde, 0x06, 0xa0, 0x17,
-	0x4e, 0xd0, 0x5f, 0xad, 0xac, 0x57, 0xee, 0x2d, 0xca, 0xd7, 0x73, 0x85, 0x7a, 0x48, 0x81, 0x12,
-	0xc4, 0xa9, 0xc9, 0xcf, 0xa4, 0x27, 0x1f, 0xe3, 0x4c, 0x97, 0x14, 0xab, 0x11, 0xce, 0x74, 0xe1,
-	0x3a, 0x58, 0xf4, 0x8e, 0xfd, 0x8e, 0xed, 0x19, 0x81, 0x53, 0x77, 0x49, 0x7d, 0x59, 0x45, 0x49,
-	0x50, 0x8a, 0xc2, 0x74, 0x49, 0x6d, 0x98, 0xa4, 0x30, 0x5d, 0x28, 0x81, 0xa5, 0xe1, 0x64, 0x60,
-	0x3c, 0x53, 0x86, 0x81, 0x3d, 0x1c, 0x5a, 0xa4, 0xba, 0xab, 0xa2, 0x14, 0x0c, 0x7b, 0x4e, 0x7f,
-	0x32, 0x76, 0xed, 0x67, 0x87, 0xd8, 0x73, 0xaa, 0x84, 0x22, 0x01, 0x81, 0xf7, 0x01, 0x1c, 0x58,
-	0xcf, 0x5a, 0x93, 0x81, 0x3a, 0x1a, 0x0e, 0xed, 0x5e, 0x60, 0xf7, 0x4d, 0xdb, 0x27, 0x05, 0x54,
-	0x15, 0x71, 0x30, 0x70, 0x17, 0x5c, 0xcd, 0x40, 0x69, 0x89, 0xe1, 0x93, 0xb2, 0xa7, 0x8a, 0x0a,
-	0xb0, 0x31, 0x9f, 0x69, 0xfb, 0xe4, 0x3a, 0x11, 0x4d, 0x7d, 0x29, 0xc9, 0x97, 0xc5, 0x16, 0xf1,
-	0x99, 0x2e, 0xa9, 0x46, 0x0a, 0xf8, 0x4c, 0x17, 0xde, 0x03, 0x17, 0xfb, 0xee, 0x63, 0x0a, 0xd4,
-	0x86, 0xd6, 0xb1, 0x4b, 0x0b, 0x8d, 0x2a, 0xca, 0x82, 0xa5, 0x3f, 0x11, 0xc0, 0xed, 0xa9, 0x2f,
-	0x23, 0x70, 0x05, 0xcc, 0xf6, 0xbc, 0x61, 0x10, 0x3a, 0x3d, 0x1d, 0x44, 0x0e, 0x57, 0x3e, 0xd5,
-	0xe1, 0x9a, 0xe0, 0x92, 0x15, 0x0a, 0xd7, 0xfc, 0x80, 0x94, 0x05, 0xe4, 0x85, 0x86, 0xf3, 0xbc,
-	0xa5, 0xf4, 0x07, 0x21, 0x09, 0xca, 0x73, 0x49, 0x7f, 0x26, 0x80, 0xb5, 0xe9, 0x8f, 0x2a, 0xe7,
-	0xb6, 0xd6, 0x00, 0x2b, 0x49, 0xbd, 0xa1, 0x02, 0x66, 0x70, 0x3e, 0x11, 0x4d, 0x7a, 0x3d, 0xdb,
-	0xf7, 0xdb, 0x1e, 0x2b, 0xcc, 0x10, 0x97, 0x5b, 0xfa, 0x9e, 0x80, 0x23, 0x41, 0xf1, 0xdb, 0xcc,
-	0xb9, 0xcd, 0xee, 0x00, 0x98, 0x54, 0x4c, 0xc5, 0x9f, 0xd9, 0x68, 0x0e, 0xaf, 0xf4, 0xa7, 0x02,
-	0xb8, 0x51, 0xfc, 0xc4, 0x73, 0x6e, 0x83, 0xd7, 0xc1, 0xe2, 0x60, 0x60, 0x9b, 0xb6, 0xbe, 0x69,
-	0x8d, 0x9b, 0x7d, 0x62, 0x69, 0x15, 0x25, 0x41, 0x98, 0xc2, 0x1e, 0x1e, 0x47, 0x14, 0x34, 0xbc,
-	0x24, 0x41, 0x38, 0x5e, 0x3b, 0x03, 0xdf, 0x61, 0xd1, 0x85, 0xfc, 0x96, 0xfe, 0x4a, 0x00, 0xab,
-	0x45, 0x6f, 0x46, 0x38, 0x24, 0x11, 0x3b, 0xdb, 0x6e, 0x18, 0xfa, 0xa3, 0xf1, 0x0b, 0x98, 0x1e,
-	0x4a, 0x69, 0xd9, 0x9f, 0x30, 0xbb, 0xa3, 0x31, 0x54, 0x71, 0x2a, 0xa2, 0x9a, 0xa9, 0xa3, 0xcf,
-	0x90, 0x2d, 0xc8, 0xe5, 0x4c, 0x94, 0x24, 0x42, 0x69, 0x1e, 0xe9, 0x77, 0x04, 0x70, 0xad, 0xe0,
-	0x59, 0xea, 0xdc, 0xeb, 0xfe, 0x1e, 0x58, 0xf2, 0xa8, 0xd8, 0xe4, 0x41, 0xbc, 0x95, 0xb7, 0x2f,
-	0xa6, 0x41, 0x29, 0x0e, 0xe9, 0x1d, 0xb0, 0x40, 0x5c, 0xf9, 0x70, 0x0f, 0xe1, 0x4c, 0x6a, 0x0d,
-	0x8e, 0xbd, 0xba, 0x1b, 0x66, 0x52, 0x3a, 0x0a, 0xe1, 0x66, 0x98, 0x12, 0xd9, 0x48, 0xfa, 0xd5,
-	0x32, 0x10, 0x35, 0x59, 0x43, 0xca, 0x5e, 0xc7, 0xf2, 0xac, 0x81, 0xdf, 0x0c, 0xec, 0x01, 0xbc,
-	0x00, 0xca, 0x4e, 0xb8, 0x1f, 0x65, 0xa7, 0x0f, 0xbf, 0x0a, 0xaa, 0x7d, 0xc7, 0xb3, 0x7b, 0x81,
-	0x33, 0x1a, 0x12, 0x7e, 0xce, 0xfa, 0x61, 0x11, 0xf5, 0x90, 0x08, 0xc5, 0xf4, 0xf0, 0x0d, 0x30,
-	0x13, 0x3c, 0x1f, 0x87, 0xf3, 0x5a, 0xe5, 0xf1, 0x91, 0xc7, 0x73, 0x42, 0x85, 0x93, 0xe1, 0xd3,
-	0x9e, 0xc3, 0x7c, 0x0b, 0xff, 0xc4, 0x10, 0xcb, 0x1b, 0x33, 0x97, 0xc2, 0x3f, 0xf1, 0x8a, 0x3f,
-	0x21, 0x53, 0xa4, 0x59, 0x8a, 0x0e, 0x18, 0x34, 0xca, 0x4c, 0x74, 0x80, 0xa1, 0x74, 0x39, 0x68,
-	0x32, 0xa2, 0x03, 0x06, 0x35, 0x5d, 0x96, 0x80, 0xe8, 0x40, 0x3a, 0x06, 0x90, 0xda, 0x13, 0x46,
-	0x09, 0xee, 0x62, 0xbc, 0x0b, 0x16, 0xfa, 0x76, 0xcf, 0xf1, 0xe3, 0xb5, 0x38, 0xfd, 0x38, 0x47,
-	0x1c, 0xd2, 0x7f, 0x09, 0xe0, 0xee, 0xa9, 0xef, 0x8e, 0xe7, 0xf6, 0xa9, 0xfb, 0x60, 0x6e, 0x62,
-	0x2b, 0x83, 0x63, 0x8f, 0x3d, 0xbc, 0x5f, 0xe5, 0x3c, 0x4a, 0x1f, 0xee, 0x21, 0xc4, 0xa8, 0x58,
-	0xe6, 0xd6, 0x3c, 0xeb, 0xd8, 0x3f, 0x70, 0xfc, 0x80, 0x2d, 0x7f, 0x0a, 0x06, 0xdf, 0x03, 0x8b,
-	0x36, 0x1e, 0x50, 0x3f, 0x59, 0x9d, 0x25, 0xb7, 0x92, 0x35, 0xde, 0x76, 0xc6, 0x9e, 0x84, 0x92,
-	0x2c, 0xd2, 0xdf, 0x0b, 0x40, 0x3a, 0xfd, 0xd5, 0xf3, 0xdc, 0x93, 0xcf, 0x4e, 0xa6, 0xc2, 0x99,
-	0x4c, 0x1d, 0x2c, 0x61, 0xcb, 0xa2, 0x64, 0x32, 0x43, 0x66, 0xb3, 0xce, 0x9b, 0x4d, 0xd2, 0x19,
-	0x50, 0x8a, 0x4b, 0xfa, 0xa1, 0x00, 0xd6, 0x4f, 0x7b, 0x48, 0xfd, 0x42, 0xa6, 0xf3, 0x1e, 0x00,
-	0xd8, 0x30, 0x96, 0x64, 0xce, 0x3a, 0x99, 0x04, 0x0f, 0x8e, 0x70, 0x37, 0xa7, 0x3c, 0xcf, 0x7e,
-	0x21, 0xb3, 0x58, 0x05, 0xf3, 0xd8, 0xa2, 0x66, 0x9f, 0x4e, 0xa1, 0x8a, 0xc2, 0xa1, 0xf4, 0x4b,
-	0x02, 0x58, 0xe1, 0x3d, 0xec, 0x16, 0x98, 0xb5, 0x01, 0x66, 0xb1, 0x52, 0x7d, 0xaa, 0x5d, 0x94,
-	0x24, 0xa4, 0x35, 0xd8, 0x49, 0x99, 0x42, 0x6b, 0x48, 0xbf, 0xc0, 0xcc, 0xc8, 0xbd, 0xf9, 0x9e,
-	0xdf, 0x8c, 0xd7, 0xc0, 0x85, 0x93, 0x11, 0x93, 0x1b, 0xe7, 0x81, 0x2a, 0xca, 0x40, 0xa5, 0x6f,
-	0x0b, 0xe0, 0x0a, 0xf7, 0xd5, 0x38, 0x95, 0x04, 0x85, 0x4c, 0x12, 0xfc, 0xdf, 0x5a, 0x90, 0x1f,
-	0x0b, 0x38, 0x64, 0x66, 0x5f, 0x9b, 0xbf, 0xd8, 0x5d, 0xc1, 0x6e, 0x73, 0x32, 0x8a, 0x73, 0x7b,
-	0x15, 0x85, 0x43, 0xf8, 0x36, 0xa8, 0x9e, 0x8c, 0x0c, 0xcf, 0x79, 0xf2, 0xc4, 0xf6, 0x58, 0xc0,
-	0xca, 0x5d, 0x70, 0xd1, 0x07, 0x7a, 0x58, 0xbc, 0xa1, 0x98, 0x5a, 0x42, 0x00, 0x68, 0xf4, 0x31,
-	0x98, 0x5f, 0x64, 0xca, 0x60, 0x05, 0x17, 0x5c, 0xcd, 0x61, 0xdf, 0xf9, 0xd8, 0xe9, 0x4f, 0x2c,
-	0xb7, 0xfd, 0xf8, 0xb1, 0x6f, 0x07, 0x2c, 0xbb, 0x72, 0x71, 0xd2, 0x37, 0xc1, 0x12, 0x95, 0xd9,
-	0x3e, 0xfe, 0x19, 0xbb, 0x17, 0xe0, 0x9c, 0xdc, 0x77, 0xf7, 0x3d, 0xfb, 0x69, 0x98, 0xab, 0xe9,
-	0x08, 0xee, 0x82, 0xea, 0x80, 0x69, 0xf6, 0x57, 0xcb, 0xc4, 0xec, 0xd5, 0x7c, 0xa9, 0x4e, 0x09,
-	0x50, 0x4c, 0x2a, 0x7d, 0xa7, 0x02, 0x2e, 0xe3, 0x8b, 0x02, 0x79, 0x7a, 0xc4, 0x21, 0x57, 0x3d,
-	0x19, 0x39, 0x3d, 0x1b, 0xee, 0x82, 0x85, 0xb1, 0xed, 0x11, 0x08, 0x2b, 0x47, 0x73, 0xe2, 0x3a,
-	0x0c, 0xdf, 0x28, 0xa1, 0x88, 0x16, 0x6e, 0x81, 0x79, 0x6b, 0x93, 0xb2, 0xd1, 0x2d, 0xbb, 0x96,
-	0xab, 0x0e, 0x36, 0x43, 0xae, 0x90, 0x92, 0x30, 0xc9, 0x94, 0xa9, 0x52, 0xc0, 0x24, 0xc7, 0x4c,
-	0x72, 0xcc, 0xb4, 0x45, 0x99, 0x66, 0x0a, 0x98, 0xb6, 0x62, 0xa6, 0xad, 0x98, 0x69, 0x9b, 0x32,
-	0xcd, 0x16, 0x30, 0x6d, 0xc7, 0x4c, 0xdb, 0x31, 0xd3, 0x0e, 0x65, 0x9a, 0x2b, 0x60, 0xda, 0x89,
-	0x99, 0x76, 0x62, 0xa6, 0x5d, 0xca, 0x34, 0x5f, 0xc0, 0xb4, 0x1b, 0x33, 0xd1, 0x9f, 0x7b, 0x0b,
-	0x60, 0xae, 0x47, 0xd6, 0x5f, 0xf2, 0xc0, 0x55, 0x4d, 0x36, 0x4e, 0x3c, 0xdb, 0x3f, 0x19, 0xb9,
-	0x7d, 0xcd, 0x34, 0x90, 0xc2, 0x76, 0xe6, 0x35, 0xb0, 0x1c, 0x84, 0x70, 0xa4, 0xa3, 0x0e, 0x75,
-	0x84, 0x46, 0x09, 0xa5, 0xc1, 0x59, 0xba, 0x23, 0xea, 0x66, 0x59, 0xba, 0xa3, 0x84, 0xce, 0x5f,
-	0x17, 0xc0, 0x25, 0xaa, 0xd4, 0x8a, 0xb5, 0xc2, 0x77, 0xc0, 0xfc, 0xd8, 0xb3, 0x7d, 0x7b, 0x18,
-	0xb0, 0x76, 0x86, 0x5c, 0x92, 0x48, 0x9b, 0xd9, 0x41, 0x28, 0x64, 0x80, 0xef, 0x86, 0xb2, 0x99,
-	0x33, 0xbc, 0x3a, 0x9d, 0x95, 0xce, 0x10, 0x85, 0xf6, 0x1c, 0xe3, 0xf3, 0x14, 0x7a, 0x19, 0x34,
-	0x80, 0xe8, 0x11, 0x37, 0x6d, 0x62, 0x11, 0x1f, 0x5b, 0xee, 0xa1, 0xcf, 0x0c, 0xba, 0x57, 0xe4,
-	0x99, 0x28, 0x43, 0x8f, 0x72, 0x12, 0xa4, 0x16, 0xa8, 0x46, 0x2e, 0x09, 0x15, 0xb0, 0x68, 0x6d,
-	0x46, 0x26, 0x31, 0xbf, 0xbf, 0xc3, 0xb3, 0x39, 0xb1, 0x40, 0x28, 0xc9, 0xc3, 0xe4, 0xc9, 0xb1,
-	0x3c, 0xf9, 0x25, 0xe4, 0xc5, 0x3c, 0xd2, 0xeb, 0x44, 0x1e, 0xf3, 0xde, 0x1b, 0x60, 0xc1, 0xda,
-	0x62, 0x41, 0x83, 0x85, 0xeb, 0x70, 0xcc, 0x14, 0x6f, 0xc7, 0x8a, 0xb7, 0x5f, 0x42, 0x71, 0xcc,
-	0x23, 0x7d, 0x47, 0x20, 0x02, 0x99, 0x37, 0xab, 0x60, 0xc9, 0xda, 0x89, 0x90, 0x9b, 0x67, 0x95,
-	0x98, 0x62, 0xca, 0x08, 0x91, 0x99, 0x4f, 0xbc, 0x90, 0x10, 0x99, 0x2d, 0xc8, 0x6e, 0xbc, 0x20,
-	0xbb, 0x99, 0x05, 0x61, 0x63, 0xe9, 0xdf, 0x05, 0xb0, 0x9c, 0x8a, 0x6c, 0xf0, 0xad, 0xac, 0x27,
-	0x73, 0x0a, 0xba, 0x88, 0x3a, 0xe9, 0xc6, 0x6f, 0x67, 0xdc, 0xf8, 0xee, 0x14, 0xbe, 0xb4, 0x0f,
-	0xc3, 0x35, 0x00, 0x4e, 0x9e, 0xfb, 0x81, 0xed, 0xd9, 0xbe, 0xe3, 0xb3, 0xfc, 0x9c, 0x80, 0xe0,
-	0x52, 0x33, 0x70, 0x06, 0x76, 0x30, 0x0a, 0x58, 0xca, 0x29, 0x28, 0x35, 0x0d, 0x67, 0x60, 0x1b,
-	0x61, 0xa6, 0x41, 0x69, 0x1e, 0xe9, 0x5f, 0x05, 0x70, 0x21, 0x34, 0x82, 0xbe, 0x2c, 0xc2, 0x9f,
-	0xc0, 0x15, 0x62, 0x64, 0x94, 0xcf, 0x36, 0xec, 0xe6, 0x14, 0xc3, 0x51, 0x8a, 0x01, 0x36, 0xc1,
-	0x45, 0x26, 0xfe, 0x68, 0x62, 0x0d, 0x03, 0x27, 0x78, 0xce, 0x2a, 0x97, 0xfc, 0x7e, 0xa5, 0xc9,
-	0x50, 0x96, 0x8f, 0x96, 0xd3, 0x58, 0xf4, 0xd1, 0xc4, 0x72, 0xb1, 0xa0, 0xca, 0xb4, 0xd5, 0x67,
-	0x44, 0x28, 0xcd, 0x23, 0x7d, 0x19, 0x2c, 0x6a, 0xb2, 0xd2, 0x27, 0xdf, 0xe7, 0x9a, 0x7d, 0x78,
-	0x0b, 0x54, 0xad, 0x70, 0xb0, 0x2a, 0x90, 0x9b, 0x5f, 0x0c, 0xa0, 0xc4, 0x75, 0xdb, 0x8d, 0x89,
-	0xfb, 0xe1, 0x20, 0x24, 0x8e, 0x00, 0xd2, 0x5f, 0x90, 0x1b, 0x1a, 0x1d, 0x28, 0xa4, 0xfe, 0x64,
-	0x91, 0xf6, 0xed, 0xb4, 0x0e, 0x81, 0xf7, 0xa2, 0x1a, 0x59, 0xd4, 0x28, 0x25, 0x0c, 0xc0, 0xac,
-	0xb1, 0xc6, 0x32, 0x9f, 0x35, 0xb2, 0x0f, 0xb3, 0x46, 0xd4, 0x70, 0x1d, 0x80, 0x93, 0x51, 0x30,
-	0x0a, 0x2c, 0xef, 0x89, 0xcd, 0xee, 0xbc, 0x8d, 0x12, 0x4a, 0xc0, 0x12, 0x11, 0xfb, 0x57, 0xc8,
-	0xc6, 0x27, 0x4d, 0x27, 0x2f, 0xf6, 0x29, 0x27, 0x5f, 0xe3, 0x5d, 0x03, 0x42, 0xf2, 0xa4, 0x97,
-	0xbf, 0x93, 0xf1, 0x72, 0x69, 0x1a, 0x63, 0x26, 0x54, 0xff, 0x9a, 0x00, 0x16, 0x18, 0x41, 0x1d,
-	0xdf, 0xdb, 0x07, 0xd1, 0x8d, 0x25, 0x7a, 0x9f, 0x4f, 0xc1, 0xf0, 0xdd, 0xd5, 0x4b, 0xf8, 0x6b,
-	0x33, 0x7c, 0xaf, 0xcf, 0x40, 0xe1, 0x36, 0x98, 0xb3, 0xe8, 0x1b, 0x02, 0xbd, 0x19, 0xdc, 0x9a,
-	0x66, 0x14, 0x62, 0xb4, 0xd2, 0x6f, 0x94, 0xc1, 0x6a, 0x51, 0xef, 0xc1, 0x0b, 0xbc, 0xb2, 0x47,
-	0x77, 0xd2, 0x32, 0xf1, 0x19, 0x76, 0x27, 0x7d, 0x17, 0x2c, 0xc6, 0x53, 0x09, 0x9f, 0xda, 0x6f,
-	0xf0, 0xec, 0xa2, 0x24, 0x28, 0x49, 0x0e, 0xf7, 0xc2, 0xc3, 0x40, 0xcd, 0x0a, 0x2b, 0xaf, 0x5b,
-	0xfc, 0xc3, 0xc0, 0xbe, 0x13, 0xa4, 0x59, 0x60, 0x0d, 0xcc, 0x0f, 0xc8, 0xb4, 0xc3, 0x92, 0xfa,
-	0x2a, 0x77, 0x55, 0xea, 0x28, 0x24, 0x93, 0xde, 0x21, 0xa9, 0x54, 0x6d, 0x2a, 0x68, 0x5f, 0x6d,
-	0xbd, 0xe0, 0xf7, 0x8f, 0xdf, 0xa2, 0x81, 0x34, 0xbe, 0xf3, 0xc2, 0x6d, 0xb0, 0x30, 0xee, 0x39,
-	0x0a, 0xc6, 0x17, 0x5e, 0x0e, 0x99, 0x2e, 0x14, 0x51, 0xbe, 0x40, 0xe1, 0x07, 0xc1, 0x8c, 0xe7,
-	0x7b, 0x63, 0x16, 0x2e, 0xc9, 0x6f, 0x06, 0x7b, 0xca, 0xae, 0xeb, 0xe4, 0xb7, 0xf4, 0x7b, 0xe4,
-	0x75, 0xb3, 0xa8, 0xfd, 0x23, 0x59, 0x52, 0x54, 0x5e, 0xa6, 0xfe, 0x54, 0xc1, 0x05, 0x7c, 0x27,
-	0x8f, 0x45, 0xb3, 0xbd, 0x9e, 0x5a, 0x0f, 0x64, 0x58, 0xa4, 0xff, 0xa8, 0xe0, 0x72, 0xe7, 0x40,
-	0x4e, 0xdf, 0x45, 0xe0, 0x37, 0xc0, 0x95, 0x80, 0xd3, 0xf5, 0x11, 0xb6, 0x8c, 0x16, 0xb4, 0x9f,
-	0xa4, 0x85, 0xf8, 0x88, 0x2f, 0x03, 0x76, 0xc1, 0xb5, 0x80, 0xdf, 0xe3, 0xc1, 0x62, 0xf8, 0x19,
-	0xc5, 0x17, 0x49, 0x21, 0xd6, 0x73, 0x3a, 0x39, 0xc2, 0x07, 0xbb, 0x33, 0x5b, 0xcf, 0x93, 0x41,
-	0xac, 0xe7, 0x77, 0x6b, 0xb0, 0xe4, 0x78, 0x66, 0xeb, 0xf9, 0x52, 0xe0, 0x87, 0x60, 0x25, 0xe8,
-	0xf4, 0x7b, 0xe3, 0xac, 0xf1, 0xb3, 0x2f, 0x22, 0x9d, 0x2b, 0x42, 0xfa, 0x03, 0xf2, 0xe8, 0xcb,
-	0xed, 0x15, 0x3a, 0x77, 0xdc, 0xf9, 0x49, 0x70, 0x31, 0x7d, 0x7d, 0xf5, 0x59, 0x4c, 0x5c, 0xcf,
-	0x5b, 0x9c, 0xb6, 0x16, 0x65, 0x19, 0xa5, 0x1f, 0x90, 0x27, 0x01, 0xb2, 0xbb, 0xc8, 0x1e, 0x77,
-	0x6c, 0x4f, 0xb7, 0xbd, 0x8f, 0xc9, 0xe2, 0x9c, 0xdd, 0xca, 0x55, 0x30, 0xdf, 0x7b, 0xea, 0x34,
-	0x1c, 0x3f, 0x60, 0x76, 0x86, 0x43, 0x5c, 0xa4, 0x7a, 0x14, 0x51, 0x21, 0x08, 0x36, 0x82, 0xaf,
-	0x82, 0xe5, 0xf1, 0xc4, 0xef, 0x9d, 0xe8, 0xce, 0xd0, 0x6b, 0xd0, 0x37, 0x43, 0x8c, 0x4e, 0x03,
-	0x29, 0x55, 0x2f, 0x41, 0x35, 0x1b, 0x52, 0x25, 0x80, 0xd2, 0xf7, 0x05, 0x70, 0xe7, 0x94, 0xc6,
-	0xa9, 0x97, 0x5b, 0xf1, 0xc4, 0xeb, 0xc3, 0xfb, 0x60, 0xc5, 0x63, 0x4b, 0x34, 0xf2, 0x82, 0x70,
-	0x89, 0xc2, 0x90, 0xff, 0x0a, 0xb7, 0xad, 0x2a, 0xbd, 0x9c, 0x88, 0x2b, 0x40, 0xfa, 0x63, 0xf2,
-	0xa2, 0x7b, 0x4a, 0x1b, 0xd6, 0x0b, 0x98, 0xbf, 0x01, 0x44, 0xb2, 0x86, 0xcd, 0x61, 0xf0, 0xb8,
-	0xf3, 0x89, 0x97, 0xd8, 0x93, 0x1c, 0x1c, 0xde, 0x07, 0x90, 0xac, 0x24, 0x81, 0x8d, 0x3e, 0xb1,
-	0xbd, 0xc4, 0x46, 0x71, 0x30, 0xd2, 0x01, 0x49, 0x1d, 0x68, 0xcf, 0x24, 0x7d, 0x04, 0x6b, 0x00,
-	0x8c, 0xbd, 0x63, 0xf2, 0x9b, 0x7c, 0x2f, 0xc0, 0x5c, 0x09, 0x48, 0x12, 0x4f, 0xbe, 0x1b, 0xa4,
-	0xf0, 0xa6, 0x2b, 0xfd, 0x4d, 0x19, 0x5c, 0x4f, 0x37, 0x63, 0xbd, 0xb4, 0xf3, 0x3d, 0xed, 0x39,
-	0x8f, 0x2c, 0xf6, 0xda, 0x51, 0x45, 0xe1, 0x90, 0x24, 0x27, 0xa6, 0x8f, 0x9d, 0x8f, 0x7c, 0x72,
-	0x62, 0xb3, 0x41, 0x11, 0x25, 0x79, 0xdd, 0xef, 0xf9, 0xe4, 0x03, 0x38, 0x39, 0x72, 0x64, 0x80,
-	0x6f, 0x29, 0xc3, 0xc9, 0x80, 0x58, 0x6b, 0x04, 0x0e, 0x46, 0x53, 0x5f, 0xcc, 0x40, 0x19, 0xb7,
-	0xe9, 0xae, 0xce, 0x45, 0xdc, 0x66, 0x8e, 0x9b, 0x7c, 0x66, 0xc8, 0x71, 0x9b, 0x2e, 0x9e, 0x8b,
-	0x67, 0x0d, 0x3f, 0xaa, 0xbb, 0x9b, 0xab, 0x0b, 0x74, 0x2e, 0x6c, 0x18, 0x63, 0xe4, 0xd5, 0x6a,
-	0x12, 0x23, 0x4b, 0x7f, 0x49, 0xdc, 0x7f, 0x6a, 0x37, 0xdd, 0xb9, 0xdd, 0xff, 0x1b, 0x60, 0x85,
-	0xb4, 0xc4, 0xf1, 0xdd, 0xff, 0xf5, 0x69, 0x1d, 0x76, 0xa9, 0x23, 0xc0, 0x13, 0x22, 0xfd, 0x1b,
-	0x39, 0x02, 0xa7, 0x74, 0xe5, 0xfd, 0x8f, 0x38, 0xc4, 0xff, 0x07, 0xcb, 0xe1, 0x36, 0x77, 0x70,
-	0x72, 0x3e, 0xd5, 0x2b, 0xd2, 0xe4, 0x49, 0x7e, 0xd2, 0x30, 0xc1, 0x9e, 0x9b, 0xce, 0xc0, 0x4f,
-	0xc8, 0xa5, 0xef, 0x56, 0xc0, 0xda, 0xf4, 0x2e, 0xc0, 0x73, 0xef, 0x54, 0x62, 0xf2, 0x95, 0xf4,
-	0xe4, 0x71, 0xe9, 0x63, 0x05, 0xd6, 0xa3, 0x91, 0x1b, 0xf9, 0x76, 0x0c, 0x48, 0x60, 0xcd, 0xd0,
-	0xb5, 0x63, 0x00, 0x39, 0xcb, 0x1f, 0x05, 0x75, 0xdb, 0xb5, 0x9e, 0xd7, 0x43, 0xd7, 0x4e, 0x40,
-	0x48, 0xd4, 0xf9, 0x28, 0xa8, 0x3b, 0x7e, 0xcf, 0xf2, 0xfa, 0xc8, 0x0a, 0x70, 0x44, 0x98, 0x67,
-	0x51, 0x27, 0x03, 0x27, 0x41, 0xfd, 0xa3, 0xe0, 0x60, 0xe4, 0xfb, 0x8c, 0x70, 0x81, 0x05, 0xf5,
-	0x24, 0x30, 0x43, 0x45, 0xbe, 0xb5, 0x65, 0xa9, 0x68, 0xcf, 0x48, 0x70, 0xe2, 0x8d, 0x26, 0x4f,
-	0x4e, 0xc6, 0x93, 0xa0, 0xee, 0xae, 0x02, 0x42, 0x94, 0x82, 0xa5, 0x69, 0x4c, 0x77, 0x75, 0x31,
-	0x4b, 0x63, 0xba, 0xd2, 0x1f, 0x56, 0x70, 0xe1, 0x97, 0x6f, 0x9a, 0x3c, 0x77, 0xa6, 0x4e, 0xde,
-	0x8f, 0x2b, 0x67, 0xbe, 0x1f, 0xbf, 0x0e, 0xca, 0x63, 0x85, 0xec, 0xd1, 0x85, 0xfc, 0x63, 0xe1,
-	0x07, 0x4d, 0xb5, 0xa9, 0x76, 0x14, 0x54, 0x1e, 0x2b, 0x78, 0x5f, 0xfc, 0xc0, 0xf2, 0x82, 0x8e,
-	0x77, 0x1c, 0x45, 0xa4, 0x04, 0x84, 0x5c, 0xe6, 0x87, 0x7d, 0x8a, 0xa5, 0xbb, 0x16, 0x8d, 0xe1,
-	0x1b, 0xe0, 0x92, 0x3f, 0x39, 0xde, 0xf7, 0xac, 0x81, 0xbd, 0xe7, 0x04, 0x03, 0xcb, 0xff, 0x28,
-	0xda, 0xb4, 0x3c, 0x02, 0xfb, 0xc7, 0xb8, 0x66, 0xda, 0x1d, 0x9c, 0x43, 0xd8, 0x8e, 0xc5, 0x80,
-	0xa4, 0x1d, 0xd1, 0x56, 0x25, 0x20, 0xb1, 0x1d, 0x66, 0xb8, 0x47, 0xd1, 0x98, 0x63, 0x47, 0xb4,
-	0x49, 0x79, 0x84, 0xf4, 0x5d, 0x7a, 0xd1, 0x2f, 0x6a, 0x33, 0x3d, 0xef, 0x7e, 0x3d, 0x00, 0x73,
-	0x7e, 0xd8, 0x6b, 0x51, 0x39, 0xd3, 0xc7, 0x59, 0x46, 0x2f, 0xfd, 0xb5, 0x00, 0xe6, 0x35, 0x59,
-	0x55, 0x54, 0x8b, 0x54, 0x28, 0xc7, 0xd6, 0x30, 0x2c, 0x77, 0xc9, 0x6f, 0xf8, 0x0e, 0xa8, 0xf6,
-	0xac, 0x9e, 0x6b, 0xf9, 0x7e, 0x3f, 0xbc, 0x7b, 0xe7, 0x2a, 0x3d, 0xc2, 0xad, 0x62, 0x9a, 0xba,
-	0x8b, 0x62, 0xf2, 0x04, 0xef, 0xc4, 0x2d, 0xfa, 0xc2, 0x1f, 0xf3, 0x9a, 0x31, 0xef, 0x84, 0x2c,
-	0x6f, 0xcf, 0x1b, 0xf9, 0xbe, 0x6a, 0x79, 0x9e, 0x63, 0x7b, 0x24, 0xcc, 0xb2, 0xd2, 0x29, 0x8f,
-	0x90, 0xbe, 0x8e, 0x27, 0x51, 0x57, 0xf1, 0x24, 0xde, 0x03, 0x4b, 0x7d, 0xef, 0xd8, 0x78, 0x3e,
-	0xb6, 0x49, 0x87, 0x21, 0x2b, 0x47, 0x72, 0x7a, 0x09, 0x71, 0x9d, 0x12, 0xa2, 0x14, 0x87, 0xf4,
-	0x2d, 0xda, 0xdd, 0x33, 0xa5, 0x43, 0xf7, 0x9c, 0xdf, 0x05, 0xa5, 0x3f, 0x27, 0xdf, 0x1d, 0x0b,
-	0x7b, 0x76, 0xcf, 0xfd, 0xdd, 0xf1, 0xcb, 0x60, 0xb6, 0x67, 0xa9, 0xd6, 0x98, 0x9d, 0xdd, 0x2b,
-	0xdc, 0x45, 0x47, 0x94, 0x06, 0x13, 0xf7, 0x7b, 0x98, 0x78, 0x86, 0x4f, 0x4c, 0x56, 0x0a, 0x51,
-	0x1a, 0xe9, 0x9f, 0x05, 0xb0, 0xa8, 0xc9, 0x1d, 0x6f, 0x34, 0xa6, 0x8d, 0x88, 0x2f, 0x57, 0x48,
-	0x3f, 0x00, 0xd7, 0x72, 0x7b, 0xc8, 0xfa, 0xc3, 0x68, 0x56, 0x28, 0x42, 0xc3, 0xaf, 0x81, 0xc5,
-	0x9e, 0x15, 0x75, 0x5c, 0x14, 0xf5, 0x6f, 0xa9, 0x4a, 0xdc, 0x94, 0x91, 0xa4, 0x27, 0x8d, 0x78,
-	0xb6, 0xd5, 0x0b, 0x0c, 0x67, 0xc0, 0x5e, 0x2a, 0xab, 0x28, 0x01, 0x91, 0x3e, 0x15, 0xc0, 0x65,
-	0x4e, 0xa7, 0xf3, 0xb9, 0x37, 0xe4, 0x6d, 0x00, 0x48, 0xaf, 0xb1, 0x8f, 0x57, 0xae, 0xa8, 0xb7,
-	0x31, 0x5a, 0x55, 0x94, 0x20, 0x96, 0xfe, 0x4e, 0xa0, 0xf7, 0x4d, 0x7e, 0x23, 0xf4, 0x79, 0x0d,
-	0xdb, 0x05, 0x55, 0xaa, 0xab, 0x39, 0xec, 0x33, 0xbb, 0x8a, 0x37, 0x30, 0x26, 0x4d, 0x04, 0x9c,
-	0x99, 0x17, 0x0c, 0x38, 0x9f, 0x0a, 0xe0, 0x2a, 0xbf, 0x23, 0xfb, 0xff, 0x6a, 0x32, 0xd2, 0x2f,
-	0x92, 0x0f, 0xba, 0xd9, 0x66, 0xee, 0xe2, 0x0f, 0xba, 0x03, 0xed, 0x34, 0x7b, 0x28, 0x09, 0xa6,
-	0xf5, 0x09, 0xed, 0xd4, 0x0f, 0xba, 0x84, 0x44, 0xfa, 0x4d, 0xd2, 0x31, 0xc6, 0xef, 0xfd, 0x3e,
-	0xf7, 0xca, 0x24, 0xf3, 0x83, 0xf0, 0x42, 0xdb, 0xf5, 0xcb, 0xa4, 0xce, 0xe6, 0xf4, 0x8c, 0x7f,
-	0xc1, 0xcb, 0xf3, 0x47, 0x64, 0x79, 0x92, 0xad, 0xe5, 0x1d, 0xdb, 0xeb, 0xd9, 0xc3, 0x00, 0xd7,
-	0x3e, 0x67, 0x4f, 0x9f, 0x35, 0x70, 0x99, 0xf5, 0x9f, 0xc7, 0xec, 0xd1, 0x8b, 0x21, 0x0f, 0xc5,
-	0xe5, 0x30, 0x5d, 0xf6, 0xb2, 0xc7, 0x43, 0x49, 0x3f, 0x20, 0xbd, 0xac, 0x53, 0xba, 0xe0, 0xcf,
-	0xbd, 0x9d, 0xdf, 0x04, 0x57, 0x03, 0xee, 0x4a, 0x30, 0xaf, 0x7f, 0x6d, 0x5a, 0x4b, 0x7e, 0x4c,
-	0x8d, 0x0a, 0xa4, 0x6c, 0xfc, 0xe7, 0x1c, 0x58, 0x4e, 0xfd, 0x91, 0x37, 0xbc, 0x02, 0x2e, 0x69,
-	0x72, 0xd7, 0x6c, 0x7d, 0xbd, 0xd5, 0x7e, 0xbf, 0x75, 0xa8, 0xe9, 0xba, 0xf2, 0x50, 0x13, 0x4b,
-	0x70, 0x15, 0xdf, 0x3f, 0xbb, 0xaa, 0x76, 0x70, 0xa0, 0xb6, 0x5b, 0xfb, 0xcd, 0x87, 0x48, 0x3b,
-	0x32, 0x35, 0xdd, 0x10, 0x05, 0x78, 0x0d, 0x07, 0xd2, 0x14, 0xa6, 0xd3, 0x46, 0x86, 0x58, 0x86,
-	0xd7, 0xb1, 0x3f, 0x75, 0x4d, 0x4d, 0xa9, 0x1f, 0x36, 0x75, 0xbd, 0xd9, 0x6e, 0x85, 0x3c, 0x15,
-	0x78, 0x03, 0x47, 0x86, 0x34, 0x4a, 0xef, 0xb4, 0x5b, 0xba, 0x26, 0xce, 0x30, 0x4d, 0x09, 0x9c,
-	0x6e, 0x28, 0x86, 0xa9, 0x8b, 0xb3, 0xf0, 0x2a, 0x3e, 0xbc, 0x5d, 0x53, 0x53, 0xdb, 0x2d, 0x43,
-	0xfb, 0xc0, 0x30, 0x3b, 0x75, 0xc5, 0xd0, 0xc4, 0x39, 0xb8, 0x02, 0x44, 0x02, 0x47, 0x1a, 0xb5,
-	0xa0, 0xd9, 0xaa, 0x8b, 0xf3, 0xf0, 0x32, 0xb8, 0xc8, 0xa0, 0x07, 0x9a, 0xa2, 0x6b, 0x18, 0xb8,
-	0x00, 0x6f, 0xe3, 0x10, 0xdb, 0xdd, 0xd3, 0x14, 0xa4, 0xa1, 0x9c, 0x5d, 0x55, 0xb8, 0x86, 0xef,
-	0x6e, 0x79, 0x34, 0xb3, 0x0d, 0xc0, 0x5b, 0xd8, 0x35, 0xb3, 0x78, 0x66, 0xdf, 0x22, 0x5b, 0x09,
-	0x8a, 0x4d, 0x68, 0x5d, 0x82, 0x22, 0x58, 0xd2, 0xe4, 0x6e, 0xa3, 0x1d, 0x2a, 0x5a, 0x8e, 0x20,
-	0xfb, 0x4a, 0xf3, 0xc0, 0x44, 0x9a, 0x78, 0x01, 0x5e, 0xc2, 0x1b, 0xd1, 0x6d, 0xb4, 0xd5, 0xf6,
-	0x61, 0xe7, 0x40, 0x33, 0x34, 0xf1, 0x22, 0x9b, 0x2f, 0xfa, 0x40, 0x6f, 0x3e, 0x3c, 0xd4, 0x14,
-	0x9d, 0x2d, 0xac, 0xc8, 0x66, 0x76, 0x20, 0x63, 0x20, 0x9d, 0xb1, 0x78, 0x09, 0xde, 0x04, 0xd7,
-	0x30, 0xb1, 0x52, 0x6f, 0xb6, 0x63, 0xe2, 0x8e, 0x86, 0x4c, 0x4d, 0x84, 0x6c, 0xda, 0x79, 0x24,
-	0xde, 0x35, 0xf1, 0x32, 0xe3, 0xd5, 0xd5, 0x86, 0x56, 0xcf, 0xf2, 0xae, 0x30, 0xde, 0x3c, 0x92,
-	0xf0, 0x5e, 0x61, 0x5b, 0x49, 0x4a, 0xc6, 0x0c, 0xeb, 0x55, 0xb6, 0x20, 0xa6, 0xa6, 0x2a, 0x1d,
-	0x65, 0xaf, 0x79, 0xd0, 0x34, 0x3e, 0x6c, 0xb6, 0xf6, 0xdb, 0xe2, 0xb5, 0x68, 0xff, 0x63, 0x84,
-	0xd6, 0x3a, 0x32, 0x9b, 0xe8, 0x43, 0x71, 0x15, 0x5e, 0xc4, 0xf7, 0x8e, 0xae, 0x8e, 0xc5, 0x2b,
-	0xf5, 0xba, 0x78, 0x9d, 0x79, 0x64, 0x08, 0x60, 0xab, 0x7d, 0x03, 0x42, 0x70, 0x21, 0x04, 0xd7,
-	0x35, 0xb2, 0x62, 0x37, 0xd9, 0xb2, 0xe2, 0xcb, 0x37, 0x5d, 0x96, 0x5b, 0xe1, 0x1a, 0x86, 0x10,
-	0xc6, 0x7d, 0x1b, 0x5e, 0x00, 0x00, 0x73, 0x6b, 0xad, 0x3d, 0xac, 0x64, 0x8d, 0xf9, 0x10, 0x1b,
-	0x33, 0xaa, 0x3b, 0x6c, 0x53, 0x30, 0x94, 0xa9, 0x58, 0x67, 0x5e, 0x6d, 0x20, 0x65, 0x7f, 0xbf,
-	0xa9, 0xea, 0x9d, 0x83, 0xa6, 0xc1, 0x74, 0xdd, 0x65, 0x32, 0x1b, 0x6d, 0x55, 0x31, 0x75, 0x4d,
-	0x94, 0x98, 0x4c, 0x84, 0xd4, 0xc4, 0x46, 0xbd, 0xb2, 0x31, 0xc2, 0x32, 0x13, 0x7d, 0xe7, 0xcc,
-	0x68, 0xed, 0x50, 0x43, 0x0f, 0xb5, 0x96, 0xfa, 0xa1, 0x58, 0x62, 0x8c, 0x8d, 0xe6, 0xc3, 0x46,
-	0xa3, 0xd3, 0x55, 0x54, 0x55, 0xd3, 0x75, 0x51, 0x60, 0x74, 0x87, 0x46, 0x08, 0x29, 0x33, 0xba,
-	0xc3, 0x76, 0x57, 0x6f, 0x3e, 0x6c, 0x29, 0x07, 0x07, 0xcd, 0xd6, 0x43, 0xb1, 0xc2, 0xcc, 0x38,
-	0x6c, 0x77, 0xeb, 0x8a, 0xa1, 0x88, 0x33, 0x1b, 0xdb, 0x24, 0xe7, 0x65, 0xc2, 0x7e, 0xb8, 0x00,
-	0x26, 0x95, 0x55, 0x62, 0xe3, 0xd0, 0x1f, 0x85, 0x8d, 0xf7, 0xb1, 0x93, 0xa5, 0xba, 0x86, 0x99,
-	0xdf, 0x85, 0xa7, 0xac, 0x8b, 0x0e, 0xf6, 0xc5, 0x12, 0xdb, 0xe3, 0x08, 0xd8, 0x68, 0x13, 0x19,
-	0xa2, 0x10, 0xae, 0x7c, 0x88, 0x68, 0x1b, 0x0d, 0x0d, 0xe9, 0x62, 0x79, 0xe3, 0x11, 0xfd, 0x00,
-	0x1c, 0x37, 0xf8, 0xb2, 0x25, 0x65, 0x27, 0xa6, 0xdb, 0x6c, 0x29, 0xaa, 0xd1, 0x7c, 0xd4, 0x34,
-	0xf0, 0x4a, 0xd0, 0x4d, 0x0e, 0x51, 0x58, 0xa3, 0xc0, 0xfc, 0x21, 0x84, 0x45, 0x72, 0xb7, 0xb1,
-	0x75, 0xa9, 0x36, 0x5d, 0x58, 0x05, 0xb3, 0x9a, 0xdc, 0xad, 0x1f, 0x88, 0x25, 0xf6, 0xd3, 0xc4,
-	0x86, 0x2d, 0xe2, 0x12, 0xa2, 0xbb, 0xd7, 0x36, 0x1a, 0x62, 0x79, 0xe3, 0x01, 0x9e, 0x76, 0xd8,
-	0xa4, 0xcb, 0x66, 0x88, 0x87, 0xdd, 0xba, 0xb6, 0xaf, 0x98, 0x07, 0x86, 0x58, 0x62, 0xfa, 0x18,
-	0xb0, 0xde, 0x54, 0x15, 0x43, 0xab, 0x8b, 0xc2, 0xc6, 0xb7, 0xcb, 0x74, 0x85, 0x12, 0x9f, 0xe1,
-	0xc3, 0x73, 0x46, 0x0f, 0x81, 0x82, 0x94, 0xc3, 0x6e, 0x07, 0x75, 0x5b, 0x6d, 0xa3, 0x81, 0x77,
-	0xa6, 0x04, 0xef, 0xe0, 0x62, 0x20, 0x8b, 0xee, 0x68, 0xa8, 0x4b, 0x06, 0xa2, 0xc0, 0xe7, 0x57,
-	0x36, 0x29, 0xba, 0x5c, 0x80, 0x96, 0x29, 0xba, 0x52, 0x80, 0xde, 0xa2, 0xe8, 0x99, 0x02, 0xf4,
-	0x36, 0x45, 0xcf, 0x16, 0xa0, 0x77, 0x28, 0x7a, 0xae, 0x00, 0xbd, 0x4b, 0xd1, 0xf3, 0x1b, 0x3f,
-	0x2e, 0xe3, 0xd0, 0x59, 0xd4, 0xcd, 0xc2, 0x9c, 0xa1, 0xa3, 0x21, 0xca, 0x7a, 0xa8, 0x77, 0x37,
-	0xe5, 0x9a, 0x58, 0xe2, 0xc0, 0xe5, 0xed, 0x5a, 0xe4, 0x3c, 0x49, 0xf8, 0xf6, 0x83, 0x9a, 0x58,
-	0xe6, 0xc0, 0x77, 0xb7, 0x6b, 0x62, 0x85, 0x79, 0x61, 0x4a, 0x7e, 0x4d, 0xde, 0x16, 0x67, 0x38,
-	0x08, 0xb9, 0xb6, 0xfd, 0x40, 0x9c, 0xe5, 0x20, 0x76, 0xb0, 0x49, 0x73, 0x2c, 0xff, 0x64, 0x45,
-	0xd5, 0xc4, 0x79, 0xe6, 0x08, 0x31, 0xa6, 0xd9, 0xea, 0x6e, 0x8a, 0x0b, 0x3c, 0xf0, 0xae, 0x58,
-	0xcd, 0x99, 0x8a, 0xa9, 0x65, 0x11, 0xf0, 0xe0, 0x5b, 0x35, 0x71, 0x91, 0x07, 0xdf, 0xad, 0x89,
-	0x4b, 0x1b, 0x01, 0x86, 0x67, 0xfb, 0x96, 0xe0, 0x3a, 0xb8, 0x85, 0xc3, 0x50, 0x03, 0x69, 0x7a,
-	0xa3, 0x7d, 0x50, 0x27, 0xe0, 0xb4, 0xb3, 0xd1, 0x0d, 0xcb, 0x53, 0x20, 0x1d, 0x75, 0x22, 0x57,
-	0xe3, 0xa2, 0x8f, 0xc4, 0xf2, 0xc6, 0xf7, 0x88, 0x77, 0xa7, 0x5a, 0x39, 0x58, 0x88, 0x30, 0x0c,
-	0xa3, 0x7b, 0xa8, 0xe3, 0xcd, 0xa3, 0x91, 0x9a, 0x8e, 0xc9, 0xae, 0x25, 0x01, 0xbb, 0xdb, 0x62,
-	0x39, 0x05, 0x78, 0x80, 0xf7, 0x89, 0xc6, 0x30, 0x0a, 0xd8, 0xac, 0xd5, 0xc4, 0x99, 0x34, 0x44,
-	0xc6, 0x3b, 0x93, 0x82, 0xec, 0xe2, 0x2d, 0x49, 0x42, 0xe4, 0x9d, 0x5d, 0x71, 0x3e, 0x05, 0xd9,
-	0x92, 0x6b, 0xe2, 0x42, 0x0a, 0x82, 0x7d, 0xa5, 0x9a, 0x82, 0xec, 0x90, 0xa5, 0x4f, 0x42, 0xb0,
-	0xdf, 0x2c, 0xb2, 0x00, 0x1f, 0xda, 0x23, 0x6f, 0x8b, 0x4b, 0x69, 0x90, 0xfc, 0xa0, 0x26, 0x2e,
-	0xa7, 0x40, 0xf2, 0xce, 0x6e, 0x2d, 0x4a, 0xd7, 0x91, 0xf0, 0x9a, 0x78, 0x71, 0x63, 0x8b, 0xb4,
-	0xa4, 0x65, 0x1a, 0x4a, 0xd8, 0x9a, 0x1d, 0xd1, 0x65, 0x2f, 0xa5, 0xc6, 0x47, 0xa2, 0xb0, 0xb1,
-	0x19, 0x07, 0x11, 0xd6, 0x3e, 0xc2, 0x48, 0xd0, 0x51, 0x57, 0x57, 0x0e, 0xb5, 0x88, 0x05, 0x1d,
-	0xd1, 0x90, 0x25, 0x6c, 0xfc, 0xb6, 0x40, 0xff, 0xf3, 0x4e, 0xb2, 0x35, 0x82, 0xdd, 0x5c, 0x70,
-	0xa2, 0x69, 0xd6, 0x71, 0xfc, 0x6c, 0xb7, 0xd2, 0xde, 0x40, 0xfd, 0x25, 0x8b, 0x57, 0xea, 0x75,
-	0x0a, 0x12, 0x85, 0x02, 0x8a, 0xba, 0x76, 0xc0, 0x28, 0xca, 0xf0, 0x2e, 0xbe, 0xed, 0xe6, 0x28,
-	0x1a, 0x6d, 0xa3, 0x6d, 0x28, 0xe8, 0xa1, 0x66, 0x88, 0x95, 0x8d, 0xdf, 0xaf, 0xc4, 0x1f, 0x15,
-	0x33, 0x9f, 0x21, 0xe1, 0x97, 0xc0, 0xdd, 0xe8, 0xda, 0x42, 0xe3, 0x48, 0xb3, 0x65, 0x68, 0xe8,
-	0x91, 0x72, 0xd0, 0x6d, 0xb5, 0x59, 0x64, 0x11, 0x4b, 0x4c, 0x0b, 0x97, 0x8c, 0x9c, 0x45, 0x51,
-	0x38, 0x85, 0x64, 0x07, 0x07, 0x0a, 0x09, 0xac, 0x4d, 0x95, 0x82, 0x9d, 0x71, 0x3a, 0x8d, 0x4c,
-	0xdc, 0x73, 0x3a, 0xcd, 0x4e, 0xad, 0x26, 0xce, 0xc2, 0x57, 0xc0, 0x9d, 0xa9, 0xba, 0xe4, 0x6d,
-	0x71, 0x8e, 0x2d, 0x2f, 0x97, 0x88, 0xcc, 0x6a, 0x7e, 0xea, 0xac, 0x58, 0xa8, 0x39, 0x85, 0x44,
-	0x16, 0xab, 0xa7, 0x91, 0xec, 0x88, 0x60, 0xe3, 0x9f, 0x48, 0xbf, 0x1c, 0x7b, 0xa6, 0x65, 0xd9,
-	0x97, 0x8c, 0xba, 0x1d, 0xa5, 0x5b, 0xdf, 0xc3, 0x74, 0xa6, 0xbe, 0x2b, 0x96, 0x98, 0x53, 0x65,
-	0x51, 0x1f, 0x6c, 0xd7, 0xdb, 0xc6, 0x5b, 0x6f, 0x89, 0x42, 0x11, 0xeb, 0x96, 0x58, 0x2e, 0x60,
-	0xd5, 0x37, 0x29, 0x6b, 0x85, 0x5d, 0x5d, 0x92, 0x78, 0xbc, 0xda, 0x79, 0xe8, 0xa6, 0x38, 0xcb,
-	0x81, 0xca, 0xd1, 0xad, 0x3f, 0x09, 0xdd, 0x12, 0xe7, 0x37, 0x7e, 0x97, 0xb4, 0x19, 0x25, 0xdf,
-	0x29, 0x59, 0x60, 0x55, 0x15, 0x55, 0xe9, 0x74, 0xd5, 0x03, 0x45, 0xd7, 0xeb, 0x07, 0x5d, 0x25,
-	0xca, 0x3d, 0x69, 0xf8, 0x5e, 0x94, 0x7b, 0xd2, 0x70, 0x35, 0xca, 0x3d, 0x69, 0x78, 0x5d, 0xac,
-	0x70, 0xe1, 0xb8, 0x90, 0xe1, 0xc1, 0xf7, 0xc5, 0xd9, 0x9c, 0x89, 0x26, 0xc7, 0x44, 0xb3, 0xc0,
-	0x44, 0xb3, 0xc0, 0x44, 0xb3, 0xc0, 0x44, 0xb3, 0xc0, 0x44, 0xb3, 0xc0, 0x44, 0x93, 0x9a, 0x58,
-	0xc3, 0x16, 0x26, 0x1f, 0x4e, 0xd9, 0x7e, 0xd6, 0x55, 0x4c, 0x59, 0x47, 0x7b, 0xc6, 0x87, 0x1d,
-	0xad, 0xab, 0x9b, 0x1d, 0xec, 0x5f, 0x5a, 0x5d, 0x2c, 0x6d, 0x3c, 0xc2, 0xf1, 0x30, 0xf1, 0x1a,
-	0xc7, 0xb2, 0xa2, 0xaa, 0xd4, 0x9b, 0x48, 0xa3, 0xb1, 0x82, 0xdc, 0xc3, 0xf2, 0x60, 0x72, 0x27,
-	0x63, 0x45, 0x64, 0x02, 0x4c, 0xef, 0x67, 0xf2, 0xf7, 0xc9, 0x8b, 0x4d, 0x33, 0x2c, 0x72, 0xd9,
-	0xdf, 0x69, 0x43, 0x1d, 0x2c, 0xeb, 0xf6, 0xb0, 0x1f, 0xfd, 0x2f, 0x34, 0x98, 0x69, 0x1d, 0xcb,
-	0xfe, 0xe3, 0xb4, 0x1b, 0x45, 0xf8, 0xf0, 0x8f, 0xb5, 0x4b, 0x35, 0x01, 0xb6, 0xc1, 0x22, 0x16,
-	0xca, 0xfe, 0x77, 0x1a, 0xcc, 0x34, 0xfd, 0x65, 0xfe, 0xa5, 0xda, 0x8d, 0x9b, 0x5c, 0x34, 0xfb,
-	0x17, 0x6c, 0xa5, 0x7b, 0x42, 0x4d, 0xd8, 0x5b, 0xfd, 0xe1, 0x67, 0x6b, 0xc2, 0x8f, 0x3e, 0x5b,
-	0x13, 0xfe, 0xe5, 0xb3, 0x35, 0xe1, 0xd3, 0xcf, 0xd7, 0x4a, 0x3f, 0xfa, 0x7c, 0xad, 0xf4, 0x8f,
-	0x9f, 0xaf, 0x95, 0x8e, 0xe7, 0xc8, 0x3f, 0x7c, 0xdb, 0xfa, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x47, 0xb1, 0x87, 0x69, 0x0d, 0x4e, 0x00, 0x00,
+	// 5299 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x7c, 0xdb, 0x6f, 0x23, 0xc9,
+	0x75, 0x37, 0x9b, 0x94, 0x44, 0xf1, 0x50, 0x97, 0x9e, 0x92, 0x46, 0xe2, 0x5c, 0x56, 0x33, 0xd3,
+	0x7b, 0xc1, 0x5a, 0xf6, 0x37, 0x96, 0x38, 0x92, 0x66, 0xbc, 0xfe, 0xbc, 0x71, 0x8b, 0x6c, 0x89,
+	0xb4, 0x29, 0x91, 0x53, 0xcd, 0x5e, 0xcf, 0xe4, 0xb2, 0x44, 0x8b, 0xec, 0x19, 0x31, 0xdb, 0xbc,
+	0x4c, 0x77, 0x73, 0xbc, 0x03, 0xe4, 0x21, 0x46, 0x60, 0x24, 0x01, 0x8c, 0x5c, 0x1c, 0xc0, 0x2f,
+	0xc9, 0x43, 0x02, 0x04, 0xc9, 0x43, 0x1e, 0x12, 0xe4, 0x29, 0x81, 0x13, 0xec, 0x53, 0x2e, 0xc8,
+	0x93, 0x9f, 0x82, 0x24, 0x2f, 0x31, 0xec, 0x97, 0xfc, 0x0b, 0x41, 0x80, 0x20, 0xa8, 0x4b, 0xdf,
+	0x8b, 0x1a, 0x69, 0xb9, 0xde, 0xe4, 0x69, 0x58, 0xe7, 0xfc, 0xce, 0xa9, 0x53, 0xa7, 0x4e, 0x9d,
+	0x3a, 0x55, 0x5d, 0x23, 0xb8, 0x61, 0x8e, 0xfb, 0x5f, 0xb6, 0xca, 0x5f, 0xb6, 0xca, 0xff, 0xaf,
+	0x3f, 0xf4, 0x2c, 0xe7, 0x99, 0xd9, 0xb5, 0xee, 0x8f, 0x9d, 0x91, 0x37, 0x42, 0x4b, 0x21, 0xc1,
+	0x2a, 0x2b, 0x08, 0xe4, 0xb6, 0x65, 0x5b, 0x03, 0xcb, 0x73, 0x5e, 0x61, 0xeb, 0xc5, 0xc4, 0x72,
+	0x3d, 0xe5, 0xef, 0x72, 0x11, 0xe2, 0x89, 0xe5, 0xba, 0xe6, 0x73, 0x0b, 0x7d, 0x15, 0x8a, 0x03,
+	0xf6, 0xb3, 0xfd, 0x6a, 0x6c, 0x95, 0xa4, 0xbb, 0xd2, 0xbb, 0x2b, 0xe5, 0x1b, 0xf7, 0xa3, 0xca,
+	0xee, 0x9f, 0x84, 0x00, 0x1c, 0x45, 0xa3, 0x27, 0xb0, 0xee, 0x98, 0xbd, 0xfe, 0xe8, 0xc4, 0x32,
+	0x5d, 0x6c, 0x8d, 0x47, 0x8e, 0xd7, 0xb2, 0x1c, 0x43, 0x2b, 0x65, 0xef, 0x4a, 0xef, 0x16, 0xcb,
+	0x4a, 0x5c, 0x0b, 0x16, 0x20, 0x6b, 0x19, 0x2c, 0xd4, 0x80, 0x3e, 0x84, 0x8d, 0x34, 0xbd, 0x62,
+	0xd9, 0x76, 0x29, 0x47, 0x75, 0xbf, 0xf5, 0x3a, 0xdd, 0x04, 0x5b, 0xcb, 0xe0, 0x29, 0x5a, 0x88,
+	0x7e, 0xb7, 0x7b, 0x6e, 0xf5, 0xd2, 0xfa, 0xe7, 0x44, 0xfa, 0x75, 0x21, 0x96, 0xe8, 0x17, 0x6b,
+	0x41, 0x06, 0xac, 0x8d, 0xab, 0x95, 0x56, 0x7c, 0x58, 0x56, 0x69, 0x9e, 0x2a, 0xbf, 0x17, 0x57,
+	0xde, 0x4a, 0x03, 0x6b, 0x19, 0x2c, 0x92, 0x3f, 0xcc, 0x81, 0xe4, 0x2a, 0x9f, 0x2c, 0xc0, 0x72,
+	0x65, 0x34, 0xf4, 0x9c, 0x91, 0x6d, 0x8c, 0x7b, 0xa6, 0x37, 0xe3, 0x24, 0x36, 0x40, 0xee, 0x5a,
+	0xb6, 0x5d, 0x19, 0x0d, 0x9f, 0xf5, 0x9f, 0xb3, 0xce, 0xf8, 0x04, 0x6e, 0xc5, 0x35, 0x54, 0x12,
+	0xa8, 0x5a, 0x06, 0xa7, 0x24, 0x51, 0x1d, 0x56, 0x1d, 0x7c, 0xc2, 0x48, 0xba, 0x67, 0x7a, 0x13,
+	0x97, 0xcf, 0xd8, 0x1b, 0x89, 0x19, 0x8b, 0x83, 0x6a, 0x19, 0x9c, 0x94, 0x43, 0x18, 0xd0, 0x44,
+	0x53, 0x7b, 0x83, 0xbe, 0xeb, 0xf6, 0x47, 0x43, 0x1e, 0xc5, 0x7c, 0x7e, 0xee, 0xc6, 0xb5, 0x19,
+	0x29, 0x5c, 0x2d, 0x83, 0x05, 0xd2, 0xa8, 0x09, 0xd7, 0x22, 0x54, 0x6e, 0x20, 0x9b, 0x95, 0x3b,
+	0x53, 0x55, 0x06, 0x26, 0xa6, 0x65, 0xc9, 0x78, 0x27, 0x1a, 0x99, 0x0d, 0xeb, 0x63, 0x8f, 0xcd,
+	0x46, 0x69, 0x41, 0x34, 0x5e, 0x23, 0x0e, 0x22, 0xe3, 0x4d, 0xc8, 0x91, 0x98, 0x3c, 0xb3, 0x4c,
+	0xc7, 0x72, 0x52, 0x63, 0xce, 0x8b, 0x62, 0xf2, 0x50, 0x88, 0x25, 0x31, 0x29, 0xd6, 0x82, 0x7e,
+	0x01, 0xae, 0x27, 0x38, 0x7c, 0xfc, 0x8b, 0x54, 0xfd, 0x9b, 0x17, 0xaa, 0x0f, 0x7c, 0x20, 0xd6,
+	0x81, 0xde, 0x03, 0x38, 0x6f, 0x56, 0x46, 0x83, 0xb1, 0x6d, 0x79, 0x56, 0xa9, 0x40, 0x35, 0x96,
+	0xe2, 0x1a, 0x6b, 0x01, 0xbf, 0x96, 0xc1, 0x11, 0x34, 0x7a, 0x08, 0x85, 0xf3, 0xe6, 0x91, 0xd9,
+	0xb7, 0x27, 0x8e, 0x55, 0x02, 0x2a, 0xba, 0x99, 0x14, 0xe5, 0xec, 0x5a, 0x06, 0x87, 0x58, 0xb4,
+	0x0b, 0xf9, 0xf3, 0x66, 0xc5, 0x9c, 0xb8, 0x56, 0xa9, 0x48, 0xc5, 0xae, 0xa7, 0x7a, 0x24, 0xcc,
+	0x5a, 0x06, 0xfb, 0x38, 0xb6, 0x82, 0xbe, 0x3f, 0x07, 0xab, 0x7c, 0x05, 0x61, 0xcb, 0x1d, 0x8f,
+	0x86, 0xee, 0x8c, 0x6b, 0xa8, 0x09, 0xd7, 0xa2, 0x2b, 0x81, 0xcd, 0x5a, 0x56, 0x14, 0x56, 0x95,
+	0x24, 0x8c, 0x84, 0x55, 0x4a, 0x96, 0xb8, 0x24, 0x58, 0x0e, 0x7c, 0x01, 0x6d, 0x4e, 0x59, 0x40,
+	0xc4, 0x25, 0x01, 0x16, 0x7d, 0x1d, 0x96, 0xec, 0x32, 0x49, 0x1b, 0x5c, 0x96, 0x2d, 0x97, 0x9b,
+	0x71, 0xd9, 0x46, 0x04, 0x51, 0xcb, 0xe0, 0x98, 0x04, 0x49, 0x5d, 0xb1, 0x85, 0xc3, 0xfc, 0x23,
+	0x4e, 0x5d, 0x46, 0x1a, 0x48, 0x52, 0x97, 0x40, 0x1e, 0x99, 0xb0, 0x99, 0x8a, 0x4b, 0xae, 0x9a,
+	0x2d, 0x98, 0xb7, 0x5f, 0x13, 0xde, 0x81, 0xfa, 0x69, 0x7a, 0x58, 0x1c, 0xc5, 0xd7, 0x4c, 0x2a,
+	0x8e, 0x42, 0xaf, 0x87, 0x58, 0x16, 0x14, 0x0d, 0x58, 0xe6, 0xf3, 0x5b, 0xb3, 0xcc, 0x9e, 0xe5,
+	0xcc, 0x14, 0x11, 0xca, 0xbf, 0xad, 0xc3, 0x0a, 0x67, 0xb6, 0xcc, 0x57, 0xf6, 0xc8, 0xec, 0x89,
+	0x83, 0x44, 0x9a, 0x21, 0x48, 0x3e, 0xdb, 0xcc, 0x2d, 0x4e, 0xb7, 0xb9, 0x99, 0xd2, 0xed, 0x94,
+	0x58, 0x9a, 0x9b, 0x31, 0x96, 0xfe, 0x2f, 0x67, 0xf1, 0x0a, 0x2c, 0x4f, 0x34, 0x6c, 0x75, 0xa9,
+	0x6b, 0xeb, 0xc3, 0x1e, 0x0f, 0xc4, 0x5b, 0x49, 0x45, 0x11, 0x48, 0x2d, 0x83, 0xe3, 0x32, 0x64,
+	0x15, 0x13, 0x82, 0x6d, 0x99, 0xae, 0x45, 0x74, 0x2c, 0x8a, 0x56, 0xb1, 0x11, 0x41, 0x90, 0x55,
+	0x1c, 0x95, 0xb8, 0x60, 0x33, 0x29, 0x7c, 0x26, 0x9b, 0xc9, 0x05, 0xcb, 0x19, 0x3e, 0xa3, 0xe5,
+	0x3c, 0x75, 0xbf, 0x2a, 0x7e, 0x06, 0xfb, 0x55, 0x03, 0x64, 0xc6, 0x88, 0x78, 0x79, 0x49, 0xb4,
+	0x76, 0x0e, 0x13, 0x28, 0xb2, 0x76, 0x92, 0x92, 0xf1, 0xcc, 0xb3, 0x7c, 0xf9, 0xcc, 0x13, 0xdf,
+	0xfa, 0x56, 0xae, 0xb0, 0xf5, 0xc5, 0xf7, 0xdb, 0xd5, 0x2b, 0xed, 0xb7, 0x91, 0x6d, 0x53, 0xbe,
+	0xdc, 0xb6, 0x49, 0xa2, 0xda, 0xc1, 0x95, 0xc8, 0xbe, 0x72, 0x4d, 0x14, 0xd5, 0x38, 0x0a, 0x21,
+	0x51, 0x1d, 0x93, 0xa1, 0xb5, 0xe1, 0xc7, 0x7a, 0xff, 0x79, 0x58, 0xd5, 0x96, 0x90, 0xb0, 0x36,
+	0x8c, 0x83, 0x68, 0x6d, 0x18, 0x27, 0xa5, 0xb6, 0xb9, 0xb5, 0x2b, 0x6f, 0x73, 0x1f, 0xc0, 0x9a,
+	0xe0, 0xe4, 0x51, 0x5a, 0xbf, 0xc2, 0xd1, 0x45, 0xa4, 0xe0, 0x82, 0x93, 0xcb, 0xf5, 0xcf, 0xe4,
+	0xe4, 0xf2, 0x04, 0xd6, 0xd3, 0x67, 0x0e, 0x43, 0x2b, 0x6d, 0x88, 0x0c, 0xd7, 0x05, 0x48, 0x72,
+	0xe6, 0x12, 0x69, 0xb8, 0xe0, 0x4c, 0xb4, 0xf9, 0xb3, 0x3c, 0x13, 0x95, 0x66, 0x3b, 0x13, 0xc5,
+	0x4b, 0xa5, 0x1b, 0x57, 0x28, 0x95, 0x04, 0x47, 0x95, 0x9b, 0x9f, 0xf2, 0xa8, 0x42, 0xf7, 0xb9,
+	0x8a, 0x39, 0x36, 0xcf, 0xfa, 0x76, 0xdf, 0x7b, 0xa5, 0x0d, 0x5f, 0x4c, 0xfa, 0xce, 0xab, 0xd2,
+	0x2d, 0xf1, 0x3e, 0x97, 0x02, 0xb2, 0x7d, 0x2e, 0x45, 0x26, 0x49, 0x2a, 0x4a, 0xae, 0x0f, 0x9f,
+	0x8d, 0x4a, 0xb7, 0x45, 0x49, 0xca, 0x48, 0xa0, 0x48, 0x92, 0x4a, 0x4a, 0xa2, 0x3d, 0x58, 0x74,
+	0xc9, 0xae, 0xaf, 0xf6, 0x7a, 0xa5, 0x37, 0xa8, 0x96, 0x8d, 0xe4, 0x8c, 0x32, 0x6e, 0x2d, 0x83,
+	0x03, 0x24, 0x3a, 0x82, 0x15, 0xff, 0x37, 0x77, 0xd2, 0x16, 0x95, 0xbd, 0x2d, 0x96, 0x0d, 0x7c,
+	0x94, 0x90, 0x42, 0x5f, 0x83, 0x22, 0xa5, 0x54, 0x2d, 0x9a, 0xb1, 0xee, 0x50, 0x25, 0x37, 0x04,
+	0x4a, 0x18, 0xa0, 0x96, 0xc1, 0x51, 0x3c, 0xc9, 0x59, 0xae, 0x75, 0x7a, 0x48, 0x6c, 0xbf, 0x2b,
+	0xca, 0x59, 0x3a, 0x63, 0x92, 0x9c, 0xc5, 0x71, 0x24, 0x67, 0xf1, 0x9f, 0xdc, 0xf0, 0x7b, 0xa2,
+	0x9c, 0xa5, 0x47, 0x21, 0x24, 0x67, 0xc5, 0x64, 0x48, 0x9e, 0x25, 0x04, 0x6e, 0xb5, 0x22, 0xca,
+	0xb3, 0x7a, 0xc0, 0x27, 0x79, 0x36, 0x44, 0x93, 0x8a, 0xca, 0x73, 0xcc, 0x67, 0xcf, 0xfa, 0x5d,
+	0x7d, 0x6c, 0xf7, 0x3d, 0x1e, 0xa2, 0x6f, 0x8a, 0x2a, 0xaa, 0x76, 0x0a, 0x47, 0x2a, 0xaa, 0xb4,
+	0x34, 0x2b, 0x55, 0x5f, 0x42, 0xde, 0xbf, 0xbf, 0x79, 0x00, 0x0b, 0xe7, 0xb4, 0x5c, 0xe5, 0x95,
+	0xe4, 0x2d, 0x61, 0x7d, 0xca, 0x2a, 0x5a, 0xcc, 0xa1, 0xe8, 0x00, 0xf2, 0x63, 0x56, 0x94, 0xf2,
+	0x7a, 0xf1, 0xb6, 0x50, 0x8a, 0x17, 0xae, 0xd8, 0x07, 0x2b, 0x06, 0x2c, 0xeb, 0x96, 0xf3, 0xb2,
+	0xdf, 0xb5, 0xb0, 0xe5, 0x4e, 0x6c, 0x0f, 0x6d, 0x01, 0x38, 0xf4, 0x57, 0x65, 0xd4, 0x63, 0x15,
+	0xf2, 0x3c, 0x8e, 0x50, 0xd0, 0x5b, 0xb0, 0xcc, 0x5a, 0x5c, 0x23, 0xed, 0xae, 0x80, 0xe3, 0x44,
+	0xa5, 0x0c, 0x73, 0x5a, 0xe5, 0xb8, 0x8e, 0x36, 0x60, 0x61, 0x6c, 0x0f, 0x86, 0xf5, 0x1e, 0xd5,
+	0x54, 0xc0, 0xbc, 0x85, 0x10, 0xcc, 0x59, 0xdd, 0x7e, 0x8f, 0x0b, 0xd3, 0xdf, 0xca, 0x57, 0xa0,
+	0x50, 0x31, 0x87, 0x3d, 0x1a, 0x31, 0x48, 0x86, 0xdc, 0xb8, 0xdb, 0xe7, 0x52, 0xe4, 0x27, 0xba,
+	0x09, 0x8b, 0x96, 0xe9, 0x3c, 0xeb, 0x0e, 0xab, 0x36, 0x17, 0x0b, 0xda, 0xca, 0x57, 0xe1, 0x5a,
+	0xaa, 0xc0, 0x46, 0xef, 0x90, 0x3e, 0x9e, 0xf7, 0xb9, 0x17, 0x51, 0xdc, 0x1f, 0xc4, 0x3a, 0x4c,
+	0xf9, 0xca, 0x3f, 0xcc, 0x81, 0x9c, 0x2c, 0xa7, 0x2f, 0x2b, 0xec, 0xdb, 0x99, 0x0d, 0xed, 0x7c,
+	0x08, 0xd0, 0xf5, 0x87, 0xe1, 0x96, 0x72, 0x77, 0x73, 0xe9, 0xec, 0x15, 0x0c, 0x13, 0x47, 0xa0,
+	0xb1, 0x01, 0xce, 0xc5, 0x07, 0x18, 0xf2, 0x0c, 0x9b, 0x56, 0xc5, 0x01, 0xcf, 0xb0, 0xd1, 0x5d,
+	0x28, 0x3a, 0x67, 0x6e, 0xcb, 0x72, 0xda, 0x5e, 0xbf, 0x6a, 0xd3, 0x2a, 0xb7, 0x80, 0xa3, 0xa4,
+	0x18, 0xc2, 0xb0, 0x69, 0xf9, 0x1a, 0x45, 0x18, 0x36, 0x52, 0x60, 0x69, 0x38, 0x19, 0xb4, 0x3f,
+	0x56, 0x87, 0x9e, 0x35, 0x1c, 0x9a, 0xb4, 0x3a, 0x2d, 0xe0, 0x18, 0x8d, 0x44, 0x46, 0x6f, 0x32,
+	0xb6, 0xad, 0x8f, 0x4f, 0x48, 0x64, 0x14, 0x28, 0x22, 0x42, 0x41, 0xf7, 0x01, 0x0d, 0xcc, 0x8f,
+	0x4f, 0x27, 0x83, 0xca, 0x68, 0x38, 0xb4, 0xba, 0x9e, 0xd5, 0x33, 0x2c, 0x97, 0x96, 0x8e, 0x05,
+	0x2c, 0xe0, 0xa0, 0x03, 0xd8, 0x48, 0x50, 0x59, 0x61, 0xc6, 0xaa, 0xc1, 0x02, 0x9e, 0xc2, 0x0d,
+	0xe5, 0x0c, 0xcb, 0xa5, 0x3b, 0x56, 0x30, 0xf4, 0xa5, 0xa8, 0x5c, 0x92, 0x3b, 0x4d, 0xce, 0xb0,
+	0x69, 0x79, 0x37, 0x45, 0xce, 0xb0, 0xd1, 0xbb, 0xb0, 0xda, 0xb3, 0x9f, 0x31, 0xa2, 0x36, 0x34,
+	0xcf, 0x6c, 0x56, 0xd6, 0x15, 0x70, 0x92, 0xac, 0xfc, 0xbe, 0x04, 0x28, 0x7d, 0x90, 0x42, 0xeb,
+	0x30, 0xdf, 0x75, 0x86, 0x9e, 0x1f, 0xcd, 0xac, 0x11, 0x44, 0x58, 0xf6, 0x35, 0x11, 0x76, 0x0c,
+	0xd7, 0x4c, 0x5f, 0xa3, 0xe6, 0x7a, 0xac, 0xc8, 0xcb, 0x89, 0x4e, 0xae, 0x6a, 0x6f, 0xe0, 0x03,
+	0x70, 0x5a, 0x46, 0xf9, 0x53, 0x09, 0xd6, 0x04, 0x27, 0xb2, 0x19, 0xcd, 0xc3, 0xb0, 0x1e, 0xed,
+	0x2a, 0x38, 0x32, 0x30, 0x0b, 0x13, 0x9b, 0x9a, 0x3e, 0xe9, 0x76, 0x2d, 0xd7, 0x6d, 0x3a, 0xbc,
+	0xe6, 0xc5, 0x42, 0x59, 0xe5, 0x8f, 0x24, 0xb8, 0x96, 0x3a, 0xe6, 0xcd, 0x68, 0xe7, 0x29, 0xa0,
+	0x68, 0x5f, 0x91, 0x8b, 0xcc, 0xd7, 0x5b, 0x29, 0x90, 0x24, 0xde, 0x5c, 0x4d, 0x9c, 0x1d, 0x67,
+	0xb4, 0xf0, 0x2e, 0x14, 0x07, 0x03, 0xcb, 0xb0, 0xf4, 0x5d, 0x73, 0x5c, 0xef, 0x51, 0xd3, 0x0a,
+	0x38, 0x4a, 0x22, 0x08, 0x6b, 0x78, 0x16, 0x20, 0x58, 0x92, 0x88, 0x92, 0x48, 0x5e, 0xed, 0x0f,
+	0xdc, 0x3e, 0xcf, 0x11, 0xf4, 0xb7, 0xf2, 0x97, 0x12, 0x2c, 0xc7, 0x0e, 0xa7, 0x24, 0x9b, 0x50,
+	0xd3, 0x9a, 0xb6, 0x9f, 0x97, 0x83, 0xf6, 0xa5, 0xad, 0xf5, 0x75, 0x9c, 0x5a, 0xdf, 0xe6, 0xa6,
+	0x06, 0x6d, 0xa4, 0x92, 0x3d, 0x82, 0x75, 0xc7, 0xc2, 0x75, 0x8e, 0xba, 0x39, 0x79, 0xb4, 0x88,
+	0x42, 0x70, 0x5c, 0x42, 0xf9, 0x9e, 0x04, 0x4b, 0xd1, 0xd3, 0xf0, 0x8c, 0xbe, 0x7d, 0x1f, 0x96,
+	0x1c, 0xa6, 0x2b, 0xba, 0x7e, 0x6e, 0x26, 0x0d, 0x0a, 0x11, 0x38, 0x86, 0x57, 0x1e, 0xc1, 0x82,
+	0xa1, 0xa9, 0x27, 0x87, 0x98, 0xec, 0x68, 0xe6, 0xe0, 0xcc, 0xa9, 0xda, 0xfe, 0x8e, 0xc6, 0x5a,
+	0x3e, 0xdd, 0xf0, 0x37, 0x27, 0xde, 0x52, 0x7e, 0x2d, 0x0b, 0x2b, 0x1a, 0x56, 0x0f, 0x5b, 0xa6,
+	0x63, 0x0e, 0xdc, 0xba, 0x67, 0x0d, 0xd0, 0x0a, 0x64, 0xfb, 0xbe, 0xe3, 0xb3, 0xfd, 0x1e, 0xfa,
+	0x0a, 0x14, 0x7a, 0x7d, 0xc7, 0xea, 0x7a, 0xfd, 0xd1, 0x90, 0x4a, 0xa7, 0x5c, 0x45, 0x14, 0x54,
+	0x7d, 0x08, 0x0e, 0xd1, 0x68, 0x1b, 0xe6, 0xbc, 0x57, 0x63, 0x7f, 0x3c, 0x1b, 0x69, 0x29, 0x7a,
+	0x8d, 0x45, 0x31, 0x64, 0xab, 0x7a, 0xd1, 0xed, 0xf3, 0xa8, 0x21, 0x3f, 0x09, 0xc5, 0x74, 0xc6,
+	0x3c, 0x58, 0xc8, 0x4f, 0xe2, 0xe5, 0xe7, 0x74, 0x70, 0x6c, 0x17, 0x61, 0x0d, 0x4e, 0x0d, 0x76,
+	0x0e, 0xd6, 0x20, 0x54, 0xe6, 0x08, 0xb6, 0x59, 0xb0, 0x06, 0xa7, 0x1a, 0x36, 0xdf, 0x20, 0x58,
+	0x43, 0xf9, 0x10, 0x64, 0x62, 0x8d, 0xbf, 0xc2, 0x85, 0x6e, 0x78, 0x0f, 0x16, 0x7b, 0x56, 0xb7,
+	0xef, 0x86, 0x5e, 0x78, 0xdd, 0xba, 0x0c, 0xf0, 0xca, 0x7f, 0x48, 0xb0, 0x21, 0xbe, 0xf0, 0x98,
+	0x31, 0x70, 0xbe, 0x04, 0x0b, 0x13, 0x4b, 0x1d, 0x9c, 0x39, 0xfc, 0xda, 0x6c, 0x3d, 0x75, 0x19,
+	0x75, 0x72, 0x88, 0x31, 0xc7, 0xf0, 0x6d, 0x54, 0x73, 0xcc, 0x33, 0xb7, 0xd1, 0xe7, 0x5f, 0x36,
+	0xd8, 0x36, 0x1a, 0xd0, 0xd0, 0xfb, 0x50, 0xb4, 0x48, 0x83, 0x05, 0x44, 0x69, 0x9e, 0x16, 0x08,
+	0xb7, 0xd3, 0x33, 0x17, 0x06, 0x0c, 0x8e, 0x0a, 0x28, 0x9f, 0x48, 0xb0, 0x39, 0xe5, 0xea, 0x65,
+	0xc6, 0xb1, 0x26, 0xad, 0xcf, 0x09, 0xac, 0x3f, 0x84, 0x25, 0x62, 0x4c, 0xe4, 0xde, 0x2f, 0x97,
+	0x3e, 0xbb, 0x24, 0xa7, 0x1a, 0xc7, 0x64, 0x94, 0xbf, 0x96, 0xe0, 0xba, 0xf0, 0x6e, 0xe7, 0x73,
+	0xb0, 0xff, 0x7d, 0x00, 0x62, 0x0b, 0x4f, 0xff, 0x97, 0xb3, 0x3e, 0x22, 0xa1, 0xfc, 0x96, 0x04,
+	0x72, 0xf2, 0xfe, 0xe8, 0x73, 0x30, 0xbb, 0x04, 0x79, 0x62, 0x44, 0xbd, 0xc7, 0x6c, 0x2e, 0x60,
+	0xbf, 0xa9, 0x4c, 0xa0, 0x10, 0x5c, 0x44, 0x4d, 0x31, 0xe4, 0x5d, 0x98, 0x27, 0x1d, 0xe9, 0x17,
+	0x58, 0xc2, 0x00, 0x3e, 0xb2, 0xcd, 0x83, 0x7d, 0x2a, 0xb2, 0xad, 0xb8, 0xa4, 0x5b, 0xff, 0xe6,
+	0x6a, 0xd6, 0x6e, 0xdf, 0x81, 0x95, 0xf3, 0x11, 0x57, 0x16, 0xe6, 0xe7, 0x02, 0x4e, 0x50, 0x95,
+	0x5f, 0x01, 0x08, 0x6f, 0xc0, 0x62, 0x3b, 0x90, 0x94, 0xd8, 0x81, 0x7e, 0x16, 0x43, 0xfe, 0x7b,
+	0x09, 0xf2, 0xfc, 0x1e, 0xed, 0xf3, 0x73, 0x34, 0x99, 0xf9, 0xf3, 0x51, 0xb8, 0x8b, 0x16, 0xb0,
+	0xdf, 0xa4, 0x17, 0x8d, 0xa3, 0xb6, 0xd3, 0x7f, 0xfe, 0xdc, 0x72, 0x78, 0x1a, 0x49, 0x14, 0x84,
+	0xf8, 0x89, 0xee, 0x1f, 0x68, 0x70, 0x88, 0x55, 0x5a, 0xb0, 0x48, 0x6f, 0xcd, 0xc4, 0xe7, 0xac,
+	0x32, 0xac, 0x93, 0xf3, 0x48, 0x7d, 0xd8, 0xeb, 0xbf, 0xec, 0xf7, 0x26, 0xa6, 0xdd, 0x7c, 0xf6,
+	0xcc, 0xb5, 0x3c, 0xbe, 0xad, 0x09, 0x79, 0xca, 0xcf, 0x03, 0x10, 0x8d, 0xcd, 0xb3, 0x5f, 0xb6,
+	0xba, 0x1e, 0xd9, 0x0a, 0x7b, 0xf6, 0x91, 0x63, 0xbd, 0xf0, 0xb7, 0x48, 0xd6, 0x42, 0x7b, 0x50,
+	0x18, 0xf0, 0x7e, 0xdd, 0x52, 0x96, 0x1a, 0xbc, 0x91, 0x3c, 0xa5, 0x32, 0x36, 0x0e, 0x81, 0xca,
+	0x77, 0x73, 0x70, 0x8d, 0x5f, 0x0e, 0x91, 0x04, 0x58, 0x39, 0x1f, 0xf5, 0xbb, 0x16, 0xda, 0x83,
+	0xc5, 0xb1, 0xe5, 0x50, 0x0a, 0x3f, 0xa3, 0x25, 0x54, 0xb5, 0x38, 0xb7, 0x96, 0xc1, 0x01, 0x12,
+	0xed, 0x42, 0xde, 0xdc, 0x65, 0x42, 0x59, 0xd1, 0x95, 0x83, 0xba, 0xeb, 0xcb, 0xf8, 0x38, 0x2a,
+	0x52, 0x66, 0x22, 0x39, 0xa1, 0x48, 0x39, 0x14, 0x29, 0x87, 0x22, 0x0f, 0x98, 0xc8, 0x9c, 0x50,
+	0xe4, 0x41, 0x28, 0xf2, 0x20, 0x14, 0xd9, 0x63, 0x22, 0xf3, 0x42, 0x91, 0xbd, 0x50, 0x64, 0x2f,
+	0x14, 0xd9, 0x67, 0x22, 0x0b, 0x42, 0x91, 0xfd, 0x50, 0x64, 0x3f, 0x14, 0x39, 0x60, 0x22, 0x79,
+	0xa1, 0xc8, 0x41, 0x28, 0xc2, 0x7e, 0x1e, 0x2e, 0xc2, 0x42, 0x97, 0x7a, 0x5c, 0x19, 0xc3, 0x7a,
+	0xfb, 0xdc, 0xb1, 0xdc, 0xf3, 0x91, 0xdd, 0xd3, 0x8c, 0x36, 0x56, 0xf9, 0x4c, 0xbc, 0x03, 0xcb,
+	0x9e, 0x4f, 0xc7, 0x3a, 0x6e, 0xb1, 0x49, 0xaf, 0x65, 0x70, 0x9c, 0x9c, 0xc4, 0x3d, 0x66, 0x01,
+	0x95, 0xc4, 0x3d, 0x8e, 0xf4, 0xf8, 0xeb, 0x12, 0xac, 0x92, 0x2e, 0xcd, 0xb0, 0x4f, 0xf4, 0x08,
+	0xf2, 0x63, 0xc7, 0x72, 0xad, 0xa1, 0xc7, 0xbf, 0xde, 0x25, 0x92, 0x77, 0xdc, 0xc4, 0x16, 0xc6,
+	0x3e, 0x1c, 0xbd, 0xe7, 0xeb, 0x15, 0xbf, 0x65, 0x11, 0x8d, 0x0d, 0xfb, 0x96, 0x7c, 0x08, 0x8b,
+	0x7e, 0x3c, 0x21, 0x0c, 0xb2, 0x43, 0xc3, 0xb1, 0x4e, 0xc4, 0x5f, 0x9a, 0xf6, 0x89, 0xcb, 0x4d,
+	0x79, 0x47, 0x1c, 0x81, 0x38, 0x81, 0xc6, 0x29, 0x79, 0xe5, 0x1b, 0x90, 0xe7, 0xa1, 0x87, 0x7e,
+	0x0e, 0x8a, 0xe6, 0x6e, 0x60, 0x0c, 0x8f, 0xed, 0x37, 0xd2, 0xb6, 0x46, 0x9c, 0x82, 0xa3, 0x12,
+	0x54, 0x57, 0x39, 0xd4, 0x55, 0xbe, 0xb2, 0xae, 0x50, 0x42, 0x79, 0x1b, 0xf2, 0x3c, 0x58, 0x49,
+	0xb6, 0x35, 0x1f, 0xf0, 0x54, 0xc0, 0xb3, 0xad, 0xdf, 0xa6, 0x5d, 0xee, 0x85, 0x5d, 0xee, 0x5d,
+	0xb9, 0xcb, 0x50, 0x42, 0xf9, 0x6d, 0x09, 0xf2, 0x3c, 0x74, 0x91, 0x0a, 0x4b, 0xe6, 0x7e, 0xc0,
+	0xda, 0xbd, 0x9c, 0xb6, 0x98, 0x48, 0x42, 0x45, 0x99, 0xcf, 0xfd, 0x15, 0x54, 0x94, 0xa9, 0x13,
+	0x0e, 0x42, 0x27, 0x1c, 0x24, 0x9c, 0xc0, 0xdb, 0xca, 0x8f, 0x25, 0x28, 0x46, 0xf2, 0x14, 0xda,
+	0x4f, 0x46, 0x6a, 0xea, 0xf8, 0x13, 0x60, 0xa3, 0x61, 0xfa, 0x30, 0x11, 0xa6, 0x77, 0xa6, 0x4a,
+	0xc5, 0x63, 0x14, 0x6d, 0x01, 0x9c, 0xbf, 0x72, 0x3d, 0xcb, 0xb1, 0xdc, 0xbe, 0xcb, 0x37, 0xd0,
+	0x08, 0x85, 0x1c, 0xca, 0xbc, 0xfe, 0xc0, 0xf2, 0x46, 0x1e, 0xdf, 0x32, 0x84, 0x87, 0xb2, 0x76,
+	0x7f, 0x60, 0xb5, 0xfd, 0x9d, 0x02, 0xc7, 0x25, 0x94, 0x7f, 0x95, 0x60, 0x89, 0x19, 0xc0, 0xef,
+	0xdb, 0xbf, 0x46, 0x8e, 0x55, 0x81, 0x41, 0x2e, 0x9f, 0xa0, 0x1b, 0x53, 0x4d, 0xc6, 0x31, 0x38,
+	0x3a, 0x86, 0x55, 0xae, 0xfa, 0xf1, 0xc4, 0x1c, 0x7a, 0x7d, 0xef, 0x15, 0x2f, 0xfc, 0x93, 0xf3,
+	0x13, 0x07, 0xe1, 0xa4, 0x14, 0x3b, 0x70, 0x12, 0xc5, 0x8f, 0x27, 0xa6, 0x4d, 0xd4, 0xe4, 0xa6,
+	0x7b, 0x9c, 0x43, 0x70, 0x5c, 0x42, 0xf9, 0x02, 0x14, 0xd4, 0x1e, 0xfd, 0xc4, 0x51, 0xef, 0xa1,
+	0xdb, 0x50, 0x30, 0xfd, 0x46, 0x49, 0xa2, 0x05, 0x57, 0x48, 0x20, 0xd0, 0xaa, 0x65, 0x87, 0xd0,
+	0x9e, 0xdf, 0xf0, 0xa1, 0x01, 0x81, 0x9c, 0xbd, 0x11, 0xfb, 0xa9, 0xd2, 0x03, 0x1b, 0xcf, 0x99,
+	0x0f, 0xe3, 0xfa, 0x05, 0x1f, 0x38, 0x02, 0x5b, 0x6a, 0x99, 0x48, 0xd7, 0x44, 0x30, 0xec, 0x2d,
+	0x2b, 0x12, 0x0c, 0x2c, 0x23, 0x82, 0x01, 0x16, 0xdd, 0x05, 0x38, 0x1f, 0x79, 0x23, 0xcf, 0x74,
+	0x9e, 0x5b, 0xbc, 0xc4, 0xa4, 0x9f, 0x10, 0x03, 0x5a, 0x24, 0xef, 0xfe, 0xaa, 0x04, 0x4b, 0x51,
+	0xa3, 0xe9, 0xe5, 0x72, 0x2c, 0x94, 0x6f, 0xa7, 0xb7, 0x6d, 0x1f, 0x1c, 0x8d, 0xe5, 0x47, 0x89,
+	0x58, 0xbe, 0x3b, 0x5d, 0x2c, 0x91, 0x70, 0x7f, 0x43, 0x82, 0x05, 0xca, 0xae, 0x92, 0xf2, 0x78,
+	0x10, 0xd4, 0x16, 0xc1, 0x45, 0x72, 0x8c, 0x46, 0x0a, 0x48, 0x27, 0x12, 0x97, 0x75, 0xff, 0x62,
+	0x39, 0x41, 0x45, 0x65, 0x58, 0x30, 0xd9, 0x31, 0x3b, 0x27, 0xfa, 0xba, 0x18, 0x35, 0x08, 0x73,
+	0xa4, 0xf2, 0x5f, 0x12, 0x2c, 0xc7, 0xbe, 0x82, 0x5e, 0xfa, 0x6e, 0x38, 0x28, 0x12, 0xb3, 0x34,
+	0x2c, 0x78, 0x91, 0xf8, 0x1e, 0x14, 0x43, 0xdb, 0xfd, 0x0b, 0xe2, 0x52, 0xda, 0x10, 0x06, 0xc0,
+	0x51, 0x30, 0xfa, 0xba, 0x1f, 0xe7, 0xcc, 0x12, 0xff, 0x00, 0x73, 0x53, 0x14, 0xe7, 0xfc, 0x3a,
+	0x3b, 0x2e, 0x80, 0xee, 0x43, 0x7e, 0x40, 0x47, 0xe9, 0x9f, 0x3c, 0xd7, 0x05, 0x2e, 0xa8, 0x62,
+	0x1f, 0xa4, 0x3c, 0x82, 0xc5, 0x56, 0xa5, 0xae, 0xe2, 0xa3, 0xca, 0xe9, 0x15, 0xef, 0xe4, 0x7f,
+	0x97, 0xe4, 0xc3, 0xb0, 0x00, 0x45, 0x65, 0x58, 0x1c, 0x77, 0xfb, 0x2a, 0xe1, 0x4e, 0xa9, 0xd8,
+	0x78, 0x3f, 0x38, 0xc0, 0x5d, 0xfa, 0x08, 0x85, 0x60, 0xce, 0x71, 0x9d, 0x31, 0xcf, 0x7a, 0xf4,
+	0x37, 0xa7, 0xbd, 0xe0, 0x55, 0x33, 0xfd, 0xad, 0x7c, 0x5f, 0x82, 0xd5, 0xc4, 0xa7, 0xe8, 0x68,
+	0x29, 0x9f, 0xbb, 0xfa, 0xe1, 0x4d, 0x85, 0x15, 0x52, 0x11, 0x47, 0xbe, 0x7f, 0xe7, 0x5e, 0x57,
+	0x89, 0x27, 0x04, 0x94, 0x7f, 0xcf, 0x81, 0xdc, 0x28, 0xc7, 0xab, 0x04, 0xf4, 0x14, 0xae, 0x7b,
+	0x82, 0x6f, 0xd4, 0xfe, 0x9b, 0xa5, 0x37, 0x45, 0x9f, 0xc5, 0xe3, 0x2a, 0x5c, 0x2c, 0xd6, 0x80,
+	0x7e, 0x09, 0x36, 0x3d, 0xf1, 0x37, 0x6a, 0x9e, 0x7d, 0x2f, 0xa5, 0x7c, 0x9a, 0x0e, 0x6a, 0xb9,
+	0xe0, 0x23, 0xb5, 0x7f, 0x47, 0x75, 0x49, 0xcb, 0x45, 0x1a, 0xa8, 0xe5, 0xfa, 0xf4, 0x37, 0xbe,
+	0x97, 0xb6, 0x5c, 0xac, 0x03, 0x7d, 0x0b, 0xd6, 0xbd, 0x56, 0xaf, 0x3b, 0x16, 0x3d, 0xf1, 0xbd,
+	0xa4, 0x6e, 0xa1, 0x02, 0xe5, 0x07, 0x12, 0x2c, 0x45, 0x5f, 0x2e, 0xcc, 0x98, 0x41, 0x6a, 0xb0,
+	0x1a, 0xaf, 0x20, 0xfd, 0x07, 0xb9, 0x5b, 0x49, 0x13, 0xe3, 0xe6, 0xe1, 0xa4, 0x98, 0xf2, 0x43,
+	0x09, 0xd6, 0xe8, 0x34, 0x62, 0x6b, 0xdc, 0xb2, 0x1c, 0xdd, 0x72, 0x5e, 0x52, 0x4f, 0x5c, 0xd6,
+	0xbe, 0x12, 0xe4, 0xbb, 0x2f, 0xfa, 0xb5, 0x3e, 0x7d, 0x1a, 0x49, 0xaf, 0x25, 0x78, 0x93, 0x9c,
+	0x01, 0x1d, 0xc6, 0xc8, 0x51, 0x06, 0x6f, 0xa1, 0xb7, 0x60, 0x79, 0x3c, 0x71, 0xbb, 0xe7, 0x7a,
+	0x7f, 0xe8, 0xd4, 0xd8, 0x15, 0x19, 0x61, 0xc7, 0x89, 0x0c, 0xd5, 0x8d, 0xa0, 0xe6, 0x7d, 0x54,
+	0x84, 0xa8, 0xfc, 0x99, 0x04, 0xeb, 0xa2, 0x77, 0x1c, 0x9f, 0xc6, 0xbd, 0x91, 0x53, 0xbc, 0xc1,
+	0x9f, 0xc0, 0x33, 0x8d, 0xbe, 0x4f, 0xfc, 0x4c, 0x7d, 0x4f, 0xf0, 0xd8, 0x23, 0xee, 0x3d, 0x2c,
+	0x14, 0x57, 0xfe, 0x40, 0x82, 0x8d, 0x29, 0x4b, 0xe6, 0xb2, 0xf6, 0x6e, 0x83, 0x4c, 0xfd, 0x54,
+	0x1f, 0x7a, 0xcf, 0x5a, 0xdf, 0x76, 0x22, 0x7e, 0x4f, 0xd1, 0xd1, 0x7d, 0x40, 0xd4, 0x5b, 0x94,
+	0x36, 0xfa, 0xb6, 0xe5, 0x44, 0x26, 0x43, 0xc0, 0x51, 0xbe, 0x01, 0x8b, 0x2d, 0x7c, 0x68, 0xd0,
+	0x2f, 0xd0, 0x5b, 0x00, 0x63, 0xe7, 0x8c, 0xfe, 0xa6, 0xf7, 0xdc, 0x44, 0x26, 0x42, 0x89, 0xf2,
+	0xe9, 0x7d, 0x77, 0x8c, 0x6f, 0xd8, 0xca, 0x27, 0x59, 0xd8, 0x8c, 0xae, 0xb1, 0x4f, 0x19, 0x5a,
+	0x2f, 0xba, 0xfd, 0x0f, 0x4c, 0x7e, 0x55, 0x50, 0xc0, 0x7e, 0x93, 0x6e, 0x24, 0xbc, 0x2f, 0x1e,
+	0xf7, 0xc9, 0x8d, 0x84, 0x8f, 0x03, 0x07, 0x38, 0x7a, 0x2b, 0xdd, 0x75, 0xe9, 0x87, 0x55, 0xba,
+	0x90, 0x68, 0x83, 0x94, 0x0d, 0xc3, 0xc9, 0x80, 0x5a, 0xda, 0xf6, 0xfa, 0x84, 0xcd, 0xe2, 0x2c,
+	0x41, 0xe5, 0xd2, 0x86, 0x5d, 0x5a, 0x08, 0xa4, 0x8d, 0x94, 0x34, 0xbd, 0x1e, 0x4f, 0x49, 0x1b,
+	0x36, 0x19, 0x89, 0x63, 0x0e, 0x3f, 0xaa, 0xda, 0xbb, 0xa5, 0x45, 0x36, 0x12, 0xde, 0x0c, 0x39,
+	0xe5, 0x52, 0x21, 0xca, 0x29, 0x2b, 0x7f, 0x2e, 0xc1, 0xba, 0xe8, 0xa5, 0xcf, 0x8c, 0xa1, 0xfd,
+	0x94, 0xbf, 0x34, 0x12, 0x87, 0xf6, 0xdb, 0xd3, 0x5f, 0x03, 0xc5, 0xc2, 0x5b, 0xa4, 0x42, 0xf9,
+	0x67, 0x09, 0x36, 0xa6, 0xe4, 0xd5, 0xd9, 0xa7, 0xfc, 0xff, 0xc3, 0xb2, 0x3f, 0x95, 0xad, 0x6e,
+	0xf8, 0x5f, 0x46, 0xa6, 0xcd, 0x7b, 0x1c, 0x1c, 0x95, 0xa6, 0x9f, 0xda, 0xf9, 0xad, 0xcc, 0x6b,
+	0xa5, 0x29, 0x58, 0xf9, 0xcd, 0x1c, 0xac, 0x09, 0xde, 0x2e, 0xcd, 0x38, 0x13, 0x91, 0xb1, 0xe6,
+	0xe2, 0x63, 0x25, 0x07, 0x0a, 0xd3, 0x33, 0x3f, 0x18, 0xd9, 0x41, 0xb8, 0x86, 0x84, 0x08, 0xd7,
+	0xf0, 0xa3, 0x35, 0x24, 0xd0, 0x85, 0xf9, 0x91, 0x57, 0xb5, 0x6c, 0xf3, 0x55, 0xd5, 0x8f, 0xd6,
+	0x08, 0x85, 0x26, 0x90, 0x8f, 0xbc, 0x6a, 0xdf, 0xed, 0x9a, 0x4e, 0x0f, 0x9b, 0x1e, 0x59, 0xde,
+	0x79, 0x9e, 0x40, 0x12, 0x74, 0x9a, 0x83, 0x3f, 0xf2, 0x1a, 0x23, 0xd7, 0xe5, 0xc0, 0x45, 0x9e,
+	0x83, 0xa3, 0xc4, 0x04, 0x8a, 0x7e, 0xf6, 0x49, 0xa2, 0xd8, 0xf3, 0x02, 0xef, 0xdc, 0x19, 0x4d,
+	0x9e, 0x9f, 0x8f, 0x27, 0x5e, 0xd5, 0x2e, 0x01, 0x05, 0xc5, 0x68, 0x71, 0x8c, 0x61, 0x97, 0x8a,
+	0x49, 0x8c, 0x61, 0x2b, 0x3f, 0xc8, 0x41, 0x21, 0x78, 0xbb, 0x35, 0xe3, 0x2e, 0x1a, 0xad, 0x47,
+	0x73, 0x97, 0xac, 0x47, 0xdf, 0x86, 0xec, 0x58, 0xa5, 0x93, 0xb2, 0x92, 0xbc, 0x3b, 0x7b, 0x52,
+	0xaf, 0xd4, 0x2b, 0x2d, 0x15, 0x67, 0xc7, 0x2a, 0x99, 0x06, 0xd7, 0x33, 0x1d, 0xaf, 0xe5, 0x9c,
+	0x05, 0x39, 0x25, 0x42, 0xa1, 0x65, 0xf3, 0xb0, 0xc7, 0xb8, 0x6c, 0x92, 0x82, 0x36, 0xfa, 0x12,
+	0x5c, 0x73, 0x27, 0x67, 0x47, 0x8e, 0x39, 0xb0, 0x0e, 0xfb, 0xde, 0xc0, 0x74, 0x3f, 0x0a, 0xe6,
+	0x28, 0xcd, 0x20, 0xe1, 0x30, 0xde, 0x31, 0xac, 0x16, 0xc9, 0xfe, 0x7c, 0x82, 0x42, 0x42, 0xd4,
+	0x8e, 0x60, 0x66, 0x22, 0x94, 0xd0, 0x0e, 0xc3, 0x9f, 0x92, 0xa0, 0x2d, 0xb0, 0x23, 0x98, 0x93,
+	0x34, 0x83, 0x5e, 0xd5, 0x25, 0x1e, 0xd5, 0xcd, 0x38, 0x3d, 0x07, 0xb0, 0xe0, 0xfa, 0xdf, 0xe8,
+	0x73, 0x97, 0xf8, 0x16, 0xc8, 0xd1, 0xca, 0xdf, 0x4a, 0x30, 0x5f, 0x51, 0x2b, 0x26, 0x3d, 0x00,
+	0x9c, 0x99, 0x43, 0xff, 0xc0, 0x48, 0x7f, 0xa3, 0x47, 0x50, 0xe8, 0x9a, 0x5d, 0xdb, 0x74, 0xdd,
+	0x9e, 0x5f, 0xed, 0x26, 0x0e, 0x4f, 0x54, 0xb6, 0x42, 0x10, 0x55, 0x1b, 0x87, 0xe0, 0x88, 0xe4,
+	0xc4, 0x16, 0x7f, 0x3e, 0x0e, 0x25, 0x8d, 0x50, 0x72, 0x42, 0x3d, 0xd9, 0x75, 0x46, 0xae, 0x5b,
+	0x31, 0x1d, 0xa7, 0x6f, 0x39, 0x34, 0x49, 0xf2, 0x53, 0x49, 0x9a, 0xa1, 0x1c, 0xc3, 0x7c, 0xb5,
+	0x42, 0xcc, 0x7f, 0x1f, 0x96, 0x7a, 0xce, 0x59, 0xfb, 0xd5, 0xd8, 0xa2, 0x8f, 0xc5, 0x78, 0xe1,
+	0x9f, 0xe8, 0x93, 0x42, 0xab, 0x0c, 0x86, 0x63, 0x78, 0x45, 0x87, 0x35, 0xc1, 0xbb, 0xc4, 0xd9,
+	0xbe, 0x55, 0x29, 0x7f, 0x22, 0x81, 0x9c, 0x7c, 0x99, 0x38, 0xe3, 0xe7, 0xaf, 0x2f, 0xc0, 0x7c,
+	0xd7, 0xac, 0x98, 0x63, 0xbe, 0x08, 0xd7, 0x04, 0x4e, 0xc5, 0x0c, 0x41, 0xa0, 0xbd, 0x2e, 0x81,
+	0xce, 0x89, 0xa0, 0xd4, 0x17, 0x98, 0x21, 0xc8, 0x76, 0x54, 0x68, 0x39, 0xa3, 0x31, 0x7b, 0x4d,
+	0xf6, 0x69, 0xce, 0x9e, 0x8f, 0x60, 0x33, 0x35, 0x3b, 0xfc, 0xf9, 0x0f, 0xcb, 0xe4, 0xd3, 0xd8,
+	0xe8, 0xab, 0x50, 0xec, 0x9a, 0xc1, 0xe7, 0x7a, 0xf1, 0x5b, 0x9d, 0x8a, 0x1a, 0x7e, 0xcf, 0x8f,
+	0xa2, 0xe9, 0x2b, 0x2b, 0xcb, 0xec, 0x7a, 0xed, 0xfe, 0x80, 0xdf, 0xd1, 0x15, 0x70, 0x84, 0xa2,
+	0x7c, 0x47, 0x82, 0x45, 0xff, 0x65, 0xe6, 0x8c, 0x9e, 0x7f, 0x08, 0x40, 0xdf, 0x63, 0xba, 0xc4,
+	0x51, 0xe2, 0x97, 0x6a, 0x81, 0x0b, 0x71, 0x04, 0xaa, 0xfc, 0x8d, 0x04, 0x2b, 0xf1, 0xd7, 0xa1,
+	0x33, 0x5a, 0xb2, 0x07, 0x05, 0xa6, 0xbe, 0x3e, 0xec, 0x71, 0x43, 0xa6, 0x4d, 0x50, 0x08, 0x8c,
+	0xa4, 0x88, 0xb9, 0x2b, 0xa5, 0x88, 0xef, 0x48, 0x50, 0x8c, 0xbc, 0x4b, 0xfd, 0xdf, 0xb0, 0x5d,
+	0x71, 0x21, 0xcf, 0x9f, 0xa9, 0x4e, 0xff, 0x96, 0x38, 0xd0, 0x2e, 0xee, 0x9f, 0x01, 0x08, 0xd2,
+	0xa5, 0xc8, 0x0b, 0xbe, 0x25, 0x52, 0x80, 0xf2, 0x5d, 0x09, 0x96, 0x63, 0x8f, 0x63, 0x67, 0x1c,
+	0x7a, 0x34, 0x47, 0x4b, 0x57, 0x98, 0x80, 0x97, 0x00, 0xe1, 0x0b, 0xdb, 0xcf, 0x71, 0xfc, 0x7f,
+	0x2c, 0xc1, 0x46, 0xf4, 0x59, 0x6e, 0xcb, 0x72, 0xba, 0xd6, 0xd0, 0x23, 0x07, 0x84, 0xcb, 0x6e,
+	0x56, 0x3b, 0xb0, 0xc6, 0x9f, 0xf0, 0x86, 0xc2, 0xc1, 0xe5, 0x97, 0x88, 0x25, 0x94, 0x30, 0x6c,
+	0x7e, 0x55, 0x25, 0x62, 0x29, 0x7f, 0x21, 0x01, 0x4a, 0xbf, 0x1e, 0x9e, 0x71, 0xae, 0x7e, 0x11,
+	0x36, 0x3c, 0xe1, 0xd0, 0x79, 0xcc, 0xbe, 0x35, 0xfd, 0xf5, 0x72, 0x88, 0xc5, 0x53, 0x74, 0x6c,
+	0xff, 0xd3, 0x02, 0x14, 0x23, 0xff, 0x71, 0x0e, 0xad, 0xc1, 0xaa, 0x71, 0xfa, 0xcd, 0xd3, 0xe6,
+	0xb7, 0x4e, 0x3b, 0x27, 0x9a, 0xae, 0xab, 0xc7, 0x9a, 0x9c, 0x41, 0x9b, 0xb0, 0x56, 0xd1, 0x1a,
+	0x8d, 0x4e, 0xa5, 0x79, 0x7a, 0x54, 0x3f, 0xee, 0x60, 0xed, 0xb1, 0xa1, 0xe9, 0x6d, 0x59, 0x42,
+	0x1b, 0x80, 0xe2, 0x8c, 0x56, 0x13, 0xb7, 0xe5, 0x2c, 0x2a, 0xc1, 0xba, 0xa1, 0x75, 0xd4, 0xea,
+	0x49, 0x5d, 0xd7, 0xeb, 0xcd, 0xd3, 0x40, 0x22, 0x87, 0x6e, 0xc0, 0xf5, 0x04, 0x47, 0x6f, 0x35,
+	0x4f, 0x75, 0x4d, 0x9e, 0x23, 0xbd, 0xc4, 0x58, 0x7a, 0x5b, 0x6d, 0x1b, 0xba, 0x3c, 0x8f, 0xae,
+	0xc3, 0x35, 0x43, 0x23, 0x7d, 0xb4, 0xb5, 0x27, 0xed, 0x8e, 0xd1, 0xaa, 0xaa, 0x6d, 0x4d, 0x5e,
+	0xa0, 0xa6, 0x6a, 0x1d, 0xac, 0xf1, 0xce, 0xeb, 0xa7, 0x55, 0x39, 0x8f, 0x10, 0xac, 0x50, 0x62,
+	0x43, 0x53, 0x75, 0x8d, 0xd2, 0x16, 0xd1, 0x6d, 0x28, 0x1d, 0x6a, 0x2a, 0xd6, 0xb0, 0xc0, 0xa2,
+	0x02, 0x7a, 0x03, 0x6e, 0x08, 0xb8, 0xdc, 0x2a, 0x40, 0xb7, 0x60, 0x33, 0xc5, 0xe6, 0x96, 0x15,
+	0xc9, 0xf8, 0x39, 0x33, 0xda, 0xe3, 0x12, 0x5a, 0x01, 0xa8, 0x35, 0x83, 0x3e, 0x96, 0x79, 0xfb,
+	0x48, 0xad, 0x37, 0x0c, 0xac, 0xc9, 0x2b, 0x68, 0x15, 0x8a, 0xb5, 0x66, 0xa7, 0xd2, 0x3c, 0x69,
+	0x35, 0xb4, 0xb6, 0x26, 0xaf, 0x92, 0x21, 0xe2, 0x27, 0x7a, 0xfd, 0xb8, 0x73, 0xa2, 0xa9, 0xba,
+	0xef, 0x47, 0x99, 0x8c, 0xa6, 0x51, 0x66, 0x34, 0x36, 0x4a, 0xf9, 0x1a, 0x19, 0x0d, 0x56, 0xab,
+	0xf5, 0x66, 0x14, 0xda, 0x69, 0x69, 0xb8, 0x63, 0x68, 0x32, 0x42, 0x5b, 0x70, 0x53, 0xcc, 0x25,
+	0xf3, 0x24, 0xaf, 0x11, 0x69, 0xbd, 0x52, 0xd3, 0xaa, 0x22, 0xe9, 0x75, 0x22, 0x2d, 0xe6, 0x52,
+	0xe9, 0xeb, 0xc4, 0x19, 0xe4, 0x44, 0x25, 0x12, 0xde, 0x20, 0xce, 0x20, 0xd3, 0xa4, 0xb6, 0xd4,
+	0xc3, 0x7a, 0xa3, 0xde, 0x7e, 0xda, 0xa9, 0x9f, 0x1e, 0x35, 0xe5, 0x4d, 0x3e, 0xe5, 0x11, 0xba,
+	0x76, 0xfa, 0xd8, 0xa8, 0xe3, 0xa7, 0x72, 0x09, 0x2d, 0x43, 0x41, 0xa7, 0x01, 0xa4, 0x56, 0xab,
+	0xf2, 0x0d, 0xb4, 0x0e, 0x72, 0xd0, 0xf4, 0x9d, 0x7c, 0x13, 0xc9, 0xb0, 0xc4, 0xa8, 0x55, 0x8d,
+	0x7a, 0xeb, 0x16, 0x71, 0x27, 0xc6, 0x27, 0xbe, 0x4b, 0x6e, 0x53, 0xef, 0x05, 0x6d, 0x5f, 0xf0,
+	0x0d, 0xb4, 0x04, 0x8b, 0xba, 0x76, 0x7a, 0x48, 0x95, 0x6f, 0x91, 0x70, 0xf1, 0x5b, 0x3e, 0xe4,
+	0x0e, 0x99, 0x08, 0x4a, 0xe4, 0xaa, 0xef, 0x92, 0xc8, 0x6d, 0x63, 0xf5, 0xe8, 0xa8, 0x5e, 0xe9,
+	0xe8, 0xad, 0x46, 0xbd, 0xed, 0x77, 0x72, 0x8f, 0x68, 0x23, 0x73, 0xa6, 0x1a, 0xba, 0x26, 0x2b,
+	0x44, 0x1b, 0xc6, 0x95, 0xd8, 0xd4, 0xbc, 0xb9, 0xfd, 0x21, 0x14, 0x23, 0x4f, 0x79, 0xc9, 0xe8,
+	0xb4, 0x13, 0x0d, 0x1f, 0x6b, 0xa7, 0x95, 0xa7, 0x72, 0x06, 0x5d, 0x83, 0xe5, 0x5a, 0xfd, 0xb8,
+	0x56, 0x6b, 0x75, 0xd4, 0x4a, 0x45, 0xd3, 0x75, 0x59, 0x22, 0x88, 0x93, 0xb6, 0xdf, 0xcc, 0x12,
+	0xc4, 0x49, 0xb3, 0xa3, 0xd7, 0x8f, 0x4f, 0xd5, 0x46, 0xa3, 0x7e, 0x7a, 0x2c, 0xe7, 0x50, 0x11,
+	0xf2, 0x27, 0xcd, 0x4e, 0x55, 0x6d, 0xab, 0xf2, 0xdc, 0xf6, 0x97, 0x40, 0x4e, 0xa6, 0x66, 0x02,
+	0xd0, 0x0d, 0xa6, 0x20, 0x43, 0x1a, 0x7e, 0x90, 0x49, 0xdb, 0x0d, 0x58, 0x8e, 0xbd, 0xd4, 0x24,
+	0x8e, 0x0c, 0x56, 0x0b, 0x6e, 0x1c, 0xc9, 0x19, 0xe2, 0xf0, 0x80, 0xc2, 0x03, 0x54, 0x96, 0xe8,
+	0xd8, 0x7c, 0x6a, 0xb3, 0x5d, 0xd3, 0xb0, 0x2e, 0x67, 0xb7, 0xbf, 0x09, 0x4b, 0xd1, 0x67, 0x96,
+	0x64, 0xb6, 0xc3, 0x98, 0x57, 0x2b, 0xed, 0xfa, 0x07, 0xf5, 0x36, 0x19, 0xe5, 0x2a, 0x14, 0x7d,
+	0x3a, 0xe9, 0x43, 0x22, 0x31, 0xec, 0x13, 0x02, 0x65, 0x5f, 0x80, 0xe5, 0xd8, 0xcb, 0x48, 0xb4,
+	0x00, 0xd9, 0x6a, 0x43, 0xce, 0x90, 0x7f, 0x0d, 0x62, 0xc2, 0x22, 0xcc, 0x1d, 0x36, 0xdb, 0x35,
+	0x39, 0xbb, 0xbd, 0x03, 0x8b, 0xfe, 0x73, 0x48, 0x32, 0x00, 0xf2, 0xbb, 0x53, 0xd5, 0x8e, 0x54,
+	0xa3, 0xd1, 0x96, 0x33, 0x44, 0x39, 0xa7, 0x54, 0xeb, 0x15, 0xb5, 0xad, 0x55, 0x65, 0x69, 0xfb,
+	0x3f, 0x25, 0x32, 0xf0, 0xc8, 0x37, 0x5a, 0x12, 0xb6, 0x7e, 0xb0, 0xaa, 0x58, 0x3d, 0xe9, 0xb4,
+	0x70, 0xe7, 0xb4, 0xd9, 0xae, 0x11, 0x0f, 0x67, 0xc8, 0xfa, 0x4f, 0x32, 0x49, 0x48, 0xd3, 0x86,
+	0x2c, 0x89, 0x64, 0xd5, 0x5d, 0xc6, 0xcc, 0x0a, 0x99, 0x65, 0xc6, 0xcc, 0x09, 0x99, 0x0f, 0x18,
+	0x73, 0x4e, 0xc8, 0xdc, 0x63, 0xcc, 0x79, 0x21, 0x73, 0x9f, 0x31, 0x17, 0x84, 0xcc, 0x03, 0xc6,
+	0xcc, 0x6f, 0xff, 0x30, 0x0b, 0xa5, 0x69, 0xcf, 0x17, 0xc8, 0x6c, 0x07, 0x23, 0xeb, 0x9c, 0xe8,
+	0x9d, 0xdd, 0xf2, 0x0e, 0x8b, 0x81, 0x18, 0xb5, 0xbc, 0xb7, 0x23, 0x4b, 0x29, 0xea, 0xde, 0xa3,
+	0x1d, 0x39, 0x9b, 0xa2, 0x1e, 0xec, 0xed, 0xc8, 0x39, 0xb2, 0xfc, 0xe2, 0x7a, 0x77, 0xca, 0x7b,
+	0xf2, 0x5c, 0x8a, 0x5c, 0xde, 0xd9, 0x7b, 0xc4, 0xb2, 0x79, 0x8c, 0xbc, 0x4f, 0xcc, 0x58, 0x20,
+	0xf1, 0x94, 0x52, 0xb2, 0x23, 0xe7, 0x49, 0x30, 0x46, 0xe8, 0xf5, 0xd3, 0xce, 0xae, 0xbc, 0x98,
+	0x26, 0x1e, 0xc8, 0x85, 0x84, 0x71, 0x04, 0x59, 0x96, 0x21, 0x4d, 0x7d, 0xb0, 0x23, 0x17, 0xd3,
+	0xd4, 0x83, 0x1d, 0x79, 0x69, 0xdb, 0x06, 0x39, 0xf9, 0x0c, 0x85, 0xa4, 0xc4, 0x76, 0x0d, 0x6b,
+	0x7a, 0xad, 0xd9, 0xa8, 0x76, 0x28, 0x31, 0x1e, 0x3e, 0xb7, 0x60, 0x53, 0xc0, 0xc7, 0x3a, 0x6e,
+	0xb1, 0xe0, 0x11, 0x33, 0x1f, 0xcb, 0xd9, 0xed, 0xff, 0x96, 0x60, 0x39, 0xf6, 0xd5, 0x9e, 0x2c,
+	0xdf, 0x76, 0xbb, 0xdd, 0x39, 0xd1, 0xc9, 0xbc, 0x2c, 0xc1, 0x22, 0x6b, 0xd0, 0xf9, 0x08, 0x5a,
+	0x07, 0x7b, 0x72, 0x36, 0x6c, 0x3d, 0x22, 0xfe, 0x5f, 0x86, 0x02, 0x6b, 0xed, 0xee, 0xec, 0xc8,
+	0x73, 0x91, 0x66, 0x99, 0xf8, 0x3b, 0x6c, 0x1e, 0x10, 0x3f, 0x07, 0xcd, 0xf2, 0xfe, 0x81, 0x9c,
+	0x0f, 0x9b, 0x0f, 0xca, 0x3b, 0xf2, 0x62, 0xd8, 0x24, 0xf3, 0x5d, 0x08, 0x9b, 0xfb, 0xd4, 0x97,
+	0x41, 0x93, 0xcc, 0x7b, 0x91, 0xa4, 0x61, 0xbf, 0xdf, 0xf2, 0x1e, 0xdb, 0xf5, 0x82, 0x8e, 0x77,
+	0xd8, 0xae, 0x17, 0x74, 0xb5, 0x23, 0xaf, 0x84, 0x6d, 0x3a, 0xe5, 0xab, 0xdb, 0x5f, 0x84, 0xd5,
+	0xc4, 0x03, 0x01, 0xea, 0x81, 0xc7, 0xcc, 0x7b, 0x99, 0xb0, 0xf1, 0x58, 0x96, 0x48, 0xca, 0x88,
+	0x3d, 0x03, 0x20, 0x5c, 0xfc, 0xb8, 0xa3, 0xab, 0x27, 0x1a, 0x83, 0xe2, 0xc7, 0x1d, 0x9a, 0x32,
+	0xa4, 0xed, 0xdf, 0x93, 0x60, 0x25, 0xfe, 0x65, 0x9b, 0x2c, 0x72, 0x9a, 0xaa, 0xeb, 0xd5, 0x0e,
+	0xc9, 0x55, 0xcd, 0xd3, 0xf8, 0x24, 0xde, 0x81, 0x5b, 0x69, 0xb6, 0x5a, 0xad, 0x12, 0x62, 0xbd,
+	0x2a, 0x4b, 0x62, 0x40, 0x55, 0x6b, 0x70, 0x40, 0x16, 0xdd, 0x85, 0xdb, 0x69, 0x40, 0xad, 0xd9,
+	0x6e, 0xb6, 0x55, 0x7c, 0xac, 0xb5, 0xe5, 0xdc, 0xf6, 0x1f, 0xe6, 0xe0, 0xba, 0xf0, 0xdb, 0x13,
+	0x7a, 0x1b, 0xee, 0xf9, 0xbb, 0x3c, 0x5f, 0xd9, 0xf5, 0xd3, 0xb6, 0x86, 0x3f, 0x50, 0x1b, 0x9d,
+	0xd3, 0xa6, 0x5f, 0x0c, 0x64, 0xd0, 0x3d, 0x78, 0x63, 0x1a, 0x8c, 0xae, 0x17, 0x59, 0x7a, 0x0d,
+	0x64, 0x9f, 0x2c, 0x61, 0x05, 0xb6, 0x2e, 0xd4, 0x42, 0x02, 0xea, 0x62, 0x4c, 0x99, 0x46, 0xd9,
+	0xc5, 0x98, 0xfd, 0x9d, 0x1d, 0x79, 0x1e, 0xbd, 0x09, 0x77, 0x2e, 0xec, 0xab, 0xbc, 0x27, 0x2f,
+	0x10, 0xcf, 0x4d, 0x03, 0xd1, 0x51, 0xe5, 0x2f, 0x1c, 0x15, 0x4f, 0x08, 0xaf, 0x81, 0x94, 0xe5,
+	0xc2, 0xeb, 0x20, 0xfb, 0x32, 0x6c, 0x7f, 0x22, 0x41, 0x9e, 0x5f, 0x07, 0x92, 0x7c, 0x44, 0x7f,
+	0x76, 0x5a, 0x6a, 0xa7, 0x7a, 0x48, 0x20, 0x86, 0x7e, 0xc0, 0xd6, 0x7b, 0x92, 0xfe, 0x64, 0xaf,
+	0xda, 0x6c, 0x3f, 0x7c, 0xc8, 0xea, 0xe1, 0x94, 0xd0, 0x03, 0xb6, 0x4f, 0xa4, 0xe8, 0xbb, 0x4c,
+	0x28, 0x47, 0x76, 0xfd, 0x28, 0x93, 0x38, 0x37, 0x41, 0xda, 0x95, 0xe7, 0x93, 0xa4, 0xb2, 0xbc,
+	0x90, 0x24, 0x3d, 0x90, 0xf3, 0xdb, 0xdf, 0x93, 0x60, 0x29, 0x7a, 0x11, 0x46, 0x32, 0x65, 0x45,
+	0xad, 0xa8, 0xad, 0x4e, 0xa5, 0xa1, 0xea, 0x7a, 0xb5, 0xd1, 0x51, 0xe5, 0x4c, 0x9a, 0x78, 0xc8,
+	0x76, 0xfd, 0x38, 0xb1, 0x22, 0x67, 0xd3, 0xc4, 0xaa, 0x9c, 0x4b, 0x13, 0x49, 0xf5, 0x9e, 0x22,
+	0x1e, 0xc9, 0xf3, 0x09, 0x73, 0x8c, 0xa4, 0x39, 0x86, 0xc8, 0x1c, 0x43, 0x64, 0x8e, 0x21, 0x32,
+	0xc7, 0x10, 0x99, 0x63, 0x88, 0xcc, 0x31, 0x98, 0x39, 0x5f, 0x84, 0xa5, 0xe8, 0xbd, 0x1b, 0x99,
+	0x96, 0x6a, 0x85, 0x80, 0xaa, 0xf8, 0xb0, 0xfd, 0xb4, 0xa5, 0x75, 0x74, 0xa3, 0x45, 0x22, 0x43,
+	0xab, 0xca, 0x99, 0xed, 0x6f, 0x42, 0x31, 0x72, 0xd7, 0x43, 0x2a, 0x8d, 0x8a, 0x5a, 0xad, 0x63,
+	0x8d, 0xad, 0x6e, 0x5a, 0xad, 0x24, 0x68, 0xb4, 0x72, 0x59, 0x07, 0x39, 0x4a, 0x63, 0x55, 0x4c,
+	0xf9, 0xaf, 0x24, 0x90, 0xeb, 0xfe, 0x31, 0x8d, 0xff, 0xbf, 0x4d, 0xd4, 0x84, 0xa2, 0x6e, 0x0d,
+	0x7b, 0xfc, 0xaf, 0xdf, 0xa0, 0xc4, 0xdb, 0xa9, 0xc4, 0x1f, 0xc5, 0xb9, 0x79, 0x4b, 0xc8, 0x66,
+	0xff, 0x81, 0x49, 0xc9, 0xbc, 0x2b, 0xed, 0x48, 0x48, 0x87, 0x65, 0xa2, 0x30, 0xf8, 0xc3, 0x62,
+	0x28, 0xf9, 0xc6, 0x32, 0xf1, 0x67, 0xc8, 0x6e, 0x4e, 0xe3, 0xfb, 0xff, 0x1b, 0x34, 0xb3, 0x23,
+	0x1d, 0x96, 0xfe, 0xf1, 0x27, 0x5b, 0xd2, 0x8f, 0x7e, 0xb2, 0x25, 0xfd, 0xf8, 0x27, 0x5b, 0xd2,
+	0xef, 0xfc, 0x74, 0x2b, 0xf3, 0xa3, 0x9f, 0x6e, 0x65, 0xfe, 0xe5, 0xa7, 0x5b, 0x99, 0xb3, 0x05,
+	0xfa, 0xd7, 0xce, 0x1e, 0xfc, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc0, 0x92, 0x3e, 0xd5, 0x0a,
+	0x4d, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -6648,31 +7000,62 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// E2InterfaceServiceClient is the client API for E2InterfaceService service.
+// InterfaceServiceClient is the client API for InterfaceService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type E2InterfaceServiceClient interface {
-	// SendTelemetry is used by the controller to start receiving a stream of telemetry messages from RAN environment.
-	SendTelemetry(ctx context.Context, in *TelemetryRequest, opts ...grpc.CallOption) (E2InterfaceService_SendTelemetryClient, error)
+type InterfaceServiceClient interface {
 	// SendControl is used by the controller to setup a bi-directional stream of control update messages
 	// from RAN environment to which it can respond asynchronously.
-	SendControl(ctx context.Context, opts ...grpc.CallOption) (E2InterfaceService_SendControlClient, error)
+	SendControl(ctx context.Context, opts ...grpc.CallOption) (InterfaceService_SendControlClient, error)
+	// SendTelemetry is used by the controller to start receiving a stream of telemetry messages from RAN environment.
+	SendTelemetry(ctx context.Context, in *TelemetryRequest, opts ...grpc.CallOption) (InterfaceService_SendTelemetryClient, error)
 }
 
-type e2InterfaceServiceClient struct {
+type interfaceServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewE2InterfaceServiceClient(cc *grpc.ClientConn) E2InterfaceServiceClient {
-	return &e2InterfaceServiceClient{cc}
+func NewInterfaceServiceClient(cc *grpc.ClientConn) InterfaceServiceClient {
+	return &interfaceServiceClient{cc}
 }
 
-func (c *e2InterfaceServiceClient) SendTelemetry(ctx context.Context, in *TelemetryRequest, opts ...grpc.CallOption) (E2InterfaceService_SendTelemetryClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_E2InterfaceService_serviceDesc.Streams[0], "/interface.e2.E2InterfaceService/SendTelemetry", opts...)
+func (c *interfaceServiceClient) SendControl(ctx context.Context, opts ...grpc.CallOption) (InterfaceService_SendControlClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_InterfaceService_serviceDesc.Streams[0], "/interface.e2.InterfaceService/SendControl", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &e2InterfaceServiceSendTelemetryClient{stream}
+	x := &interfaceServiceSendControlClient{stream}
+	return x, nil
+}
+
+type InterfaceService_SendControlClient interface {
+	Send(*ControlResponse) error
+	Recv() (*ControlUpdate, error)
+	grpc.ClientStream
+}
+
+type interfaceServiceSendControlClient struct {
+	grpc.ClientStream
+}
+
+func (x *interfaceServiceSendControlClient) Send(m *ControlResponse) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *interfaceServiceSendControlClient) Recv() (*ControlUpdate, error) {
+	m := new(ControlUpdate)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *interfaceServiceClient) SendTelemetry(ctx context.Context, in *TelemetryRequest, opts ...grpc.CallOption) (InterfaceService_SendTelemetryClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_InterfaceService_serviceDesc.Streams[1], "/interface.e2.InterfaceService/SendTelemetry", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &interfaceServiceSendTelemetryClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -6682,16 +7065,16 @@ func (c *e2InterfaceServiceClient) SendTelemetry(ctx context.Context, in *Teleme
 	return x, nil
 }
 
-type E2InterfaceService_SendTelemetryClient interface {
+type InterfaceService_SendTelemetryClient interface {
 	Recv() (*TelemetryMessage, error)
 	grpc.ClientStream
 }
 
-type e2InterfaceServiceSendTelemetryClient struct {
+type interfaceServiceSendTelemetryClient struct {
 	grpc.ClientStream
 }
 
-func (x *e2InterfaceServiceSendTelemetryClient) Recv() (*TelemetryMessage, error) {
+func (x *interfaceServiceSendTelemetryClient) Recv() (*TelemetryMessage, error) {
 	m := new(TelemetryMessage)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -6699,101 +7082,49 @@ func (x *e2InterfaceServiceSendTelemetryClient) Recv() (*TelemetryMessage, error
 	return m, nil
 }
 
-func (c *e2InterfaceServiceClient) SendControl(ctx context.Context, opts ...grpc.CallOption) (E2InterfaceService_SendControlClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_E2InterfaceService_serviceDesc.Streams[1], "/interface.e2.E2InterfaceService/SendControl", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &e2InterfaceServiceSendControlClient{stream}
-	return x, nil
-}
-
-type E2InterfaceService_SendControlClient interface {
-	Send(*ControlResponse) error
-	Recv() (*ControlUpdate, error)
-	grpc.ClientStream
-}
-
-type e2InterfaceServiceSendControlClient struct {
-	grpc.ClientStream
-}
-
-func (x *e2InterfaceServiceSendControlClient) Send(m *ControlResponse) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *e2InterfaceServiceSendControlClient) Recv() (*ControlUpdate, error) {
-	m := new(ControlUpdate)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// E2InterfaceServiceServer is the server API for E2InterfaceService service.
-type E2InterfaceServiceServer interface {
-	// SendTelemetry is used by the controller to start receiving a stream of telemetry messages from RAN environment.
-	SendTelemetry(*TelemetryRequest, E2InterfaceService_SendTelemetryServer) error
+// InterfaceServiceServer is the server API for InterfaceService service.
+type InterfaceServiceServer interface {
 	// SendControl is used by the controller to setup a bi-directional stream of control update messages
 	// from RAN environment to which it can respond asynchronously.
-	SendControl(E2InterfaceService_SendControlServer) error
+	SendControl(InterfaceService_SendControlServer) error
+	// SendTelemetry is used by the controller to start receiving a stream of telemetry messages from RAN environment.
+	SendTelemetry(*TelemetryRequest, InterfaceService_SendTelemetryServer) error
 }
 
-// UnimplementedE2InterfaceServiceServer can be embedded to have forward compatible implementations.
-type UnimplementedE2InterfaceServiceServer struct {
+// UnimplementedInterfaceServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedInterfaceServiceServer struct {
 }
 
-func (*UnimplementedE2InterfaceServiceServer) SendTelemetry(req *TelemetryRequest, srv E2InterfaceService_SendTelemetryServer) error {
-	return status.Errorf(codes.Unimplemented, "method SendTelemetry not implemented")
-}
-func (*UnimplementedE2InterfaceServiceServer) SendControl(srv E2InterfaceService_SendControlServer) error {
+func (*UnimplementedInterfaceServiceServer) SendControl(srv InterfaceService_SendControlServer) error {
 	return status.Errorf(codes.Unimplemented, "method SendControl not implemented")
 }
-
-func RegisterE2InterfaceServiceServer(s *grpc.Server, srv E2InterfaceServiceServer) {
-	s.RegisterService(&_E2InterfaceService_serviceDesc, srv)
+func (*UnimplementedInterfaceServiceServer) SendTelemetry(req *TelemetryRequest, srv InterfaceService_SendTelemetryServer) error {
+	return status.Errorf(codes.Unimplemented, "method SendTelemetry not implemented")
 }
 
-func _E2InterfaceService_SendTelemetry_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(TelemetryRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(E2InterfaceServiceServer).SendTelemetry(m, &e2InterfaceServiceSendTelemetryServer{stream})
+func RegisterInterfaceServiceServer(s *grpc.Server, srv InterfaceServiceServer) {
+	s.RegisterService(&_InterfaceService_serviceDesc, srv)
 }
 
-type E2InterfaceService_SendTelemetryServer interface {
-	Send(*TelemetryMessage) error
-	grpc.ServerStream
+func _InterfaceService_SendControl_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(InterfaceServiceServer).SendControl(&interfaceServiceSendControlServer{stream})
 }
 
-type e2InterfaceServiceSendTelemetryServer struct {
-	grpc.ServerStream
-}
-
-func (x *e2InterfaceServiceSendTelemetryServer) Send(m *TelemetryMessage) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _E2InterfaceService_SendControl_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(E2InterfaceServiceServer).SendControl(&e2InterfaceServiceSendControlServer{stream})
-}
-
-type E2InterfaceService_SendControlServer interface {
+type InterfaceService_SendControlServer interface {
 	Send(*ControlUpdate) error
 	Recv() (*ControlResponse, error)
 	grpc.ServerStream
 }
 
-type e2InterfaceServiceSendControlServer struct {
+type interfaceServiceSendControlServer struct {
 	grpc.ServerStream
 }
 
-func (x *e2InterfaceServiceSendControlServer) Send(m *ControlUpdate) error {
+func (x *interfaceServiceSendControlServer) Send(m *ControlUpdate) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *e2InterfaceServiceSendControlServer) Recv() (*ControlResponse, error) {
+func (x *interfaceServiceSendControlServer) Recv() (*ControlResponse, error) {
 	m := new(ControlResponse)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -6801,21 +7132,42 @@ func (x *e2InterfaceServiceSendControlServer) Recv() (*ControlResponse, error) {
 	return m, nil
 }
 
-var _E2InterfaceService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "interface.e2.E2InterfaceService",
-	HandlerType: (*E2InterfaceServiceServer)(nil),
+func _InterfaceService_SendTelemetry_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TelemetryRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(InterfaceServiceServer).SendTelemetry(m, &interfaceServiceSendTelemetryServer{stream})
+}
+
+type InterfaceService_SendTelemetryServer interface {
+	Send(*TelemetryMessage) error
+	grpc.ServerStream
+}
+
+type interfaceServiceSendTelemetryServer struct {
+	grpc.ServerStream
+}
+
+func (x *interfaceServiceSendTelemetryServer) Send(m *TelemetryMessage) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+var _InterfaceService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "interface.e2.InterfaceService",
+	HandlerType: (*InterfaceServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "SendTelemetry",
-			Handler:       _E2InterfaceService_SendTelemetry_Handler,
-			ServerStreams: true,
-		},
-		{
 			StreamName:    "SendControl",
-			Handler:       _E2InterfaceService_SendControl_Handler,
+			Handler:       _InterfaceService_SendControl_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "SendTelemetry",
+			Handler:       _InterfaceService_SendTelemetry_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "api/e2/e2-interface.proto",
@@ -6864,9 +7216,107 @@ func (m *TelemetryMessage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.S != nil {
+		{
+			size := m.S.Size()
+			i -= size
+			if _, err := m.S.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if m.MessageType != 0 {
+		i = encodeVarintE2Interface(dAtA, i, uint64(m.MessageType))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
+func (m *TelemetryMessage_RadioMeasReportPerUE) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TelemetryMessage_RadioMeasReportPerUE) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.RadioMeasReportPerUE != nil {
+		{
+			size, err := m.RadioMeasReportPerUE.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TelemetryMessage_RadioMeasReportPerCell) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TelemetryMessage_RadioMeasReportPerCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.RadioMeasReportPerCell != nil {
+		{
+			size, err := m.RadioMeasReportPerCell.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TelemetryMessage_SchedMeasReportPerCell) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TelemetryMessage_SchedMeasReportPerCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.SchedMeasReportPerCell != nil {
+		{
+			size, err := m.SchedMeasReportPerCell.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	return len(dAtA) - i, nil
+}
+func (m *TelemetryMessage_PDCPMeasReportPerUe) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TelemetryMessage_PDCPMeasReportPerUe) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.PDCPMeasReportPerUe != nil {
+		{
+			size, err := m.PDCPMeasReportPerUe.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	return len(dAtA) - i, nil
+}
 func (m *ControlUpdate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -6887,9 +7337,233 @@ func (m *ControlUpdate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.S != nil {
+		{
+			size := m.S.Size()
+			i -= size
+			if _, err := m.S.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if m.MessageType != 0 {
+		i = encodeVarintE2Interface(dAtA, i, uint64(m.MessageType))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
+func (m *ControlUpdate_CellConfigReport) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_CellConfigReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.CellConfigReport != nil {
+		{
+			size, err := m.CellConfigReport.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_RRMConfigStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_RRMConfigStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.RRMConfigStatus != nil {
+		{
+			size, err := m.RRMConfigStatus.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_UEAdmissionRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_UEAdmissionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.UEAdmissionRequest != nil {
+		{
+			size, err := m.UEAdmissionRequest.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_UEAdmissionStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_UEAdmissionStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.UEAdmissionStatus != nil {
+		{
+			size, err := m.UEAdmissionStatus.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_UEContextUpdate) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_UEContextUpdate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.UEContextUpdate != nil {
+		{
+			size, err := m.UEContextUpdate.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_BearerAdmissionRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_BearerAdmissionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.BearerAdmissionRequest != nil {
+		{
+			size, err := m.BearerAdmissionRequest.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_BearerAdmissionStatus) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_BearerAdmissionStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.BearerAdmissionStatus != nil {
+		{
+			size, err := m.BearerAdmissionStatus.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_HOComplete) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_HOComplete) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.HOComplete != nil {
+		{
+			size, err := m.HOComplete.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_HOFailure) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_HOFailure) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.HOFailure != nil {
+		{
+			size, err := m.HOFailure.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x52
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlUpdate_HOCause) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlUpdate_HOCause) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.HOCause != nil {
+		{
+			size, err := m.HOCause.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x5a
+	}
+	return len(dAtA) - i, nil
+}
 func (m *ControlResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -6910,10 +7584,150 @@ func (m *ControlResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.S != nil {
+		{
+			size := m.S.Size()
+			i -= size
+			if _, err := m.S.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if m.MessageType != 0 {
+		i = encodeVarintE2Interface(dAtA, i, uint64(m.MessageType))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MessageHeader) Marshal() (dAtA []byte, err error) {
+func (m *ControlResponse_CellConfigRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_CellConfigRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.CellConfigRequest != nil {
+		{
+			size, err := m.CellConfigRequest.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlResponse_RRMConfig) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_RRMConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.RRMConfig != nil {
+		{
+			size, err := m.RRMConfig.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlResponse_L2MeasConfig) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_L2MeasConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.L2MeasConfig != nil {
+		{
+			size, err := m.L2MeasConfig.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlResponse_UEAdmissionResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_UEAdmissionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.UEAdmissionResponse != nil {
+		{
+			size, err := m.UEAdmissionResponse.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x2a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlResponse_BearerAdmissionResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_BearerAdmissionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.BearerAdmissionResponse != nil {
+		{
+			size, err := m.BearerAdmissionResponse.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlResponse_HORequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_HORequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.HORequest != nil {
+		{
+			size, err := m.HORequest.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2Interface(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *MessageHeader) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -6923,12 +7737,12 @@ func (m *E2MessageHeader) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2MessageHeader) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessageHeader) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessageHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessageHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -6941,7 +7755,7 @@ func (m *E2MessageHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MessagePayload) Marshal() (dAtA []byte, err error) {
+func (m *MessagePayload) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -6951,21 +7765,21 @@ func (m *E2MessagePayload) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2MessagePayload) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Attributes != nil {
+	if m.S != nil {
 		{
-			size := m.Attributes.Size()
+			size := m.S.Size()
 			i -= size
-			if _, err := m.Attributes.MarshalTo(dAtA[i:]); err != nil {
+			if _, err := m.S.MarshalTo(dAtA[i:]); err != nil {
 				return 0, err
 			}
 		}
@@ -6973,16 +7787,16 @@ func (m *E2MessagePayload) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MessagePayload_CellConfigRequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_CellConfigRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_CellConfigRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_CellConfigRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.CellConfigRequestAttribute != nil {
+	if m.CellConfigRequest != nil {
 		{
-			size, err := m.CellConfigRequestAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.CellConfigRequest.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -6994,16 +7808,16 @@ func (m *E2MessagePayload_CellConfigRequestAttribute) MarshalToSizedBuffer(dAtA 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_CellConfigReportAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_CellConfigReport) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_CellConfigReportAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_CellConfigReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.CellConfigReportAttribute != nil {
+	if m.CellConfigReport != nil {
 		{
-			size, err := m.CellConfigReportAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.CellConfigReport.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7015,16 +7829,16 @@ func (m *E2MessagePayload_CellConfigReportAttribute) MarshalToSizedBuffer(dAtA [
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UEAdmissionRequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEAdmissionRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UEAdmissionRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEAdmissionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UEAdmissionRequestAttribute != nil {
+	if m.UEAdmissionRequest != nil {
 		{
-			size, err := m.UEAdmissionRequestAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UEAdmissionRequest.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7036,16 +7850,16 @@ func (m *E2MessagePayload_UEAdmissionRequestAttribute) MarshalToSizedBuffer(dAtA
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UEAdmissionResponseAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEAdmissionResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UEAdmissionResponseAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEAdmissionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UEAdmissionResponseAttribute != nil {
+	if m.UEAdmissionResponse != nil {
 		{
-			size, err := m.UEAdmissionResponseAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UEAdmissionResponse.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7057,16 +7871,16 @@ func (m *E2MessagePayload_UEAdmissionResponseAttribute) MarshalToSizedBuffer(dAt
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UEAdmissionStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEAdmissionStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UEAdmissionStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEAdmissionStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UEAdmissionStatusAttribute != nil {
+	if m.UEAdmissionStatus != nil {
 		{
-			size, err := m.UEAdmissionStatusAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UEAdmissionStatus.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7078,16 +7892,16 @@ func (m *E2MessagePayload_UEAdmissionStatusAttribute) MarshalToSizedBuffer(dAtA 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UEContextUpdateAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEContextUpdate) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UEContextUpdateAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEContextUpdate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UEContextUpdateAttribute != nil {
+	if m.UEContextUpdate != nil {
 		{
-			size, err := m.UEContextUpdateAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UEContextUpdate.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7099,16 +7913,16 @@ func (m *E2MessagePayload_UEContextUpdateAttribute) MarshalToSizedBuffer(dAtA []
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UEReconfigIndAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEReconfigInd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UEReconfigIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEReconfigInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UEReconfigIndAttribute != nil {
+	if m.UEReconfigInd != nil {
 		{
-			size, err := m.UEReconfigIndAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UEReconfigInd.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7120,16 +7934,16 @@ func (m *E2MessagePayload_UEReconfigIndAttribute) MarshalToSizedBuffer(dAtA []by
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UEReleaseIndAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEReleaseInd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UEReleaseIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UEReleaseInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UEReleaseIndAttribute != nil {
+	if m.UEReleaseInd != nil {
 		{
-			size, err := m.UEReleaseIndAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UEReleaseInd.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7141,16 +7955,16 @@ func (m *E2MessagePayload_UEReleaseIndAttribute) MarshalToSizedBuffer(dAtA []byt
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_BearerAdmissionRequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerAdmissionRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_BearerAdmissionRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerAdmissionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.BearerAdmissionRequestAttribute != nil {
+	if m.BearerAdmissionRequest != nil {
 		{
-			size, err := m.BearerAdmissionRequestAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.BearerAdmissionRequest.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7162,16 +7976,16 @@ func (m *E2MessagePayload_BearerAdmissionRequestAttribute) MarshalToSizedBuffer(
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_BearerAdmissionResponseAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerAdmissionResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_BearerAdmissionResponseAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerAdmissionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.BearerAdmissionResponseAttribute != nil {
+	if m.BearerAdmissionResponse != nil {
 		{
-			size, err := m.BearerAdmissionResponseAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.BearerAdmissionResponse.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7183,16 +7997,16 @@ func (m *E2MessagePayload_BearerAdmissionResponseAttribute) MarshalToSizedBuffer
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_BearerAdmissionStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerAdmissionStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_BearerAdmissionStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerAdmissionStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.BearerAdmissionStatusAttribute != nil {
+	if m.BearerAdmissionStatus != nil {
 		{
-			size, err := m.BearerAdmissionStatusAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.BearerAdmissionStatus.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7204,16 +8018,16 @@ func (m *E2MessagePayload_BearerAdmissionStatusAttribute) MarshalToSizedBuffer(d
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_BearerReleaseIndAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerReleaseInd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_BearerReleaseIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_BearerReleaseInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.BearerReleaseIndAttribute != nil {
+	if m.BearerReleaseInd != nil {
 		{
-			size, err := m.BearerReleaseIndAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.BearerReleaseInd.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7225,16 +8039,16 @@ func (m *E2MessagePayload_BearerReleaseIndAttribute) MarshalToSizedBuffer(dAtA [
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_HORequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_HORequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_HORequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_HORequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.HORequestAttribute != nil {
+	if m.HORequest != nil {
 		{
-			size, err := m.HORequestAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.HORequest.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7246,16 +8060,16 @@ func (m *E2MessagePayload_HORequestAttribute) MarshalToSizedBuffer(dAtA []byte) 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_HOFailureAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_HOFailure) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_HOFailureAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_HOFailure) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.HOFailureAttribute != nil {
+	if m.HOFailure != nil {
 		{
-			size, err := m.HOFailureAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.HOFailure.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7267,16 +8081,16 @@ func (m *E2MessagePayload_HOFailureAttribute) MarshalToSizedBuffer(dAtA []byte) 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_HOCompleteAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_HOComplete) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_HOCompleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_HOComplete) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.HOCompleteAttribute != nil {
+	if m.HOComplete != nil {
 		{
-			size, err := m.HOCompleteAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.HOComplete.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7288,16 +8102,16 @@ func (m *E2MessagePayload_HOCompleteAttribute) MarshalToSizedBuffer(dAtA []byte)
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_HOCauseAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_HOCause) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_HOCauseAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_HOCause) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.HOCauseAttribute != nil {
+	if m.HOCause != nil {
 		{
-			size, err := m.HOCauseAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.HOCause.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7311,16 +8125,16 @@ func (m *E2MessagePayload_HOCauseAttribute) MarshalToSizedBuffer(dAtA []byte) (i
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_RRCMeasConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_RRCMeasConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_RRCMeasConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_RRCMeasConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.RRCMeasConfigAttribute != nil {
+	if m.RRCMeasConfig != nil {
 		{
-			size, err := m.RRCMeasConfigAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.RRCMeasConfig.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7334,16 +8148,16 @@ func (m *E2MessagePayload_RRCMeasConfigAttribute) MarshalToSizedBuffer(dAtA []by
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_RxSigMeasReportAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_RxSigMeasReport) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_RxSigMeasReportAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_RxSigMeasReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.RxSigMeasReportAttribute != nil {
+	if m.RxSigMeasReport != nil {
 		{
-			size, err := m.RxSigMeasReportAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.RxSigMeasReport.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7357,16 +8171,16 @@ func (m *E2MessagePayload_RxSigMeasReportAttribute) MarshalToSizedBuffer(dAtA []
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_L2MeasConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_L2MeasConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_L2MeasConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_L2MeasConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.L2MeasConfigAttribute != nil {
+	if m.L2MeasConfig != nil {
 		{
-			size, err := m.L2MeasConfigAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.L2MeasConfig.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7380,12 +8194,12 @@ func (m *E2MessagePayload_L2MeasConfigAttribute) MarshalToSizedBuffer(dAtA []byt
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_RadioMeasReportPerU) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_RadioMeasReportPerU) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_RadioMeasReportPerU) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_RadioMeasReportPerU) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.RadioMeasReportPerU != nil {
 		{
@@ -7403,16 +8217,16 @@ func (m *E2MessagePayload_RadioMeasReportPerU) MarshalToSizedBuffer(dAtA []byte)
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_RadioMeasReportPerCellAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_RadioMeasReportPerCell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_RadioMeasReportPerCellAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_RadioMeasReportPerCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.RadioMeasReportPerCellAttribute != nil {
+	if m.RadioMeasReportPerCell != nil {
 		{
-			size, err := m.RadioMeasReportPerCellAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.RadioMeasReportPerCell.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7426,16 +8240,16 @@ func (m *E2MessagePayload_RadioMeasReportPerCellAttribute) MarshalToSizedBuffer(
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_SchedMeasReportPerUEAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_SchedMeasReportPerUE) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_SchedMeasReportPerUEAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_SchedMeasReportPerUE) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.SchedMeasReportPerUEAttribute != nil {
+	if m.SchedMeasReportPerUE != nil {
 		{
-			size, err := m.SchedMeasReportPerUEAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SchedMeasReportPerUE.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7449,16 +8263,16 @@ func (m *E2MessagePayload_SchedMeasReportPerUEAttribute) MarshalToSizedBuffer(dA
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_SchedMeasReportPerCellAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_SchedMeasReportPerCell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_SchedMeasReportPerCellAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_SchedMeasReportPerCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.SchedMeasReportPerCellAttribute != nil {
+	if m.SchedMeasReportPerCell != nil {
 		{
-			size, err := m.SchedMeasReportPerCellAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SchedMeasReportPerCell.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7472,16 +8286,16 @@ func (m *E2MessagePayload_SchedMeasReportPerCellAttribute) MarshalToSizedBuffer(
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_PDCPMeasReportPerUeAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_PDCPMeasReportPerUe) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_PDCPMeasReportPerUeAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_PDCPMeasReportPerUe) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.PDCPMeasReportPerUeAttribute != nil {
+	if m.PDCPMeasReportPerUe != nil {
 		{
-			size, err := m.PDCPMeasReportPerUeAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.PDCPMeasReportPerUe.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7495,16 +8309,16 @@ func (m *E2MessagePayload_PDCPMeasReportPerUeAttribute) MarshalToSizedBuffer(dAt
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_RRMConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_RRMConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_RRMConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_RRMConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.RRMConfigAttribute != nil {
+	if m.RRMConfig != nil {
 		{
-			size, err := m.RRMConfigAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.RRMConfig.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7518,16 +8332,16 @@ func (m *E2MessagePayload_RRMConfigAttribute) MarshalToSizedBuffer(dAtA []byte) 
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_RRMConfigStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_RRMConfigStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_RRMConfigStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_RRMConfigStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.RRMConfigStatusAttribute != nil {
+	if m.RRMConfigStatus != nil {
 		{
-			size, err := m.RRMConfigStatusAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.RRMConfigStatus.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7541,16 +8355,16 @@ func (m *E2MessagePayload_RRMConfigStatusAttribute) MarshalToSizedBuffer(dAtA []
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UECapabilityEnquiryAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UECapabilityEnquiry) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UECapabilityEnquiryAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UECapabilityEnquiry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UECapabilityEnquiryAttribute != nil {
+	if m.UECapabilityEnquiry != nil {
 		{
-			size, err := m.UECapabilityEnquiryAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UECapabilityEnquiry.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7564,16 +8378,16 @@ func (m *E2MessagePayload_UECapabilityEnquiryAttribute) MarshalToSizedBuffer(dAt
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_UECapabilityInfoAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_UECapabilityInfo) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_UECapabilityInfoAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_UECapabilityInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.UECapabilityInfoAttribute != nil {
+	if m.UECapabilityInfo != nil {
 		{
-			size, err := m.UECapabilityInfoAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.UECapabilityInfo.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7587,16 +8401,16 @@ func (m *E2MessagePayload_UECapabilityInfoAttribute) MarshalToSizedBuffer(dAtA [
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_ScellAddAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_ScellAdd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_ScellAddAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_ScellAdd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.ScellAddAttribute != nil {
+	if m.ScellAdd != nil {
 		{
-			size, err := m.ScellAddAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.ScellAdd.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7610,16 +8424,16 @@ func (m *E2MessagePayload_ScellAddAttribute) MarshalToSizedBuffer(dAtA []byte) (
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_ScellAddStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_ScellAddStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_ScellAddStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_ScellAddStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.ScellAddStatusAttribute != nil {
+	if m.ScellAddStatus != nil {
 		{
-			size, err := m.ScellAddStatusAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.ScellAddStatus.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7633,16 +8447,16 @@ func (m *E2MessagePayload_ScellAddStatusAttribute) MarshalToSizedBuffer(dAtA []b
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_ScellDeleteAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_ScellDelete) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_ScellDeleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_ScellDelete) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.ScellDeleteAttribute != nil {
+	if m.ScellDelete != nil {
 		{
-			size, err := m.ScellDeleteAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.ScellDelete.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7656,16 +8470,16 @@ func (m *E2MessagePayload_ScellDeleteAttribute) MarshalToSizedBuffer(dAtA []byte
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_SeNBAddAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_SeNBAdd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_SeNBAddAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_SeNBAdd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.SeNBAddAttribute != nil {
+	if m.SeNBAdd != nil {
 		{
-			size, err := m.SeNBAddAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SeNBAdd.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7679,16 +8493,16 @@ func (m *E2MessagePayload_SeNBAddAttribute) MarshalToSizedBuffer(dAtA []byte) (i
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_SeNBAddStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_SeNBAddStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_SeNBAddStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_SeNBAddStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.SeNBAddStatusAttribute != nil {
+	if m.SeNBAddStatus != nil {
 		{
-			size, err := m.SeNBAddStatusAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SeNBAddStatus.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7702,16 +8516,16 @@ func (m *E2MessagePayload_SeNBAddStatusAttribute) MarshalToSizedBuffer(dAtA []by
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_SeNBDeleteAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_SeNBDelete) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_SeNBDeleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_SeNBDelete) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.SeNBDeleteAttribute != nil {
+	if m.SeNBDelete != nil {
 		{
-			size, err := m.SeNBDeleteAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.SeNBDelete.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7725,16 +8539,16 @@ func (m *E2MessagePayload_SeNBDeleteAttribute) MarshalToSizedBuffer(dAtA []byte)
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MessagePayload_TrafficSplitConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *MessagePayload_TrafficSplitConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MessagePayload_TrafficSplitConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MessagePayload_TrafficSplitConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	if m.TrafficSplitConfigAttribute != nil {
+	if m.TrafficSplitConfig != nil {
 		{
-			size, err := m.TrafficSplitConfigAttribute.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.TrafficSplitConfig.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -7748,7 +8562,7 @@ func (m *E2MessagePayload_TrafficSplitConfigAttribute) MarshalToSizedBuffer(dAtA
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2Message) Marshal() (dAtA []byte, err error) {
+func (m *Message) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -7758,12 +8572,12 @@ func (m *E2Message) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2Message) MarshalTo(dAtA []byte) (int, error) {
+func (m *Message) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2Message) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Message) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -7830,7 +8644,7 @@ func (m *ServiceResult) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ECGI) Marshal() (dAtA []byte, err error) {
+func (m *ECGI) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -7840,12 +8654,12 @@ func (m *E2ECGI) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ECGI) MarshalTo(dAtA []byte) (int, error) {
+func (m *ECGI) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ECGI) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ECGI) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -7867,7 +8681,7 @@ func (m *E2ECGI) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2CandScell) Marshal() (dAtA []byte, err error) {
+func (m *CandScell) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -7877,12 +8691,12 @@ func (m *E2CandScell) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2CandScell) MarshalTo(dAtA []byte) (int, error) {
+func (m *CandScell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2CandScell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CandScell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -7904,7 +8718,7 @@ func (m *E2CandScell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2CellConfigRequestAttribute) Marshal() (dAtA []byte, err error) {
+func (m *CellConfigRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -7914,12 +8728,12 @@ func (m *E2CellConfigRequestAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2CellConfigRequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *CellConfigRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2CellConfigRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CellConfigRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -7939,7 +8753,7 @@ func (m *E2CellConfigRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *E2CellConfigReportAttribute) Marshal() (dAtA []byte, err error) {
+func (m *CellConfigReport) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -7949,12 +8763,12 @@ func (m *E2CellConfigReportAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2CellConfigReportAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *CellConfigReport) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2CellConfigReportAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CellConfigReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8072,7 +8886,7 @@ func (m *E2CellConfigReportAttribute) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UEAdmissionRequestAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UEAdmissionRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8082,12 +8896,12 @@ func (m *E2UEAdmissionRequestAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UEAdmissionRequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UEAdmissionRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UEAdmissionRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UEAdmissionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8119,7 +8933,7 @@ func (m *E2UEAdmissionRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UEAdmissionResponseAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UEAdmissionResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8129,12 +8943,12 @@ func (m *E2UEAdmissionResponseAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UEAdmissionResponseAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UEAdmissionResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UEAdmissionResponseAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UEAdmissionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8166,7 +8980,7 @@ func (m *E2UEAdmissionResponseAttribute) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UEAdmissionStatusAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UEAdmissionStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8176,12 +8990,12 @@ func (m *E2UEAdmissionStatusAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UEAdmissionStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UEAdmissionStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UEAdmissionStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UEAdmissionStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8213,7 +9027,7 @@ func (m *E2UEAdmissionStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, e
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UEContextUpdateAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UEContextUpdate) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8223,12 +9037,12 @@ func (m *E2UEContextUpdateAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UEContextUpdateAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UEContextUpdate) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UEContextUpdateAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UEContextUpdate) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8276,7 +9090,7 @@ func (m *E2UEContextUpdateAttribute) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UEReconfigIndAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UEReconfigInd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8286,12 +9100,12 @@ func (m *E2UEReconfigIndAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UEReconfigIndAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UEReconfigInd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UEReconfigIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UEReconfigInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8330,7 +9144,7 @@ func (m *E2UEReconfigIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UEReleaseIndAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UEReleaseInd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8340,12 +9154,12 @@ func (m *E2UEReleaseIndAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UEReleaseIndAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UEReleaseInd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UEReleaseIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UEReleaseInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8377,7 +9191,7 @@ func (m *E2UEReleaseIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UEAMBR) Marshal() (dAtA []byte, err error) {
+func (m *UEAMBR) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8387,12 +9201,12 @@ func (m *E2UEAMBR) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UEAMBR) MarshalTo(dAtA []byte) (int, error) {
+func (m *UEAMBR) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UEAMBR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UEAMBR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8414,7 +9228,7 @@ func (m *E2UEAMBR) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ERABParamsItem) Marshal() (dAtA []byte, err error) {
+func (m *ERABParamsItem) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8424,12 +9238,12 @@ func (m *E2ERABParamsItem) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ERABParamsItem) MarshalTo(dAtA []byte) (int, error) {
+func (m *ERABParamsItem) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ERABParamsItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ERABParamsItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8496,7 +9310,7 @@ func (m *E2ERABParamsItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ERABResponseItem) Marshal() (dAtA []byte, err error) {
+func (m *ERABResponseItem) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8506,12 +9320,12 @@ func (m *E2ERABResponseItem) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ERABResponseItem) MarshalTo(dAtA []byte) (int, error) {
+func (m *ERABResponseItem) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ERABResponseItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ERABResponseItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8531,7 +9345,7 @@ func (m *E2ERABResponseItem) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2BearerAdmissionRequestAttribute) Marshal() (dAtA []byte, err error) {
+func (m *BearerAdmissionRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8541,12 +9355,12 @@ func (m *E2BearerAdmissionRequestAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2BearerAdmissionRequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *BearerAdmissionRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2BearerAdmissionRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *BearerAdmissionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8606,7 +9420,7 @@ func (m *E2BearerAdmissionRequestAttribute) MarshalToSizedBuffer(dAtA []byte) (i
 	return len(dAtA) - i, nil
 }
 
-func (m *E2BearerAdmissionResponseAttribute) Marshal() (dAtA []byte, err error) {
+func (m *BearerAdmissionResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8616,12 +9430,12 @@ func (m *E2BearerAdmissionResponseAttribute) Marshal() (dAtA []byte, err error) 
 	return dAtA[:n], nil
 }
 
-func (m *E2BearerAdmissionResponseAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *BearerAdmissionResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2BearerAdmissionResponseAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *BearerAdmissionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8669,7 +9483,7 @@ func (m *E2BearerAdmissionResponseAttribute) MarshalToSizedBuffer(dAtA []byte) (
 	return len(dAtA) - i, nil
 }
 
-func (m *E2BearerAdmissionStatusAttribute) Marshal() (dAtA []byte, err error) {
+func (m *BearerAdmissionStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8679,12 +9493,12 @@ func (m *E2BearerAdmissionStatusAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2BearerAdmissionStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *BearerAdmissionStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2BearerAdmissionStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *BearerAdmissionStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8732,7 +9546,7 @@ func (m *E2BearerAdmissionStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *E2BearerReleaseIndAttribute) Marshal() (dAtA []byte, err error) {
+func (m *BearerReleaseInd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8742,12 +9556,12 @@ func (m *E2BearerReleaseIndAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2BearerReleaseIndAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *BearerReleaseInd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2BearerReleaseIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *BearerReleaseInd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8790,7 +9604,7 @@ func (m *E2BearerReleaseIndAttribute) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *E2HORequestAttribute) Marshal() (dAtA []byte, err error) {
+func (m *HORequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8800,12 +9614,12 @@ func (m *E2HORequestAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2HORequestAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *HORequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2HORequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *HORequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8844,7 +9658,7 @@ func (m *E2HORequestAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2HOFailureAttribute) Marshal() (dAtA []byte, err error) {
+func (m *HOFailure) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8854,12 +9668,12 @@ func (m *E2HOFailureAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2HOFailureAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *HOFailure) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2HOFailureAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *HOFailure) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8893,7 +9707,7 @@ func (m *E2HOFailureAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2HOCompleteAttribute) Marshal() (dAtA []byte, err error) {
+func (m *HOComplete) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8903,12 +9717,12 @@ func (m *E2HOCompleteAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2HOCompleteAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *HOComplete) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2HOCompleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *HOComplete) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -8947,7 +9761,7 @@ func (m *E2HOCompleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2HOCauseAttribute) Marshal() (dAtA []byte, err error) {
+func (m *HOCause) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -8957,12 +9771,12 @@ func (m *E2HOCauseAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2HOCauseAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *HOCause) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2HOCauseAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *HOCause) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9022,7 +9836,7 @@ func (m *E2HOCauseAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MeasCell) Marshal() (dAtA []byte, err error) {
+func (m *MeasCell) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9032,12 +9846,12 @@ func (m *E2MeasCell) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2MeasCell) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasCell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9059,7 +9873,7 @@ func (m *E2MeasCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MeasObject) Marshal() (dAtA []byte, err error) {
+func (m *MeasObject) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9069,12 +9883,12 @@ func (m *E2MeasObject) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2MeasObject) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasObject) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasObject) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasObject) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9103,7 +9917,7 @@ func (m *E2MeasObject) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ReportParamChoice) Marshal() (dAtA []byte, err error) {
+func (m *ReportParamChoice) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9113,12 +9927,12 @@ func (m *E2ReportParamChoice) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ReportParamChoice) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9135,12 +9949,12 @@ func (m *E2ReportParamChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ReportParamChoice_PerParam) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_PerParam) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice_PerParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_PerParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.PerParam != nil {
 		{
@@ -9156,12 +9970,12 @@ func (m *E2ReportParamChoice_PerParam) MarshalToSizedBuffer(dAtA []byte) (int, e
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2ReportParamChoice_A1Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A1Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice_A1Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A1Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.A1Param != nil {
 		{
@@ -9177,12 +9991,12 @@ func (m *E2ReportParamChoice_A1Param) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2ReportParamChoice_A2Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A2Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice_A2Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A2Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.A2Param != nil {
 		{
@@ -9198,12 +10012,12 @@ func (m *E2ReportParamChoice_A2Param) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2ReportParamChoice_A3Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A3Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice_A3Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A3Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.A3Param != nil {
 		{
@@ -9219,12 +10033,12 @@ func (m *E2ReportParamChoice_A3Param) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2ReportParamChoice_A4Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A4Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice_A4Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A4Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.A4Param != nil {
 		{
@@ -9240,12 +10054,12 @@ func (m *E2ReportParamChoice_A4Param) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2ReportParamChoice_A5Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A5Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice_A5Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A5Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.A5Param != nil {
 		{
@@ -9261,12 +10075,12 @@ func (m *E2ReportParamChoice_A5Param) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2ReportParamChoice_A6Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A6Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParamChoice_A6Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParamChoice_A6Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.A6Param != nil {
 		{
@@ -9282,7 +10096,7 @@ func (m *E2ReportParamChoice_A6Param) MarshalToSizedBuffer(dAtA []byte) (int, er
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2ThresholdEUTRAChoice) Marshal() (dAtA []byte, err error) {
+func (m *ThresholdEUTRAChoice) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9292,12 +10106,12 @@ func (m *E2ThresholdEUTRAChoice) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ThresholdEUTRAChoice) MarshalTo(dAtA []byte) (int, error) {
+func (m *ThresholdEUTRAChoice) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ThresholdEUTRAChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ThresholdEUTRAChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9314,12 +10128,12 @@ func (m *E2ThresholdEUTRAChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ThresholdEUTRAChoice_ThresholdRSRP) MarshalTo(dAtA []byte) (int, error) {
+func (m *ThresholdEUTRAChoice_ThresholdRSRP) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ThresholdEUTRAChoice_ThresholdRSRP) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ThresholdEUTRAChoice_ThresholdRSRP) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	i -= len(m.ThresholdRSRP)
 	copy(dAtA[i:], m.ThresholdRSRP)
@@ -9328,12 +10142,12 @@ func (m *E2ThresholdEUTRAChoice_ThresholdRSRP) MarshalToSizedBuffer(dAtA []byte)
 	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
-func (m *E2ThresholdEUTRAChoice_ThresholdRSRQ) MarshalTo(dAtA []byte) (int, error) {
+func (m *ThresholdEUTRAChoice_ThresholdRSRQ) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ThresholdEUTRAChoice_ThresholdRSRQ) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ThresholdEUTRAChoice_ThresholdRSRQ) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	i -= len(m.ThresholdRSRQ)
 	copy(dAtA[i:], m.ThresholdRSRQ)
@@ -9342,7 +10156,7 @@ func (m *E2ThresholdEUTRAChoice_ThresholdRSRQ) MarshalToSizedBuffer(dAtA []byte)
 	dAtA[i] = 0x12
 	return len(dAtA) - i, nil
 }
-func (m *E2ThreasholdEUTRA) Marshal() (dAtA []byte, err error) {
+func (m *ThreasholdEUTRA) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9352,12 +10166,12 @@ func (m *E2ThreasholdEUTRA) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ThreasholdEUTRA) MarshalTo(dAtA []byte) (int, error) {
+func (m *ThreasholdEUTRA) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ThreasholdEUTRA) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ThreasholdEUTRA) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9382,7 +10196,7 @@ func (m *E2ThreasholdEUTRA) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2PerParam) Marshal() (dAtA []byte, err error) {
+func (m *PerParam) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9392,12 +10206,12 @@ func (m *E2PerParam) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2PerParam) MarshalTo(dAtA []byte) (int, error) {
+func (m *PerParam) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2PerParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PerParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9410,7 +10224,7 @@ func (m *E2PerParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2A1Param) Marshal() (dAtA []byte, err error) {
+func (m *A1Param) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9420,12 +10234,12 @@ func (m *E2A1Param) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2A1Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *A1Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2A1Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *A1Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9445,7 +10259,7 @@ func (m *E2A1Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2A2Param) Marshal() (dAtA []byte, err error) {
+func (m *A2Param) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9455,12 +10269,12 @@ func (m *E2A2Param) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2A2Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *A2Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2A2Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *A2Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9480,7 +10294,7 @@ func (m *E2A2Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2A3Param) Marshal() (dAtA []byte, err error) {
+func (m *A3Param) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9490,12 +10304,12 @@ func (m *E2A3Param) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2A3Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *A3Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2A3Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *A3Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9510,7 +10324,7 @@ func (m *E2A3Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2A4Param) Marshal() (dAtA []byte, err error) {
+func (m *A4Param) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9520,12 +10334,12 @@ func (m *E2A4Param) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2A4Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *A4Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2A4Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *A4Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9545,7 +10359,7 @@ func (m *E2A4Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2A5Param) Marshal() (dAtA []byte, err error) {
+func (m *A5Param) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9555,12 +10369,12 @@ func (m *E2A5Param) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2A5Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *A5Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2A5Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *A5Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9592,7 +10406,7 @@ func (m *E2A5Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2A6Param) Marshal() (dAtA []byte, err error) {
+func (m *A6Param) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9602,12 +10416,12 @@ func (m *E2A6Param) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2A6Param) MarshalTo(dAtA []byte) (int, error) {
+func (m *A6Param) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2A6Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *A6Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9622,7 +10436,7 @@ func (m *E2A6Param) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ReportParam) Marshal() (dAtA []byte, err error) {
+func (m *ReportParam) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9632,12 +10446,12 @@ func (m *E2ReportParam) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ReportParam) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportParam) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9674,7 +10488,7 @@ func (m *E2ReportParam) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ReportConfig) Marshal() (dAtA []byte, err error) {
+func (m *ReportConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9684,12 +10498,12 @@ func (m *E2ReportConfig) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ReportConfig) MarshalTo(dAtA []byte) (int, error) {
+func (m *ReportConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ReportConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ReportConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9719,7 +10533,7 @@ func (m *E2ReportConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2AddMeasId) Marshal() (dAtA []byte, err error) {
+func (m *AddMeasId) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9729,12 +10543,12 @@ func (m *E2AddMeasId) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2AddMeasId) MarshalTo(dAtA []byte) (int, error) {
+func (m *AddMeasId) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2AddMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *AddMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9751,7 +10565,7 @@ func (m *E2AddMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2DelMeasId) Marshal() (dAtA []byte, err error) {
+func (m *DelMeasId) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9761,12 +10575,12 @@ func (m *E2DelMeasId) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2DelMeasId) MarshalTo(dAtA []byte) (int, error) {
+func (m *DelMeasId) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2DelMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DelMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9783,7 +10597,7 @@ func (m *E2DelMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MeasIdActionChoice) Marshal() (dAtA []byte, err error) {
+func (m *MeasIdActionChoice) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9793,12 +10607,12 @@ func (m *E2MeasIdActionChoice) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2MeasIdActionChoice) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasIdActionChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9815,12 +10629,12 @@ func (m *E2MeasIdActionChoice) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MeasIdActionChoice_AddMeasId) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice_AddMeasId) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasIdActionChoice_AddMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice_AddMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.AddMeasId != nil {
 		{
@@ -9836,12 +10650,12 @@ func (m *E2MeasIdActionChoice_AddMeasId) MarshalToSizedBuffer(dAtA []byte) (int,
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MeasIdActionChoice_DelMeasId) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice_DelMeasId) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasIdActionChoice_DelMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice_DelMeasId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	if m.DelMeasId != nil {
 		{
@@ -9857,12 +10671,12 @@ func (m *E2MeasIdActionChoice_DelMeasId) MarshalToSizedBuffer(dAtA []byte) (int,
 	}
 	return len(dAtA) - i, nil
 }
-func (m *E2MeasIdActionChoice_Hototarget) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice_Hototarget) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasIdActionChoice_Hototarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasIdActionChoice_Hototarget) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	i -= len(m.Hototarget)
 	copy(dAtA[i:], m.Hototarget)
@@ -9871,7 +10685,7 @@ func (m *E2MeasIdActionChoice_Hototarget) MarshalToSizedBuffer(dAtA []byte) (int
 	dAtA[i] = 0x1a
 	return len(dAtA) - i, nil
 }
-func (m *E2MeasIdAction) Marshal() (dAtA []byte, err error) {
+func (m *MeasIdAction) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9881,12 +10695,12 @@ func (m *E2MeasIdAction) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2MeasIdAction) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasIdAction) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasIdAction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasIdAction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9911,7 +10725,7 @@ func (m *E2MeasIdAction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2MeasID) Marshal() (dAtA []byte, err error) {
+func (m *MeasID) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9921,12 +10735,12 @@ func (m *E2MeasID) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2MeasID) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeasID) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2MeasID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MeasID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -9960,7 +10774,7 @@ func (m *E2MeasID) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RRCMeasConfigAttribute) Marshal() (dAtA []byte, err error) {
+func (m *RRCMeasConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -9970,12 +10784,12 @@ func (m *E2RRCMeasConfigAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RRCMeasConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *RRCMeasConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RRCMeasConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RRCMeasConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10046,7 +10860,7 @@ func (m *E2RRCMeasConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *E2PCIARFCN) Marshal() (dAtA []byte, err error) {
+func (m *PCIARFCN) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10056,12 +10870,12 @@ func (m *E2PCIARFCN) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2PCIARFCN) MarshalTo(dAtA []byte) (int, error) {
+func (m *PCIARFCN) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2PCIARFCN) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PCIARFCN) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10083,7 +10897,7 @@ func (m *E2PCIARFCN) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RXSigReport) Marshal() (dAtA []byte, err error) {
+func (m *RXSigReport) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10093,12 +10907,12 @@ func (m *E2RXSigReport) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RXSigReport) MarshalTo(dAtA []byte) (int, error) {
+func (m *RXSigReport) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RXSigReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RXSigReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10144,7 +10958,7 @@ func (m *E2RXSigReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RxSigMeasReportAttribute) Marshal() (dAtA []byte, err error) {
+func (m *RxSigMeasReport) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10154,12 +10968,12 @@ func (m *E2RxSigMeasReportAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RxSigMeasReportAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *RxSigMeasReport) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RxSigMeasReportAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RxSigMeasReport) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10202,7 +11016,7 @@ func (m *E2RxSigMeasReportAttribute) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *E2L2ReportInterval) Marshal() (dAtA []byte, err error) {
+func (m *L2ReportInterval) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10212,12 +11026,12 @@ func (m *E2L2ReportInterval) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2L2ReportInterval) MarshalTo(dAtA []byte) (int, error) {
+func (m *L2ReportInterval) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2L2ReportInterval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *L2ReportInterval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10250,7 +11064,7 @@ func (m *E2L2ReportInterval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2L2MeasConfigAttribute) Marshal() (dAtA []byte, err error) {
+func (m *L2MeasConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10260,12 +11074,12 @@ func (m *E2L2MeasConfigAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2L2MeasConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *L2MeasConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2L2MeasConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *L2MeasConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10306,7 +11120,7 @@ func (m *E2L2MeasConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RadioRepPerServCell) Marshal() (dAtA []byte, err error) {
+func (m *RadioRepPerServCell) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10316,12 +11130,12 @@ func (m *E2RadioRepPerServCell) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RadioRepPerServCell) MarshalTo(dAtA []byte) (int, error) {
+func (m *RadioRepPerServCell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RadioRepPerServCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RadioRepPerServCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10377,7 +11191,7 @@ func (m *E2RadioRepPerServCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RadioMeasReportPerUEAttribute) Marshal() (dAtA []byte, err error) {
+func (m *RadioMeasReportPerUE) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10387,12 +11201,12 @@ func (m *E2RadioMeasReportPerUEAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RadioMeasReportPerUEAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *RadioMeasReportPerUE) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RadioMeasReportPerUEAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RadioMeasReportPerUE) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10433,7 +11247,7 @@ func (m *E2RadioMeasReportPerUEAttribute) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RadioMeasReportPerCellAttribute) Marshal() (dAtA []byte, err error) {
+func (m *RadioMeasReportPerCell) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10443,12 +11257,12 @@ func (m *E2RadioMeasReportPerCellAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RadioMeasReportPerCellAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *RadioMeasReportPerCell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RadioMeasReportPerCellAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RadioMeasReportPerCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10486,7 +11300,7 @@ func (m *E2RadioMeasReportPerCellAttribute) MarshalToSizedBuffer(dAtA []byte) (i
 	return len(dAtA) - i, nil
 }
 
-func (m *E2PRBUsage) Marshal() (dAtA []byte, err error) {
+func (m *PRBUsage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10496,12 +11310,12 @@ func (m *E2PRBUsage) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2PRBUsage) MarshalTo(dAtA []byte) (int, error) {
+func (m *PRBUsage) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2PRBUsage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PRBUsage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10527,7 +11341,7 @@ func (m *E2PRBUsage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2SchedMeasRepPerServCell) Marshal() (dAtA []byte, err error) {
+func (m *SchedMeasRepPerServCell) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10537,12 +11351,12 @@ func (m *E2SchedMeasRepPerServCell) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2SchedMeasRepPerServCell) MarshalTo(dAtA []byte) (int, error) {
+func (m *SchedMeasRepPerServCell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2SchedMeasRepPerServCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SchedMeasRepPerServCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10637,7 +11451,7 @@ func (m *E2SchedMeasRepPerServCell) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *E2SchedMeasReportPerUEAttribute) Marshal() (dAtA []byte, err error) {
+func (m *SchedMeasReportPerUE) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10647,12 +11461,12 @@ func (m *E2SchedMeasReportPerUEAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2SchedMeasReportPerUEAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *SchedMeasReportPerUE) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2SchedMeasReportPerUEAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SchedMeasReportPerUE) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10693,7 +11507,7 @@ func (m *E2SchedMeasReportPerUEAttribute) MarshalToSizedBuffer(dAtA []byte) (int
 	return len(dAtA) - i, nil
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) Marshal() (dAtA []byte, err error) {
+func (m *SchedMeasReportPerCell) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10703,12 +11517,12 @@ func (m *E2SchedMeasReportPerCellAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *SchedMeasReportPerCell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SchedMeasReportPerCell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10761,7 +11575,7 @@ func (m *E2SchedMeasReportPerCellAttribute) MarshalToSizedBuffer(dAtA []byte) (i
 	return len(dAtA) - i, nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) Marshal() (dAtA []byte, err error) {
+func (m *PDCPMeasReportPerUe) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10771,12 +11585,12 @@ func (m *E2PDCPMeasReportPerUeAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *PDCPMeasReportPerUe) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PDCPMeasReportPerUe) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10884,7 +11698,7 @@ func (m *E2PDCPMeasReportPerUeAttribute) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RRMConfigAttribute) Marshal() (dAtA []byte, err error) {
+func (m *RRMConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -10894,12 +11708,12 @@ func (m *E2RRMConfigAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RRMConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *RRMConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RRMConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RRMConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -10968,20 +11782,20 @@ func (m *E2RRMConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.PA) > 0 {
-		dAtA94 := make([]byte, len(m.PA)*10)
-		var j93 int
+		dAtA114 := make([]byte, len(m.PA)*10)
+		var j113 int
 		for _, num := range m.PA {
 			for num >= 1<<7 {
-				dAtA94[j93] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA114[j113] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j93++
+				j113++
 			}
-			dAtA94[j93] = uint8(num)
-			j93++
+			dAtA114[j113] = uint8(num)
+			j113++
 		}
-		i -= j93
-		copy(dAtA[i:], dAtA94[:j93])
-		i = encodeVarintE2Interface(dAtA, i, uint64(j93))
+		i -= j113
+		copy(dAtA[i:], dAtA114[:j113])
+		i = encodeVarintE2Interface(dAtA, i, uint64(j113))
 		i--
 		dAtA[i] = 0x22
 	}
@@ -11021,7 +11835,7 @@ func (m *E2RRMConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2RRMConfigStatusAttribute) Marshal() (dAtA []byte, err error) {
+func (m *RRMConfigStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11031,31 +11845,31 @@ func (m *E2RRMConfigStatusAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2RRMConfigStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *RRMConfigStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2RRMConfigStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RRMConfigStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Status) > 0 {
-		dAtA98 := make([]byte, len(m.Status)*10)
-		var j97 int
+		dAtA118 := make([]byte, len(m.Status)*10)
+		var j117 int
 		for _, num := range m.Status {
 			for num >= 1<<7 {
-				dAtA98[j97] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA118[j117] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j97++
+				j117++
 			}
-			dAtA98[j97] = uint8(num)
-			j97++
+			dAtA118[j117] = uint8(num)
+			j117++
 		}
-		i -= j97
-		copy(dAtA[i:], dAtA98[:j97])
-		i = encodeVarintE2Interface(dAtA, i, uint64(j97))
+		i -= j117
+		copy(dAtA[i:], dAtA118[:j117])
+		i = encodeVarintE2Interface(dAtA, i, uint64(j117))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -11083,7 +11897,7 @@ func (m *E2RRMConfigStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *E2CACap) Marshal() (dAtA []byte, err error) {
+func (m *CACap) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11093,12 +11907,12 @@ func (m *E2CACap) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2CACap) MarshalTo(dAtA []byte) (int, error) {
+func (m *CACap) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2CACap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *CACap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11130,7 +11944,7 @@ func (m *E2CACap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2DCCap) Marshal() (dAtA []byte, err error) {
+func (m *DCCap) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11140,12 +11954,12 @@ func (m *E2DCCap) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2DCCap) MarshalTo(dAtA []byte) (int, error) {
+func (m *DCCap) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2DCCap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *DCCap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11158,7 +11972,7 @@ func (m *E2DCCap) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UECapabilityEnquiryAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UECapabilityEnquiry) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11168,12 +11982,12 @@ func (m *E2UECapabilityEnquiryAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UECapabilityEnquiryAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UECapabilityEnquiry) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UECapabilityEnquiryAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UECapabilityEnquiry) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11200,7 +12014,7 @@ func (m *E2UECapabilityEnquiryAttribute) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
-func (m *E2UECapabilityInfoAttribute) Marshal() (dAtA []byte, err error) {
+func (m *UECapabilityInfo) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11210,12 +12024,12 @@ func (m *E2UECapabilityInfoAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2UECapabilityInfoAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *UECapabilityInfo) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2UECapabilityInfoAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *UECapabilityInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11266,7 +12080,7 @@ func (m *E2UECapabilityInfoAttribute) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *E2PropScell) Marshal() (dAtA []byte, err error) {
+func (m *PropScell) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11276,12 +12090,12 @@ func (m *E2PropScell) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2PropScell) MarshalTo(dAtA []byte) (int, error) {
+func (m *PropScell) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2PropScell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *PropScell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11320,7 +12134,7 @@ func (m *E2PropScell) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ScellAddAttribute) Marshal() (dAtA []byte, err error) {
+func (m *ScellAdd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11330,12 +12144,12 @@ func (m *E2ScellAddAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ScellAddAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *ScellAdd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ScellAddAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ScellAdd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11376,7 +12190,7 @@ func (m *E2ScellAddAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ScellAddStatusAttribute) Marshal() (dAtA []byte, err error) {
+func (m *ScellAddStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11386,31 +12200,31 @@ func (m *E2ScellAddStatusAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ScellAddStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *ScellAddStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ScellAddStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ScellAddStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	if len(m.Status) > 0 {
-		dAtA107 := make([]byte, len(m.Status)*10)
-		var j106 int
+		dAtA127 := make([]byte, len(m.Status)*10)
+		var j126 int
 		for _, num := range m.Status {
 			for num >= 1<<7 {
-				dAtA107[j106] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA127[j126] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j106++
+				j126++
 			}
-			dAtA107[j106] = uint8(num)
-			j106++
+			dAtA127[j126] = uint8(num)
+			j126++
 		}
-		i -= j106
-		copy(dAtA[i:], dAtA107[:j106])
-		i = encodeVarintE2Interface(dAtA, i, uint64(j106))
+		i -= j126
+		copy(dAtA[i:], dAtA127[:j126])
+		i = encodeVarintE2Interface(dAtA, i, uint64(j126))
 		i--
 		dAtA[i] = 0x22
 	}
@@ -11450,7 +12264,7 @@ func (m *E2ScellAddStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *E2ScellDeleteAttribute) Marshal() (dAtA []byte, err error) {
+func (m *ScellDelete) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11460,12 +12274,12 @@ func (m *E2ScellDeleteAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2ScellDeleteAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *ScellDelete) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2ScellDeleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ScellDelete) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11506,7 +12320,7 @@ func (m *E2ScellDeleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *E2SeNBAddAttribute) Marshal() (dAtA []byte, err error) {
+func (m *SeNBAdd) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11516,12 +12330,12 @@ func (m *E2SeNBAddAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2SeNBAddAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *SeNBAdd) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2SeNBAddAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SeNBAdd) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11560,7 +12374,7 @@ func (m *E2SeNBAddAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2SeNBAddStatusAttribute) Marshal() (dAtA []byte, err error) {
+func (m *SeNBAddStatus) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11570,12 +12384,12 @@ func (m *E2SeNBAddStatusAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2SeNBAddStatusAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *SeNBAddStatus) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2SeNBAddStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SeNBAddStatus) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11607,7 +12421,7 @@ func (m *E2SeNBAddStatusAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *E2SeNBDeleteAttribute) Marshal() (dAtA []byte, err error) {
+func (m *SeNBDelete) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11617,12 +12431,12 @@ func (m *E2SeNBDeleteAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2SeNBDeleteAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *SeNBDelete) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2SeNBDeleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *SeNBDelete) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11661,7 +12475,7 @@ func (m *E2SeNBDeleteAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *E2TrafficSplitPercentage) Marshal() (dAtA []byte, err error) {
+func (m *TrafficSplitPercentage) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11671,12 +12485,12 @@ func (m *E2TrafficSplitPercentage) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2TrafficSplitPercentage) MarshalTo(dAtA []byte) (int, error) {
+func (m *TrafficSplitPercentage) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2TrafficSplitPercentage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TrafficSplitPercentage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11710,7 +12524,7 @@ func (m *E2TrafficSplitPercentage) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *E2TrafficSplitConfigAttribute) Marshal() (dAtA []byte, err error) {
+func (m *TrafficSplitConfig) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -11720,12 +12534,12 @@ func (m *E2TrafficSplitConfigAttribute) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *E2TrafficSplitConfigAttribute) MarshalTo(dAtA []byte) (int, error) {
+func (m *TrafficSplitConfig) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *E2TrafficSplitConfigAttribute) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *TrafficSplitConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -11792,28 +12606,286 @@ func (m *TelemetryMessage) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.MessageType != 0 {
+		n += 1 + sovE2Interface(uint64(m.MessageType))
+	}
+	if m.S != nil {
+		n += m.S.Size()
+	}
 	return n
 }
 
+func (m *TelemetryMessage_RadioMeasReportPerUE) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RadioMeasReportPerUE != nil {
+		l = m.RadioMeasReportPerUE.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *TelemetryMessage_RadioMeasReportPerCell) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RadioMeasReportPerCell != nil {
+		l = m.RadioMeasReportPerCell.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *TelemetryMessage_SchedMeasReportPerCell) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.SchedMeasReportPerCell != nil {
+		l = m.SchedMeasReportPerCell.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *TelemetryMessage_PDCPMeasReportPerUe) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.PDCPMeasReportPerUe != nil {
+		l = m.PDCPMeasReportPerUe.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
 func (m *ControlUpdate) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	if m.MessageType != 0 {
+		n += 1 + sovE2Interface(uint64(m.MessageType))
+	}
+	if m.S != nil {
+		n += m.S.Size()
+	}
 	return n
 }
 
+func (m *ControlUpdate_CellConfigReport) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.CellConfigReport != nil {
+		l = m.CellConfigReport.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_RRMConfigStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RRMConfigStatus != nil {
+		l = m.RRMConfigStatus.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_UEAdmissionRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.UEAdmissionRequest != nil {
+		l = m.UEAdmissionRequest.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_UEAdmissionStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.UEAdmissionStatus != nil {
+		l = m.UEAdmissionStatus.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_UEContextUpdate) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.UEContextUpdate != nil {
+		l = m.UEContextUpdate.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_BearerAdmissionRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BearerAdmissionRequest != nil {
+		l = m.BearerAdmissionRequest.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_BearerAdmissionStatus) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BearerAdmissionStatus != nil {
+		l = m.BearerAdmissionStatus.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_HOComplete) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.HOComplete != nil {
+		l = m.HOComplete.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_HOFailure) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.HOFailure != nil {
+		l = m.HOFailure.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlUpdate_HOCause) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.HOCause != nil {
+		l = m.HOCause.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
 func (m *ControlResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	if m.MessageType != 0 {
+		n += 1 + sovE2Interface(uint64(m.MessageType))
+	}
+	if m.S != nil {
+		n += m.S.Size()
+	}
 	return n
 }
 
-func (m *E2MessageHeader) Size() (n int) {
+func (m *ControlResponse_CellConfigRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.CellConfigRequest != nil {
+		l = m.CellConfigRequest.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlResponse_RRMConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RRMConfig != nil {
+		l = m.RRMConfig.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlResponse_L2MeasConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.L2MeasConfig != nil {
+		l = m.L2MeasConfig.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlResponse_UEAdmissionResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.UEAdmissionResponse != nil {
+		l = m.UEAdmissionResponse.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlResponse_BearerAdmissionResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.BearerAdmissionResponse != nil {
+		l = m.BearerAdmissionResponse.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *ControlResponse_HORequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.HORequest != nil {
+		l = m.HORequest.Size()
+		n += 1 + l + sovE2Interface(uint64(l))
+	}
+	return n
+}
+func (m *MessageHeader) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -11825,247 +12897,247 @@ func (m *E2MessageHeader) Size() (n int) {
 	return n
 }
 
-func (m *E2MessagePayload) Size() (n int) {
+func (m *MessagePayload) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Attributes != nil {
-		n += m.Attributes.Size()
+	if m.S != nil {
+		n += m.S.Size()
 	}
 	return n
 }
 
-func (m *E2MessagePayload_CellConfigRequestAttribute) Size() (n int) {
+func (m *MessagePayload_CellConfigRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.CellConfigRequestAttribute != nil {
-		l = m.CellConfigRequestAttribute.Size()
+	if m.CellConfigRequest != nil {
+		l = m.CellConfigRequest.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_CellConfigReportAttribute) Size() (n int) {
+func (m *MessagePayload_CellConfigReport) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.CellConfigReportAttribute != nil {
-		l = m.CellConfigReportAttribute.Size()
+	if m.CellConfigReport != nil {
+		l = m.CellConfigReport.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UEAdmissionRequestAttribute) Size() (n int) {
+func (m *MessagePayload_UEAdmissionRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UEAdmissionRequestAttribute != nil {
-		l = m.UEAdmissionRequestAttribute.Size()
+	if m.UEAdmissionRequest != nil {
+		l = m.UEAdmissionRequest.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UEAdmissionResponseAttribute) Size() (n int) {
+func (m *MessagePayload_UEAdmissionResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UEAdmissionResponseAttribute != nil {
-		l = m.UEAdmissionResponseAttribute.Size()
+	if m.UEAdmissionResponse != nil {
+		l = m.UEAdmissionResponse.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UEAdmissionStatusAttribute) Size() (n int) {
+func (m *MessagePayload_UEAdmissionStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UEAdmissionStatusAttribute != nil {
-		l = m.UEAdmissionStatusAttribute.Size()
+	if m.UEAdmissionStatus != nil {
+		l = m.UEAdmissionStatus.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UEContextUpdateAttribute) Size() (n int) {
+func (m *MessagePayload_UEContextUpdate) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UEContextUpdateAttribute != nil {
-		l = m.UEContextUpdateAttribute.Size()
+	if m.UEContextUpdate != nil {
+		l = m.UEContextUpdate.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UEReconfigIndAttribute) Size() (n int) {
+func (m *MessagePayload_UEReconfigInd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UEReconfigIndAttribute != nil {
-		l = m.UEReconfigIndAttribute.Size()
+	if m.UEReconfigInd != nil {
+		l = m.UEReconfigInd.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UEReleaseIndAttribute) Size() (n int) {
+func (m *MessagePayload_UEReleaseInd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UEReleaseIndAttribute != nil {
-		l = m.UEReleaseIndAttribute.Size()
+	if m.UEReleaseInd != nil {
+		l = m.UEReleaseInd.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_BearerAdmissionRequestAttribute) Size() (n int) {
+func (m *MessagePayload_BearerAdmissionRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.BearerAdmissionRequestAttribute != nil {
-		l = m.BearerAdmissionRequestAttribute.Size()
+	if m.BearerAdmissionRequest != nil {
+		l = m.BearerAdmissionRequest.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_BearerAdmissionResponseAttribute) Size() (n int) {
+func (m *MessagePayload_BearerAdmissionResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.BearerAdmissionResponseAttribute != nil {
-		l = m.BearerAdmissionResponseAttribute.Size()
+	if m.BearerAdmissionResponse != nil {
+		l = m.BearerAdmissionResponse.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_BearerAdmissionStatusAttribute) Size() (n int) {
+func (m *MessagePayload_BearerAdmissionStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.BearerAdmissionStatusAttribute != nil {
-		l = m.BearerAdmissionStatusAttribute.Size()
+	if m.BearerAdmissionStatus != nil {
+		l = m.BearerAdmissionStatus.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_BearerReleaseIndAttribute) Size() (n int) {
+func (m *MessagePayload_BearerReleaseInd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.BearerReleaseIndAttribute != nil {
-		l = m.BearerReleaseIndAttribute.Size()
+	if m.BearerReleaseInd != nil {
+		l = m.BearerReleaseInd.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_HORequestAttribute) Size() (n int) {
+func (m *MessagePayload_HORequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.HORequestAttribute != nil {
-		l = m.HORequestAttribute.Size()
+	if m.HORequest != nil {
+		l = m.HORequest.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_HOFailureAttribute) Size() (n int) {
+func (m *MessagePayload_HOFailure) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.HOFailureAttribute != nil {
-		l = m.HOFailureAttribute.Size()
+	if m.HOFailure != nil {
+		l = m.HOFailure.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_HOCompleteAttribute) Size() (n int) {
+func (m *MessagePayload_HOComplete) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.HOCompleteAttribute != nil {
-		l = m.HOCompleteAttribute.Size()
+	if m.HOComplete != nil {
+		l = m.HOComplete.Size()
 		n += 1 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_HOCauseAttribute) Size() (n int) {
+func (m *MessagePayload_HOCause) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.HOCauseAttribute != nil {
-		l = m.HOCauseAttribute.Size()
+	if m.HOCause != nil {
+		l = m.HOCause.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_RRCMeasConfigAttribute) Size() (n int) {
+func (m *MessagePayload_RRCMeasConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.RRCMeasConfigAttribute != nil {
-		l = m.RRCMeasConfigAttribute.Size()
+	if m.RRCMeasConfig != nil {
+		l = m.RRCMeasConfig.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_RxSigMeasReportAttribute) Size() (n int) {
+func (m *MessagePayload_RxSigMeasReport) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.RxSigMeasReportAttribute != nil {
-		l = m.RxSigMeasReportAttribute.Size()
+	if m.RxSigMeasReport != nil {
+		l = m.RxSigMeasReport.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_L2MeasConfigAttribute) Size() (n int) {
+func (m *MessagePayload_L2MeasConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.L2MeasConfigAttribute != nil {
-		l = m.L2MeasConfigAttribute.Size()
+	if m.L2MeasConfig != nil {
+		l = m.L2MeasConfig.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_RadioMeasReportPerU) Size() (n int) {
+func (m *MessagePayload_RadioMeasReportPerU) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12077,187 +13149,187 @@ func (m *E2MessagePayload_RadioMeasReportPerU) Size() (n int) {
 	}
 	return n
 }
-func (m *E2MessagePayload_RadioMeasReportPerCellAttribute) Size() (n int) {
+func (m *MessagePayload_RadioMeasReportPerCell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.RadioMeasReportPerCellAttribute != nil {
-		l = m.RadioMeasReportPerCellAttribute.Size()
+	if m.RadioMeasReportPerCell != nil {
+		l = m.RadioMeasReportPerCell.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_SchedMeasReportPerUEAttribute) Size() (n int) {
+func (m *MessagePayload_SchedMeasReportPerUE) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.SchedMeasReportPerUEAttribute != nil {
-		l = m.SchedMeasReportPerUEAttribute.Size()
+	if m.SchedMeasReportPerUE != nil {
+		l = m.SchedMeasReportPerUE.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_SchedMeasReportPerCellAttribute) Size() (n int) {
+func (m *MessagePayload_SchedMeasReportPerCell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.SchedMeasReportPerCellAttribute != nil {
-		l = m.SchedMeasReportPerCellAttribute.Size()
+	if m.SchedMeasReportPerCell != nil {
+		l = m.SchedMeasReportPerCell.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_PDCPMeasReportPerUeAttribute) Size() (n int) {
+func (m *MessagePayload_PDCPMeasReportPerUe) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.PDCPMeasReportPerUeAttribute != nil {
-		l = m.PDCPMeasReportPerUeAttribute.Size()
+	if m.PDCPMeasReportPerUe != nil {
+		l = m.PDCPMeasReportPerUe.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_RRMConfigAttribute) Size() (n int) {
+func (m *MessagePayload_RRMConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.RRMConfigAttribute != nil {
-		l = m.RRMConfigAttribute.Size()
+	if m.RRMConfig != nil {
+		l = m.RRMConfig.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_RRMConfigStatusAttribute) Size() (n int) {
+func (m *MessagePayload_RRMConfigStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.RRMConfigStatusAttribute != nil {
-		l = m.RRMConfigStatusAttribute.Size()
+	if m.RRMConfigStatus != nil {
+		l = m.RRMConfigStatus.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UECapabilityEnquiryAttribute) Size() (n int) {
+func (m *MessagePayload_UECapabilityEnquiry) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UECapabilityEnquiryAttribute != nil {
-		l = m.UECapabilityEnquiryAttribute.Size()
+	if m.UECapabilityEnquiry != nil {
+		l = m.UECapabilityEnquiry.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_UECapabilityInfoAttribute) Size() (n int) {
+func (m *MessagePayload_UECapabilityInfo) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.UECapabilityInfoAttribute != nil {
-		l = m.UECapabilityInfoAttribute.Size()
+	if m.UECapabilityInfo != nil {
+		l = m.UECapabilityInfo.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_ScellAddAttribute) Size() (n int) {
+func (m *MessagePayload_ScellAdd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.ScellAddAttribute != nil {
-		l = m.ScellAddAttribute.Size()
+	if m.ScellAdd != nil {
+		l = m.ScellAdd.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_ScellAddStatusAttribute) Size() (n int) {
+func (m *MessagePayload_ScellAddStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.ScellAddStatusAttribute != nil {
-		l = m.ScellAddStatusAttribute.Size()
+	if m.ScellAddStatus != nil {
+		l = m.ScellAddStatus.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_ScellDeleteAttribute) Size() (n int) {
+func (m *MessagePayload_ScellDelete) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.ScellDeleteAttribute != nil {
-		l = m.ScellDeleteAttribute.Size()
+	if m.ScellDelete != nil {
+		l = m.ScellDelete.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_SeNBAddAttribute) Size() (n int) {
+func (m *MessagePayload_SeNBAdd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.SeNBAddAttribute != nil {
-		l = m.SeNBAddAttribute.Size()
+	if m.SeNBAdd != nil {
+		l = m.SeNBAdd.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_SeNBAddStatusAttribute) Size() (n int) {
+func (m *MessagePayload_SeNBAddStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.SeNBAddStatusAttribute != nil {
-		l = m.SeNBAddStatusAttribute.Size()
+	if m.SeNBAddStatus != nil {
+		l = m.SeNBAddStatus.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_SeNBDeleteAttribute) Size() (n int) {
+func (m *MessagePayload_SeNBDelete) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.SeNBDeleteAttribute != nil {
-		l = m.SeNBDeleteAttribute.Size()
+	if m.SeNBDelete != nil {
+		l = m.SeNBDelete.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2MessagePayload_TrafficSplitConfigAttribute) Size() (n int) {
+func (m *MessagePayload_TrafficSplitConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.TrafficSplitConfigAttribute != nil {
-		l = m.TrafficSplitConfigAttribute.Size()
+	if m.TrafficSplitConfig != nil {
+		l = m.TrafficSplitConfig.Size()
 		n += 2 + l + sovE2Interface(uint64(l))
 	}
 	return n
 }
-func (m *E2Message) Size() (n int) {
+func (m *Message) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12290,7 +13362,7 @@ func (m *ServiceResult) Size() (n int) {
 	return n
 }
 
-func (m *E2ECGI) Size() (n int) {
+func (m *ECGI) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12307,7 +13379,7 @@ func (m *E2ECGI) Size() (n int) {
 	return n
 }
 
-func (m *E2CandScell) Size() (n int) {
+func (m *CandScell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12324,7 +13396,7 @@ func (m *E2CandScell) Size() (n int) {
 	return n
 }
 
-func (m *E2CellConfigRequestAttribute) Size() (n int) {
+func (m *CellConfigRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12337,7 +13409,7 @@ func (m *E2CellConfigRequestAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2CellConfigReportAttribute) Size() (n int) {
+func (m *CellConfigReport) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12404,7 +13476,7 @@ func (m *E2CellConfigReportAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UEAdmissionRequestAttribute) Size() (n int) {
+func (m *UEAdmissionRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12424,7 +13496,7 @@ func (m *E2UEAdmissionRequestAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UEAdmissionResponseAttribute) Size() (n int) {
+func (m *UEAdmissionResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12444,7 +13516,7 @@ func (m *E2UEAdmissionResponseAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UEAdmissionStatusAttribute) Size() (n int) {
+func (m *UEAdmissionStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12464,7 +13536,7 @@ func (m *E2UEAdmissionStatusAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UEContextUpdateAttribute) Size() (n int) {
+func (m *UEContextUpdate) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12493,7 +13565,7 @@ func (m *E2UEContextUpdateAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UEReconfigIndAttribute) Size() (n int) {
+func (m *UEReconfigInd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12517,7 +13589,7 @@ func (m *E2UEReconfigIndAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UEReleaseIndAttribute) Size() (n int) {
+func (m *UEReleaseInd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12537,7 +13609,7 @@ func (m *E2UEReleaseIndAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UEAMBR) Size() (n int) {
+func (m *UEAMBR) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12554,7 +13626,7 @@ func (m *E2UEAMBR) Size() (n int) {
 	return n
 }
 
-func (m *E2ERABParamsItem) Size() (n int) {
+func (m *ERABParamsItem) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12597,7 +13669,7 @@ func (m *E2ERABParamsItem) Size() (n int) {
 	return n
 }
 
-func (m *E2ERABResponseItem) Size() (n int) {
+func (m *ERABResponseItem) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12613,7 +13685,7 @@ func (m *E2ERABResponseItem) Size() (n int) {
 	return n
 }
 
-func (m *E2BearerAdmissionRequestAttribute) Size() (n int) {
+func (m *BearerAdmissionRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12644,7 +13716,7 @@ func (m *E2BearerAdmissionRequestAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2BearerAdmissionResponseAttribute) Size() (n int) {
+func (m *BearerAdmissionResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12671,7 +13743,7 @@ func (m *E2BearerAdmissionResponseAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2BearerAdmissionStatusAttribute) Size() (n int) {
+func (m *BearerAdmissionStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12698,7 +13770,7 @@ func (m *E2BearerAdmissionStatusAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2BearerReleaseIndAttribute) Size() (n int) {
+func (m *BearerReleaseInd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12725,7 +13797,7 @@ func (m *E2BearerReleaseIndAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2HORequestAttribute) Size() (n int) {
+func (m *HORequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12746,7 +13818,7 @@ func (m *E2HORequestAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2HOFailureAttribute) Size() (n int) {
+func (m *HOFailure) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12767,7 +13839,7 @@ func (m *E2HOFailureAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2HOCompleteAttribute) Size() (n int) {
+func (m *HOComplete) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12788,7 +13860,7 @@ func (m *E2HOCompleteAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2HOCauseAttribute) Size() (n int) {
+func (m *HOCause) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12819,7 +13891,7 @@ func (m *E2HOCauseAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2MeasCell) Size() (n int) {
+func (m *MeasCell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12836,7 +13908,7 @@ func (m *E2MeasCell) Size() (n int) {
 	return n
 }
 
-func (m *E2MeasObject) Size() (n int) {
+func (m *MeasObject) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12855,7 +13927,7 @@ func (m *E2MeasObject) Size() (n int) {
 	return n
 }
 
-func (m *E2ReportParamChoice) Size() (n int) {
+func (m *ReportParamChoice) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12867,7 +13939,7 @@ func (m *E2ReportParamChoice) Size() (n int) {
 	return n
 }
 
-func (m *E2ReportParamChoice_PerParam) Size() (n int) {
+func (m *ReportParamChoice_PerParam) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12879,7 +13951,7 @@ func (m *E2ReportParamChoice_PerParam) Size() (n int) {
 	}
 	return n
 }
-func (m *E2ReportParamChoice_A1Param) Size() (n int) {
+func (m *ReportParamChoice_A1Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12891,7 +13963,7 @@ func (m *E2ReportParamChoice_A1Param) Size() (n int) {
 	}
 	return n
 }
-func (m *E2ReportParamChoice_A2Param) Size() (n int) {
+func (m *ReportParamChoice_A2Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12903,7 +13975,7 @@ func (m *E2ReportParamChoice_A2Param) Size() (n int) {
 	}
 	return n
 }
-func (m *E2ReportParamChoice_A3Param) Size() (n int) {
+func (m *ReportParamChoice_A3Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12915,7 +13987,7 @@ func (m *E2ReportParamChoice_A3Param) Size() (n int) {
 	}
 	return n
 }
-func (m *E2ReportParamChoice_A4Param) Size() (n int) {
+func (m *ReportParamChoice_A4Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12927,7 +13999,7 @@ func (m *E2ReportParamChoice_A4Param) Size() (n int) {
 	}
 	return n
 }
-func (m *E2ReportParamChoice_A5Param) Size() (n int) {
+func (m *ReportParamChoice_A5Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12939,7 +14011,7 @@ func (m *E2ReportParamChoice_A5Param) Size() (n int) {
 	}
 	return n
 }
-func (m *E2ReportParamChoice_A6Param) Size() (n int) {
+func (m *ReportParamChoice_A6Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12951,7 +14023,7 @@ func (m *E2ReportParamChoice_A6Param) Size() (n int) {
 	}
 	return n
 }
-func (m *E2ThresholdEUTRAChoice) Size() (n int) {
+func (m *ThresholdEUTRAChoice) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12963,7 +14035,7 @@ func (m *E2ThresholdEUTRAChoice) Size() (n int) {
 	return n
 }
 
-func (m *E2ThresholdEUTRAChoice_ThresholdRSRP) Size() (n int) {
+func (m *ThresholdEUTRAChoice_ThresholdRSRP) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12973,7 +14045,7 @@ func (m *E2ThresholdEUTRAChoice_ThresholdRSRP) Size() (n int) {
 	n += 1 + l + sovE2Interface(uint64(l))
 	return n
 }
-func (m *E2ThresholdEUTRAChoice_ThresholdRSRQ) Size() (n int) {
+func (m *ThresholdEUTRAChoice_ThresholdRSRQ) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12983,7 +14055,7 @@ func (m *E2ThresholdEUTRAChoice_ThresholdRSRQ) Size() (n int) {
 	n += 1 + l + sovE2Interface(uint64(l))
 	return n
 }
-func (m *E2ThreasholdEUTRA) Size() (n int) {
+func (m *ThreasholdEUTRA) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -12999,7 +14071,7 @@ func (m *E2ThreasholdEUTRA) Size() (n int) {
 	return n
 }
 
-func (m *E2PerParam) Size() (n int) {
+func (m *PerParam) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13011,7 +14083,7 @@ func (m *E2PerParam) Size() (n int) {
 	return n
 }
 
-func (m *E2A1Param) Size() (n int) {
+func (m *A1Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13024,7 +14096,7 @@ func (m *E2A1Param) Size() (n int) {
 	return n
 }
 
-func (m *E2A2Param) Size() (n int) {
+func (m *A2Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13037,7 +14109,7 @@ func (m *E2A2Param) Size() (n int) {
 	return n
 }
 
-func (m *E2A3Param) Size() (n int) {
+func (m *A3Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13050,7 +14122,7 @@ func (m *E2A3Param) Size() (n int) {
 	return n
 }
 
-func (m *E2A4Param) Size() (n int) {
+func (m *A4Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13063,7 +14135,7 @@ func (m *E2A4Param) Size() (n int) {
 	return n
 }
 
-func (m *E2A5Param) Size() (n int) {
+func (m *A5Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13080,7 +14152,7 @@ func (m *E2A5Param) Size() (n int) {
 	return n
 }
 
-func (m *E2A6Param) Size() (n int) {
+func (m *A6Param) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13093,7 +14165,7 @@ func (m *E2A6Param) Size() (n int) {
 	return n
 }
 
-func (m *E2ReportParam) Size() (n int) {
+func (m *ReportParam) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13116,7 +14188,7 @@ func (m *E2ReportParam) Size() (n int) {
 	return n
 }
 
-func (m *E2ReportConfig) Size() (n int) {
+func (m *ReportConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13135,7 +14207,7 @@ func (m *E2ReportConfig) Size() (n int) {
 	return n
 }
 
-func (m *E2AddMeasId) Size() (n int) {
+func (m *AddMeasId) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13150,7 +14222,7 @@ func (m *E2AddMeasId) Size() (n int) {
 	return n
 }
 
-func (m *E2DelMeasId) Size() (n int) {
+func (m *DelMeasId) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13165,7 +14237,7 @@ func (m *E2DelMeasId) Size() (n int) {
 	return n
 }
 
-func (m *E2MeasIdActionChoice) Size() (n int) {
+func (m *MeasIdActionChoice) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13177,7 +14249,7 @@ func (m *E2MeasIdActionChoice) Size() (n int) {
 	return n
 }
 
-func (m *E2MeasIdActionChoice_AddMeasId) Size() (n int) {
+func (m *MeasIdActionChoice_AddMeasId) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13189,7 +14261,7 @@ func (m *E2MeasIdActionChoice_AddMeasId) Size() (n int) {
 	}
 	return n
 }
-func (m *E2MeasIdActionChoice_DelMeasId) Size() (n int) {
+func (m *MeasIdActionChoice_DelMeasId) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13201,7 +14273,7 @@ func (m *E2MeasIdActionChoice_DelMeasId) Size() (n int) {
 	}
 	return n
 }
-func (m *E2MeasIdActionChoice_Hototarget) Size() (n int) {
+func (m *MeasIdActionChoice_Hototarget) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13211,7 +14283,7 @@ func (m *E2MeasIdActionChoice_Hototarget) Size() (n int) {
 	n += 1 + l + sovE2Interface(uint64(l))
 	return n
 }
-func (m *E2MeasIdAction) Size() (n int) {
+func (m *MeasIdAction) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13227,7 +14299,7 @@ func (m *E2MeasIdAction) Size() (n int) {
 	return n
 }
 
-func (m *E2MeasID) Size() (n int) {
+func (m *MeasID) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13248,7 +14320,7 @@ func (m *E2MeasID) Size() (n int) {
 	return n
 }
 
-func (m *E2RRCMeasConfigAttribute) Size() (n int) {
+func (m *RRCMeasConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13285,7 +14357,7 @@ func (m *E2RRCMeasConfigAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2PCIARFCN) Size() (n int) {
+func (m *PCIARFCN) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13302,7 +14374,7 @@ func (m *E2PCIARFCN) Size() (n int) {
 	return n
 }
 
-func (m *E2RXSigReport) Size() (n int) {
+func (m *RXSigReport) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13327,7 +14399,7 @@ func (m *E2RXSigReport) Size() (n int) {
 	return n
 }
 
-func (m *E2RxSigMeasReportAttribute) Size() (n int) {
+func (m *RxSigMeasReport) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13352,7 +14424,7 @@ func (m *E2RxSigMeasReportAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2L2ReportInterval) Size() (n int) {
+func (m *L2ReportInterval) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13376,7 +14448,7 @@ func (m *E2L2ReportInterval) Size() (n int) {
 	return n
 }
 
-func (m *E2L2MeasConfigAttribute) Size() (n int) {
+func (m *L2MeasConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13399,7 +14471,7 @@ func (m *E2L2MeasConfigAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2RadioRepPerServCell) Size() (n int) {
+func (m *RadioRepPerServCell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13436,7 +14508,7 @@ func (m *E2RadioRepPerServCell) Size() (n int) {
 	return n
 }
 
-func (m *E2RadioMeasReportPerUEAttribute) Size() (n int) {
+func (m *RadioMeasReportPerUE) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13459,7 +14531,7 @@ func (m *E2RadioMeasReportPerUEAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2RadioMeasReportPerCellAttribute) Size() (n int) {
+func (m *RadioMeasReportPerCell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13484,7 +14556,7 @@ func (m *E2RadioMeasReportPerCellAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2PRBUsage) Size() (n int) {
+func (m *PRBUsage) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13505,7 +14577,7 @@ func (m *E2PRBUsage) Size() (n int) {
 	return n
 }
 
-func (m *E2SchedMeasRepPerServCell) Size() (n int) {
+func (m *SchedMeasRepPerServCell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13564,7 +14636,7 @@ func (m *E2SchedMeasRepPerServCell) Size() (n int) {
 	return n
 }
 
-func (m *E2SchedMeasReportPerUEAttribute) Size() (n int) {
+func (m *SchedMeasReportPerUE) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13587,7 +14659,7 @@ func (m *E2SchedMeasReportPerUEAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2SchedMeasReportPerCellAttribute) Size() (n int) {
+func (m *SchedMeasReportPerCell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13614,7 +14686,7 @@ func (m *E2SchedMeasReportPerCellAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2PDCPMeasReportPerUeAttribute) Size() (n int) {
+func (m *PDCPMeasReportPerUe) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13685,7 +14757,7 @@ func (m *E2PDCPMeasReportPerUeAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2RRMConfigAttribute) Size() (n int) {
+func (m *RRMConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13757,7 +14829,7 @@ func (m *E2RRMConfigAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2RRMConfigStatusAttribute) Size() (n int) {
+func (m *RRMConfigStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13783,7 +14855,7 @@ func (m *E2RRMConfigStatusAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2CACap) Size() (n int) {
+func (m *CACap) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13806,7 +14878,7 @@ func (m *E2CACap) Size() (n int) {
 	return n
 }
 
-func (m *E2DCCap) Size() (n int) {
+func (m *DCCap) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13818,7 +14890,7 @@ func (m *E2DCCap) Size() (n int) {
 	return n
 }
 
-func (m *E2UECapabilityEnquiryAttribute) Size() (n int) {
+func (m *UECapabilityEnquiry) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13835,7 +14907,7 @@ func (m *E2UECapabilityEnquiryAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2UECapabilityInfoAttribute) Size() (n int) {
+func (m *UECapabilityInfo) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13860,7 +14932,7 @@ func (m *E2UECapabilityInfoAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2PropScell) Size() (n int) {
+func (m *PropScell) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13884,7 +14956,7 @@ func (m *E2PropScell) Size() (n int) {
 	return n
 }
 
-func (m *E2ScellAddAttribute) Size() (n int) {
+func (m *ScellAdd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13907,7 +14979,7 @@ func (m *E2ScellAddAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2ScellAddStatusAttribute) Size() (n int) {
+func (m *ScellAddStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13937,7 +15009,7 @@ func (m *E2ScellAddStatusAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2ScellDeleteAttribute) Size() (n int) {
+func (m *ScellDelete) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13960,7 +15032,7 @@ func (m *E2ScellDeleteAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2SeNBAddAttribute) Size() (n int) {
+func (m *SeNBAdd) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -13981,7 +15053,7 @@ func (m *E2SeNBAddAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2SeNBAddStatusAttribute) Size() (n int) {
+func (m *SeNBAddStatus) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -14001,7 +15073,7 @@ func (m *E2SeNBAddStatusAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2SeNBDeleteAttribute) Size() (n int) {
+func (m *SeNBDelete) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -14022,7 +15094,7 @@ func (m *E2SeNBDeleteAttribute) Size() (n int) {
 	return n
 }
 
-func (m *E2TrafficSplitPercentage) Size() (n int) {
+func (m *TrafficSplitPercentage) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -14043,7 +15115,7 @@ func (m *E2TrafficSplitPercentage) Size() (n int) {
 	return n
 }
 
-func (m *E2TrafficSplitConfigAttribute) Size() (n int) {
+func (m *TrafficSplitConfig) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -14154,6 +15226,165 @@ func (m *TelemetryMessage) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: TelemetryMessage: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MessageType", wireType)
+			}
+			m.MessageType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MessageType |= MessageType(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RadioMeasReportPerUE", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &RadioMeasReportPerUE{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &TelemetryMessage_RadioMeasReportPerUE{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RadioMeasReportPerCell", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &RadioMeasReportPerCell{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &TelemetryMessage_RadioMeasReportPerCell{v}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SchedMeasReportPerCell", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &SchedMeasReportPerCell{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &TelemetryMessage_SchedMeasReportPerCell{v}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PDCPMeasReportPerUe", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &PDCPMeasReportPerUe{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &TelemetryMessage_PDCPMeasReportPerUe{v}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipE2Interface(dAtA[iNdEx:])
@@ -14207,6 +15438,375 @@ func (m *ControlUpdate) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: ControlUpdate: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MessageType", wireType)
+			}
+			m.MessageType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MessageType |= MessageType(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CellConfigReport", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &CellConfigReport{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_CellConfigReport{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RRMConfigStatus", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &RRMConfigStatus{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_RRMConfigStatus{v}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionRequest", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &UEAdmissionRequest{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_UEAdmissionRequest{v}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionStatus", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &UEAdmissionStatus{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_UEAdmissionStatus{v}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UEContextUpdate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &UEContextUpdate{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_UEContextUpdate{v}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionRequest", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &BearerAdmissionRequest{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_BearerAdmissionRequest{v}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionStatus", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &BearerAdmissionStatus{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_BearerAdmissionStatus{v}
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HOComplete", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &HOComplete{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_HOComplete{v}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HOFailure", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &HOFailure{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_HOFailure{v}
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HOCause", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &HOCause{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlUpdate_HOCause{v}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipE2Interface(dAtA[iNdEx:])
@@ -14260,6 +15860,235 @@ func (m *ControlResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: ControlResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MessageType", wireType)
+			}
+			m.MessageType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.MessageType |= MessageType(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CellConfigRequest", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &CellConfigRequest{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlResponse_CellConfigRequest{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RRMConfig", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &RRMConfig{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlResponse_RRMConfig{v}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field L2MeasConfig", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &L2MeasConfig{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlResponse_L2MeasConfig{v}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionResponse", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &UEAdmissionResponse{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlResponse_UEAdmissionResponse{v}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionResponse", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &BearerAdmissionResponse{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlResponse_BearerAdmissionResponse{v}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HORequest", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2Interface
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2Interface
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &HORequest{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.S = &ControlResponse_HORequest{v}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipE2Interface(dAtA[iNdEx:])
@@ -14284,7 +16113,7 @@ func (m *ControlResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2MessageHeader) Unmarshal(dAtA []byte) error {
+func (m *MessageHeader) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -14307,10 +16136,10 @@ func (m *E2MessageHeader) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2MessageHeader: wiretype end group for non-group")
+			return fmt.Errorf("proto: MessageHeader: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2MessageHeader: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MessageHeader: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -14327,7 +16156,7 @@ func (m *E2MessageHeader) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MessageType |= E2MessageType(b&0x7F) << shift
+				m.MessageType |= MessageType(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -14356,7 +16185,7 @@ func (m *E2MessageHeader) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
+func (m *MessagePayload) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -14379,15 +16208,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2MessagePayload: wiretype end group for non-group")
+			return fmt.Errorf("proto: MessagePayload: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2MessagePayload: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MessagePayload: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CellConfigRequestAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CellConfigRequest", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14414,15 +16243,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2CellConfigRequestAttribute{}
+			v := &CellConfigRequest{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_CellConfigRequestAttribute{v}
+			m.S = &MessagePayload_CellConfigRequest{v}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CellConfigReportAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CellConfigReport", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14449,15 +16278,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2CellConfigReportAttribute{}
+			v := &CellConfigReport{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_CellConfigReportAttribute{v}
+			m.S = &MessagePayload_CellConfigReport{v}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionRequestAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionRequest", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14484,15 +16313,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UEAdmissionRequestAttribute{}
+			v := &UEAdmissionRequest{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UEAdmissionRequestAttribute{v}
+			m.S = &MessagePayload_UEAdmissionRequest{v}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionResponseAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionResponse", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14519,15 +16348,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UEAdmissionResponseAttribute{}
+			v := &UEAdmissionResponse{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UEAdmissionResponseAttribute{v}
+			m.S = &MessagePayload_UEAdmissionResponse{v}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionStatusAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UEAdmissionStatus", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14554,15 +16383,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UEAdmissionStatusAttribute{}
+			v := &UEAdmissionStatus{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UEAdmissionStatusAttribute{v}
+			m.S = &MessagePayload_UEAdmissionStatus{v}
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UEContextUpdateAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UEContextUpdate", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14589,15 +16418,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UEContextUpdateAttribute{}
+			v := &UEContextUpdate{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UEContextUpdateAttribute{v}
+			m.S = &MessagePayload_UEContextUpdate{v}
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UEReconfigIndAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UEReconfigInd", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14624,15 +16453,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UEReconfigIndAttribute{}
+			v := &UEReconfigInd{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UEReconfigIndAttribute{v}
+			m.S = &MessagePayload_UEReconfigInd{v}
 			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UEReleaseIndAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UEReleaseInd", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14659,15 +16488,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UEReleaseIndAttribute{}
+			v := &UEReleaseInd{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UEReleaseIndAttribute{v}
+			m.S = &MessagePayload_UEReleaseInd{v}
 			iNdEx = postIndex
 		case 9:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionRequestAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionRequest", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14694,15 +16523,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2BearerAdmissionRequestAttribute{}
+			v := &BearerAdmissionRequest{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_BearerAdmissionRequestAttribute{v}
+			m.S = &MessagePayload_BearerAdmissionRequest{v}
 			iNdEx = postIndex
 		case 10:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionResponseAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionResponse", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14729,15 +16558,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2BearerAdmissionResponseAttribute{}
+			v := &BearerAdmissionResponse{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_BearerAdmissionResponseAttribute{v}
+			m.S = &MessagePayload_BearerAdmissionResponse{v}
 			iNdEx = postIndex
 		case 11:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionStatusAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BearerAdmissionStatus", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14764,15 +16593,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2BearerAdmissionStatusAttribute{}
+			v := &BearerAdmissionStatus{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_BearerAdmissionStatusAttribute{v}
+			m.S = &MessagePayload_BearerAdmissionStatus{v}
 			iNdEx = postIndex
 		case 12:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BearerReleaseIndAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field BearerReleaseInd", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14799,15 +16628,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2BearerReleaseIndAttribute{}
+			v := &BearerReleaseInd{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_BearerReleaseIndAttribute{v}
+			m.S = &MessagePayload_BearerReleaseInd{v}
 			iNdEx = postIndex
 		case 13:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HORequestAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field HORequest", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14834,15 +16663,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2HORequestAttribute{}
+			v := &HORequest{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_HORequestAttribute{v}
+			m.S = &MessagePayload_HORequest{v}
 			iNdEx = postIndex
 		case 14:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HOFailureAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field HOFailure", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14869,15 +16698,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2HOFailureAttribute{}
+			v := &HOFailure{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_HOFailureAttribute{v}
+			m.S = &MessagePayload_HOFailure{v}
 			iNdEx = postIndex
 		case 15:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HOCompleteAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field HOComplete", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14904,15 +16733,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2HOCompleteAttribute{}
+			v := &HOComplete{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_HOCompleteAttribute{v}
+			m.S = &MessagePayload_HOComplete{v}
 			iNdEx = postIndex
 		case 16:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HOCauseAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field HOCause", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14939,15 +16768,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2HOCauseAttribute{}
+			v := &HOCause{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_HOCauseAttribute{v}
+			m.S = &MessagePayload_HOCause{v}
 			iNdEx = postIndex
 		case 17:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RRCMeasConfigAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RRCMeasConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -14974,15 +16803,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2RRCMeasConfigAttribute{}
+			v := &RRCMeasConfig{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_RRCMeasConfigAttribute{v}
+			m.S = &MessagePayload_RRCMeasConfig{v}
 			iNdEx = postIndex
 		case 18:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RxSigMeasReportAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RxSigMeasReport", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15009,15 +16838,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2RxSigMeasReportAttribute{}
+			v := &RxSigMeasReport{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_RxSigMeasReportAttribute{v}
+			m.S = &MessagePayload_RxSigMeasReport{v}
 			iNdEx = postIndex
 		case 19:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field L2MeasConfigAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field L2MeasConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15044,11 +16873,11 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2L2MeasConfigAttribute{}
+			v := &L2MeasConfig{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_L2MeasConfigAttribute{v}
+			m.S = &MessagePayload_L2MeasConfig{v}
 			iNdEx = postIndex
 		case 20:
 			if wireType != 2 {
@@ -15079,15 +16908,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2RadioMeasReportPerUEAttribute{}
+			v := &RadioMeasReportPerUE{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_RadioMeasReportPerU{v}
+			m.S = &MessagePayload_RadioMeasReportPerU{v}
 			iNdEx = postIndex
 		case 21:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RadioMeasReportPerCellAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RadioMeasReportPerCell", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15114,15 +16943,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2RadioMeasReportPerCellAttribute{}
+			v := &RadioMeasReportPerCell{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_RadioMeasReportPerCellAttribute{v}
+			m.S = &MessagePayload_RadioMeasReportPerCell{v}
 			iNdEx = postIndex
 		case 22:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SchedMeasReportPerUEAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SchedMeasReportPerUE", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15149,15 +16978,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2SchedMeasReportPerUEAttribute{}
+			v := &SchedMeasReportPerUE{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_SchedMeasReportPerUEAttribute{v}
+			m.S = &MessagePayload_SchedMeasReportPerUE{v}
 			iNdEx = postIndex
 		case 23:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SchedMeasReportPerCellAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SchedMeasReportPerCell", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15184,15 +17013,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2SchedMeasReportPerCellAttribute{}
+			v := &SchedMeasReportPerCell{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_SchedMeasReportPerCellAttribute{v}
+			m.S = &MessagePayload_SchedMeasReportPerCell{v}
 			iNdEx = postIndex
 		case 24:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PDCPMeasReportPerUeAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PDCPMeasReportPerUe", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15219,15 +17048,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2PDCPMeasReportPerUeAttribute{}
+			v := &PDCPMeasReportPerUe{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_PDCPMeasReportPerUeAttribute{v}
+			m.S = &MessagePayload_PDCPMeasReportPerUe{v}
 			iNdEx = postIndex
 		case 25:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RRMConfigAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RRMConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15254,15 +17083,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2RRMConfigAttribute{}
+			v := &RRMConfig{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_RRMConfigAttribute{v}
+			m.S = &MessagePayload_RRMConfig{v}
 			iNdEx = postIndex
 		case 26:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RRMConfigStatusAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RRMConfigStatus", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15289,15 +17118,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2RRMConfigStatusAttribute{}
+			v := &RRMConfigStatus{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_RRMConfigStatusAttribute{v}
+			m.S = &MessagePayload_RRMConfigStatus{v}
 			iNdEx = postIndex
 		case 27:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UECapabilityEnquiryAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UECapabilityEnquiry", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15324,15 +17153,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UECapabilityEnquiryAttribute{}
+			v := &UECapabilityEnquiry{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UECapabilityEnquiryAttribute{v}
+			m.S = &MessagePayload_UECapabilityEnquiry{v}
 			iNdEx = postIndex
 		case 28:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UECapabilityInfoAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field UECapabilityInfo", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15359,15 +17188,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2UECapabilityInfoAttribute{}
+			v := &UECapabilityInfo{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_UECapabilityInfoAttribute{v}
+			m.S = &MessagePayload_UECapabilityInfo{v}
 			iNdEx = postIndex
 		case 29:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ScellAddAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ScellAdd", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15394,15 +17223,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2ScellAddAttribute{}
+			v := &ScellAdd{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_ScellAddAttribute{v}
+			m.S = &MessagePayload_ScellAdd{v}
 			iNdEx = postIndex
 		case 30:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ScellAddStatusAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ScellAddStatus", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15429,15 +17258,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2ScellAddStatusAttribute{}
+			v := &ScellAddStatus{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_ScellAddStatusAttribute{v}
+			m.S = &MessagePayload_ScellAddStatus{v}
 			iNdEx = postIndex
 		case 31:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ScellDeleteAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ScellDelete", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15464,15 +17293,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2ScellDeleteAttribute{}
+			v := &ScellDelete{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_ScellDeleteAttribute{v}
+			m.S = &MessagePayload_ScellDelete{v}
 			iNdEx = postIndex
 		case 32:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SeNBAddAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SeNBAdd", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15499,15 +17328,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2SeNBAddAttribute{}
+			v := &SeNBAdd{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_SeNBAddAttribute{v}
+			m.S = &MessagePayload_SeNBAdd{v}
 			iNdEx = postIndex
 		case 33:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SeNBAddStatusAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SeNBAddStatus", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15534,15 +17363,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2SeNBAddStatusAttribute{}
+			v := &SeNBAddStatus{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_SeNBAddStatusAttribute{v}
+			m.S = &MessagePayload_SeNBAddStatus{v}
 			iNdEx = postIndex
 		case 34:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SeNBDeleteAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SeNBDelete", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15569,15 +17398,15 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2SeNBDeleteAttribute{}
+			v := &SeNBDelete{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_SeNBDeleteAttribute{v}
+			m.S = &MessagePayload_SeNBDelete{v}
 			iNdEx = postIndex
 		case 35:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TrafficSplitConfigAttribute", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TrafficSplitConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -15604,11 +17433,11 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2TrafficSplitConfigAttribute{}
+			v := &TrafficSplitConfig{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Attributes = &E2MessagePayload_TrafficSplitConfigAttribute{v}
+			m.S = &MessagePayload_TrafficSplitConfig{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -15634,7 +17463,7 @@ func (m *E2MessagePayload) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2Message) Unmarshal(dAtA []byte) error {
+func (m *Message) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -15657,10 +17486,10 @@ func (m *E2Message) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2Message: wiretype end group for non-group")
+			return fmt.Errorf("proto: Message: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2Message: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Message: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -15693,7 +17522,7 @@ func (m *E2Message) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Header == nil {
-				m.Header = &E2MessageHeader{}
+				m.Header = &MessageHeader{}
 			}
 			if err := m.Header.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -15729,7 +17558,7 @@ func (m *E2Message) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Payload == nil {
-				m.Payload = &E2MessagePayload{}
+				m.Payload = &MessagePayload{}
 			}
 			if err := m.Payload.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -15863,7 +17692,7 @@ func (m *ServiceResult) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ECGI) Unmarshal(dAtA []byte) error {
+func (m *ECGI) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -15886,10 +17715,10 @@ func (m *E2ECGI) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ECGI: wiretype end group for non-group")
+			return fmt.Errorf("proto: ECGI: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ECGI: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ECGI: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -15980,7 +17809,7 @@ func (m *E2ECGI) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2CandScell) Unmarshal(dAtA []byte) error {
+func (m *CandScell) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -16003,10 +17832,10 @@ func (m *E2CandScell) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2CandScell: wiretype end group for non-group")
+			return fmt.Errorf("proto: CandScell: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2CandScell: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CandScell: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -16097,7 +17926,7 @@ func (m *E2CandScell) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2CellConfigRequestAttribute) Unmarshal(dAtA []byte) error {
+func (m *CellConfigRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -16120,10 +17949,10 @@ func (m *E2CellConfigRequestAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2CellConfigRequestAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: CellConfigRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2CellConfigRequestAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CellConfigRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -16156,7 +17985,7 @@ func (m *E2CellConfigRequestAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -16186,7 +18015,7 @@ func (m *E2CellConfigRequestAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2CellConfigReportAttribute) Unmarshal(dAtA []byte) error {
+func (m *CellConfigReport) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -16209,10 +18038,10 @@ func (m *E2CellConfigReportAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2CellConfigReportAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: CellConfigReport: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2CellConfigReportAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CellConfigReport: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -16245,7 +18074,7 @@ func (m *E2CellConfigReportAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -16312,7 +18141,7 @@ func (m *E2CellConfigReportAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CandScells = append(m.CandScells, &E2CandScell{})
+			m.CandScells = append(m.CandScells, &CandScell{})
 			if err := m.CandScells[len(m.CandScells)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -16693,7 +18522,7 @@ func (m *E2CellConfigReportAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UEAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
+func (m *UEAdmissionRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -16716,10 +18545,10 @@ func (m *E2UEAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UEAdmissionRequestAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UEAdmissionRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UEAdmissionRequestAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UEAdmissionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -16784,7 +18613,7 @@ func (m *E2UEAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -16804,7 +18633,7 @@ func (m *E2UEAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.AdmissionEstCause |= E2AdmEstCause(b&0x7F) << shift
+				m.AdmissionEstCause |= AdmEstCause(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -16833,7 +18662,7 @@ func (m *E2UEAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UEAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
+func (m *UEAdmissionResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -16856,10 +18685,10 @@ func (m *E2UEAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UEAdmissionResponseAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UEAdmissionResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UEAdmissionResponseAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UEAdmissionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -16924,7 +18753,7 @@ func (m *E2UEAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -16944,7 +18773,7 @@ func (m *E2UEAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.AdmissionEstResponse |= E2SuccessOrFailure(b&0x7F) << shift
+				m.AdmissionEstResponse |= SuccessOrFailure(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -16973,7 +18802,7 @@ func (m *E2UEAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UEAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
+func (m *UEAdmissionStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -16996,10 +18825,10 @@ func (m *E2UEAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UEAdmissionStatusAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UEAdmissionStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UEAdmissionStatusAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UEAdmissionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17064,7 +18893,7 @@ func (m *E2UEAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -17084,7 +18913,7 @@ func (m *E2UEAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.AdmissionEstStatus |= E2SuccessOrFailure(b&0x7F) << shift
+				m.AdmissionEstStatus |= SuccessOrFailure(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -17113,7 +18942,7 @@ func (m *E2UEAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UEContextUpdateAttribute) Unmarshal(dAtA []byte) error {
+func (m *UEContextUpdate) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17136,10 +18965,10 @@ func (m *E2UEContextUpdateAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UEContextUpdateAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UEContextUpdate: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UEContextUpdateAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UEContextUpdate: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17204,7 +19033,7 @@ func (m *E2UEContextUpdateAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -17330,7 +19159,7 @@ func (m *E2UEContextUpdateAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UEReconfigIndAttribute) Unmarshal(dAtA []byte) error {
+func (m *UEReconfigInd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17353,10 +19182,10 @@ func (m *E2UEReconfigIndAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UEReconfigIndAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UEReconfigInd: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UEReconfigIndAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UEReconfigInd: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17421,7 +19250,7 @@ func (m *E2UEReconfigIndAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -17473,7 +19302,7 @@ func (m *E2UEReconfigIndAttribute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ReconfigCause |= E2ReconfigCause(b&0x7F) << shift
+				m.ReconfigCause |= ReconfigCause(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -17502,7 +19331,7 @@ func (m *E2UEReconfigIndAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UEReleaseIndAttribute) Unmarshal(dAtA []byte) error {
+func (m *UEReleaseInd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17525,10 +19354,10 @@ func (m *E2UEReleaseIndAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UEReleaseIndAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UEReleaseInd: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UEReleaseIndAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UEReleaseInd: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17593,7 +19422,7 @@ func (m *E2UEReleaseIndAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -17613,7 +19442,7 @@ func (m *E2UEReleaseIndAttribute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ReleaseCause |= E2ReleaseCause(b&0x7F) << shift
+				m.ReleaseCause |= ReleaseCause(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -17642,7 +19471,7 @@ func (m *E2UEReleaseIndAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UEAMBR) Unmarshal(dAtA []byte) error {
+func (m *UEAMBR) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17665,10 +19494,10 @@ func (m *E2UEAMBR) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UEAMBR: wiretype end group for non-group")
+			return fmt.Errorf("proto: UEAMBR: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UEAMBR: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UEAMBR: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17759,7 +19588,7 @@ func (m *E2UEAMBR) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ERABParamsItem) Unmarshal(dAtA []byte) error {
+func (m *ERABParamsItem) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -17782,10 +19611,10 @@ func (m *E2ERABParamsItem) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ERABParamsItem: wiretype end group for non-group")
+			return fmt.Errorf("proto: ERABParamsItem: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ERABParamsItem: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ERABParamsItem: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -17834,7 +19663,7 @@ func (m *E2ERABParamsItem) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Direction |= E2ERABDirection(b&0x7F) << shift
+				m.Direction |= ERABDirection(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -17853,7 +19682,7 @@ func (m *E2ERABParamsItem) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Type |= E2ERABType(b&0x7F) << shift
+				m.Type |= ERABType(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -18074,7 +19903,7 @@ func (m *E2ERABParamsItem) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ERABResponseItem) Unmarshal(dAtA []byte) error {
+func (m *ERABResponseItem) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -18097,10 +19926,10 @@ func (m *E2ERABResponseItem) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ERABResponseItem: wiretype end group for non-group")
+			return fmt.Errorf("proto: ERABResponseItem: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ERABResponseItem: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ERABResponseItem: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -18149,7 +19978,7 @@ func (m *E2ERABResponseItem) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Decision |= E2SuccessOrFailure(b&0x7F) << shift
+				m.Decision |= SuccessOrFailure(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -18178,7 +20007,7 @@ func (m *E2ERABResponseItem) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2BearerAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
+func (m *BearerAdmissionRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -18201,10 +20030,10 @@ func (m *E2BearerAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2BearerAdmissionRequestAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: BearerAdmissionRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2BearerAdmissionRequestAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: BearerAdmissionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -18269,7 +20098,7 @@ func (m *E2BearerAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -18305,7 +20134,7 @@ func (m *E2BearerAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.UeAmbr == nil {
-				m.UeAmbr = &E2UEAMBR{}
+				m.UeAmbr = &UEAMBR{}
 			}
 			if err := m.UeAmbr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -18372,7 +20201,7 @@ func (m *E2BearerAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ErabsParams = append(m.ErabsParams, &E2ERABParamsItem{})
+			m.ErabsParams = append(m.ErabsParams, &ERABParamsItem{})
 			if err := m.ErabsParams[len(m.ErabsParams)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -18401,7 +20230,7 @@ func (m *E2BearerAdmissionRequestAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2BearerAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
+func (m *BearerAdmissionResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -18424,10 +20253,10 @@ func (m *E2BearerAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2BearerAdmissionResponseAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: BearerAdmissionResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2BearerAdmissionResponseAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: BearerAdmissionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -18492,7 +20321,7 @@ func (m *E2BearerAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -18559,7 +20388,7 @@ func (m *E2BearerAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ErabResponse = append(m.ErabResponse, &E2ERABResponseItem{})
+			m.ErabResponse = append(m.ErabResponse, &ERABResponseItem{})
 			if err := m.ErabResponse[len(m.ErabResponse)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -18588,7 +20417,7 @@ func (m *E2BearerAdmissionResponseAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2BearerAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
+func (m *BearerAdmissionStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -18611,10 +20440,10 @@ func (m *E2BearerAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2BearerAdmissionStatusAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: BearerAdmissionStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2BearerAdmissionStatusAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: BearerAdmissionStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -18679,7 +20508,7 @@ func (m *E2BearerAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -18746,7 +20575,7 @@ func (m *E2BearerAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ErabStatus = append(m.ErabStatus, &E2ERABResponseItem{})
+			m.ErabStatus = append(m.ErabStatus, &ERABResponseItem{})
 			if err := m.ErabStatus[len(m.ErabStatus)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -18775,7 +20604,7 @@ func (m *E2BearerAdmissionStatusAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2BearerReleaseIndAttribute) Unmarshal(dAtA []byte) error {
+func (m *BearerReleaseInd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -18798,10 +20627,10 @@ func (m *E2BearerReleaseIndAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2BearerReleaseIndAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: BearerReleaseInd: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2BearerReleaseIndAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: BearerReleaseInd: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -18866,7 +20695,7 @@ func (m *E2BearerReleaseIndAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -18960,7 +20789,7 @@ func (m *E2BearerReleaseIndAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2HORequestAttribute) Unmarshal(dAtA []byte) error {
+func (m *HORequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -18983,10 +20812,10 @@ func (m *E2HORequestAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2HORequestAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: HORequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2HORequestAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: HORequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -19051,7 +20880,7 @@ func (m *E2HORequestAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EcgiS == nil {
-				m.EcgiS = &E2ECGI{}
+				m.EcgiS = &ECGI{}
 			}
 			if err := m.EcgiS.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -19087,7 +20916,7 @@ func (m *E2HORequestAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EcgiT == nil {
-				m.EcgiT = &E2ECGI{}
+				m.EcgiT = &ECGI{}
 			}
 			if err := m.EcgiT.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -19117,7 +20946,7 @@ func (m *E2HORequestAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2HOFailureAttribute) Unmarshal(dAtA []byte) error {
+func (m *HOFailure) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -19140,10 +20969,10 @@ func (m *E2HOFailureAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2HOFailureAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: HOFailure: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2HOFailureAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: HOFailure: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -19208,7 +21037,7 @@ func (m *E2HOFailureAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EcgiS == nil {
-				m.EcgiS = &E2ECGI{}
+				m.EcgiS = &ECGI{}
 			}
 			if err := m.EcgiS.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -19270,7 +21099,7 @@ func (m *E2HOFailureAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2HOCompleteAttribute) Unmarshal(dAtA []byte) error {
+func (m *HOComplete) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -19293,10 +21122,10 @@ func (m *E2HOCompleteAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2HOCompleteAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: HOComplete: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2HOCompleteAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: HOComplete: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -19361,7 +21190,7 @@ func (m *E2HOCompleteAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EcgiS == nil {
-				m.EcgiS = &E2ECGI{}
+				m.EcgiS = &ECGI{}
 			}
 			if err := m.EcgiS.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -19397,7 +21226,7 @@ func (m *E2HOCompleteAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EcgiT == nil {
-				m.EcgiT = &E2ECGI{}
+				m.EcgiT = &ECGI{}
 			}
 			if err := m.EcgiT.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -19427,7 +21256,7 @@ func (m *E2HOCompleteAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2HOCauseAttribute) Unmarshal(dAtA []byte) error {
+func (m *HOCause) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -19450,10 +21279,10 @@ func (m *E2HOCauseAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2HOCauseAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: HOCause: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2HOCauseAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: HOCause: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -19518,7 +21347,7 @@ func (m *E2HOCauseAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EcgiS == nil {
-				m.EcgiS = &E2ECGI{}
+				m.EcgiS = &ECGI{}
 			}
 			if err := m.EcgiS.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -19554,7 +21383,7 @@ func (m *E2HOCauseAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EcgiT == nil {
-				m.EcgiT = &E2ECGI{}
+				m.EcgiT = &ECGI{}
 			}
 			if err := m.EcgiT.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -19621,7 +21450,7 @@ func (m *E2HOCauseAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.HoTrigger = append(m.HoTrigger, &E2RXSigReport{})
+			m.HoTrigger = append(m.HoTrigger, &RXSigReport{})
 			if err := m.HoTrigger[len(m.HoTrigger)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -19650,7 +21479,7 @@ func (m *E2HOCauseAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2MeasCell) Unmarshal(dAtA []byte) error {
+func (m *MeasCell) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -19673,10 +21502,10 @@ func (m *E2MeasCell) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2MeasCell: wiretype end group for non-group")
+			return fmt.Errorf("proto: MeasCell: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2MeasCell: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MeasCell: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -19767,7 +21596,7 @@ func (m *E2MeasCell) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2MeasObject) Unmarshal(dAtA []byte) error {
+func (m *MeasObject) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -19790,10 +21619,10 @@ func (m *E2MeasObject) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2MeasObject: wiretype end group for non-group")
+			return fmt.Errorf("proto: MeasObject: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2MeasObject: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MeasObject: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -19857,7 +21686,7 @@ func (m *E2MeasObject) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MeasCells = append(m.MeasCells, &E2MeasCell{})
+			m.MeasCells = append(m.MeasCells, &MeasCell{})
 			if err := m.MeasCells[len(m.MeasCells)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -19886,7 +21715,7 @@ func (m *E2MeasObject) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
+func (m *ReportParamChoice) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -19909,10 +21738,10 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ReportParamChoice: wiretype end group for non-group")
+			return fmt.Errorf("proto: ReportParamChoice: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ReportParamChoice: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ReportParamChoice: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -19944,11 +21773,11 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2PerParam{}
+			v := &PerParam{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2ReportParamChoice_PerParam{v}
+			m.Choice = &ReportParamChoice_PerParam{v}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -19979,11 +21808,11 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2A1Param{}
+			v := &A1Param{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2ReportParamChoice_A1Param{v}
+			m.Choice = &ReportParamChoice_A1Param{v}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -20014,11 +21843,11 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2A2Param{}
+			v := &A2Param{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2ReportParamChoice_A2Param{v}
+			m.Choice = &ReportParamChoice_A2Param{v}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -20049,11 +21878,11 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2A3Param{}
+			v := &A3Param{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2ReportParamChoice_A3Param{v}
+			m.Choice = &ReportParamChoice_A3Param{v}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -20084,11 +21913,11 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2A4Param{}
+			v := &A4Param{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2ReportParamChoice_A4Param{v}
+			m.Choice = &ReportParamChoice_A4Param{v}
 			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
@@ -20119,11 +21948,11 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2A5Param{}
+			v := &A5Param{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2ReportParamChoice_A5Param{v}
+			m.Choice = &ReportParamChoice_A5Param{v}
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
@@ -20154,11 +21983,11 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2A6Param{}
+			v := &A6Param{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2ReportParamChoice_A6Param{v}
+			m.Choice = &ReportParamChoice_A6Param{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -20184,7 +22013,7 @@ func (m *E2ReportParamChoice) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ThresholdEUTRAChoice) Unmarshal(dAtA []byte) error {
+func (m *ThresholdEUTRAChoice) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20207,10 +22036,10 @@ func (m *E2ThresholdEUTRAChoice) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ThresholdEUTRAChoice: wiretype end group for non-group")
+			return fmt.Errorf("proto: ThresholdEUTRAChoice: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ThresholdEUTRAChoice: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ThresholdEUTRAChoice: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20243,7 +22072,7 @@ func (m *E2ThresholdEUTRAChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Choice = &E2ThresholdEUTRAChoice_ThresholdRSRP{string(dAtA[iNdEx:postIndex])}
+			m.Choice = &ThresholdEUTRAChoice_ThresholdRSRP{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -20275,7 +22104,7 @@ func (m *E2ThresholdEUTRAChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Choice = &E2ThresholdEUTRAChoice_ThresholdRSRQ{string(dAtA[iNdEx:postIndex])}
+			m.Choice = &ThresholdEUTRAChoice_ThresholdRSRQ{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -20301,7 +22130,7 @@ func (m *E2ThresholdEUTRAChoice) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ThreasholdEUTRA) Unmarshal(dAtA []byte) error {
+func (m *ThreasholdEUTRA) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20324,10 +22153,10 @@ func (m *E2ThreasholdEUTRA) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ThreasholdEUTRA: wiretype end group for non-group")
+			return fmt.Errorf("proto: ThreasholdEUTRA: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ThreasholdEUTRA: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ThreasholdEUTRA: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20344,7 +22173,7 @@ func (m *E2ThreasholdEUTRA) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Present |= E2ThresholdEUTRAPR(b&0x7F) << shift
+				m.Present |= ThresholdEUTRAPR(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -20379,7 +22208,7 @@ func (m *E2ThreasholdEUTRA) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Choice == nil {
-				m.Choice = &E2ThresholdEUTRAChoice{}
+				m.Choice = &ThresholdEUTRAChoice{}
 			}
 			if err := m.Choice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -20409,7 +22238,7 @@ func (m *E2ThreasholdEUTRA) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2PerParam) Unmarshal(dAtA []byte) error {
+func (m *PerParam) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20432,10 +22261,10 @@ func (m *E2PerParam) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2PerParam: wiretype end group for non-group")
+			return fmt.Errorf("proto: PerParam: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2PerParam: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PerParam: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20452,7 +22281,7 @@ func (m *E2PerParam) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ReportIntervalMs |= E2PerParamReportIntervalMs(b&0x7F) << shift
+				m.ReportIntervalMs |= PerParamReportIntervalMs(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -20481,7 +22310,7 @@ func (m *E2PerParam) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2A1Param) Unmarshal(dAtA []byte) error {
+func (m *A1Param) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20504,10 +22333,10 @@ func (m *E2A1Param) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2A1Param: wiretype end group for non-group")
+			return fmt.Errorf("proto: A1Param: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2A1Param: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: A1Param: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20540,7 +22369,7 @@ func (m *E2A1Param) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.A1Threshold == nil {
-				m.A1Threshold = &E2ThreasholdEUTRA{}
+				m.A1Threshold = &ThreasholdEUTRA{}
 			}
 			if err := m.A1Threshold.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -20570,7 +22399,7 @@ func (m *E2A1Param) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2A2Param) Unmarshal(dAtA []byte) error {
+func (m *A2Param) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20593,10 +22422,10 @@ func (m *E2A2Param) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2A2Param: wiretype end group for non-group")
+			return fmt.Errorf("proto: A2Param: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2A2Param: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: A2Param: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20629,7 +22458,7 @@ func (m *E2A2Param) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.A2Threshold == nil {
-				m.A2Threshold = &E2ThreasholdEUTRA{}
+				m.A2Threshold = &ThreasholdEUTRA{}
 			}
 			if err := m.A2Threshold.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -20659,7 +22488,7 @@ func (m *E2A2Param) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2A3Param) Unmarshal(dAtA []byte) error {
+func (m *A3Param) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20682,10 +22511,10 @@ func (m *E2A3Param) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2A3Param: wiretype end group for non-group")
+			return fmt.Errorf("proto: A3Param: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2A3Param: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: A3Param: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20744,7 +22573,7 @@ func (m *E2A3Param) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2A4Param) Unmarshal(dAtA []byte) error {
+func (m *A4Param) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20767,10 +22596,10 @@ func (m *E2A4Param) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2A4Param: wiretype end group for non-group")
+			return fmt.Errorf("proto: A4Param: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2A4Param: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: A4Param: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20803,7 +22632,7 @@ func (m *E2A4Param) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.A4Threshold == nil {
-				m.A4Threshold = &E2ThreasholdEUTRA{}
+				m.A4Threshold = &ThreasholdEUTRA{}
 			}
 			if err := m.A4Threshold.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -20833,7 +22662,7 @@ func (m *E2A4Param) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2A5Param) Unmarshal(dAtA []byte) error {
+func (m *A5Param) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20856,10 +22685,10 @@ func (m *E2A5Param) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2A5Param: wiretype end group for non-group")
+			return fmt.Errorf("proto: A5Param: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2A5Param: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: A5Param: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -20892,7 +22721,7 @@ func (m *E2A5Param) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.A5Threshold1 == nil {
-				m.A5Threshold1 = &E2ThreasholdEUTRA{}
+				m.A5Threshold1 = &ThreasholdEUTRA{}
 			}
 			if err := m.A5Threshold1.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -20928,7 +22757,7 @@ func (m *E2A5Param) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.A5Threshold2 == nil {
-				m.A5Threshold2 = &E2ThreasholdEUTRA{}
+				m.A5Threshold2 = &ThreasholdEUTRA{}
 			}
 			if err := m.A5Threshold2.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -20958,7 +22787,7 @@ func (m *E2A5Param) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2A6Param) Unmarshal(dAtA []byte) error {
+func (m *A6Param) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -20981,10 +22810,10 @@ func (m *E2A6Param) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2A6Param: wiretype end group for non-group")
+			return fmt.Errorf("proto: A6Param: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2A6Param: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: A6Param: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21043,7 +22872,7 @@ func (m *E2A6Param) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ReportParam) Unmarshal(dAtA []byte) error {
+func (m *ReportParam) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21066,10 +22895,10 @@ func (m *E2ReportParam) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ReportParam: wiretype end group for non-group")
+			return fmt.Errorf("proto: ReportParam: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ReportParam: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ReportParam: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21086,7 +22915,7 @@ func (m *E2ReportParam) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Present |= E2ReportParamPR(b&0x7F) << shift
+				m.Present |= ReportParamPR(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -21121,7 +22950,7 @@ func (m *E2ReportParam) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Choice == nil {
-				m.Choice = &E2ReportParamChoice{}
+				m.Choice = &ReportParamChoice{}
 			}
 			if err := m.Choice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -21173,7 +23002,7 @@ func (m *E2ReportParam) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Timetotrigger |= E2TimeToTrigger(b&0x7F) << shift
+				m.Timetotrigger |= TimeToTrigger(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -21202,7 +23031,7 @@ func (m *E2ReportParam) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ReportConfig) Unmarshal(dAtA []byte) error {
+func (m *ReportConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21225,10 +23054,10 @@ func (m *E2ReportConfig) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ReportConfig: wiretype end group for non-group")
+			return fmt.Errorf("proto: ReportConfig: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ReportConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ReportConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21261,7 +23090,7 @@ func (m *E2ReportConfig) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ReportParams == nil {
-				m.ReportParams = &E2ReportParam{}
+				m.ReportParams = &ReportParam{}
 			}
 			if err := m.ReportParams.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -21281,7 +23110,7 @@ func (m *E2ReportConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TriggerQuantity |= E2TriggerQuantity(b&0x7F) << shift
+				m.TriggerQuantity |= TriggerQuantity(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -21300,7 +23129,7 @@ func (m *E2ReportConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ReportQuality |= E2ReportQuality(b&0x7F) << shift
+				m.ReportQuality |= ReportQuality(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -21329,7 +23158,7 @@ func (m *E2ReportConfig) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2AddMeasId) Unmarshal(dAtA []byte) error {
+func (m *AddMeasId) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21352,10 +23181,10 @@ func (m *E2AddMeasId) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2AddMeasId: wiretype end group for non-group")
+			return fmt.Errorf("proto: AddMeasId: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2AddMeasId: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: AddMeasId: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21414,7 +23243,7 @@ func (m *E2AddMeasId) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2DelMeasId) Unmarshal(dAtA []byte) error {
+func (m *DelMeasId) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21437,10 +23266,10 @@ func (m *E2DelMeasId) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2DelMeasId: wiretype end group for non-group")
+			return fmt.Errorf("proto: DelMeasId: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2DelMeasId: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DelMeasId: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21499,7 +23328,7 @@ func (m *E2DelMeasId) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2MeasIdActionChoice) Unmarshal(dAtA []byte) error {
+func (m *MeasIdActionChoice) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21522,10 +23351,10 @@ func (m *E2MeasIdActionChoice) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2MeasIdActionChoice: wiretype end group for non-group")
+			return fmt.Errorf("proto: MeasIdActionChoice: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2MeasIdActionChoice: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MeasIdActionChoice: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21557,11 +23386,11 @@ func (m *E2MeasIdActionChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2AddMeasId{}
+			v := &AddMeasId{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2MeasIdActionChoice_AddMeasId{v}
+			m.Choice = &MeasIdActionChoice_AddMeasId{v}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -21592,11 +23421,11 @@ func (m *E2MeasIdActionChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &E2DelMeasId{}
+			v := &DelMeasId{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.Choice = &E2MeasIdActionChoice_DelMeasId{v}
+			m.Choice = &MeasIdActionChoice_DelMeasId{v}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -21628,7 +23457,7 @@ func (m *E2MeasIdActionChoice) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Choice = &E2MeasIdActionChoice_Hototarget{string(dAtA[iNdEx:postIndex])}
+			m.Choice = &MeasIdActionChoice_Hototarget{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -21654,7 +23483,7 @@ func (m *E2MeasIdActionChoice) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2MeasIdAction) Unmarshal(dAtA []byte) error {
+func (m *MeasIdAction) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21677,10 +23506,10 @@ func (m *E2MeasIdAction) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2MeasIdAction: wiretype end group for non-group")
+			return fmt.Errorf("proto: MeasIdAction: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2MeasIdAction: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MeasIdAction: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21697,7 +23526,7 @@ func (m *E2MeasIdAction) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Present |= E2MeasIdActionPR(b&0x7F) << shift
+				m.Present |= MeasIdActionPR(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -21732,7 +23561,7 @@ func (m *E2MeasIdAction) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Choice == nil {
-				m.Choice = &E2MeasIdActionChoice{}
+				m.Choice = &MeasIdActionChoice{}
 			}
 			if err := m.Choice.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -21762,7 +23591,7 @@ func (m *E2MeasIdAction) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2MeasID) Unmarshal(dAtA []byte) error {
+func (m *MeasID) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21785,10 +23614,10 @@ func (m *E2MeasID) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2MeasID: wiretype end group for non-group")
+			return fmt.Errorf("proto: MeasID: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2MeasID: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MeasID: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21885,7 +23714,7 @@ func (m *E2MeasID) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Action == nil {
-				m.Action = &E2MeasIdAction{}
+				m.Action = &MeasIdAction{}
 			}
 			if err := m.Action.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -21915,7 +23744,7 @@ func (m *E2MeasID) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RRCMeasConfigAttribute) Unmarshal(dAtA []byte) error {
+func (m *RRCMeasConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -21938,10 +23767,10 @@ func (m *E2RRCMeasConfigAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RRCMeasConfigAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: RRCMeasConfig: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RRCMeasConfigAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RRCMeasConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -21974,7 +23803,7 @@ func (m *E2RRCMeasConfigAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -22041,7 +23870,7 @@ func (m *E2RRCMeasConfigAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MeasObjects = append(m.MeasObjects, &E2MeasObject{})
+			m.MeasObjects = append(m.MeasObjects, &MeasObject{})
 			if err := m.MeasObjects[len(m.MeasObjects)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -22075,7 +23904,7 @@ func (m *E2RRCMeasConfigAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ReportConfigs = append(m.ReportConfigs, &E2ReportConfig{})
+			m.ReportConfigs = append(m.ReportConfigs, &ReportConfig{})
 			if err := m.ReportConfigs[len(m.ReportConfigs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -22109,7 +23938,7 @@ func (m *E2RRCMeasConfigAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MeasIds = append(m.MeasIds, &E2MeasID{})
+			m.MeasIds = append(m.MeasIds, &MeasID{})
 			if err := m.MeasIds[len(m.MeasIds)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -22138,7 +23967,7 @@ func (m *E2RRCMeasConfigAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2PCIARFCN) Unmarshal(dAtA []byte) error {
+func (m *PCIARFCN) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -22161,10 +23990,10 @@ func (m *E2PCIARFCN) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2PCIARFCN: wiretype end group for non-group")
+			return fmt.Errorf("proto: PCIARFCN: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2PCIARFCN: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PCIARFCN: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -22255,7 +24084,7 @@ func (m *E2PCIARFCN) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RXSigReport) Unmarshal(dAtA []byte) error {
+func (m *RXSigReport) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -22278,10 +24107,10 @@ func (m *E2RXSigReport) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RXSigReport: wiretype end group for non-group")
+			return fmt.Errorf("proto: RXSigReport: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RXSigReport: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RXSigReport: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -22314,7 +24143,7 @@ func (m *E2RXSigReport) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PciArfcn == nil {
-				m.PciArfcn = &E2PCIARFCN{}
+				m.PciArfcn = &PCIARFCN{}
 			}
 			if err := m.PciArfcn.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -22350,7 +24179,7 @@ func (m *E2RXSigReport) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -22444,7 +24273,7 @@ func (m *E2RXSigReport) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RxSigMeasReportAttribute) Unmarshal(dAtA []byte) error {
+func (m *RxSigMeasReport) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -22467,10 +24296,10 @@ func (m *E2RxSigMeasReportAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RxSigMeasReportAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: RxSigMeasReport: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RxSigMeasReportAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RxSigMeasReport: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -22535,7 +24364,7 @@ func (m *E2RxSigMeasReportAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -22570,7 +24399,7 @@ func (m *E2RxSigMeasReportAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CellMeasReport = append(m.CellMeasReport, &E2RXSigReport{})
+			m.CellMeasReport = append(m.CellMeasReport, &RXSigReport{})
 			if err := m.CellMeasReport[len(m.CellMeasReport)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -22599,7 +24428,7 @@ func (m *E2RxSigMeasReportAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
+func (m *L2ReportInterval) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -22622,10 +24451,10 @@ func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2L2ReportInterval: wiretype end group for non-group")
+			return fmt.Errorf("proto: L2ReportInterval: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2L2ReportInterval: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: L2ReportInterval: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -22642,7 +24471,7 @@ func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TRadioMeasReportPerUe |= E2L2MeasReportIntervals(b&0x7F) << shift
+				m.TRadioMeasReportPerUe |= L2MeasReportIntervals(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -22661,7 +24490,7 @@ func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TRadioMeasReportPerCell |= E2L2MeasReportIntervals(b&0x7F) << shift
+				m.TRadioMeasReportPerCell |= L2MeasReportIntervals(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -22680,7 +24509,7 @@ func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TSchedMeasReportPerUe |= E2L2MeasReportIntervals(b&0x7F) << shift
+				m.TSchedMeasReportPerUe |= L2MeasReportIntervals(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -22699,7 +24528,7 @@ func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TSchedMeasReportPerCell |= E2L2MeasReportIntervals(b&0x7F) << shift
+				m.TSchedMeasReportPerCell |= L2MeasReportIntervals(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -22718,7 +24547,7 @@ func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.TPdcpMeasReportPerUe |= E2L2MeasReportIntervals(b&0x7F) << shift
+				m.TPdcpMeasReportPerUe |= L2MeasReportIntervals(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -22747,7 +24576,7 @@ func (m *E2L2ReportInterval) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2L2MeasConfigAttribute) Unmarshal(dAtA []byte) error {
+func (m *L2MeasConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -22770,10 +24599,10 @@ func (m *E2L2MeasConfigAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2L2MeasConfigAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: L2MeasConfig: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2L2MeasConfigAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: L2MeasConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -22806,7 +24635,7 @@ func (m *E2L2MeasConfigAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -22874,7 +24703,7 @@ func (m *E2L2MeasConfigAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ReportIntervals == nil {
-				m.ReportIntervals = &E2L2ReportInterval{}
+				m.ReportIntervals = &L2ReportInterval{}
 			}
 			if err := m.ReportIntervals.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -22904,7 +24733,7 @@ func (m *E2L2MeasConfigAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RadioRepPerServCell) Unmarshal(dAtA []byte) error {
+func (m *RadioRepPerServCell) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -22927,10 +24756,10 @@ func (m *E2RadioRepPerServCell) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RadioRepPerServCell: wiretype end group for non-group")
+			return fmt.Errorf("proto: RadioRepPerServCell: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RadioRepPerServCell: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RadioRepPerServCell: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -22963,7 +24792,7 @@ func (m *E2RadioRepPerServCell) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -23121,7 +24950,7 @@ func (m *E2RadioRepPerServCell) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RadioMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
+func (m *RadioMeasReportPerUE) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -23144,10 +24973,10 @@ func (m *E2RadioMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RadioMeasReportPerUEAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: RadioMeasReportPerUE: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RadioMeasReportPerUEAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RadioMeasReportPerUE: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -23180,7 +25009,7 @@ func (m *E2RadioMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -23247,7 +25076,7 @@ func (m *E2RadioMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RadioReportServCells = append(m.RadioReportServCells, &E2RadioRepPerServCell{})
+			m.RadioReportServCells = append(m.RadioReportServCells, &RadioRepPerServCell{})
 			if err := m.RadioReportServCells[len(m.RadioReportServCells)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -23276,7 +25105,7 @@ func (m *E2RadioMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RadioMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
+func (m *RadioMeasReportPerCell) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -23299,10 +25128,10 @@ func (m *E2RadioMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RadioMeasReportPerCellAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: RadioMeasReportPerCell: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RadioMeasReportPerCellAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RadioMeasReportPerCell: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -23335,7 +25164,7 @@ func (m *E2RadioMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -23429,7 +25258,7 @@ func (m *E2RadioMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2PRBUsage) Unmarshal(dAtA []byte) error {
+func (m *PRBUsage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -23452,10 +25281,10 @@ func (m *E2PRBUsage) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2PRBUsage: wiretype end group for non-group")
+			return fmt.Errorf("proto: PRBUsage: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2PRBUsage: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PRBUsage: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -23546,7 +25375,7 @@ func (m *E2PRBUsage) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2SchedMeasRepPerServCell) Unmarshal(dAtA []byte) error {
+func (m *SchedMeasRepPerServCell) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -23569,10 +25398,10 @@ func (m *E2SchedMeasRepPerServCell) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2SchedMeasRepPerServCell: wiretype end group for non-group")
+			return fmt.Errorf("proto: SchedMeasRepPerServCell: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2SchedMeasRepPerServCell: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SchedMeasRepPerServCell: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -23605,7 +25434,7 @@ func (m *E2SchedMeasRepPerServCell) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -23673,7 +25502,7 @@ func (m *E2SchedMeasRepPerServCell) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PrbUsage == nil {
-				m.PrbUsage = &E2PRBUsage{}
+				m.PrbUsage = &PRBUsage{}
 			}
 			if err := m.PrbUsage.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -23895,7 +25724,7 @@ func (m *E2SchedMeasRepPerServCell) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2SchedMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
+func (m *SchedMeasReportPerUE) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -23918,10 +25747,10 @@ func (m *E2SchedMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2SchedMeasReportPerUEAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: SchedMeasReportPerUE: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2SchedMeasReportPerUEAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SchedMeasReportPerUE: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -23954,7 +25783,7 @@ func (m *E2SchedMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -24021,7 +25850,7 @@ func (m *E2SchedMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SchedReportServCells = append(m.SchedReportServCells, &E2SchedMeasRepPerServCell{})
+			m.SchedReportServCells = append(m.SchedReportServCells, &SchedMeasRepPerServCell{})
 			if err := m.SchedReportServCells[len(m.SchedReportServCells)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -24050,7 +25879,7 @@ func (m *E2SchedMeasReportPerUEAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2SchedMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
+func (m *SchedMeasReportPerCell) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -24073,10 +25902,10 @@ func (m *E2SchedMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2SchedMeasReportPerCellAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: SchedMeasReportPerCell: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2SchedMeasReportPerCellAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SchedMeasReportPerCell: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -24109,7 +25938,7 @@ func (m *E2SchedMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -24177,7 +26006,7 @@ func (m *E2SchedMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PrbUsagePcell == nil {
-				m.PrbUsagePcell = &E2PRBUsage{}
+				m.PrbUsagePcell = &PRBUsage{}
 			}
 			if err := m.PrbUsagePcell.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -24213,7 +26042,7 @@ func (m *E2SchedMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PrbUsageScell == nil {
-				m.PrbUsageScell = &E2PRBUsage{}
+				m.PrbUsageScell = &PRBUsage{}
 			}
 			if err := m.PrbUsageScell.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -24243,7 +26072,7 @@ func (m *E2SchedMeasReportPerCellAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2PDCPMeasReportPerUeAttribute) Unmarshal(dAtA []byte) error {
+func (m *PDCPMeasReportPerUe) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -24266,10 +26095,10 @@ func (m *E2PDCPMeasReportPerUeAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2PDCPMeasReportPerUeAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: PDCPMeasReportPerUe: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2PDCPMeasReportPerUeAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PDCPMeasReportPerUe: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -24302,7 +26131,7 @@ func (m *E2PDCPMeasReportPerUeAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -24652,7 +26481,7 @@ func (m *E2PDCPMeasReportPerUeAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
+func (m *RRMConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -24675,10 +26504,10 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RRMConfigAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: RRMConfig: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RRMConfigAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RRMConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -24711,7 +26540,7 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -24779,7 +26608,7 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PciArfcn == nil {
-				m.PciArfcn = &E2PCIARFCN{}
+				m.PciArfcn = &PCIARFCN{}
 			}
 			if err := m.PciArfcn.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -24787,7 +26616,7 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType == 0 {
-				var v E2XICICPA
+				var v XICICPA
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowE2Interface
@@ -24797,7 +26626,7 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= E2XICICPA(b&0x7F) << shift
+					v |= XICICPA(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -24831,10 +26660,10 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 				}
 				var elementCount int
 				if elementCount != 0 && len(m.PA) == 0 {
-					m.PA = make([]E2XICICPA, 0, elementCount)
+					m.PA = make([]XICICPA, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v E2XICICPA
+					var v XICICPA
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowE2Interface
@@ -24844,7 +26673,7 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= E2XICICPA(b&0x7F) << shift
+						v |= XICICPA(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -25102,7 +26931,7 @@ func (m *E2RRMConfigAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
+func (m *RRMConfigStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -25125,10 +26954,10 @@ func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2RRMConfigStatusAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: RRMConfigStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2RRMConfigStatusAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RRMConfigStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -25161,7 +26990,7 @@ func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -25201,7 +27030,7 @@ func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType == 0 {
-				var v E2SuccessOrFailure
+				var v SuccessOrFailure
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowE2Interface
@@ -25211,7 +27040,7 @@ func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= E2SuccessOrFailure(b&0x7F) << shift
+					v |= SuccessOrFailure(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -25245,10 +27074,10 @@ func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
 				}
 				var elementCount int
 				if elementCount != 0 && len(m.Status) == 0 {
-					m.Status = make([]E2SuccessOrFailure, 0, elementCount)
+					m.Status = make([]SuccessOrFailure, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v E2SuccessOrFailure
+					var v SuccessOrFailure
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowE2Interface
@@ -25258,7 +27087,7 @@ func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= E2SuccessOrFailure(b&0x7F) << shift
+						v |= SuccessOrFailure(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -25292,7 +27121,7 @@ func (m *E2RRMConfigStatusAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2CACap) Unmarshal(dAtA []byte) error {
+func (m *CACap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -25315,10 +27144,10 @@ func (m *E2CACap) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2CACap: wiretype end group for non-group")
+			return fmt.Errorf("proto: CACap: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2CACap: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: CACap: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -25367,7 +27196,7 @@ func (m *E2CACap) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Caclassdl |= E2CACapClassDl(b&0x7F) << shift
+				m.Caclassdl |= CACapClassDl(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -25386,7 +27215,7 @@ func (m *E2CACap) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Caclassul |= E2CACapClassUl(b&0x7F) << shift
+				m.Caclassul |= CACapClassUl(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -25447,7 +27276,7 @@ func (m *E2CACap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2DCCap) Unmarshal(dAtA []byte) error {
+func (m *DCCap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -25470,10 +27299,10 @@ func (m *E2DCCap) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2DCCap: wiretype end group for non-group")
+			return fmt.Errorf("proto: DCCap: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2DCCap: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DCCap: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -25490,7 +27319,7 @@ func (m *E2DCCap) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.DrbTypeSplit |= E2DCCapDrbType(b&0x7F) << shift
+				m.DrbTypeSplit |= DCCapDrbType(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -25519,7 +27348,7 @@ func (m *E2DCCap) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UECapabilityEnquiryAttribute) Unmarshal(dAtA []byte) error {
+func (m *UECapabilityEnquiry) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -25542,10 +27371,10 @@ func (m *E2UECapabilityEnquiryAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UECapabilityEnquiryAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UECapabilityEnquiry: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UECapabilityEnquiryAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UECapabilityEnquiry: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -25610,7 +27439,7 @@ func (m *E2UECapabilityEnquiryAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -25640,7 +27469,7 @@ func (m *E2UECapabilityEnquiryAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2UECapabilityInfoAttribute) Unmarshal(dAtA []byte) error {
+func (m *UECapabilityInfo) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -25663,10 +27492,10 @@ func (m *E2UECapabilityInfoAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2UECapabilityInfoAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: UECapabilityInfo: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2UECapabilityInfoAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: UECapabilityInfo: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -25731,7 +27560,7 @@ func (m *E2UECapabilityInfoAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -25767,7 +27596,7 @@ func (m *E2UECapabilityInfoAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.CaCap == nil {
-				m.CaCap = &E2CACap{}
+				m.CaCap = &CACap{}
 			}
 			if err := m.CaCap.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -25803,7 +27632,7 @@ func (m *E2UECapabilityInfoAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.DcCap == nil {
-				m.DcCap = &E2DCCap{}
+				m.DcCap = &DCCap{}
 			}
 			if err := m.DcCap.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -25833,7 +27662,7 @@ func (m *E2UECapabilityInfoAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2PropScell) Unmarshal(dAtA []byte) error {
+func (m *PropScell) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -25856,10 +27685,10 @@ func (m *E2PropScell) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2PropScell: wiretype end group for non-group")
+			return fmt.Errorf("proto: PropScell: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2PropScell: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: PropScell: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -25892,7 +27721,7 @@ func (m *E2PropScell) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.PciArfcn == nil {
-				m.PciArfcn = &E2PCIARFCN{}
+				m.PciArfcn = &PCIARFCN{}
 			}
 			if err := m.PciArfcn.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -25944,7 +27773,7 @@ func (m *E2PropScell) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.CaDirection |= E2CADirection(b&0x7F) << shift
+				m.CaDirection |= CADirection(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -26005,7 +27834,7 @@ func (m *E2PropScell) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ScellAddAttribute) Unmarshal(dAtA []byte) error {
+func (m *ScellAdd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -26028,10 +27857,10 @@ func (m *E2ScellAddAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ScellAddAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: ScellAdd: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ScellAddAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ScellAdd: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -26096,7 +27925,7 @@ func (m *E2ScellAddAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26131,7 +27960,7 @@ func (m *E2ScellAddAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ScellsProp = append(m.ScellsProp, &E2PropScell{})
+			m.ScellsProp = append(m.ScellsProp, &PropScell{})
 			if err := m.ScellsProp[len(m.ScellsProp)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -26160,7 +27989,7 @@ func (m *E2ScellAddAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
+func (m *ScellAddStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -26183,10 +28012,10 @@ func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ScellAddStatusAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: ScellAddStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ScellAddStatusAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ScellAddStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -26251,7 +28080,7 @@ func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26286,14 +28115,14 @@ func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ScellsInd = append(m.ScellsInd, &E2PCIARFCN{})
+			m.ScellsInd = append(m.ScellsInd, &PCIARFCN{})
 			if err := m.ScellsInd[len(m.ScellsInd)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 4:
 			if wireType == 0 {
-				var v E2SuccessOrFailure
+				var v SuccessOrFailure
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowE2Interface
@@ -26303,7 +28132,7 @@ func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					v |= E2SuccessOrFailure(b&0x7F) << shift
+					v |= SuccessOrFailure(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -26337,10 +28166,10 @@ func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
 				}
 				var elementCount int
 				if elementCount != 0 && len(m.Status) == 0 {
-					m.Status = make([]E2SuccessOrFailure, 0, elementCount)
+					m.Status = make([]SuccessOrFailure, 0, elementCount)
 				}
 				for iNdEx < postIndex {
-					var v E2SuccessOrFailure
+					var v SuccessOrFailure
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowE2Interface
@@ -26350,7 +28179,7 @@ func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= E2SuccessOrFailure(b&0x7F) << shift
+						v |= SuccessOrFailure(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -26384,7 +28213,7 @@ func (m *E2ScellAddStatusAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2ScellDeleteAttribute) Unmarshal(dAtA []byte) error {
+func (m *ScellDelete) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -26407,10 +28236,10 @@ func (m *E2ScellDeleteAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2ScellDeleteAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: ScellDelete: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2ScellDeleteAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ScellDelete: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -26475,7 +28304,7 @@ func (m *E2ScellDeleteAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26510,7 +28339,7 @@ func (m *E2ScellDeleteAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ScellsInd = append(m.ScellsInd, &E2PCIARFCN{})
+			m.ScellsInd = append(m.ScellsInd, &PCIARFCN{})
 			if err := m.ScellsInd[len(m.ScellsInd)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -26539,7 +28368,7 @@ func (m *E2ScellDeleteAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2SeNBAddAttribute) Unmarshal(dAtA []byte) error {
+func (m *SeNBAdd) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -26562,10 +28391,10 @@ func (m *E2SeNBAddAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2SeNBAddAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: SeNBAdd: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2SeNBAddAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SeNBAdd: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -26630,7 +28459,7 @@ func (m *E2SeNBAddAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.MEcgi == nil {
-				m.MEcgi = &E2ECGI{}
+				m.MEcgi = &ECGI{}
 			}
 			if err := m.MEcgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26666,7 +28495,7 @@ func (m *E2SeNBAddAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.SEcgi == nil {
-				m.SEcgi = &E2ECGI{}
+				m.SEcgi = &ECGI{}
 			}
 			if err := m.SEcgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26696,7 +28525,7 @@ func (m *E2SeNBAddAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2SeNBAddStatusAttribute) Unmarshal(dAtA []byte) error {
+func (m *SeNBAddStatus) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -26719,10 +28548,10 @@ func (m *E2SeNBAddStatusAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2SeNBAddStatusAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: SeNBAddStatus: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2SeNBAddStatusAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SeNBAddStatus: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -26787,7 +28616,7 @@ func (m *E2SeNBAddStatusAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26807,7 +28636,7 @@ func (m *E2SeNBAddStatusAttribute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Status |= E2SuccessOrFailure(b&0x7F) << shift
+				m.Status |= SuccessOrFailure(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -26836,7 +28665,7 @@ func (m *E2SeNBAddStatusAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2SeNBDeleteAttribute) Unmarshal(dAtA []byte) error {
+func (m *SeNBDelete) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -26859,10 +28688,10 @@ func (m *E2SeNBDeleteAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2SeNBDeleteAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: SeNBDelete: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2SeNBDeleteAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SeNBDelete: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -26927,7 +28756,7 @@ func (m *E2SeNBDeleteAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.MEcgi == nil {
-				m.MEcgi = &E2ECGI{}
+				m.MEcgi = &ECGI{}
 			}
 			if err := m.MEcgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26963,7 +28792,7 @@ func (m *E2SeNBDeleteAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.SEcgi == nil {
-				m.SEcgi = &E2ECGI{}
+				m.SEcgi = &ECGI{}
 			}
 			if err := m.SEcgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -26993,7 +28822,7 @@ func (m *E2SeNBDeleteAttribute) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2TrafficSplitPercentage) Unmarshal(dAtA []byte) error {
+func (m *TrafficSplitPercentage) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -27016,10 +28845,10 @@ func (m *E2TrafficSplitPercentage) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2TrafficSplitPercentage: wiretype end group for non-group")
+			return fmt.Errorf("proto: TrafficSplitPercentage: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2TrafficSplitPercentage: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TrafficSplitPercentage: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -27052,7 +28881,7 @@ func (m *E2TrafficSplitPercentage) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -27146,7 +28975,7 @@ func (m *E2TrafficSplitPercentage) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *E2TrafficSplitConfigAttribute) Unmarshal(dAtA []byte) error {
+func (m *TrafficSplitConfig) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -27169,10 +28998,10 @@ func (m *E2TrafficSplitConfigAttribute) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: E2TrafficSplitConfigAttribute: wiretype end group for non-group")
+			return fmt.Errorf("proto: TrafficSplitConfig: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: E2TrafficSplitConfigAttribute: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: TrafficSplitConfig: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -27237,7 +29066,7 @@ func (m *E2TrafficSplitConfigAttribute) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Ecgi == nil {
-				m.Ecgi = &E2ECGI{}
+				m.Ecgi = &ECGI{}
 			}
 			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -27272,7 +29101,7 @@ func (m *E2TrafficSplitConfigAttribute) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TrafficSplitPercentage = append(m.TrafficSplitPercentage, &E2TrafficSplitPercentage{})
+			m.TrafficSplitPercentage = append(m.TrafficSplitPercentage, &TrafficSplitPercentage{})
 			if err := m.TrafficSplitPercentage[len(m.TrafficSplitPercentage)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

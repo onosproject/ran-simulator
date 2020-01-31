@@ -18,7 +18,7 @@ syntax = "proto3";
 
 package ran.trafficsim;
 
-import "github.com/OpenNetworkingFoundation/gmap-ran/api/types/types.proto";
+import "github.com/onosproject/ran-simulator/api/types/types.proto";
 
 message MapLayoutRequest {
 }
