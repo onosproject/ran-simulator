@@ -20,21 +20,23 @@ import (
 	"sync"
 )
 
+// Dispatcher :
 type Dispatcher struct {
-	nbiUeListenersLock sync.RWMutex
-	nbiUeListeners map[string]chan Event
+	nbiUeListenersLock    sync.RWMutex
+	nbiUeListeners        map[string]chan Event
 	nbiRouteListenersLock sync.RWMutex
-	nbiRouteListeners map[string]chan Event
+	nbiRouteListeners     map[string]chan Event
 }
 
 // NewDispatcher creates and initializes a new event dispatcher
 func NewDispatcher() *Dispatcher {
 	return &Dispatcher{
-		nbiUeListeners: make(map[string]chan Event),
+		nbiUeListeners:    make(map[string]chan Event),
 		nbiRouteListeners: make(map[string]chan Event),
 	}
 }
 
+// ListenUeEvents :
 func (d *Dispatcher) ListenUeEvents(ueEventChannel <-chan Event) {
 	log.Info("User Equipment Event listener initialized")
 
@@ -47,17 +49,19 @@ func (d *Dispatcher) ListenUeEvents(ueEventChannel <-chan Event) {
 	}
 }
 
+// RegisterUeListener :
 func (d *Dispatcher) RegisterUeListener(subscriber string) (chan Event, error) {
 	d.nbiUeListenersLock.Lock()
 	defer d.nbiUeListenersLock.Unlock()
 	if _, ok := d.nbiUeListeners[subscriber]; ok {
 		return nil, fmt.Errorf("NBI UE %s is already registered", subscriber)
 	}
-	channel := make(chan Event);
+	channel := make(chan Event)
 	d.nbiUeListeners[subscriber] = channel
 	return channel, nil
 }
 
+// UnregisterUeListener :
 func (d *Dispatcher) UnregisterUeListener(subscriber string) {
 	d.nbiUeListenersLock.Lock()
 	defer d.nbiUeListenersLock.Unlock()
@@ -70,6 +74,7 @@ func (d *Dispatcher) UnregisterUeListener(subscriber string) {
 	close(channel)
 }
 
+// ListenRouteEvents :
 func (d *Dispatcher) ListenRouteEvents(routeEventChannel <-chan Event) {
 	log.Info("Route Event listener initialized")
 
@@ -82,17 +87,19 @@ func (d *Dispatcher) ListenRouteEvents(routeEventChannel <-chan Event) {
 	}
 }
 
+// RegisterRouteListener :
 func (d *Dispatcher) RegisterRouteListener(subscriber string) (chan Event, error) {
 	d.nbiRouteListenersLock.Lock()
 	defer d.nbiRouteListenersLock.Unlock()
 	if _, ok := d.nbiRouteListeners[subscriber]; ok {
 		return nil, fmt.Errorf("NBI Route %s is already registered", subscriber)
 	}
-	channel := make(chan Event);
+	channel := make(chan Event)
 	d.nbiRouteListeners[subscriber] = channel
 	return channel, nil
 }
 
+// UnregisterRouteListener :
 func (d *Dispatcher) UnregisterRouteListener(subscriber string) {
 	d.nbiRouteListenersLock.Lock()
 	defer d.nbiRouteListenersLock.Unlock()

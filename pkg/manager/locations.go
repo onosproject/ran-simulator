@@ -20,12 +20,14 @@ import (
 	"math/rand"
 )
 
+// LocationsParams :
 type LocationsParams struct {
-	NumLocations int;
+	NumLocations int
 }
 
+// Location :
 type Location struct {
-	Name string
+	Name     string
 	Position types.Point
 }
 

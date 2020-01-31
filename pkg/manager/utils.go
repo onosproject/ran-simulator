@@ -31,11 +31,11 @@ func randomLatLng(mapCenterLat float32, mapCenterLng float32) types.Point {
 	u := rand.Float64()
 	v := rand.Float64()
 
-	w := r * math.Sqrt(u);
-	t := 2 * math.Pi * v;
-	x := w * math.Cos(t);
-	y1 := w * math.Sin(t);
-	x1 := x / math.Cos(y0);
+	w := r * math.Sqrt(u)
+	t := 2 * math.Pi * v
+	x := w * math.Cos(t)
+	y1 := w * math.Sin(t)
+	x1 := x / math.Cos(y0)
 
 	newY := roundToDecimal(y0+y1, 6)
 	newX := roundToDecimal(x0+x1, 6)
@@ -61,7 +61,7 @@ func getRotationDegrees(pointA *types.Point, pointB *types.Point) float64 {
 }
 
 func randomColor() string {
-	const letters = "0123456789ABCDEF";
+	const letters = "0123456789ABCDEF"
 	color := make([]uint8, 7)
 	color[0] = '#'
 	for i := range color {
