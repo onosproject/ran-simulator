@@ -22,7 +22,7 @@ static_resources:
                       routes:
                         - match: { prefix: "/" }
                           route:
-                            cluster: trafficsim_service
+                            cluster: ran-simulator_service
                             max_grpc_timeout: 0s
                       cors:
                         allow_origin:
@@ -36,13 +36,13 @@ static_resources:
                   - name: envoy.cors
                   - name: envoy.router
   clusters:
-    - name: trafficsim_service
+    - name: ran-simulator_service
       connect_timeout: 0.25s
       type: logical_dns
       http2_protocol_options: {}
       lb_policy: round_robin
       # win/mac hosts: Use address: host.docker.internal instead of address: localhost in the line below
-      hosts: [{ socket_address: { address: trafficsim, port_value: 5150 }}]
+      hosts: [{ socket_address: { address: ran-simulator, port_value: 5150 }}]
       tls_context:
         common_tls_context:
           tls_certificates:

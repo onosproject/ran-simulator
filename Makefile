@@ -3,8 +3,7 @@ export GO111MODULE=on
 
 .PHONY: build
 
-GMAP_RAN_VERSION := latest
-GMAP_RAN_DEBUG_VERSION := debug
+RAN_SIMULATOR_VERSION := latest
 ONOS_BUILD_VERSION := stable
 
 build: # @HELP build the Go binaries and run all validations (default)
@@ -46,32 +45,37 @@ protos: # @HELP compile the protobuf files (using protoc-go Docker)
 		--entrypoint build/bin/compile-protos.sh \
 		onosproject/protoc-go:stable
 
-trafficsim-base-docker: # @HELP build trafficsim base Docker image
+ran-simulator-base-docker: # @HELP build ran-simulator base Docker image
 	@go mod vendor
 	docker build . -f build/base/Dockerfile \
 		--build-arg ONOS_BUILD_VERSION=${ONOS_BUILD_VERSION} \
 		--build-arg ONOS_MAKE_TARGET=build \
-		-t onosproject/trafficsim-base:${GMAP_RAN_VERSION}
+		-t onosproject/ran-simulator-base:${RAN_SIMULATOR_VERSION}
 	@rm -rf vendor
 
-trafficsim-docker: trafficsim-base-docker # @HELP build trafficsim Docker image
-	docker build . -f build/trafficsim/Dockerfile \
-		--build-arg GMAP_RAN_BASE_VERSION=${GMAP_RAN_VERSION} \
-		-t onosproject/trafficsim:${GMAP_RAN_VERSION}
+ran-simulator-docker: ran-simulator-base-docker # @HELP build ran-simulator Docker image
+	docker build . -f build/ran-simulator/Dockerfile \
+		--build-arg GMAP_RAN_BASE_VERSION=${RAN_SIMULATOR_VERSION} \
+		-t onosproject/ran-simulator:${RAN_SIMULATOR_VERSION}
+
+sd-ran-gui-docker: build-gui # @HELP build onos-gui Docker image
+	docker build . -f build/sd-ran-gui/Dockerfile \
+		-t onosproject/sd-ran-gui:${RAN_SIMULATOR_VERSION}
 
 images: # @HELP build all Docker images
-images: trafficsim-docker build-gui
+images: ran-simulator-docker sd-ran-gui-docker
 
 kind: # @HELP build Docker images and add them to the currently configured kind cluster
 kind: images
 	@if [ "`kind get clusters`" = '' ]; then echo "no kind cluster found" && exit 1; fi
-	kind load docker-image onosproject/trafficsim:${GMAP_RAN_VERSION}
+	kind load docker-image onosproject/ran-simulator:${RAN_SIMULATOR_VERSION}
+	kind load docker-image onosproject/sd-ran-gui:${RAN_SIMULATOR_VERSION}
 
 all: build images
 
 clean: # @HELP remove all the build artifacts
-	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim ./cmd/onos/onos
-	go clean -testcache github.com/OpenNetworkingFoundation/trafficsim/...
+	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim web/sd-ran-gui/dist web/sd-ran-gui/node_modules
+	go clean -testcache github.com/onosproject/ran-simulator/...
 
 help:
 	@grep -E '^.*: *# *@HELP' $(MAKEFILE_LIST) \
