@@ -1,29 +1,15 @@
-/*
- * Copyright 2020-present Open Networking Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 /**
  * @fileoverview gRPC-Web generated client stub for ran.trafficsim
  * @enhanceable
  * @public
  */
 
+// GENERATED CODE -- DO NOT EDIT!
 
 
 import * as grpcWeb from 'grpc-web';
 
-import * as github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb from '../../../../../github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb';
+import * as github_com_onosproject_ran$simulator_api_types_types_pb from '../../../../../github.com/onosproject/ran-simulator/api/types/types_pb';
 
 import {
   ListRoutesRequest,
@@ -53,18 +39,18 @@ export class TrafficClient {
   }
 
   methodInfoGetMapLayout = new grpcWeb.AbstractClientBase.MethodInfo(
-    github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.MapLayout,
+    github_com_onosproject_ran$simulator_api_types_types_pb.MapLayout,
     (request: MapLayoutRequest) => {
       return request.serializeBinary();
     },
-    github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.MapLayout.deserializeBinary
+    github_com_onosproject_ran$simulator_api_types_types_pb.MapLayout.deserializeBinary
   );
 
   getMapLayout(
     request: MapLayoutRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.MapLayout) => void) {
+               response: github_com_onosproject_ran$simulator_api_types_types_pb.MapLayout) => void) {
     return this.client_.rpcCall(
       this.hostname_ +
         '/ran.trafficsim.Traffic/GetMapLayout',
@@ -75,11 +61,11 @@ export class TrafficClient {
   }
 
   methodInfoListTowers = new grpcWeb.AbstractClientBase.MethodInfo(
-    github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Tower,
+    github_com_onosproject_ran$simulator_api_types_types_pb.Tower,
     (request: ListTowersRequest) => {
       return request.serializeBinary();
     },
-    github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Tower.deserializeBinary
+    github_com_onosproject_ran$simulator_api_types_types_pb.Tower.deserializeBinary
   );
 
   listTowers(

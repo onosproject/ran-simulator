@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { OnosSdranTrafficsimService } from './onos-sdran-trafficsim.service';
+import {OnosSdranTrafficsimService} from './onos-sdran-trafficsim.service';
 
 describe('OnosSdranTrafficsimService', () => {
-  let service: OnosSdranTrafficsimService;
+    let service: OnosSdranTrafficsimService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(OnosSdranTrafficsimService);
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [
+                {
+                    provide: OnosSdranTrafficsimService,
+                    useValue: new OnosSdranTrafficsimService('http://localhost:8080')
+                }
+            ]
+        });
+        service = TestBed.inject(OnosSdranTrafficsimService);
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 });

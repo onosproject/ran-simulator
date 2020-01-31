@@ -40,8 +40,9 @@ gofmt: # @HELP run the Go format validation
 	bash -c "diff -u <(echo -n) <(gofmt -d pkg/ cmd/ tests/)"
 
 protos: # @HELP compile the protobuf files (using protoc-go Docker)
-	docker run -it -v `pwd`:/go/src/github.com/OpenNetworkingFoundation/gmap-ran \
-		-w /go/src/github.com/OpenNetworkingFoundation/gmap-ran \
+	docker run -it -v `pwd`:/go/src/github.com/onosproject/ran-simulator \
+		-v `pwd`/../build-tools/licensing:/build-tools/licensing \
+		-w /go/src/github.com/onosproject/ran-simulator \
 		--entrypoint build/bin/compile-protos.sh \
 		onosproject/protoc-go:stable
 

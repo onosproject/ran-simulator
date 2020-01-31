@@ -1,19 +1,4 @@
-/*
- * Copyright 2020-present Open Networking Foundation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-// source: github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim/trafficsim.proto
+// source: github.com/onosproject/ran-simulator/api/trafficsim/trafficsim.proto
 /**
  * @fileoverview
  * @enhanceable
@@ -27,8 +12,8 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
-var github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb = require('../../../../../github.com/OpenNetworkingFoundation/gmap-ran/api/types/types_pb.js');
-goog.object.extend(proto, github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb);
+var github_com_onosproject_ran$simulator_api_types_types_pb = require('../../../../../github.com/onosproject/ran-simulator/api/types/types_pb.js');
+goog.object.extend(proto, github_com_onosproject_ran$simulator_api_types_types_pb);
 goog.exportSymbol('proto.ran.trafficsim.ListRoutesRequest', null, global);
 goog.exportSymbol('proto.ran.trafficsim.ListRoutesResponse', null, global);
 goog.exportSymbol('proto.ran.trafficsim.ListTowersRequest', null, global);
@@ -550,7 +535,7 @@ proto.ran.trafficsim.ListRoutesResponse.prototype.toObject = function(opt_includ
  */
 proto.ran.trafficsim.ListRoutesResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    route: (f = msg.getRoute()) && github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Route.toObject(includeInstance, f),
+    route: (f = msg.getRoute()) && github_com_onosproject_ran$simulator_api_types_types_pb.Route.toObject(includeInstance, f),
     type: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
@@ -589,8 +574,8 @@ proto.ran.trafficsim.ListRoutesResponse.deserializeBinaryFromReader = function(m
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Route;
-      reader.readMessage(value,github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Route.deserializeBinaryFromReader);
+      var value = new github_com_onosproject_ran$simulator_api_types_types_pb.Route;
+      reader.readMessage(value,github_com_onosproject_ran$simulator_api_types_types_pb.Route.deserializeBinaryFromReader);
       msg.setRoute(value);
       break;
     case 2:
@@ -631,7 +616,7 @@ proto.ran.trafficsim.ListRoutesResponse.serializeBinaryToWriter = function(messa
     writer.writeMessage(
       1,
       f,
-      github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Route.serializeBinaryToWriter
+      github_com_onosproject_ran$simulator_api_types_types_pb.Route.serializeBinaryToWriter
     );
   }
   f = message.getType();
@@ -650,7 +635,7 @@ proto.ran.trafficsim.ListRoutesResponse.serializeBinaryToWriter = function(messa
  */
 proto.ran.trafficsim.ListRoutesResponse.prototype.getRoute = function() {
   return /** @type{?proto.ran.trafficsim.types.Route} */ (
-    jspb.Message.getWrapperField(this, github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Route, 1));
+    jspb.Message.getWrapperField(this, github_com_onosproject_ran$simulator_api_types_types_pb.Route, 1));
 };
 
 
@@ -878,7 +863,7 @@ proto.ran.trafficsim.ListUesResponse.prototype.toObject = function(opt_includeIn
  */
 proto.ran.trafficsim.ListUesResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
-    ue: (f = msg.getUe()) && github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Ue.toObject(includeInstance, f),
+    ue: (f = msg.getUe()) && github_com_onosproject_ran$simulator_api_types_types_pb.Ue.toObject(includeInstance, f),
     type: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
@@ -917,8 +902,8 @@ proto.ran.trafficsim.ListUesResponse.deserializeBinaryFromReader = function(msg,
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Ue;
-      reader.readMessage(value,github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Ue.deserializeBinaryFromReader);
+      var value = new github_com_onosproject_ran$simulator_api_types_types_pb.Ue;
+      reader.readMessage(value,github_com_onosproject_ran$simulator_api_types_types_pb.Ue.deserializeBinaryFromReader);
       msg.setUe(value);
       break;
     case 2:
@@ -959,7 +944,7 @@ proto.ran.trafficsim.ListUesResponse.serializeBinaryToWriter = function(message,
     writer.writeMessage(
       1,
       f,
-      github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Ue.serializeBinaryToWriter
+      github_com_onosproject_ran$simulator_api_types_types_pb.Ue.serializeBinaryToWriter
     );
   }
   f = message.getType();
@@ -978,7 +963,7 @@ proto.ran.trafficsim.ListUesResponse.serializeBinaryToWriter = function(message,
  */
 proto.ran.trafficsim.ListUesResponse.prototype.getUe = function() {
   return /** @type{?proto.ran.trafficsim.types.Ue} */ (
-    jspb.Message.getWrapperField(this, github_com_OpenNetworkingFoundation_gmap$ran_api_types_types_pb.Ue, 1));
+    jspb.Message.getWrapperField(this, github_com_onosproject_ran$simulator_api_types_types_pb.Ue, 1));
 };
 
 

@@ -13,28 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { MapviewComponent } from './mapview.component';
+import {MapviewComponent} from './mapview.component';
+import {OnosSdranTrafficsimService} from '../proto/onos-sdran-trafficsim.service';
+import {GoogleMapsModule} from '@angular/google-maps';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {RouterTestingModule} from '@angular/router/testing';
 
 describe('MapviewComponent', () => {
-  let component: MapviewComponent;
-  let fixture: ComponentFixture<MapviewComponent>;
+    let component: MapviewComponent;
+    let fixture: ComponentFixture<MapviewComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ MapviewComponent ]
-    })
-    .compileComponents();
-  }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            imports: [
+                CommonModule,
+                FormsModule,
+                GoogleMapsModule,
+                RouterTestingModule
+            ],
+            declarations: [MapviewComponent],
+            providers: [
+                {
+                    provide: OnosSdranTrafficsimService,
+                    useValue: new OnosSdranTrafficsimService('http://localhost:8080')
+                }
+            ]
+        })
+            .compileComponents();
+    }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(MapviewComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(MapviewComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

@@ -85,10 +85,10 @@ describe('NavComponent', () => {
 
     beforeEach(async(() => {
         log = new ConsoleLoggerService();
-        ar = new MockActivatedRoute({'debug': 'txrx'});
+        ar = new MockActivatedRoute({debug: 'txrx'});
 
-        windowMock = <any>{
-            location: <any>{
+        windowMock = {
+            location: {
                 hostname: 'foo',
                 host: 'foo',
                 port: '80',
@@ -96,8 +96,8 @@ describe('NavComponent', () => {
                 search: {debug: 'true'},
                 href: 'ws://foo:123/onos/ui/websock/path',
                 absUrl: 'ws://foo:123/onos/ui/websock/path'
-            }
-        };
+            } as any
+        } as any;
         fs = new FnService(ar, log, windowMock);
 
         TestBed.configureTestingModule({
@@ -144,14 +144,14 @@ describe('NavComponent', () => {
         const appDe: DebugElement = fixture.debugElement;
         const divDe = appDe.query(By.css('nav#nav div#platform.nav-hdr'));
         const div: HTMLElement = divDe.nativeElement;
-        expect(div.textContent).toEqual('%cat_platform%');
+        expect(div.textContent).toEqual('Platform');
     });
 
     it('should have a network div.nav-hdr inside a nav#nav', () => {
         const appDe: DebugElement = fixture.debugElement;
         const divDe = appDe.query(By.css('nav#nav div#network.nav-hdr'));
         const div: HTMLElement = divDe.nativeElement;
-        expect(div.textContent).toEqual('%cat_network%');
+        expect(div.textContent).toEqual('Network');
     });
 
 });

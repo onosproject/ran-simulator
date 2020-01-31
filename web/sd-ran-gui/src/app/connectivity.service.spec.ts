@@ -22,7 +22,7 @@ describe('ConnectivityService', () => {
     beforeEach(() => TestBed.configureTestingModule({}));
 
     it('should be created', () => {
-        const service: ConnectivityService = TestBed.get(ConnectivityService);
+        const service: ConnectivityService = TestBed.inject(ConnectivityService);
         expect(service).toBeTruthy();
     });
 });

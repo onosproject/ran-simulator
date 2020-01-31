@@ -9,7 +9,7 @@ services:
         target: /etc/ssl/certs
     ports:
       - "15150:5150" #Only needed to for attaching for debug
-    command: -googleApiKey YOUR_API_KEY_HERE -certPath=/etc/ssl/certs/trafficsim.crt -keyPath=/etc/ssl/certs/trafficsim.key -caPath=/etc/ssl/certs/onfca.crt
+    command: -googleAPIKey YOUR_API_KEY_HERE -certPath=/etc/ssl/certs/trafficsim.crt -keyPath=/etc/ssl/certs/trafficsim.key -caPath=/etc/ssl/certs/onfca.crt
   envoy-proxy:
     hostname: envoy-proxy
     ports:
@@ -32,6 +32,6 @@ services:
         source: ../web/sd-ran-gui/dist/sd-ran-gui
         target: /usr/share/nginx/html/
     ports:
-      - "4200:80" #Make sure to add 'onos-gui' to your /etc/hosts at 127.0.0.1 and access with http://onos-gui/index.html
+      - "4200:80"
     labels:
       description: "ONOS SD RAN GUI"

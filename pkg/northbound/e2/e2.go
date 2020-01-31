@@ -33,7 +33,7 @@ type Service struct {
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
 	server := &Server{}
-	sb.RegisterE2InterfaceServiceServer(r, server)
+	sb.RegisterInterfaceServiceServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
@@ -41,11 +41,11 @@ type Server struct {
 }
 
 // SendTelemetry ...
-func (s *Server) SendTelemetry(req *sb.TelemetryRequest, stream sb.E2InterfaceService_SendTelemetryServer) error {
+func (s *Server) SendTelemetry(req *sb.TelemetryRequest, stream sb.InterfaceService_SendTelemetryServer) error {
 	return nil
 }
 
 // SendControl ...
-func (s *Server) SendControl(stream sb.E2InterfaceService_SendControlServer) error {
+func (s *Server) SendControl(stream sb.InterfaceService_SendControlServer) error {
 	return nil
 }

@@ -21,16 +21,16 @@ import {Routes, RouterModule, Route} from '@angular/router';
  * elsewhere like tabular icon for flows etc
  */
 const onosRoutes: Routes = [
-  {
-    path: 'mapview',
-    pathMatch: 'full',
-    loadChildren: () => import('./onos-sdran/onos-sdran.module').then(m => m.OnosSdranModule)
-  } as Route,
-  {
-    path: '',
-    redirectTo: 'mapview', // Default to Topology view
-    pathMatch: 'full'
-  } as Route
+    {
+        path: 'mapview',
+        pathMatch: 'full',
+        loadChildren: () => import('./onos-sdran/onos-sdran.module').then(m => m.OnosSdranModule)
+    } as Route,
+    {
+        path: '',
+        redirectTo: 'mapview', // Default to Topology view
+        pathMatch: 'full'
+    } as Route
 ];
 
 /**
@@ -40,11 +40,11 @@ const onosRoutes: Routes = [
  * for the theory of operation
  */
 @NgModule({
-  imports: [
-    RouterModule.forRoot(onosRoutes, {useHash: true})
-  ],
-  exports: [RouterModule],
-  providers: []
+    imports: [
+        RouterModule.forRoot(onosRoutes, {useHash: true})
+    ],
+    exports: [RouterModule],
+    providers: []
 })
 export class OnosRoutingModule {
 }
