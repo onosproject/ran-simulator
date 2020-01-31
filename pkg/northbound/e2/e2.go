@@ -15,8 +15,8 @@
 package e2
 
 import (
-	sb "github.com/OpenNetworkingFoundation/gmap-ran/api/e2"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/service"
+	sb "github.com/onosproject/ran-simulator/api/e2"
+	"github.com/onosproject/ran-simulator/pkg/service"
 	"google.golang.org/grpc"
 )
 

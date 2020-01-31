@@ -16,7 +16,7 @@ package manager
 
 import (
 	"fmt"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	"github.com/onosproject/ran-simulator/api/types"
 	"math/rand"
 )
 

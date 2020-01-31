@@ -17,10 +17,10 @@ package trafficsim
 import (
 	"context"
 	"fmt"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/manager"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/service"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
+	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/manager"
+	"github.com/onosproject/ran-simulator/pkg/service"
 	"google.golang.org/grpc"
 	log "k8s.io/klog"
 )

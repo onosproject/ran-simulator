@@ -16,9 +16,9 @@ package manager
 
 import (
 	"fmt"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/dispatcher"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
+	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	log "k8s.io/klog"
 	"strings"
 	"time"

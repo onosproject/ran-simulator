@@ -15,7 +15,7 @@
 package manager
 
 import (
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	"github.com/onosproject/ran-simulator/api/types"
 	"math"
 	"math/rand"
 )

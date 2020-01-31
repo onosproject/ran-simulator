@@ -14,7 +14,7 @@
 
 package dispatcher
 
-import "github.com/OpenNetworkingFoundation/gmap-ran/api/trafficsim"
+import "github.com/onosproject/ran-simulator/api/trafficsim"
 
 // Event is a stream event
 type Event struct {

@@ -16,8 +16,8 @@
 package manager
 
 import (
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/dispatcher"
+	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	log "k8s.io/klog"
 )
 

@@ -30,13 +30,13 @@ package main
 
 import (
 	"flag"
-	"github.com/OpenNetworkingFoundation/gmap-ran/api/types"
+	"github.com/onosproject/ran-simulator/api/types"
 	"time"
 
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/manager"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/northbound/e2"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/northbound/trafficsim"
-	"github.com/OpenNetworkingFoundation/gmap-ran/pkg/service"
+	"github.com/onosproject/ran-simulator/pkg/manager"
+	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
+	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
+	"github.com/onosproject/ran-simulator/pkg/service"
 	log "k8s.io/klog"
 )
 
