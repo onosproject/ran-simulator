@@ -15,33 +15,29 @@
 package e2
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/prometheus/common/log"
 )
 
-func recv(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
+func recv(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	for {
 		in, err := stream.Recv()
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
+		if err == io.EOF || err != nil {
+			return
 		}
 		log.Infof("Recv messageType %d", in.MessageType)
 		switch x := in.S.(type) {
 		case *e2.ControlResponse_CellConfigRequest:
-			return handleCellConfigRequest(stream, x.CellConfigRequest, c)
+			handleCellConfigRequest(stream, x.CellConfigRequest, c)
 		default:
-			return fmt.Errorf("ControlResponse has unexpected type %T", x)
+			log.Errorf("ControlResponse has unexpected type %T", x)
 		}
 	}
 }
 
-func handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *e2.CellConfigRequest, c chan e2.ControlUpdate) error {
+func handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *e2.CellConfigRequest, c chan e2.ControlUpdate) {
 	log.Infof("handleCellConfigRequest")
 	cellConfigReport := e2.ControlUpdate{
 		MessageType: e2.MessageType_CELL_CONFIG_REPORT,
@@ -55,5 +51,5 @@ func handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *
 	c <- cellConfigReport
 	log.Infof("handleCellConfigRequest sent")
 
-	return nil
+	return
 }
