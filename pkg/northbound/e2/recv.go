@@ -50,6 +50,4 @@ func handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *
 
 	c <- cellConfigReport
 	log.Infof("handleCellConfigRequest sent")
-
-	return
 }
