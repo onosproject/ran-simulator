@@ -16,7 +16,6 @@ package e2
 
 import (
 	"github.com/onosproject/ran-simulator/api/e2"
-	e2 "github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/pkg/service"
 	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
