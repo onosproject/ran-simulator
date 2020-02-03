@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/onosproject/onos-config v0.0.0-20200124182344-6c3f5eb1e6ed
+	github.com/prometheus/common v0.4.1
 	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/net v0.0.0-20191112182307-2180aed22343 // indirect
 	golang.org/x/sys v0.0.0-20191113165036-4c7a9d0fe056 // indirect
