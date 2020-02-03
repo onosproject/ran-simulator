@@ -19,11 +19,10 @@ import (
 	"io"
 
 	"github.com/onosproject/ran-simulator/api/e2"
-	pb "github.com/onosproject/ran-simulator/api/e2"
 	"github.com/prometheus/common/log"
 )
 
-func recv(stream pb.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
+func recv(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -42,7 +41,7 @@ func recv(stream pb.InterfaceService_SendControlServer, c chan e2.ControlUpdate)
 	}
 }
 
-func handleCellConfigRequest(stream pb.InterfaceService_SendControlServer, req *pb.CellConfigRequest, c chan e2.ControlUpdate) error {
+func handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *e2.CellConfigRequest, c chan e2.ControlUpdate) error {
 	log.Infof("handleCellConfigRequest")
 	cellConfigReport := e2.ControlUpdate{
 		MessageType: e2.MessageType_CELL_CONFIG_REPORT,
