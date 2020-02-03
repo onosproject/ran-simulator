@@ -1,5 +1,15 @@
 version: "3.2"
 services:
+  onos-ran:
+    image: onosproject/onos-ran:latest
+    hostname: onos-ran
+    volumes:
+      - type: bind
+        source: ./ran-simulator/certs
+        target: /etc/ssl/certs
+    ports:
+      - "25150:5150" #Only needed to for attaching for debug
+    command: -certPath=/etc/ssl/certs/ran-simulator.crt -keyPath=/etc/ssl/certs/ran-simulator.key -caPath=/etc/ssl/certs/onfca.crt
   ran-simulator:
     image: onosproject/ran-simulator:latest
     hostname: ran-simulator
