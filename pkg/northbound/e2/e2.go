@@ -16,7 +16,7 @@ package e2
 
 import (
 	"github.com/onosproject/ran-simulator/api/e2"
-	pb "github.com/onosproject/ran-simulator/api/e2"
+	e2 "github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/pkg/service"
 	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
@@ -35,7 +35,7 @@ type Service struct {
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
 	server := &Server{}
-	pb.RegisterInterfaceServiceServer(r, server)
+	e2.RegisterInterfaceServiceServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
@@ -43,12 +43,12 @@ type Server struct {
 }
 
 // SendTelemetry ...
-func (s *Server) SendTelemetry(req *pb.TelemetryRequest, stream pb.InterfaceService_SendTelemetryServer) error {
+func (s *Server) SendTelemetry(req *e2.TelemetryRequest, stream e2.InterfaceService_SendTelemetryServer) error {
 	return nil
 }
 
 // SendControl ...
-func (s *Server) SendControl(stream pb.InterfaceService_SendControlServer) error {
+func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error {
 	c := make(chan e2.ControlUpdate)
 
 	go recv(stream, c)
