@@ -15,11 +15,24 @@
 package e2
 
 import (
+	"fmt"
 	"io"
+	"regexp"
+	"strconv"
 
 	"github.com/onosproject/ran-simulator/api/e2"
+	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/prometheus/common/log"
 )
+
+// TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
+const TestPlmnID = "001001"
+
+func getEci(towerName string) string {
+	re := regexp.MustCompile("[0-9]+")
+	id, _ := strconv.Atoi(re.FindAllString(towerName, 1)[0])
+	return fmt.Sprintf("%07X", id)
+}
 
 func recv(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	for {
@@ -39,15 +52,24 @@ func recv(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate)
 
 func handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *e2.CellConfigRequest, c chan e2.ControlUpdate) {
 	log.Infof("handleCellConfigRequest")
-	cellConfigReport := e2.ControlUpdate{
-		MessageType: e2.MessageType_CELL_CONFIG_REPORT,
-		S: &e2.ControlUpdate_CellConfigReport{
-			CellConfigReport: &e2.CellConfigReport{
-				Ecgi: &e2.ECGI{PlmnId: "test", Ecid: "test"},
-			},
-		},
-	}
 
-	c <- cellConfigReport
-	log.Infof("handleCellConfigRequest sent")
+	mgr := manager.GetManager()
+
+	for _, tower := range mgr.Towers {
+		eci := getEci(tower.Name)
+		cellConfigReport := e2.ControlUpdate{
+			MessageType: e2.MessageType_CELL_CONFIG_REPORT,
+			S: &e2.ControlUpdate_CellConfigReport{
+				CellConfigReport: &e2.CellConfigReport{
+					Ecgi: &e2.ECGI{
+						PlmnId: TestPlmnID,
+						Ecid:   eci,
+					},
+				},
+			},
+		}
+
+		c <- cellConfigReport
+		log.Infof("handleCellConfigRequest sent")
+	}
 }
