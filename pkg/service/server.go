@@ -17,12 +17,9 @@
 package service
 
 import (
-	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net"
 
-	"github.com/onosproject/onos-config/pkg/certs"
 	log "k8s.io/klog"
 
 	"google.golang.org/grpc"
@@ -129,6 +126,7 @@ func (s *Server) Serve(started func(string)) error {
 	return server.Serve(lis)
 }
 
+/*
 func getCertPoolDefault() *x509.CertPool {
 	certPool := x509.NewCertPool()
 	if ok := certPool.AppendCertsFromPEM([]byte(certs.OnfCaCrt)); !ok {
@@ -148,3 +146,4 @@ func getCertPool(CaPath string) *x509.CertPool {
 	}
 	return certPool
 }
+*/
