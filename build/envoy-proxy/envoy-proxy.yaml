@@ -43,10 +43,10 @@ static_resources:
       lb_policy: round_robin
       # win/mac hosts: Use address: host.docker.internal instead of address: localhost in the line below
       hosts: [{ socket_address: { address: ran-simulator, port_value: 5150 }}]
-      tls_context:
-        common_tls_context:
-          tls_certificates:
-            certificate_chain: { "filename": "/etc/envoy-proxy/certs/localhost.crt" }
-            private_key: { "filename": "/etc/envoy-proxy/certs/localhost.key" }
-          validation_context:
-            trusted_ca: { filename: "/etc/envoy-proxy/certs/onfca.crt" }
+#      tls_context:
+#        common_tls_context:
+#          tls_certificates:
+#            certificate_chain: { "filename": "/etc/envoy-proxy/certs/localhost.crt" }
+#            private_key: { "filename": "/etc/envoy-proxy/certs/localhost.key" }
+#          validation_context:
+#            trusted_ca: { filename: "/etc/envoy-proxy/certs/onfca.crt" }

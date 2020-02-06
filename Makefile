@@ -63,7 +63,7 @@ sd-ran-gui-docker: build-gui # @HELP build onos-gui Docker image
 		-t onosproject/sd-ran-gui:${RAN_SIMULATOR_VERSION}
 
 images: # @HELP build all Docker images
-images: ran-simulator-docker 
+images: ran-simulator-docker sd-ran-gui-docker
 
 kind: # @HELP build Docker images and add them to the currently configured kind cluster
 kind: images
