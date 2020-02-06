@@ -28,10 +28,16 @@ import (
 // TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
 const TestPlmnID = "001001"
 
-func getEci(towerName string) string {
+func makeEci(towerName string) string {
 	re := regexp.MustCompile("[0-9]+")
 	id, _ := strconv.Atoi(re.FindAllString(towerName, 1)[0])
 	return fmt.Sprintf("%07X", id)
+}
+
+func makeCrnti(ueName string) string {
+	re := regexp.MustCompile("[0-9]+")
+	id, _ := strconv.Atoi(re.FindAllString(ueName, 1)[0])
+	return fmt.Sprintf("%04X", id+1)
 }
 
 func recv(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
@@ -56,20 +62,44 @@ func handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *
 	mgr := manager.GetManager()
 
 	for _, tower := range mgr.Towers {
-		eci := getEci(tower.Name)
+		tower.Eci = makeEci(tower.Name)
 		cellConfigReport := e2.ControlUpdate{
 			MessageType: e2.MessageType_CELL_CONFIG_REPORT,
 			S: &e2.ControlUpdate_CellConfigReport{
 				CellConfigReport: &e2.CellConfigReport{
 					Ecgi: &e2.ECGI{
 						PlmnId: TestPlmnID,
-						Ecid:   eci,
+						Ecid:   tower.Eci,
 					},
 				},
 			},
 		}
 
 		c <- cellConfigReport
-		log.Infof("handleCellConfigRequest sent")
+		log.Infof("handleCellConfigReport eci: %s", tower.Eci)
+	}
+
+	// Initate UE admissions
+	for _, ue := range mgr.UserEquipments {
+		log.Infof("Ue: %s", ue.Name)
+		ue.Crnti = makeCrnti(ue.Name)
+		log.Infof("Ue: %s", ue.Crnti)
+
+		eci := mgr.GetTowerByName(ue.Tower).Eci
+		ueAdmReq := e2.ControlUpdate{
+			MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
+			S: &e2.ControlUpdate_UEAdmissionRequest{
+				UEAdmissionRequest: &e2.UEAdmissionRequest{
+					Ecgi: &e2.ECGI{
+						PlmnId: TestPlmnID,
+						Ecid:   eci,
+					},
+					Crnti:             ue.Crnti,
+					AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
+				},
+			},
+		}
+		c <- ueAdmReq
+		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
 	}
 }

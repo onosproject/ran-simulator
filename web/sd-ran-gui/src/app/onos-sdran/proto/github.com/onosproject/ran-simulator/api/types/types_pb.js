@@ -525,7 +525,8 @@ proto.ran.trafficsim.types.Ue.toObject = function(includeInstance, msg) {
     route: jspb.Message.getFieldWithDefault(msg, 6, ""),
     tower: jspb.Message.getFieldWithDefault(msg, 7, ""),
     tower2: jspb.Message.getFieldWithDefault(msg, 8, ""),
-    tower3: jspb.Message.getFieldWithDefault(msg, 9, "")
+    tower3: jspb.Message.getFieldWithDefault(msg, 9, ""),
+    crnti: jspb.Message.getFieldWithDefault(msg, 10, "")
   };
 
   if (includeInstance) {
@@ -594,6 +595,10 @@ proto.ran.trafficsim.types.Ue.deserializeBinaryFromReader = function(msg, reader
     case 9:
       var value = /** @type {string} */ (reader.readString());
       msg.setTower3(value);
+      break;
+    case 10:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setCrnti(value);
       break;
     default:
       reader.skipField();
@@ -678,6 +683,13 @@ proto.ran.trafficsim.types.Ue.serializeBinaryToWriter = function(message, writer
   if (f.length > 0) {
     writer.writeString(
       9,
+      f
+    );
+  }
+  f = message.getCrnti();
+  if (f.length > 0) {
+    writer.writeString(
+      10,
       f
     );
   }
@@ -822,6 +834,21 @@ proto.ran.trafficsim.types.Ue.prototype.setTower3 = function(value) {
 };
 
 
+/**
+ * optional string crnti = 10;
+ * @return {string}
+ */
+proto.ran.trafficsim.types.Ue.prototype.getCrnti = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
+};
+
+
+/** @param {string} value */
+proto.ran.trafficsim.types.Ue.prototype.setCrnti = function(value) {
+  jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
 
 
 
@@ -856,7 +883,8 @@ proto.ran.trafficsim.types.Tower.toObject = function(includeInstance, msg) {
   var f, obj = {
     name: jspb.Message.getFieldWithDefault(msg, 1, ""),
     location: (f = msg.getLocation()) && proto.ran.trafficsim.types.Point.toObject(includeInstance, f),
-    color: jspb.Message.getFieldWithDefault(msg, 3, "")
+    color: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    eci: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -906,6 +934,10 @@ proto.ran.trafficsim.types.Tower.deserializeBinaryFromReader = function(msg, rea
       var value = /** @type {string} */ (reader.readString());
       msg.setColor(value);
       break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEci(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -954,6 +986,13 @@ proto.ran.trafficsim.types.Tower.serializeBinaryToWriter = function(message, wri
   if (f.length > 0) {
     writer.writeString(
       3,
+      f
+    );
+  }
+  f = message.getEci();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
       f
     );
   }
@@ -1020,6 +1059,21 @@ proto.ran.trafficsim.types.Tower.prototype.getColor = function() {
 /** @param {string} value */
 proto.ran.trafficsim.types.Tower.prototype.setColor = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string eci = 4;
+ * @return {string}
+ */
+proto.ran.trafficsim.types.Tower.prototype.getEci = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.ran.trafficsim.types.Tower.prototype.setEci = function(value) {
+  jspb.Message.setProto3StringField(this, 4, value);
 };
 
 

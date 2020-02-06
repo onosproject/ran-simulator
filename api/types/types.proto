@@ -48,6 +48,8 @@ message Ue {
     string tower2 = 8;
 
     string tower3 = 9;
+
+    string crnti = 10;
 }
 
 message Tower {
@@ -56,6 +58,8 @@ message Tower {
     Point location = 2;
 
     string color = 3;
+
+    string eci = 4;
 }
 
 message MapLayout {
