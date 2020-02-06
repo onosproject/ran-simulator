@@ -1,6 +1,6 @@
 # Deploy with docker-compose
 
-`docker-compose` is a simple tool that allow a collection of Docker images to be
+[docker-compose] is a simple tool that allow a collection of Docker images to be
 launched together. It can be used as a simple alternative for deploying to a Kubernetes
 cluster, or running the docker images individually.
 
@@ -11,7 +11,7 @@ cluster, or running the docker images individually.
 > supported on docker-compose. When onos-ran changes to use Atomix, this page
 > will be deleted. 
 
-In this project the [ran-simulator/build/dockercompose.yaml](ran-simulator/build/dockercompose.yaml)
+In this project the [../build/dockercompose.yaml](../build/docker-compose.yaml)
 file launches 4 applications:
 
 1. onos-ran (the main ORAN application - exposes the C1 interface northbound, accesses the E2 interface on the southbound )
@@ -49,7 +49,18 @@ a298d1214eb1        envoyproxy/envoy-alpine:v1.11.1    "/docker-entrypoint.…" 
 Ensure 4 all are running. If `ran-simulator` is not running, you might not have
 entered a valid Google API Key. Check the logs shown in the startup terminal.
 
+### Tips for running
+
+* See the `docker-compose` documentation for [more tips](https://docs.docker.com/compose/#step-8-experiment-with-some-other-commands)
+* To run a subset of the containers, give only the names of the ones you want to start at the end of the command
+* To run the containers in the background, use the `-d` flag after `up`
+* To connect to the terminal shell of any container, use `docker exec -it <containername> /bin/sh`
+* When you make updates to any one of the applications, run `make images` to push
+the changes in to your local docker and `docker-compose` will pick it up the next
+time it is started
+
 ## Browser access
 With the 4 services running, the GUI will be available on [http://localhost:4200]
 
 [Directions API]: https://developers.google.com/maps/documentation/directions/start
+[docker-compose]: https://docs.docker.com/compose/

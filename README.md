@@ -16,7 +16,7 @@ This is an [Angular] appliation and written in [TypeScript] in `web/sd-ran-gui`.
 See the [README.md](web/sd-ran-gui/README.md) in that folder for more info.
 
 ## Running the applications
-See [demo.md](docs/demo.md) for details of running the application.
+See [README.md](docs/README.md) for details of running the application.
 It can be run simply with [docker-compose](docs/docker-compose.md)
 
 Alternatively it can be run on Kubernetes - see [ran-simulator.md](docs/deployment.md) and

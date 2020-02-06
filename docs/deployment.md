@@ -17,7 +17,7 @@ You must enter your own key in to [onos-helm-charts/ran-simulator/values.yaml](o
 before you deploy the Helm chart.
 
 ## Tuning parameters
-[demo.md] shows the list of startup parameters - these can be adjusted in the Helm
+[README.md](README.md) shows the list of startup parameters - these can be adjusted in the Helm
 Chart by adding them to the `args` in [onos-helm-charts/ran-simulator/templates/deployment.yaml]
 (onos-helm-charts/ran-simulator/templates/deployment.yaml).
 
