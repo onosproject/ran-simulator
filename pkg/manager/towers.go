@@ -16,8 +16,9 @@ package manager
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/api/types"
 	"math"
+
+	"github.com/onosproject/ran-simulator/api/types"
 )
 
 // TowersParams :
@@ -101,4 +102,14 @@ func distanceToTower(tower *types.Tower, point *types.Point) float32 {
 		float64(tower.GetLocation().GetLat()-point.GetLat()),
 		float64(tower.GetLocation().GetLng()-point.GetLng()),
 	))
+}
+
+// GetTowerByName ...
+func (m *Manager) GetTowerByName(name string) *types.Tower {
+	for _, tower := range m.Towers {
+		if tower.Name == name {
+			return tower
+		}
+	}
+	return nil
 }
