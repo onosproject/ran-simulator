@@ -136,7 +136,7 @@ func main() {
 	if routesParams.NumRoutes < 2 || routesParams.NumRoutes > 100 {
 		log.Fatal("Invalid number of Routes - must be between 2 and 100 inclusive")
 	}
-	if locationParams.NumLocations < routesParams.NumRoutes * 2 {
+	if locationParams.NumLocations < routesParams.NumRoutes*2 {
 		log.Fatal("Invalid number of Location:Routes - must be at least 2")
 	}
 	if *stepDelayMs < 100 || *stepDelayMs > 60000 {
@@ -157,7 +157,9 @@ func main() {
 		log.Fatal("Unable to start e2 manager", err)
 	}
 	err = e2Mgr.Run(towerParams)
-
+	if err != nil {
+		log.Fatal("Unable to run e2 manager", err)
+	}
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
 	}

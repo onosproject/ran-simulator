@@ -17,6 +17,8 @@
 <input type="checkbox" [(ngModel)]="showRoutes" (ngModelChange)="updateRoutes($event)">
 <label><small>Map</small></label>
 <input type="checkbox" [(ngModel)]="showMap" (ngModelChange)="updateMap($event)">
+<label><small>Power</small></label>
+<input type="checkbox" [(ngModel)]="showPower" (ngModelChange)="updatePower($event)">
 <!-- See https://medium.com/angular-in-depth/google-maps-is-now-an-angular-component-821ec61d2a0 -->
 <google-map #map height="85vh" width="100%"
             [center]="center"

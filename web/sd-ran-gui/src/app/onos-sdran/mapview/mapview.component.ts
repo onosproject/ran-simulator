@@ -52,12 +52,14 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
     infoContent: string[];
     showRoutes = true;
     showMap = false;
+    showPower = false;
     zoom = 12.0;
     center: google.maps.LatLng;
     towers: google.maps.Marker[] = [];
     routes: Map<string, google.maps.Polyline>;
     carMap: Map<string, google.maps.Marker>;
     carLineMap: Map<string, google.maps.Polyline>;
+    powerCircleMap: Map<string, google.maps.Circle>;
     towerSub: Subscription;
     routesSub: Subscription;
     uesSub: Subscription;
@@ -68,6 +70,7 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         this.routes = new Map<string, google.maps.Polyline>();
         this.carMap = new Map<string, google.maps.Marker>();
         this.carLineMap = new Map<string, google.maps.Polyline>();
+        this.powerCircleMap = new Map<string, google.maps.Circle>();
     }
 
     ngOnInit() {
@@ -155,6 +158,12 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         this.googleMap._googleMap.setOptions({disableDefaultUI: !update} as google.maps.MapOptions);
     }
 
+    updatePower(update: boolean) {
+        this.powerCircleMap.forEach((pc) => {
+            pc.setVisible(update);
+        });
+    }
+
     openTowerInfo(tower: MapMarker) {
         this.infoContent = [tower.getTitle(), 'Lat: ' + tower.getPosition().lat(), 'Lng: ' + tower.getPosition().lng()];
         this.infoWindow.open(tower);
@@ -176,8 +185,24 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 }
             }
         );
-
         this.towers.push(marker);
+
+        const powerCircle = new google.maps.Circle({
+            center: pos,
+            radius: 600,
+            fillOpacity: 0,
+            strokeColor: tower.getColor(),
+            strokeWeight: 0.5,
+            strokeOpacity: 1,
+            icons: [{
+                icon: LINE_SYMBOL,
+                offset: '0',
+                repeat: '10px',
+            }],
+        } as google.maps.CircleOptions);
+        powerCircle.setMap(this.googleMap._googleMap);
+        powerCircle.setVisible(this.showPower);
+        this.powerCircleMap.set(tower.getName(), powerCircle);
     }
 
     private initRoute(route: Route): void {
