@@ -16,6 +16,7 @@ package e2
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"io"
 	"regexp"
 	"strconv"
@@ -29,6 +30,7 @@ import (
 
 // TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
 const TestPlmnID = "001001"
+const e2Manager = "e2Manager"
 
 var mgr Manager
 
@@ -42,7 +44,7 @@ func NewManager() (*Manager, error) {
 }
 
 // Run ...
-func (m *Manager) Run(towerParams types.TowersParams) {
+func (m *Manager) Run(towerParams types.TowersParams) error {
 	trafficSimMgr := manager.GetManager()
 	for _, tower := range trafficSimMgr.Towers {
 		tower.PlmnID = TestPlmnID
@@ -54,10 +56,28 @@ func (m *Manager) Run(towerParams types.TowersParams) {
 	for _, ue := range trafficSimMgr.UserEquipments {
 		ue.Crnti = makeCrnti(ue.Name)
 	}
+	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(e2Manager)
+	if err != nil {
+		return err
+	}
+	go func() {
+		for ueUpdate := range ueChangeChannel {
+			if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
+				ue, ok := ueUpdate.Object.(*types.Ue)
+				if !ok {
+					log.Fatalf("Object %v could not be converted to UE", ueUpdate)
+				}
+				log.Infof("UE %s changed. Serving: %s (%f), 2nd: %s (%f), 3rd: %s (%f).",
+					ue.Name, ue.Tower, ue.TowerDist, ue.Tower2, ue.Tower2Dist, ue.Tower3, ue.Tower3Dist)
+			}
+		}
+	}()
+	return nil
 }
 
 //Close kills the channels and manager related objects
 func (m *Manager) Close() {
+	manager.GetManager().Dispatcher.UnregisterUeListener(e2Manager)
 	log.Info("Closing Manager")
 }
 

@@ -23,8 +23,8 @@ import (
 /**
  * Generates a random latlng value in 1000 meter radius of loc
  */
-func randomLatLng(mapCenterLat float32, mapCenterLng float32) types.Point {
-	const r = 5000 / float64(111300) // = 100 meters
+func randomLatLng(mapCenterLat float32, mapCenterLng float32, scale float32) types.Point {
+	var r = float64(scale)
 	y0 := float64(mapCenterLat)
 	x0 := float64(mapCenterLng)
 
