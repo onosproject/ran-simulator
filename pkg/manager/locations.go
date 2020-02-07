@@ -16,8 +16,9 @@ package manager
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/api/types"
 	"math/rand"
+
+	"github.com/onosproject/ran-simulator/api/types"
 )
 
 // LocationsParams :
@@ -31,7 +32,7 @@ type Location struct {
 	Position types.Point
 }
 
-func newLocations(params LocationsParams, towersParams TowersParams, mapLayout types.MapLayout) map[string]*Location {
+func newLocations(params LocationsParams, towersParams types.TowersParams, mapLayout types.MapLayout) map[string]*Location {
 	locations := make(map[string]*Location)
 
 	for l := 0; l < params.NumLocations; l++ {

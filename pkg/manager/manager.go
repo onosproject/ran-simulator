@@ -47,7 +47,7 @@ func NewManager() (*Manager, error) {
 }
 
 // Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams TowersParams, locParams LocationsParams, routesParams RoutesParams) {
+func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams, locParams LocationsParams, routesParams RoutesParams) {
 	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
 	m.MapLayout = mapLayoutParams
 	m.Towers = newTowers(towerparams, mapLayoutParams)
