@@ -21,9 +21,14 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"googlemaps.github.io/maps"
 	log "k8s.io/klog"
+	"math"
+	"math/rand"
 	"net/http"
 	"time"
 )
+
+const googleAPIKeyMinLen = 38
+const stepsPerDecimalDegree = 500
 
 // RoutesParams :
 type RoutesParams struct {
@@ -54,12 +59,37 @@ func (m *Manager) newRoutes(params RoutesParams) (map[string]*types.Route, error
 	return routes, nil
 }
 
-func (m *Manager) newRoute(startLoc *Location, r int, apiKey string, color string) (*types.Route, error) {
+// If a googleApiKey is given, them call the Google Directions API to get steps that
+// follow known streets and traffic rules
+func (m *Manager) newRoute(startLoc *Location, rID int, apiKey string, color string) (*types.Route, error) {
 	endLoc, err := m.getRandomLocation(startLoc.Name)
 	if err != nil {
 		return nil, err
 	}
 
+	var points []*types.Point
+	if len(apiKey) >= googleAPIKeyMinLen {
+		points, err = googleRoute(startLoc, endLoc, apiKey)
+		log.Infof("Generated new Route-%d with %d points using Google Directions", rID, len(points))
+	} else {
+		points, err = randomRoute(startLoc, endLoc)
+		log.Infof("Generated new Route-%d with %d points using Random Directions", rID, len(points))
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	name := fmt.Sprintf("Route-%d", rID)
+	route := types.Route{
+		Name:      name,
+		Waypoints: points,
+		Color:     color,
+	}
+
+	return &route, nil
+}
+
+func googleRoute(startLoc *Location, endLoc *Location, apiKey string) ([]*types.Point, error) {
 	cfg := &tls.Config{
 		InsecureSkipVerify: true,
 	}
@@ -87,7 +117,6 @@ func (m *Manager) newRoute(startLoc *Location, r int, apiKey string, color strin
 		if err != nil {
 			return nil, err
 		}
-		log.Infof("Route-%d is Google route %s #Points %d", r, groute.Summary, len(latLngs))
 		for _, ll := range latLngs {
 			point := types.Point{
 				Lat: float32(ll.Lat),
@@ -96,13 +125,34 @@ func (m *Manager) newRoute(startLoc *Location, r int, apiKey string, color strin
 			points = append(points, &point)
 		}
 	}
+	return points, nil
+}
 
-	name := fmt.Sprintf("Route-%d", r)
-	route := types.Route{
-		Name:      name,
-		Waypoints: points,
-		Color:     color,
+// If the no google API Key is given, we cannot access the Directions API and so
+// generate a route randomly - it will not follow the streets
+// Warning - this is a simple calculator that expect points to be on the same hemisphere
+func randomRoute(startLoc *Location, endLoc *Location) ([]*types.Point, error) {
+	routeWidth := float64(endLoc.Position.GetLng() - startLoc.Position.GetLng())
+	routeHeight := float64(endLoc.Position.GetLat() - startLoc.Position.GetLat())
+
+	directLength := math.Hypot(routeWidth, routeHeight)
+	// Try to have a step evey 1/stepsPerDecimalDegree of a decimal degree
+	points := make([]*types.Point, int(math.Floor(directLength*stepsPerDecimalDegree)))
+
+	for i := range points {
+		randFactor := (rand.Float64() - 0.5) / stepsPerDecimalDegree
+		if i == 0 {
+			randFactor = 0.0
+		}
+		deltaX := float32(routeWidth*float64(i)/float64(len(points)) + randFactor)
+		deltaY := float32(routeHeight*float64(i)/float64(len(points)) + randFactor)
+
+		points[i] = &types.Point{
+			Lng: startLoc.Position.GetLng() + deltaX,
+			Lat: startLoc.Position.GetLat() + deltaY,
+		}
 	}
+	points = append(points, &endLoc.Position)
 
-	return &route, nil
+	return points, nil
 }
