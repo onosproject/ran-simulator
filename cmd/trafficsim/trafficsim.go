@@ -30,8 +30,9 @@ package main
 
 import (
 	"flag"
-	"github.com/onosproject/ran-simulator/api/types"
 	"time"
+
+	"github.com/onosproject/ran-simulator/api/types"
 
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
@@ -58,6 +59,7 @@ func main() {
 	numLocations := flag.Int("numLocations", 10, "Number of locations")
 	numRoutes := flag.Int("numRoutes", 3, "Number of routes")
 	stepDelayMs := flag.Int("stepDelayMs", 1000, "delay between steps on route")
+	maxUEs := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
 
 	//lines 93-109 are implemented according to
 	// https://github.com/kubernetes/klog/blob/master/examples/coexist_glog/coexist_glog.go
@@ -92,12 +94,12 @@ func main() {
 		Fade:       *fade,
 	}
 
-	towerParams := manager.TowersParams{
-
-		TowerRows:         *towerRows,
-		TowerCols:         *towerCols,
+	towerParams := types.TowersParams{
+		TowerRows:         uint32(*towerRows),
+		TowerCols:         uint32(*towerCols),
 		TowerSpacingVert:  float32(*towerSpacingVert),
 		TowerSpacingHoriz: float32(*towerSpacingHoriz),
+		MaxUEs:            uint32(*maxUEs),
 	}
 
 	locationParams := manager.LocationsParams{NumLocations: *numLocations}
@@ -113,12 +115,18 @@ func main() {
 	mgr, err := manager.NewManager()
 	if err != nil {
 		log.Fatal("Unable to load trafficsim ", err)
-	} else {
-		mgr.Run(mapLayoutParams, towerParams, locationParams, routesParams)
-		err = startServer(*caPath, *keyPath, *certPath)
-		if err != nil {
-			log.Fatal("Unable to start trafficsim ", err)
-		}
+		return
+	}
+	mgr.Run(mapLayoutParams, towerParams, locationParams, routesParams)
+
+	e2Mgr, err := e2.NewManager()
+	if err != nil {
+		log.Fatal("Unable to start e2 manager", err)
+	}
+	e2Mgr.Run(towerParams)
+
+	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
+		log.Fatal("Unable to start trafficsim ", err)
 	}
 }
 

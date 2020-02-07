@@ -21,20 +21,12 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 )
 
-// TowersParams :
-type TowersParams struct {
-	TowerRows         int
-	TowerCols         int
-	TowerSpacingVert  float32
-	TowerSpacingHoriz float32
-}
-
 // TowerIf :
 type TowerIf interface {
 	GetPosition() types.Point
 }
 
-func newTowers(params TowersParams, mapLayout types.MapLayout) map[string]*types.Tower {
+func newTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]*types.Tower {
 	topLeft := types.Point{
 		Lat: mapLayout.GetCenter().GetLat() + params.TowerSpacingVert*float32(params.TowerRows)/2,
 		Lng: mapLayout.GetCenter().GetLng() - params.TowerSpacingHoriz*float32(params.TowerCols)/2,
@@ -42,8 +34,8 @@ func newTowers(params TowersParams, mapLayout types.MapLayout) map[string]*types
 	var towerNum = 0
 	towers := make(map[string]*types.Tower)
 
-	for r := 0; r < params.TowerRows; r++ {
-		for c := 0; c < params.TowerCols; c++ {
+	for r := 0; r < int(params.TowerRows); r++ {
+		for c := 0; c < int(params.TowerCols); c++ {
 			pos := types.Point{
 				Lat: topLeft.Lat - 0.03*float32(r),
 				Lng: topLeft.Lng + 0.05*float32(c),

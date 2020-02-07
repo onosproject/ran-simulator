@@ -52,6 +52,19 @@ message Ue {
     string crnti = 10;
 }
 
+
+message TowersParams {
+	uint32 towerRows = 1;
+
+	uint32 towerCols = 2;
+
+	float towerSpacingVert = 3;
+
+	float towerSpacingHoriz = 4;
+
+    uint32 maxUEs = 5;
+}
+
 message Tower {
     string name = 1;
 
@@ -59,7 +72,13 @@ message Tower {
 
     string color = 3;
 
-    string eci = 4;
+    string plmnID = 5;
+
+    string ecID = 4;
+
+    uint32 maxUEs = 6;
+
+    repeated string neighbors = 7;
 }
 
 message MapLayout {

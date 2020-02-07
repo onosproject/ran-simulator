@@ -17,7 +17,6 @@ package e2
 import (
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/pkg/service"
-	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
 )
 
@@ -48,20 +47,6 @@ func (s *Server) SendTelemetry(req *e2.TelemetryRequest, stream e2.InterfaceServ
 
 // SendControl ...
 func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error {
-	c := make(chan e2.ControlUpdate)
-
-	go recv(stream, c)
-
-	for {
-		select {
-		case msg := <-c:
-			if err := stream.Send(&msg); err != nil {
-				log.Infof("send error %v", err)
-				return err
-			}
-		case <-stream.Context().Done():
-			log.Infof("Controller has disconnected")
-			return nil
-		}
-	}
+	mgr := GetManager()
+	return mgr.runControl(stream)
 }
