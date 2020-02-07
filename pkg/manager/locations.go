@@ -36,7 +36,8 @@ func newLocations(params LocationsParams, towersParams types.TowersParams, mapLa
 	locations := make(map[string]*Location)
 
 	for l := 0; l < params.NumLocations; l++ {
-		pos := randomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng())
+		pos := randomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng(),
+			towersParams.TowerSpacingHoriz*float32(towersParams.TowerCols-1))
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{
 			Name:     name,

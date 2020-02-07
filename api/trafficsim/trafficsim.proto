@@ -58,6 +58,9 @@ message ListUesResponse {
 
     // type is a qualification of the type of change being made
     Type type = 2;
+
+    // update_type is a qualification of the type of UE change
+    UpdateType update_type = 3;
 }
 
 // Traffic - provides a stream of traffic data to GUI
@@ -84,4 +87,15 @@ enum Type {
 
     // REMOVED is an event which occurs when a Change is removed from the configuration
     REMOVED = 3;
+}
+
+// In the case of an update this helps qualify the update type - add items as necessary
+enum UpdateType {
+    NOUPDATETYPE = 0;
+
+    // POSITION An update in position of UE only, without a change in the Tower affinity
+    POSITION = 1;
+
+    // TOWER An update in tower affinity (and also position) of UE
+    TOWER = 2;
 }

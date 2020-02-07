@@ -28,8 +28,8 @@ type TowerIf interface {
 
 func newTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]*types.Tower {
 	topLeft := types.Point{
-		Lat: mapLayout.GetCenter().GetLat() + params.TowerSpacingVert*float32(params.TowerRows)/2,
-		Lng: mapLayout.GetCenter().GetLng() - params.TowerSpacingHoriz*float32(params.TowerCols)/2,
+		Lat: mapLayout.GetCenter().GetLat() + params.TowerSpacingVert*float32(params.TowerRows-1)/2,
+		Lng: mapLayout.GetCenter().GetLng() - params.TowerSpacingHoriz*float32(params.TowerCols-1)/2,
 	}
 	var towerNum = 0
 	towers := make(map[string]*types.Tower)
@@ -37,8 +37,8 @@ func newTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 	for r := 0; r < int(params.TowerRows); r++ {
 		for c := 0; c < int(params.TowerCols); c++ {
 			pos := types.Point{
-				Lat: topLeft.Lat - 0.03*float32(r),
-				Lng: topLeft.Lng + 0.05*float32(c),
+				Lat: topLeft.Lat - params.TowerSpacingVert*float32(r),
+				Lng: topLeft.Lng + params.TowerSpacingHoriz*float32(c),
 			}
 			towerNum = towerNum + 1
 			towerName := fmt.Sprintf("Tower-%d", towerNum)
@@ -55,7 +55,7 @@ func newTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 
 // Find the closest tower to any point - return serving, candidate1 and candidate2
 // in order of distance
-func (m *Manager) findClosestTower(point *types.Point) (string, string, string) {
+func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
 	var serving string
 	var candidate1 string
 	var candidate2 string
@@ -84,7 +84,7 @@ func (m *Manager) findClosestTower(point *types.Point) (string, string, string) 
 		}
 	}
 
-	return serving, candidate1, candidate2
+	return []string{serving, candidate1, candidate2}, []float32{servingDist, candidate1Dist, candidate2Dist}
 }
 
 // Measure the distance between a point and a tower and return an answer in decimal degrees

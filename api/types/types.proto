@@ -50,6 +50,12 @@ message Ue {
     string tower3 = 9;
 
     string crnti = 10;
+
+    float towerDist = 11;
+
+    float tower2Dist = 12;
+
+    float tower3Dist = 13;
 }
 
 

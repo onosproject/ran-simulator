@@ -109,6 +109,9 @@ export class ListUesResponse extends jspb.Message {
   getType(): Type;
   setType(value: Type): void;
 
+  getUpdateType(): UpdateType;
+  setUpdateType(value: UpdateType): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListUesResponse.AsObject;
   static toObject(includeInstance: boolean, msg: ListUesResponse): ListUesResponse.AsObject;
@@ -121,6 +124,7 @@ export namespace ListUesResponse {
   export type AsObject = {
     ue?: github_com_onosproject_ran$simulator_api_types_types_pb.Ue.AsObject,
     type: Type,
+    updateType: UpdateType,
   }
 }
 
@@ -129,4 +133,9 @@ export enum Type {
   ADDED = 1,
   UPDATED = 2,
   REMOVED = 3,
+}
+export enum UpdateType { 
+  NOUPDATETYPE = 0,
+  POSITION = 1,
+  TOWER = 2,
 }

@@ -21,6 +21,9 @@ type Event struct {
 	// Type is the stream event type
 	Type trafficsim.Type
 
+	// UpdateType is a qualification on the type of update
+	UpdateType trafficsim.UpdateType
+
 	// Object is the event object
 	Object interface{}
 }

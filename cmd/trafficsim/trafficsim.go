@@ -51,7 +51,7 @@ func main() {
 	towerCols := flag.Int("towerCols", 3, "Number of columns of towers")
 	mapCenterLat := flag.Float64("mapCenterLat", 52.5200, "Map center latitude")
 	mapCenterLng := flag.Float64("mapCenterLng", 13.4050, "Map center longitude") // Berlin
-	zoom := flag.Float64("zoom", 12.0, "The starting Zoom level")
+	zoom := flag.Float64("zoom", 12.5, "The starting Zoom level")
 	fade := flag.Bool("fade", true, "Show map as faded on start")
 	showRoutes := flag.Bool("showRoutes", true, "Show routes on start")
 	towerSpacingVert := flag.Float64("towerSpacingVert", 0.02, "Tower spacing vert in degrees latitude")
@@ -93,6 +93,15 @@ func main() {
 		ShowRoutes: *showRoutes,
 		Fade:       *fade,
 	}
+	if mapLayoutParams.Zoom < 10 || mapLayoutParams.Zoom > 15 {
+		log.Fatal("Invalid Zoom level - must be between 10 and 15 inclusive")
+	}
+	if mapLayoutParams.Center.GetLat() <= -90.0 || mapLayoutParams.Center.GetLat() >= 90.0 {
+		log.Fatal("Invalid Map Centre Latitude - must be between -90 and 90 exclusive")
+	}
+	if mapLayoutParams.Center.GetLng() <= -180.0 || mapLayoutParams.Center.GetLng() >= 180.0 {
+		log.Fatal("Invalid Map Centre Longitude - must be between -180 and 180 exclusive")
+	}
 
 	towerParams := types.TowersParams{
 		TowerRows:         uint32(*towerRows),
@@ -101,13 +110,37 @@ func main() {
 		TowerSpacingHoriz: float32(*towerSpacingHoriz),
 		MaxUEs:            uint32(*maxUEs),
 	}
+	if towerParams.TowerRows < 2 || towerParams.TowerRows > 20 {
+		log.Fatal("Invalid number of Tower Rows - must be between 2 and 20 inclusive")
+	}
+	if towerParams.TowerCols < 2 || towerParams.TowerCols > 20 {
+		log.Fatal("Invalid number of Tower Cols - must be between 2 and 20 inclusive")
+	}
+	if towerParams.TowerSpacingVert < 0.001 || towerParams.TowerSpacingVert > 1.0 {
+		log.Fatal("Invalid vertical tower spacing - must be between 0.001 and 1.0 degree latitude inclusive")
+	}
+	if towerParams.TowerSpacingHoriz < 0.001 || towerParams.TowerSpacingHoriz > 1.0 {
+		log.Fatal("Invalid horizontal tower spacing - must be between 0.001 and 1.0 degree longitude inclusive")
+	}
 
 	locationParams := manager.LocationsParams{NumLocations: *numLocations}
+	if locationParams.NumLocations < 3 || locationParams.NumLocations > 200 {
+		log.Fatal("Invalid number of Locations - must be between 3 and 100 inclusive")
+	}
 
 	routesParams := manager.RoutesParams{
 		NumRoutes: *numRoutes,
 		APIKey:    *googleAPIKey,
 		StepDelay: time.Duration(*stepDelayMs) * time.Millisecond,
+	}
+	if routesParams.NumRoutes < 2 || routesParams.NumRoutes > 100 {
+		log.Fatal("Invalid number of Routes - must be between 2 and 100 inclusive")
+	}
+	if locationParams.NumLocations < routesParams.NumRoutes * 2 {
+		log.Fatal("Invalid number of Location:Routes - must be at least 2")
+	}
+	if *stepDelayMs < 100 || *stepDelayMs > 60000 {
+		log.Fatal("Invalid step Delay - must be between 100ms and 60000ms inclusive")
 	}
 
 	log.Info("Starting trafficsim")
@@ -123,7 +156,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Unable to start e2 manager", err)
 	}
-	e2Mgr.Run(towerParams)
+	err = e2Mgr.Run(towerParams)
 
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
