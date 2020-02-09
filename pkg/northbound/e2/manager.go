@@ -16,11 +16,12 @@ package e2
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"io"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/onosproject/ran-simulator/api/trafficsim"
 
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -56,22 +57,6 @@ func (m *Manager) Run(towerParams types.TowersParams) error {
 	for _, ue := range trafficSimMgr.UserEquipments {
 		ue.Crnti = makeCrnti(ue.Name)
 	}
-	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(e2Manager)
-	if err != nil {
-		return err
-	}
-	go func() {
-		for ueUpdate := range ueChangeChannel {
-			if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
-				ue, ok := ueUpdate.Object.(*types.Ue)
-				if !ok {
-					log.Fatalf("Object %v could not be converted to UE", ueUpdate)
-				}
-				log.Infof("UE %s changed. Serving: %s (%f), 2nd: %s (%f), 3rd: %s (%f).",
-					ue.Name, ue.Tower, ue.TowerDist, ue.Tower2, ue.Tower2Dist, ue.Tower3, ue.Tower3Dist)
-			}
-		}
-	}()
 	return nil
 }
 
@@ -139,13 +124,22 @@ func makeCrnti(ueName string) string {
 	return fmt.Sprintf("%04X", id+1)
 }
 
-func (m *Manager) runControl(stream e2.InterfaceService_SendControlServer) error {
-	c := make(chan e2.ControlUpdate)
-	go mgr.recvLoop(stream, c)
-	return mgr.sendLoop(stream, c)
+func makeCqi(distance float32) uint32 {
+	cqi := uint32(0.001 / (distance * distance))
+	if cqi > 15 {
+		cqi = 15
+	}
+	return cqi
 }
 
-func (m *Manager) sendLoop(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
+// RunControl ...
+func (m *Manager) RunControl(stream e2.InterfaceService_SendControlServer) error {
+	c := make(chan e2.ControlUpdate)
+	go mgr.recvControlLoop(stream, c)
+	return mgr.sendControlLoop(stream, c)
+}
+
+func (m *Manager) sendControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
 	for {
 		select {
 		case msg := <-c:
@@ -160,7 +154,7 @@ func (m *Manager) sendLoop(stream e2.InterfaceService_SendControlServer, c chan 
 	}
 }
 
-func (m *Manager) recvLoop(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
+func (m *Manager) recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
@@ -228,5 +222,92 @@ func (m *Manager) handleCellConfigRequest(stream e2.InterfaceService_SendControl
 		}
 		c <- ueAdmReq
 		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+	}
+}
+
+// RunTelemetry ...
+func (m *Manager) RunTelemetry(stream e2.InterfaceService_SendTelemetryServer) error {
+	c := make(chan e2.TelemetryMessage)
+	go mgr.radioMeasReportPerUE(stream, c)
+	return mgr.sendTelemetryLoop(stream, c)
+}
+
+func (m *Manager) sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+	for {
+		select {
+		case msg := <-c:
+			if err := stream.Send(&msg); err != nil {
+				log.Infof("send error %v", err)
+				return err
+			}
+		case <-stream.Context().Done():
+			log.Infof("Controller has disconnected")
+			return nil
+		}
+	}
+}
+
+func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) {
+	trafficSimMgr := manager.GetManager()
+	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(e2Manager)
+	if err != nil {
+		return
+	}
+	for ueUpdate := range ueChangeChannel {
+		if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
+			ue, ok := ueUpdate.Object.(*types.Ue)
+			if !ok {
+				log.Fatalf("Object %v could not be converted to UE", ueUpdate)
+			}
+			log.Infof("UE %s changed. Serving: %s (%f), 2nd: %s (%f), 3rd: %s (%f).",
+				ue.Name, ue.Tower, ue.TowerDist, ue.Tower2, ue.Tower2Dist, ue.Tower3, ue.Tower3Dist)
+
+			tower := trafficSimMgr.GetTowerByName(ue.Tower)
+			tower2 := trafficSimMgr.GetTowerByName(ue.Tower2)
+			tower3 := trafficSimMgr.GetTowerByName(ue.Tower3)
+
+			reports := make([]*e2.RadioRepPerServCell, 3)
+
+			reports[0] = new(e2.RadioRepPerServCell)
+			reports[0].Ecgi = &e2.ECGI{
+				PlmnId: tower.PlmnID,
+				Ecid:   tower.EcID,
+			}
+			reports[0].CqiHist = make([]uint32, 1)
+			reports[0].CqiHist[0] = makeCqi(ue.TowerDist)
+
+			reports[1] = new(e2.RadioRepPerServCell)
+			reports[1].Ecgi = &e2.ECGI{
+				PlmnId: tower2.PlmnID,
+				Ecid:   tower2.EcID,
+			}
+			reports[1].CqiHist = make([]uint32, 1)
+			reports[1].CqiHist[0] = makeCqi(ue.Tower2Dist)
+
+			reports[2] = new(e2.RadioRepPerServCell)
+			reports[2].Ecgi = &e2.ECGI{
+				PlmnId: tower3.PlmnID,
+				Ecid:   tower3.EcID,
+			}
+			reports[2].CqiHist = make([]uint32, 1)
+			reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist)
+
+			log.Infof(">>>>>>>>UE %s cqi: %d, %d, %d", ue.Name, reports[0].CqiHist[0], reports[1].CqiHist[0], reports[2].CqiHist[0])
+
+			radioMeasReportPerUE := e2.TelemetryMessage{
+				MessageType: e2.MessageType_RADIO_MEAS_REPORT_PER_UE,
+				S: &e2.TelemetryMessage_RadioMeasReportPerUE{
+					RadioMeasReportPerUE: &e2.RadioMeasReportPerUE{
+						Ecgi: &e2.ECGI{
+							PlmnId: tower.PlmnID,
+							Ecid:   tower.EcID,
+						},
+						Crnti:                ue.Crnti,
+						RadioReportServCells: reports,
+					},
+				},
+			}
+			c <- radioMeasReportPerUE
+		}
 	}
 }
