@@ -17,6 +17,7 @@ package e2
 import (
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/pkg/service"
+	"github.com/prometheus/common/log"
 	"google.golang.org/grpc"
 )
 
@@ -41,12 +42,14 @@ type Server struct {
 }
 
 // SendTelemetry ...
-func (s *Server) SendTelemetry(req *e2.TelemetryRequest, stream e2.InterfaceService_SendTelemetryServer) error {
-	return nil
+func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_SendTelemetryServer) error {
+	log.Infof("*****************************************************")
+	mgr := GetManager()
+	return mgr.RunTelemetry(stream)
 }
 
 // SendControl ...
 func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error {
 	mgr := GetManager()
-	return mgr.runControl(stream)
+	return mgr.RunControl(stream)
 }
