@@ -124,16 +124,6 @@ func makeCrnti(ueName string) string {
 	return fmt.Sprintf("%04X", id+1)
 }
 
-func crntiToName(crnti string) string {
-	id, _ := strconv.Atoi(crnti)
-	return fmt.Sprintf("Ue-%d", id-1)
-}
-
-func eciToName(eci string) string {
-	id, _ := strconv.Atoi(eci)
-	return fmt.Sprintf("Tower-%d", id)
-}
-
 func makeCqi(distance float32) uint32 {
 	cqi := uint32(0.001 / (distance * distance))
 	if cqi > 15 {
@@ -174,44 +164,17 @@ func (m *Manager) recvControlLoop(stream e2.InterfaceService_SendControlServer, 
 		switch x := in.S.(type) {
 		case *e2.ControlResponse_CellConfigRequest:
 			mgr.handleCellConfigRequest(stream, x.CellConfigRequest, c)
-		case *e2.ControlResponse_HORequest:
-			mgr.handleHORequest(stream, x.HORequest, c)
 		default:
 			log.Errorf("ControlResponse has unexpected type %T", x)
 		}
 	}
 }
 
-func (m *Manager) handleHORequest(stream e2.InterfaceService_SendControlServer, req *e2.HORequest, c chan e2.ControlUpdate) {
-	//log.Infof("handleHORequest crnti:%s, name:%s serving:%s, target:%s", req.Crnti, crntiToName(req.Crnti), req.EcgiS.Ecid, req.EcgiT.Ecid)
-
-	trafficSimMgr := manager.GetManager()
-
-	ue := trafficSimMgr.GetUe(crntiToName(req.Crnti))
-	if ue == nil {
-		log.Fatalf("UE not found: crnti:%s, ueName:%s", req.Crnti, crntiToName(req.Crnti))
-		return
-	}
-	sourceTower := trafficSimMgr.GetTower(eciToName(req.EcgiS.Ecid))
-	targetTower := trafficSimMgr.GetTower(eciToName(req.EcgiT.Ecid))
-
-	if ue.Tower == targetTower.Name {
-		log.Infof("HO ignore, serving == target: %s, %s", ue.Tower, targetTower.Name)
-		return
-	}
-	if ue.Tower != sourceTower.Name {
-		log.Errorf("HO failure, tower mismatch: %s, %s", ue.Tower, sourceTower.Name)
-		return
-	}
-
-	// Hand-over
-	ue.Tower = targetTower.Name
-}
-
 func (m *Manager) handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *e2.CellConfigRequest, c chan e2.ControlUpdate) {
+	log.Infof("handleCellConfigRequest")
+
 	trafficSimMgr := manager.GetManager()
 
-	// Send CellConfigReport for all base-stations
 	for _, tower := range trafficSimMgr.Towers {
 		cells := make([]*e2.CandScell, 0, 8)
 		for _, neighbor := range tower.Neighbors {

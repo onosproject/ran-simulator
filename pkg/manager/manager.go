@@ -66,16 +66,6 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	go m.startMoving(routesParams)
 }
 
-// GetUe returns Ue based on its name
-func (m *Manager) GetUe(name string) *types.Ue {
-	return m.UserEquipments[name]
-}
-
-// GetTower returns tower based on its name
-func (m *Manager) GetTower(name string) *types.Tower {
-	return m.Towers[name]
-}
-
 //Close kills the channels and manager related objects
 func (m *Manager) Close() {
 	log.Info("Closing Manager")
