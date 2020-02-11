@@ -16,12 +16,13 @@ package manager
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	log "k8s.io/klog"
-	"strings"
-	"time"
 )
 
 func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
@@ -29,7 +30,7 @@ func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
 
 	// There is already a route per UE
 	for u := 0; u < params.NumRoutes; u++ {
-		name := fmt.Sprintf("Ue-%d", u)
+		name := fmt.Sprintf("Ue-%04X", u+1)
 		routeName := fmt.Sprintf("Route-%d", u)
 		route := m.Routes[routeName]
 		towers, distances := m.findClosestTowers(route.Waypoints[0])
@@ -64,7 +65,7 @@ func (m *Manager) startMoving(params RoutesParams) {
 	for {
 		breakout := false // Needed to breakout of double for loop
 		for ueidx := 0; ueidx < params.NumRoutes; ueidx++ {
-			ueName := fmt.Sprintf("Ue-%d", ueidx)
+			ueName := fmt.Sprintf("Ue-%04X", ueidx+1)
 			routeName := fmt.Sprintf("Route-%d", ueidx)
 			err := m.moveUe(m.UserEquipments[ueName], m.Routes[routeName], m.UeChannel)
 			if err != nil && strings.HasPrefix(err.Error(), "end of route") {

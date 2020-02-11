@@ -119,9 +119,7 @@ func makeEci(towerName string) string {
 }
 
 func makeCrnti(ueName string) string {
-	re := regexp.MustCompile("[0-9]+")
-	id, _ := strconv.Atoi(re.FindAllString(ueName, 1)[0])
-	return fmt.Sprintf("%04X", id+1)
+	return strings.Split(ueName, "-")[1]
 }
 
 func makeCqi(distance float32) uint32 {
@@ -133,8 +131,7 @@ func makeCqi(distance float32) uint32 {
 }
 
 func crntiToName(crnti string) string {
-	id, _ := strconv.Atoi(crnti)
-	return fmt.Sprintf("Ue-%d", id-1)
+	return "Ue-" + crnti
 }
 
 func eciToName(eci string) string {
@@ -330,7 +327,7 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			reports[2].CqiHist = make([]uint32, 1)
 			reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist)
 
-			log.Infof(">>>>>>>>UE %s cqi: %d, %d, %d", ue.Name, reports[0].CqiHist[0], reports[1].CqiHist[0], reports[2].CqiHist[0])
+			log.Infof("RadioMeasReport %s cqi:%d(%s),%d(%s),%d(%s)", ue.Name, reports[0].CqiHist[0], reports[0].Ecgi.Ecid, reports[1].CqiHist[0], reports[1].Ecgi.Ecid, reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
 
 			radioMeasReportPerUE := e2.TelemetryMessage{
 				MessageType: e2.MessageType_RADIO_MEAS_REPORT_PER_UE,
