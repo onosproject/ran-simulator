@@ -54,6 +54,7 @@ func main() {
 	zoom := flag.Float64("zoom", 12.5, "The starting Zoom level")
 	fade := flag.Bool("fade", true, "Show map as faded on start")
 	showRoutes := flag.Bool("showRoutes", true, "Show routes on start")
+	showPower := flag.Bool("showPower", true, "Show power as circle on start")
 	towerSpacingVert := flag.Float64("towerSpacingVert", 0.02, "Tower spacing vert in degrees latitude")
 	towerSpacingHoriz := flag.Float64("towerSpacingHoriz", 0.02, "Tower spacing horiz in degrees longitude")
 	numLocations := flag.Int("numLocations", 10, "Number of locations")
@@ -92,6 +93,7 @@ func main() {
 		Zoom:       float32(*zoom),
 		ShowRoutes: *showRoutes,
 		Fade:       *fade,
+		ShowPower:  *showPower,
 	}
 	if mapLayoutParams.Zoom < 10 || mapLayoutParams.Zoom > 15 {
 		log.Fatal("Invalid Zoom level - must be between 10 and 15 inclusive")

@@ -26,6 +26,8 @@ type Dispatcher struct {
 	nbiUeListeners        map[string]chan Event
 	nbiRouteListenersLock sync.RWMutex
 	nbiRouteListeners     map[string]chan Event
+	nbiTowerListenersLock sync.RWMutex
+	nbiTowerListeners     map[string]chan Event
 }
 
 // NewDispatcher creates and initializes a new event dispatcher
@@ -33,6 +35,7 @@ func NewDispatcher() *Dispatcher {
 	return &Dispatcher{
 		nbiUeListeners:    make(map[string]chan Event),
 		nbiRouteListeners: make(map[string]chan Event),
+		nbiTowerListeners: make(map[string]chan Event),
 	}
 }
 
@@ -112,6 +115,44 @@ func (d *Dispatcher) UnregisterRouteListener(subscriber string) {
 	close(channel)
 }
 
+// ListenTowerEvents :
+func (d *Dispatcher) ListenTowerEvents(routeEventChannel <-chan Event) {
+	log.Info("Tower Event listener initialized")
+
+	for towerEvent := range routeEventChannel {
+		d.nbiTowerListenersLock.RLock()
+		for _, nbiChan := range d.nbiTowerListeners {
+			nbiChan <- towerEvent
+		}
+		d.nbiTowerListenersLock.RUnlock()
+	}
+}
+
+// RegisterTowerListener :
+func (d *Dispatcher) RegisterTowerListener(subscriber string) (chan Event, error) {
+	d.nbiTowerListenersLock.Lock()
+	defer d.nbiTowerListenersLock.Unlock()
+	if _, ok := d.nbiTowerListeners[subscriber]; ok {
+		return nil, fmt.Errorf("NBI Tower %s is already registered", subscriber)
+	}
+	channel := make(chan Event)
+	d.nbiTowerListeners[subscriber] = channel
+	return channel, nil
+}
+
+// UnregisterTowerListener :
+func (d *Dispatcher) UnregisterTowerListener(subscriber string) {
+	d.nbiTowerListenersLock.Lock()
+	defer d.nbiTowerListenersLock.Unlock()
+	channel, ok := d.nbiTowerListeners[subscriber]
+	if !ok {
+		log.Infof("Subscriber %s had not been registered", subscriber)
+		return
+	}
+	delete(d.nbiTowerListeners, subscriber)
+	close(channel)
+}
+
 // GetListeners returns a list of registered listeners names
 func (d *Dispatcher) GetListeners() []string {
 	listenerKeys := make([]string, 0)
@@ -123,6 +164,11 @@ func (d *Dispatcher) GetListeners() []string {
 	d.nbiRouteListenersLock.RLock()
 	defer d.nbiRouteListenersLock.RUnlock()
 	for k := range d.nbiRouteListeners {
+		listenerKeys = append(listenerKeys, k)
+	}
+	d.nbiTowerListenersLock.RLock()
+	defer d.nbiTowerListenersLock.RUnlock()
+	for k := range d.nbiTowerListeners {
 		listenerKeys = append(listenerKeys, k)
 	}
 	return listenerKeys

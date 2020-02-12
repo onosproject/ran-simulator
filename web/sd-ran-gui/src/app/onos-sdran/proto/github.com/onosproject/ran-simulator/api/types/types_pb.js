@@ -1582,7 +1582,8 @@ proto.ran.trafficsim.types.MapLayout.toObject = function(includeInstance, msg) {
     center: (f = msg.getCenter()) && proto.ran.trafficsim.types.Point.toObject(includeInstance, f),
     zoom: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
     fade: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
-    showroutes: jspb.Message.getBooleanFieldWithDefault(msg, 4, false)
+    showroutes: jspb.Message.getBooleanFieldWithDefault(msg, 4, false),
+    showpower: jspb.Message.getBooleanFieldWithDefault(msg, 5, false)
   };
 
   if (includeInstance) {
@@ -1635,6 +1636,10 @@ proto.ran.trafficsim.types.MapLayout.deserializeBinaryFromReader = function(msg,
     case 4:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setShowroutes(value);
+      break;
+    case 5:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setShowpower(value);
       break;
     default:
       reader.skipField();
@@ -1691,6 +1696,13 @@ proto.ran.trafficsim.types.MapLayout.serializeBinaryToWriter = function(message,
   if (f) {
     writer.writeBool(
       4,
+      f
+    );
+  }
+  f = message.getShowpower();
+  if (f) {
+    writer.writeBool(
+      5,
       f
     );
   }
@@ -1772,6 +1784,21 @@ proto.ran.trafficsim.types.MapLayout.prototype.getShowroutes = function() {
 /** @param {boolean} value */
 proto.ran.trafficsim.types.MapLayout.prototype.setShowroutes = function(value) {
   jspb.Message.setProto3BooleanField(this, 4, value);
+};
+
+
+/**
+ * optional bool showPower = 5;
+ * @return {boolean}
+ */
+proto.ran.trafficsim.types.MapLayout.prototype.getShowpower = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 5, false));
+};
+
+
+/** @param {boolean} value */
+proto.ran.trafficsim.types.MapLayout.prototype.setShowpower = function(value) {
+  jspb.Message.setProto3BooleanField(this, 5, value);
 };
 
 

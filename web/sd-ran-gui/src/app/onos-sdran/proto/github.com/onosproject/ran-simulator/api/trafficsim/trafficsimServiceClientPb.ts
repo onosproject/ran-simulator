@@ -15,6 +15,7 @@ import {
   ListRoutesRequest,
   ListRoutesResponse,
   ListTowersRequest,
+  ListTowersResponse,
   ListUesRequest,
   ListUesResponse,
   MapLayoutRequest} from './trafficsim_pb';
@@ -61,11 +62,11 @@ export class TrafficClient {
   }
 
   methodInfoListTowers = new grpcWeb.AbstractClientBase.MethodInfo(
-    github_com_onosproject_ran$simulator_api_types_types_pb.Tower,
+    ListTowersResponse,
     (request: ListTowersRequest) => {
       return request.serializeBinary();
     },
-    github_com_onosproject_ran$simulator_api_types_types_pb.Tower.deserializeBinary
+    ListTowersResponse.deserializeBinary
   );
 
   listTowers(

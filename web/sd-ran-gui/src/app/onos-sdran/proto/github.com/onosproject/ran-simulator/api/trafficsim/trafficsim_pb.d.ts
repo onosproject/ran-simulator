@@ -19,6 +19,12 @@ export namespace MapLayoutRequest {
 }
 
 export class ListTowersRequest extends jspb.Message {
+  getSubscribe(): boolean;
+  setSubscribe(value: boolean): void;
+
+  getWithoutreplay(): boolean;
+  setWithoutreplay(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListTowersRequest.AsObject;
   static toObject(includeInstance: boolean, msg: ListTowersRequest): ListTowersRequest.AsObject;
@@ -29,6 +35,32 @@ export class ListTowersRequest extends jspb.Message {
 
 export namespace ListTowersRequest {
   export type AsObject = {
+    subscribe: boolean,
+    withoutreplay: boolean,
+  }
+}
+
+export class ListTowersResponse extends jspb.Message {
+  getTower(): github_com_onosproject_ran$simulator_api_types_types_pb.Tower | undefined;
+  setTower(value?: github_com_onosproject_ran$simulator_api_types_types_pb.Tower): void;
+  hasTower(): boolean;
+  clearTower(): void;
+
+  getType(): Type;
+  setType(value: Type): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListTowersResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ListTowersResponse): ListTowersResponse.AsObject;
+  static serializeBinaryToWriter(message: ListTowersResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListTowersResponse;
+  static deserializeBinaryFromReader(message: ListTowersResponse, reader: jspb.BinaryReader): ListTowersResponse;
+}
+
+export namespace ListTowersResponse {
+  export type AsObject = {
+    tower?: github_com_onosproject_ran$simulator_api_types_types_pb.Tower.AsObject,
+    type: Type,
   }
 }
 

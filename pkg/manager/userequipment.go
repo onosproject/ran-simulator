@@ -60,6 +60,11 @@ func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
 	return ues
 }
 
+// GetUe returns Ue based on its name
+func (m *Manager) GetUe(name string) *types.Ue {
+	return m.UserEquipments[name]
+}
+
 func (m *Manager) startMoving(params RoutesParams) {
 
 	for {
@@ -84,6 +89,9 @@ func (m *Manager) startMoving(params RoutesParams) {
 					Type:   trafficsim.Type_UPDATED,
 					Object: newRoute,
 				}
+				// Move the UE to this new start point - google might return a
+				// start point just a few metres from where we asked
+				m.UserEquipments[ueName].Position = newRoute.GetWaypoints()[0]
 			} else if err != nil {
 				log.Errorf("Error %s", err.Error())
 				breakout = true

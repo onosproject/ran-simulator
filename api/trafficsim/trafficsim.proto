@@ -24,6 +24,20 @@ message MapLayoutRequest {
 }
 
 message ListTowersRequest {
+    // subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
+    // after all towers have been streamed to the client
+    bool subscribe = 1;
+
+    // option to request only changes that happen after the call
+    bool withoutReplay = 2;
+}
+
+message ListTowersResponse {
+    // tower is the tower change on which the event occurred
+    ran.trafficsim.types.Tower tower = 1;
+
+    // type is a qualification of the type of change being made
+    Type type = 2;
 }
 
 message ListRoutesRequest {
@@ -67,7 +81,7 @@ message ListUesResponse {
 service Traffic {
     rpc GetMapLayout(MapLayoutRequest) returns (ran.trafficsim.types.MapLayout);
 
-    rpc ListTowers(ListTowersRequest) returns (stream ran.trafficsim.types.Tower);
+    rpc ListTowers(ListTowersRequest) returns (stream ListTowersResponse);
 
     rpc ListRoutes(ListRoutesRequest) returns (stream ListRoutesResponse);
 
