@@ -33,6 +33,7 @@ type Manager struct {
 	Dispatcher     *dispatcher.Dispatcher
 	UeChannel      chan dispatcher.Event
 	RouteChannel   chan dispatcher.Event
+	TowerChannel   chan dispatcher.Event
 }
 
 // NewManager initializes the RAN subsystem.
@@ -42,6 +43,7 @@ func NewManager() (*Manager, error) {
 		Dispatcher:   dispatcher.NewDispatcher(),
 		UeChannel:    make(chan dispatcher.Event),
 		RouteChannel: make(chan dispatcher.Event),
+		TowerChannel: make(chan dispatcher.Event),
 	}
 	return &mgr, nil
 }
@@ -55,6 +57,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
+	go m.Dispatcher.ListenTowerEvents(m.TowerChannel)
 
 	var err error
 	m.Routes, err = m.newRoutes(routesParams)
@@ -64,16 +67,6 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	m.UserEquipments = m.newUserEquipments(routesParams)
 
 	go m.startMoving(routesParams)
-}
-
-// GetUe returns Ue based on its name
-func (m *Manager) GetUe(name string) *types.Ue {
-	return m.UserEquipments[name]
-}
-
-// GetTower returns tower based on its name
-func (m *Manager) GetTower(name string) *types.Tower {
-	return m.Towers[name]
 }
 
 //Close kills the channels and manager related objects

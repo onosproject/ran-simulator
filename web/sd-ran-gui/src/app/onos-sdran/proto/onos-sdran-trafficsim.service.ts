@@ -20,7 +20,7 @@ import {Observable, Subscriber} from 'rxjs';
 import {MapLayout, Tower} from './github.com/onosproject/ran-simulator/api/types/types_pb';
 import {
     ListRoutesRequest, ListRoutesResponse,
-    ListTowersRequest, ListUesResponse, MapLayoutRequest
+    ListTowersRequest, ListTowersResponse, ListUesResponse, MapLayoutRequest
 } from './github.com/onosproject/ran-simulator/api/trafficsim/trafficsim_pb';
 import * as grpcWeb from 'grpc-web';
 
@@ -54,11 +54,13 @@ export class OnosSdranTrafficsimService {
         return getMapLayoutObs;
     }
 
-    requestListTowers(): Observable<Tower> {
-        const stream = this.trafficClient.listTowers(new ListTowersRequest(), {});
+    requestListTowers(): Observable<ListTowersResponse> {
+        const req = new ListTowersRequest();
+        req.setSubscribe(true);
+        const stream = this.trafficClient.listTowers(req, {});
 
-        const listTowersObs = new Observable<Tower>((observer: Subscriber<Tower>) => {
-            stream.on('data', (tower: Tower) => {
+        const listTowersObs = new Observable<ListTowersResponse>((observer: Subscriber<ListTowersResponse>) => {
+            stream.on('data', (tower: ListTowersResponse) => {
                 observer.next(tower);
             });
             stream.on('error', (error: grpcWeb.Error) => {

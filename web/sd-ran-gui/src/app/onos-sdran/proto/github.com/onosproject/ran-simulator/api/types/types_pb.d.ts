@@ -215,6 +215,9 @@ export class MapLayout extends jspb.Message {
   getShowroutes(): boolean;
   setShowroutes(value: boolean): void;
 
+  getShowpower(): boolean;
+  setShowpower(value: boolean): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MapLayout.AsObject;
   static toObject(includeInstance: boolean, msg: MapLayout): MapLayout.AsObject;
@@ -229,6 +232,7 @@ export namespace MapLayout {
     zoom: number,
     fade: boolean,
     showroutes: boolean,
+    showpower: boolean,
   }
 }
 

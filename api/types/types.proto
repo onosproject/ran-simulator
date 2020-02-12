@@ -97,4 +97,6 @@ message MapLayout {
     bool fade = 3;
 
     bool showRoutes = 4;
+
+    bool showPower = 5;
 }

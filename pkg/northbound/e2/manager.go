@@ -206,6 +206,7 @@ func (m *Manager) handleRRMConfig(stream e2.InterfaceService_SendControlServer, 
 	case e2.XICICPA_XICIC_PA_DB_3:
 		tower.TxPower += 3
 	}
+	trafficSimMgr.UpdateTower(tower)
 }
 
 func (m *Manager) handleHORequest(stream e2.InterfaceService_SendControlServer, req *e2.HORequest, c chan e2.ControlUpdate) {
@@ -292,7 +293,13 @@ func (m *Manager) handleCellConfigRequest(stream e2.InterfaceService_SendControl
 // RunTelemetry ...
 func (m *Manager) RunTelemetry(stream e2.InterfaceService_SendTelemetryServer) error {
 	c := make(chan e2.TelemetryMessage)
-	go mgr.radioMeasReportPerUE(stream, c)
+	defer close(c)
+	go func() {
+		err := mgr.radioMeasReportPerUE(stream, c)
+		if err != nil {
+			log.Errorf("Unable to send radioMeasReportPerUE %s", err.Error())
+		}
+	}()
 	return mgr.sendTelemetryLoop(stream, c)
 }
 
@@ -311,11 +318,12 @@ func (m *Manager) sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServ
 	}
 }
 
-func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) {
+func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	trafficSimMgr := manager.GetManager()
 	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(e2Manager)
+	defer trafficSimMgr.Dispatcher.UnregisterUeListener(e2Manager)
 	if err != nil {
-		return
+		return err
 	}
 	for ueUpdate := range ueChangeChannel {
 		if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
@@ -323,9 +331,6 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ueUpdate)
 			}
-			log.Infof("UE %s changed. Serving: %s (%f), 2nd: %s (%f), 3rd: %s (%f).",
-				ue.Name, ue.Tower, ue.TowerDist, ue.Tower2, ue.Tower2Dist, ue.Tower3, ue.Tower3Dist)
-
 			tower := trafficSimMgr.GetTowerByName(ue.Tower)
 			tower2 := trafficSimMgr.GetTowerByName(ue.Tower2)
 			tower3 := trafficSimMgr.GetTowerByName(ue.Tower3)
@@ -374,4 +379,5 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			c <- radioMeasReportPerUE
 		}
 	}
+	return nil
 }
