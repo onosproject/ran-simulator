@@ -162,11 +162,11 @@ export class Tower extends jspb.Message {
   getColor(): string;
   setColor(value: string): void;
 
-  getPlmnid(): string;
-  setPlmnid(value: string): void;
-
   getEcid(): string;
   setEcid(value: string): void;
+
+  getPlmnid(): string;
+  setPlmnid(value: string): void;
 
   getMaxues(): number;
   setMaxues(value: number): void;
@@ -175,6 +175,9 @@ export class Tower extends jspb.Message {
   setNeighborsList(value: Array<string>): void;
   clearNeighborsList(): void;
   addNeighbors(value: string, index?: number): void;
+
+  getTxpower(): number;
+  setTxpower(value: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Tower.AsObject;
@@ -189,10 +192,11 @@ export namespace Tower {
     name: string,
     location?: Point.AsObject,
     color: string,
-    plmnid: string,
     ecid: string,
+    plmnid: string,
     maxues: number,
     neighborsList: Array<string>,
+    txpower: number,
   }
 }
 
