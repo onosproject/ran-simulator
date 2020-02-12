@@ -16,6 +16,8 @@ package manager
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"math"
 
 	"github.com/onosproject/ran-simulator/api/types"
@@ -85,6 +87,21 @@ func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
 	}
 
 	return []string{serving, candidate1, candidate2}, []float32{servingDist, candidate1Dist, candidate2Dist}
+}
+
+// GetTower returns tower based on its name
+func (m *Manager) GetTower(name string) *types.Tower {
+	return m.Towers[name]
+}
+
+// UpdateTower Update a tower's properties - usually power level
+func (m *Manager) UpdateTower(tower *types.Tower) {
+	// Only the power can be updated at present
+	m.Towers[tower.GetName()].TxPower = tower.TxPower
+	m.TowerChannel <- dispatcher.Event{
+		Type:   trafficsim.Type_UPDATED,
+		Object: tower,
+	}
 }
 
 // Measure the distance between a point and a tower and return an answer in decimal degrees

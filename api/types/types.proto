@@ -78,13 +78,15 @@ message Tower {
 
     string color = 3;
 
-    string plmnID = 5;
-
     string ecID = 4;
+
+    string plmnID = 5;
 
     uint32 maxUEs = 6;
 
     repeated string neighbors = 7;
+
+    uint32 txPower = 8;
 }
 
 message MapLayout {
@@ -95,4 +97,6 @@ message MapLayout {
     bool fade = 3;
 
     bool showRoutes = 4;
+
+    bool showPower = 5;
 }

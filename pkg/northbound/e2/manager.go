@@ -33,6 +33,9 @@ import (
 const TestPlmnID = "001001"
 const e2Manager = "e2Manager"
 
+// DefaultTxPower - all base-stations start with this power level
+const DefaultTxPower = 10
+
 var mgr Manager
 
 // Manager single point of entry for the trafficsim system.
@@ -52,6 +55,7 @@ func (m *Manager) Run(towerParams types.TowersParams) error {
 		tower.EcID = makeEci(tower.Name)
 		tower.MaxUEs = towerParams.MaxUEs
 		tower.Neighbors = makeNeighbors(tower.Name, towerParams)
+		tower.TxPower = DefaultTxPower
 		log.Infof("Neighbors of %s - %s", tower.Name, strings.Join(tower.Neighbors, ", "))
 	}
 	for _, ue := range trafficSimMgr.UserEquipments {
@@ -122,8 +126,8 @@ func makeCrnti(ueName string) string {
 	return strings.Split(ueName, "-")[1]
 }
 
-func makeCqi(distance float32) uint32 {
-	cqi := uint32(0.001 / (distance * distance))
+func makeCqi(distance float32, txPower uint32) uint32 {
+	cqi := uint32((0.0001 * float32(txPower)) / (distance * distance))
 	if cqi > 15 {
 		cqi = 15
 	}
@@ -167,16 +171,42 @@ func (m *Manager) recvControlLoop(stream e2.InterfaceService_SendControlServer, 
 		if err == io.EOF || err != nil {
 			return
 		}
-		log.Infof("Recv messageType %d", in.MessageType)
+		//log.Infof("Recv messageType %d", in.MessageType)
 		switch x := in.S.(type) {
 		case *e2.ControlResponse_CellConfigRequest:
 			mgr.handleCellConfigRequest(stream, x.CellConfigRequest, c)
 		case *e2.ControlResponse_HORequest:
 			mgr.handleHORequest(stream, x.HORequest, c)
+		case *e2.ControlResponse_RRMConfig:
+			mgr.handleRRMConfig(stream, x.RRMConfig, c)
 		default:
 			log.Errorf("ControlResponse has unexpected type %T", x)
 		}
 	}
+}
+
+func (m *Manager) handleRRMConfig(stream e2.InterfaceService_SendControlServer, req *e2.RRMConfig, c chan e2.ControlUpdate) {
+	trafficSimMgr := manager.GetManager()
+	tower := trafficSimMgr.GetTower(eciToName(req.Ecgi.Ecid))
+	switch req.PA[0] {
+	case e2.XICICPA_XICIC_PA_DB_MINUS6:
+		tower.TxPower -= 4
+	case e2.XICICPA_XICIC_PA_DB_MINUX4DOT77:
+		tower.TxPower -= 3
+	case e2.XICICPA_XICIC_PA_DB_MINUS3:
+		tower.TxPower -= 2
+	case e2.XICICPA_XICIC_PA_DB_MINUS1DOT77:
+		tower.TxPower--
+	case e2.XICICPA_XICIC_PA_DB_0:
+		tower.TxPower -= 0
+	case e2.XICICPA_XICIC_PA_DB_1:
+		tower.TxPower++
+	case e2.XICICPA_XICIC_PA_DB_2:
+		tower.TxPower += 2
+	case e2.XICICPA_XICIC_PA_DB_3:
+		tower.TxPower += 3
+	}
+	trafficSimMgr.UpdateTower(tower)
 }
 
 func (m *Manager) handleHORequest(stream e2.InterfaceService_SendControlServer, req *e2.HORequest, c chan e2.ControlUpdate) {
@@ -193,15 +223,15 @@ func (m *Manager) handleHORequest(stream e2.InterfaceService_SendControlServer, 
 	targetTower := trafficSimMgr.GetTower(eciToName(req.EcgiT.Ecid))
 
 	if ue.Tower == targetTower.Name {
-		log.Infof("HO ignore, serving == target: %s, %s", ue.Tower, targetTower.Name)
+		//log.Infof("HO ignore, serving == target: %s, %s", ue.Tower, targetTower.Name)
 		return
 	}
 	if ue.Tower != sourceTower.Name {
-		log.Errorf("HO failure, tower mismatch: %s, %s", ue.Tower, sourceTower.Name)
+		//log.Errorf("HO failure, tower mismatch: %s, %s", ue.Tower, sourceTower.Name)
 		return
 	}
 
-	// Hand-over
+	log.Infof("hand-over %s from %s to %s", crntiToName(req.Crnti), eciToName(req.EcgiS.Ecid), eciToName(req.EcgiT.Ecid))
 	ue.Tower = targetTower.Name
 }
 
@@ -263,7 +293,13 @@ func (m *Manager) handleCellConfigRequest(stream e2.InterfaceService_SendControl
 // RunTelemetry ...
 func (m *Manager) RunTelemetry(stream e2.InterfaceService_SendTelemetryServer) error {
 	c := make(chan e2.TelemetryMessage)
-	go mgr.radioMeasReportPerUE(stream, c)
+	defer close(c)
+	go func() {
+		err := mgr.radioMeasReportPerUE(stream, c)
+		if err != nil {
+			log.Errorf("Unable to send radioMeasReportPerUE %s", err.Error())
+		}
+	}()
 	return mgr.sendTelemetryLoop(stream, c)
 }
 
@@ -282,11 +318,12 @@ func (m *Manager) sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServ
 	}
 }
 
-func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) {
+func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	trafficSimMgr := manager.GetManager()
 	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(e2Manager)
+	defer trafficSimMgr.Dispatcher.UnregisterUeListener(e2Manager)
 	if err != nil {
-		return
+		return err
 	}
 	for ueUpdate := range ueChangeChannel {
 		if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
@@ -294,9 +331,6 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ueUpdate)
 			}
-			log.Infof("UE %s changed. Serving: %s (%f), 2nd: %s (%f), 3rd: %s (%f).",
-				ue.Name, ue.Tower, ue.TowerDist, ue.Tower2, ue.Tower2Dist, ue.Tower3, ue.Tower3Dist)
-
 			tower := trafficSimMgr.GetTowerByName(ue.Tower)
 			tower2 := trafficSimMgr.GetTowerByName(ue.Tower2)
 			tower3 := trafficSimMgr.GetTowerByName(ue.Tower3)
@@ -309,7 +343,7 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 				Ecid:   tower.EcID,
 			}
 			reports[0].CqiHist = make([]uint32, 1)
-			reports[0].CqiHist[0] = makeCqi(ue.TowerDist)
+			reports[0].CqiHist[0] = makeCqi(ue.TowerDist, tower.TxPower)
 
 			reports[1] = new(e2.RadioRepPerServCell)
 			reports[1].Ecgi = &e2.ECGI{
@@ -317,7 +351,7 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 				Ecid:   tower2.EcID,
 			}
 			reports[1].CqiHist = make([]uint32, 1)
-			reports[1].CqiHist[0] = makeCqi(ue.Tower2Dist)
+			reports[1].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.TxPower)
 
 			reports[2] = new(e2.RadioRepPerServCell)
 			reports[2].Ecgi = &e2.ECGI{
@@ -325,7 +359,7 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 				Ecid:   tower3.EcID,
 			}
 			reports[2].CqiHist = make([]uint32, 1)
-			reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist)
+			reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.TxPower)
 
 			log.Infof("RadioMeasReport %s cqi:%d(%s),%d(%s),%d(%s)", ue.Name, reports[0].CqiHist[0], reports[0].Ecgi.Ecid, reports[1].CqiHist[0], reports[1].Ecgi.Ecid, reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
 
@@ -345,4 +379,5 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			c <- radioMeasReportPerUE
 		}
 	}
+	return nil
 }

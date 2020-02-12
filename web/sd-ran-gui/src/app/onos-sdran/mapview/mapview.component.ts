@@ -13,12 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild, ViewChildren} from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewChild
+} from '@angular/core';
 import {GoogleMap, MapInfoWindow, MapMarker} from '@angular/google-maps';
 import {Subscription} from 'rxjs';
 import {OnosSdranTrafficsimService} from '../proto/onos-sdran-trafficsim.service';
-import {Point, Route, Tower, Ue} from '../proto/github.com/onosproject/ran-simulator/api/types/types_pb';
-import {ListUesResponse, Type} from '../proto/github.com/onosproject/ran-simulator/api/trafficsim/trafficsim_pb';
+import {
+    Point,
+    Route,
+    Tower,
+    Ue
+} from '../proto/github.com/onosproject/ran-simulator/api/types/types_pb';
+import {
+    ListUesResponse,
+    Type
+} from '../proto/github.com/onosproject/ran-simulator/api/trafficsim/trafficsim_pb';
 
 export const CAR_ICON = 'M29.395,0H17.636c-3.117,0-5.643,3.467-5.643,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759 ' +
     'c3.116,0,5.644-2.527,5.644-5.644V6.584C35.037,3.467,32.511,0,29.395,0z M34.05,14.188v11.665l-2.729,0.351v-4.806L34.05,14.188z ' +
@@ -52,7 +66,7 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
     infoContent: string[];
     showRoutes = true;
     showMap = false;
-    showPower = false;
+    showPower = true;
     zoom = 12.0;
     center: google.maps.LatLng;
     towers: google.maps.Marker[] = [];
@@ -79,14 +93,7 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
             this.zoom = mapLayout.getZoom();
             this.showRoutes = mapLayout.getShowroutes();
             this.showMap = !mapLayout.getFade();
-        });
-
-        this.towerSub = this.trafficSimService.requestListTowers().subscribe((tower) => {
-            this.initTower(tower, this.zoom);
-        }, error => {
-            console.error('Tower', error);
-        }, () => {
-            console.log(this.towers.length, 'towers retrieved');
+            this.showPower = mapLayout.getShowpower();
         });
 
     }
@@ -99,6 +106,22 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.googleMap._googleMap.mapTypes.set('custom', bwMapStyle);
         this.googleMap._googleMap.setMapTypeId('custom');
+
+        this.towerSub = this.trafficSimService.requestListTowers().subscribe((resp) => {
+            if (resp.getType() === Type.NONE || resp.getType() === Type.ADDED) {
+                this.initTower(resp.getTower(), this.zoom);
+            } else if (resp.getType() === Type.UPDATED) {
+                this.updateTower(resp.getTower());
+            } else if (resp.getType() === Type.REMOVED) {
+                this.deleteTower(resp.getTower());
+            } else {
+                console.warn('Unhandled Route response type', resp.getType(), 'for', resp.getTower().getName());
+            }
+        }, error => {
+            console.error('Tower', error);
+        }, () => {
+            console.log(this.towers.length, 'towers retrieved');
+        });
 
         // Get the list of routes - we're doing this here because we need to wait until `googleMap` object is populated
         this.routesSub = this.trafficSimService.requestListRoutes().subscribe((resp) => {
@@ -189,7 +212,7 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
 
         const powerCircle = new google.maps.Circle({
             center: pos,
-            radius: 600,
+            radius: this.powerToRadius(tower.getTxpower()),
             fillOpacity: 0,
             strokeColor: tower.getColor(),
             strokeWeight: 0.5,
@@ -203,6 +226,33 @@ export class MapviewComponent implements OnInit, AfterViewInit, OnDestroy {
         powerCircle.setMap(this.googleMap._googleMap);
         powerCircle.setVisible(this.showPower);
         this.powerCircleMap.set(tower.getName(), powerCircle);
+    }
+
+    private powerToRadius(powerUnsigneddB: number): number {
+        let powerSigneddB = 0;
+        if (powerUnsigneddB >= Math.pow(2, 31)) {
+            powerSigneddB = powerUnsigneddB - Math.pow(2, 32);
+        } else {
+            powerSigneddB = powerUnsigneddB;
+        }
+        const power = Math.pow(10, powerSigneddB / 10);
+        const distance = Math.sqrt(power) * 1000;
+        console.log('Power calc:', powerUnsigneddB, powerSigneddB, power, distance);
+        if (distance < 100) {
+            return 100;
+        }
+        return distance;
+    }
+
+    private updateTower(tower: Tower): void {
+        console.log('Updated tower', tower.getName(), tower.getTxpower(), this.powerToRadius(tower.getTxpower()));
+        this.powerCircleMap.get(tower.getName()).setRadius(this.powerToRadius(tower.getTxpower()));
+    }
+
+    private deleteTower(tower: Tower) {
+        this.powerCircleMap.delete(tower.getName());
+        const tIndex = this.towers.findIndex((t) => t.getTitle() === tower.getName());
+        this.towers.splice(tIndex, 1);
     }
 
     private initRoute(route: Route): void {

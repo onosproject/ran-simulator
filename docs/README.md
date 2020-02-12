@@ -13,9 +13,10 @@ The application is very tunable through startup parameters, and can be run:
 * deployed in a **Kubernetes** cluster
 
 ## Google Maps API Key
-The RAN Simulator connects to Google's [Directions API] and so needs a Google API Key.
+The RAN Simulator can connect to Google's [Directions API] with a Google API Key.
 Google charges $5.00 per 1000 requests to the [Directions API], and so we do not put
-our API key up in the public domain.
+our API key up in the public domain. Without the API key directions will be created
+randomly between 2 locations (usually in the form of a zig-zag line).
 
 The SD RAN GUI also (separately) accesses Google Maps API and also incurs a cost of $7.00 per
 1000 requests. The API Key here is "baked in" to the GUI application, and so does
@@ -24,7 +25,7 @@ not need to be configured when the application is run.
 >Key will be made obsolete.
 
 ## Startup parameters
-Supplying ran-simulator with a bogus parameter gets it to show the start parameters
+Supplying `ran-simulator` with a bogus parameter gets it to show the start parameters
 and their defaults
 ```bash
 docker run -it onosproject/ran-simulator:latest -test
@@ -44,6 +45,8 @@ Usage of trafficsim:
     	Map center latitude (default 52.52)
   -mapCenterLng float
     	Map center longitude (default 13.405)
+  -maxUEsPerTower
+        Max num of UEs per tower
   -numLocations int
     	Number of locations (default 10)
   -numRoutes int
@@ -66,7 +69,7 @@ Usage of trafficsim:
 
 See [deployment.md] for how to change these for a Kubernetes deployment.
 
-See [docker-compose.md] for how to change thse on a Docker Compose deployment.
+See [docker-compose.md] for how to change these on a Docker Compose deployment.
 
 ## Browser access
 When deployed with the **sd-ran-gui** application, the simulation can be accessed
