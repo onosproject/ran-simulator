@@ -214,25 +214,8 @@ func (m *Manager) handleHORequest(stream e2.InterfaceService_SendControlServer, 
 
 	trafficSimMgr := manager.GetManager()
 
-	ue := trafficSimMgr.GetUe(crntiToName(req.Crnti))
-	if ue == nil {
-		log.Fatalf("UE not found: crnti:%s, ueName:%s", req.Crnti, crntiToName(req.Crnti))
-		return
-	}
-	sourceTower := trafficSimMgr.GetTower(eciToName(req.EcgiS.Ecid))
-	targetTower := trafficSimMgr.GetTower(eciToName(req.EcgiT.Ecid))
-
-	if ue.Tower == targetTower.Name {
-		//log.Infof("HO ignore, serving == target: %s, %s", ue.Tower, targetTower.Name)
-		return
-	}
-	if ue.Tower != sourceTower.Name {
-		//log.Errorf("HO failure, tower mismatch: %s, %s", ue.Tower, sourceTower.Name)
-		return
-	}
-
 	log.Infof("hand-over %s from %s to %s", crntiToName(req.Crnti), eciToName(req.EcgiS.Ecid), eciToName(req.EcgiT.Ecid))
-	ue.Tower = targetTower.Name
+	trafficSimMgr.UeHandover(crntiToName(req.Crnti), eciToName(req.EcgiT.Ecid))
 }
 
 func (m *Manager) handleCellConfigRequest(stream e2.InterfaceService_SendControlServer, req *e2.CellConfigRequest, c chan e2.ControlUpdate) {

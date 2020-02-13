@@ -1298,7 +1298,8 @@ proto.ran.trafficsim.Type = {
 proto.ran.trafficsim.UpdateType = {
   NOUPDATETYPE: 0,
   POSITION: 1,
-  TOWER: 2
+  TOWER: 2,
+  HANDOVER: 3
 };
 
 goog.object.extend(exports, proto.ran.trafficsim);
