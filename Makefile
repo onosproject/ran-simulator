@@ -10,9 +10,6 @@ build: # @HELP build the Go binaries and run all validations (default)
 build:
 	CGO_ENABLED=1 go build -o build/_output/trafficsim ./cmd/trafficsim
 
-build-gui:
-	cd web/sd-ran-gui && ng build --prod
-
 test: # @HELP run the unit tests and source code validation
 test: build deps linters license_check
 	CGO_ENABLED=1 go test -race github.com/onosproject/ran-simulator/pkg/...
@@ -58,23 +55,18 @@ ran-simulator-docker: ran-simulator-base-docker # @HELP build ran-simulator Dock
 		--build-arg GMAP_RAN_BASE_VERSION=${RAN_SIMULATOR_VERSION} \
 		-t onosproject/ran-simulator:${RAN_SIMULATOR_VERSION}
 
-sd-ran-gui-docker: build-gui # @HELP build onos-gui Docker image
-	docker build . -f build/sd-ran-gui/Dockerfile \
-		-t onosproject/sd-ran-gui:${RAN_SIMULATOR_VERSION}
-
 images: # @HELP build all Docker images
-images: ran-simulator-docker sd-ran-gui-docker
+images: ran-simulator-docker
 
 kind: # @HELP build Docker images and add them to the currently configured kind cluster
 kind: images
 	@if [ "`kind get clusters`" = '' ]; then echo "no kind cluster found" && exit 1; fi
 	kind load docker-image onosproject/ran-simulator:${RAN_SIMULATOR_VERSION}
-	kind load docker-image onosproject/sd-ran-gui:${RAN_SIMULATOR_VERSION}
 
 all: build images
 
 clean: # @HELP remove all the build artifacts
-	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim web/sd-ran-gui/dist web/sd-ran-gui/node_modules
+	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim
 	go clean -testcache github.com/onosproject/ran-simulator/...
 
 help:
