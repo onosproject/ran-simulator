@@ -170,4 +170,5 @@ export enum UpdateType {
   NOUPDATETYPE = 0,
   POSITION = 1,
   TOWER = 2,
+  HANDOVER = 3,
 }

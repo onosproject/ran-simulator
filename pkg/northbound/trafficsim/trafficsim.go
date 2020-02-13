@@ -186,8 +186,9 @@ func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traff
 					return fmt.Errorf("could not cast object from event to UE %v", ueEvent)
 				}
 				msg := &trafficsim.ListUesResponse{
-					Ue:   ue,
-					Type: ueEvent.Type,
+					Ue:         ue,
+					Type:       ueEvent.Type,
+					UpdateType: ueEvent.UpdateType,
 				}
 				err := stream.SendMsg(msg)
 				if err != nil {
