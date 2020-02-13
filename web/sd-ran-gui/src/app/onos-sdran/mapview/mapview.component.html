@@ -29,11 +29,10 @@
                 'streetViewControl': false,
                 'disableDefaultUI': true
                 }">
-    <map-marker #towerElem *ngFor="let tower of towers"
-                [title]="tower.getTitle()"
-                [position]="tower.getPosition()"
-                [label]="tower.getLabel()"
-                [options]="{icon: tower.getIcon()}"
+    <map-marker #towerElem *ngFor="let towerEntry of towerMarkers | keyvalue"
+                [title]="towerEntry.value.getTitle()"
+                [position]="towerEntry.value.getPosition()"
+                [options]="{icon: towerEntry.value.getIcon()}"
                 (mapClick)="openTowerInfo(towerElem)">
     </map-marker>
     <map-info-window #infoWindow>{{ infoContent }}</map-info-window>

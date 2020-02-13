@@ -65,6 +65,20 @@ func (m *Manager) GetUe(name string) *types.Ue {
 	return m.UserEquipments[name]
 }
 
+// UeHandover perform the handover on simulated UE
+func (m *Manager) UeHandover(name string, tower string) {
+	ue := m.UserEquipments[name]
+	ue.Tower = tower
+	names, _ := m.findClosestTowers(ue.Position)
+	ue.Tower2 = names[1]
+	ue.Tower3 = names[2]
+	m.UeChannel <- dispatcher.Event{
+		Type:       trafficsim.Type_UPDATED,
+		UpdateType: trafficsim.UpdateType_HANDOVER,
+		Object:     ue,
+	}
+}
+
 func (m *Manager) startMoving(params RoutesParams) {
 
 	for {
@@ -72,7 +86,7 @@ func (m *Manager) startMoving(params RoutesParams) {
 		for ueidx := 0; ueidx < params.NumRoutes; ueidx++ {
 			ueName := fmt.Sprintf("Ue-%04X", ueidx+1)
 			routeName := fmt.Sprintf("Route-%d", ueidx)
-			err := m.moveUe(m.UserEquipments[ueName], m.Routes[routeName], m.UeChannel)
+			err := m.moveUe(m.UserEquipments[ueName], m.Routes[routeName])
 			if err != nil && strings.HasPrefix(err.Error(), "end of route") {
 				oldRouteFinish := m.Routes[routeName].GetWaypoints()[len(m.Routes[routeName].GetWaypoints())-1]
 				log.Errorf("Need to do a new route for %s Start %v %v", ueName, oldRouteFinish, err)
@@ -119,14 +133,14 @@ func (m *Manager) getColorForUe(ueName string) string {
 }
 
 // Move the UE to a new position along its route
-func (m *Manager) moveUe(ue *types.Ue, route *types.Route, ueUpdateChan chan dispatcher.Event) error {
+func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 	for idx, wp := range route.GetWaypoints() {
 		if ue.Position.GetLng() == wp.GetLng() && ue.Position.GetLat() == wp.GetLat() {
 			if idx+1 == len(route.GetWaypoints()) {
 				return fmt.Errorf("end of route %s %d", route.GetName(), idx)
 			}
 			ue.Position = route.Waypoints[idx+1]
-			ue.Rotation = uint32(getRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]))
+			ue.Rotation = uint32(getRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
 			names, distances := m.findClosestTowers(ue.Position)
 			updateType := trafficsim.UpdateType_POSITION
 			oldTower2 := ue.Tower2
@@ -159,7 +173,7 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route, ueUpdateChan chan dis
 			if ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
 				updateType = trafficsim.UpdateType_TOWER
 			}
-			ueUpdateChan <- dispatcher.Event{
+			m.UeChannel <- dispatcher.Event{
 				Type:       trafficsim.Type_UPDATED,
 				UpdateType: updateType,
 				Object:     ue,

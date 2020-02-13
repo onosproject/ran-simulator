@@ -110,6 +110,9 @@ enum UpdateType {
     // POSITION An update in position of UE only, without a change in the Tower affinity
     POSITION = 1;
 
-    // TOWER An update in tower affinity (and also position) of UE
+    // TOWER An update in non-serving tower affinity (and also position) of UE
     TOWER = 2;
+
+    // HANDOVER An update of the serving tower
+    HANDOVER = 3;
 }
