@@ -23,8 +23,8 @@ import (
 /**
  * Generates a random latlng value in 1000 meter radius of loc
  */
-func randomLatLng(mapCenterLat float32, mapCenterLng float32) types.Point {
-	const r = 5000 / float64(111300) // = 100 meters
+func randomLatLng(mapCenterLat float32, mapCenterLng float32, scale float32) types.Point {
+	var r = float64(scale)
 	y0 := float64(mapCenterLat)
 	x0 := float64(mapCenterLng)
 
@@ -60,15 +60,50 @@ func getRotationDegrees(pointA *types.Point, pointB *types.Point) float64 {
 	return math.Atan2(deltaY, deltaX) * 180 / math.Pi
 }
 
+// from https://htmlcolorcodes.com/
 func randomColor() string {
-	const letters = "0123456789ABCDEF"
-	color := make([]uint8, 7)
-	color[0] = '#'
-	for i := range color {
-		if i == 0 {
-			continue
-		}
-		color[i] = letters[rand.Intn(15)]
+	colorPalette := []string{
+		"#641E16",
+		"#78281F",
+		"#512E5F",
+		"#4A235A",
+		"#154360",
+		"#1B4F72",
+		"#0E6251",
+		"#0B5345",
+		"#145A32",
+		"#186A3B",
+		"#7D6608",
+		"#7E5109",
+		"#784212",
+		"#6E2C00",
+		"#7B7D7D",
+		"#626567",
+		"#4D5656",
+		"#424949",
+		"#1B2631",
+		"#17202A",
+
+		"#C0392B",
+		"#E74C3C",
+		"#9B59B6",
+		"#8E44AD",
+		"#2980B9",
+		"#3498DB",
+		"#1ABC9C",
+		"#16A085",
+		"#27AE60",
+		"#2ECC71",
+		"#F1C40F",
+		"#F39C12",
+		"#E67E22",
+		"#D35400",
+		"#B3B6B7",
+		"#BDC3C7",
+		"#95A5A6",
+		"#7F8C8D",
+		"#34495E",
+		"#2C3E50",
 	}
-	return string(color)
+	return colorPalette[rand.Intn(39)]
 }

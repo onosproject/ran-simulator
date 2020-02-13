@@ -548,7 +548,10 @@ proto.ran.trafficsim.types.Ue.toObject = function(includeInstance, msg) {
     tower: jspb.Message.getFieldWithDefault(msg, 7, ""),
     tower2: jspb.Message.getFieldWithDefault(msg, 8, ""),
     tower3: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    crnti: jspb.Message.getFieldWithDefault(msg, 10, "")
+    crnti: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    towerdist: jspb.Message.getFloatingPointFieldWithDefault(msg, 11, 0.0),
+    tower2dist: jspb.Message.getFloatingPointFieldWithDefault(msg, 12, 0.0),
+    tower3dist: jspb.Message.getFloatingPointFieldWithDefault(msg, 13, 0.0)
   };
 
   if (includeInstance) {
@@ -621,6 +624,18 @@ proto.ran.trafficsim.types.Ue.deserializeBinaryFromReader = function(msg, reader
     case 10:
       var value = /** @type {string} */ (reader.readString());
       msg.setCrnti(value);
+      break;
+    case 11:
+      var value = /** @type {number} */ (reader.readFloat());
+      msg.setTowerdist(value);
+      break;
+    case 12:
+      var value = /** @type {number} */ (reader.readFloat());
+      msg.setTower2dist(value);
+      break;
+    case 13:
+      var value = /** @type {number} */ (reader.readFloat());
+      msg.setTower3dist(value);
       break;
     default:
       reader.skipField();
@@ -712,6 +727,27 @@ proto.ran.trafficsim.types.Ue.serializeBinaryToWriter = function(message, writer
   if (f.length > 0) {
     writer.writeString(
       10,
+      f
+    );
+  }
+  f = message.getTowerdist();
+  if (f !== 0.0) {
+    writer.writeFloat(
+      11,
+      f
+    );
+  }
+  f = message.getTower2dist();
+  if (f !== 0.0) {
+    writer.writeFloat(
+      12,
+      f
+    );
+  }
+  f = message.getTower3dist();
+  if (f !== 0.0) {
+    writer.writeFloat(
+      13,
       f
     );
   }
@@ -868,6 +904,51 @@ proto.ran.trafficsim.types.Ue.prototype.getCrnti = function() {
 /** @param {string} value */
 proto.ran.trafficsim.types.Ue.prototype.setCrnti = function(value) {
   jspb.Message.setProto3StringField(this, 10, value);
+};
+
+
+/**
+ * optional float towerDist = 11;
+ * @return {number}
+ */
+proto.ran.trafficsim.types.Ue.prototype.getTowerdist = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 11, 0.0));
+};
+
+
+/** @param {number} value */
+proto.ran.trafficsim.types.Ue.prototype.setTowerdist = function(value) {
+  jspb.Message.setProto3FloatField(this, 11, value);
+};
+
+
+/**
+ * optional float tower2Dist = 12;
+ * @return {number}
+ */
+proto.ran.trafficsim.types.Ue.prototype.getTower2dist = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 12, 0.0));
+};
+
+
+/** @param {number} value */
+proto.ran.trafficsim.types.Ue.prototype.setTower2dist = function(value) {
+  jspb.Message.setProto3FloatField(this, 12, value);
+};
+
+
+/**
+ * optional float tower3Dist = 13;
+ * @return {number}
+ */
+proto.ran.trafficsim.types.Ue.prototype.getTower3dist = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 13, 0.0));
+};
+
+
+/** @param {number} value */
+proto.ran.trafficsim.types.Ue.prototype.setTower3dist = function(value) {
+  jspb.Message.setProto3FloatField(this, 13, value);
 };
 
 
@@ -1148,10 +1229,11 @@ proto.ran.trafficsim.types.Tower.toObject = function(includeInstance, msg) {
     name: jspb.Message.getFieldWithDefault(msg, 1, ""),
     location: (f = msg.getLocation()) && proto.ran.trafficsim.types.Point.toObject(includeInstance, f),
     color: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    plmnid: jspb.Message.getFieldWithDefault(msg, 5, ""),
     ecid: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    plmnid: jspb.Message.getFieldWithDefault(msg, 5, ""),
     maxues: jspb.Message.getFieldWithDefault(msg, 6, 0),
-    neighborsList: (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f
+    neighborsList: (f = jspb.Message.getRepeatedField(msg, 7)) == null ? undefined : f,
+    txpower: jspb.Message.getFieldWithDefault(msg, 8, 0)
   };
 
   if (includeInstance) {
@@ -1201,13 +1283,13 @@ proto.ran.trafficsim.types.Tower.deserializeBinaryFromReader = function(msg, rea
       var value = /** @type {string} */ (reader.readString());
       msg.setColor(value);
       break;
-    case 5:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setPlmnid(value);
-      break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
       msg.setEcid(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setPlmnid(value);
       break;
     case 6:
       var value = /** @type {number} */ (reader.readUint32());
@@ -1216,6 +1298,10 @@ proto.ran.trafficsim.types.Tower.deserializeBinaryFromReader = function(msg, rea
     case 7:
       var value = /** @type {string} */ (reader.readString());
       msg.addNeighbors(value);
+      break;
+    case 8:
+      var value = /** @type {number} */ (reader.readUint32());
+      msg.setTxpower(value);
       break;
     default:
       reader.skipField();
@@ -1268,17 +1354,17 @@ proto.ran.trafficsim.types.Tower.serializeBinaryToWriter = function(message, wri
       f
     );
   }
-  f = message.getPlmnid();
-  if (f.length > 0) {
-    writer.writeString(
-      5,
-      f
-    );
-  }
   f = message.getEcid();
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getPlmnid();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
       f
     );
   }
@@ -1293,6 +1379,13 @@ proto.ran.trafficsim.types.Tower.serializeBinaryToWriter = function(message, wri
   if (f.length > 0) {
     writer.writeRepeatedString(
       7,
+      f
+    );
+  }
+  f = message.getTxpower();
+  if (f !== 0) {
+    writer.writeUint32(
+      8,
       f
     );
   }
@@ -1363,21 +1456,6 @@ proto.ran.trafficsim.types.Tower.prototype.setColor = function(value) {
 
 
 /**
- * optional string plmnID = 5;
- * @return {string}
- */
-proto.ran.trafficsim.types.Tower.prototype.getPlmnid = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
-};
-
-
-/** @param {string} value */
-proto.ran.trafficsim.types.Tower.prototype.setPlmnid = function(value) {
-  jspb.Message.setProto3StringField(this, 5, value);
-};
-
-
-/**
  * optional string ecID = 4;
  * @return {string}
  */
@@ -1389,6 +1467,21 @@ proto.ran.trafficsim.types.Tower.prototype.getEcid = function() {
 /** @param {string} value */
 proto.ran.trafficsim.types.Tower.prototype.setEcid = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional string plmnID = 5;
+ * @return {string}
+ */
+proto.ran.trafficsim.types.Tower.prototype.getPlmnid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.ran.trafficsim.types.Tower.prototype.setPlmnid = function(value) {
+  jspb.Message.setProto3StringField(this, 5, value);
 };
 
 
@@ -1439,6 +1532,21 @@ proto.ran.trafficsim.types.Tower.prototype.clearNeighborsList = function() {
 };
 
 
+/**
+ * optional uint32 txPower = 8;
+ * @return {number}
+ */
+proto.ran.trafficsim.types.Tower.prototype.getTxpower = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+};
+
+
+/** @param {number} value */
+proto.ran.trafficsim.types.Tower.prototype.setTxpower = function(value) {
+  jspb.Message.setProto3IntField(this, 8, value);
+};
+
+
 
 
 
@@ -1474,7 +1582,8 @@ proto.ran.trafficsim.types.MapLayout.toObject = function(includeInstance, msg) {
     center: (f = msg.getCenter()) && proto.ran.trafficsim.types.Point.toObject(includeInstance, f),
     zoom: jspb.Message.getFloatingPointFieldWithDefault(msg, 2, 0.0),
     fade: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
-    showroutes: jspb.Message.getBooleanFieldWithDefault(msg, 4, false)
+    showroutes: jspb.Message.getBooleanFieldWithDefault(msg, 4, false),
+    showpower: jspb.Message.getBooleanFieldWithDefault(msg, 5, false)
   };
 
   if (includeInstance) {
@@ -1527,6 +1636,10 @@ proto.ran.trafficsim.types.MapLayout.deserializeBinaryFromReader = function(msg,
     case 4:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setShowroutes(value);
+      break;
+    case 5:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setShowpower(value);
       break;
     default:
       reader.skipField();
@@ -1583,6 +1696,13 @@ proto.ran.trafficsim.types.MapLayout.serializeBinaryToWriter = function(message,
   if (f) {
     writer.writeBool(
       4,
+      f
+    );
+  }
+  f = message.getShowpower();
+  if (f) {
+    writer.writeBool(
+      5,
       f
     );
   }
@@ -1664,6 +1784,21 @@ proto.ran.trafficsim.types.MapLayout.prototype.getShowroutes = function() {
 /** @param {boolean} value */
 proto.ran.trafficsim.types.MapLayout.prototype.setShowroutes = function(value) {
   jspb.Message.setProto3BooleanField(this, 4, value);
+};
+
+
+/**
+ * optional bool showPower = 5;
+ * @return {boolean}
+ */
+proto.ran.trafficsim.types.MapLayout.prototype.getShowpower = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 5, false));
+};
+
+
+/** @param {boolean} value */
+proto.ran.trafficsim.types.MapLayout.prototype.setShowpower = function(value) {
+  jspb.Message.setProto3BooleanField(this, 5, value);
 };
 
 

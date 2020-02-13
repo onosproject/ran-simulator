@@ -104,10 +104,49 @@ func (s *Server) ListRoutes(req *trafficsim.ListRoutesRequest, stream trafficsim
 
 // ListTowers :
 func (s *Server) ListTowers(req *trafficsim.ListTowersRequest, stream trafficsim.Traffic_ListTowersServer) error {
-	for _, tower := range manager.GetManager().Towers {
-		err := stream.Send(tower)
+	if !req.WithoutReplay {
+		for _, tower := range manager.GetManager().Towers {
+			resp := &trafficsim.ListTowersResponse{
+				Tower: tower,
+				Type:  trafficsim.Type_NONE,
+			}
+			err := stream.Send(resp)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	if req.Subscribe {
+		streamID := fmt.Sprintf("tower-%p", stream)
+		listener, err := manager.GetManager().Dispatcher.RegisterTowerListener(streamID)
 		if err != nil {
+			log.Info("Failed setting up a listener for Ue events")
 			return err
+		}
+		defer manager.GetManager().Dispatcher.UnregisterTowerListener(streamID)
+		log.Infof("NBI Tower updates started on %s", streamID)
+
+		for {
+			select {
+			case towerEvent := <-listener:
+				tower, objOk := towerEvent.Object.(*types.Tower)
+				if !objOk {
+					return fmt.Errorf("could not cast object from event to Tower %v", towerEvent)
+				}
+				msg := &trafficsim.ListTowersResponse{
+					Tower: tower,
+					Type:  towerEvent.Type,
+				}
+				err := stream.SendMsg(msg)
+				if err != nil {
+					log.Warningf("Error sending message on stream. Closing. %v", msg)
+					return err
+				}
+			case <-stream.Context().Done():
+				log.Infof("Client has disconnected ListTowers on %s", streamID)
+				return nil
+			}
 		}
 	}
 
@@ -147,8 +186,9 @@ func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traff
 					return fmt.Errorf("could not cast object from event to UE %v", ueEvent)
 				}
 				msg := &trafficsim.ListUesResponse{
-					Ue:   ue,
-					Type: ueEvent.Type,
+					Ue:         ue,
+					Type:       ueEvent.Type,
+					UpdateType: ueEvent.UpdateType,
 				}
 				err := stream.SendMsg(msg)
 				if err != nil {

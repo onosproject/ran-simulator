@@ -17,6 +17,8 @@
 <input type="checkbox" [(ngModel)]="showRoutes" (ngModelChange)="updateRoutes($event)">
 <label><small>Map</small></label>
 <input type="checkbox" [(ngModel)]="showMap" (ngModelChange)="updateMap($event)">
+<label><small>Power</small></label>
+<input type="checkbox" [(ngModel)]="showPower" (ngModelChange)="updatePower($event)">
 <!-- See https://medium.com/angular-in-depth/google-maps-is-now-an-angular-component-821ec61d2a0 -->
 <google-map #map height="85vh" width="100%"
             [center]="center"
@@ -27,11 +29,10 @@
                 'streetViewControl': false,
                 'disableDefaultUI': true
                 }">
-    <map-marker #towerElem *ngFor="let tower of towers"
-                [title]="tower.getTitle()"
-                [position]="tower.getPosition()"
-                [label]="tower.getLabel()"
-                [options]="{icon: tower.getIcon()}"
+    <map-marker #towerElem *ngFor="let towerEntry of towerMarkers | keyvalue"
+                [title]="towerEntry.value.getTitle()"
+                [position]="towerEntry.value.getPosition()"
+                [options]="{icon: towerEntry.value.getIcon()}"
                 (mapClick)="openTowerInfo(towerElem)">
     </map-marker>
     <map-info-window #infoWindow>{{ infoContent }}</map-info-window>

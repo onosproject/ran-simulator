@@ -16,12 +16,13 @@ package manager
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	log "k8s.io/klog"
-	"strings"
-	"time"
 )
 
 func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
@@ -29,26 +30,28 @@ func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
 
 	// There is already a route per UE
 	for u := 0; u < params.NumRoutes; u++ {
-		name := fmt.Sprintf("Ue-%d", u)
+		name := fmt.Sprintf("Ue-%04X", u+1)
 		routeName := fmt.Sprintf("Route-%d", u)
 		route := m.Routes[routeName]
-		serving, tower2, tower3 := m.findClosestTower(route.Waypoints[0])
+		towers, distances := m.findClosestTowers(route.Waypoints[0])
 
 		ue := types.Ue{
-			Name:     name,
-			Type:     "Car",
-			Position: route.Waypoints[0],
-			Rotation: 0,
-			Route:    routeName,
-			Tower:    serving,
-			Tower2:   tower2,
-			Tower3:   tower3,
+			Name:       name,
+			Type:       "Car",
+			Position:   route.Waypoints[0],
+			Rotation:   0,
+			Route:      routeName,
+			Tower:      towers[0],
+			Tower2:     towers[1],
+			Tower2Dist: distances[1],
+			Tower3:     towers[2],
+			Tower3Dist: distances[2],
 		}
 		ues[name] = &ue
 
 		// Now would be a good time to update the Route colour
 		for _, t := range m.Towers {
-			if t.Name == serving {
+			if t.Name == towers[0] {
 				m.Routes[routeName].Color = t.Color
 				break
 			}
@@ -57,14 +60,33 @@ func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
 	return ues
 }
 
+// GetUe returns Ue based on its name
+func (m *Manager) GetUe(name string) *types.Ue {
+	return m.UserEquipments[name]
+}
+
+// UeHandover perform the handover on simulated UE
+func (m *Manager) UeHandover(name string, tower string) {
+	ue := m.UserEquipments[name]
+	ue.Tower = tower
+	names, _ := m.findClosestTowers(ue.Position)
+	ue.Tower2 = names[1]
+	ue.Tower3 = names[2]
+	m.UeChannel <- dispatcher.Event{
+		Type:       trafficsim.Type_UPDATED,
+		UpdateType: trafficsim.UpdateType_HANDOVER,
+		Object:     ue,
+	}
+}
+
 func (m *Manager) startMoving(params RoutesParams) {
 
 	for {
 		breakout := false // Needed to breakout of double for loop
 		for ueidx := 0; ueidx < params.NumRoutes; ueidx++ {
-			ueName := fmt.Sprintf("Ue-%d", ueidx)
+			ueName := fmt.Sprintf("Ue-%04X", ueidx+1)
 			routeName := fmt.Sprintf("Route-%d", ueidx)
-			err := moveUe(m.UserEquipments[ueName], m.Routes[routeName], m.UeChannel)
+			err := m.moveUe(m.UserEquipments[ueName], m.Routes[routeName])
 			if err != nil && strings.HasPrefix(err.Error(), "end of route") {
 				oldRouteFinish := m.Routes[routeName].GetWaypoints()[len(m.Routes[routeName].GetWaypoints())-1]
 				log.Errorf("Need to do a new route for %s Start %v %v", ueName, oldRouteFinish, err)
@@ -81,6 +103,9 @@ func (m *Manager) startMoving(params RoutesParams) {
 					Type:   trafficsim.Type_UPDATED,
 					Object: newRoute,
 				}
+				// Move the UE to this new start point - google might return a
+				// start point just a few metres from where we asked
+				m.UserEquipments[ueName].Position = newRoute.GetWaypoints()[0]
 			} else if err != nil {
 				log.Errorf("Error %s", err.Error())
 				breakout = true
@@ -108,7 +133,7 @@ func (m *Manager) getColorForUe(ueName string) string {
 }
 
 // Move the UE to a new position along its route
-func moveUe(ue *types.Ue, route *types.Route, ueUpdateChan chan dispatcher.Event) error {
+func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 	for idx, wp := range route.GetWaypoints() {
 		if ue.Position.GetLng() == wp.GetLng() && ue.Position.GetLat() == wp.GetLat() {
 			if idx+1 == len(route.GetWaypoints()) {
@@ -116,9 +141,42 @@ func moveUe(ue *types.Ue, route *types.Route, ueUpdateChan chan dispatcher.Event
 			}
 			ue.Position = route.Waypoints[idx+1]
 			ue.Rotation = uint32(getRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
-			ueUpdateChan <- dispatcher.Event{
-				Type:   trafficsim.Type_UPDATED,
-				Object: ue,
+			names, distances := m.findClosestTowers(ue.Position)
+			updateType := trafficsim.UpdateType_POSITION
+			oldTower2 := ue.Tower2
+			oldTower3 := ue.Tower3
+			if ue.Tower == names[0] {
+				ue.Tower2 = names[1]
+				ue.Tower3 = names[2]
+				ue.TowerDist = distances[0]
+				ue.Tower2Dist = distances[1]
+				ue.Tower3Dist = distances[2]
+			} else if ue.Tower == names[1] {
+				ue.Tower2 = names[0]
+				ue.Tower3 = names[2]
+				ue.TowerDist = distances[1]
+				ue.Tower2Dist = distances[0]
+				ue.Tower3Dist = distances[2]
+			} else if ue.Tower == names[2] {
+				ue.Tower2 = names[0]
+				ue.Tower3 = names[1]
+				ue.TowerDist = distances[2]
+				ue.Tower2Dist = distances[0]
+				ue.Tower3Dist = distances[1]
+			} else {
+				ue.Tower2 = names[0]
+				ue.Tower3 = names[1]
+				ue.TowerDist = distanceToTower(m.Towers[ue.Tower], ue.Position)
+				ue.Tower2Dist = distances[0]
+				ue.Tower3Dist = distances[1]
+			}
+			if ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
+				updateType = trafficsim.UpdateType_TOWER
+			}
+			m.UeChannel <- dispatcher.Event{
+				Type:       trafficsim.Type_UPDATED,
+				UpdateType: updateType,
+				Object:     ue,
 			}
 			return nil
 		}

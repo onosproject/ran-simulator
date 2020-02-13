@@ -63,6 +63,41 @@ func (Type) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_47869854f8356ea4, []int{0}
 }
 
+// In the case of an update this helps qualify the update type - add items as necessary
+type UpdateType int32
+
+const (
+	UpdateType_NOUPDATETYPE UpdateType = 0
+	// POSITION An update in position of UE only, without a change in the Tower affinity
+	UpdateType_POSITION UpdateType = 1
+	// TOWER An update in non-serving tower affinity (and also position) of UE
+	UpdateType_TOWER UpdateType = 2
+	// HANDOVER An update of the serving tower
+	UpdateType_HANDOVER UpdateType = 3
+)
+
+var UpdateType_name = map[int32]string{
+	0: "NOUPDATETYPE",
+	1: "POSITION",
+	2: "TOWER",
+	3: "HANDOVER",
+}
+
+var UpdateType_value = map[string]int32{
+	"NOUPDATETYPE": 0,
+	"POSITION":     1,
+	"TOWER":        2,
+	"HANDOVER":     3,
+}
+
+func (x UpdateType) String() string {
+	return proto.EnumName(UpdateType_name, int32(x))
+}
+
+func (UpdateType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_47869854f8356ea4, []int{1}
+}
+
 type MapLayoutRequest struct {
 }
 
@@ -100,6 +135,11 @@ func (m *MapLayoutRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_MapLayoutRequest proto.InternalMessageInfo
 
 type ListTowersRequest struct {
+	// subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
+	// after all towers have been streamed to the client
+	Subscribe bool `protobuf:"varint,1,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
+	// option to request only changes that happen after the call
+	WithoutReplay bool `protobuf:"varint,2,opt,name=withoutReplay,proto3" json:"withoutReplay,omitempty"`
 }
 
 func (m *ListTowersRequest) Reset()         { *m = ListTowersRequest{} }
@@ -135,6 +175,74 @@ func (m *ListTowersRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListTowersRequest proto.InternalMessageInfo
 
+func (m *ListTowersRequest) GetSubscribe() bool {
+	if m != nil {
+		return m.Subscribe
+	}
+	return false
+}
+
+func (m *ListTowersRequest) GetWithoutReplay() bool {
+	if m != nil {
+		return m.WithoutReplay
+	}
+	return false
+}
+
+type ListTowersResponse struct {
+	// tower is the tower change on which the event occurred
+	Tower *types.Tower `protobuf:"bytes,1,opt,name=tower,proto3" json:"tower,omitempty"`
+	// type is a qualification of the type of change being made
+	Type Type `protobuf:"varint,2,opt,name=type,proto3,enum=ran.trafficsim.Type" json:"type,omitempty"`
+}
+
+func (m *ListTowersResponse) Reset()         { *m = ListTowersResponse{} }
+func (m *ListTowersResponse) String() string { return proto.CompactTextString(m) }
+func (*ListTowersResponse) ProtoMessage()    {}
+func (*ListTowersResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_47869854f8356ea4, []int{2}
+}
+func (m *ListTowersResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListTowersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListTowersResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListTowersResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListTowersResponse.Merge(m, src)
+}
+func (m *ListTowersResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListTowersResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListTowersResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListTowersResponse proto.InternalMessageInfo
+
+func (m *ListTowersResponse) GetTower() *types.Tower {
+	if m != nil {
+		return m.Tower
+	}
+	return nil
+}
+
+func (m *ListTowersResponse) GetType() Type {
+	if m != nil {
+		return m.Type
+	}
+	return Type_NONE
+}
+
 type ListRoutesRequest struct {
 	// subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
 	// after all routes have been streamed to the client
@@ -147,7 +255,7 @@ func (m *ListRoutesRequest) Reset()         { *m = ListRoutesRequest{} }
 func (m *ListRoutesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListRoutesRequest) ProtoMessage()    {}
 func (*ListRoutesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{2}
+	return fileDescriptor_47869854f8356ea4, []int{3}
 }
 func (m *ListRoutesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -201,7 +309,7 @@ func (m *ListRoutesResponse) Reset()         { *m = ListRoutesResponse{} }
 func (m *ListRoutesResponse) String() string { return proto.CompactTextString(m) }
 func (*ListRoutesResponse) ProtoMessage()    {}
 func (*ListRoutesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{3}
+	return fileDescriptor_47869854f8356ea4, []int{4}
 }
 func (m *ListRoutesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -256,7 +364,7 @@ func (m *ListUesRequest) Reset()         { *m = ListUesRequest{} }
 func (m *ListUesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListUesRequest) ProtoMessage()    {}
 func (*ListUesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{4}
+	return fileDescriptor_47869854f8356ea4, []int{5}
 }
 func (m *ListUesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -304,13 +412,15 @@ type ListUesResponse struct {
 	Ue *types.Ue `protobuf:"bytes,1,opt,name=ue,proto3" json:"ue,omitempty"`
 	// type is a qualification of the type of change being made
 	Type Type `protobuf:"varint,2,opt,name=type,proto3,enum=ran.trafficsim.Type" json:"type,omitempty"`
+	// update_type is a qualification of the type of UE change
+	UpdateType UpdateType `protobuf:"varint,3,opt,name=update_type,json=updateType,proto3,enum=ran.trafficsim.UpdateType" json:"update_type,omitempty"`
 }
 
 func (m *ListUesResponse) Reset()         { *m = ListUesResponse{} }
 func (m *ListUesResponse) String() string { return proto.CompactTextString(m) }
 func (*ListUesResponse) ProtoMessage()    {}
 func (*ListUesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{5}
+	return fileDescriptor_47869854f8356ea4, []int{6}
 }
 func (m *ListUesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -353,10 +463,19 @@ func (m *ListUesResponse) GetType() Type {
 	return Type_NONE
 }
 
+func (m *ListUesResponse) GetUpdateType() UpdateType {
+	if m != nil {
+		return m.UpdateType
+	}
+	return UpdateType_NOUPDATETYPE
+}
+
 func init() {
 	proto.RegisterEnum("ran.trafficsim.Type", Type_name, Type_value)
+	proto.RegisterEnum("ran.trafficsim.UpdateType", UpdateType_name, UpdateType_value)
 	proto.RegisterType((*MapLayoutRequest)(nil), "ran.trafficsim.MapLayoutRequest")
 	proto.RegisterType((*ListTowersRequest)(nil), "ran.trafficsim.ListTowersRequest")
+	proto.RegisterType((*ListTowersResponse)(nil), "ran.trafficsim.ListTowersResponse")
 	proto.RegisterType((*ListRoutesRequest)(nil), "ran.trafficsim.ListRoutesRequest")
 	proto.RegisterType((*ListRoutesResponse)(nil), "ran.trafficsim.ListRoutesResponse")
 	proto.RegisterType((*ListUesRequest)(nil), "ran.trafficsim.ListUesRequest")
@@ -366,35 +485,41 @@ func init() {
 func init() { proto.RegisterFile("api/trafficsim/trafficsim.proto", fileDescriptor_47869854f8356ea4) }
 
 var fileDescriptor_47869854f8356ea4 = []byte{
-	// 442 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x53, 0x4d, 0x6f, 0xd3, 0x40,
-	0x14, 0xcc, 0x9a, 0x94, 0xb4, 0xaf, 0x10, 0xcc, 0x83, 0x43, 0x14, 0x90, 0x5b, 0x2c, 0x0e, 0x11,
-	0x12, 0x4e, 0x08, 0xe2, 0xc2, 0xad, 0xc8, 0x16, 0x97, 0x34, 0x05, 0xcb, 0x81, 0xb3, 0x13, 0x6d,
-	0xe9, 0xa2, 0x26, 0xbb, 0xdd, 0x0f, 0x55, 0xf9, 0x17, 0xfc, 0x2c, 0x8e, 0xe5, 0xc6, 0x11, 0x25,
-	0x7f, 0x04, 0x79, 0xb7, 0xa9, 0x1b, 0x27, 0x20, 0x21, 0x71, 0xb1, 0xbc, 0xa3, 0x79, 0xf3, 0x76,
-	0x34, 0xb3, 0x70, 0x90, 0x0b, 0xd6, 0xd5, 0x32, 0x3f, 0x3d, 0x65, 0x13, 0xc5, 0xa6, 0xb7, 0x7e,
-	0x23, 0x21, 0xb9, 0xe6, 0xd8, 0x94, 0xf9, 0x2c, 0x2a, 0xd1, 0xf6, 0xdb, 0x2f, 0x4c, 0x9f, 0x99,
-	0x71, 0x34, 0xe1, 0xd3, 0x2e, 0x9f, 0x71, 0x25, 0x24, 0xff, 0x4a, 0x27, 0xba, 0x2b, 0xf3, 0xd9,
-	0x4b, 0xc5, 0xa6, 0xe6, 0x3c, 0xd7, 0x5c, 0x76, 0xad, 0xea, 0x5c, 0x50, 0xe5, 0xbe, 0x4e, 0x2b,
-	0x44, 0xf0, 0x8f, 0x73, 0x31, 0xc8, 0xe7, 0xdc, 0xe8, 0x94, 0x5e, 0x18, 0xaa, 0x74, 0xf8, 0x08,
-	0x1e, 0x0e, 0x98, 0xd2, 0x19, 0xbf, 0xa4, 0x52, 0xad, 0xc0, 0xcf, 0x0e, 0x4c, 0xb9, 0xd1, 0x74,
-	0x05, 0xe2, 0x53, 0xd8, 0x53, 0x66, 0xac, 0x26, 0x92, 0x8d, 0x69, 0x8b, 0x1c, 0x92, 0xce, 0x6e,
-	0x5a, 0x02, 0xf8, 0x1c, 0xee, 0x5f, 0x32, 0x7d, 0x66, 0x95, 0xc5, 0x79, 0x3e, 0x6f, 0x79, 0x96,
-	0xb1, 0x0e, 0x86, 0x17, 0x80, 0xb7, 0x85, 0x95, 0xe0, 0x33, 0x45, 0xf1, 0x15, 0xec, 0xc8, 0x02,
-	0xb1, 0xaa, 0xfb, 0xfd, 0x27, 0xd1, 0xba, 0xe7, 0xc8, 0x79, 0xb0, 0x43, 0xa9, 0x63, 0x62, 0x07,
-	0xea, 0x05, 0x6a, 0xb7, 0x34, 0xfb, 0x8f, 0xab, 0x13, 0xd9, 0x5c, 0xd0, 0xd4, 0x32, 0xc2, 0x0c,
-	0x9a, 0xc5, 0xca, 0xd1, 0xff, 0x35, 0x42, 0xe1, 0xc1, 0x8d, 0xea, 0xb5, 0x8b, 0x0e, 0x78, 0x66,
-	0x65, 0xa1, 0xb5, 0xdd, 0xc2, 0x88, 0xa6, 0x9e, 0xf9, 0x87, 0xcb, 0xbf, 0x78, 0x03, 0xf5, 0xe2,
-	0x84, 0xbb, 0x50, 0x1f, 0x9e, 0x0c, 0x13, 0xbf, 0x86, 0x7b, 0xb0, 0x73, 0x14, 0xc7, 0x49, 0xec,
-	0x13, 0xdc, 0x87, 0xc6, 0xe8, 0x43, 0x7c, 0x94, 0x25, 0xb1, 0xef, 0x15, 0x87, 0x34, 0x39, 0x3e,
-	0xf9, 0x94, 0xc4, 0xfe, 0x9d, 0xfe, 0x0f, 0x0f, 0x1a, 0x99, 0x13, 0xc4, 0x8f, 0x70, 0xef, 0x3d,
-	0xd5, 0x37, 0xb9, 0xe3, 0x61, 0x75, 0x5d, 0xb5, 0x12, 0xed, 0x83, 0xed, 0x97, 0x2f, 0x25, 0x86,
-	0x00, 0x65, 0x67, 0xf0, 0x59, 0x95, 0xbe, 0xd1, 0xa7, 0xf6, 0x1f, 0x12, 0xb5, 0xa4, 0x1e, 0xc1,
-	0x91, 0xd3, 0x73, 0xad, 0xd8, 0xae, 0xb7, 0x56, 0xc5, 0x76, 0xf8, 0x37, 0x8a, 0x8b, 0xa3, 0x47,
-	0x70, 0x00, 0x8d, 0xeb, 0x8c, 0x30, 0xd8, 0x36, 0x50, 0x56, 0x62, 0xd3, 0x72, 0x25, 0xdc, 0x1e,
-	0x79, 0xd7, 0xfa, 0xbe, 0x08, 0xc8, 0xd5, 0x22, 0x20, 0xbf, 0x16, 0x01, 0xf9, 0xb6, 0x0c, 0x6a,
-	0x57, 0xcb, 0xa0, 0xf6, 0x73, 0x19, 0xd4, 0xc6, 0x77, 0xed, 0xeb, 0x7a, 0xfd, 0x3b, 0x00, 0x00,
-	0xff, 0xff, 0x12, 0x8f, 0xf1, 0xf2, 0xcc, 0x03, 0x00, 0x00,
+	// 531 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x94, 0xc1, 0x8e, 0xd2, 0x40,
+	0x18, 0xc7, 0x99, 0xc2, 0x0a, 0xfb, 0x81, 0x58, 0x27, 0x1e, 0x08, 0x9a, 0xee, 0x4a, 0x3c, 0x90,
+	0x4d, 0x04, 0xc4, 0x78, 0xd1, 0x13, 0xa6, 0x8d, 0x6e, 0xc2, 0xb6, 0x38, 0xb6, 0xbb, 0xf1, 0x64,
+	0x0a, 0xce, 0xba, 0x35, 0x0b, 0xd3, 0xed, 0xcc, 0x64, 0xc3, 0x5b, 0xf8, 0x0c, 0x3e, 0x8d, 0xc7,
+	0x3d, 0xee, 0xd1, 0xc0, 0x8b, 0x98, 0x4e, 0x81, 0x2e, 0xdd, 0x66, 0x93, 0x4d, 0xf4, 0x02, 0xd3,
+	0xaf, 0xff, 0xff, 0x6f, 0xe6, 0xdf, 0x7e, 0x5f, 0x61, 0xcf, 0x0f, 0x83, 0xae, 0x88, 0xfc, 0xd3,
+	0xd3, 0x60, 0xc2, 0x83, 0xe9, 0x8d, 0x65, 0x27, 0x8c, 0x98, 0x60, 0xb8, 0x1e, 0xf9, 0xb3, 0x4e,
+	0x5a, 0x6d, 0xbe, 0xfd, 0x1e, 0x88, 0x33, 0x39, 0xee, 0x4c, 0xd8, 0xb4, 0xcb, 0x66, 0x8c, 0x87,
+	0x11, 0xfb, 0x41, 0x27, 0xa2, 0x1b, 0xf9, 0xb3, 0x97, 0x3c, 0x98, 0xca, 0x73, 0x5f, 0xb0, 0xa8,
+	0xab, 0xa8, 0xf3, 0x90, 0xf2, 0xe4, 0x37, 0x61, 0xb5, 0x30, 0xe8, 0x47, 0x7e, 0x38, 0xf4, 0xe7,
+	0x4c, 0x0a, 0x42, 0x2f, 0x24, 0xe5, 0xa2, 0x75, 0x02, 0x8f, 0x87, 0x01, 0x17, 0x2e, 0xbb, 0xa4,
+	0x11, 0x5f, 0x15, 0xf1, 0x33, 0xd8, 0xe5, 0x72, 0xcc, 0x27, 0x51, 0x30, 0xa6, 0x0d, 0xb4, 0x8f,
+	0xda, 0x15, 0x92, 0x16, 0xf0, 0x0b, 0x78, 0x78, 0x19, 0x88, 0x33, 0x05, 0x09, 0xcf, 0xfd, 0x79,
+	0x43, 0x53, 0x8a, 0xed, 0x62, 0xeb, 0x02, 0xf0, 0x4d, 0x30, 0x0f, 0xd9, 0x8c, 0x53, 0xfc, 0x0a,
+	0x76, 0x44, 0x5c, 0x51, 0xd4, 0x6a, 0xff, 0x69, 0x67, 0x3b, 0x5e, 0x27, 0x39, 0xae, 0x32, 0x91,
+	0x44, 0x89, 0xdb, 0x50, 0x8a, 0xab, 0x6a, 0x97, 0x7a, 0xff, 0x49, 0xd6, 0xe1, 0xce, 0x43, 0x4a,
+	0x94, 0x62, 0x9d, 0x85, 0x30, 0x29, 0xe8, 0xff, 0xc8, 0xb2, 0x06, 0xa7, 0x59, 0xa2, 0xb8, 0x72,
+	0x77, 0x16, 0x65, 0x22, 0x89, 0xf2, 0x1e, 0x59, 0x5c, 0xa8, 0xc7, 0x5b, 0x7a, 0xff, 0x36, 0xc8,
+	0x2f, 0x04, 0x8f, 0x36, 0xd8, 0x55, 0x8c, 0x36, 0x68, 0x72, 0x9d, 0xa1, 0x91, 0x9f, 0xc1, 0xa3,
+	0x44, 0x93, 0xf7, 0x38, 0x3d, 0x7e, 0x07, 0x55, 0x19, 0x7e, 0xf3, 0x05, 0xfd, 0xaa, 0x0c, 0x45,
+	0x65, 0x68, 0x66, 0x0d, 0x9e, 0x92, 0x28, 0x1b, 0xc8, 0xcd, 0xfa, 0xe0, 0x0d, 0x94, 0xe2, 0x7f,
+	0x5c, 0x81, 0x92, 0xed, 0xd8, 0x96, 0x5e, 0xc0, 0xbb, 0xb0, 0x33, 0x30, 0x4d, 0xcb, 0xd4, 0x11,
+	0xae, 0x42, 0xd9, 0x1b, 0x99, 0x03, 0xd7, 0x32, 0x75, 0x2d, 0xbe, 0x20, 0xd6, 0x91, 0x73, 0x6c,
+	0x99, 0x7a, 0xf1, 0xc0, 0x02, 0x48, 0x81, 0x58, 0x87, 0x9a, 0xed, 0x24, 0x4a, 0xf7, 0xcb, 0x28,
+	0x86, 0xd4, 0xa0, 0x32, 0x72, 0x3e, 0x1f, 0xba, 0x87, 0x8e, 0xad, 0xa3, 0x18, 0xe9, 0x3a, 0x27,
+	0x16, 0xd1, 0xb5, 0xf8, 0xc6, 0xc7, 0x81, 0x6d, 0x3a, 0xc7, 0x16, 0xd1, 0x8b, 0xfd, 0x6b, 0x0d,
+	0xca, 0x6e, 0x72, 0x46, 0xfc, 0x09, 0x6a, 0x1f, 0xa8, 0xd8, 0xcc, 0x0c, 0xde, 0xcf, 0x26, 0xc8,
+	0x8e, 0x53, 0x73, 0x2f, 0xff, 0x01, 0xa6, 0x08, 0x0f, 0x20, 0x1d, 0x0b, 0xfc, 0x3c, 0x2b, 0xbf,
+	0x35, 0x8b, 0xcd, 0xd6, 0x5d, 0x92, 0xe4, 0x15, 0xf6, 0xd0, 0x1a, 0x9b, 0x74, 0x68, 0x3e, 0x76,
+	0x6b, 0x2c, 0xf2, 0xb1, 0xdb, 0x0d, 0xde, 0x43, 0x78, 0x08, 0xe5, 0x55, 0xbb, 0x60, 0x23, 0xcf,
+	0x90, 0xb6, 0xe7, 0xed, 0xe4, 0x99, 0x3e, 0xeb, 0xa1, 0xf7, 0x8d, 0xdf, 0x0b, 0x03, 0x5d, 0x2d,
+	0x0c, 0xf4, 0x67, 0x61, 0xa0, 0x9f, 0x4b, 0xa3, 0x70, 0xb5, 0x34, 0x0a, 0xd7, 0x4b, 0xa3, 0x30,
+	0x7e, 0xa0, 0x3e, 0x50, 0xaf, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0x7d, 0xca, 0x67, 0x8d, 0x0f,
+	0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -448,7 +573,7 @@ func (c *trafficClient) ListTowers(ctx context.Context, in *ListTowersRequest, o
 }
 
 type Traffic_ListTowersClient interface {
-	Recv() (*types.Tower, error)
+	Recv() (*ListTowersResponse, error)
 	grpc.ClientStream
 }
 
@@ -456,8 +581,8 @@ type trafficListTowersClient struct {
 	grpc.ClientStream
 }
 
-func (x *trafficListTowersClient) Recv() (*types.Tower, error) {
-	m := new(types.Tower)
+func (x *trafficListTowersClient) Recv() (*ListTowersResponse, error) {
+	m := new(ListTowersResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -584,7 +709,7 @@ func _Traffic_ListTowers_Handler(srv interface{}, stream grpc.ServerStream) erro
 }
 
 type Traffic_ListTowersServer interface {
-	Send(*types.Tower) error
+	Send(*ListTowersResponse) error
 	grpc.ServerStream
 }
 
@@ -592,7 +717,7 @@ type trafficListTowersServer struct {
 	grpc.ServerStream
 }
 
-func (x *trafficListTowersServer) Send(m *types.Tower) error {
+func (x *trafficListTowersServer) Send(m *ListTowersResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -710,6 +835,66 @@ func (m *ListTowersRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.WithoutReplay {
+		i--
+		if m.WithoutReplay {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Subscribe {
+		i--
+		if m.Subscribe {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListTowersResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListTowersResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListTowersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Type != 0 {
+		i = encodeVarintTrafficsim(dAtA, i, uint64(m.Type))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Tower != nil {
+		{
+			size, err := m.Tower.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTrafficsim(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -859,6 +1044,11 @@ func (m *ListUesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.UpdateType != 0 {
+		i = encodeVarintTrafficsim(dAtA, i, uint64(m.UpdateType))
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.Type != 0 {
 		i = encodeVarintTrafficsim(dAtA, i, uint64(m.Type))
 		i--
@@ -905,6 +1095,28 @@ func (m *ListTowersRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.Subscribe {
+		n += 2
+	}
+	if m.WithoutReplay {
+		n += 2
+	}
+	return n
+}
+
+func (m *ListTowersResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Tower != nil {
+		l = m.Tower.Size()
+		n += 1 + l + sovTrafficsim(uint64(l))
+	}
+	if m.Type != 0 {
+		n += 1 + sovTrafficsim(uint64(m.Type))
+	}
 	return n
 }
 
@@ -966,6 +1178,9 @@ func (m *ListUesResponse) Size() (n int) {
 	}
 	if m.Type != 0 {
 		n += 1 + sovTrafficsim(uint64(m.Type))
+	}
+	if m.UpdateType != 0 {
+		n += 1 + sovTrafficsim(uint64(m.UpdateType))
 	}
 	return n
 }
@@ -1058,6 +1273,154 @@ func (m *ListTowersRequest) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: ListTowersRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Subscribe", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Subscribe = bool(v != 0)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WithoutReplay", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.WithoutReplay = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTrafficsim(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListTowersResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTrafficsim
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListTowersResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListTowersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tower", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Tower == nil {
+				m.Tower = &types.Tower{}
+			}
+			if err := m.Tower.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			m.Type = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Type |= Type(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTrafficsim(dAtA[iNdEx:])
@@ -1456,6 +1819,25 @@ func (m *ListUesResponse) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Type |= Type(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UpdateType", wireType)
+			}
+			m.UpdateType = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.UpdateType |= UpdateType(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

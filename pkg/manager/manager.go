@@ -33,6 +33,7 @@ type Manager struct {
 	Dispatcher     *dispatcher.Dispatcher
 	UeChannel      chan dispatcher.Event
 	RouteChannel   chan dispatcher.Event
+	TowerChannel   chan dispatcher.Event
 }
 
 // NewManager initializes the RAN subsystem.
@@ -42,6 +43,7 @@ func NewManager() (*Manager, error) {
 		Dispatcher:   dispatcher.NewDispatcher(),
 		UeChannel:    make(chan dispatcher.Event),
 		RouteChannel: make(chan dispatcher.Event),
+		TowerChannel: make(chan dispatcher.Event),
 	}
 	return &mgr, nil
 }
@@ -55,6 +57,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
+	go m.Dispatcher.ListenTowerEvents(m.TowerChannel)
 
 	var err error
 	m.Routes, err = m.newRoutes(routesParams)
