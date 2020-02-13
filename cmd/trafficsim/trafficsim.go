@@ -117,17 +117,21 @@ func main() {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
+	log.Info("Running manager")
 	mgr.Run(mapLayoutParams, towerParams, locationParams, routesParams)
 
+	log.Info("running E2 manager")
 	e2Mgr, err := e2.NewManager()
 	if err != nil {
 		log.Fatal("Unable to start e2 manager", err)
 	}
 	e2Mgr.Run(towerParams)
 
+	log.Info("Starting GRPC server")
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
 	}
+	log.Info("Done starting services")
 }
 
 // Creates gRPC server and registers various services; then serves.
