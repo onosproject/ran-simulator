@@ -36,6 +36,10 @@ const e2Manager = "e2Manager"
 // DefaultTxPower - all base-stations start with this power level
 const DefaultTxPower = 10
 
+// MagicConstant is used in the cqi calculation
+//const MagicConstant = 0.0001
+const MagicConstant = 0.00005
+
 var mgr Manager
 
 // Manager single point of entry for the trafficsim system.
@@ -127,7 +131,7 @@ func makeCrnti(ueName string) string {
 }
 
 func makeCqi(distance float32, txPower uint32) uint32 {
-	cqi := uint32((0.0001 * float32(txPower)) / (distance * distance))
+	cqi := uint32((MagicConstant * float32(txPower)) / (distance * distance))
 	if cqi > 15 {
 		cqi = 15
 	}
@@ -309,7 +313,7 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 		return err
 	}
 	for ueUpdate := range ueChangeChannel {
-		if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
+		if ueUpdate.Type == trafficsim.Type_UPDATED {
 			ue, ok := ueUpdate.Object.(*types.Ue)
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ueUpdate)
