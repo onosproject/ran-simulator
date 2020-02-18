@@ -9,10 +9,10 @@ cluster, or running the docker images individually.
 > It is only possible to run on docker-compose because none of the components below
 > have a dependency on Atomix at this point in time (Feb '20). Atomix is not
 > supported on docker-compose. When onos-ran changes to use Atomix, this page
-> will be deleted. 
+> will be deleted.
 
-In this project the [../build/dockercompose.yaml](../build/docker-compose.yaml)
-file launches 4 applications:
+In this project the [../build/docker-compose.yaml](../build/docker-compose.yaml)
+file launches 6 applications:
 
 1. onos-ran (the main ORAN application - exposes the C1 interface northbound, accesses the E2 interface on the southbound)
 1. onos-ran-ho (the Handover application - attaches to the C1 interface of onos-ran)
@@ -24,17 +24,24 @@ file launches 4 applications:
 ## Google Maps API Key
 The RAN Simulator can be connected to Google's [Directions API] if a valid Google
 API Key is given. Google charges $5.00 per 1000 requests to the [Directions API],
-and so we do not put our API key up in the public domain. The key must be specified
-in the docker-compose.yaml file. If it is not provided a straight line with random
-deviations will be chosen for the directions between 2 locations.
+and so we do not put our API key up in the public domain.
+
+In addition the `sd-ran-gui` uses the Google [Maps API] to retrieve tiled maps,
+at an additional cost of $7.00 per 1000 requests.
+ 
+The key must be specified when running docker-compose as shown below.
+
+> If the environment variable `GOOGLE_API_KEY` is not given, then the `ran-simulator`
+> application will run, and will use randomly generated routes. The `sd-ran-gui` will
+> exit and will not be accessible.
 
 ## Running
 From the **Ran Simulator** directory run
 ```bash
-docker-compose -f build/docker-compose.yaml up
+GOOGLE_API_KEY=<YOUR_API_KEY_HERE> docker-compose -f build/docker-compose.yaml up
 ```
 
-The first time this is run, it may pull the application images down from the internet.
+The first time this is run, it may pull the application images down from [Docker Hub].
 On subsequent runs it will use images cached on your system.
 
 To see the services running (in a separate terminal window) use:
@@ -92,4 +99,6 @@ time it is started
 With the `ran-simulator` and `envoy-proxy` services running, the GUI will be available on [http://localhost:4200]
 
 [Directions API]: https://developers.google.com/maps/documentation/directions/start
+[Maps API]: https://developers.google.com/maps/documentation/javascript/tutorial
 [docker-compose]: https://docs.docker.com/compose/
+[Docker Hub]: https://hub.docker.com/orgs/onosproject/repositories
