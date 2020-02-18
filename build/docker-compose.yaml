@@ -29,7 +29,7 @@ services:
         target: /etc/ssl/certs
     ports:
       - "15150:5150" #Only needed to for attaching for debug
-    command: -googleAPIKey YOUR_API_KEY_HERE -numLocations 100 -numRoutes 25 -certPath=/etc/ssl/certs/ran-simulator.crt -keyPath=/etc/ssl/certs/ran-simulator.key -caPath=/etc/ssl/certs/onfca.crt
+    command: -googleAPIKey ${GOOGLE_API_KEY} -numLocations 100 -numRoutes 25 -certPath=/etc/ssl/certs/ran-simulator.crt -keyPath=/etc/ssl/certs/ran-simulator.key -caPath=/etc/ssl/certs/onfca.crt
   envoy-proxy:
     hostname: envoy-proxy
     ports:
@@ -44,6 +44,8 @@ services:
   sd-ran-gui:
     image: onosproject/sd-ran-gui:latest
     hostname: sd-ran-gui
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
     volumes:
       - type: bind
         source: ./sd-ran-gui

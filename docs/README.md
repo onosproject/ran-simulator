@@ -18,11 +18,8 @@ Google charges $5.00 per 1000 requests to the [Directions API], and so we do not
 our API key up in the public domain. Without the API key directions will be created
 randomly between 2 locations (usually in the form of a zig-zag line).
 
-The SD RAN GUI also (separately) accesses Google Maps API and also incurs a cost of $7.00 per
-1000 requests. The API Key here is "baked in" to the GUI application, and so does
-not need to be configured when the application is run.
-> This will change in future. After the MWC demo in Feb '20 that baked in API
->Key will be made obsolete.
+The SD RAN GUI also (separately) accesses Google [Maps API] and incurs an additional
+cost of $7.00 per 1000 requests.
 
 ## Startup parameters
 Supplying `ran-simulator` with a bogus parameter gets it to show the start parameters
@@ -82,7 +79,12 @@ This shows the default deployment with
 * 3 routes (and hence 3 UEs active at any time)
 * Choosing routes start and finish points from among 10 random locations around the Towers
 * The Map is faded to increase the visibility of the towers and routes
-* The route paths are shown as dotted lines
+* The route paths are shown as dotted lines and are faded to 50% opacity.
+* Towers have an surrounding circle that shows the power setting in effect. This
+varies at run time through the control of `onos-ran`. As the power level is varied
+on a tower, it will temporarily enlarge for 500ms.
+* The UE's (cars) will be handed over from one tower to another - as they do they
+enlarge for a period of 500ms and their color changes to that of the newly selected tower.
 
 At intervals of `stepDelayMs` (default every second) each UE moves one step along
 its route.
@@ -96,4 +98,5 @@ This continues on indefinitely.
 
 A second browser window opened on a second device will show identical movements.
 
-![sd-ran-gui](images/sd-ran-gui-berlin.png)
+![sd-ran-gui](../../sdran-gui/docs/images/sd-ran-gui-berlin.png)
+[Directions API]: https://developers.google.com/maps/documentation/directions/start
