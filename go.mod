@@ -4,7 +4,10 @@ go 1.13
 
 require (
 	github.com/gogo/protobuf v1.3.1
-	github.com/onosproject/onos-config v0.0.0-20200124182344-6c3f5eb1e6ed // indirect
+	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/google/uuid v1.1.1 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
 	github.com/prometheus/common v0.4.1
 	google.golang.org/grpc v1.26.0
 	googlemaps.github.io/maps v0.0.0-20200124220646-5b7f2815585f

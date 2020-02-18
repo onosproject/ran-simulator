@@ -43,19 +43,23 @@ message Ue {
 
     string route = 6;
 
-    string tower = 7;
+    string serving_tower = 7;
 
-    string tower2 = 8;
+    float serving_tower_dist = 8;
 
-    string tower3 = 9;
+    string tower1 = 9;
 
-    string crnti = 10;
+    float tower1_dist = 10;
 
-    float towerDist = 11;
+    string tower2 = 11;
 
-    float tower2Dist = 12;
+    float tower2_dist = 12;
 
-    float tower3Dist = 13;
+    string tower3 = 13;
+
+    float tower3_dist = 14;
+
+    string crnti = 15;
 }
 
 

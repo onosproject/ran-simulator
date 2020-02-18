@@ -55,26 +55,31 @@ func newTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 	return towers
 }
 
-// Find the closest tower to any point - return serving, candidate1 and candidate2
+// Find the closest tower to any point - return closest, candidate1 and candidate2
 // in order of distance
+// Note this does not take any account of serving - it's just about distance
 func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
-	var serving string
-	var candidate1 string
-	var candidate2 string
+	var (
+		closest    string
+		candidate1 string
+		candidate2 string
+	)
 
-	var servingDist float32 = math.MaxFloat32
-	var candidate1Dist float32 = math.MaxFloat32
-	var candidate2Dist float32 = math.MaxFloat32
+	var (
+		closestDist    float32 = math.MaxFloat32
+		candidate1Dist float32 = math.MaxFloat32
+		candidate2Dist float32 = math.MaxFloat32
+	)
 
 	for _, tower := range m.Towers {
 		distance := distanceToTower(tower, point)
-		if distance < servingDist {
+		if distance < closestDist {
 			candidate2 = candidate1
 			candidate2Dist = candidate1Dist
-			candidate1 = serving
-			candidate1Dist = servingDist
-			serving = tower.Name
-			servingDist = distance
+			candidate1 = closest
+			candidate1Dist = closestDist
+			closest = tower.Name
+			closestDist = distance
 		} else if distance < candidate1Dist {
 			candidate2 = candidate1
 			candidate2Dist = candidate1Dist
@@ -86,7 +91,7 @@ func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
 		}
 	}
 
-	return []string{serving, candidate1, candidate2}, []float32{servingDist, candidate1Dist, candidate2Dist}
+	return []string{closest, candidate1, candidate2}, []float32{closestDist, candidate1Dist, candidate2Dist}
 }
 
 // GetTower returns tower based on its name
