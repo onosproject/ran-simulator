@@ -254,7 +254,7 @@ func (m *Manager) handleCellConfigRequest(stream e2.InterfaceService_SendControl
 
 	// Initate UE admissions
 	for _, ue := range trafficSimMgr.UserEquipments {
-		eci := trafficSimMgr.GetTowerByName(ue.Tower).EcID
+		eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
 		ueAdmReq := e2.ControlUpdate{
 			MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
 			S: &e2.ControlUpdate_UEAdmissionRequest{
@@ -314,7 +314,7 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ueUpdate)
 			}
-			tower := trafficSimMgr.GetTowerByName(ue.Tower)
+			tower1 := trafficSimMgr.GetTowerByName(ue.Tower1)
 			tower2 := trafficSimMgr.GetTowerByName(ue.Tower2)
 			tower3 := trafficSimMgr.GetTowerByName(ue.Tower3)
 
@@ -322,11 +322,11 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 
 			reports[0] = new(e2.RadioRepPerServCell)
 			reports[0].Ecgi = &e2.ECGI{
-				PlmnId: tower.PlmnID,
-				Ecid:   tower.EcID,
+				PlmnId: tower1.PlmnID,
+				Ecid:   tower1.EcID,
 			}
 			reports[0].CqiHist = make([]uint32, 1)
-			reports[0].CqiHist[0] = makeCqi(ue.TowerDist, tower.TxPower)
+			reports[0].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.TxPower)
 
 			reports[1] = new(e2.RadioRepPerServCell)
 			reports[1].Ecgi = &e2.ECGI{
@@ -351,8 +351,8 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 				S: &e2.TelemetryMessage_RadioMeasReportPerUE{
 					RadioMeasReportPerUE: &e2.RadioMeasReportPerUE{
 						Ecgi: &e2.ECGI{
-							PlmnId: tower.PlmnID,
-							Ecid:   tower.EcID,
+							PlmnId: tower1.PlmnID,
+							Ecid:   tower1.EcID,
 						},
 						Crnti:                ue.Crnti,
 						RadioReportServCells: reports,

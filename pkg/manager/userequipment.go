@@ -34,18 +34,22 @@ func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
 		routeName := fmt.Sprintf("Route-%d", u)
 		route := m.Routes[routeName]
 		towers, distances := m.findClosestTowers(route.Waypoints[0])
+		servingTowerDist := distanceToTower(m.Towers[towers[0]], route.Waypoints[0])
 
 		ue := types.Ue{
-			Name:       name,
-			Type:       "Car",
-			Position:   route.Waypoints[0],
-			Rotation:   0,
-			Route:      routeName,
-			Tower:      towers[0],
-			Tower2:     towers[1],
-			Tower2Dist: distances[1],
-			Tower3:     towers[2],
-			Tower3Dist: distances[2],
+			Name:             name,
+			Type:             "Car",
+			Position:         route.Waypoints[0],
+			Rotation:         0,
+			Route:            routeName,
+			ServingTower:     towers[0],
+			ServingTowerDist: servingTowerDist,
+			Tower1:           towers[0],
+			Tower1Dist:       distances[0],
+			Tower2:           towers[1],
+			Tower2Dist:       distances[1],
+			Tower3:           towers[2],
+			Tower3Dist:       distances[2],
 		}
 		ues[name] = &ue
 
@@ -68,8 +72,9 @@ func (m *Manager) GetUe(name string) *types.Ue {
 // UeHandover perform the handover on simulated UE
 func (m *Manager) UeHandover(name string, tower string) {
 	ue := m.UserEquipments[name]
-	ue.Tower = tower
+	ue.ServingTower = tower
 	names, _ := m.findClosestTowers(ue.Position)
+	ue.Tower1 = names[0]
 	ue.Tower2 = names[1]
 	ue.Tower3 = names[2]
 	m.UeChannel <- dispatcher.Event{
@@ -125,7 +130,7 @@ func (m *Manager) getColorForUe(ueName string) string {
 		return ""
 	}
 	for _, t := range m.Towers {
-		if t.Name == ue.Tower {
+		if t.Name == ue.ServingTower {
 			return t.Color
 		}
 	}
@@ -143,34 +148,17 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			ue.Rotation = uint32(getRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
 			names, distances := m.findClosestTowers(ue.Position)
 			updateType := trafficsim.UpdateType_POSITION
+			oldTower1 := ue.Tower1
 			oldTower2 := ue.Tower2
 			oldTower3 := ue.Tower3
-			if ue.Tower == names[0] {
-				ue.Tower2 = names[1]
-				ue.Tower3 = names[2]
-				ue.TowerDist = distances[0]
-				ue.Tower2Dist = distances[1]
-				ue.Tower3Dist = distances[2]
-			} else if ue.Tower == names[1] {
-				ue.Tower2 = names[0]
-				ue.Tower3 = names[2]
-				ue.TowerDist = distances[1]
-				ue.Tower2Dist = distances[0]
-				ue.Tower3Dist = distances[2]
-			} else if ue.Tower == names[2] {
-				ue.Tower2 = names[0]
-				ue.Tower3 = names[1]
-				ue.TowerDist = distances[2]
-				ue.Tower2Dist = distances[0]
-				ue.Tower3Dist = distances[1]
-			} else {
-				ue.Tower2 = names[0]
-				ue.Tower3 = names[1]
-				ue.TowerDist = distanceToTower(m.Towers[ue.Tower], ue.Position)
-				ue.Tower2Dist = distances[0]
-				ue.Tower3Dist = distances[1]
-			}
-			if ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
+			ue.Tower1 = names[0]
+			ue.Tower1Dist = distances[0]
+			ue.Tower2 = names[1]
+			ue.Tower2Dist = distances[1]
+			ue.Tower3 = names[2]
+			ue.Tower3Dist = distances[2]
+
+			if ue.Tower1 != oldTower1 || ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
 				updateType = trafficsim.UpdateType_TOWER
 			}
 			m.UeChannel <- dispatcher.Event{
