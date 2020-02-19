@@ -21,12 +21,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/onosproject/ran-simulator/api/trafficsim"
-
 	"github.com/onosproject/ran-simulator/api/e2"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"github.com/prometheus/common/log"
+	log "k8s.io/klog"
 )
 
 // TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
@@ -314,6 +313,7 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ueUpdate)
 			}
+			servingTower := trafficSimMgr.GetTowerByName(ue.ServingTower)
 			tower1 := trafficSimMgr.GetTowerByName(ue.Tower1)
 			tower2 := trafficSimMgr.GetTowerByName(ue.Tower2)
 			tower3 := trafficSimMgr.GetTowerByName(ue.Tower3)
@@ -344,15 +344,18 @@ func (m *Manager) radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryS
 			reports[2].CqiHist = make([]uint32, 1)
 			reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.TxPower)
 
-			log.Infof("RadioMeasReport %s cqi:%d(%s),%d(%s),%d(%s)", ue.Name, reports[0].CqiHist[0], reports[0].Ecgi.Ecid, reports[1].CqiHist[0], reports[1].Ecgi.Ecid, reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
+			log.Infof("RadioMeasReport %s %s cqi:%d(%s),%d(%s),%d(%s)", servingTower.EcID, ue.Name,
+				reports[0].CqiHist[0], reports[0].Ecgi.Ecid,
+				reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
+				reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
 
 			radioMeasReportPerUE := e2.TelemetryMessage{
 				MessageType: e2.MessageType_RADIO_MEAS_REPORT_PER_UE,
 				S: &e2.TelemetryMessage_RadioMeasReportPerUE{
 					RadioMeasReportPerUE: &e2.RadioMeasReportPerUE{
 						Ecgi: &e2.ECGI{
-							PlmnId: tower1.PlmnID,
-							Ecid:   tower1.EcID,
+							PlmnId: servingTower.PlmnID,
+							Ecid:   servingTower.EcID,
 						},
 						Crnti:                ue.Crnti,
 						RadioReportServCells: reports,
