@@ -29,7 +29,7 @@ func Test_findClosestTowers(t *testing.T) {
 	const towerSpacingHoriz = 0.02
 	const decimalDegreeTolerance = 0.0001
 
-	m.Towers = newTowers(
+	m.Towers = NewTowers(
 		types.TowersParams{
 			TowerRows:         3,
 			TowerCols:         3,

@@ -32,7 +32,8 @@ type Location struct {
 	Position types.Point
 }
 
-func newLocations(params LocationsParams, towersParams types.TowersParams, mapLayout types.MapLayout) map[string]*Location {
+// NewLocations - create a new set of locations
+func NewLocations(params LocationsParams, towersParams types.TowersParams, mapLayout types.MapLayout) map[string]*Location {
 	locations := make(map[string]*Location)
 
 	for l := 0; l < params.NumLocations; l++ {

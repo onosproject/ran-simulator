@@ -16,9 +16,11 @@ package dispatcher
 
 import (
 	"fmt"
-	log "k8s.io/klog"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"sync"
 )
+
+var log = logging.GetLogger("dispatcher")
 
 // Dispatcher :
 type Dispatcher struct {

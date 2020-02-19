@@ -30,16 +30,17 @@ package main
 
 import (
 	"flag"
+	"github.com/onosproject/ran-simulator/pkg/service"
 	"time"
 
+	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
-
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
-	"github.com/onosproject/ran-simulator/pkg/service"
-	log "k8s.io/klog"
 )
+
+var log = liblog.GetLogger("main")
 
 // The main entry point
 func main() {
@@ -72,18 +73,6 @@ func main() {
 		log.Error("Cant' avoid double Error logging ", err)
 	}
 	flag.Parse()
-
-	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
-	log.InitFlags(klogFlags)
-
-	// Sync the glog and klog flags.
-	flag.CommandLine.VisitAll(func(f1 *flag.Flag) {
-		f2 := klogFlags.Lookup(f1.Name)
-		if f2 != nil {
-			value := f1.Value.String()
-			_ = f2.Value.Set(value)
-		}
-	})
 
 	mapLayoutParams := types.MapLayout{
 		Center: &types.Point{
@@ -154,14 +143,6 @@ func main() {
 	}
 	mgr.Run(mapLayoutParams, towerParams, locationParams, routesParams)
 
-	e2Mgr, err := e2.NewManager()
-	if err != nil {
-		log.Fatal("Unable to start e2 manager", err)
-	}
-	err = e2Mgr.Run(towerParams)
-	if err != nil {
-		log.Fatal("Unable to run e2 manager", err)
-	}
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
 	}

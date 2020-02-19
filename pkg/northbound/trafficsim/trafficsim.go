@@ -17,20 +17,22 @@ package trafficsim
 import (
 	"context"
 	"fmt"
+	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/service"
 	"google.golang.org/grpc"
-	log "k8s.io/klog"
 )
+
+var log = liblog.GetLogger("northbound", "admin")
 
 // NewService returns a new trafficsim Service
 func NewService() (service.Service, error) {
 	return &Service{}, nil
 }
 
-// Service is an implementation of TrafficSim service.
+// Service is a Service implementation for administration.
 type Service struct {
 	service.Service
 }
@@ -89,7 +91,7 @@ func (s *Server) ListRoutes(req *trafficsim.ListRoutesRequest, stream trafficsim
 				}
 				err := stream.SendMsg(msg)
 				if err != nil {
-					log.Warningf("Error sending message on stream. Closing. %v", msg)
+					log.Warnf("Error sending message on stream. Closing. %v", msg)
 					return err
 				}
 			case <-stream.Context().Done():
@@ -140,7 +142,7 @@ func (s *Server) ListTowers(req *trafficsim.ListTowersRequest, stream trafficsim
 				}
 				err := stream.SendMsg(msg)
 				if err != nil {
-					log.Warningf("Error sending message on stream. Closing. %v", msg)
+					log.Warnf("Error sending message on stream. Closing. %v", msg)
 					return err
 				}
 			case <-stream.Context().Done():
@@ -192,7 +194,7 @@ func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traff
 				}
 				err := stream.SendMsg(msg)
 				if err != nil {
-					log.Warningf("Error sending message on stream. Closing. %v", msg)
+					log.Warnf("Error sending message on stream. Closing. %v", msg)
 					return err
 				}
 			case <-stream.Context().Done():
