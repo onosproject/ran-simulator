@@ -18,12 +18,13 @@ package service
 
 import (
 	"fmt"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"net"
-
-	log "k8s.io/klog"
 
 	"google.golang.org/grpc"
 )
+
+var log = logging.GetLogger("service")
 
 // Service provides service-specific registration for grpc services.
 type Service interface {
@@ -117,6 +118,7 @@ func (s *Server) Serve(started func(string)) error {
 	*/
 	var opts []grpc.ServerOption
 	server := grpc.NewServer(opts...)
+
 	for i := range s.services {
 		s.services[i].Register(server)
 	}

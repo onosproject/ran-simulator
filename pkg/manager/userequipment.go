@@ -22,10 +22,10 @@ import (
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
-	log "k8s.io/klog"
 )
 
-func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
+// NewUserEquipments - create a new set of UEs (phone, car etc)
+func (m *Manager) NewUserEquipments(params RoutesParams) map[string]*types.Ue {
 	ues := make(map[string]*types.Ue)
 
 	// There is already a route per UE
@@ -50,6 +50,7 @@ func (m *Manager) newUserEquipments(params RoutesParams) map[string]*types.Ue {
 			Tower2Dist:       distances[1],
 			Tower3:           towers[2],
 			Tower3Dist:       distances[2],
+			Crnti:            makeCrnti(name),
 		}
 		ues[name] = &ue
 
@@ -121,7 +122,7 @@ func (m *Manager) startMoving(params RoutesParams) {
 			break
 		}
 	}
-	log.Warningf("Stopped driving")
+	log.Warnf("Stopped driving")
 }
 
 func (m *Manager) getColorForUe(ueName string) string {
@@ -170,4 +171,8 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 		}
 	}
 	return fmt.Errorf("unexpectedly hit end of route %s %v %v", route.GetName(), ue.Position, route.GetWaypoints()[0])
+}
+
+func makeCrnti(ueName string) string {
+	return strings.Split(ueName, "-")[1]
 }

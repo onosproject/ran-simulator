@@ -17,18 +17,26 @@ package manager
 import (
 	"fmt"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
+	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"math"
-
-	"github.com/onosproject/ran-simulator/api/types"
+	"regexp"
+	"strconv"
 )
+
+// TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
+const TestPlmnID = "001001"
+
+// DefaultTxPower - all base-stations start with this power level
+const DefaultTxPower = 10
 
 // TowerIf :
 type TowerIf interface {
 	GetPosition() types.Point
 }
 
-func newTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]*types.Tower {
+// NewTowers - create a set of new towers
+func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]*types.Tower {
 	topLeft := types.Point{
 		Lat: mapLayout.GetCenter().GetLat() + params.TowerSpacingVert*float32(params.TowerRows-1)/2,
 		Lng: mapLayout.GetCenter().GetLng() - params.TowerSpacingHoriz*float32(params.TowerCols-1)/2,
@@ -45,9 +53,14 @@ func newTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 			towerNum = towerNum + 1
 			towerName := fmt.Sprintf("Tower-%d", towerNum)
 			towers[towerName] = &types.Tower{
-				Name:     towerName,
-				Location: &pos,
-				Color:    randomColor(),
+				Name:      towerName,
+				Location:  &pos,
+				Color:     randomColor(),
+				PlmnID:    TestPlmnID,
+				EcID:      makeEci(towerName),
+				MaxUEs:    params.MaxUEs,
+				Neighbors: makeNeighbors(towerName, params),
+				TxPower:   DefaultTxPower,
 			}
 		}
 	}
@@ -116,6 +129,52 @@ func distanceToTower(tower *types.Tower, point *types.Point) float32 {
 		float64(tower.GetLocation().GetLat()-point.GetLat()),
 		float64(tower.GetLocation().GetLng()-point.GetLng()),
 	))
+}
+
+func makeEci(towerName string) string {
+	re := regexp.MustCompile("[0-9]+")
+	id, _ := strconv.Atoi(re.FindAllString(towerName, 1)[0])
+	return fmt.Sprintf("%07X", id)
+}
+
+func makeNeighbors(towerName string, towerParams types.TowersParams) []string {
+	neighbors := make([]string, 0, 8)
+	re := regexp.MustCompile("[0-9]+")
+	id, _ := strconv.Atoi(re.FindAllString(towerName, 1)[0])
+	id--
+
+	nrows := int(towerParams.TowerRows)
+	ncols := int(towerParams.TowerCols)
+
+	i := id / nrows
+	j := id % ncols
+
+	for x := max(0, i-1); x <= min(i+1, nrows-1); x++ {
+		for y := max(0, j-1); y <= min(j+1, ncols-1); y++ {
+			if (x == i && y == j-1) || (x == i && y == j+1) || (x == i-1 && y == j) || (x == i+1 && y == j) {
+				towerNum := x*nrows + y + 1
+				towerName := fmt.Sprintf("Tower-%d", towerNum)
+				neighbors = append(neighbors, towerName)
+			}
+		}
+	}
+	return neighbors
+}
+
+// Min ...
+func min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
+}
+
+// Max ...
+func max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
 }
 
 // GetTowerByName ...

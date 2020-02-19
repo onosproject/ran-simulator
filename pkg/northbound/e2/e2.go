@@ -15,10 +15,13 @@
 package e2
 
 import (
+	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/pkg/service"
 	"google.golang.org/grpc"
 )
+
+var log = liblog.GetLogger("northbound", "e2")
 
 // NewService returns a new trafficsim Service
 func NewService() (service.Service, error) {
@@ -38,16 +41,4 @@ func (s Service) Register(r *grpc.Server) {
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-}
-
-// SendTelemetry ...
-func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_SendTelemetryServer) error {
-	mgr := GetManager()
-	return mgr.RunTelemetry(stream)
-}
-
-// SendControl ...
-func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error {
-	mgr := GetManager()
-	return mgr.RunControl(stream)
 }

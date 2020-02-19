@@ -16,10 +16,12 @@
 package manager
 
 import (
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
-	log "k8s.io/klog"
 )
+
+var log = logging.GetLogger("main")
 
 var mgr Manager
 
@@ -52,19 +54,19 @@ func NewManager() (*Manager, error) {
 func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams, locParams LocationsParams, routesParams RoutesParams) {
 	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
 	m.MapLayout = mapLayoutParams
-	m.Towers = newTowers(towerparams, mapLayoutParams)
-	m.Locations = newLocations(locParams, towerparams, mapLayoutParams)
+	m.Towers = NewTowers(towerparams, mapLayoutParams)
+	m.Locations = NewLocations(locParams, towerparams, mapLayoutParams)
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
 	go m.Dispatcher.ListenTowerEvents(m.TowerChannel)
 
 	var err error
-	m.Routes, err = m.newRoutes(routesParams)
+	m.Routes, err = m.NewRoutes(routesParams)
 	if err != nil {
 		log.Fatalf("Error calculating routes %s", err.Error())
 	}
-	m.UserEquipments = m.newUserEquipments(routesParams)
+	m.UserEquipments = m.NewUserEquipments(routesParams)
 
 	go m.startMoving(routesParams)
 }
