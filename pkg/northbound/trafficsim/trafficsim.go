@@ -25,7 +25,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("northbound", "admin")
+var log = liblog.GetLogger("northbound", "trafficsim")
 
 // NewService returns a new trafficsim Service
 func NewService() (service.Service, error) {
