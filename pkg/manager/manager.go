@@ -21,7 +21,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 )
 
-var log = logging.GetLogger("main")
+var log = logging.GetLogger("manager")
 
 var mgr Manager
 

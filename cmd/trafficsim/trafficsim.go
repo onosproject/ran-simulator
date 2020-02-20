@@ -40,7 +40,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
 )
 
-var log = liblog.GetLogger("main")
+var log = liblog.GetDefaultLogger()
 
 // The main entry point
 func main() {
