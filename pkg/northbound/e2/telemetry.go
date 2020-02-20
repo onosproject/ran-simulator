@@ -24,16 +24,9 @@ import (
 
 const e2TelemetryNbi = "e2TelemetryNbi"
 
-func powerSigned(value uint32) float32 {
-	floatValue := float64(value)
-	if floatValue >= math.Pow(2, 31) {
-		return float32(floatValue - math.Pow(2, 32))
-	}
-	return float32(value)
-}
-
-func makeCqi(distance float32, txPower uint32) uint32 {
-	cqi := uint32((0.0001 * powerSigned(txPower)) / (distance * distance))
+func makeCqi(distance float32, txPowerdB float32) uint32 {
+	power := float32(math.Pow(10, float64(txPowerdB/10)))
+	cqi := uint32(power / (distance * distance))
 	if cqi > 15 {
 		cqi = 15
 	}

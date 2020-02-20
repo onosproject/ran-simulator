@@ -37,8 +37,11 @@ github.com/onosproject/onos-lib-go v0.0.0-20200220060353-00302d827ca2 h1:fTmEp0z
 github.com/onosproject/onos-lib-go v0.0.0-20200220060353-00302d827ca2/go.mod h1:UyQsvuvUGGXZBJ2TTIsQJ9u75WZxayrsAKuH0rg/gYs=
 github.com/onosproject/onos-lib-go v0.0.0-20200220094703-dbbf2810301d h1:MMuJz3eSwCZO4MIj4ktRArimO/JfNVELwDaqY+us7LM=
 github.com/onosproject/onos-lib-go v0.0.0-20200220094703-dbbf2810301d/go.mod h1:UyQsvuvUGGXZBJ2TTIsQJ9u75WZxayrsAKuH0rg/gYs=
+<<<<<<< HEAD
 github.com/onosproject/onos-lib-go v0.0.0-20200220193455-fe7dac6f40c0 h1:YL2RqchsVix2eQTDOqhF2cDJUxa9t4gQwPRSnezO4fw=
 github.com/onosproject/onos-lib-go v0.0.0-20200220193455-fe7dac6f40c0/go.mod h1:UyQsvuvUGGXZBJ2TTIsQJ9u75WZxayrsAKuH0rg/gYs=
+=======
+>>>>>>> Changed the power to a float and labelled it as dB
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/plar/go-adaptive-radix-tree v1.0.1 h1:J+2qrXaKWLACw59s8SlTVYYxWjlUr/BlCsfkAzn96/0=

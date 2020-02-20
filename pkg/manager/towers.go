@@ -60,7 +60,7 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 				EcID:      makeEci(towerName),
 				MaxUEs:    params.MaxUEs,
 				Neighbors: makeNeighbors(towerName, params),
-				TxPower:   DefaultTxPower,
+				TxPowerdB: DefaultTxPower,
 			}
 		}
 	}
@@ -115,7 +115,7 @@ func (m *Manager) GetTower(name string) *types.Tower {
 // UpdateTower Update a tower's properties - usually power level
 func (m *Manager) UpdateTower(tower *types.Tower) {
 	// Only the power can be updated at present
-	m.Towers[tower.GetName()].TxPower = tower.TxPower
+	m.Towers[tower.GetName()].TxPowerdB = tower.TxPowerdB
 	m.TowerChannel <- dispatcher.Event{
 		Type:   trafficsim.Type_UPDATED,
 		Object: tower,

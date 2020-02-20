@@ -81,21 +81,21 @@ func handleRRMConfig(req *e2.RRMConfig) {
 	tower := trafficSimMgr.GetTower(eciToName(req.Ecgi.Ecid))
 	switch req.PA[0] {
 	case e2.XICICPA_XICIC_PA_DB_MINUS6:
-		tower.TxPower -= 4
+		tower.TxPowerdB -= 6
 	case e2.XICICPA_XICIC_PA_DB_MINUX4DOT77:
-		tower.TxPower -= 3
+		tower.TxPowerdB -= 4.77
 	case e2.XICICPA_XICIC_PA_DB_MINUS3:
-		tower.TxPower -= 2
+		tower.TxPowerdB -= 3
 	case e2.XICICPA_XICIC_PA_DB_MINUS1DOT77:
-		tower.TxPower--
+		tower.TxPowerdB -= 1.77
 	case e2.XICICPA_XICIC_PA_DB_0:
-		tower.TxPower -= 0
+		tower.TxPowerdB -= 0
 	case e2.XICICPA_XICIC_PA_DB_1:
-		tower.TxPower++
+		tower.TxPowerdB++
 	case e2.XICICPA_XICIC_PA_DB_2:
-		tower.TxPower += 2
+		tower.TxPowerdB += 2
 	case e2.XICICPA_XICIC_PA_DB_3:
-		tower.TxPower += 3
+		tower.TxPowerdB += 3
 	}
 	trafficSimMgr.UpdateTower(tower)
 }
