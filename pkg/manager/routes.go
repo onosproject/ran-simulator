@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/onosproject/ran-simulator/api/types"
 	"googlemaps.github.io/maps"
-	log "k8s.io/klog"
 	"math"
 	"math/rand"
 	"net/http"
@@ -37,9 +36,9 @@ type RoutesParams struct {
 	StepDelay time.Duration
 }
 
-// Create new routes, by taking two random locations and asking Google for
+// NewRoutes Create new routes, by taking two random locations and asking Google for
 // directions to get from one to the other
-func (m *Manager) newRoutes(params RoutesParams) (map[string]*types.Route, error) {
+func (m *Manager) NewRoutes(params RoutesParams) (map[string]*types.Route, error) {
 	routes := make(map[string]*types.Route)
 
 	for r := 0; r < params.NumRoutes; r++ {
