@@ -9,7 +9,6 @@ routes between different locations.
 The application is very tunable through startup parameters, and can be run:
  
 * as a standalone application in docker
-* as part of a **docker-compose** collection of applications
 * deployed in a **Kubernetes** cluster
 
 ## Google Maps API Key
@@ -65,8 +64,6 @@ Usage of trafficsim:
 ```
 
 See [deployment.md](deployment.md) for how to change these for a Kubernetes deployment.
-
-See [docker-compose.md](docker-compose.md) for how to change these on a Docker Compose deployment.
 
 ## Browser access
 When deployed with the **sd-ran-gui** application, the simulation can be accessed
