@@ -161,5 +161,6 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) {
 		}
 		c <- ueAdmReq
 		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+		trafficSimMgr.UeAdmitted(ue)
 	}
 }

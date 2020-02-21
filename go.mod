@@ -6,7 +6,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/google/go-cmp v0.3.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
-	github.com/onosproject/onos-lib-go v0.0.0-20200220060353-00302d827ca2
+	github.com/onosproject/onos-lib-go v0.0.0-20200220193455-fe7dac6f40c0
 	github.com/sergi/go-diff v1.1.0 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/net v0.0.0-20191112182307-2180aed22343 // indirect
