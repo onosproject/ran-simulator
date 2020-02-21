@@ -84,6 +84,7 @@ func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
 		candidate2Dist float32 = math.MaxFloat32
 	)
 
+	m.TowersLock.RLock()
 	for _, tower := range m.Towers {
 		distance := distanceToTower(tower, point)
 		if distance < closestDist {
@@ -103,19 +104,24 @@ func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
 			candidate2Dist = distance
 		}
 	}
+	m.TowersLock.RUnlock()
 
 	return []string{closest, candidate1, candidate2}, []float32{closestDist, candidate1Dist, candidate2Dist}
 }
 
 // GetTower returns tower based on its name
 func (m *Manager) GetTower(name string) *types.Tower {
+	m.TowersLock.RLock()
+	defer m.TowersLock.RUnlock()
 	return m.Towers[name]
 }
 
 // UpdateTower Update a tower's properties - usually power level
 func (m *Manager) UpdateTower(tower *types.Tower) {
 	// Only the power can be updated at present
+	m.TowersLock.Lock()
 	m.Towers[tower.GetName()].TxPowerdB = tower.TxPowerdB
+	m.TowersLock.Unlock()
 	m.TowerChannel <- dispatcher.Event{
 		Type:   trafficsim.Type_UPDATED,
 		Object: tower,
@@ -161,7 +167,7 @@ func makeNeighbors(towerName string, towerParams types.TowersParams) []string {
 	return neighbors
 }
 
-// Min ...
+// min ...
 func min(x, y int) int {
 	if x < y {
 		return x
@@ -169,7 +175,7 @@ func min(x, y int) int {
 	return y
 }
 
-// Max ...
+// max ...
 func max(x, y int) int {
 	if x > y {
 		return x

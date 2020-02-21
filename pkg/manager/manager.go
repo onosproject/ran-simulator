@@ -19,6 +19,7 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
+	"sync"
 )
 
 var log = logging.GetLogger("manager")
@@ -27,25 +28,31 @@ var mgr Manager
 
 // Manager single point of entry for the trafficsim system.
 type Manager struct {
-	MapLayout      types.MapLayout
-	Towers         map[string]*types.Tower
-	Locations      map[string]*Location
-	Routes         map[string]*types.Route
-	UserEquipments map[string]*types.Ue
-	Dispatcher     *dispatcher.Dispatcher
-	UeChannel      chan dispatcher.Event
-	RouteChannel   chan dispatcher.Event
-	TowerChannel   chan dispatcher.Event
+	MapLayout          types.MapLayout
+	Towers             map[string]*types.Tower
+	TowersLock         *sync.RWMutex
+	Locations          map[string]*Location
+	Routes             map[string]*types.Route
+	RoutesLock         *sync.RWMutex
+	UserEquipments     map[string]*types.Ue
+	UserEquipmentsLock *sync.RWMutex
+	Dispatcher         *dispatcher.Dispatcher
+	UeChannel          chan dispatcher.Event
+	RouteChannel       chan dispatcher.Event
+	TowerChannel       chan dispatcher.Event
 }
 
 // NewManager initializes the RAN subsystem.
 func NewManager() (*Manager, error) {
 	log.Info("Creating Manager")
 	mgr = Manager{
-		Dispatcher:   dispatcher.NewDispatcher(),
-		UeChannel:    make(chan dispatcher.Event),
-		RouteChannel: make(chan dispatcher.Event),
-		TowerChannel: make(chan dispatcher.Event),
+		TowersLock:         &sync.RWMutex{},
+		RoutesLock:         &sync.RWMutex{},
+		UserEquipmentsLock: &sync.RWMutex{},
+		Dispatcher:         dispatcher.NewDispatcher(),
+		UeChannel:          make(chan dispatcher.Event),
+		RouteChannel:       make(chan dispatcher.Event),
+		TowerChannel:       make(chan dispatcher.Event),
 	}
 	return &mgr, nil
 }
@@ -54,7 +61,9 @@ func NewManager() (*Manager, error) {
 func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams, locParams LocationsParams, routesParams RoutesParams) {
 	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
 	m.MapLayout = mapLayoutParams
+	m.TowersLock.Lock()
 	m.Towers = NewTowers(towerparams, mapLayoutParams)
+	m.TowersLock.Unlock()
 	m.Locations = NewLocations(locParams, towerparams, mapLayoutParams)
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)

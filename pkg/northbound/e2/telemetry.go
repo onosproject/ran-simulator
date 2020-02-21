@@ -19,14 +19,12 @@ import (
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"math"
 )
 
 const e2TelemetryNbi = "e2TelemetryNbi"
 
 func makeCqi(distance float32, txPowerdB float32) uint32 {
-	power := float32(math.Pow(10, float64(txPowerdB/10)))
-	cqi := uint32(power / (distance * distance))
+	cqi := uint32(0.0001 * txPowerdB / (distance * distance))
 	if cqi > 15 {
 		cqi = 15
 	}

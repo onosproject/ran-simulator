@@ -107,6 +107,7 @@ func (s *Server) ListRoutes(req *trafficsim.ListRoutesRequest, stream trafficsim
 // ListTowers :
 func (s *Server) ListTowers(req *trafficsim.ListTowersRequest, stream trafficsim.Traffic_ListTowersServer) error {
 	if !req.WithoutReplay {
+		manager.GetManager().TowersLock.RLock()
 		for _, tower := range manager.GetManager().Towers {
 			resp := &trafficsim.ListTowersResponse{
 				Tower: tower,
@@ -114,9 +115,11 @@ func (s *Server) ListTowers(req *trafficsim.ListTowersRequest, stream trafficsim
 			}
 			err := stream.Send(resp)
 			if err != nil {
+				manager.GetManager().TowersLock.RUnlock()
 				return err
 			}
 		}
+		manager.GetManager().TowersLock.RUnlock()
 	}
 
 	if req.Subscribe {
