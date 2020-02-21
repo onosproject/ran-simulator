@@ -34,8 +34,9 @@ func (m *Manager) NewUserEquipments(params RoutesParams) map[string]*types.Ue {
 		routeName := fmt.Sprintf("Route-%d", u)
 		route := m.Routes[routeName]
 		towers, distances := m.findClosestTowers(route.Waypoints[0])
+		m.TowersLock.RLock()
 		servingTowerDist := distanceToTower(m.Towers[towers[0]], route.Waypoints[0])
-
+		m.TowersLock.RUnlock()
 		ue := types.Ue{
 			Name:             name,
 			Type:             "Car",

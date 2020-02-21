@@ -44,4 +44,6 @@ func Test_GenerateReport(t *testing.T) {
 			t.Errorf("Unexpected Ecid %s in report", ecid)
 		}
 	}
+
+	mgr.Close()
 }
