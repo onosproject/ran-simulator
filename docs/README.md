@@ -1,6 +1,6 @@
 # Ran Simulator
 
-The Ran Simulator is part of µONOS and is meant to work alongside `onos-ran` and
+The Ran Simulator is part of µONOS and is meant to work alongside `onos-ric` and
 `sd-ran-gui`.
 
 The simulator mimics a collection of Cell Towers and a set of UE's moving along

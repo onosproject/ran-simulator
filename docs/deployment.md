@@ -44,12 +44,12 @@ created by it. To list the charts that are installed and view their statuses, ru
 > helm ls
 NAME         	NAMESPACE 	REVISION	UPDATED                                	STATUS  	CHART              	APP VERSION
 onos-cli     	micro-onos	1       	2020-02-04 08:01:54.860813386 +0000 UTC	deployed	onos-cli-0.0.1     	1          
-onos-ran     	micro-onos	1       	2020-02-04 08:02:17.663782372 +0000 UTC	deployed	onos-ran-0.0.1     	1          
+onos-ric     	micro-onos	1       	2020-02-04 08:02:17.663782372 +0000 UTC	deployed	onos-ric-0.0.1     	1          
 ran-simulator	micro-onos	1       	2020-02-04 09:32:21.533299519 +0000 UTC	deployed	ran-simulator-0.0.1	1          
 sd-ran-gui   	micro-onos	1       	2020-02-04 09:32:49.018099586 +0000 UTC	deployed	sd-ran-gui-0.0.1   	1  
 ```
 
-> Here the service is shown running alongside `onos-cli`, `onos-ran` and the `sd-ran-gui`
+> Here the service is shown running alongside `onos-cli`, `onos-ric` and the `sd-ran-gui`
 > as these are usually deployed together to give a demo scenario. See the individual
 > deployment instructions for these services.
 
@@ -58,7 +58,7 @@ To check whether the service is running correctly use `kubectl`
 > kubectl get pods -n micro-onos
 NAME                             READY   STATUS             RESTARTS   AGE
 onos-cli-68bbf4f674-ssjt4        1/1     Running            0          18m
-onos-ran-5fb8c6bdd7-xmcmq        1/1     Running            0          18m
+onos-ric-5fb8c6bdd7-xmcmq        1/1     Running            0          18m
 ran-simulator-6f577597d8-5lcv8   1/1     Running            0          82s
 sd-ran-gui-76ff54d85-fh72j       2/2     Running            0          54s
 ```
