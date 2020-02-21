@@ -82,6 +82,20 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 //Close kills the channels and manager related objects
 func (m *Manager) Close() {
+	close(m.TowerChannel)
+	close(m.UeChannel)
+	close(m.RouteChannel)
+	for r := range m.Routes {
+		delete(m.Routes, r)
+	}
+	for l := range m.Locations {
+		delete(m.Locations, l)
+	}
+	m.TowersLock.Lock()
+	for tid := range m.Towers {
+		delete(m.Towers, tid)
+	}
+	m.TowersLock.Unlock()
 	log.Info("Closing Manager")
 }
 

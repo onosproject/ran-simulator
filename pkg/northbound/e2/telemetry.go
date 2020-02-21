@@ -98,13 +98,14 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 
 	reports := make([]*e2.RadioRepPerServCell, 3)
 
+	trafficSimMgr.TowersLock.RLock()
 	reports[0] = new(e2.RadioRepPerServCell)
 	reports[0].Ecgi = &e2.ECGI{
 		PlmnId: tower1.PlmnID,
 		Ecid:   tower1.EcID,
 	}
 	reports[0].CqiHist = make([]uint32, 1)
-	reports[0].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.TxPower)
+	reports[0].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.GetTxPowerdB())
 
 	reports[1] = new(e2.RadioRepPerServCell)
 	reports[1].Ecgi = &e2.ECGI{
@@ -112,7 +113,7 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 		Ecid:   tower2.EcID,
 	}
 	reports[1].CqiHist = make([]uint32, 1)
-	reports[1].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.TxPower)
+	reports[1].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.GetTxPowerdB())
 
 	reports[2] = new(e2.RadioRepPerServCell)
 	reports[2].Ecgi = &e2.ECGI{
@@ -120,7 +121,8 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 		Ecid:   tower3.EcID,
 	}
 	reports[2].CqiHist = make([]uint32, 1)
-	reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.TxPower)
+	reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
+	trafficSimMgr.TowersLock.RUnlock()
 
 	log.Infof("RadioMeasReport %s %s cqi:%d(%s),%d(%s),%d(%s)", servingTower.EcID, ue.Name,
 		reports[0].CqiHist[0], reports[0].Ecgi.Ecid,
