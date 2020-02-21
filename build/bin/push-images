@@ -2,4 +2,3 @@
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 make images
 docker push onosproject/ran-simulator:latest
-# docker push onosproject/onos-ran-tests:latest
