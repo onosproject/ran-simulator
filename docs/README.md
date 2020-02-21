@@ -9,7 +9,6 @@ routes between different locations.
 The application is very tunable through startup parameters, and can be run:
  
 * as a standalone application in docker
-* as part of a **docker-compose** collection of applications
 * deployed in a **Kubernetes** cluster
 
 ## Google Maps API Key
@@ -64,39 +63,10 @@ Usage of trafficsim:
     	The starting Zoom level (default 12)
 ```
 
-See [deployment.md] for how to change these for a Kubernetes deployment.
-
-See [docker-compose.md] for how to change these on a Docker Compose deployment.
+See [deployment.md](deployment.md) for how to change these for a Kubernetes deployment.
 
 ## Browser access
 When deployed with the **sd-ran-gui** application, the simulation can be accessed
 from a browser.
 
-This shows the default deployment with
-* A Google Map centered over Berlin
-* 3 x 3 Towers at given spacings 
-* Zoomed to include most of the city
-* 3 routes (and hence 3 UEs active at any time)
-* Choosing routes start and finish points from among 10 random locations around the Towers
-* The Map is faded to increase the visibility of the towers and routes
-* The route paths are shown as dotted lines and are faded to 50% opacity.
-* Towers have an surrounding circle that shows the power setting in effect. This
-varies at run time through the control of `onos-ran`. As the power level is varied
-on a tower, it will temporarily enlarge for 500ms.
-* The UE's (cars) will be handed over from one tower to another - as they do they
-enlarge for a period of 500ms and their color changes to that of the newly selected tower.
-
-At intervals of `stepDelayMs` (default every second) each UE moves one step along
-its route.
-
-The number of steps depends on the Google Directions API, and usually
-varies between 25 and 150. When a UE reaches the end of its route, it uses that
-End Location as the start of a new Route and randomly chooses a new Location as its
-end point and starts moving along it.
-
-This continues on indefinitely.
-
-A second browser window opened on a second device will show identical movements.
-
-![sd-ran-gui](../../sdran-gui/docs/images/sd-ran-gui-berlin.png)
 [Directions API]: https://developers.google.com/maps/documentation/directions/start

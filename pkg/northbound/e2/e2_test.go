@@ -52,7 +52,9 @@ func setUpManager() (*manager.Manager, error) {
 		return nil, err
 	}
 	mgr.MapLayout = mapLayout
+	mgr.TowersLock.Lock()
 	mgr.Towers = towers
+	mgr.TowersLock.Unlock()
 	mgr.Locations = locations
 
 	mgr.Routes, err = mgr.NewRoutes(routesParams)

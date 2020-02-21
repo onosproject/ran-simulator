@@ -60,6 +60,8 @@ message Ue {
     float tower3_dist = 14;
 
     string crnti = 15;
+
+    bool admitted = 16;
 }
 
 
@@ -90,7 +92,8 @@ message Tower {
 
     repeated string neighbors = 7;
 
-    uint32 txPower = 8;
+    // The tower transmit power in decibels
+    float txPowerdB = 8;
 }
 
 message MapLayout {

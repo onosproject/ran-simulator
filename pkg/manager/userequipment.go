@@ -34,8 +34,9 @@ func (m *Manager) NewUserEquipments(params RoutesParams) map[string]*types.Ue {
 		routeName := fmt.Sprintf("Route-%d", u)
 		route := m.Routes[routeName]
 		towers, distances := m.findClosestTowers(route.Waypoints[0])
+		m.TowersLock.RLock()
 		servingTowerDist := distanceToTower(m.Towers[towers[0]], route.Waypoints[0])
-
+		m.TowersLock.RUnlock()
 		ue := types.Ue{
 			Name:             name,
 			Type:             "Car",
@@ -51,6 +52,7 @@ func (m *Manager) NewUserEquipments(params RoutesParams) map[string]*types.Ue {
 			Tower3:           towers[2],
 			Tower3Dist:       distances[2],
 			Crnti:            makeCrnti(name),
+			Admitted:         false,
 		}
 		ues[name] = &ue
 
@@ -81,6 +83,18 @@ func (m *Manager) UeHandover(name string, tower string) {
 	m.UeChannel <- dispatcher.Event{
 		Type:       trafficsim.Type_UPDATED,
 		UpdateType: trafficsim.UpdateType_HANDOVER,
+		Object:     ue,
+	}
+}
+
+// UeAdmitted - called when the Admission Request for the UE is processed
+// This causes the first RadioMeasurementReport to be sent
+func (m *Manager) UeAdmitted(ue *types.Ue) {
+	time.Sleep(time.Millisecond * 100)
+	ue.Admitted = true
+	m.UeChannel <- dispatcher.Event{
+		Type:       trafficsim.Type_UPDATED,
+		UpdateType: trafficsim.UpdateType_TOWER,
 		Object:     ue,
 	}
 }
@@ -162,10 +176,12 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			if ue.Tower1 != oldTower1 || ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
 				updateType = trafficsim.UpdateType_TOWER
 			}
-			m.UeChannel <- dispatcher.Event{
-				Type:       trafficsim.Type_UPDATED,
-				UpdateType: updateType,
-				Object:     ue,
+			if ue.Admitted {
+				m.UeChannel <- dispatcher.Event{
+					Type:       trafficsim.Type_UPDATED,
+					UpdateType: updateType,
+					Object:     ue,
+				}
 			}
 			return nil
 		}
