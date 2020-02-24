@@ -17,6 +17,8 @@ package e2
 import (
 	"fmt"
 	"github.com/onosproject/ran-simulator/api/e2"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
+	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"io"
 	"strconv"
@@ -65,7 +67,12 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 		//log.Infof("Recv messageType %d", in.MessageType)
 		switch x := in.S.(type) {
 		case *e2.ControlResponse_CellConfigRequest:
-			handleCellConfigRequest(c)
+			go func() {
+				err := handleCellConfigRequest(c)
+				if err != nil {
+					log.Errorf("error listening for UE updates %s", err.Error())
+				}
+			}()
 		case *e2.ControlResponse_HORequest:
 			handleHORequest(x.HORequest)
 		case *e2.ControlResponse_RRMConfig:
@@ -109,7 +116,7 @@ func handleHORequest(req *e2.HORequest) {
 	trafficSimMgr.UeHandover(crntiToName(req.Crnti), eciToName(req.EcgiT.Ecid))
 }
 
-func handleCellConfigRequest(c chan e2.ControlUpdate) {
+func handleCellConfigRequest(c chan e2.ControlUpdate) error {
 	log.Infof("handleCellConfigRequest")
 
 	trafficSimMgr := manager.GetManager()
@@ -144,23 +151,37 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) {
 	}
 
 	// Initate UE admissions
-	for _, ue := range trafficSimMgr.UserEquipments {
-		eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
-		ueAdmReq := e2.ControlUpdate{
-			MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
-			S: &e2.ControlUpdate_UEAdmissionRequest{
-				UEAdmissionRequest: &e2.UEAdmissionRequest{
-					Ecgi: &e2.ECGI{
-						PlmnId: manager.TestPlmnID,
-						Ecid:   eci,
-					},
-					Crnti:             ue.Crnti,
-					AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
-				},
-			},
-		}
-		c <- ueAdmReq
-		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
-		trafficSimMgr.UeAdmitted(ue)
+	ueUpdatesLsnr, err := trafficSimMgr.Dispatcher.RegisterUeListener("handleCellConfigReport")
+	if err != nil {
+		log.Errorf("could not register for UE events")
+		return err
 	}
+	for event := range ueUpdatesLsnr {
+		ue, ok := event.Object.(*types.Ue)
+		if !ok {
+			return fmt.Errorf("invalid event type for %v", event.Object)
+		}
+		if event.Type == trafficsim.Type_ADDED || event.Type == trafficsim.Type_NONE {
+			eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
+			ueAdmReq := e2.ControlUpdate{
+				MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
+				S: &e2.ControlUpdate_UEAdmissionRequest{
+					UEAdmissionRequest: &e2.UEAdmissionRequest{
+						Ecgi: &e2.ECGI{
+							PlmnId: manager.TestPlmnID,
+							Ecid:   eci,
+						},
+						Crnti:             ue.Crnti,
+						AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
+					},
+				},
+			}
+			c <- ueAdmReq
+			log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+			trafficSimMgr.UeAdmitted(ue)
+		} else if event.Type == trafficsim.Type_REMOVED {
+			log.Warnf("removal of UE %s - not yet supported", ue.GetName())
+		}
+	}
+	return nil
 }

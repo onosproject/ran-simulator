@@ -30,6 +30,8 @@ const TestPlmnID = "001001"
 // DefaultTxPower - all base-stations start with this power level
 const DefaultTxPower = 10
 
+const defaultColor = "#000000"
+
 // TowerIf :
 type TowerIf interface {
 	GetPosition() types.Point

@@ -18,7 +18,9 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"googlemaps.github.io/maps"
 	"math"
 	"math/rand"
@@ -47,7 +49,7 @@ func (m *Manager) NewRoutes(params RoutesParams) (map[string]*types.Route, error
 			return nil, err
 		}
 		// Colour is dependent on UE tower and is not known at this stage
-		route, err := m.newRoute(startLoc, r, params.APIKey, "#000000")
+		route, err := m.newRoute(startLoc, r, params.APIKey, defaultColor)
 		if err != nil {
 			return nil, err
 		}
@@ -58,7 +60,18 @@ func (m *Manager) NewRoutes(params RoutesParams) (map[string]*types.Route, error
 	return routes, nil
 }
 
-// If a googleApiKey is given, them call the Google Directions API to get steps that
+func (m *Manager) removeRoute(routeName string) {
+	r, ok := m.Routes[routeName]
+	if ok {
+		delete(m.Routes, routeName)
+		m.RouteChannel <- dispatcher.Event{
+			Type:   trafficsim.Type_REMOVED,
+			Object: r,
+		}
+	}
+}
+
+// If a googleAPIKey is given, them call the Google Directions API to get steps that
 // follow known streets and traffic rules
 func (m *Manager) newRoute(startLoc *Location, rID int, apiKey string, color string) (*types.Route, error) {
 	endLoc, err := m.getRandomLocation(startLoc.Name)
@@ -69,18 +82,17 @@ func (m *Manager) newRoute(startLoc *Location, rID int, apiKey string, color str
 	var points []*types.Point
 	if len(apiKey) >= googleAPIKeyMinLen {
 		points, err = googleRoute(startLoc, endLoc, apiKey)
-		log.Infof("Generated new Route-%d with %d points using Google Directions", rID, len(points))
+		log.Infof("Generated new %s with %d points using Google Directions", routeName(rID), len(points))
 	} else {
 		points, err = randomRoute(startLoc, endLoc)
-		log.Infof("Generated new Route-%d with %d points using Random Directions", rID, len(points))
+		log.Infof("Generated new %s with %d points using Random Directions", routeName(rID), len(points))
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	name := fmt.Sprintf("Route-%d", rID)
 	route := types.Route{
-		Name:      name,
+		Name:      routeName(rID),
 		Waypoints: points,
 		Color:     color,
 	}
@@ -154,4 +166,8 @@ func randomRoute(startLoc *Location, endLoc *Location) ([]*types.Point, error) {
 	points = append(points, &endLoc.Position)
 
 	return points, nil
+}
+
+func routeName(idx int) string {
+	return fmt.Sprintf("Route-%d", idx)
 }

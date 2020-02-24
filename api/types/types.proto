@@ -106,4 +106,10 @@ message MapLayout {
     bool showRoutes = 4;
 
     bool showPower = 5;
+
+    uint32 min_routes = 6;
+
+    uint32 max_routes = 7;
+
+    uint32 current_routes = 8;
 }
