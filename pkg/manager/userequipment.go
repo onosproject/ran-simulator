@@ -30,41 +30,100 @@ func (m *Manager) NewUserEquipments(params RoutesParams) map[string]*types.Ue {
 
 	// There is already a route per UE
 	for u := 0; u < params.NumRoutes; u++ {
-		name := fmt.Sprintf("Ue-%04X", u+1)
-		routeName := fmt.Sprintf("Route-%d", u)
-		route := m.Routes[routeName]
-		towers, distances := m.findClosestTowers(route.Waypoints[0])
-		m.TowersLock.RLock()
-		servingTowerDist := distanceToTower(m.Towers[towers[0]], route.Waypoints[0])
-		m.TowersLock.RUnlock()
-		ue := types.Ue{
-			Name:             name,
-			Type:             "Car",
-			Position:         route.Waypoints[0],
-			Rotation:         0,
-			Route:            routeName,
-			ServingTower:     towers[0],
-			ServingTowerDist: servingTowerDist,
-			Tower1:           towers[0],
-			Tower1Dist:       distances[0],
-			Tower2:           towers[1],
-			Tower2Dist:       distances[1],
-			Tower3:           towers[2],
-			Tower3Dist:       distances[2],
-			Crnti:            makeCrnti(name),
-			Admitted:         false,
-		}
-		ues[name] = &ue
+		ue := m.newUe(u)
+		ues[ue.Name] = ue
+	}
+	return ues
+}
 
-		// Now would be a good time to update the Route colour
-		for _, t := range m.Towers {
-			if t.Name == towers[0] {
-				m.Routes[routeName].Color = t.Color
-				break
+func (m *Manager) newUe(ueIdx int) *types.Ue {
+	name := fmt.Sprintf("Ue-%04X", ueIdx+1)
+	routeName := fmt.Sprintf("Route-%d", ueIdx)
+	route := m.Routes[routeName]
+	towers, distances := m.findClosestTowers(route.Waypoints[0])
+	m.TowersLock.RLock()
+	servingTowerDist := distanceToTower(m.Towers[towers[0]], route.Waypoints[0])
+	m.TowersLock.RUnlock()
+	ue := &types.Ue{
+		Name:             name,
+		Type:             "Car",
+		Position:         route.Waypoints[0],
+		Rotation:         0,
+		Route:            routeName,
+		ServingTower:     towers[0],
+		ServingTowerDist: servingTowerDist,
+		Tower1:           towers[0],
+		Tower1Dist:       distances[0],
+		Tower2:           towers[1],
+		Tower2Dist:       distances[1],
+		Tower3:           towers[2],
+		Tower3Dist:       distances[2],
+		Crnti:            makeCrnti(name),
+		Admitted:         false,
+	}
+
+	// Now would be a good time to update the Route colour
+	for _, t := range m.Towers {
+		if t.Name == towers[0] {
+			m.Routes[routeName].Color = t.Color
+			break
+		}
+	}
+
+	return ue
+}
+
+// SetNumberUes - change the number of active UEs
+func (m *Manager) SetNumberUes(numUes int) error {
+	currentNum := len(m.UserEquipments)
+	if numUes < int(m.MapLayout.MinRoutes) {
+		return fmt.Errorf("number of UEs requested %d is below minimum %d", numUes, m.MapLayout.MinRoutes)
+	} else if numUes > int(m.MapLayout.MaxRoutes) {
+		return fmt.Errorf("number of UEs requested %d is above maximum %d", numUes, m.MapLayout.MaxRoutes)
+	} else if numUes < currentNum {
+		log.Infof("Decreasing number of UEs from %d to %d", currentNum, numUes)
+		for ueidx := currentNum - 1; ueidx >= numUes; ueidx-- {
+			ueName := ueName(ueidx)
+			routeName := routeName(ueidx)
+			log.Infof("Removing Route %s, UE %s", routeName, ueName)
+			m.removeRoute(routeName)
+			ue, ok := m.UserEquipments[ueName]
+			if !ok {
+				return fmt.Errorf("error removing UE %s (%d)", ueName, ueidx)
+			}
+			delete(m.UserEquipments, ueName)
+			m.UeChannel <- dispatcher.Event{
+				Type:   trafficsim.Type_REMOVED,
+				Object: ue,
+			}
+		}
+	} else {
+		log.Infof("Increasing number of UEs from %d to %d", currentNum, numUes)
+		for ueidx := currentNum; ueidx < numUes; ueidx++ {
+			startLoc, err := m.getRandomLocation("")
+			if err != nil {
+				return err
+			}
+			newRoute, err := m.newRoute(startLoc, ueidx, m.googleAPIKey, defaultColor)
+			if err != nil {
+				return err
+			}
+			m.Routes[newRoute.GetName()] = newRoute
+			m.RouteChannel <- dispatcher.Event{
+				Type:   trafficsim.Type_ADDED,
+				Object: newRoute,
+			}
+			ue := m.newUe(ueidx)
+			m.UserEquipments[ue.GetName()] = ue
+			m.UeChannel <- dispatcher.Event{
+				Type:   trafficsim.Type_ADDED,
+				Object: ue,
 			}
 		}
 	}
-	return ues
+	m.MapLayout.CurrentRoutes = uint32(numUes)
+
+	return nil
 }
 
 // GetUe returns Ue based on its name
@@ -103,9 +162,9 @@ func (m *Manager) startMoving(params RoutesParams) {
 
 	for {
 		breakout := false // Needed to breakout of double for loop
-		for ueidx := 0; ueidx < params.NumRoutes; ueidx++ {
-			ueName := fmt.Sprintf("Ue-%04X", ueidx+1)
-			routeName := fmt.Sprintf("Route-%d", ueidx)
+		for ueidx := 0; ueidx < len(m.Routes); ueidx++ {
+			ueName := ueName(ueidx)
+			routeName := routeName(ueidx)
 			err := m.moveUe(m.UserEquipments[ueName], m.Routes[routeName])
 			if err != nil && strings.HasPrefix(err.Error(), "end of route") {
 				oldRouteFinish := m.Routes[routeName].GetWaypoints()[len(m.Routes[routeName].GetWaypoints())-1]
@@ -173,15 +232,13 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			ue.Tower3 = names[2]
 			ue.Tower3Dist = distances[2]
 
-			if ue.Tower1 != oldTower1 || ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
+			if ue.Admitted && ue.Tower1 != oldTower1 || ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
 				updateType = trafficsim.UpdateType_TOWER
 			}
-			if ue.Admitted {
-				m.UeChannel <- dispatcher.Event{
-					Type:       trafficsim.Type_UPDATED,
-					UpdateType: updateType,
-					Object:     ue,
-				}
+			m.UeChannel <- dispatcher.Event{
+				Type:       trafficsim.Type_UPDATED,
+				UpdateType: updateType,
+				Object:     ue,
 			}
 			return nil
 		}
@@ -191,4 +248,8 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 
 func makeCrnti(ueName string) string {
 	return strings.Split(ueName, "-")[1]
+}
+
+func ueName(idx int) string {
+	return fmt.Sprintf("Ue-%04X", idx+1)
 }
