@@ -77,6 +77,14 @@ message ListUesResponse {
     UpdateType update_type = 3;
 }
 
+message SetNumberUEsRequest {
+    uint32 number = 1;
+}
+
+message SetNumberUEsResponse {
+    uint32 number = 1;
+}
+
 // Traffic - provides a stream of traffic data to GUI
 service Traffic {
     rpc GetMapLayout(MapLayoutRequest) returns (ran.trafficsim.types.MapLayout);
@@ -86,6 +94,8 @@ service Traffic {
     rpc ListRoutes(ListRoutesRequest) returns (stream ListRoutesResponse);
 
     rpc ListUes(ListUesRequest) returns (stream ListUesResponse);
+
+    rpc SetNumberUEs(SetNumberUEsRequest) returns (SetNumberUEsResponse);
 }
 
 // Change event type

@@ -40,6 +40,7 @@ type Manager struct {
 	UeChannel          chan dispatcher.Event
 	RouteChannel       chan dispatcher.Event
 	TowerChannel       chan dispatcher.Event
+	googleAPIKey       string
 }
 
 // NewManager initializes the RAN subsystem.
@@ -65,6 +66,9 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	m.Towers = NewTowers(towerparams, mapLayoutParams)
 	m.TowersLock.Unlock()
 	m.Locations = NewLocations(locParams, towerparams, mapLayoutParams)
+	m.MapLayout.MinRoutes = uint32(routesParams.NumRoutes)
+	m.MapLayout.MaxRoutes = uint32(locParams.NumLocations / 2)
+	m.googleAPIKey = routesParams.APIKey
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)

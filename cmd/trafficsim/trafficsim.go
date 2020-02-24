@@ -115,8 +115,8 @@ func main() {
 	}
 
 	locationParams := manager.LocationsParams{NumLocations: *numLocations}
-	if locationParams.NumLocations < 3 || locationParams.NumLocations > 200 {
-		log.Fatal("Invalid number of Locations - must be between 3 and 100 inclusive")
+	if locationParams.NumLocations < 3 || locationParams.NumLocations > 600 {
+		log.Fatal("Invalid number of Locations - must be between 3 and 600 inclusive")
 	}
 
 	routesParams := manager.RoutesParams{

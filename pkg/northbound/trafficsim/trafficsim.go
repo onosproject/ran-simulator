@@ -23,6 +23,8 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/service"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var log = liblog.GetLogger("northbound", "trafficsim")
@@ -208,4 +210,15 @@ func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traff
 	}
 
 	return nil
+}
+
+// SetNumberUEs - change the number of UEs in the simulation
+// Cannot be set below the minimum or above the maximum
+func (s *Server) SetNumberUEs(ctx context.Context, req *trafficsim.SetNumberUEsRequest) (*trafficsim.SetNumberUEsResponse, error) {
+	numRoutes := req.GetNumber()
+	err := manager.GetManager().SetNumberUes(int(numRoutes))
+	if err != nil {
+		return nil, status.Error(codes.OutOfRange, err.Error())
+	}
+	return &trafficsim.SetNumberUEsResponse{Number: numRoutes}, nil
 }
