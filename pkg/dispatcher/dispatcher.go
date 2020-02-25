@@ -77,6 +77,7 @@ func (d *Dispatcher) UnregisterUeListener(subscriber string) {
 	}
 	delete(d.nbiUeListeners, subscriber)
 	close(channel)
+	log.Infof("Unregistered %s from UE listeners", subscriber)
 }
 
 // ListenRouteEvents :

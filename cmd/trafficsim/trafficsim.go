@@ -58,7 +58,7 @@ func main() {
 	showPower := flag.Bool("showPower", true, "Show power as circle on start")
 	towerSpacingVert := flag.Float64("towerSpacingVert", 0.02, "Tower spacing vert in degrees latitude")
 	towerSpacingHoriz := flag.Float64("towerSpacingHoriz", 0.02, "Tower spacing horiz in degrees longitude")
-	numLocations := flag.Int("numLocations", 10, "Number of locations")
+	numLocations := flag.Int("numLocations", 600, "Number of locations")
 	numRoutes := flag.Int("numRoutes", 3, "Number of routes")
 	stepDelayMs := flag.Int("stepDelayMs", 1000, "delay between steps on route")
 	maxUEs := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
