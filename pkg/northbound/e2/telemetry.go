@@ -53,6 +53,7 @@ func sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServer, c chan e2
 				log.Infof("send error %v", err)
 				return err
 			}
+			UpdateTelemetryMetrics(&msg)
 		case <-stream.Context().Done():
 			log.Infof("Controller has disconnected")
 			return nil
