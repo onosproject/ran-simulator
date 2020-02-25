@@ -37,7 +37,7 @@ func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_
 	defer close(c)
 
 	go func() {
-		err := radioMeasReportPerUE(stream, c)
+		err := radioMeasReportPerUE(c)
 		if err != nil {
 			log.Errorf("Unable to send radioMeasReportPerUE %s", err.Error())
 		}
@@ -53,6 +53,7 @@ func sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServer, c chan e2
 				log.Infof("send error %v", err)
 				return err
 			}
+			UpdateTelemetryMetrics(&msg)
 		case <-stream.Context().Done():
 			log.Infof("Controller has disconnected")
 			return nil
@@ -60,7 +61,7 @@ func sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServer, c chan e2
 	}
 }
 
-func radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func radioMeasReportPerUE(c chan e2.TelemetryMessage) error {
 	trafficSimMgr := manager.GetManager()
 
 	// replay any existing UE's
@@ -129,7 +130,7 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
 		reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
 
-	return e2.TelemetryMessage{
+	m := e2.TelemetryMessage{
 		MessageType: e2.MessageType_RADIO_MEAS_REPORT_PER_UE,
 		S: &e2.TelemetryMessage_RadioMeasReportPerUE{
 			RadioMeasReportPerUE: &e2.RadioMeasReportPerUE{
@@ -142,4 +143,6 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 			},
 		},
 	}
+
+	return m
 }

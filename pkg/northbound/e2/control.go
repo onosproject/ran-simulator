@@ -16,12 +16,13 @@ package e2
 
 import (
 	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"io"
-	"strconv"
 )
 
 func crntiToName(crnti string) string {
@@ -80,6 +81,7 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 		default:
 			log.Errorf("ControlResponse has unexpected type %T", x)
 		}
+		UpdateControlMetrics(in)
 	}
 }
 
