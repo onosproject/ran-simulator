@@ -15,6 +15,7 @@
 package e2
 
 import (
+	"fmt"
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -35,7 +36,6 @@ func makeCqi(distance float32, txPowerdB float32) uint32 {
 func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_SendTelemetryServer) error {
 	c := make(chan e2.TelemetryMessage)
 	defer close(c)
-
 	go func() {
 		err := radioMeasReportPerUE(stream, c)
 		if err != nil {
@@ -53,6 +53,7 @@ func sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServer, c chan e2
 				log.Infof("send error %v", err)
 				return err
 			}
+			UpdateTelemetryMetrics(&msg)
 		case <-stream.Context().Done():
 			log.Infof("Controller has disconnected")
 			return nil
@@ -70,22 +71,28 @@ func radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan
 		}
 	}
 
-	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(e2TelemetryNbi)
-	defer trafficSimMgr.Dispatcher.UnregisterUeListener(e2TelemetryNbi)
+	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, stream)
+	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
+	defer trafficSimMgr.Dispatcher.UnregisterUeListener(streamID)
 	if err != nil {
 		return err
 	}
-	// then listen out for any updates to UEs
-	for ueUpdate := range ueChangeChannel {
-		if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
-			ue, ok := ueUpdate.Object.(*types.Ue)
-			if !ok {
-				log.Fatalf("Object %v could not be converted to UE", ueUpdate)
+	// block here and listen out for any updates to UEs
+	for {
+		select {
+		case ueUpdate := <-ueChangeChannel:
+			if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
+				ue, ok := ueUpdate.Object.(*types.Ue)
+				if !ok {
+					log.Fatalf("Object %v could not be converted to UE", ueUpdate)
+				}
+				c <- generateReport(ue)
 			}
-			c <- generateReport(ue)
+		case <-stream.Context().Done():
+			log.Infof("Controller has disconnected")
+			return nil
 		}
 	}
-	return nil
 }
 
 func generateReport(ue *types.Ue) e2.TelemetryMessage {

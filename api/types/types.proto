@@ -62,8 +62,18 @@ message Ue {
     string crnti = 15;
 
     bool admitted = 16;
+
+    UeMetrics metrics = 17;
+
 }
 
+message UeMetrics {
+    // Latency (in nanoseconds) of the most recent hand-over
+    int64 ho_latency = 1;
+
+    // Handover report timestamp (in nanoseconds since epoch)
+    int64 ho_report_timestamp = 2;
+}
 
 message TowersParams {
 	uint32 towerRows = 1;

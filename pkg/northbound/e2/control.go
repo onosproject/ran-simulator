@@ -16,12 +16,13 @@ package e2
 
 import (
 	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"io"
-	"strconv"
 )
 
 func crntiToName(crnti string) string {
@@ -67,12 +68,8 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 		//log.Infof("Recv messageType %d", in.MessageType)
 		switch x := in.S.(type) {
 		case *e2.ControlResponse_CellConfigRequest:
-			go func() {
-				err := handleCellConfigRequest(c)
-				if err != nil {
-					log.Errorf("error listening for UE updates %s", err.Error())
-				}
-			}()
+			handleCellConfigRequest(c)
+			go handleUeAdmissions(stream, c)
 		case *e2.ControlResponse_HORequest:
 			handleHORequest(x.HORequest)
 		case *e2.ControlResponse_RRMConfig:
@@ -80,6 +77,7 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 		default:
 			log.Errorf("ControlResponse has unexpected type %T", x)
 		}
+		UpdateControlMetrics(in)
 	}
 }
 
@@ -116,7 +114,7 @@ func handleHORequest(req *e2.HORequest) {
 	trafficSimMgr.UeHandover(crntiToName(req.Crnti), eciToName(req.EcgiT.Ecid))
 }
 
-func handleCellConfigRequest(c chan e2.ControlUpdate) error {
+func handleCellConfigRequest(c chan e2.ControlUpdate) {
 	log.Infof("handleCellConfigRequest")
 
 	trafficSimMgr := manager.GetManager()
@@ -149,39 +147,63 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) error {
 		c <- cellConfigReport
 		log.Infof("handleCellConfigReport eci: %s", tower.EcID)
 	}
+}
 
-	// Initate UE admissions
-	ueUpdatesLsnr, err := trafficSimMgr.Dispatcher.RegisterUeListener("handleCellConfigReport")
+func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
+	trafficSimMgr := manager.GetManager()
+	// Initiate UE admissions - handle what's currently here and listen for others
+	for _, ue := range trafficSimMgr.UserEquipments {
+		eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
+		ueAdmReq := formatUeAdmissionReq(eci, ue.Crnti)
+		c <- *ueAdmReq
+		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+		trafficSimMgr.UeAdmitted(ue)
+	}
+
+	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
+	ueUpdatesLsnr, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
 	if err != nil {
-		log.Errorf("could not register for UE events")
-		return err
+		log.Fatalf("could not register for UE events")
 	}
-	for event := range ueUpdatesLsnr {
-		ue, ok := event.Object.(*types.Ue)
-		if !ok {
-			return fmt.Errorf("invalid event type for %v", event.Object)
-		}
-		if event.Type == trafficsim.Type_ADDED || event.Type == trafficsim.Type_NONE {
-			eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
-			ueAdmReq := e2.ControlUpdate{
-				MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
-				S: &e2.ControlUpdate_UEAdmissionRequest{
-					UEAdmissionRequest: &e2.UEAdmissionRequest{
-						Ecgi: &e2.ECGI{
-							PlmnId: manager.TestPlmnID,
-							Ecid:   eci,
-						},
-						Crnti:             ue.Crnti,
-						AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
-					},
-				},
+	defer trafficSimMgr.Dispatcher.UnregisterUeListener(streamID)
+	for {
+		// block here and listen for updates on UEs
+		select {
+		case event := <-ueUpdatesLsnr:
+			ue, ok := event.Object.(*types.Ue)
+			if !ok {
+				log.Fatalf("Object %v could not be converted to UE", ue)
 			}
-			c <- ueAdmReq
-			log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
-			trafficSimMgr.UeAdmitted(ue)
-		} else if event.Type == trafficsim.Type_REMOVED {
-			log.Warnf("removal of UE %s - not yet supported", ue.GetName())
+			if event.Type == trafficsim.Type_ADDED {
+				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
+				ueAdmReq := formatUeAdmissionReq(eci, ue.Crnti)
+				c <- *ueAdmReq
+				log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+				ue.Admitted = true
+			} else if event.Type == trafficsim.Type_REMOVED {
+				// TODO - implement the UEReleaseInd
+				log.Warnf("removal of UE %s - not yet supported", ue.GetName())
+			}
+			// Nothing to be done for trafficsim.Type_UPDATED - they are handled by Telemetry
+		case <-stream.Context().Done():
+			log.Infof("Controller has disconnected")
+			return
 		}
 	}
-	return nil
+}
+
+func formatUeAdmissionReq(eci string, crnti string) *e2.ControlUpdate {
+	return &e2.ControlUpdate{
+		MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
+		S: &e2.ControlUpdate_UEAdmissionRequest{
+			UEAdmissionRequest: &e2.UEAdmissionRequest{
+				Ecgi: &e2.ECGI{
+					PlmnId: manager.TestPlmnID,
+					Ecid:   eci,
+				},
+				Crnti:             crnti,
+				AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
+			},
+		},
+	}
 }

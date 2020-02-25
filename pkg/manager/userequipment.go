@@ -60,6 +60,10 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 		Tower3Dist:       distances[2],
 		Crnti:            makeCrnti(name),
 		Admitted:         false,
+		Metrics: &types.UeMetrics{
+			HoLatency:         0,
+			HoReportTimestamp: 0,
+		},
 	}
 
 	// Now would be a good time to update the Route colour
