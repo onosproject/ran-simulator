@@ -181,8 +181,10 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 				log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
 				ue.Admitted = true
 			} else if event.Type == trafficsim.Type_REMOVED {
-				// TODO - implement the UEReleaseInd
-				log.Warnf("removal of UE %s - not yet supported", ue.GetName())
+				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
+				ueRelInd := formatUeReleaseInd(eci, ue.Crnti)
+				c <- *ueRelInd
+				log.Infof("ueReleaseInd eci:%s crnti:%s", eci, ue.Crnti)
 			}
 			// Nothing to be done for trafficsim.Type_UPDATED - they are handled by Telemetry
 		case <-stream.Context().Done():
@@ -203,6 +205,22 @@ func formatUeAdmissionReq(eci string, crnti string) *e2.ControlUpdate {
 				},
 				Crnti:             crnti,
 				AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
+			},
+		},
+	}
+}
+
+func formatUeReleaseInd(eci string, crnti string) *e2.ControlUpdate {
+	return &e2.ControlUpdate{
+		MessageType: e2.MessageType_UE_RELEASE_IND,
+		S: &e2.ControlUpdate_UEReleaseInd{
+			UEReleaseInd: &e2.UEReleaseInd{
+				Ecgi: &e2.ECGI{
+					PlmnId: manager.TestPlmnID,
+					Ecid:   eci,
+				},
+				Crnti:        crnti,
+				ReleaseCause: e2.ReleaseCause_RELEASE_INACTIVITY,
 			},
 		},
 	}
