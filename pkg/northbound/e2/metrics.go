@@ -49,6 +49,9 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 		ue := trafficSimMgr.UserEquipments[crntiToName(m.Crnti)]
 		if ue.Metrics.HoReportTimestamp != 0 {
 			ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
+			if trafficSimMgr.InfluxDbAvail {
+				go manager.WriteHoMetricToInfluxDb(trafficSimMgr.InfluxDbAddr, m.Crnti, ue.Metrics.HoLatency, ue.Metrics.HoReportTimestamp)
+			}
 			ue.Metrics.HoReportTimestamp = 0
 			log.Infof("Hand-over latency: %d microsec", ue.Metrics.HoLatency/1000)
 		}

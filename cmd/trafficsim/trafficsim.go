@@ -62,6 +62,7 @@ func main() {
 	numRoutes := flag.Int("numRoutes", 3, "Number of routes")
 	stepDelayMs := flag.Int("stepDelayMs", 1000, "delay between steps on route")
 	maxUEs := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
+	influxDbAddr := flag.String("influxDbAddr", "", "Address of Influx DB instance e.g. ran-metrics:8086")
 
 	//lines 93-109 are implemented according to
 	// https://github.com/kubernetes/klog/blob/master/examples/coexist_glog/coexist_glog.go
@@ -141,7 +142,8 @@ func main() {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
-	mgr.Run(mapLayoutParams, towerParams, locationParams, routesParams)
+
+	mgr.Run(mapLayoutParams, towerParams, locationParams, routesParams, *influxDbAddr)
 
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)

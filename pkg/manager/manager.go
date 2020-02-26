@@ -20,6 +20,7 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"sync"
+	"time"
 )
 
 var log = logging.GetLogger("manager")
@@ -41,6 +42,8 @@ type Manager struct {
 	RouteChannel       chan dispatcher.Event
 	TowerChannel       chan dispatcher.Event
 	googleAPIKey       string
+	InfluxDbAddr       string
+	InfluxDbAvail      bool
 }
 
 // NewManager initializes the RAN subsystem.
@@ -59,8 +62,10 @@ func NewManager() (*Manager, error) {
 }
 
 // Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams, locParams LocationsParams, routesParams RoutesParams) {
-	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
+func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams,
+	locParams LocationsParams, routesParams RoutesParams,
+	influxDbAddr string) {
+	log.Infof("Starting Manager with %v %v %v %s", towerparams, locParams, routesParams, influxDbAddr)
 	m.MapLayout = mapLayoutParams
 	m.TowersLock.Lock()
 	m.Towers = NewTowers(towerparams, mapLayoutParams)
@@ -69,6 +74,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	m.MapLayout.MinRoutes = uint32(routesParams.NumRoutes)
 	m.MapLayout.MaxRoutes = uint32(locParams.NumLocations / 2)
 	m.googleAPIKey = routesParams.APIKey
+	m.InfluxDbAddr = influxDbAddr
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
@@ -82,6 +88,13 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	m.UserEquipments = m.NewUserEquipments(routesParams)
 
 	go m.startMoving(routesParams)
+
+	go func() {
+		for {
+			m.InfluxDbAvail = checkInfluxDbAvailable(m.InfluxDbAddr)
+			time.Sleep(time.Second * 10)
+		}
+	}()
 }
 
 //Close kills the channels and manager related objects
