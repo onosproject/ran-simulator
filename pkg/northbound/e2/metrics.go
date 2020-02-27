@@ -29,10 +29,22 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 		r := x.RadioMeasReportPerUE
 		name := crntiToName(r.Crnti)
 		ue := trafficSimMgr.UserEquipments[name]
-		tower := trafficSimMgr.GetTowerByName(ue.ServingTower)
 		reports := r.RadioReportServCells
-		cqi := makeCqi(ue.ServingTowerDist, tower.GetTxPowerdB())
-		if cqi < reports[0].CqiHist[0] || cqi < reports[1].CqiHist[0] || cqi < reports[2].CqiHist[0] {
+
+		bestCQI := reports[0].CqiHist[0]
+		bestStationID := reports[0].Ecgi
+
+		for i := 1; i < len(reports); i++ {
+			temp := reports[i].CqiHist[0]
+			if bestCQI < temp {
+				bestCQI = temp
+				bestStationID = reports[i].Ecgi
+			}
+		}
+
+		servingTower := trafficSimMgr.GetTowerByName(ue.ServingTower)
+
+		if servingTower.EcID != bestStationID.Ecid || servingTower.PlmnID != bestStationID.PlmnId {
 			if ue.Metrics.HoReportTimestamp == 0 {
 				ue.Metrics.HoReportTimestamp = time.Now().UnixNano()
 			}
@@ -50,7 +62,7 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 		if ue.Metrics.HoReportTimestamp != 0 {
 			ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
 			ue.Metrics.HoReportTimestamp = 0
-			log.Infof("Hand-over latency: %d microsec", ue.Metrics.HoLatency/1000)
+			log.Infof("%s Hand-over latency: %d microsec", ue.Name, ue.Metrics.HoLatency/1000)
 		}
 	}
 }
