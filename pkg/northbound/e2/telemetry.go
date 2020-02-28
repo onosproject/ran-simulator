@@ -49,11 +49,11 @@ func sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServer, c chan e2
 	for {
 		select {
 		case msg := <-c:
+			UpdateTelemetryMetrics(&msg)
 			if err := stream.Send(&msg); err != nil {
 				log.Infof("send error %v", err)
 				return err
 			}
-			UpdateTelemetryMetrics(&msg)
 		case <-stream.Context().Done():
 			log.Infof("Controller has disconnected")
 			return nil
@@ -98,6 +98,9 @@ func radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan
 func generateReport(ue *types.Ue) e2.TelemetryMessage {
 	trafficSimMgr := manager.GetManager()
 
+	trafficSimMgr.TowersLock.RLock()
+	defer trafficSimMgr.TowersLock.RUnlock()
+
 	servingTower := trafficSimMgr.GetTowerByName(ue.ServingTower)
 	tower1 := trafficSimMgr.GetTowerByName(ue.Tower1)
 	tower2 := trafficSimMgr.GetTowerByName(ue.Tower2)
@@ -105,7 +108,6 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 
 	reports := make([]*e2.RadioRepPerServCell, 3)
 
-	trafficSimMgr.TowersLock.RLock()
 	reports[0] = new(e2.RadioRepPerServCell)
 	reports[0].Ecgi = &e2.ECGI{
 		PlmnId: tower1.PlmnID,
@@ -129,7 +131,6 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 	}
 	reports[2].CqiHist = make([]uint32, 1)
 	reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
-	trafficSimMgr.TowersLock.RUnlock()
 
 	log.Infof("RadioMeasReport %s %s cqi:%d(%s),%d(%s),%d(%s)", servingTower.EcID, ue.Name,
 		reports[0].CqiHist[0], reports[0].Ecgi.Ecid,

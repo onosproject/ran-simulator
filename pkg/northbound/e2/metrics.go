@@ -15,6 +15,7 @@
 package e2
 
 import (
+	"github.com/onosproject/ran-simulator/api/types"
 	"time"
 
 	"github.com/onosproject/ran-simulator/api/e2"
@@ -28,7 +29,15 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 	case *e2.TelemetryMessage_RadioMeasReportPerUE:
 		r := x.RadioMeasReportPerUE
 		name := crntiToName(r.Crnti)
-		ue := trafficSimMgr.UserEquipments[name]
+		var ue *types.Ue
+		var ok bool
+		trafficSimMgr.UserEquipmentsLock.RLock()
+		if ue, ok = trafficSimMgr.UserEquipments[name]; !ok {
+			trafficSimMgr.UserEquipmentsLock.RUnlock()
+			return
+		}
+		trafficSimMgr.UserEquipmentsLock.RUnlock()
+
 		reports := r.RadioReportServCells
 
 		bestCQI := reports[0].CqiHist[0]
@@ -41,13 +50,16 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 				bestStationID = reports[i].Ecgi
 			}
 		}
-
+		trafficSimMgr.TowersLock.RLock()
 		servingTower := trafficSimMgr.GetTowerByName(ue.ServingTower)
+		trafficSimMgr.TowersLock.RUnlock()
 
 		if servingTower.EcID != bestStationID.Ecid || servingTower.PlmnID != bestStationID.PlmnId {
+			trafficSimMgr.UserEquipmentsLock.Lock()
 			if ue.Metrics.HoReportTimestamp == 0 {
 				ue.Metrics.HoReportTimestamp = time.Now().UnixNano()
 			}
+			trafficSimMgr.UserEquipmentsLock.Unlock()
 		}
 	}
 }
@@ -58,11 +70,18 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 	switch x := in.S.(type) {
 	case *e2.ControlResponse_HORequest:
 		m := x.HORequest
-		ue := trafficSimMgr.UserEquipments[crntiToName(m.Crnti)]
+		trafficSimMgr.UserEquipmentsLock.Lock()
+		ue, ok := trafficSimMgr.UserEquipments[crntiToName(m.Crnti)]
+		if !ok {
+			log.Errorf("ue %s not found", crntiToName(m.Crnti))
+			trafficSimMgr.UserEquipmentsLock.Unlock()
+			return
+		}
 		if ue.Metrics.HoReportTimestamp != 0 {
 			ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
 			ue.Metrics.HoReportTimestamp = 0
 			log.Infof("%s Hand-over latency: %d microsec", ue.Name, ue.Metrics.HoLatency/1000)
 		}
+		trafficSimMgr.UserEquipmentsLock.Unlock()
 	}
 }
