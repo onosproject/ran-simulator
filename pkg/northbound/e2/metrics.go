@@ -80,6 +80,7 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 		if ue.Metrics.HoReportTimestamp != 0 {
 			ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
 			ue.Metrics.HoReportTimestamp = 0
+			trafficSimMgr.LatencyChannel <- ue.Metrics.HoLatency
 			log.Infof("%s Hand-over latency: %d microsec", ue.Name, ue.Metrics.HoLatency/1000)
 		}
 		trafficSimMgr.UserEquipmentsLock.Unlock()

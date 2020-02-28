@@ -19,6 +19,7 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
+	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 	"sync"
 )
 
@@ -41,6 +42,7 @@ type Manager struct {
 	RouteChannel       chan dispatcher.Event
 	TowerChannel       chan dispatcher.Event
 	googleAPIKey       string
+	LatencyChannel     chan int64
 }
 
 // NewManager initializes the RAN subsystem.
@@ -54,12 +56,14 @@ func NewManager() (*Manager, error) {
 		UeChannel:          make(chan dispatcher.Event),
 		RouteChannel:       make(chan dispatcher.Event),
 		TowerChannel:       make(chan dispatcher.Event),
+		LatencyChannel:     make(chan int64),
 	}
 	return &mgr, nil
 }
 
 // Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams, locParams LocationsParams, routesParams RoutesParams) {
+func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams,
+	locParams LocationsParams, routesParams RoutesParams, metricsPort int) {
 	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
 	m.MapLayout = mapLayoutParams
 	m.TowersLock.Lock()
@@ -82,6 +86,8 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	m.UserEquipments = m.NewUserEquipments(routesParams)
 
 	go m.startMoving(routesParams)
+
+	go metrics.RunHOExposer(metricsPort, m.LatencyChannel)
 }
 
 //Close kills the channels and manager related objects
