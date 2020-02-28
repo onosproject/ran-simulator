@@ -79,6 +79,9 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 
 // SetNumberUes - change the number of active UEs
 func (m *Manager) SetNumberUes(numUes int) error {
+	mgr.UserEquipmentsLock.Lock()
+	defer mgr.UserEquipmentsLock.Unlock()
+
 	currentNum := len(m.UserEquipments)
 	if numUes < int(m.MapLayout.MinRoutes) {
 		return fmt.Errorf("number of UEs requested %d is below minimum %d", numUes, m.MapLayout.MinRoutes)
@@ -131,15 +134,25 @@ func (m *Manager) SetNumberUes(numUes int) error {
 }
 
 // GetUe returns Ue based on its name
-func (m *Manager) GetUe(name string) *types.Ue {
-	return m.UserEquipments[name]
+func (m *Manager) GetUe(name string) (*types.Ue, error) {
+	m.UserEquipmentsLock.RLock()
+	defer m.UserEquipmentsLock.RUnlock()
+	ue, ok := m.UserEquipments[name]
+	if !ok {
+		return nil, fmt.Errorf("ue %s not found", name)
+	}
+	return ue, nil
 }
 
 // UeHandover perform the handover on simulated UE
 func (m *Manager) UeHandover(name string, tower string) {
-	ue := m.UserEquipments[name]
-	ue.ServingTower = tower
+	ue, err := m.GetUe(name)
+	if err != nil {
+		log.Error(err)
+		return
+	}
 	names, _ := m.findClosestTowers(ue.Position)
+	ue.ServingTower = tower
 	ue.Tower1 = names[0]
 	ue.Tower2 = names[1]
 	ue.Tower3 = names[2]
@@ -169,7 +182,12 @@ func (m *Manager) startMoving(params RoutesParams) {
 		for ueidx := 0; ueidx < len(m.Routes); ueidx++ {
 			ueName := ueName(ueidx)
 			routeName := routeName(ueidx)
-			err := m.moveUe(m.UserEquipments[ueName], m.Routes[routeName])
+			ue, err := m.GetUe(ueName)
+			if err != nil {
+				log.Errorf(err.Error())
+				continue
+			}
+			err = m.moveUe(ue, m.Routes[routeName])
 			if err != nil && strings.HasPrefix(err.Error(), "end of route") {
 				oldRouteFinish := m.Routes[routeName].GetWaypoints()[len(m.Routes[routeName].GetWaypoints())-1]
 				log.Errorf("Need to do a new route for %s Start %v %v", ueName, oldRouteFinish, err)
@@ -188,7 +206,7 @@ func (m *Manager) startMoving(params RoutesParams) {
 				}
 				// Move the UE to this new start point - google might return a
 				// start point just a few metres from where we asked
-				m.UserEquipments[ueName].Position = newRoute.GetWaypoints()[0]
+				ue.Position = newRoute.GetWaypoints()[0]
 			} else if err != nil {
 				log.Errorf("Error %s", err.Error())
 				breakout = true
@@ -256,4 +274,32 @@ func makeCrnti(ueName string) string {
 
 func ueName(idx int) string {
 	return fmt.Sprintf("Ue-%04X", idx+1)
+}
+
+// UeDeepCopy ...
+func UeDeepCopy(original *types.Ue) *types.Ue {
+	return &types.Ue{
+		Name: original.GetName(),
+		Type: original.GetType(),
+		Position: &types.Point{
+			Lat: original.GetPosition().GetLat(),
+			Lng: original.GetPosition().GetLng(),
+		},
+		Rotation:         original.GetRotation(),
+		Route:            original.GetRoute(),
+		ServingTower:     original.GetServingTower(),
+		ServingTowerDist: original.GetServingTowerDist(),
+		Tower1:           original.GetTower1(),
+		Tower1Dist:       original.GetTower1Dist(),
+		Tower2:           original.GetTower2(),
+		Tower2Dist:       original.GetTower2Dist(),
+		Tower3:           original.GetTower3(),
+		Tower3Dist:       original.GetTower3Dist(),
+		Crnti:            original.GetCrnti(),
+		Admitted:         original.GetAdmitted(),
+		Metrics: &types.UeMetrics{
+			HoLatency:         original.GetMetrics().GetHoLatency(),
+			HoReportTimestamp: original.GetMetrics().GetHoReportTimestamp(),
+		},
+	}
 }

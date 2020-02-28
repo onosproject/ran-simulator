@@ -152,13 +152,17 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) {
 func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
+	trafficSimMgr.UserEquipmentsLock.RLock()
 	for _, ue := range trafficSimMgr.UserEquipments {
+		trafficSimMgr.TowersLock.RLock()
 		eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
+		trafficSimMgr.TowersLock.RUnlock()
 		ueAdmReq := formatUeAdmissionReq(eci, ue.Crnti)
 		c <- *ueAdmReq
 		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
 		trafficSimMgr.UeAdmitted(ue)
 	}
+	trafficSimMgr.UserEquipmentsLock.RUnlock()
 
 	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
 	ueUpdatesLsnr, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
@@ -175,13 +179,17 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 				log.Fatalf("Object %v could not be converted to UE", ue)
 			}
 			if event.Type == trafficsim.Type_ADDED {
+				trafficSimMgr.TowersLock.RLock()
 				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
+				trafficSimMgr.TowersLock.RUnlock()
 				ueAdmReq := formatUeAdmissionReq(eci, ue.Crnti)
 				c <- *ueAdmReq
 				log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
 				ue.Admitted = true
 			} else if event.Type == trafficsim.Type_REMOVED {
+				trafficSimMgr.TowersLock.RLock()
 				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
+				trafficSimMgr.TowersLock.RUnlock()
 				ueRelInd := formatUeReleaseInd(eci, ue.Crnti)
 				c <- *ueRelInd
 				log.Infof("ueReleaseInd eci:%s crnti:%s", eci, ue.Crnti)

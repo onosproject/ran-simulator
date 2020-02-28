@@ -163,6 +163,7 @@ func (s *Server) ListTowers(req *trafficsim.ListTowersRequest, stream trafficsim
 // ListUes :
 func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traffic_ListUesServer) error {
 	if !req.WithoutReplay {
+		manager.GetManager().UserEquipmentsLock.RLock()
 		for _, ue := range manager.GetManager().UserEquipments {
 			resp := &trafficsim.ListUesResponse{
 				Ue:   ue,
@@ -170,9 +171,11 @@ func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traff
 			}
 			err := stream.Send(resp)
 			if err != nil {
+				manager.GetManager().UserEquipmentsLock.RUnlock()
 				return err
 			}
 		}
+		manager.GetManager().UserEquipmentsLock.RUnlock()
 	}
 
 	if req.Subscribe {
@@ -193,7 +196,7 @@ func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traff
 					return fmt.Errorf("could not cast object from event to UE %v", ueEvent)
 				}
 				msg := &trafficsim.ListUesResponse{
-					Ue:         ue,
+					Ue:         manager.UeDeepCopy(ue),
 					Type:       ueEvent.Type,
 					UpdateType: ueEvent.UpdateType,
 				}

@@ -25,7 +25,10 @@ func Test_GenerateReport(t *testing.T) {
 	assert.NilError(t, err, "Unexpected error setting up manager")
 	assert.Assert(t, mgr != nil, "Unexpectedly Manager is nil!")
 
-	ue1 := mgr.UserEquipments["Ue-0001"]
+	mgr.UserEquipmentsLock.RLock()
+	ue1, ok := mgr.UserEquipments["Ue-0001"]
+	assert.Assert(t, ok, "Expected to find Ue-0001")
+	mgr.UserEquipmentsLock.RUnlock()
 
 	msg := generateReport(ue1)
 	assert.Equal(t, e2.MessageType_RADIO_MEAS_REPORT_PER_UE, msg.MessageType)
