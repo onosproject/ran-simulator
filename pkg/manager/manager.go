@@ -16,11 +16,12 @@
 package manager
 
 import (
+	"sync"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
-	"sync"
 )
 
 var log = logging.GetLogger("manager")
@@ -42,7 +43,7 @@ type Manager struct {
 	RouteChannel       chan dispatcher.Event
 	TowerChannel       chan dispatcher.Event
 	googleAPIKey       string
-	LatencyChannel     chan int64
+	LatencyChannel     chan metrics.HOEvent
 }
 
 // NewManager initializes the RAN subsystem.
@@ -56,7 +57,7 @@ func NewManager() (*Manager, error) {
 		UeChannel:          make(chan dispatcher.Event),
 		RouteChannel:       make(chan dispatcher.Event),
 		TowerChannel:       make(chan dispatcher.Event),
-		LatencyChannel:     make(chan int64),
+		LatencyChannel:     make(chan metrics.HOEvent),
 	}
 	return &mgr, nil
 }
