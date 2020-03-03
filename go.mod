@@ -4,10 +4,9 @@ go 1.13
 
 require (
 	github.com/gogo/protobuf v1.3.1
-	github.com/google/go-cmp v0.4.0 // indirect
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/onosproject/onos-lib-go v0.0.0-20200220193455-fe7dac6f40c0
-	github.com/prometheus/client_golang v0.9.4
+	github.com/prometheus/client_golang v1.4.1
 	github.com/sergi/go-diff v1.1.0 // indirect
 	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect

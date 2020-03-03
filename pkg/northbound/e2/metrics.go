@@ -83,6 +83,7 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 			ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
 			ue.Metrics.HoReportTimestamp = 0
 			tmpHOEvent := metrics.HOEvent{
+				Timestamp:    time.Now(),
 				Crnti:        ue.GetCrnti(),
 				ServingTower: ue.GetServingTower(),
 				HOLatency:    ue.Metrics.HoLatency,

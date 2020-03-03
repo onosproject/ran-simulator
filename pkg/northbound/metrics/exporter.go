@@ -17,6 +17,7 @@ package metrics
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,12 +26,15 @@ import (
 
 // HOEvent is a structure for HO event
 type HOEvent struct {
+	Timestamp    time.Time
 	Crnti        string
 	ServingTower string
 	HOLatency    int64
 }
 
 var log = liblog.GetLogger("northbound", "trafficsim")
+
+var allHOEvents []HOEvent
 
 // RunHOExposer runs Prometheus exposer
 func RunHOExposer(port int, latencyChan chan HOEvent) {
@@ -49,7 +53,16 @@ func RunHOExposer(port int, latencyChan chan HOEvent) {
 		// block here until a latency measurement is received
 		for latency := range latencyChan {
 			hoLatencyHistogram.Observe(float64(latency.HOLatency / 1e3))
-			exposeAllHOEvents(latency)
+			allHOEvents = append(allHOEvents, latency)
+		}
+	}()
+	go func() {
+		for {
+			listHOEventCounter := exposeAllHOEvents()
+			time.Sleep(1000 * time.Millisecond)
+			for i := 0; i < len(listHOEventCounter); i++ {
+				prometheus.Unregister(listHOEventCounter[i])
+			}
 		}
 	}()
 	http.Handle("/metrics", promhttp.Handler())
@@ -59,16 +72,24 @@ func RunHOExposer(port int, latencyChan chan HOEvent) {
 	}
 }
 
-func exposeAllHOEvents(event HOEvent) {
-	tmpHOEvent := prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: "onosproject",
-		Subsystem: "ransimulator",
-		Name:      "hoevents",
-		ConstLabels: prometheus.Labels{
-			"crnti":        event.Crnti,
-			"servingtower": event.ServingTower,
-		},
-	})
-	tmpHOEvent.Add(float64(event.HOLatency / 1e3))
-	prometheus.MustRegister(tmpHOEvent)
+func exposeAllHOEvents() []prometheus.Counter {
+	var listHOEventCounter []prometheus.Counter
+	for _, e := range allHOEvents {
+		tmpHOEvent := prometheus.NewCounter(prometheus.CounterOpts{
+			Namespace: "onosproject",
+			Subsystem: "ransimulator",
+			Name:      "hoevents",
+			ConstLabels: prometheus.Labels{
+				"timestamp":    fmt.Sprintf("%d-%d-%d %d:%d:%d", e.Timestamp.Year(), e.Timestamp.Month(), e.Timestamp.Day(), e.Timestamp.Hour(), e.Timestamp.Minute(), e.Timestamp.Second()),
+				"crnti":        e.Crnti,
+				"servingtower": e.ServingTower,
+			},
+		})
+		tmpHOEvent.Add(float64(e.HOLatency / 1e3))
+		listHOEventCounter = append(listHOEventCounter, tmpHOEvent)
+		if err := prometheus.Register(tmpHOEvent); err != nil {
+			log.Error(err)
+		}
+	}
+	return listHOEventCounter
 }
