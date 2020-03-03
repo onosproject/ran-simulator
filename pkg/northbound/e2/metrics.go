@@ -15,11 +15,13 @@
 package e2
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
 	"time"
+
+	"github.com/onosproject/ran-simulator/api/types"
 
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/pkg/manager"
+	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
 
 // UpdateTelemetryMetrics ...
@@ -80,7 +82,12 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 		if ue.Metrics.HoReportTimestamp != 0 {
 			ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
 			ue.Metrics.HoReportTimestamp = 0
-			trafficSimMgr.LatencyChannel <- ue.Metrics.HoLatency
+			tmpHOEvent := metrics.HOEvent{
+				Crnti:        ue.GetCrnti(),
+				ServingTower: ue.GetServingTower(),
+				HOLatency:    ue.Metrics.HoLatency,
+			}
+			trafficSimMgr.LatencyChannel <- tmpHOEvent
 			log.Infof("%s Hand-over latency: %d microsec", ue.Name, ue.Metrics.HoLatency/1000)
 		}
 		trafficSimMgr.UserEquipmentsLock.Unlock()
