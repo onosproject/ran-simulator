@@ -32,6 +32,11 @@ const DefaultTxPower = 10
 
 const defaultColor = "#000000"
 
+const (
+	maxPowerdB = 30.0
+	minPowerdB = -15.0
+)
+
 // TowerIf :
 type TowerIf interface {
 	GetPosition() types.Point
@@ -119,15 +124,28 @@ func (m *Manager) GetTower(name string) *types.Tower {
 }
 
 // UpdateTower Update a tower's properties - usually power level
-func (m *Manager) UpdateTower(tower *types.Tower) {
+func (m *Manager) UpdateTower(tower string, powerAdjust float32) error {
 	// Only the power can be updated at present
 	m.TowersLock.Lock()
-	m.Towers[tower.GetName()].TxPowerdB = tower.TxPowerdB
+	t, ok := m.Towers[tower]
+	if !ok {
+		m.TowersLock.Unlock()
+		return fmt.Errorf("unknown tower %s", tower)
+	}
+	currentPower := t.TxPowerdB
+	if currentPower+powerAdjust < minPowerdB {
+		t.TxPowerdB = minPowerdB
+	} else if currentPower+powerAdjust > maxPowerdB {
+		t.TxPowerdB = maxPowerdB
+	} else {
+		t.TxPowerdB += powerAdjust
+	}
 	m.TowersLock.Unlock()
 	m.TowerChannel <- dispatcher.Event{
 		Type:   trafficsim.Type_UPDATED,
-		Object: tower,
+		Object: t,
 	}
+	return nil
 }
 
 // Measure the distance between a point and a tower and return an answer in decimal degrees

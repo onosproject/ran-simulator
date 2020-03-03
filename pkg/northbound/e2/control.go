@@ -82,27 +82,31 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 }
 
 func handleRRMConfig(req *e2.RRMConfig) {
-	trafficSimMgr := manager.GetManager()
-	tower := trafficSimMgr.GetTower(eciToName(req.Ecgi.Ecid))
+	tower := eciToName(req.Ecgi.Ecid)
+	var powerAdjust float32
 	switch req.PA[0] {
 	case e2.XICICPA_XICIC_PA_DB_MINUS6:
-		tower.TxPowerdB -= 6
+		powerAdjust = -6
 	case e2.XICICPA_XICIC_PA_DB_MINUX4DOT77:
-		tower.TxPowerdB -= 4.77
+		powerAdjust = -4.77
 	case e2.XICICPA_XICIC_PA_DB_MINUS3:
-		tower.TxPowerdB -= 3
+		powerAdjust = -3
 	case e2.XICICPA_XICIC_PA_DB_MINUS1DOT77:
-		tower.TxPowerdB -= 1.77
+		powerAdjust = -1.77
 	case e2.XICICPA_XICIC_PA_DB_0:
-		tower.TxPowerdB -= 0
+		//Nothing to do
 	case e2.XICICPA_XICIC_PA_DB_1:
-		tower.TxPowerdB++
+		powerAdjust = 1
 	case e2.XICICPA_XICIC_PA_DB_2:
-		tower.TxPowerdB += 2
+		powerAdjust = 2
 	case e2.XICICPA_XICIC_PA_DB_3:
-		tower.TxPowerdB += 3
+		powerAdjust = 3
 	}
-	trafficSimMgr.UpdateTower(tower)
+	trafficSimMgr := manager.GetManager()
+	err := trafficSimMgr.UpdateTower(tower, powerAdjust)
+	if err != nil {
+		log.Warn(err.Error())
+	}
 }
 
 func handleHORequest(req *e2.HORequest) {

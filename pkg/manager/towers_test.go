@@ -15,9 +15,11 @@
 package manager
 
 import (
+	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"gotest.tools/assert"
 	"testing"
+	"time"
 )
 
 func Test_findClosestTowers(t *testing.T) {
@@ -43,7 +45,7 @@ func Test_findClosestTowers(t *testing.T) {
 			ShowRoutes: false,
 		})
 
-	assert.Equal(t, 9, len(m.Towers), "Expected 9 towersA to have been created")
+	assert.Equal(t, 9, len(m.Towers), "Expected 9 towers to have been created")
 	for _, tower := range m.Towers {
 		switch tower.Name {
 		case "Tower-1":
@@ -102,4 +104,56 @@ func Test_findClosestTowers(t *testing.T) {
 	assert.Equal(t, 3, len(distancesC), "Expected 3 tower distancesA in findClosest")
 	assert.Assert(t, distancesC[2] > distancesC[1], "Expected distance to be greater")
 	assert.Assert(t, distancesC[1] > distancesC[0], "Expected distance to be greater")
+}
+
+func Test_PowerAdjust(t *testing.T) {
+	m, err := NewManager()
+	assert.NilError(t, err, "Unexpected error creating manager")
+
+	const mapCenterLat = 52.0
+	const mapCenterLng = -8.0
+	const towerSpacingVert = 0.01
+	const towerSpacingHoriz = 0.02
+	m.Towers = NewTowers(
+		types.TowersParams{
+			TowerRows:         1,
+			TowerCols:         1,
+			TowerSpacingVert:  towerSpacingVert,
+			TowerSpacingHoriz: towerSpacingHoriz,
+		},
+		types.MapLayout{
+			Center:     &types.Point{Lat: mapCenterLat, Lng: mapCenterLng},
+			Zoom:       12,
+			Fade:       false,
+			ShowRoutes: false,
+		})
+	go func() {
+		for event := range m.TowerChannel {
+			assert.Equal(t, trafficsim.Type_UPDATED, event.Type)
+		}
+	}()
+
+	assert.Equal(t, 1, len(m.Towers), "Expected 1 tower to have been created")
+
+	err = m.UpdateTower("Tower-1", -6) // subtracted from initial 10dB
+	assert.NilError(t, err, "Unexpected response from adjusting power")
+	tower1, ok := m.Towers["Tower-1"]
+	assert.Assert(t, ok)
+	assert.Equal(t, float32(4.0), tower1.TxPowerdB, "unexpected value for tower power")
+
+	///////// Try with value too low - capped at -15dB /////////////////////
+	err = m.UpdateTower("Tower-1", -30) // subtracted from prev 4dB
+	assert.NilError(t, err, "Unexpected response from adjusting power")
+	assert.Equal(t, float32(-15.0), tower1.TxPowerdB, "unexpected value for tower power")
+
+	///////// Try with value too high - capped at 30dB /////////////////////
+	err = m.UpdateTower("Tower-1", 50) // Added to prev -15dB
+	assert.NilError(t, err, "Unexpected response from adjusting power")
+	assert.Equal(t, float32(30.0), tower1.TxPowerdB, "unexpected value for tower power")
+
+	///////// Try with wrong name /////////////////////
+	err = m.UpdateTower("Tower-2", -3)
+	assert.Error(t, err, "unknown tower Tower-2", "Expected an error for wrong name when adjusting power")
+
+	time.Sleep(time.Millisecond * 100)
 }
