@@ -25,12 +25,13 @@ import (
 )
 
 // NewUserEquipments - create a new set of UEs (phone, car etc)
-func (m *Manager) NewUserEquipments(params RoutesParams) map[string]*types.Ue {
+func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) map[string]*types.Ue {
 	ues := make(map[string]*types.Ue)
 
 	// There is already a route per UE
-	for u := 0; u < params.NumRoutes; u++ {
-		ue := m.newUe(u)
+	var u uint32
+	for u = 0; u < mapLayoutParams.MinUes; u++ {
+		ue := m.newUe(int(u))
 		ues[ue.Name] = ue
 	}
 	return ues
@@ -83,10 +84,10 @@ func (m *Manager) SetNumberUes(numUes int) error {
 	defer mgr.UserEquipmentsLock.Unlock()
 
 	currentNum := len(m.UserEquipments)
-	if numUes < int(m.MapLayout.MinRoutes) {
-		return fmt.Errorf("number of UEs requested %d is below minimum %d", numUes, m.MapLayout.MinRoutes)
-	} else if numUes > int(m.MapLayout.MaxRoutes) {
-		return fmt.Errorf("number of UEs requested %d is above maximum %d", numUes, m.MapLayout.MaxRoutes)
+	if numUes < int(m.MapLayout.MinUes) {
+		return fmt.Errorf("number of UEs requested %d is below minimum %d", numUes, m.MapLayout.MinUes)
+	} else if numUes > int(m.MapLayout.MaxUes) {
+		return fmt.Errorf("number of UEs requested %d is above maximum %d", numUes, m.MapLayout.MaxUes)
 	} else if numUes < currentNum {
 		log.Infof("Decreasing number of UEs from %d to %d", currentNum, numUes)
 		for ueidx := currentNum - 1; ueidx >= numUes; ueidx-- {

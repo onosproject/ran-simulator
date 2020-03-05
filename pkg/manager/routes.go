@@ -33,23 +33,23 @@ const stepsPerDecimalDegree = 500
 
 // RoutesParams :
 type RoutesParams struct {
-	NumRoutes int
 	APIKey    string
 	StepDelay time.Duration
 }
 
 // NewRoutes Create new routes, by taking two random locations and asking Google for
 // directions to get from one to the other
-func (m *Manager) NewRoutes(params RoutesParams) (map[string]*types.Route, error) {
+func (m *Manager) NewRoutes(mapLayoutParams types.MapLayout, params RoutesParams) (map[string]*types.Route, error) {
 	routes := make(map[string]*types.Route)
 
-	for r := 0; r < params.NumRoutes; r++ {
+	var r uint32
+	for r = 0; r < mapLayoutParams.MinUes; r++ {
 		startLoc, err := m.getRandomLocation("")
 		if err != nil {
 			return nil, err
 		}
 		// Colour is dependent on UE tower and is not known at this stage
-		route, err := m.newRoute(startLoc, r, params.APIKey, defaultColor)
+		route, err := m.newRoute(startLoc, int(r), params.APIKey, defaultColor)
 		if err != nil {
 			return nil, err
 		}

@@ -76,15 +76,23 @@ message UeMetrics {
 }
 
 message TowersParams {
+    // Number of rows of towers
 	uint32 towerRows = 1;
 
+    // Number of columns of towers
 	uint32 towerCols = 2;
 
-	float towerSpacingVert = 3;
+    // Tower spacing vert in degrees latitude
+    float towerSpacingVert = 3;
 
+    // Tower spacing horiz in degrees longitude
 	float towerSpacingHoriz = 4;
 
-    uint32 maxUEs = 5;
+    // Ratio of random locations diameter to tower grid width
+    float locationsScale = 5;
+
+    // Max num of UEs per tower
+    uint32 maxUEsPerTower = 6;
 }
 
 message Tower {
@@ -107,19 +115,27 @@ message Tower {
 }
 
 message MapLayout {
+    // Map center latitude and longitude
     ran.trafficsim.types.Point center = 1;
 
+    // The starting Zoom level
     float zoom = 2;
 
+    // Show map as faded on start
     bool fade = 3;
 
+    // Show routes on start
     bool showRoutes = 4;
 
+    // Show power as circle on start
     bool showPower = 5;
 
-    uint32 min_routes = 6;
+    // Max number of UEs for complete simulation
+    uint32 min_ues = 6;
 
-    uint32 max_routes = 7;
+    // Max number of UEs for complete simulation
+    uint32 max_ues = 7;
 
+    // the current number of routes
     uint32 current_routes = 8;
 }

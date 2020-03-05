@@ -24,43 +24,50 @@ cost of $7.00 per 1000 requests.
 Supplying `ran-simulator` with a bogus parameter gets it to show the start parameters
 and their defaults
 ```bash
-docker run -it onosproject/ran-simulator:latest -test
+docker run -it onosproject/ran-simulator:latest -help
 ...
 Usage of trafficsim:
+Usage of /tmp/go-build089760012/b001/exe/trafficsim:
   -caPath string
-    	path to CA certificate
+        path to CA certificate
   -certPath string
-    	path to client certificate
+        path to client certificate
   -fade
-    	Show map as faded on start (default true)
+        Show map as faded on start (default true)
   -googleAPIKey string
-    	your google maps api key
+        your google maps api key
   -keyPath string
-    	path to client private key
+        path to client private key
+  -locationsScale float
+        Ratio of random locations diameter to tower grid width (default 1)
   -mapCenterLat float
-    	Map center latitude (default 52.52)
+        Map center latitude (default 52.52)
   -mapCenterLng float
-    	Map center longitude (default 13.405)
-  -maxUEsPerTower
-        Max num of UEs per tower
-  -numLocations int
-    	Number of locations (default 10)
-  -numRoutes int
-    	Number of routes (default 3)
+        Map center longitude (default 13.405)
+  -maxUEs int
+        Max number of UEs for complete simulation (default 300)
+  -maxUEsPerTower int
+        Max num of UEs per tower (default 5)
+  -metricsPort int
+        port for Prometheus metrics (default 9090)
+  -minUEs int
+        Max number of UEs for complete simulation (default 3)
+  -showPower
+        Show power as circle on start (default true)
   -showRoutes
-    	Show routes on start (default true)
+        Show routes on start (default true)
   -stepDelayMs int
-    	delay between steps on route (default 1000)
+        delay between steps on route (default 1000)
   -towerCols int
-    	Number of columns of towers (default 3)
+        Number of columns of towers (default 3)
   -towerRows int
-    	Number of rows of towers (default 3)
+        Number of rows of towers (default 3)
   -towerSpacingHoriz float
-    	Tower spacing horiz in degrees longitude (default 0.02)
+        Tower spacing horiz in degrees longitude (default 0.02)
   -towerSpacingVert float
-    	Tower spacing vert in degrees latitude (default 0.02)
+        Tower spacing vert in degrees latitude (default 0.02)
   -zoom float
-    	The starting Zoom level (default 12)
+        The starting Zoom level (default 13)
 ```
 
 See [deployment.md](deployment.md) for how to change these for a Kubernetes deployment.

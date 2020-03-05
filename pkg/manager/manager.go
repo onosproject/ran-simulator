@@ -64,15 +64,15 @@ func NewManager() (*Manager, error) {
 
 // Run starts a synchronizer based on the devices and the northbound services.
 func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams,
-	locParams LocationsParams, routesParams RoutesParams, metricsPort int) {
-	log.Infof("Starting Manager with %v %v %v", towerparams, locParams, routesParams)
+	routesParams RoutesParams, metricsPort int) {
+	log.Infof("Starting Manager with %v %v %v", mapLayoutParams, towerparams, routesParams)
 	m.MapLayout = mapLayoutParams
 	m.TowersLock.Lock()
 	m.Towers = NewTowers(towerparams, mapLayoutParams)
 	m.TowersLock.Unlock()
-	m.Locations = NewLocations(locParams, towerparams, mapLayoutParams)
-	m.MapLayout.MinRoutes = uint32(routesParams.NumRoutes)
-	m.MapLayout.MaxRoutes = uint32(locParams.NumLocations / 2)
+	m.Locations = NewLocations(towerparams, mapLayoutParams)
+	m.MapLayout.MinUes = mapLayoutParams.MinUes
+	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
 	m.googleAPIKey = routesParams.APIKey
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
@@ -80,11 +80,11 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	go m.Dispatcher.ListenTowerEvents(m.TowerChannel)
 
 	var err error
-	m.Routes, err = m.NewRoutes(routesParams)
+	m.Routes, err = m.NewRoutes(mapLayoutParams, routesParams)
 	if err != nil {
 		log.Fatalf("Error calculating routes %s", err.Error())
 	}
-	m.UserEquipments = m.NewUserEquipments(routesParams)
+	m.UserEquipments = m.NewUserEquipments(mapLayoutParams, routesParams)
 
 	go m.startMoving(routesParams)
 
