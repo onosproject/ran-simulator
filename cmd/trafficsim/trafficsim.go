@@ -52,16 +52,17 @@ func main() {
 	towerCols := flag.Int("towerCols", 3, "Number of columns of towers")
 	mapCenterLat := flag.Float64("mapCenterLat", 52.5200, "Map center latitude")
 	mapCenterLng := flag.Float64("mapCenterLng", 13.4050, "Map center longitude") // Berlin
-	zoom := flag.Float64("zoom", 12.5, "The starting Zoom level")
+	zoom := flag.Float64("zoom", 13, "The starting Zoom level")
 	fade := flag.Bool("fade", true, "Show map as faded on start")
 	showRoutes := flag.Bool("showRoutes", true, "Show routes on start")
 	showPower := flag.Bool("showPower", true, "Show power as circle on start")
 	towerSpacingVert := flag.Float64("towerSpacingVert", 0.02, "Tower spacing vert in degrees latitude")
 	towerSpacingHoriz := flag.Float64("towerSpacingHoriz", 0.02, "Tower spacing horiz in degrees longitude")
-	numLocations := flag.Int("numLocations", 600, "Number of locations")
-	numRoutes := flag.Int("numRoutes", 3, "Number of routes")
+	locationsScale := flag.Float64("locationsScale", 1.0, "Ratio of random locations diameter to tower grid width")
+	maxUEs := flag.Int("maxUEs", 300, "Max number of UEs for complete simulation")
+	minUEs := flag.Int("minUEs", 3, "Max number of UEs for complete simulation")
 	stepDelayMs := flag.Int("stepDelayMs", 1000, "delay between steps on route")
-	maxUEs := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
+	maxUEsPerTower := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
 	metricsPort := flag.Int("metricsPort", 9090, "port for Prometheus metrics")
 
 	//lines 93-109 are implemented according to
@@ -84,6 +85,8 @@ func main() {
 		ShowRoutes: *showRoutes,
 		Fade:       *fade,
 		ShowPower:  *showPower,
+		MinUes:     uint32(*minUEs),
+		MaxUes:     uint32(*maxUEs),
 	}
 	if mapLayoutParams.Zoom < 10 || mapLayoutParams.Zoom > 15 {
 		log.Fatal("Invalid Zoom level - must be between 10 and 15 inclusive")
@@ -95,12 +98,23 @@ func main() {
 		log.Fatal("Invalid Map Centre Longitude - must be between -180 and 180 exclusive")
 	}
 
+	if mapLayoutParams.MaxUes < 10 || mapLayoutParams.MaxUes > 10000 {
+		log.Fatal("Invalid number for MaxUEs - must be between 10 and 10000")
+	}
+	if mapLayoutParams.MinUes < 2 || mapLayoutParams.MinUes > 100 {
+		log.Fatal("Invalid number for MinUEs - must be between 2 and 100 inclusive")
+	}
+	if mapLayoutParams.MinUes*2 > mapLayoutParams.MaxUes {
+		log.Fatal("Invalid number of MaxUEs:MinUEs - must be at least 2")
+	}
+
 	towerParams := types.TowersParams{
 		TowerRows:         uint32(*towerRows),
 		TowerCols:         uint32(*towerCols),
 		TowerSpacingVert:  float32(*towerSpacingVert),
 		TowerSpacingHoriz: float32(*towerSpacingHoriz),
-		MaxUEs:            uint32(*maxUEs),
+		MaxUEsPerTower:    uint32(*maxUEsPerTower),
+		LocationsScale:    float32(*locationsScale),
 	}
 	if towerParams.TowerRows < 2 || towerParams.TowerRows > 20 {
 		log.Fatal("Invalid number of Tower Rows - must be between 2 and 20 inclusive")
@@ -115,22 +129,15 @@ func main() {
 		log.Fatal("Invalid horizontal tower spacing - must be between 0.001 and 1.0 degree longitude inclusive")
 	}
 
-	locationParams := manager.LocationsParams{NumLocations: *numLocations}
-	if locationParams.NumLocations < 3 || locationParams.NumLocations > 600 {
-		log.Fatal("Invalid number of Locations - must be between 3 and 600 inclusive")
+	if towerParams.LocationsScale < 0.1 || towerParams.LocationsScale > 2.0 {
+		log.Fatal("Invalid locationsScale - must be between 0.1 and 2.0")
 	}
 
 	routesParams := manager.RoutesParams{
-		NumRoutes: *numRoutes,
 		APIKey:    *googleAPIKey,
 		StepDelay: time.Duration(*stepDelayMs) * time.Millisecond,
 	}
-	if routesParams.NumRoutes < 2 || routesParams.NumRoutes > 100 {
-		log.Fatal("Invalid number of Routes - must be between 2 and 100 inclusive")
-	}
-	if locationParams.NumLocations < routesParams.NumRoutes*2 {
-		log.Fatal("Invalid number of Location:Routes - must be at least 2")
-	}
+
 	if *stepDelayMs < 100 || *stepDelayMs > 60000 {
 		log.Fatal("Invalid step Delay - must be between 100ms and 60000ms inclusive")
 	}
@@ -142,7 +149,7 @@ func main() {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
-	mgr.Run(mapLayoutParams, towerParams, locationParams, routesParams, *metricsPort)
+	mgr.Run(mapLayoutParams, towerParams, routesParams, *metricsPort)
 
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)

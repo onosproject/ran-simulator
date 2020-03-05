@@ -9,17 +9,15 @@ the [Kubernetes] setup steps outlined in [deploy with Helm](https://docs.onospro
 The following steps assume you have the setup outlined in that page, including the `micro-onos` namespace configured. 
 
 ## Google Maps API Key
-The RAN Simulator connects to Google's [Directions API] and so needs a Google API Key.
+The RAN Simulator can connect to Google's [Directions API] and with a Google API Key.
 Google charges $5.00 per 1000 requests to the [Directions API], and so we do not put
 our API key up in the public domain.
 
-You must enter your own key in to [onos-helm-charts/ran-simulator/values.yaml](onos-helm-charts/ran-simulator/values.yaml)
-before you deploy the Helm chart.
+> If a Google API key is not given, the simulator will revert to a built in random route generator
 
 ## Tuning parameters
-[README.md](README.md) shows the list of startup parameters - these can be adjusted in the Helm
-Chart by adding them to the `args` in [onos-helm-charts/ran-simulator/templates/deployment.yaml]
-(onos-helm-charts/ran-simulator/templates/deployment.yaml).
+[README.md](README.md) shows the list of startup parameters - these can be overridden using the
+```--set param=value``` syntax.
 
 ## Installing the Chart
 To install the chart in the `micro-onos` namespace run from the root directory of
@@ -35,6 +33,11 @@ NAMESPACE: default
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
+```
+
+To start with a Google API key run the command like:
+```bash
+helm install -n micro-onos ran-simulator ran-simulator --set googleAPIKey=YOUR_API_KEY_HERE
 ```
 
 `helm install` assigns a unique name to the chart and displays all the k8s resources that were

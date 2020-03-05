@@ -26,26 +26,25 @@ func setUpManager() (*manager.Manager, error) {
 		Fade:       false,
 		ShowRoutes: false,
 		ShowPower:  false,
+		MinUes:     5,
+		MaxUes:     5,
 	}
 	towerParams := types.TowersParams{
 		TowerRows:         2,
 		TowerCols:         2,
 		TowerSpacingVert:  0.01,
 		TowerSpacingHoriz: 0.01,
-		MaxUEs:            4,
-	}
-	locationsParams := manager.LocationsParams{
-		NumLocations: 10,
+		MaxUEsPerTower:    4,
+		LocationsScale:    1.0,
 	}
 	routesParams := manager.RoutesParams{
-		NumRoutes: 5,
 		APIKey:    "",
 		StepDelay: 1000,
 	}
 
 	towers := manager.NewTowers(towerParams, mapLayout)
 
-	locations := manager.NewLocations(locationsParams, towerParams, mapLayout)
+	locations := manager.NewLocations(towerParams, mapLayout)
 
 	mgr, err := manager.NewManager()
 	if err != nil {
@@ -57,11 +56,11 @@ func setUpManager() (*manager.Manager, error) {
 	mgr.TowersLock.Unlock()
 	mgr.Locations = locations
 
-	mgr.Routes, err = mgr.NewRoutes(routesParams)
+	mgr.Routes, err = mgr.NewRoutes(mapLayout, routesParams)
 	if err != nil {
 		return nil, err
 	}
-	mgr.UserEquipments = mgr.NewUserEquipments(routesParams)
+	mgr.UserEquipments = mgr.NewUserEquipments(mapLayout, routesParams)
 
 	return mgr, nil
 }

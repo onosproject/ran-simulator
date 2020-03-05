@@ -65,7 +65,7 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 				Color:     randomColor(),
 				PlmnID:    TestPlmnID,
 				EcID:      makeEci(towerName),
-				MaxUEs:    params.MaxUEs,
+				MaxUEs:    params.GetMaxUEsPerTower(),
 				Neighbors: makeNeighbors(towerName, params),
 				TxPowerdB: DefaultTxPower,
 			}

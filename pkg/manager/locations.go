@@ -21,11 +21,6 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 )
 
-// LocationsParams :
-type LocationsParams struct {
-	NumLocations int
-}
-
 // Location :
 type Location struct {
 	Name     string
@@ -33,12 +28,12 @@ type Location struct {
 }
 
 // NewLocations - create a new set of locations
-func NewLocations(params LocationsParams, towersParams types.TowersParams, mapLayout types.MapLayout) map[string]*Location {
+func NewLocations(towersParams types.TowersParams, mapLayout types.MapLayout) map[string]*Location {
 	locations := make(map[string]*Location)
-
-	for l := 0; l < params.NumLocations; l++ {
+	var l uint32
+	for l = 0; l < (mapLayout.MaxUes * 2); l++ {
 		pos := randomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng(),
-			towersParams.TowerSpacingHoriz*float32(towersParams.TowerCols-1))
+			towersParams.TowerSpacingHoriz*float32(towersParams.TowerCols-1)*towersParams.LocationsScale/2)
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{
 			Name:     name,

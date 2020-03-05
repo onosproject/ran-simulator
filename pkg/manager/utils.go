@@ -23,8 +23,8 @@ import (
 /**
  * Generates a random latlng value in 1000 meter radius of loc
  */
-func randomLatLng(mapCenterLat float32, mapCenterLng float32, scale float32) types.Point {
-	var r = float64(scale)
+func randomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32) types.Point {
+	var r = float64(radius)
 	y0 := float64(mapCenterLat)
 	x0 := float64(mapCenterLng)
 
@@ -33,9 +33,8 @@ func randomLatLng(mapCenterLat float32, mapCenterLng float32, scale float32) typ
 
 	w := r * math.Sqrt(u)
 	t := 2 * math.Pi * v
-	x := w * math.Cos(t)
+	x1 := w * math.Cos(t)
 	y1 := w * math.Sin(t)
-	x1 := x / math.Cos(y0)
 
 	newY := roundToDecimal(y0+y1, 6)
 	newX := roundToDecimal(x0+x1, 6)
