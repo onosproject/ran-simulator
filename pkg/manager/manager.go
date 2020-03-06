@@ -96,6 +96,7 @@ func (m *Manager) Close() {
 	close(m.TowerChannel)
 	close(m.UeChannel)
 	close(m.RouteChannel)
+	close(m.LatencyChannel)
 	for r := range m.Routes {
 		delete(m.Routes, r)
 	}

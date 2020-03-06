@@ -17,6 +17,7 @@ package metrics
 import (
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
@@ -35,6 +36,7 @@ type HOEvent struct {
 var log = liblog.GetLogger("northbound", "trafficsim")
 
 var allHOEvents []HOEvent
+var allHOEventsLock sync.RWMutex
 
 // RunHOExposer runs Prometheus exposer
 func RunHOExposer(port int, latencyChan chan HOEvent) {
@@ -53,7 +55,9 @@ func RunHOExposer(port int, latencyChan chan HOEvent) {
 		// block here until a latency measurement is received
 		for latency := range latencyChan {
 			hoLatencyHistogram.Observe(float64(latency.HOLatency / 1e3))
+			allHOEventsLock.Lock()
 			allHOEvents = append(allHOEvents, latency)
+			allHOEventsLock.Unlock()
 		}
 	}()
 	go func() {
