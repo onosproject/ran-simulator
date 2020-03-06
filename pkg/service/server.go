@@ -17,8 +17,13 @@
 package service
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"github.com/onosproject/onos-lib-go/pkg/certs"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"google.golang.org/grpc/credentials"
+	"io/ioutil"
 	"net"
 
 	"google.golang.org/grpc"
@@ -77,46 +82,44 @@ func (s *Server) Serve(started func(string)) error {
 		return err
 	}
 
-	/*
-		tlsCfg := &tls.Config{}
+	tlsCfg := &tls.Config{}
 
-		if *s.cfg.CertPath == "" && *s.cfg.KeyPath == "" {
-			// Load default Certificates
-			clientCerts, err := tls.X509KeyPair([]byte(certs.DefaultLocalhostCrt), []byte(certs.DefaultLocalhostKey))
-			if err != nil {
-				log.Errorf("Error loading default certs %s", err.Error())
-				return err
-			}
-			tlsCfg.Certificates = []tls.Certificate{clientCerts}
-		} else {
-			log.Infof("Loading certs: %s %s", *s.cfg.CertPath, *s.cfg.KeyPath)
-			clientCerts, err := tls.LoadX509KeyPair(*s.cfg.CertPath, *s.cfg.KeyPath)
-			if err != nil {
-				log.Errorf("Error loading certs %s", err.Error())
-				return err
-			}
-			tlsCfg.Certificates = []tls.Certificate{clientCerts}
+	if *s.cfg.CertPath == "" && *s.cfg.KeyPath == "" {
+		// Load default Certificates
+		clientCerts, err := tls.X509KeyPair([]byte(certs.DefaultLocalhostCrt), []byte(certs.DefaultLocalhostKey))
+		if err != nil {
+			log.Errorf("Error loading default certs %s", err.Error())
+			return err
 		}
-
-		if s.cfg.Insecure {
-			// RequestClientCert will ask client for a certificate but won't
-			// require it to proceed. If certificate is provided, it will be
-			// verified.
-			tlsCfg.ClientAuth = tls.RequestClientCert
-		} else {
-			tlsCfg.ClientAuth = tls.RequireAndVerifyClientCert
+		tlsCfg.Certificates = []tls.Certificate{clientCerts}
+	} else {
+		log.Infof("Loading certs: %s %s", *s.cfg.CertPath, *s.cfg.KeyPath)
+		clientCerts, err := tls.LoadX509KeyPair(*s.cfg.CertPath, *s.cfg.KeyPath)
+		if err != nil {
+			log.Errorf("Error loading certs %s", err.Error())
+			return err
 		}
+		tlsCfg.Certificates = []tls.Certificate{clientCerts}
+	}
 
-		if *s.cfg.CaPath == "" {
-			log.Info("Loading default CA onfca")
-			tlsCfg.ClientCAs = getCertPoolDefault()
-		} else {
-			tlsCfg.ClientCAs = getCertPool(*s.cfg.CaPath)
-		}
+	if s.cfg.Insecure {
+		// RequestClientCert will ask client for a certificate but won't
+		// require it to proceed. If certificate is provided, it will be
+		// verified.
+		tlsCfg.ClientAuth = tls.RequestClientCert
+	} else {
+		tlsCfg.ClientAuth = tls.RequireAndVerifyClientCert
+	}
 
-		opts := []grpc.ServerOption{grpc.Creds(credentials.NewTLS(tlsCfg))}
-	*/
-	var opts []grpc.ServerOption
+	if *s.cfg.CaPath == "" {
+		log.Info("Loading default CA onfca")
+		tlsCfg.ClientCAs = getCertPoolDefault()
+	} else {
+		tlsCfg.ClientCAs = getCertPool(*s.cfg.CaPath)
+	}
+
+	opts := []grpc.ServerOption{grpc.Creds(credentials.NewTLS(tlsCfg))}
+
 	server := grpc.NewServer(opts...)
 
 	for i := range s.services {
@@ -128,11 +131,10 @@ func (s *Server) Serve(started func(string)) error {
 	return server.Serve(lis)
 }
 
-/*
 func getCertPoolDefault() *x509.CertPool {
 	certPool := x509.NewCertPool()
 	if ok := certPool.AppendCertsFromPEM([]byte(certs.OnfCaCrt)); !ok {
-		log.Warning("failed to append CA certificates")
+		log.Warn("failed to append CA certificates")
 	}
 	return certPool
 }
@@ -141,11 +143,10 @@ func getCertPool(CaPath string) *x509.CertPool {
 	certPool := x509.NewCertPool()
 	ca, err := ioutil.ReadFile(CaPath)
 	if err != nil {
-		log.Warning("could not read ", CaPath, err)
+		log.Warn("could not read ", CaPath, err)
 	}
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
-		log.Warning("failed to append CA certificates")
+		log.Warn("failed to append CA certificates")
 	}
 	return certPool
 }
-*/
