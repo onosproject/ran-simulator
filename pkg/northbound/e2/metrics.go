@@ -30,7 +30,7 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 	switch x := m.S.(type) {
 	case *e2.TelemetryMessage_RadioMeasReportPerUE:
 		r := x.RadioMeasReportPerUE
-		name, err := trafficSimMgr.CrntiToName(r.Crnti, r.Ecgi.Ecid)
+		name, err := trafficSimMgr.CrntiToName(types.Crnti(r.Crnti), types.EcID(r.Ecgi.Ecid))
 		if err != nil {
 			log.Errorf("ue %s/%s not found", r.Ecgi.Ecid, r.Crnti)
 		}
@@ -56,10 +56,10 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 			}
 		}
 		trafficSimMgr.TowersLock.RLock()
-		servingTower := trafficSimMgr.GetTowerByName(ue.ServingTower)
+		servingTower := trafficSimMgr.Towers[ue.ServingTower]
 		trafficSimMgr.TowersLock.RUnlock()
 
-		if servingTower.EcID != bestStationID.Ecid || servingTower.PlmnID != bestStationID.PlmnId {
+		if servingTower.EcID != types.EcID(bestStationID.Ecid) || servingTower.PlmnID != types.PlmnID(bestStationID.PlmnId) {
 			trafficSimMgr.UserEquipmentsLock.Lock()
 			if ue.Metrics.HoReportTimestamp == 0 {
 				ue.Metrics.HoReportTimestamp = time.Now().UnixNano()
@@ -77,7 +77,7 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 		m := x.HORequest
 		trafficSimMgr.UserEquipmentsLock.Lock()
 		defer trafficSimMgr.UserEquipmentsLock.Unlock()
-		ueName, err := trafficSimMgr.CrntiToName(m.Crnti, m.EcgiS.Ecid)
+		ueName, err := trafficSimMgr.CrntiToName(types.Crnti(m.Crnti), types.EcID(m.EcgiS.Ecid))
 		if err != nil {
 			log.Errorf("ue %s/%s not found", m.EcgiS.Ecid, m.Crnti)
 			return
@@ -93,8 +93,8 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 			ue.Metrics.HoReportTimestamp = 0
 			tmpHOEvent := metrics.HOEvent{
 				Timestamp:    time.Now(),
-				Crnti:        ue.GetCrnti(),
-				ServingTower: ue.GetServingTower(),
+				Crnti:        string(ue.GetCrnti()),
+				ServingTower: string(ue.GetServingTower()),
 				HOLatency:    ue.Metrics.HoLatency,
 			}
 			trafficSimMgr.LatencyChannel <- tmpHOEvent

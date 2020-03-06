@@ -18,6 +18,8 @@ syntax = "proto3";
 
 package ran.trafficsim.types;
 
+import "gogoproto/gogo.proto";
+
 message Point {
     float lat = 1;
 
@@ -25,7 +27,7 @@ message Point {
 }
 
 message Route {
-    string name = 1;
+    string name = 1 [(gogoproto.customname) = "RouteID", (gogoproto.casttype) = "RouteID"];
 
     repeated Point waypoints = 2;
 
@@ -33,7 +35,7 @@ message Route {
 }
 
 message Ue {
-    string name = 1;
+    string name = 1 [(gogoproto.customname) = "Name", (gogoproto.casttype) = "UEName"];
 
     string type = 2;
 
@@ -41,25 +43,25 @@ message Ue {
 
     uint32 rotation = 5;
 
-    string route = 6;
+    string route = 6 [(gogoproto.casttype) = "RouteID"];
 
-    string serving_tower = 7;
+    string serving_tower = 7 [(gogoproto.casttype) = "EcID"];
 
     float serving_tower_dist = 8;
 
-    string tower1 = 9;
+    string tower1 = 9 [(gogoproto.casttype) = "EcID"];
 
     float tower1_dist = 10;
 
-    string tower2 = 11;
+    string tower2 = 11 [(gogoproto.casttype) = "EcID"];
 
     float tower2_dist = 12;
 
-    string tower3 = 13;
+    string tower3 = 13 [(gogoproto.casttype) = "EcID"];
 
     float tower3_dist = 14;
 
-    string crnti = 15;
+    string crnti = 15 [(gogoproto.customname) = "Crnti", (gogoproto.casttype) = "Crnti"];
 
     bool admitted = 16;
 
@@ -96,25 +98,23 @@ message TowersParams {
 }
 
 message Tower {
-    string name = 1;
+    string ecID = 1 [(gogoproto.customname) = "EcID", (gogoproto.casttype) = "EcID"];
 
-    Point location = 2;
+    string plmnID = 2 [(gogoproto.customname) = "PlmnID", (gogoproto.casttype) = "PlmnID"];
 
-    string color = 3;
+    Point location = 3;
 
-    string ecID = 4;
+    string color = 4;
 
-    string plmnID = 5;
+    uint32 maxUEs = 5;
 
-    uint32 maxUEs = 6;
-
-    repeated string neighbors = 7;
+    repeated string neighbors = 6 [(gogoproto.casttype) = "EcID"];
 
     // The tower transmit power in decibels
-    float txPowerdB = 8;
+    float txPowerdB = 7;
 
     // crntis maps a ue's name to its crnti
-    map<string, string> crntiMap = 9;
+    map<string, string> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "UEName"];
 
     uint32 crntiIndex = 10;
 }
