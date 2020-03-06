@@ -67,7 +67,8 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 		},
 	}
 
-	m.NewCrnti(ue)
+	crnti, _ := m.NewCrnti(ue.ServingTower, ue.Name)
+	ue.Crnti = crnti
 
 	// Now would be a good time to update the Route colour
 	for _, t := range m.Towers {
@@ -155,12 +156,25 @@ func (m *Manager) UeHandover(name string, tower string) {
 		return
 	}
 	names, _ := m.findClosestTowers(ue.Position)
-	m.DelCrnti(ue)
+	err = m.DelCrnti(ue.ServingTower, ue.Name)
+	if err != nil {
+		log.Errorf(err.Error())
+		return
+	}
+	m.UserEquipmentsLock.Lock()
+	ue.Crnti = InvalidCrnti
 	ue.ServingTower = tower
-	m.NewCrnti(ue)
+	newCrnti, err := m.NewCrnti(tower, ue.Name)
+	if err != nil {
+		m.UserEquipmentsLock.Unlock()
+		log.Errorf(err.Error())
+		return
+	}
+	ue.Crnti = newCrnti
 	ue.Tower1 = names[0]
 	ue.Tower2 = names[1]
 	ue.Tower3 = names[2]
+	m.UserEquipmentsLock.Unlock()
 	m.UeChannel <- dispatcher.Event{
 		Type:       trafficsim.Type_UPDATED,
 		UpdateType: trafficsim.UpdateType_HANDOVER,
@@ -171,8 +185,7 @@ func (m *Manager) UeHandover(name string, tower string) {
 // UeAdmitted - called when the Admission Request for the UE is processed
 // This causes the first RadioMeasurementReport to be sent
 func (m *Manager) UeAdmitted(ue *types.Ue) {
-	time.Sleep(time.Millisecond * 100)
-	ue.Admitted = true
+	// The UEs should not be locked when this is sent or a deadlock will occur
 	m.UeChannel <- dispatcher.Event{
 		Type:       trafficsim.Type_UPDATED,
 		UpdateType: trafficsim.UpdateType_TOWER,
