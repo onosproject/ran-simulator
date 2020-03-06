@@ -30,7 +30,10 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 	switch x := m.S.(type) {
 	case *e2.TelemetryMessage_RadioMeasReportPerUE:
 		r := x.RadioMeasReportPerUE
-		name := crntiToName(r.Crnti)
+		name, err := trafficSimMgr.CrntiToName(r.Crnti, r.Ecgi.Ecid)
+		if err != nil {
+			log.Errorf("ue %s/%s not found", r.Ecgi.Ecid, r.Crnti)
+		}
 		var ue *types.Ue
 		var ok bool
 		trafficSimMgr.UserEquipmentsLock.RLock()
@@ -73,10 +76,16 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 	case *e2.ControlResponse_HORequest:
 		m := x.HORequest
 		trafficSimMgr.UserEquipmentsLock.Lock()
-		ue, ok := trafficSimMgr.UserEquipments[crntiToName(m.Crnti)]
-		if !ok {
-			log.Errorf("ue %s not found", crntiToName(m.Crnti))
-			trafficSimMgr.UserEquipmentsLock.Unlock()
+		defer trafficSimMgr.UserEquipmentsLock.Unlock()
+		ueName, err := trafficSimMgr.CrntiToName(m.Crnti, m.EcgiS.Ecid)
+		if err != nil {
+			log.Errorf("ue %s/%s not found", m.EcgiS.Ecid, m.Crnti)
+			return
+		}
+		var ue *types.Ue
+		var ok bool
+		if ue, ok = trafficSimMgr.UserEquipments[ueName]; !ok {
+			log.Errorf("ue %s not found", ueName)
 			return
 		}
 		if ue.Metrics.HoReportTimestamp != 0 {
@@ -91,6 +100,5 @@ func UpdateControlMetrics(in *e2.ControlResponse) {
 			trafficSimMgr.LatencyChannel <- tmpHOEvent
 			log.Infof("%s Hand-over latency: %d microsec", ue.Name, ue.Metrics.HoLatency/1000)
 		}
-		trafficSimMgr.UserEquipmentsLock.Unlock()
 	}
 }

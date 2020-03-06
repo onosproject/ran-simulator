@@ -16,12 +16,13 @@ package manager
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/api/trafficsim"
-	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"math"
 	"regexp"
 	"strconv"
+
+	"github.com/onosproject/ran-simulator/api/trafficsim"
+	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 )
 
 // TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
@@ -36,6 +37,12 @@ const (
 	maxPowerdB = 30.0
 	minPowerdB = -15.0
 )
+
+// MaxCrnti - Maximum value of CRNTI
+const MaxCrnti = 65523
+
+// InvalidCrnti ...
+const InvalidCrnti = "0000"
 
 // TowerIf :
 type TowerIf interface {
@@ -60,14 +67,16 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 			towerNum = towerNum + 1
 			towerName := fmt.Sprintf("Tower-%d", towerNum)
 			towers[towerName] = &types.Tower{
-				Name:      towerName,
-				Location:  &pos,
-				Color:     randomColor(),
-				PlmnID:    TestPlmnID,
-				EcID:      makeEci(towerName),
-				MaxUEs:    params.GetMaxUEsPerTower(),
-				Neighbors: makeNeighbors(towerName, params),
-				TxPowerdB: DefaultTxPower,
+				Name:       towerName,
+				Location:   &pos,
+				Color:      randomColor(),
+				PlmnID:     TestPlmnID,
+				EcID:       makeEci(towerName),
+				MaxUEs:     params.MaxUEsPerTower,
+				Neighbors:  makeNeighbors(towerName, params),
+				TxPowerdB:  DefaultTxPower,
+				CrntiMap:   make(map[string]string),
+				CrntiIndex: 0,
 			}
 		}
 	}
@@ -146,6 +155,45 @@ func (m *Manager) UpdateTower(tower string, powerAdjust float32) error {
 		Object: t,
 	}
 	return nil
+}
+
+// NewCrnti allocs a new crnti
+func (m *Manager) NewCrnti(ue *types.Ue) {
+	m.TowersLock.RLock()
+	tower := m.Towers[ue.ServingTower]
+	tower.CrntiIndex++
+	ue.Crnti = fmt.Sprintf("%04X", tower.CrntiIndex%MaxCrnti)
+	tower.CrntiMap[ue.Crnti] = ue.Name
+	m.TowersLock.RUnlock()
+}
+
+// DelCrnti deletes a crnti
+func (m *Manager) DelCrnti(ue *types.Ue) {
+	m.TowersLock.RLock()
+	tower := m.Towers[ue.ServingTower]
+	crntiMap := tower.CrntiMap
+	delete(crntiMap, ue.Crnti)
+	ue.Crnti = InvalidCrnti
+	m.TowersLock.RUnlock()
+}
+
+// CrntiToName ...
+func (m *Manager) CrntiToName(crnti string, ecid string) (string, error) {
+	tower, ok := m.Towers[m.EciToName(ecid)]
+	if !ok {
+		return "", fmt.Errorf("tower %s not found", ecid)
+	}
+	ueName, ok := tower.CrntiMap[crnti]
+	if !ok {
+		return "", fmt.Errorf("crnti %s not found", crnti)
+	}
+	return ueName, nil
+}
+
+// EciToName - TODO return the error OR refactor altogether
+func (m *Manager) EciToName(eci string) string {
+	id, _ := strconv.Atoi(eci)
+	return fmt.Sprintf("Tower-%d", id)
 }
 
 // Measure the distance between a point and a tower and return an answer in decimal degrees

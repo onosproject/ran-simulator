@@ -15,23 +15,22 @@
 package e2
 
 import (
+	"testing"
+	"time"
+
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"gotest.tools/assert"
-	"testing"
-	"time"
 )
 
-func Test_CrntiToName(t *testing.T) {
-	assert.Equal(t, "Ue-0019", crntiToName("0019"))
-	assert.Equal(t, "Ue-1234567890ABCDE", crntiToName("1234567890ABCDE"))
-}
-
 func Test_EciToName(t *testing.T) {
-	assert.Equal(t, "Tower-1", eciToName("1"))
-	assert.Equal(t, "Tower-0", eciToName("1234567890ABCDE"))
+	mgr, err := setUpManager()
+	assert.NilError(t, err, "Unexpected error setting up manager")
+	assert.Assert(t, mgr != nil, "Unexpectedly Manager is nil!")
+	assert.Equal(t, "Tower-1", mgr.EciToName("1"))
+	assert.Equal(t, "Tower-0", mgr.EciToName("1234567890ABCDE"))
 }
 
 func Test_HandleRrmConfig(t *testing.T) {
