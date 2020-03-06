@@ -25,8 +25,8 @@ import (
 )
 
 // NewUserEquipments - create a new set of UEs (phone, car etc)
-func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) map[string]*types.Ue {
-	ues := make(map[string]*types.Ue)
+func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) map[types.UEName]*types.Ue {
+	ues := make(map[types.UEName]*types.Ue)
 
 	// There is already a route per UE
 	var u uint32
@@ -38,8 +38,8 @@ func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params Rout
 }
 
 func (m *Manager) newUe(ueIdx int) *types.Ue {
-	name := fmt.Sprintf("Ue-%04X", ueIdx+1)
-	routeName := fmt.Sprintf("Route-%d", ueIdx)
+	name := types.UEName(fmt.Sprintf("Ue-%04X", ueIdx+1))
+	routeName := types.RouteID(fmt.Sprintf("Route-%d", ueIdx))
 	route := m.Routes[routeName]
 	towers, distances := m.findClosestTowers(route.Waypoints[0])
 	m.TowersLock.RLock()
@@ -72,7 +72,7 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 
 	// Now would be a good time to update the Route colour
 	for _, t := range m.Towers {
-		if t.Name == towers[0] {
+		if t.EcID == towers[0] {
 			m.Routes[routeName].Color = t.Color
 			break
 		}
@@ -119,7 +119,7 @@ func (m *Manager) SetNumberUes(numUes int) error {
 			if err != nil {
 				return err
 			}
-			m.Routes[newRoute.GetName()] = newRoute
+			m.Routes[newRoute.GetRouteID()] = newRoute
 			m.RouteChannel <- dispatcher.Event{
 				Type:   trafficsim.Type_ADDED,
 				Object: newRoute,
@@ -138,7 +138,7 @@ func (m *Manager) SetNumberUes(numUes int) error {
 }
 
 // GetUe returns Ue based on its name
-func (m *Manager) GetUe(name string) (*types.Ue, error) {
+func (m *Manager) GetUe(name types.UEName) (*types.Ue, error) {
 	m.UserEquipmentsLock.RLock()
 	defer m.UserEquipmentsLock.RUnlock()
 	ue, ok := m.UserEquipments[name]
@@ -149,14 +149,14 @@ func (m *Manager) GetUe(name string) (*types.Ue, error) {
 }
 
 // UeHandover perform the handover on simulated UE
-func (m *Manager) UeHandover(name string, tower string) {
+func (m *Manager) UeHandover(name types.UEName, tower types.EcID) {
 	ue, err := m.GetUe(name)
 	if err != nil {
 		log.Error(err)
 		return
 	}
 	names, _ := m.findClosestTowers(ue.Position)
-	err = m.DelCrnti(ue.ServingTower, ue.Name)
+	err = m.DelCrnti(ue.ServingTower, ue.Crnti)
 	if err != nil {
 		log.Errorf(err.Error())
 		return
@@ -238,13 +238,13 @@ func (m *Manager) startMoving(params RoutesParams) {
 	log.Warnf("Stopped driving")
 }
 
-func (m *Manager) getColorForUe(ueName string) string {
+func (m *Manager) getColorForUe(ueName types.UEName) string {
 	ue, ok := m.UserEquipments[ueName]
 	if !ok {
 		return ""
 	}
 	for _, t := range m.Towers {
-		if t.Name == ue.ServingTower {
+		if t.EcID == ue.ServingTower {
 			return t.Color
 		}
 	}
@@ -256,7 +256,7 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 	for idx, wp := range route.GetWaypoints() {
 		if ue.Position.GetLng() == wp.GetLng() && ue.Position.GetLat() == wp.GetLat() {
 			if idx+1 == len(route.GetWaypoints()) {
-				return fmt.Errorf("end of route %s %d", route.GetName(), idx)
+				return fmt.Errorf("end of route %s %d", route.GetRouteID(), idx)
 			}
 			ue.Position = route.Waypoints[idx+1]
 			ue.Rotation = uint32(getRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
@@ -283,11 +283,11 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("unexpectedly hit end of route %s %v %v", route.GetName(), ue.Position, route.GetWaypoints()[0])
+	return fmt.Errorf("unexpectedly hit end of route %s %v %v", route.GetRouteID(), ue.Position, route.GetWaypoints()[0])
 }
 
-func ueName(idx int) string {
-	return fmt.Sprintf("Ue-%04X", idx+1)
+func ueName(idx int) types.UEName {
+	return types.UEName(fmt.Sprintf("Ue-%04X", idx+1))
 }
 
 // UeDeepCopy ...

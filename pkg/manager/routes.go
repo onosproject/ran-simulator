@@ -39,8 +39,8 @@ type RoutesParams struct {
 
 // NewRoutes Create new routes, by taking two random locations and asking Google for
 // directions to get from one to the other
-func (m *Manager) NewRoutes(mapLayoutParams types.MapLayout, params RoutesParams) (map[string]*types.Route, error) {
-	routes := make(map[string]*types.Route)
+func (m *Manager) NewRoutes(mapLayoutParams types.MapLayout, params RoutesParams) (map[types.RouteID]*types.Route, error) {
+	routes := make(map[types.RouteID]*types.Route)
 
 	var r uint32
 	for r = 0; r < mapLayoutParams.MinUes; r++ {
@@ -54,13 +54,13 @@ func (m *Manager) NewRoutes(mapLayoutParams types.MapLayout, params RoutesParams
 			return nil, err
 		}
 
-		routes[route.Name] = route
+		routes[route.RouteID] = route
 	}
 
 	return routes, nil
 }
 
-func (m *Manager) removeRoute(routeName string) {
+func (m *Manager) removeRoute(routeName types.RouteID) {
 	r, ok := m.Routes[routeName]
 	if ok {
 		delete(m.Routes, routeName)
@@ -92,7 +92,7 @@ func (m *Manager) newRoute(startLoc *Location, rID int, apiKey string, color str
 	}
 
 	route := types.Route{
-		Name:      routeName(rID),
+		RouteID:   routeName(rID),
 		Waypoints: points,
 		Color:     color,
 	}
@@ -168,6 +168,6 @@ func randomRoute(startLoc *Location, endLoc *Location) ([]*types.Point, error) {
 	return points, nil
 }
 
-func routeName(idx int) string {
-	return fmt.Sprintf("Route-%d", idx)
+func routeName(idx int) types.RouteID {
+	return types.RouteID(fmt.Sprintf("Route-%d", idx))
 }

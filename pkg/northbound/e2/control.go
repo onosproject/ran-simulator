@@ -74,7 +74,6 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 }
 
 func handleRRMConfig(req *e2.RRMConfig) {
-	tower := manager.EciToName(req.Ecgi.Ecid)
 	var powerAdjust float32
 	switch req.PA[0] {
 	case e2.XICICPA_XICIC_PA_DB_MINUS6:
@@ -95,7 +94,7 @@ func handleRRMConfig(req *e2.RRMConfig) {
 		powerAdjust = 3
 	}
 	trafficSimMgr := manager.GetManager()
-	err := trafficSimMgr.UpdateTower(tower, powerAdjust)
+	err := trafficSimMgr.UpdateTower(types.EcID(req.Ecgi.Ecid), powerAdjust)
 	if err != nil {
 		log.Warn(err.Error())
 	}
@@ -104,12 +103,12 @@ func handleRRMConfig(req *e2.RRMConfig) {
 func handleHORequest(req *e2.HORequest) error {
 	log.Infof("handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
 	m := manager.GetManager()
-	ueName, err := m.CrntiToName(req.Crnti, req.EcgiS.Ecid)
+	ueName, err := m.CrntiToName(types.Crnti(req.Crnti), types.EcID(req.EcgiS.Ecid))
 	if err != nil {
 		log.Error(err)
 		return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, req.Crnti)
 	}
-	m.UeHandover(ueName, manager.EciToName(req.EcgiT.Ecid))
+	m.UeHandover(ueName, types.EcID(req.EcgiT.Ecid))
 	return err
 }
 
@@ -124,8 +123,8 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) {
 			t := trafficSimMgr.Towers[neighbor]
 			cell := e2.CandScell{
 				Ecgi: &e2.ECGI{
-					PlmnId: t.PlmnID,
-					Ecid:   t.EcID,
+					PlmnId: string(t.PlmnID),
+					Ecid:   string(t.EcID),
 				}}
 			cells = append(cells, &cell)
 		}
@@ -134,8 +133,8 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) {
 			S: &e2.ControlUpdate_CellConfigReport{
 				CellConfigReport: &e2.CellConfigReport{
 					Ecgi: &e2.ECGI{
-						PlmnId: tower.PlmnID,
-						Ecid:   tower.EcID,
+						PlmnId: string(tower.PlmnID),
+						Ecid:   string(tower.EcID),
 					},
 					MaxNumConnectedUes: tower.MaxUEs,
 					CandScells:         cells,
@@ -152,13 +151,10 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
-		trafficSimMgr.TowersLock.RLock()
-		eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
-		trafficSimMgr.TowersLock.RUnlock()
 		trafficSimMgr.UserEquipmentsLock.Lock()
-		ueAdmReq := formatUeAdmissionReq(eci, ue.Crnti)
+		ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti)
 		c <- *ueAdmReq
-		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+		log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
 		ue.Admitted = true
 		trafficSimMgr.UserEquipmentsLock.Unlock()
 		trafficSimMgr.UeAdmitted(ue)
@@ -179,12 +175,9 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 				log.Fatalf("Object %v could not be converted to UE", ue)
 			}
 			if event.Type == trafficsim.Type_ADDED {
-				trafficSimMgr.TowersLock.RLock()
-				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
-				trafficSimMgr.TowersLock.RUnlock()
-				ueAdmReq := formatUeAdmissionReq(eci, ue.Crnti)
+				ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti)
 				c <- *ueAdmReq
-				log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+				log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
 				ue.Admitted = true
 			} else if event.Type == trafficsim.Type_REMOVED {
 				err = trafficSimMgr.DelCrnti(ue.ServingTower, ue.Crnti)
@@ -193,12 +186,9 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 					continue
 				}
 				ue.Crnti = manager.InvalidCrnti
-				trafficSimMgr.TowersLock.RLock()
-				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
-				trafficSimMgr.TowersLock.RUnlock()
-				ueRelInd := formatUeReleaseInd(eci, ue.Crnti)
+				ueRelInd := formatUeReleaseInd(ue.ServingTower, ue.Crnti)
 				c <- *ueRelInd
-				log.Infof("ueReleaseInd eci:%s crnti:%s", eci, ue.Crnti)
+				log.Infof("ueReleaseInd eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
 			}
 			// Nothing to be done for trafficsim.Type_UPDATED - they are handled by Telemetry
 		case <-stream.Context().Done():
@@ -208,32 +198,32 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 	}
 }
 
-func formatUeAdmissionReq(eci string, crnti string) *e2.ControlUpdate {
+func formatUeAdmissionReq(eci types.EcID, crnti types.Crnti) *e2.ControlUpdate {
 	return &e2.ControlUpdate{
 		MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
 		S: &e2.ControlUpdate_UEAdmissionRequest{
 			UEAdmissionRequest: &e2.UEAdmissionRequest{
 				Ecgi: &e2.ECGI{
 					PlmnId: manager.TestPlmnID,
-					Ecid:   eci,
+					Ecid:   string(eci),
 				},
-				Crnti:             crnti,
+				Crnti:             string(crnti),
 				AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
 			},
 		},
 	}
 }
 
-func formatUeReleaseInd(eci string, crnti string) *e2.ControlUpdate {
+func formatUeReleaseInd(eci types.EcID, crnti types.Crnti) *e2.ControlUpdate {
 	return &e2.ControlUpdate{
 		MessageType: e2.MessageType_UE_RELEASE_IND,
 		S: &e2.ControlUpdate_UEReleaseInd{
 			UEReleaseInd: &e2.UEReleaseInd{
 				Ecgi: &e2.ECGI{
 					PlmnId: manager.TestPlmnID,
-					Ecid:   eci,
+					Ecid:   string(eci),
 				},
-				Crnti:        crnti,
+				Crnti:        string(crnti),
 				ReleaseCause: e2.ReleaseCause_RELEASE_INACTIVITY,
 			},
 		},

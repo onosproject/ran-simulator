@@ -31,12 +31,12 @@ var mgr Manager
 // Manager single point of entry for the trafficsim system.
 type Manager struct {
 	MapLayout          types.MapLayout
-	Towers             map[string]*types.Tower
+	Towers             map[types.EcID]*types.Tower
 	TowersLock         *sync.RWMutex
 	Locations          map[string]*Location
-	Routes             map[string]*types.Route
+	Routes             map[types.RouteID]*types.Route
 	RoutesLock         *sync.RWMutex
-	UserEquipments     map[string]*types.Ue
+	UserEquipments     map[types.UEName]*types.Ue
 	UserEquipmentsLock *sync.RWMutex
 	Dispatcher         *dispatcher.Dispatcher
 	UeChannel          chan dispatcher.Event

@@ -17,8 +17,6 @@ package manager
 import (
 	"fmt"
 	"math"
-	"regexp"
-	"strconv"
 
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -50,13 +48,13 @@ type TowerIf interface {
 }
 
 // NewTowers - create a set of new towers
-func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]*types.Tower {
+func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.EcID]*types.Tower {
 	topLeft := types.Point{
 		Lat: mapLayout.GetCenter().GetLat() + params.TowerSpacingVert*float32(params.TowerRows-1)/2,
 		Lng: mapLayout.GetCenter().GetLng() - params.TowerSpacingHoriz*float32(params.TowerCols-1)/2,
 	}
 	var towerNum = 0
-	towers := make(map[string]*types.Tower)
+	towers := make(map[types.EcID]*types.Tower)
 
 	for r := 0; r < int(params.TowerRows); r++ {
 		for c := 0; c < int(params.TowerCols); c++ {
@@ -65,17 +63,16 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 				Lng: topLeft.Lng + params.TowerSpacingHoriz*float32(c),
 			}
 			towerNum = towerNum + 1
-			towerName := fmt.Sprintf("Tower-%d", towerNum)
-			towers[towerName] = &types.Tower{
-				Name:       towerName,
+			ecid := types.EcID(fmt.Sprintf("%07X", towerNum))
+			towers[ecid] = &types.Tower{
 				Location:   &pos,
 				Color:      randomColor(),
 				PlmnID:     TestPlmnID,
-				EcID:       makeEci(towerName),
+				EcID:       ecid,
 				MaxUEs:     params.MaxUEsPerTower,
-				Neighbors:  makeNeighbors(towerName, params),
+				Neighbors:  makeNeighbors(towerNum, params),
 				TxPowerdB:  DefaultTxPower,
-				CrntiMap:   make(map[string]string),
+				CrntiMap:   make(map[types.Crnti]types.UEName),
 				CrntiIndex: 0,
 			}
 		}
@@ -87,11 +84,11 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[string]
 // Find the closest tower to any point - return closest, candidate1 and candidate2
 // in order of distance
 // Note this does not take any account of serving - it's just about distance
-func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
+func (m *Manager) findClosestTowers(point *types.Point) ([]types.EcID, []float32) {
 	var (
-		closest    string
-		candidate1 string
-		candidate2 string
+		closest    types.EcID
+		candidate1 types.EcID
+		candidate2 types.EcID
 	)
 
 	var (
@@ -108,32 +105,32 @@ func (m *Manager) findClosestTowers(point *types.Point) ([]string, []float32) {
 			candidate2Dist = candidate1Dist
 			candidate1 = closest
 			candidate1Dist = closestDist
-			closest = tower.Name
+			closest = tower.EcID
 			closestDist = distance
 		} else if distance < candidate1Dist {
 			candidate2 = candidate1
 			candidate2Dist = candidate1Dist
-			candidate1 = tower.Name
+			candidate1 = tower.EcID
 			candidate1Dist = distance
 		} else if distance < candidate2Dist {
-			candidate2 = tower.Name
+			candidate2 = tower.EcID
 			candidate2Dist = distance
 		}
 	}
 	m.TowersLock.RUnlock()
 
-	return []string{closest, candidate1, candidate2}, []float32{closestDist, candidate1Dist, candidate2Dist}
+	return []types.EcID{closest, candidate1, candidate2}, []float32{closestDist, candidate1Dist, candidate2Dist}
 }
 
 // GetTower returns tower based on its name
-func (m *Manager) GetTower(name string) *types.Tower {
+func (m *Manager) GetTower(name types.EcID) *types.Tower {
 	m.TowersLock.RLock()
 	defer m.TowersLock.RUnlock()
 	return m.Towers[name]
 }
 
 // UpdateTower Update a tower's properties - usually power level
-func (m *Manager) UpdateTower(tower string, powerAdjust float32) error {
+func (m *Manager) UpdateTower(tower types.EcID, powerAdjust float32) error {
 	// Only the power can be updated at present
 	m.TowersLock.Lock()
 	t, ok := m.Towers[tower]
@@ -158,7 +155,7 @@ func (m *Manager) UpdateTower(tower string, powerAdjust float32) error {
 }
 
 // NewCrnti allocs a new crnti
-func (m *Manager) NewCrnti(servingTower string, ueName string) (string, error) {
+func (m *Manager) NewCrnti(servingTower types.EcID, ueName types.UEName) (types.Crnti, error) {
 	m.TowersLock.Lock()
 	defer m.TowersLock.Unlock()
 	tower, ok := m.Towers[servingTower]
@@ -166,13 +163,13 @@ func (m *Manager) NewCrnti(servingTower string, ueName string) (string, error) {
 		return "", fmt.Errorf("unknown tower %s", servingTower)
 	}
 	tower.CrntiIndex++
-	crnti := fmt.Sprintf("%04X", tower.CrntiIndex%MaxCrnti)
+	crnti := types.Crnti(fmt.Sprintf("%04X", tower.CrntiIndex%MaxCrnti))
 	tower.CrntiMap[crnti] = ueName
 	return crnti, nil
 }
 
 // DelCrnti deletes a crnti
-func (m *Manager) DelCrnti(servingTower string, crnti string) error {
+func (m *Manager) DelCrnti(servingTower types.EcID, crnti types.Crnti) error {
 	m.TowersLock.Lock()
 	defer m.TowersLock.Unlock()
 	tower, ok := m.Towers[servingTower]
@@ -185,8 +182,8 @@ func (m *Manager) DelCrnti(servingTower string, crnti string) error {
 }
 
 // CrntiToName ...
-func (m *Manager) CrntiToName(crnti string, ecid string) (string, error) {
-	tower, ok := m.Towers[EciToName(ecid)]
+func (m *Manager) CrntiToName(crnti types.Crnti, ecid types.EcID) (types.UEName, error) {
+	tower, ok := m.Towers[ecid]
 	if !ok {
 		return "", fmt.Errorf("tower %s not found", ecid)
 	}
@@ -195,12 +192,6 @@ func (m *Manager) CrntiToName(crnti string, ecid string) (string, error) {
 		return "", fmt.Errorf("crnti %s not found", crnti)
 	}
 	return ueName, nil
-}
-
-// EciToName - TODO return the error OR refactor altogether
-func EciToName(eci string) string {
-	id, _ := strconv.Atoi(eci)
-	return fmt.Sprintf("Tower-%d", id)
 }
 
 // Measure the distance between a point and a tower and return an answer in decimal degrees
@@ -212,17 +203,8 @@ func distanceToTower(tower *types.Tower, point *types.Point) float32 {
 	))
 }
 
-func makeEci(towerName string) string {
-	re := regexp.MustCompile("[0-9]+")
-	id, _ := strconv.Atoi(re.FindAllString(towerName, 1)[0])
-	return fmt.Sprintf("%07X", id)
-}
-
-func makeNeighbors(towerName string, towerParams types.TowersParams) []string {
-	neighbors := make([]string, 0, 8)
-	re := regexp.MustCompile("[0-9]+")
-	id, _ := strconv.Atoi(re.FindAllString(towerName, 1)[0])
-	id--
+func makeNeighbors(id int, towerParams types.TowersParams) []types.EcID {
+	neighbors := make([]types.EcID, 0, 8)
 
 	nrows := int(towerParams.TowerRows)
 	ncols := int(towerParams.TowerCols)
@@ -234,8 +216,8 @@ func makeNeighbors(towerName string, towerParams types.TowersParams) []string {
 		for y := max(0, j-1); y <= min(j+1, ncols-1); y++ {
 			if (x == i && y == j-1) || (x == i && y == j+1) || (x == i-1 && y == j) || (x == i+1 && y == j) {
 				towerNum := x*nrows + y + 1
-				towerName := fmt.Sprintf("Tower-%d", towerNum)
-				neighbors = append(neighbors, towerName)
+				towerEcID := types.EcID(fmt.Sprintf("%07X", towerNum))
+				neighbors = append(neighbors, towerEcID)
 			}
 		}
 	}
@@ -256,14 +238,4 @@ func max(x, y int) int {
 		return x
 	}
 	return y
-}
-
-// GetTowerByName ...
-func (m *Manager) GetTowerByName(name string) *types.Tower {
-	for _, tower := range m.Towers {
-		if tower.Name == name {
-			return tower
-		}
-	}
-	return nil
 }

@@ -29,8 +29,6 @@ func Test_EciToName(t *testing.T) {
 	mgr, err := setUpManager()
 	assert.NilError(t, err, "Unexpected error setting up manager")
 	assert.Assert(t, mgr != nil, "Unexpectedly Manager is nil!")
-	assert.Equal(t, "Tower-1", manager.EciToName("1"))
-	assert.Equal(t, "Tower-0", manager.EciToName("1234567890ABCDE"))
 }
 
 func Test_HandleRrmConfig(t *testing.T) {
@@ -41,7 +39,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 	testReq := e2.RRMConfig{
 		Ecgi: &e2.ECGI{
 			PlmnId: manager.TestPlmnID,
-			Ecid:   "1",
+			Ecid:   "0000001",
 		},
 		PA: []e2.XICICPA{e2.XICICPA_XICIC_PA_DB_MINUS3},
 	}
@@ -53,18 +51,17 @@ func Test_HandleRrmConfig(t *testing.T) {
 			assert.Equal(t, trafficsim.UpdateType_NOUPDATETYPE, updateEvent.UpdateType)
 			tower, ok := updateEvent.Object.(*types.Tower)
 			assert.Assert(t, ok, "Problem converting event object to Tower %v", updateEvent.Object)
-			assert.Equal(t, "0000001", tower.EcID)
+			assert.Equal(t, types.EcID("0000001"), tower.EcID)
 			mgr.TowersLock.RLock()
 			assert.Equal(t, float32(7), tower.GetTxPowerdB())
 			mgr.TowersLock.RUnlock()
-		case <-time.After(3 * time.Second):
+		case <-time.After(time.Millisecond * 100):
 			t.Errorf("Timed out on Test_HandleRrmConfig")
 		}
 	}()
 
 	handleRRMConfig(&testReq)
-
-	time.Sleep(time.Millisecond * 5)
+	time.Sleep(time.Millisecond * 110)
 
 	mgr.Close()
 }
