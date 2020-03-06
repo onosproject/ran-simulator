@@ -112,6 +112,11 @@ message Tower {
 
     // The tower transmit power in decibels
     float txPowerdB = 8;
+
+    // crntis maps a ue's name to its crnti
+    map<string, string> crntiMap = 9;
+
+    uint32 crntiIndex = 10;
 }
 
 message MapLayout {

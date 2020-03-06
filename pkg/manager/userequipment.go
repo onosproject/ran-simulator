@@ -59,13 +59,15 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 		Tower2Dist:       distances[1],
 		Tower3:           towers[2],
 		Tower3Dist:       distances[2],
-		Crnti:            makeCrnti(name),
 		Admitted:         false,
+		Crnti:            InvalidCrnti,
 		Metrics: &types.UeMetrics{
 			HoLatency:         0,
 			HoReportTimestamp: 0,
 		},
 	}
+
+	m.NewCrnti(ue)
 
 	// Now would be a good time to update the Route colour
 	for _, t := range m.Towers {
@@ -153,7 +155,9 @@ func (m *Manager) UeHandover(name string, tower string) {
 		return
 	}
 	names, _ := m.findClosestTowers(ue.Position)
+	m.DelCrnti(ue)
 	ue.ServingTower = tower
+	m.NewCrnti(ue)
 	ue.Tower1 = names[0]
 	ue.Tower2 = names[1]
 	ue.Tower3 = names[2]
@@ -267,10 +271,6 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 		}
 	}
 	return fmt.Errorf("unexpectedly hit end of route %s %v %v", route.GetName(), ue.Position, route.GetWaypoints()[0])
-}
-
-func makeCrnti(ueName string) string {
-	return strings.Split(ueName, "-")[1]
 }
 
 func ueName(idx int) string {

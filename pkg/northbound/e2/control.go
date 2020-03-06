@@ -17,23 +17,12 @@ package e2
 import (
 	"fmt"
 	"io"
-	"strconv"
 
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
-
-func crntiToName(crnti string) string {
-	return "Ue-" + crnti
-}
-
-// TODO return the error OR refactor altogether
-func eciToName(eci string) string {
-	id, _ := strconv.Atoi(eci)
-	return fmt.Sprintf("Tower-%d", id)
-}
 
 // SendControl ...
 func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error {
@@ -71,18 +60,22 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 			handleCellConfigRequest(c)
 			go handleUeAdmissions(stream, c)
 		case *e2.ControlResponse_HORequest:
-			handleHORequest(x.HORequest)
+			UpdateControlMetrics(in)
+			err = handleHORequest(x.HORequest)
+			if err != nil {
+				log.Error(err)
+			}
 		case *e2.ControlResponse_RRMConfig:
 			handleRRMConfig(x.RRMConfig)
 		default:
 			log.Errorf("ControlResponse has unexpected type %T", x)
 		}
-		UpdateControlMetrics(in)
 	}
 }
 
 func handleRRMConfig(req *e2.RRMConfig) {
-	tower := eciToName(req.Ecgi.Ecid)
+	trafficSimMgr := manager.GetManager()
+	tower := trafficSimMgr.EciToName(req.Ecgi.Ecid)
 	var powerAdjust float32
 	switch req.PA[0] {
 	case e2.XICICPA_XICIC_PA_DB_MINUS6:
@@ -102,20 +95,22 @@ func handleRRMConfig(req *e2.RRMConfig) {
 	case e2.XICICPA_XICIC_PA_DB_3:
 		powerAdjust = 3
 	}
-	trafficSimMgr := manager.GetManager()
 	err := trafficSimMgr.UpdateTower(tower, powerAdjust)
 	if err != nil {
 		log.Warn(err.Error())
 	}
 }
 
-func handleHORequest(req *e2.HORequest) {
-	//log.Infof("handleHORequest crnti:%s, name:%s serving:%s, target:%s", req.Crnti, crntiToName(req.Crnti), req.EcgiS.Ecid, req.EcgiT.Ecid)
-
-	trafficSimMgr := manager.GetManager()
-
-	log.Infof("hand-over %s from %s to %s", crntiToName(req.Crnti), eciToName(req.EcgiS.Ecid), eciToName(req.EcgiT.Ecid))
-	trafficSimMgr.UeHandover(crntiToName(req.Crnti), eciToName(req.EcgiT.Ecid))
+func handleHORequest(req *e2.HORequest) error {
+	log.Infof("handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
+	m := manager.GetManager()
+	ueName, err := m.CrntiToName(req.Crnti, req.EcgiS.Ecid)
+	if err != nil {
+		log.Error(err)
+		return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, req.Crnti)
+	}
+	m.UeHandover(ueName, m.EciToName(req.EcgiT.Ecid))
+	return err
 }
 
 func handleCellConfigRequest(c chan e2.ControlUpdate) {
@@ -194,6 +189,7 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 				trafficSimMgr.TowersLock.RLock()
 				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
 				trafficSimMgr.TowersLock.RUnlock()
+				trafficSimMgr.DelCrnti(ue)
 				ueRelInd := formatUeReleaseInd(eci, ue.Crnti)
 				c <- *ueRelInd
 				log.Infof("ueReleaseInd eci:%s crnti:%s", eci, ue.Crnti)
