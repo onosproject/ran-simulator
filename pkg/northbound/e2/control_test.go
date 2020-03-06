@@ -29,8 +29,8 @@ func Test_EciToName(t *testing.T) {
 	mgr, err := setUpManager()
 	assert.NilError(t, err, "Unexpected error setting up manager")
 	assert.Assert(t, mgr != nil, "Unexpectedly Manager is nil!")
-	assert.Equal(t, "Tower-1", mgr.EciToName("1"))
-	assert.Equal(t, "Tower-0", mgr.EciToName("1234567890ABCDE"))
+	assert.Equal(t, "Tower-1", manager.EciToName("1"))
+	assert.Equal(t, "Tower-0", manager.EciToName("1234567890ABCDE"))
 }
 
 func Test_HandleRrmConfig(t *testing.T) {

@@ -74,8 +74,7 @@ func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 }
 
 func handleRRMConfig(req *e2.RRMConfig) {
-	trafficSimMgr := manager.GetManager()
-	tower := trafficSimMgr.EciToName(req.Ecgi.Ecid)
+	tower := manager.EciToName(req.Ecgi.Ecid)
 	var powerAdjust float32
 	switch req.PA[0] {
 	case e2.XICICPA_XICIC_PA_DB_MINUS6:
@@ -95,6 +94,7 @@ func handleRRMConfig(req *e2.RRMConfig) {
 	case e2.XICICPA_XICIC_PA_DB_3:
 		powerAdjust = 3
 	}
+	trafficSimMgr := manager.GetManager()
 	err := trafficSimMgr.UpdateTower(tower, powerAdjust)
 	if err != nil {
 		log.Warn(err.Error())
@@ -109,7 +109,7 @@ func handleHORequest(req *e2.HORequest) error {
 		log.Error(err)
 		return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, req.Crnti)
 	}
-	m.UeHandover(ueName, m.EciToName(req.EcgiT.Ecid))
+	m.UeHandover(ueName, manager.EciToName(req.EcgiT.Ecid))
 	return err
 }
 
@@ -151,17 +151,18 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) {
 func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
-	trafficSimMgr.UserEquipmentsLock.RLock()
 	for _, ue := range trafficSimMgr.UserEquipments {
 		trafficSimMgr.TowersLock.RLock()
 		eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
 		trafficSimMgr.TowersLock.RUnlock()
+		trafficSimMgr.UserEquipmentsLock.Lock()
 		ueAdmReq := formatUeAdmissionReq(eci, ue.Crnti)
 		c <- *ueAdmReq
 		log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
+		ue.Admitted = true
+		trafficSimMgr.UserEquipmentsLock.Unlock()
 		trafficSimMgr.UeAdmitted(ue)
 	}
-	trafficSimMgr.UserEquipmentsLock.RUnlock()
 
 	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
 	ueUpdatesLsnr, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
@@ -186,10 +187,15 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 				log.Infof("ueAdmissionRequest eci:%s crnti:%s", eci, ue.Crnti)
 				ue.Admitted = true
 			} else if event.Type == trafficsim.Type_REMOVED {
+				err = trafficSimMgr.DelCrnti(ue.ServingTower, ue.Crnti)
+				if err != nil {
+					log.Error(err.Error())
+					continue
+				}
+				ue.Crnti = manager.InvalidCrnti
 				trafficSimMgr.TowersLock.RLock()
 				eci := trafficSimMgr.GetTowerByName(ue.ServingTower).EcID
 				trafficSimMgr.TowersLock.RUnlock()
-				trafficSimMgr.DelCrnti(ue)
 				ueRelInd := formatUeReleaseInd(eci, ue.Crnti)
 				c <- *ueRelInd
 				log.Infof("ueReleaseInd eci:%s crnti:%s", eci, ue.Crnti)

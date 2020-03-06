@@ -78,6 +78,8 @@ func RunHOExposer(port int, latencyChan chan HOEvent) {
 
 func exposeAllHOEvents() []prometheus.Counter {
 	var listHOEventCounter []prometheus.Counter
+	allHOEventsLock.RLock()
+	defer allHOEventsLock.RUnlock()
 	for _, e := range allHOEvents {
 		tmpHOEvent := prometheus.NewCounter(prometheus.CounterOpts{
 			Namespace: "onosproject",

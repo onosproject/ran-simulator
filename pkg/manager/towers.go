@@ -158,28 +158,35 @@ func (m *Manager) UpdateTower(tower string, powerAdjust float32) error {
 }
 
 // NewCrnti allocs a new crnti
-func (m *Manager) NewCrnti(ue *types.Ue) {
-	m.TowersLock.RLock()
-	tower := m.Towers[ue.ServingTower]
+func (m *Manager) NewCrnti(servingTower string, ueName string) (string, error) {
+	m.TowersLock.Lock()
+	defer m.TowersLock.Unlock()
+	tower, ok := m.Towers[servingTower]
+	if !ok {
+		return "", fmt.Errorf("unknown tower %s", servingTower)
+	}
 	tower.CrntiIndex++
-	ue.Crnti = fmt.Sprintf("%04X", tower.CrntiIndex%MaxCrnti)
-	tower.CrntiMap[ue.Crnti] = ue.Name
-	m.TowersLock.RUnlock()
+	crnti := fmt.Sprintf("%04X", tower.CrntiIndex%MaxCrnti)
+	tower.CrntiMap[crnti] = ueName
+	return crnti, nil
 }
 
 // DelCrnti deletes a crnti
-func (m *Manager) DelCrnti(ue *types.Ue) {
-	m.TowersLock.RLock()
-	tower := m.Towers[ue.ServingTower]
+func (m *Manager) DelCrnti(servingTower string, crnti string) error {
+	m.TowersLock.Lock()
+	defer m.TowersLock.Unlock()
+	tower, ok := m.Towers[servingTower]
+	if !ok {
+		return fmt.Errorf("unknown tower %s", servingTower)
+	}
 	crntiMap := tower.CrntiMap
-	delete(crntiMap, ue.Crnti)
-	ue.Crnti = InvalidCrnti
-	m.TowersLock.RUnlock()
+	delete(crntiMap, crnti)
+	return nil
 }
 
 // CrntiToName ...
 func (m *Manager) CrntiToName(crnti string, ecid string) (string, error) {
-	tower, ok := m.Towers[m.EciToName(ecid)]
+	tower, ok := m.Towers[EciToName(ecid)]
 	if !ok {
 		return "", fmt.Errorf("tower %s not found", ecid)
 	}
@@ -191,7 +198,7 @@ func (m *Manager) CrntiToName(crnti string, ecid string) (string, error) {
 }
 
 // EciToName - TODO return the error OR refactor altogether
-func (m *Manager) EciToName(eci string) string {
+func EciToName(eci string) string {
 	id, _ := strconv.Atoi(eci)
 	return fmt.Sprintf("Tower-%d", id)
 }
