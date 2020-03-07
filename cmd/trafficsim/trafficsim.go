@@ -30,10 +30,10 @@ package main
 
 import (
 	"flag"
-	"github.com/onosproject/ran-simulator/pkg/service"
 	"time"
 
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
+	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
@@ -158,7 +158,7 @@ func main() {
 
 // Creates gRPC server and registers various services; then serves.
 func startServer(caPath string, keyPath string, certPath string) error {
-	s := service.NewServer(service.NewServerConfig(caPath, keyPath, certPath))
+	s := service.NewServer(service.NewServerConfig(caPath, keyPath, certPath, 5150, true))
 	s.AddService(trafficsim.Service{})
 	s.AddService(e2.Service{})
 
