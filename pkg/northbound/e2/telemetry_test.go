@@ -38,10 +38,10 @@ func Test_GenerateReport(t *testing.T) {
 	assert.Equal(t, 3, len(rmrpu.RadioMeasReportPerUE.RadioReportServCells))
 	for _, rr := range rmrpu.RadioMeasReportPerUE.RadioReportServCells {
 		switch ecid := rr.Ecgi.Ecid; ecid {
-		case "0000001":
-		case "0000002":
-		case "0000003":
-		case "0000004":
+		case "0001420":
+		case "0001421":
+		case "0001422":
+		case "0001423":
 			// ok
 		default:
 			t.Errorf("Unexpected Ecid %s in report", ecid)

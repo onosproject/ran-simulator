@@ -48,33 +48,33 @@ func Test_findClosestTowers(t *testing.T) {
 	assert.Equal(t, 9, len(m.Towers), "Expected 9 towers to have been created")
 	for _, tower := range m.Towers {
 		switch tower.EcID {
-		case "0000001":
-		case "0000002":
-		case "0000003":
+		case "0001420":
+		case "0001421":
+		case "0001422":
 			assert.Assert(t, tower.Location.GetLat()-mapCenterLat-towerSpacingVert < decimalDegreeTolerance)
-		case "0000004":
-		case "0000005":
-		case "0000006":
+		case "0001423":
+		case "0001424":
+		case "0001425":
 			assert.Assert(t, tower.Location.GetLat()-mapCenterLat < decimalDegreeTolerance)
-		case "0000007":
-		case "0000008":
-		case "0000009":
+		case "0001426":
+		case "0001427":
+		case "0001428":
 			assert.Assert(t, tower.Location.GetLat()-mapCenterLat+towerSpacingVert < decimalDegreeTolerance)
 		default:
 			t.Errorf("Unexpected tower %s", tower.EcID)
 		}
 		switch tower.EcID {
-		case "0000001":
-		case "0000004":
-		case "0000007":
+		case "0001420":
+		case "0001423":
+		case "0001426":
 			assert.Assert(t, tower.Location.GetLng()+mapCenterLng+towerSpacingHoriz < decimalDegreeTolerance)
-		case "0000002":
-		case "0000005":
-		case "0000008":
+		case "0001421":
+		case "0001424":
+		case "0001427":
 			assert.Assert(t, tower.Location.GetLng()-mapCenterLng < decimalDegreeTolerance)
-		case "0000003":
-		case "0000006":
-		case "0000009":
+		case "0001422":
+		case "0001425":
+		case "0001428":
 			assert.Assert(t, tower.Location.GetLng()-mapCenterLng-towerSpacingHoriz < decimalDegreeTolerance)
 		default:
 			t.Errorf("Unexpected tower %s", tower.EcID)
@@ -135,25 +135,25 @@ func Test_PowerAdjust(t *testing.T) {
 
 	assert.Equal(t, 1, len(m.Towers), "Expected 1 tower to have been created")
 
-	err = m.UpdateTower("0000001", -6) // subtracted from initial 10dB
+	err = m.UpdateTower("0001420", -6) // subtracted from initial 10dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
-	tower1, ok := m.Towers["0000001"]
+	tower1, ok := m.Towers["0001420"]
 	assert.Assert(t, ok)
 	assert.Equal(t, float32(4.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too low - capped at -15dB /////////////////////
-	err = m.UpdateTower("0000001", -30) // subtracted from prev 4dB
+	err = m.UpdateTower("0001420", -30) // subtracted from prev 4dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
 	assert.Equal(t, float32(-15.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too high - capped at 30dB /////////////////////
-	err = m.UpdateTower("0000001", 50) // Added to prev -15dB
+	err = m.UpdateTower("0001420", 50) // Added to prev -15dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
 	assert.Equal(t, float32(30.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with wrong name /////////////////////
-	err = m.UpdateTower("0000002", -3)
-	assert.Error(t, err, "unknown tower 0000002", "Expected an error for wrong name when adjusting power")
+	err = m.UpdateTower("0001421", -3)
+	assert.Error(t, err, "unknown tower 0001421", "Expected an error for wrong name when adjusting power")
 
 	time.Sleep(time.Millisecond * 100)
 }

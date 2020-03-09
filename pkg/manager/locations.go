@@ -16,6 +16,7 @@ package manager
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"math/rand"
 
 	"github.com/onosproject/ran-simulator/api/types"
@@ -32,7 +33,7 @@ func NewLocations(towersParams types.TowersParams, mapLayout types.MapLayout) ma
 	locations := make(map[string]*Location)
 	var l uint32
 	for l = 0; l < (mapLayout.MaxUes * 2); l++ {
-		pos := randomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng(),
+		pos := utils.RandomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng(),
 			towersParams.TowerSpacingHoriz*float32(towersParams.TowerCols-1)*towersParams.LocationsScale/2)
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{

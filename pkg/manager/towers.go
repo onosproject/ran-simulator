@@ -16,6 +16,7 @@ package manager
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"math"
 
 	"github.com/onosproject/ran-simulator/api/trafficsim"
@@ -49,29 +50,23 @@ type TowerIf interface {
 
 // NewTowers - create a set of new towers
 func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.EcID]*types.Tower {
-	topLeft := types.Point{
-		Lat: mapLayout.GetCenter().GetLat() + params.TowerSpacingVert*float32(params.TowerRows-1)/2,
-		Lng: mapLayout.GetCenter().GetLng() - params.TowerSpacingHoriz*float32(params.TowerCols-1)/2,
-	}
-	var towerNum = 0
 	towers := make(map[types.EcID]*types.Tower)
 
-	for r := 0; r < int(params.TowerRows); r++ {
-		for c := 0; c < int(params.TowerCols); c++ {
-			pos := types.Point{
-				Lat: topLeft.Lat - params.TowerSpacingVert*float32(r),
-				Lng: topLeft.Lng + params.TowerSpacingHoriz*float32(c),
-			}
-			towerNum = towerNum + 1
-			ecid := types.EcID(fmt.Sprintf("%07X", towerNum))
+	var r, c uint32
+	for r = 0; r < params.TowerRows; r++ {
+		for c = 0; c < params.TowerCols; c++ {
+			pos := getTowerPosition(r, c, params, mapLayout)
+			towerPort := utils.GrpcBasePort + r*params.TowerCols + c + 2 // Start at 5152 so it appears as 1420 in Hex
+			ecid := utils.EcIDForPort(int16(towerPort))
 			towers[ecid] = &types.Tower{
-				Location:   &pos,
-				Color:      randomColor(),
+				Location:   pos,
+				Color:      utils.RandomColor(),
 				PlmnID:     TestPlmnID,
 				EcID:       ecid,
 				MaxUEs:     params.MaxUEsPerTower,
-				Neighbors:  makeNeighbors(towerNum, params),
+				Neighbors:  makeNeighbors(int(towerPort), params),
 				TxPowerdB:  DefaultTxPower,
+				Port:       towerPort,
 				CrntiMap:   make(map[types.Crnti]types.UEName),
 				CrntiIndex: 0,
 			}

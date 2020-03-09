@@ -19,6 +19,7 @@ import (
 	"sync"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	topo "github.com/onosproject/onos-topo/api/device"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
@@ -44,6 +45,7 @@ type Manager struct {
 	TowerChannel       chan dispatcher.Event
 	googleAPIKey       string
 	LatencyChannel     chan metrics.HOEvent
+	TopoClient         topo.DeviceServiceClient
 }
 
 // NewManager initializes the RAN subsystem.

@@ -28,11 +28,11 @@ import (
 func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error {
 	c := make(chan e2.ControlUpdate)
 	defer close(c)
-	go recvControlLoop(stream, c)
-	return sendControlLoop(stream, c)
+	go recvControlLoop(s.GetPort(), s.GetEcID(), stream, c)
+	return sendControlLoop(s.GetPort(), stream, c)
 }
 
-func sendControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
+func sendControlLoop(port int16, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
 	for {
 		select {
 		case msg := <-c:
@@ -41,24 +41,24 @@ func sendControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.Con
 				return err
 			}
 		case <-stream.Context().Done():
-			log.Infof("Controller has disconnected")
+			log.Infof("Controller on Port %d has disconnected", port)
 			return nil
 		}
 	}
 }
 
-func recvControlLoop(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
+func recvControlLoop(port int16, towerID types.EcID, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
-			log.Errorf("Unexpectedly ended when receiving Control responses %s", err.Error())
+			log.Errorf("Unexpectedly ended when receiving Control responses on Port %d %s", port, err.Error())
 			return
 		}
 		//log.Infof("Recv messageType %d", in.MessageType)
 		switch x := in.S.(type) {
 		case *e2.ControlResponse_CellConfigRequest:
-			handleCellConfigRequest(c)
-			go handleUeAdmissions(stream, c)
+			handleCellConfigRequest(port, c)
+			go handleUeAdmissions(towerID, stream, c)
 		case *e2.ControlResponse_HORequest:
 			UpdateControlMetrics(in)
 			err = handleHORequest(x.HORequest)
@@ -112,12 +112,15 @@ func handleHORequest(req *e2.HORequest) error {
 	return err
 }
 
-func handleCellConfigRequest(c chan e2.ControlUpdate) {
-	log.Infof("handleCellConfigRequest")
+func handleCellConfigRequest(port int16, c chan e2.ControlUpdate) {
+	log.Infof("handleCellConfigRequest on Port %d", port)
 
 	trafficSimMgr := manager.GetManager()
 
 	for _, tower := range trafficSimMgr.Towers {
+		if tower.GetPort() != uint32(port) {
+			continue
+		}
 		cells := make([]*e2.CandScell, 0, 8)
 		for _, neighbor := range tower.Neighbors {
 			t := trafficSimMgr.Towers[neighbor]
@@ -147,11 +150,15 @@ func handleCellConfigRequest(c chan e2.ControlUpdate) {
 	}
 }
 
-func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
+func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
 		trafficSimMgr.UserEquipmentsLock.Lock()
+		if ue.GetServingTower() != towerID {
+			trafficSimMgr.UserEquipmentsLock.Unlock()
+			continue
+		}
 		ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti)
 		c <- *ueAdmReq
 		log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
@@ -173,6 +180,9 @@ func handleUeAdmissions(stream e2.InterfaceService_SendControlServer, c chan e2.
 			ue, ok := event.Object.(*types.Ue)
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ue)
+			}
+			if ue.ServingTower != towerID {
+				continue // listen for the next event
 			}
 			if event.Type == trafficsim.Type_ADDED {
 				ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti)

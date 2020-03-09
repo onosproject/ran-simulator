@@ -39,7 +39,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 	testReq := e2.RRMConfig{
 		Ecgi: &e2.ECGI{
 			PlmnId: manager.TestPlmnID,
-			Ecid:   "0000001",
+			Ecid:   "0001420",
 		},
 		PA: []e2.XICICPA{e2.XICICPA_XICIC_PA_DB_MINUS3},
 	}
@@ -51,7 +51,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 			assert.Equal(t, trafficsim.UpdateType_NOUPDATETYPE, updateEvent.UpdateType)
 			tower, ok := updateEvent.Object.(*types.Tower)
 			assert.Assert(t, ok, "Problem converting event object to Tower %v", updateEvent.Object)
-			assert.Equal(t, types.EcID("0000001"), tower.EcID)
+			assert.Equal(t, types.EcID("0001420"), tower.EcID)
 			mgr.TowersLock.RLock()
 			assert.Equal(t, float32(7), tower.GetTxPowerdB())
 			mgr.TowersLock.RUnlock()

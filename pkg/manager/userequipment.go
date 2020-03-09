@@ -16,6 +16,7 @@ package manager
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"strings"
 	"time"
 
@@ -259,7 +260,7 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 				return fmt.Errorf("end of route %s %d", route.GetRouteID(), idx)
 			}
 			ue.Position = route.Waypoints[idx+1]
-			ue.Rotation = uint32(getRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
+			ue.Rotation = uint32(utils.GetRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
 			names, distances := m.findClosestTowers(ue.Position)
 			updateType := trafficsim.UpdateType_POSITION
 			oldTower1 := ue.Tower1
