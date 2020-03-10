@@ -14,4 +14,7 @@ require (
 	google.golang.org/grpc v1.27.1
 	googlemaps.github.io/maps v0.0.0-20200124220646-5b7f2815585f
 	gotest.tools v2.2.0+incompatible
+	k8s.io/api v0.0.0-20190620073856-dcce3486da33
+	k8s.io/apimachinery v0.0.0-20190802060556-6fa4771c83b3
+	k8s.io/client-go v0.0.0-20190620074045-585a16d2e773
 )

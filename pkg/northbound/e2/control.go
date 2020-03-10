@@ -57,7 +57,7 @@ func recvControlLoop(port int16, towerID types.EcID, stream e2.InterfaceService_
 		//log.Infof("Recv messageType %d", in.MessageType)
 		switch x := in.S.(type) {
 		case *e2.ControlResponse_CellConfigRequest:
-			handleCellConfigRequest(port, c)
+			handleCellConfigRequest(port, towerID, c)
 			go handleUeAdmissions(towerID, stream, c)
 		case *e2.ControlResponse_HORequest:
 			UpdateControlMetrics(in)
@@ -112,42 +112,43 @@ func handleHORequest(req *e2.HORequest) error {
 	return err
 }
 
-func handleCellConfigRequest(port int16, c chan e2.ControlUpdate) {
+func handleCellConfigRequest(port int16, ecID types.EcID, c chan e2.ControlUpdate) {
 	log.Infof("handleCellConfigRequest on Port %d", port)
 
 	trafficSimMgr := manager.GetManager()
-
-	for _, tower := range trafficSimMgr.Towers {
-		if tower.GetPort() != uint32(port) {
-			continue
-		}
-		cells := make([]*e2.CandScell, 0, 8)
-		for _, neighbor := range tower.Neighbors {
-			t := trafficSimMgr.Towers[neighbor]
-			cell := e2.CandScell{
-				Ecgi: &e2.ECGI{
-					PlmnId: string(t.PlmnID),
-					Ecid:   string(t.EcID),
-				}}
-			cells = append(cells, &cell)
-		}
-		cellConfigReport := e2.ControlUpdate{
-			MessageType: e2.MessageType_CELL_CONFIG_REPORT,
-			S: &e2.ControlUpdate_CellConfigReport{
-				CellConfigReport: &e2.CellConfigReport{
-					Ecgi: &e2.ECGI{
-						PlmnId: string(tower.PlmnID),
-						Ecid:   string(tower.EcID),
-					},
-					MaxNumConnectedUes: tower.MaxUEs,
-					CandScells:         cells,
-				},
-			},
-		}
-
-		c <- cellConfigReport
-		log.Infof("handleCellConfigReport eci: %s", tower.EcID)
+	trafficSimMgr.TowersLock.RLock()
+	defer trafficSimMgr.TowersLock.RUnlock()
+	tower, ok := trafficSimMgr.Towers[ecID]
+	if !ok {
+		log.Warnf("Tower %s not found for handleCellConfigRequest on Port %d", ecID, port)
+		return
 	}
+	cells := make([]*e2.CandScell, 0, 8)
+	for _, neighbor := range tower.Neighbors {
+		t := trafficSimMgr.Towers[neighbor]
+		cell := e2.CandScell{
+			Ecgi: &e2.ECGI{
+				PlmnId: string(t.PlmnID),
+				Ecid:   string(t.EcID),
+			}}
+		cells = append(cells, &cell)
+	}
+	cellConfigReport := e2.ControlUpdate{
+		MessageType: e2.MessageType_CELL_CONFIG_REPORT,
+		S: &e2.ControlUpdate_CellConfigReport{
+			CellConfigReport: &e2.CellConfigReport{
+				Ecgi: &e2.ECGI{
+					PlmnId: string(tower.PlmnID),
+					Ecid:   string(tower.EcID),
+				},
+				MaxNumConnectedUes: tower.MaxUEs,
+				CandScells:         cells,
+			},
+		},
+	}
+
+	c <- cellConfigReport
+	log.Infof("handleCellConfigReport eci: %s", tower.EcID)
 }
 
 func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {

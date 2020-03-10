@@ -31,6 +31,8 @@ package main
 import (
 	"flag"
 	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
+	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"time"
 
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
@@ -162,6 +164,9 @@ func main() {
 			}()
 		}
 	}
+	rangeStart := utils.GrpcBasePort + 2
+	rangeEnd := rangeStart + *towerCols * *towerRows
+	kubernetes.AddK8SServicePorts(int32(rangeStart), int32(rangeEnd))
 
 	log.Info("Starting trafficsim")
 	mgr, err := manager.NewManager()
