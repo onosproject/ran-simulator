@@ -16,6 +16,7 @@ package e2
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"io"
 
 	"github.com/onosproject/ran-simulator/api/e2"
@@ -215,7 +216,7 @@ func formatUeAdmissionReq(eci types.EcID, crnti types.Crnti) *e2.ControlUpdate {
 		S: &e2.ControlUpdate_UEAdmissionRequest{
 			UEAdmissionRequest: &e2.UEAdmissionRequest{
 				Ecgi: &e2.ECGI{
-					PlmnId: manager.TestPlmnID,
+					PlmnId: utils.TestPlmnID,
 					Ecid:   string(eci),
 				},
 				Crnti:             string(crnti),
@@ -231,7 +232,7 @@ func formatUeReleaseInd(eci types.EcID, crnti types.Crnti) *e2.ControlUpdate {
 		S: &e2.ControlUpdate_UEReleaseInd{
 			UEReleaseInd: &e2.UEReleaseInd{
 				Ecgi: &e2.ECGI{
-					PlmnId: manager.TestPlmnID,
+					PlmnId: utils.TestPlmnID,
 					Ecid:   string(eci),
 				},
 				Crnti:        string(crnti),

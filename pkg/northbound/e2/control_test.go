@@ -15,13 +15,13 @@
 package e2
 
 import (
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"testing"
 	"time"
 
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/manager"
 	"gotest.tools/assert"
 )
 
@@ -38,7 +38,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 
 	testReq := e2.RRMConfig{
 		Ecgi: &e2.ECGI{
-			PlmnId: manager.TestPlmnID,
+			PlmnId: utils.TestPlmnID,
 			Ecid:   "0001420",
 		},
 		PA: []e2.XICICPA{e2.XICICPA_XICIC_PA_DB_MINUS3},

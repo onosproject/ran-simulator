@@ -23,18 +23,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-// ServerParams - params to start a new server
-type ServerParams struct {
-	CaPath       string
-	KeyPath      string
-	CertPath     string
-	TopoEndpoint string
-}
-
 var log = liblog.GetLogger("northbound", "e2")
 
 // NewTowerServer - start a new gRPC server per tower
-func NewTowerServer(towerIndex int, serverParams ServerParams) error {
+func NewTowerServer(towerIndex int, serverParams utils.ServerParams) error {
 	port := int16(utils.GrpcBasePort + towerIndex + 1) // Start at 5152 so this translates to 1420 in Hex
 	ecID := utils.EcIDForPort(port)
 	s := service.NewServer(service.NewServerConfig(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, port, true))

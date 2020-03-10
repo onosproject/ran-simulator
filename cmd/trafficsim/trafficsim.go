@@ -40,6 +40,7 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
+	_ "github.com/ugorji/go/codec"
 )
 
 var log = liblog.GetDefaultLogger()
@@ -145,7 +146,7 @@ func main() {
 		log.Fatal("Invalid step Delay - must be between 100ms and 60000ms inclusive")
 	}
 
-	serverParams := e2.ServerParams{
+	serverParams := utils.ServerParams{
 		CaPath:       *caPath,
 		KeyPath:      *keyPath,
 		CertPath:     *certPath,
@@ -164,8 +165,9 @@ func main() {
 			}()
 		}
 	}
+	// Add these new ports to the K8s service
 	rangeStart := utils.GrpcBasePort + 2
-	rangeEnd := rangeStart + *towerCols * *towerRows
+	rangeEnd := rangeStart + *towerCols**towerRows
 	kubernetes.AddK8SServicePorts(int32(rangeStart), int32(rangeEnd))
 
 	log.Info("Starting trafficsim")
@@ -174,11 +176,12 @@ func main() {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
-	mgr.Run(mapLayoutParams, towerParams, routesParams, *metricsPort)
+	mgr.Run(mapLayoutParams, towerParams, routesParams, *topoEndpoint, *metricsPort, serverParams)
 
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
 	}
+	mgr.Close()
 }
 
 // Creates gRPC server and registers various services; then serves.

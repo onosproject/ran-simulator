@@ -76,8 +76,9 @@ func AddK8SServicePorts(rangeStart int32, rangeEnd int32) {
 	log.Infof("Service %s - appended ports %d-%d", serviceName, rangeStart, rangeEnd)
 	_, err = clientset.CoreV1().Services(namespace).Update(thisService)
 	if statusError, isStatus := err.(*errors.StatusError); isStatus {
-		log.Errorf("Error getting Service %s in namespace %s. Status: %v",
-			serviceName, namespace, statusError.ErrStatus.Message)
+		// The ports may already exist if the ran-simulator pod is restarting
+		log.Infof("Error updating %s:%s. Status: %v %v",
+			namespace, serviceName, statusError.ErrStatus.Reason, statusError.ErrStatus.Message)
 		return
 	} else if err != nil {
 		log.Fatalf("Kubernetes API error when replacing service %s %s", serviceName, err.Error())

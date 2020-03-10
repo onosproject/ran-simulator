@@ -3,11 +3,13 @@ module github.com/onosproject/ran-simulator
 go 1.13
 
 require (
+	github.com/atomix/go-client v0.0.0-20200218200323-6fd69e684d05
 	github.com/gogo/protobuf v1.3.1
-	github.com/onosproject/onos-lib-go v0.0.0-20200306140458-9060addb3534
+	github.com/onosproject/onos-lib-go v0.0.0-20200307155659-8ad70c22b981
 	github.com/onosproject/onos-topo v0.0.0-20200306012916-78b9f54b370a
 	github.com/prometheus/client_golang v1.4.1
 	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/ugorji/go/codec v1.1.7
 	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/genproto v0.0.0-20200212174721-66ed5ce911ce // indirect

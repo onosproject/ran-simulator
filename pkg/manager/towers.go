@@ -24,9 +24,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 )
 
-// TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
-const TestPlmnID = "001001"
-
 // DefaultTxPower - all base-stations start with this power level
 const DefaultTxPower = 10
 
@@ -61,7 +58,7 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.E
 			towers[ecid] = &types.Tower{
 				Location:   pos,
 				Color:      utils.RandomColor(),
-				PlmnID:     TestPlmnID,
+				PlmnID:     utils.TestPlmnID,
 				EcID:       ecid,
 				MaxUEs:     params.MaxUEsPerTower,
 				Neighbors:  makeNeighbors(int(towerPort), params),

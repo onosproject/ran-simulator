@@ -21,8 +21,22 @@ import (
 	"math/rand"
 )
 
+// ServerParams - params to start a new server
+type ServerParams struct {
+	CaPath       string
+	KeyPath      string
+	CertPath     string
+	TopoEndpoint string
+}
+
 // GrpcBasePort - the base port for trafficsim - other e2 ports are stepped from this
 const GrpcBasePort = 5150
+
+// ServiceName is the default name of this Kubernetes service
+const ServiceName = "ran-simulator"
+
+// TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
+const TestPlmnID = "001001"
 
 // RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
 func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32) types.Point {

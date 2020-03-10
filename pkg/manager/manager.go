@@ -16,10 +16,13 @@
 package manager
 
 import (
+	"context"
+	"github.com/onosproject/onos-topo/api/device"
+	"github.com/onosproject/ran-simulator/pkg/southbound/topo"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"sync"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	topo "github.com/onosproject/onos-topo/api/device"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
@@ -45,7 +48,7 @@ type Manager struct {
 	TowerChannel       chan dispatcher.Event
 	googleAPIKey       string
 	LatencyChannel     chan metrics.HOEvent
-	TopoClient         topo.DeviceServiceClient
+	TopoClient         device.DeviceServiceClient
 }
 
 // NewManager initializes the RAN subsystem.
@@ -66,7 +69,7 @@ func NewManager() (*Manager, error) {
 
 // Run starts a synchronizer based on the devices and the northbound services.
 func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams,
-	routesParams RoutesParams, metricsPort int) {
+	routesParams RoutesParams, topoEndpoint string, metricsPort int, serverParams utils.ServerParams) {
 	log.Infof("Starting Manager with %v %v %v", mapLayoutParams, towerparams, routesParams)
 	m.MapLayout = mapLayoutParams
 	m.TowersLock.Lock()
@@ -91,6 +94,10 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	go m.startMoving(routesParams)
 
 	go metrics.RunHOExposer(metricsPort, m.LatencyChannel)
+
+	ctx := context.Background()
+	m.TopoClient = topo.ConnectToTopo(ctx, topoEndpoint, serverParams)
+	topo.SyncToTopo(ctx, &m.TopoClient, m.Towers)
 }
 
 //Close kills the channels and manager related objects
@@ -110,6 +117,7 @@ func (m *Manager) Close() {
 		delete(m.Towers, tid)
 	}
 	m.TowersLock.Unlock()
+	// TODO - clean up the topo entries on shutdown
 	log.Info("Closing Manager")
 }
 
