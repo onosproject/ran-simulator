@@ -40,7 +40,6 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
-	_ "github.com/ugorji/go/codec"
 )
 
 var log = liblog.GetDefaultLogger()
@@ -120,12 +119,7 @@ func main() {
 		MaxUEsPerTower:    uint32(*maxUEsPerTower),
 		LocationsScale:    float32(*locationsScale),
 	}
-	if towerParams.TowerRows < 2 || towerParams.TowerRows > 20 {
-		log.Fatal("Invalid number of Tower Rows - must be between 2 and 20 inclusive")
-	}
-	if towerParams.TowerCols < 2 || towerParams.TowerCols > 20 {
-		log.Fatal("Invalid number of Tower Cols - must be between 2 and 20 inclusive")
-	}
+	checkTowerLimits(*towerRows, *towerCols)
 	if towerParams.TowerSpacingVert < 0.001 || towerParams.TowerSpacingVert > 1.0 {
 		log.Fatal("Invalid vertical tower spacing - must be between 0.001 and 1.0 degree latitude inclusive")
 	}
@@ -192,4 +186,16 @@ func startServer(caPath string, keyPath string, certPath string) error {
 	return s.Serve(func(started string) {
 		log.Info("Started NBI on ", started)
 	})
+}
+
+func checkTowerLimits(rows int, cols int) {
+	if rows < 2 || rows > 64 {
+		log.Fatal("Invalid number of Tower Rows - must be between 2 and 64 inclusive")
+	}
+	if cols < 2 || cols > 64 {
+		log.Fatal("Invalid number of Tower Cols - must be between 2 and 64 inclusive")
+	}
+	if cols*rows > 1024 {
+		log.Fatal("Invalid number of Tower (Rows x Cols) - must not exceed 1024")
+	}
 }
