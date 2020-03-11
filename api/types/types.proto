@@ -117,6 +117,8 @@ message Tower {
     map<string, string> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "UEName"];
 
     uint32 crntiIndex = 10;
+
+    uint32 port = 11;
 }
 
 message MapLayout {

@@ -30,13 +30,15 @@ package main
 
 import (
 	"flag"
+	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
+	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"time"
 
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
 )
 
@@ -64,6 +66,7 @@ func main() {
 	stepDelayMs := flag.Int("stepDelayMs", 1000, "delay between steps on route")
 	maxUEsPerTower := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
 	metricsPort := flag.Int("metricsPort", 9090, "port for Prometheus metrics")
+	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
 
 	//lines 93-109 are implemented according to
 	// https://github.com/kubernetes/klog/blob/master/examples/coexist_glog/coexist_glog.go
@@ -116,12 +119,7 @@ func main() {
 		MaxUEsPerTower:    uint32(*maxUEsPerTower),
 		LocationsScale:    float32(*locationsScale),
 	}
-	if towerParams.TowerRows < 2 || towerParams.TowerRows > 20 {
-		log.Fatal("Invalid number of Tower Rows - must be between 2 and 20 inclusive")
-	}
-	if towerParams.TowerCols < 2 || towerParams.TowerCols > 20 {
-		log.Fatal("Invalid number of Tower Cols - must be between 2 and 20 inclusive")
-	}
+	checkTowerLimits(*towerRows, *towerCols)
 	if towerParams.TowerSpacingVert < 0.001 || towerParams.TowerSpacingVert > 1.0 {
 		log.Fatal("Invalid vertical tower spacing - must be between 0.001 and 1.0 degree latitude inclusive")
 	}
@@ -142,27 +140,62 @@ func main() {
 		log.Fatal("Invalid step Delay - must be between 100ms and 60000ms inclusive")
 	}
 
-	log.Info("Starting trafficsim")
+	serverParams := utils.ServerParams{
+		CaPath:       *caPath,
+		KeyPath:      *keyPath,
+		CertPath:     *certPath,
+		TopoEndpoint: *topoEndpoint,
+	}
 
+	for r := 0; r < *towerRows; r++ {
+		for c := 0; c < *towerCols; c++ {
+			towerNum := r**towerCols + c + 1 // Start at 1
+			go func() {
+				// Blocks here when server running
+				err := e2.NewTowerServer(towerNum, serverParams)
+				if err != nil {
+					log.Fatal("Unable to start server ", err)
+				}
+			}()
+		}
+	}
+	// Add these new ports to the K8s service
+	rangeStart := utils.GrpcBasePort + 2
+	rangeEnd := rangeStart + *towerCols**towerRows
+	kubernetes.AddK8SServicePorts(int32(rangeStart), int32(rangeEnd))
+
+	log.Info("Starting trafficsim")
 	mgr, err := manager.NewManager()
 	if err != nil {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
-	mgr.Run(mapLayoutParams, towerParams, routesParams, *metricsPort)
+	mgr.Run(mapLayoutParams, towerParams, routesParams, *topoEndpoint, *metricsPort, serverParams)
 
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
 	}
+	mgr.Close()
 }
 
 // Creates gRPC server and registers various services; then serves.
 func startServer(caPath string, keyPath string, certPath string) error {
 	s := service.NewServer(service.NewServerConfig(caPath, keyPath, certPath, 5150, true))
 	s.AddService(trafficsim.Service{})
-	s.AddService(e2.Service{})
 
 	return s.Serve(func(started string) {
 		log.Info("Started NBI on ", started)
 	})
+}
+
+func checkTowerLimits(rows int, cols int) {
+	if rows < 2 || rows > 64 {
+		log.Fatal("Invalid number of Tower Rows - must be between 2 and 64 inclusive")
+	}
+	if cols < 2 || cols > 64 {
+		log.Fatal("Invalid number of Tower Cols - must be between 2 and 64 inclusive")
+	}
+	if cols*rows > 1024 {
+		log.Fatal("Invalid number of Tower (Rows x Cols) - must not exceed 1024")
+	}
 }

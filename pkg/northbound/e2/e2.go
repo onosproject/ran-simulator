@@ -18,27 +18,53 @@ import (
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/e2"
+	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"google.golang.org/grpc"
 )
 
 var log = liblog.GetLogger("northbound", "e2")
 
-// NewService returns a new trafficsim Service
-func NewService() (service.Service, error) {
-	return &Service{}, nil
+// NewTowerServer - start a new gRPC server per tower
+func NewTowerServer(towerIndex int, serverParams utils.ServerParams) error {
+	port := utils.GrpcBasePort + towerIndex + 1 // Start at 5152 so this translates to 1420 in Hex
+	ecID := utils.EcIDForPort(port)
+	s := service.NewServer(service.NewServerConfig(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, int16(port), true))
+	s.AddService(Service{
+		port:      port,
+		towerEcID: ecID,
+	})
+
+	return s.Serve(func(started string) {
+		log.Info("Started E2 server on ", started)
+	})
 }
 
 // Service is an implementation of e2 service.
 type Service struct {
 	service.Service
+	port      int
+	towerEcID types.EcID
 }
 
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
-	server := &Server{}
+	server := &Server{port: s.port, towerEcID: s.towerEcID}
 	e2.RegisterInterfaceServiceServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
+	port      int
+	towerEcID types.EcID
+}
+
+// GetPort - expose the port number
+func (s *Server) GetPort() int {
+	return s.port
+}
+
+// GetEcID - expose the tower EcID
+func (s *Server) GetEcID() types.EcID {
+	return s.towerEcID
 }

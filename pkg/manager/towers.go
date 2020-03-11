@@ -16,15 +16,12 @@ package manager
 
 import (
 	"fmt"
-	"math"
-
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
+	"github.com/onosproject/ran-simulator/pkg/utils"
+	"math"
 )
-
-// TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
-const TestPlmnID = "001001"
 
 // DefaultTxPower - all base-stations start with this power level
 const DefaultTxPower = 10
@@ -49,29 +46,24 @@ type TowerIf interface {
 
 // NewTowers - create a set of new towers
 func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.EcID]*types.Tower {
-	topLeft := types.Point{
-		Lat: mapLayout.GetCenter().GetLat() + params.TowerSpacingVert*float32(params.TowerRows-1)/2,
-		Lng: mapLayout.GetCenter().GetLng() - params.TowerSpacingHoriz*float32(params.TowerCols-1)/2,
-	}
-	var towerNum = 0
 	towers := make(map[types.EcID]*types.Tower)
 
-	for r := 0; r < int(params.TowerRows); r++ {
-		for c := 0; c < int(params.TowerCols); c++ {
-			pos := types.Point{
-				Lat: topLeft.Lat - params.TowerSpacingVert*float32(r),
-				Lng: topLeft.Lng + params.TowerSpacingHoriz*float32(c),
-			}
-			towerNum = towerNum + 1
-			ecid := types.EcID(fmt.Sprintf("%07X", towerNum))
+	var r, c uint32
+	for r = 0; r < params.TowerRows; r++ {
+		for c = 0; c < params.TowerCols; c++ {
+			pos := getTowerPosition(r, c, params, mapLayout)
+			towerNum := r*params.TowerCols + c
+			towerPort := utils.GrpcBasePort + towerNum + 2 // Start at 5152 so it appears as 1420 in Hex
+			ecid := utils.EcIDForPort(int(towerPort))
 			towers[ecid] = &types.Tower{
-				Location:   &pos,
-				Color:      randomColor(),
-				PlmnID:     TestPlmnID,
+				Location:   pos,
+				Color:      utils.RandomColor(),
+				PlmnID:     utils.TestPlmnID,
 				EcID:       ecid,
 				MaxUEs:     params.MaxUEsPerTower,
-				Neighbors:  makeNeighbors(towerNum, params),
+				Neighbors:  makeNeighbors(int(towerNum), params),
 				TxPowerdB:  DefaultTxPower,
+				Port:       towerPort,
 				CrntiMap:   make(map[types.Crnti]types.UEName),
 				CrntiIndex: 0,
 			}
@@ -215,8 +207,8 @@ func makeNeighbors(id int, towerParams types.TowersParams) []types.EcID {
 	for x := max(0, i-1); x <= min(i+1, nrows-1); x++ {
 		for y := max(0, j-1); y <= min(j+1, ncols-1); y++ {
 			if (x == i && y == j-1) || (x == i && y == j+1) || (x == i-1 && y == j) || (x == i+1 && y == j) {
-				towerNum := x*nrows + y + 1
-				towerEcID := types.EcID(fmt.Sprintf("%07X", towerNum))
+				towerID := x*nrows + y + 2 + utils.GrpcBasePort
+				towerEcID := utils.EcIDForPort(towerID)
 				neighbors = append(neighbors, towerEcID)
 			}
 		}

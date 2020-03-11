@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package manager
+package utils
 
 import (
 	"github.com/onosproject/ran-simulator/api/types"
@@ -51,21 +51,21 @@ func Test_GetRotationDegrees(t *testing.T) {
 		Lat: Pos1Lat,
 		Lng: Pos2Lng,
 	}
-	r1 := getRotationDegrees(&centre, &p1)
+	r1 := GetRotationDegrees(&centre, &p1)
 	assert.Equal(t, float64(45), math.Round(r1), "Unexpected r1")
 
-	r2 := getRotationDegrees(&centre, &p2)
+	r2 := GetRotationDegrees(&centre, &p2)
 	assert.Equal(t, float64(-136), math.Round(r2), "Unexpected r2")
 
-	r3 := getRotationDegrees(&centre, &p3)
+	r3 := GetRotationDegrees(&centre, &p3)
 	assert.Equal(t, float64(-45), math.Round(r3), "Unexpected r3")
 
-	r4 := getRotationDegrees(&centre, &p4)
+	r4 := GetRotationDegrees(&centre, &p4)
 	assert.Equal(t, float64(136), math.Round(r4), "Unexpected r4")
 }
 
 func Test_RandomColor(t *testing.T) {
-	c := randomColor()
+	c := RandomColor()
 	assert.Equal(t, 7, len(c))
 	assert.Equal(t, uint8('#'), c[0])
 }
@@ -73,7 +73,7 @@ func Test_RandomColor(t *testing.T) {
 func Test_GetRandomLngLat(t *testing.T) {
 	const scale = 0.2
 	for i := 0; i < 100; i++ {
-		pt := randomLatLng(0.0, 0.0, scale)
+		pt := RandomLatLng(0.0, 0.0, scale)
 		assert.Assert(t, pt.GetLat() < scale, "Expecting position %f to be within scale", pt.GetLat())
 	}
 }

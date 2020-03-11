@@ -22,14 +22,17 @@ import (
 	"time"
 )
 
+const (
+	mapCenterLat           = 52.0
+	mapCenterLng           = -8.0
+	towerSpacingVert       = 0.01
+	towerSpacingHoriz      = 0.02
+	decimalDegreeTolerance = 0.0001
+)
+
 func Test_findClosestTowers(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
-	const mapCenterLat = 52.0
-	const mapCenterLng = -8.0
-	const towerSpacingVert = 0.01
-	const towerSpacingHoriz = 0.02
-	const decimalDegreeTolerance = 0.0001
 
 	m.Towers = NewTowers(
 		types.TowersParams{
@@ -48,33 +51,33 @@ func Test_findClosestTowers(t *testing.T) {
 	assert.Equal(t, 9, len(m.Towers), "Expected 9 towers to have been created")
 	for _, tower := range m.Towers {
 		switch tower.EcID {
-		case "0000001":
-		case "0000002":
-		case "0000003":
+		case "0001420":
+		case "0001421":
+		case "0001422":
 			assert.Assert(t, tower.Location.GetLat()-mapCenterLat-towerSpacingVert < decimalDegreeTolerance)
-		case "0000004":
-		case "0000005":
-		case "0000006":
+		case "0001423":
+		case "0001424":
+		case "0001425":
 			assert.Assert(t, tower.Location.GetLat()-mapCenterLat < decimalDegreeTolerance)
-		case "0000007":
-		case "0000008":
-		case "0000009":
+		case "0001426":
+		case "0001427":
+		case "0001428":
 			assert.Assert(t, tower.Location.GetLat()-mapCenterLat+towerSpacingVert < decimalDegreeTolerance)
 		default:
 			t.Errorf("Unexpected tower %s", tower.EcID)
 		}
 		switch tower.EcID {
-		case "0000001":
-		case "0000004":
-		case "0000007":
+		case "0001420":
+		case "0001423":
+		case "0001426":
 			assert.Assert(t, tower.Location.GetLng()+mapCenterLng+towerSpacingHoriz < decimalDegreeTolerance)
-		case "0000002":
-		case "0000005":
-		case "0000008":
+		case "0001421":
+		case "0001424":
+		case "0001427":
 			assert.Assert(t, tower.Location.GetLng()-mapCenterLng < decimalDegreeTolerance)
-		case "0000003":
-		case "0000006":
-		case "0000009":
+		case "0001422":
+		case "0001425":
+		case "0001428":
 			assert.Assert(t, tower.Location.GetLng()-mapCenterLng-towerSpacingHoriz < decimalDegreeTolerance)
 		default:
 			t.Errorf("Unexpected tower %s", tower.EcID)
@@ -135,25 +138,53 @@ func Test_PowerAdjust(t *testing.T) {
 
 	assert.Equal(t, 1, len(m.Towers), "Expected 1 tower to have been created")
 
-	err = m.UpdateTower("0000001", -6) // subtracted from initial 10dB
+	err = m.UpdateTower("0001420", -6) // subtracted from initial 10dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
-	tower1, ok := m.Towers["0000001"]
+	tower1, ok := m.Towers["0001420"]
 	assert.Assert(t, ok)
 	assert.Equal(t, float32(4.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too low - capped at -15dB /////////////////////
-	err = m.UpdateTower("0000001", -30) // subtracted from prev 4dB
+	err = m.UpdateTower("0001420", -30) // subtracted from prev 4dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
 	assert.Equal(t, float32(-15.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too high - capped at 30dB /////////////////////
-	err = m.UpdateTower("0000001", 50) // Added to prev -15dB
+	err = m.UpdateTower("0001420", 50) // Added to prev -15dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
 	assert.Equal(t, float32(30.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with wrong name /////////////////////
-	err = m.UpdateTower("0000002", -3)
-	assert.Error(t, err, "unknown tower 0000002", "Expected an error for wrong name when adjusting power")
+	err = m.UpdateTower("0001421", -3)
+	assert.Error(t, err, "unknown tower 0001421", "Expected an error for wrong name when adjusting power")
 
 	time.Sleep(time.Millisecond * 100)
+}
+
+func Test_MakeNeighbors(t *testing.T) {
+	towerParams := types.TowersParams{
+		TowerRows:         3,
+		TowerCols:         3,
+		TowerSpacingVert:  towerSpacingVert,
+		TowerSpacingHoriz: towerSpacingHoriz,
+	}
+
+	// 1420 --- 1421 --- 1422
+	//   |        |        |
+	// 1423 --- 1424 --- 1425
+	//   |        |        |
+	// 1426 --- 1427 --- 1428
+	// tower num 2 is the top right - it's id is "0001422"
+	neighborIDs := makeNeighbors(2, towerParams)
+	assert.Equal(t, 2, len(neighborIDs), "Unexpected number of neighbors for 2")
+	assert.Equal(t, types.EcID("0001421"), neighborIDs[0])
+	assert.Equal(t, types.EcID("0001425"), neighborIDs[1])
+
+	// tower num 4 is the middle - it's id is "0001424"
+	neighborIDs4 := makeNeighbors(4, towerParams)
+	assert.Equal(t, 4, len(neighborIDs4), "Unexpected number of neighbors for 5")
+	assert.Equal(t, types.EcID("0001421"), neighborIDs4[0])
+	assert.Equal(t, types.EcID("0001423"), neighborIDs4[1])
+	assert.Equal(t, types.EcID("0001425"), neighborIDs4[2])
+	assert.Equal(t, types.EcID("0001427"), neighborIDs4[3])
 }

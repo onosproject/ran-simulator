@@ -12,18 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package manager
+package utils
 
 import (
+	"fmt"
 	"github.com/onosproject/ran-simulator/api/types"
 	"math"
 	"math/rand"
 )
 
-/**
- * Generates a random latlng value in 1000 meter radius of loc
- */
-func randomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32) types.Point {
+// ServerParams - params to start a new server
+type ServerParams struct {
+	CaPath       string
+	KeyPath      string
+	CertPath     string
+	TopoEndpoint string
+}
+
+// GrpcBasePort - the base port for trafficsim - other e2 ports are stepped from this
+const GrpcBasePort = 5150
+
+// ServiceName is the default name of this Kubernetes service
+const ServiceName = "ran-simulator"
+
+// TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
+const TestPlmnID = "001001"
+
+// RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
+func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32) types.Point {
 	var r = float64(radius)
 	y0 := float64(mapCenterLat)
 	x0 := float64(mapCenterLng)
@@ -52,15 +68,16 @@ func roundToDecimal(value float64, decimals int) float32 {
 	return float32(math.Round(intValue) / math.Pow10(decimals))
 }
 
-func getRotationDegrees(pointA *types.Point, pointB *types.Point) float64 {
+// GetRotationDegrees - get the rotation of the car
+func GetRotationDegrees(pointA *types.Point, pointB *types.Point) float64 {
 	deltaX := float64(pointB.GetLng() - pointA.GetLng())
 	deltaY := float64(pointB.GetLat() - pointA.GetLat())
 
 	return math.Atan2(deltaY, deltaX) * 180 / math.Pi
 }
 
-// from https://htmlcolorcodes.com/
-func randomColor() string {
+// RandomColor from https://htmlcolorcodes.com/
+func RandomColor() string {
 	colorPalette := []string{
 		"#641E16",
 		"#78281F",
@@ -105,4 +122,9 @@ func randomColor() string {
 		"#2C3E50",
 	}
 	return colorPalette[rand.Intn(39)]
+}
+
+// EcIDForPort gives a consistent naming convention
+func EcIDForPort(towerPort int) types.EcID {
+	return types.EcID(fmt.Sprintf("%07X", towerPort))
 }

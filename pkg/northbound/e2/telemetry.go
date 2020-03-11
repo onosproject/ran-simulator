@@ -37,35 +37,38 @@ func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_
 	c := make(chan e2.TelemetryMessage)
 	defer close(c)
 	go func() {
-		err := radioMeasReportPerUE(stream, c)
+		err := radioMeasReportPerUE(s.GetPort(), s.GetEcID(), stream, c)
 		if err != nil {
-			log.Errorf("Unable to send radioMeasReportPerUE %s", err.Error())
+			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
 		}
 	}()
-	return sendTelemetryLoop(stream, c)
+	return sendTelemetryLoop(s.GetPort(), stream, c)
 }
 
-func sendTelemetryLoop(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func sendTelemetryLoop(port int, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	for {
 		select {
 		case msg := <-c:
 			UpdateTelemetryMetrics(&msg)
 			if err := stream.Send(&msg); err != nil {
-				log.Infof("send error %v", err)
+				log.Infof("send error on Port %d %v", port, err)
 				return err
 			}
 		case <-stream.Context().Done():
-			log.Infof("Controller has disconnected")
+			log.Infof("Controller has disconnected on Port %d", port)
 			return nil
 		}
 	}
 }
 
-func radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func radioMeasReportPerUE(port int, towerID types.EcID, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	trafficSimMgr := manager.GetManager()
 
 	// replay any existing UE's
 	for _, ue := range trafficSimMgr.UserEquipments {
+		if ue.ServingTower != towerID {
+			continue
+		}
 		if ue.Admitted {
 			c <- generateReport(ue)
 		}
@@ -77,19 +80,23 @@ func radioMeasReportPerUE(stream e2.InterfaceService_SendTelemetryServer, c chan
 	if err != nil {
 		return err
 	}
-	// block here and listen out for any updates to UEs
+	log.Infof("Listening for changes on UEs with ServingTower=%s for Port %d", towerID, port)
 	for {
 		select {
+		// block here and listen out for any updates to UEs
 		case ueUpdate := <-ueChangeChannel:
 			if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
 				ue, ok := ueUpdate.Object.(*types.Ue)
 				if !ok {
 					log.Fatalf("Object %v could not be converted to UE", ueUpdate)
 				}
+				if ue.ServingTower != towerID {
+					continue
+				}
 				c <- generateReport(ue)
 			}
 		case <-stream.Context().Done():
-			log.Infof("Controller has disconnected")
+			log.Infof("Controller has disconnected on Port %d", port)
 			return nil
 		}
 	}
