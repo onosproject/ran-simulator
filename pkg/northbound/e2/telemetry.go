@@ -45,7 +45,7 @@ func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_
 	return sendTelemetryLoop(s.GetPort(), stream, c)
 }
 
-func sendTelemetryLoop(port int16, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func sendTelemetryLoop(port int, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	for {
 		select {
 		case msg := <-c:
@@ -61,7 +61,7 @@ func sendTelemetryLoop(port int16, stream e2.InterfaceService_SendTelemetryServe
 	}
 }
 
-func radioMeasReportPerUE(port int16, towerID types.EcID, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func radioMeasReportPerUE(port int, towerID types.EcID, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	trafficSimMgr := manager.GetManager()
 
 	// replay any existing UE's
@@ -80,7 +80,7 @@ func radioMeasReportPerUE(port int16, towerID types.EcID, stream e2.InterfaceSer
 	if err != nil {
 		return err
 	}
-	log.Infof("Listening for changes on UEs with ServicngTower=%s for Port %d", towerID, port)
+	log.Infof("Listening for changes on UEs with ServingTower=%s for Port %d", towerID, port)
 	for {
 		select {
 		// block here and listen out for any updates to UEs

@@ -33,7 +33,7 @@ func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error
 	return sendControlLoop(s.GetPort(), stream, c)
 }
 
-func sendControlLoop(port int16, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
+func sendControlLoop(port int, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
 	for {
 		select {
 		case msg := <-c:
@@ -48,7 +48,7 @@ func sendControlLoop(port int16, stream e2.InterfaceService_SendControlServer, c
 	}
 }
 
-func recvControlLoop(port int16, towerID types.EcID, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
+func recvControlLoop(port int, towerID types.EcID, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
@@ -113,7 +113,7 @@ func handleHORequest(req *e2.HORequest) error {
 	return err
 }
 
-func handleCellConfigRequest(port int16, ecID types.EcID, c chan e2.ControlUpdate) {
+func handleCellConfigRequest(port int, ecID types.EcID, c chan e2.ControlUpdate) {
 	log.Infof("handleCellConfigRequest on Port %d", port)
 
 	trafficSimMgr := manager.GetManager()

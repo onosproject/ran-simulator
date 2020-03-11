@@ -27,9 +27,9 @@ var log = liblog.GetLogger("northbound", "e2")
 
 // NewTowerServer - start a new gRPC server per tower
 func NewTowerServer(towerIndex int, serverParams utils.ServerParams) error {
-	port := int16(utils.GrpcBasePort + towerIndex + 1) // Start at 5152 so this translates to 1420 in Hex
+	port := utils.GrpcBasePort + towerIndex + 1 // Start at 5152 so this translates to 1420 in Hex
 	ecID := utils.EcIDForPort(port)
-	s := service.NewServer(service.NewServerConfig(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, port, true))
+	s := service.NewServer(service.NewServerConfig(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, int16(port), true))
 	s.AddService(Service{
 		port:      port,
 		towerEcID: ecID,
@@ -43,7 +43,7 @@ func NewTowerServer(towerIndex int, serverParams utils.ServerParams) error {
 // Service is an implementation of e2 service.
 type Service struct {
 	service.Service
-	port      int16
+	port      int
 	towerEcID types.EcID
 }
 
@@ -55,12 +55,12 @@ func (s Service) Register(r *grpc.Server) {
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-	port      int16
+	port      int
 	towerEcID types.EcID
 }
 
 // GetPort - expose the port number
-func (s *Server) GetPort() int16 {
+func (s *Server) GetPort() int {
 	return s.port
 }
 

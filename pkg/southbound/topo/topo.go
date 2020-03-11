@@ -30,8 +30,7 @@ import (
 
 const (
 	ranSimVersion    = "1.0.0"
-	ranSimType       = "Tower"
-	ranSimRole       = "Simulator"
+	ranSimType       = "RanSimulator"
 	ranSimTimeoutSec = 5
 )
 
@@ -90,7 +89,6 @@ func createTowerForTopo(tower *types.Tower) *topodevice.Device {
 		Credentials: topodevice.Credentials{},
 		TLS:         topodevice.TlsConfig{},
 		Type:        ranSimType,
-		Role:        ranSimRole,
 		Attributes:  towerAttributes,
 	}
 }

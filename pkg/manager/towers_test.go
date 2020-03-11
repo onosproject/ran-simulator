@@ -22,14 +22,17 @@ import (
 	"time"
 )
 
+const (
+	mapCenterLat           = 52.0
+	mapCenterLng           = -8.0
+	towerSpacingVert       = 0.01
+	towerSpacingHoriz      = 0.02
+	decimalDegreeTolerance = 0.0001
+)
+
 func Test_findClosestTowers(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
-	const mapCenterLat = 52.0
-	const mapCenterLng = -8.0
-	const towerSpacingVert = 0.01
-	const towerSpacingHoriz = 0.02
-	const decimalDegreeTolerance = 0.0001
 
 	m.Towers = NewTowers(
 		types.TowersParams{
@@ -156,4 +159,32 @@ func Test_PowerAdjust(t *testing.T) {
 	assert.Error(t, err, "unknown tower 0001421", "Expected an error for wrong name when adjusting power")
 
 	time.Sleep(time.Millisecond * 100)
+}
+
+func Test_MakeNeighbors(t *testing.T) {
+	towerParams := types.TowersParams{
+		TowerRows:         3,
+		TowerCols:         3,
+		TowerSpacingVert:  towerSpacingVert,
+		TowerSpacingHoriz: towerSpacingHoriz,
+	}
+
+	// 1420 --- 1421 --- 1422
+	//   |        |        |
+	// 1423 --- 1424 --- 1425
+	//   |        |        |
+	// 1426 --- 1427 --- 1428
+	// tower num 2 is the top right - it's id is "0001422"
+	neighborIDs := makeNeighbors(2, towerParams)
+	assert.Equal(t, 2, len(neighborIDs), "Unexpected number of neighbors for 2")
+	assert.Equal(t, types.EcID("0001421"), neighborIDs[0])
+	assert.Equal(t, types.EcID("0001425"), neighborIDs[1])
+
+	// tower num 4 is the middle - it's id is "0001424"
+	neighborIDs4 := makeNeighbors(4, towerParams)
+	assert.Equal(t, 4, len(neighborIDs4), "Unexpected number of neighbors for 5")
+	assert.Equal(t, types.EcID("0001421"), neighborIDs4[0])
+	assert.Equal(t, types.EcID("0001423"), neighborIDs4[1])
+	assert.Equal(t, types.EcID("0001425"), neighborIDs4[2])
+	assert.Equal(t, types.EcID("0001427"), neighborIDs4[3])
 }

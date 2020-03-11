@@ -125,6 +125,6 @@ func RandomColor() string {
 }
 
 // EcIDForPort gives a consistent naming convention
-func EcIDForPort(towerPort int16) types.EcID {
+func EcIDForPort(towerPort int) types.EcID {
 	return types.EcID(fmt.Sprintf("%07X", towerPort))
 }

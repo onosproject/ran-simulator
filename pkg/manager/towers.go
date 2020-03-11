@@ -16,12 +16,11 @@ package manager
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/pkg/utils"
-	"math"
-
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
+	"github.com/onosproject/ran-simulator/pkg/utils"
+	"math"
 )
 
 // DefaultTxPower - all base-stations start with this power level
@@ -53,15 +52,16 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.E
 	for r = 0; r < params.TowerRows; r++ {
 		for c = 0; c < params.TowerCols; c++ {
 			pos := getTowerPosition(r, c, params, mapLayout)
-			towerPort := utils.GrpcBasePort + r*params.TowerCols + c + 2 // Start at 5152 so it appears as 1420 in Hex
-			ecid := utils.EcIDForPort(int16(towerPort))
+			towerNum := r*params.TowerCols + c
+			towerPort := utils.GrpcBasePort + towerNum + 2 // Start at 5152 so it appears as 1420 in Hex
+			ecid := utils.EcIDForPort(int(towerPort))
 			towers[ecid] = &types.Tower{
 				Location:   pos,
 				Color:      utils.RandomColor(),
 				PlmnID:     utils.TestPlmnID,
 				EcID:       ecid,
 				MaxUEs:     params.MaxUEsPerTower,
-				Neighbors:  makeNeighbors(int(towerPort), params),
+				Neighbors:  makeNeighbors(int(towerNum), params),
 				TxPowerdB:  DefaultTxPower,
 				Port:       towerPort,
 				CrntiMap:   make(map[types.Crnti]types.UEName),
@@ -207,8 +207,8 @@ func makeNeighbors(id int, towerParams types.TowersParams) []types.EcID {
 	for x := max(0, i-1); x <= min(i+1, nrows-1); x++ {
 		for y := max(0, j-1); y <= min(j+1, ncols-1); y++ {
 			if (x == i && y == j-1) || (x == i && y == j+1) || (x == i-1 && y == j) || (x == i+1 && y == j) {
-				towerNum := x*nrows + y + 1
-				towerEcID := types.EcID(fmt.Sprintf("%07X", towerNum))
+				towerID := x*nrows + y + 2 + utils.GrpcBasePort
+				towerEcID := utils.EcIDForPort(towerID)
 				neighbors = append(neighbors, towerEcID)
 			}
 		}
