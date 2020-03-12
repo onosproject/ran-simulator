@@ -62,7 +62,7 @@ func recvControlLoop(port int, towerID types.EcID, stream e2.InterfaceService_Se
 			go handleUeAdmissions(towerID, stream, c)
 		case *e2.ControlResponse_HORequest:
 			UpdateControlMetrics(in)
-			err = handleHORequest(x.HORequest)
+			err = handleHORequest(towerID, x.HORequest)
 			if err != nil {
 				log.Error(err)
 			}
@@ -101,16 +101,21 @@ func handleRRMConfig(req *e2.RRMConfig) {
 	}
 }
 
-func handleHORequest(req *e2.HORequest) error {
-	log.Infof("handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
-	m := manager.GetManager()
-	ueName, err := m.CrntiToName(types.Crnti(req.Crnti), types.EcID(req.EcgiS.Ecid))
-	if err != nil {
-		log.Error(err)
-		return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, req.Crnti)
+func handleHORequest(towerID types.EcID, req *e2.HORequest) error {
+	if towerID == types.EcID(req.EcgiS.Ecid) {
+		log.Infof("Source handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
+		m := manager.GetManager()
+		ueName, err := m.CrntiToName(types.Crnti(req.Crnti), towerID)
+		if err != nil {
+			log.Error(err)
+			return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, req.Crnti)
+		}
+		return m.UeHandover(ueName, types.EcID(req.EcgiT.Ecid))
+	} else if towerID == types.EcID(req.EcgiT.Ecid) {
+		log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
+		return nil
 	}
-	m.UeHandover(ueName, types.EcID(req.EcgiT.Ecid))
-	return err
+	return fmt.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
 }
 
 func handleCellConfigRequest(port int, ecID types.EcID, c chan e2.ControlUpdate) {
@@ -186,7 +191,8 @@ func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendContr
 			if ue.ServingTower != towerID {
 				continue // listen for the next event
 			}
-			if event.Type == trafficsim.Type_ADDED {
+			if event.Type == trafficsim.Type_ADDED ||
+				event.Type == trafficsim.Type_UPDATED && event.UpdateType == trafficsim.UpdateType_HANDOVER {
 				ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti)
 				c <- *ueAdmReq
 				log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)

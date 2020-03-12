@@ -181,7 +181,7 @@ func (m *Manager) CrntiToName(crnti types.Crnti, ecid types.EcID) (types.UEName,
 	}
 	ueName, ok := tower.CrntiMap[crnti]
 	if !ok {
-		return "", fmt.Errorf("crnti %s not found", crnti)
+		return "", fmt.Errorf("crnti %s/%s not found", ecid, crnti)
 	}
 	return ueName, nil
 }

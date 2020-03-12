@@ -150,37 +150,31 @@ func (m *Manager) GetUe(name types.UEName) (*types.Ue, error) {
 }
 
 // UeHandover perform the handover on simulated UE
-func (m *Manager) UeHandover(name types.UEName, tower types.EcID) {
+func (m *Manager) UeHandover(name types.UEName, newTowerID types.EcID) error {
 	ue, err := m.GetUe(name)
 	if err != nil {
-		log.Error(err)
-		return
+		return err
 	}
-	names, _ := m.findClosestTowers(ue.Position)
 	err = m.DelCrnti(ue.ServingTower, ue.Crnti)
 	if err != nil {
-		log.Errorf(err.Error())
-		return
+		return err
 	}
 	m.UserEquipmentsLock.Lock()
-	ue.Crnti = InvalidCrnti
-	ue.ServingTower = tower
-	newCrnti, err := m.NewCrnti(tower, ue.Name)
+	ue.ServingTower = newTowerID
+	newCrnti, err := m.NewCrnti(newTowerID, ue.Name)
 	if err != nil {
 		m.UserEquipmentsLock.Unlock()
-		log.Errorf(err.Error())
-		return
+		return err
 	}
 	ue.Crnti = newCrnti
-	ue.Tower1 = names[0]
-	ue.Tower2 = names[1]
-	ue.Tower3 = names[2]
+	ue.Admitted = false
 	m.UserEquipmentsLock.Unlock()
 	m.UeChannel <- dispatcher.Event{
 		Type:       trafficsim.Type_UPDATED,
 		UpdateType: trafficsim.UpdateType_HANDOVER,
 		Object:     ue,
 	}
+	return nil
 }
 
 // UeAdmitted - called when the Admission Request for the UE is processed
