@@ -60,7 +60,7 @@ func SyncToTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient,
 		topoDevice := createTowerForTopo(t)
 		resp, err := (*topoClient).Add(ctx, &topodevice.AddRequest{Device: topoDevice})
 		if err != nil {
-			log.Warnf("Could not add %s to onos-topo", topoTowerID(t.GetEcID()))
+			log.Warnf("Could not add %s to onos-topo %s", topoTowerID(t.GetEcID()), err.Error())
 			continue
 		}
 		if resp.GetDevice().ID != topodevice.ID(topoTowerID(t.GetEcID())) {
