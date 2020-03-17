@@ -16,8 +16,9 @@ package e2
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/pkg/utils"
 	"io"
+
+	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	"github.com/onosproject/ran-simulator/api/e2"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
@@ -203,10 +204,10 @@ func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendContr
 					log.Error(err.Error())
 					continue
 				}
-				ue.Crnti = manager.InvalidCrnti
 				ueRelInd := formatUeReleaseInd(ue.ServingTower, ue.Crnti)
 				c <- *ueRelInd
 				log.Infof("ueReleaseInd eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
+				ue.Crnti = manager.InvalidCrnti
 			}
 			// Nothing to be done for trafficsim.Type_UPDATED - they are handled by Telemetry
 		case <-stream.Context().Done():
