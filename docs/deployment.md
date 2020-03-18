@@ -13,7 +13,8 @@ The RAN Simulator can connect to Google's [Directions API] and with a Google API
 Google charges $5.00 per 1000 requests to the [Directions API], and so we do not put
 our API key up in the public domain.
 
-> If a Google API key is not given, the simulator will revert to a built in random route generator
+> If a Google API key is not given OR is less than 38 chars in length, the simulator
+> will revert to the built in random route generator
 
 ## Tuning parameters
 [README.md](README.md) shows the list of startup parameters - these can be overridden using the
@@ -49,10 +50,10 @@ NAME         	NAMESPACE 	REVISION	UPDATED                                	STATUS
 onos-cli     	micro-onos	1       	2020-02-04 08:01:54.860813386 +0000 UTC	deployed	onos-cli-0.0.1     	1          
 onos-ric     	micro-onos	1       	2020-02-04 08:02:17.663782372 +0000 UTC	deployed	onos-ric-0.0.1     	1          
 ran-simulator	micro-onos	1       	2020-02-04 09:32:21.533299519 +0000 UTC	deployed	ran-simulator-0.0.1	1          
-sd-ran-gui   	micro-onos	1       	2020-02-04 09:32:49.018099586 +0000 UTC	deployed	sd-ran-gui-0.0.1   	1  
+onos-gui   	    micro-onos	1       	2020-02-04 09:32:49.018099586 +0000 UTC	deployed	onos-gui-0.0.1   	1  
 ```
 
-> Here the service is shown running alongside `onos-cli`, `onos-ric` and the `sd-ran-gui`
+> Here the service is shown running alongside `onos-cli`, `onos-ric` and the `onos-gui`
 > as these are usually deployed together to give a demo scenario. See the individual
 > deployment instructions for these services.
 
@@ -63,7 +64,7 @@ NAME                             READY   STATUS             RESTARTS   AGE
 onos-cli-68bbf4f674-ssjt4        1/1     Running            0          18m
 onos-ric-5fb8c6bdd7-xmcmq        1/1     Running            0          18m
 ran-simulator-6f577597d8-5lcv8   1/1     Running            0          82s
-sd-ran-gui-76ff54d85-fh72j       2/2     Running            0          54s
+onos-gui-76ff54d85-fh72j         2/2     Running            0          54s
 ```
 
 See Troubleshooting below if the `Status` is not `Running`
@@ -77,7 +78,7 @@ helm install -n <your_name_space> ran-simulator ran-simulator
 
 ### Troubleshoot
 If your chart does not install or the pod is not running for some reason and/or you modified values Helm offers two flags to help you
-debug your chart:  
+debug your chart:
 
 * `--dry-run` check the chart without actually installing the pod. 
 * `--debug` prints out more information about your chart
@@ -85,23 +86,6 @@ debug your chart:
 ```bash
 helm install -n micro-onos ran-simulator --debug --dry-run ran-simulator/
 ```
-
-#### CrashLoopBackOff
-If the ran-simulator has a status of `CrashLoopBackOff` it is usually an indication
-that the Google API Key is not valid. Un-deploy the ran-simulator, update the key
-in `values.yaml` and redeploy it again.
-
-Looking at the logs of the pod shows where this is the case
-```bash
-> kubectl -n micro-onos logs ran-simulator-6f65c8b57-rq4gf
-E0204 08:24:24.305652       1 trafficsim.go:69] Cant' avoid double Error logging no such flag -alsologtostderr
-I0204 08:24:24.305777       1 trafficsim.go:111] Starting trafficsim
-I0204 08:24:24.305804       1 manager.go:40] Creating Manager
-I0204 08:24:24.305818       1 manager.go:51] Starting Manager with {3 3 0.02 0.02} {10} {3 YOUR_API_KEY_HERE 1s}
-I0204 08:24:24.305953       1 dispatcher.go:41] User Equipment Event listener initialized
-I0204 08:24:24.306070       1 dispatcher.go:79] Route Event listener initialized
-F0204 08:24:24.553960       1 manager.go:62] Error calculating routes maps: REQUEST_DENIED - The provided API key is invalid.
-``` 
 
 ## Uninstalling the chart.
 
