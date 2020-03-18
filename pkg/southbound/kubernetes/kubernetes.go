@@ -57,9 +57,8 @@ func AddK8SServicePorts(rangeStart int32, rangeEnd int32) {
 		log.Errorf("Service %s not found in namespace %s", serviceName, namespace)
 		return
 	} else if statusError, isStatus := err.(*errors.StatusError); isStatus {
-		log.Errorf("Error getting Service %s in namespace %s. Status: %v",
+		log.Fatal("Error getting Service %s in namespace %s. Status: %v",
 			serviceName, namespace, statusError.ErrStatus.Message)
-		return
 	} else if err != nil {
 		log.Fatalf("Kubernetes API error %s", err.Error())
 	}
