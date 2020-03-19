@@ -17,7 +17,7 @@ package e2
 import (
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
-	"github.com/onosproject/ran-simulator/api/e2"
+	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"google.golang.org/grpc"

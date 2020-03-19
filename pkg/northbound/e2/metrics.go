@@ -19,7 +19,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/api/types"
 
-	"github.com/onosproject/ran-simulator/api/e2"
+	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
