@@ -15,9 +15,10 @@
 package e2
 
 import (
-	"github.com/onosproject/ran-simulator/api/e2"
-	"gotest.tools/assert"
 	"testing"
+
+	e2 "github.com/onosproject/onos-ric/api/sb"
+	"gotest.tools/assert"
 )
 
 func Test_GenerateReport(t *testing.T) {

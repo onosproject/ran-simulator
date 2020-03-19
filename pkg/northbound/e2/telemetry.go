@@ -16,7 +16,8 @@ package e2
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/api/e2"
+
+	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"

@@ -15,11 +15,12 @@
 package e2
 
 import (
-	"github.com/onosproject/ran-simulator/pkg/utils"
 	"testing"
 	"time"
 
-	"github.com/onosproject/ran-simulator/api/e2"
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
+	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"gotest.tools/assert"
