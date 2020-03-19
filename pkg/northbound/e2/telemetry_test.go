@@ -17,6 +17,7 @@ package e2
 import (
 	"testing"
 
+	e2 "github.com/onosproject/onos-ric/api/sb"
 	"gotest.tools/assert"
 )
 
