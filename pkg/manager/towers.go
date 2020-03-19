@@ -175,6 +175,8 @@ func (m *Manager) DelCrnti(servingTower types.EcID, crnti types.Crnti) error {
 
 // CrntiToName ...
 func (m *Manager) CrntiToName(crnti types.Crnti, ecid types.EcID) (types.UEName, error) {
+	m.TowersLock.RLock()
+	defer m.TowersLock.RUnlock()
 	tower, ok := m.Towers[ecid]
 	if !ok {
 		return "", fmt.Errorf("tower %s not found", ecid)
