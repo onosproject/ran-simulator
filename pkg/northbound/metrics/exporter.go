@@ -39,8 +39,8 @@ var allHOEvents []HOEvent
 var allHOEventsLock sync.RWMutex
 
 // RunHOExposer runs Prometheus exposer
-func RunHOExposer(port int, latencyChan chan HOEvent) {
-	log.Infof("Starting Prometheus agent on http://:%d/metrics", port)
+func RunHOExposer(port int, latencyChan chan HOEvent, exportAll bool) {
+	log.Infof("Starting Prometheus agent on http://:%d/metrics with All HO Events=%v", port, exportAll)
 	hoLatencyHistogram := prometheus.NewHistogram(
 		prometheus.HistogramOpts{
 			Namespace: "onosproject",
@@ -55,20 +55,24 @@ func RunHOExposer(port int, latencyChan chan HOEvent) {
 		// block here until a latency measurement is received
 		for latency := range latencyChan {
 			hoLatencyHistogram.Observe(float64(latency.HOLatency / 1e3))
-			allHOEventsLock.Lock()
-			allHOEvents = append(allHOEvents, latency)
-			allHOEventsLock.Unlock()
-		}
-	}()
-	go func() {
-		for {
-			listHOEventCounter := exposeAllHOEvents()
-			time.Sleep(1000 * time.Millisecond)
-			for i := 0; i < len(listHOEventCounter); i++ {
-				prometheus.Unregister(listHOEventCounter[i])
+			if exportAll {
+				allHOEventsLock.Lock()
+				allHOEvents = append(allHOEvents, latency)
+				allHOEventsLock.Unlock()
 			}
 		}
 	}()
+	if exportAll {
+		go func() {
+			for {
+				listHOEventCounter := exposeAllHOEvents()
+				time.Sleep(1000 * time.Millisecond)
+				for i := 0; i < len(listHOEventCounter); i++ {
+					prometheus.Unregister(listHOEventCounter[i])
+				}
+			}
+		}()
+	}
 	http.Handle("/metrics", promhttp.Handler())
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	if err != nil {

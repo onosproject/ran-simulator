@@ -51,6 +51,12 @@ type Manager struct {
 	TopoClient         device.DeviceServiceClient
 }
 
+// MetricsParams for the Prometheus exporter
+type MetricsParams struct {
+	Port              int
+	ExportAllHOEvents bool
+}
+
 // NewManager initializes the RAN subsystem.
 func NewManager() (*Manager, error) {
 	log.Info("Creating Manager")
@@ -69,7 +75,8 @@ func NewManager() (*Manager, error) {
 
 // Run starts a synchronizer based on the devices and the northbound services.
 func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams,
-	routesParams RoutesParams, topoEndpoint string, metricsPort int, serverParams utils.ServerParams) {
+	routesParams RoutesParams, topoEndpoint string, metricsPort int, serverParams utils.ServerParams,
+	metricsParams MetricsParams) {
 	log.Infof("Starting Manager with %v %v %v", mapLayoutParams, towerparams, routesParams)
 	m.MapLayout = mapLayoutParams
 	m.TowersLock.Lock()
@@ -93,7 +100,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 	go m.startMoving(routesParams)
 
-	go metrics.RunHOExposer(metricsPort, m.LatencyChannel)
+	go metrics.RunHOExposer(metricsParams.Port, m.LatencyChannel, metricsParams.ExportAllHOEvents)
 
 	ctx := context.Background()
 	m.TopoClient = topo.ConnectToTopo(ctx, topoEndpoint, serverParams)
