@@ -263,6 +263,7 @@ github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpO
 github.com/imdario/mergo v0.3.5/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
 github.com/imdario/mergo v0.3.6/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
 github.com/imdario/mergo v0.3.7/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
+github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/jcmturner/gofork v1.0.0 h1:J7uCkflzTEhUZ64xqKnkDxq3kzc96ajM1Gli5ktUem8=
 github.com/jcmturner/gofork v1.0.0/go.mod h1:MK8+TM0La+2rjBD4jE12Kj1pCCxK7d2LK/UM3ncEo0o=
@@ -328,10 +329,12 @@ github.com/onosproject/onos-config v0.0.0-20200124182344-6c3f5eb1e6ed/go.mod h1:
 github.com/onosproject/onos-config v0.0.0-20200131171925-566694cf7e94/go.mod h1:3OKwIzkqat9YiJ/DM1aRdBIWD5HANzbc5nfY8/eJAJM=
 github.com/onosproject/onos-config v0.0.0-20200204191831-5c2803ee469d/go.mod h1:rVNKd9v/Y4ZvttCte8jrf1KnfKSHbe0nwCXVxZC4EHk=
 github.com/onosproject/onos-lib-go v0.0.0-20200302190914-1f7a2e625e9d/go.mod h1:tbdH7aqxvcOLSfz8cgiDwNP5szPnll1/m9HYKbXruSI=
-github.com/onosproject/onos-lib-go v0.0.0-20200307155659-8ad70c22b981 h1:ao+nAtL8RslrH8v/7XoXHU7q71JgvajFMIp3rcExrns=
-github.com/onosproject/onos-lib-go v0.0.0-20200307155659-8ad70c22b981/go.mod h1:tbdH7aqxvcOLSfz8cgiDwNP5szPnll1/m9HYKbXruSI=
 github.com/onosproject/onos-lib-go v0.0.0-20200311221003-fad88142208e h1:gmR2xTdzpbSYgoPH3R83l8P/JnCUDK7eVaTqhWo9X6s=
 github.com/onosproject/onos-lib-go v0.0.0-20200311221003-fad88142208e/go.mod h1:gnWmBzxrrUIdMPbwcBudAxIJCALzRj/CdSpaCfrgwkU=
+github.com/onosproject/onos-lib-go v0.0.0-20200318222217-3c0f4a7ed58b h1:ZbXioCOdmU1C8wMToj/WtAaViPkn594qlc+xwuVg/0U=
+github.com/onosproject/onos-lib-go v0.0.0-20200318222217-3c0f4a7ed58b/go.mod h1:gnWmBzxrrUIdMPbwcBudAxIJCALzRj/CdSpaCfrgwkU=
+github.com/onosproject/onos-lib-go v0.0.0-20200320145407-3d6fa701a6ca h1:pwqoSFcEZZJ3RoDA9z/scz1bBLHvXUnyvgSF0HQlMpc=
+github.com/onosproject/onos-lib-go v0.0.0-20200320145407-3d6fa701a6ca/go.mod h1:gnWmBzxrrUIdMPbwcBudAxIJCALzRj/CdSpaCfrgwkU=
 github.com/onosproject/onos-ran v0.0.0-20200205211410-0667c7147453/go.mod h1:mDd/65obXVUsEGFSLmxokw6QaW/3YCYal+HV1Y08kf8=
 github.com/onosproject/onos-ran v0.0.0-20200210203428-df3953bf0fb1/go.mod h1:mIi1jgByW+1Ns9vZg/lAXyTXDGi7wI6zWiqhnB9qiKU=
 github.com/onosproject/onos-ric v0.0.0-20200225182040-dcf370614b8e h1:vPNS9RSPDnVSk8rNi+lGhG71zuLzkoiqbrpa+lNdRcY=
@@ -432,6 +435,7 @@ github.com/spf13/afero v1.2.2/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTd
 github.com/spf13/cast v1.3.0 h1:oget//CVOEoFewqQxwr0Ej5yjygnqGkvggSE/gB35Q8=
 github.com/spf13/cast v1.3.0/go.mod h1:Qx5cxh0v+4UWYiBimWS+eyWzqEqokIECu5etghLkUJE=
 github.com/spf13/cobra v0.0.5/go.mod h1:3K3wKZymM7VvHMDS9+Akkh4K60UwM26emMESw8tLCHU=
+github.com/spf13/cobra v0.0.6 h1:breEStsVwemnKh2/s6gMvSdMEkwW0sK8vGStnlVBMCs=
 github.com/spf13/cobra v0.0.6/go.mod h1:/6GTrnGXV9HjY+aR4k0oJ5tcvakLuG6EuKReYlHNrgE=
 github.com/spf13/jwalterweatherman v1.0.0 h1:XHEdyB+EcvlqZamSM4ZOMGlc93t6AcsBEu9Gc1vn7yk=
 github.com/spf13/jwalterweatherman v1.0.0/go.mod h1:cQK4TGJAtQXfYWX+Ddv3mKDzgVb68N+wFjFa4jdeBTo=
