@@ -5,11 +5,12 @@ go 1.13
 require (
 	github.com/atomix/go-client v0.0.0-20200307025134-f638fa3fb644
 	github.com/gogo/protobuf v1.3.1
-	github.com/onosproject/onos-lib-go v0.0.0-20200311221003-fad88142208e
+	github.com/onosproject/onos-lib-go v0.0.0-20200320145407-3d6fa701a6ca
 	github.com/onosproject/onos-ric v0.0.0-20200317232454-e09647a17960
 	github.com/onosproject/onos-topo v0.0.0-20200306012916-78b9f54b370a
 	github.com/prometheus/client_golang v1.4.1
 	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/spf13/cobra v0.0.6
 	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/genproto v0.0.0-20200212174721-66ed5ce911ce // indirect
