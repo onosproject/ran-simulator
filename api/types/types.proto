@@ -67,6 +67,7 @@ message Ue {
 
     UeMetrics metrics = 17;
 
+    uint32 imsi = 18;
 }
 
 message UeMetrics {
