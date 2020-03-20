@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
+	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
@@ -34,7 +35,7 @@ func makeCqi(distance float32, txPowerdB float32) uint32 {
 }
 
 // SendTelemetry ...
-func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_SendTelemetryServer) error {
+func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2ap.E2AP_SendTelemetryServer) error {
 	c := make(chan e2.TelemetryMessage)
 	defer close(c)
 	go func() {
@@ -46,7 +47,7 @@ func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2.InterfaceService_
 	return sendTelemetryLoop(s.GetPort(), stream, c)
 }
 
-func sendTelemetryLoop(port int, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func sendTelemetryLoop(port int, stream e2ap.E2AP_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	for {
 		select {
 		case msg := <-c:
@@ -62,7 +63,7 @@ func sendTelemetryLoop(port int, stream e2.InterfaceService_SendTelemetryServer,
 	}
 }
 
-func radioMeasReportPerUE(port int, towerID types.EcID, stream e2.InterfaceService_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func radioMeasReportPerUE(port int, towerID types.EcID, stream e2ap.E2AP_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	trafficSimMgr := manager.GetManager()
 
 	// replay any existing UE's

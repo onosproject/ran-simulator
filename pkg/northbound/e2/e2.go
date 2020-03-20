@@ -17,7 +17,7 @@ package e2
 import (
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
-	e2 "github.com/onosproject/onos-ric/api/sb"
+	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"google.golang.org/grpc"
@@ -50,7 +50,7 @@ type Service struct {
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
 	server := &Server{port: s.port, towerEcID: s.towerEcID}
-	e2.RegisterInterfaceServiceServer(r, server)
+	e2ap.RegisterE2APServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
