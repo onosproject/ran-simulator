@@ -66,6 +66,7 @@ func main() {
 	stepDelayMs := flag.Int("stepDelayMs", 1000, "delay between steps on route")
 	maxUEsPerTower := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
 	metricsPort := flag.Int("metricsPort", 9090, "port for Prometheus metrics")
+	metricsAllHoEvents := flag.Bool("metricsAllHoEvents", true, "Export all HO events in metrics (only historgram if false)")
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
 
 	//lines 93-109 are implemented according to
@@ -164,13 +165,18 @@ func main() {
 	rangeEnd := rangeStart + *towerCols**towerRows
 	kubernetes.AddK8SServicePorts(int32(rangeStart), int32(rangeEnd))
 
+	metricsParams := manager.MetricsParams{
+		Port:              *metricsPort,
+		ExportAllHOEvents: *metricsAllHoEvents,
+	}
+
 	log.Info("Starting trafficsim")
 	mgr, err := manager.NewManager()
 	if err != nil {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
-	mgr.Run(mapLayoutParams, towerParams, routesParams, *topoEndpoint, *metricsPort, serverParams)
+	mgr.Run(mapLayoutParams, towerParams, routesParams, *topoEndpoint, *metricsPort, serverParams, metricsParams)
 
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
