@@ -28,3 +28,6 @@ type RouteID string
 
 // UEName is a name for a UE
 type UEName string
+
+// Imsi is a UE unique identifier
+type Imsi uint64

@@ -6,7 +6,7 @@ require (
 	github.com/atomix/go-client v0.0.0-20200307025134-f638fa3fb644
 	github.com/gogo/protobuf v1.3.1
 	github.com/onosproject/onos-lib-go v0.0.0-20200320145407-3d6fa701a6ca
-	github.com/onosproject/onos-ric v0.0.0-20200317232454-e09647a17960
+	github.com/onosproject/onos-ric v0.0.0-20200323192023-afc66fee3b37
 	github.com/onosproject/onos-topo v0.0.0-20200306012916-78b9f54b370a
 	github.com/prometheus/client_golang v1.4.1
 	github.com/sergi/go-diff v1.1.0 // indirect

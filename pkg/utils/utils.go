@@ -39,7 +39,7 @@ const ServiceName = "ran-simulator"
 const TestPlmnID = "001001"
 
 // RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
-func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32) types.Point {
+func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32, aspectRatio float32) types.Point {
 	var r = float64(radius)
 	y0 := float64(mapCenterLat)
 	x0 := float64(mapCenterLng)
@@ -49,7 +49,7 @@ func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32) ty
 
 	w := r * math.Sqrt(u)
 	t := 2 * math.Pi * v
-	x1 := w * math.Cos(t)
+	x1 := w * math.Cos(t) * float64(aspectRatio)
 	y1 := w * math.Sin(t)
 
 	newY := roundToDecimal(y0+y1, 6)

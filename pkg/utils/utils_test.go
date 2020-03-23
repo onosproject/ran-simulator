@@ -73,7 +73,7 @@ func Test_RandomColor(t *testing.T) {
 func Test_GetRandomLngLat(t *testing.T) {
 	const scale = 0.2
 	for i := 0; i < 100; i++ {
-		pt := RandomLatLng(0.0, 0.0, scale)
+		pt := RandomLatLng(0.0, 0.0, scale, 1)
 		assert.Assert(t, pt.GetLat() < scale, "Expecting position %f to be within scale", pt.GetLat())
 	}
 }
