@@ -167,7 +167,7 @@ func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendContr
 			trafficSimMgr.UserEquipmentsLock.Unlock()
 			continue
 		}
-		ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti)
+		ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti, ue.Imsi)
 		c <- *ueAdmReq
 		log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
 		ue.Admitted = true
@@ -194,7 +194,7 @@ func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendContr
 			}
 			if event.Type == trafficsim.Type_ADDED ||
 				event.Type == trafficsim.Type_UPDATED && event.UpdateType == trafficsim.UpdateType_HANDOVER {
-				ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti)
+				ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti, ue.Imsi)
 				c <- *ueAdmReq
 				log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
 				ue.Admitted = true
@@ -217,7 +217,7 @@ func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendContr
 	}
 }
 
-func formatUeAdmissionReq(eci types.EcID, crnti types.Crnti) *e2.ControlUpdate {
+func formatUeAdmissionReq(eci types.EcID, crnti types.Crnti, imsi types.Imsi) *e2.ControlUpdate {
 	return &e2.ControlUpdate{
 		MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
 		S: &e2.ControlUpdate_UEAdmissionRequest{
@@ -228,6 +228,7 @@ func formatUeAdmissionReq(eci types.EcID, crnti types.Crnti) *e2.ControlUpdate {
 				},
 				Crnti:             string(crnti),
 				AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
+				Imsi:              uint64(imsi),
 			},
 		},
 	}

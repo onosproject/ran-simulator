@@ -26,7 +26,7 @@ import (
 )
 
 // ImsiBaseCbrs - from https://imsiadmin.com/cbrs-assignments
-const ImsiBaseCbrs = 315010999900000
+const ImsiBaseCbrs = types.Imsi(315010999900000)
 
 // NewUserEquipments - create a new set of UEs (phone, car etc)
 func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) map[types.UEName]*types.Ue {
@@ -51,7 +51,7 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 	m.TowersLock.RUnlock()
 	ue := &types.Ue{
 		Name:             name,
-		Imsi:             uint32(ImsiBaseCbrs + ueIdx + 1),
+		Imsi:             ImsiBaseCbrs + types.Imsi(ueIdx) + 1,
 		Type:             "Car",
 		Position:         route.Waypoints[0],
 		Rotation:         0,

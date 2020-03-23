@@ -67,7 +67,7 @@ message Ue {
 
     UeMetrics metrics = 17;
 
-    uint32 imsi = 18;
+    uint64 imsi = 18 [(gogoproto.customname) = "Imsi", (gogoproto.casttype) = "Imsi"];
 }
 
 message UeMetrics {

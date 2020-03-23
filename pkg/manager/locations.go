@@ -32,9 +32,11 @@ type Location struct {
 func NewLocations(towersParams types.TowersParams, mapLayout types.MapLayout) map[string]*Location {
 	locations := make(map[string]*Location)
 	var l uint32
+	aspectRatio := towersParams.TowerSpacingHoriz / towersParams.TowerSpacingVert
 	for l = 0; l < (mapLayout.MaxUes * 2); l++ {
 		pos := utils.RandomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng(),
-			towersParams.TowerSpacingHoriz*float32(towersParams.TowerCols-1)*towersParams.LocationsScale/2)
+			towersParams.TowerSpacingHoriz*float32(towersParams.TowerCols-1)*towersParams.LocationsScale/2,
+			aspectRatio)
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{
 			Name:     name,
