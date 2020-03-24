@@ -20,6 +20,8 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
+	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
+	e2sm "github.com/onosproject/onos-ric/api/sb/e2sm"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
@@ -70,10 +72,10 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 }
 
 // UpdateControlMetrics ...
-func UpdateControlMetrics(in *e2.ControlResponse) {
+func UpdateControlMetrics(in *e2ap.RicControlRequest) {
 	trafficSimMgr := manager.GetManager()
-	switch x := in.S.(type) {
-	case *e2.ControlResponse_HORequest:
+	switch x := in.Msg.S.(type) {
+	case *e2sm.RicControlMessage_HORequest:
 		m := x.HORequest
 		trafficSimMgr.UserEquipmentsLock.Lock()
 		defer trafficSimMgr.UserEquipmentsLock.Unlock()

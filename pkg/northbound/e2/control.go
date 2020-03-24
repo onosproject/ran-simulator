@@ -21,20 +21,30 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
+	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
+	e2sm "github.com/onosproject/onos-ric/api/sb/e2sm"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
+// RicControl ...
+func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
+	c := make(chan e2ap.RicControlResponse)
+	defer close(c)
+	go ricControlRequest(s.GetPort(), s.GetEcID(), stream, c)
+	return ricControlResponse(s.GetPort(), stream, c)
+}
+
 // SendControl ...
-func (s *Server) SendControl(stream e2.InterfaceService_SendControlServer) error {
+func (s *Server) SendControl(stream e2ap.E2AP_SendControlServer) error {
 	c := make(chan e2.ControlUpdate)
 	defer close(c)
 	go recvControlLoop(s.GetPort(), s.GetEcID(), stream, c)
 	return sendControlLoop(s.GetPort(), stream, c)
 }
 
-func sendControlLoop(port int, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) error {
+func ricControlResponse(port int, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) error {
 	for {
 		select {
 		case msg := <-c:
@@ -49,7 +59,45 @@ func sendControlLoop(port int, stream e2.InterfaceService_SendControlServer, c c
 	}
 }
 
-func recvControlLoop(port int, towerID types.EcID, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
+func sendControlLoop(port int, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) error {
+	for {
+		select {
+		case msg := <-c:
+			if err := stream.Send(&msg); err != nil {
+				log.Infof("send error %v", err)
+				return err
+			}
+		case <-stream.Context().Done():
+			log.Infof("Controller on Port %d has disconnected", port)
+			return nil
+		}
+	}
+}
+
+func ricControlRequest(port int, towerID types.EcID, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) {
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF || err != nil {
+			log.Errorf("Unexpectedly ended when receiving Control responses on Port %d %s", port, err.Error())
+			return
+		}
+		//log.Infof("Recv messageType %d", in.MessageType)
+		switch x := in.Msg.S.(type) {
+		case *e2sm.RicControlMessage_HORequest:
+			UpdateControlMetrics(in)
+			err = handleHORequest(towerID, x.HORequest)
+			if err != nil {
+				log.Error(err)
+			}
+		case *e2sm.RicControlMessage_RRMConfig:
+			handleRRMConfig(x.RRMConfig)
+		default:
+			log.Errorf("ControlResponse has unexpected type %T", x)
+		}
+	}
+}
+
+func recvControlLoop(port int, towerID types.EcID, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
@@ -61,14 +109,6 @@ func recvControlLoop(port int, towerID types.EcID, stream e2.InterfaceService_Se
 		case *e2.ControlResponse_CellConfigRequest:
 			handleCellConfigRequest(port, towerID, c)
 			go handleUeAdmissions(towerID, stream, c)
-		case *e2.ControlResponse_HORequest:
-			UpdateControlMetrics(in)
-			err = handleHORequest(towerID, x.HORequest)
-			if err != nil {
-				log.Error(err)
-			}
-		case *e2.ControlResponse_RRMConfig:
-			handleRRMConfig(x.RRMConfig)
 		default:
 			log.Errorf("ControlResponse has unexpected type %T", x)
 		}
@@ -158,7 +198,7 @@ func handleCellConfigRequest(port int, ecID types.EcID, c chan e2.ControlUpdate)
 	log.Infof("handleCellConfigReport eci: %s", tower.EcID)
 }
 
-func handleUeAdmissions(towerID types.EcID, stream e2.InterfaceService_SendControlServer, c chan e2.ControlUpdate) {
+func handleUeAdmissions(towerID types.EcID, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
