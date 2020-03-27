@@ -17,6 +17,7 @@ package manager
 import (
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"gotest.tools/assert"
 	"testing"
 	"time"
@@ -50,7 +51,7 @@ func Test_findClosestTowers(t *testing.T) {
 
 	assert.Equal(t, 9, len(m.Towers), "Expected 9 towers to have been created")
 	for _, tower := range m.Towers {
-		switch tower.EcID {
+		switch tower.Ecgi.EcID {
 		case "0001420":
 		case "0001421":
 		case "0001422":
@@ -64,9 +65,9 @@ func Test_findClosestTowers(t *testing.T) {
 		case "0001428":
 			assert.Assert(t, tower.Location.GetLat()-mapCenterLat+towerSpacingVert < decimalDegreeTolerance)
 		default:
-			t.Errorf("Unexpected tower %s", tower.EcID)
+			t.Errorf("Unexpected tower %s", tower.Ecgi)
 		}
-		switch tower.EcID {
+		switch tower.Ecgi.EcID {
 		case "0001420":
 		case "0001423":
 		case "0001426":
@@ -80,7 +81,7 @@ func Test_findClosestTowers(t *testing.T) {
 		case "0001428":
 			assert.Assert(t, tower.Location.GetLng()-mapCenterLng-towerSpacingHoriz < decimalDegreeTolerance)
 		default:
-			t.Errorf("Unexpected tower %s", tower.EcID)
+			t.Errorf("Unexpected tower %s", tower.Ecgi)
 		}
 	}
 
@@ -137,26 +138,27 @@ func Test_PowerAdjust(t *testing.T) {
 	}()
 
 	assert.Equal(t, 1, len(m.Towers), "Expected 1 tower to have been created")
-
-	err = m.UpdateTower("0001420", -6) // subtracted from initial 10dB
+	towerID1420 := newEcgi("0001420", utils.TestPlmnID)
+	err = m.UpdateTower(towerID1420, -6) // subtracted from initial 10dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
-	tower1, ok := m.Towers["0001420"]
+	tower1, ok := m.Towers[towerID1420]
 	assert.Assert(t, ok)
 	assert.Equal(t, float32(4.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too low - capped at -15dB /////////////////////
-	err = m.UpdateTower("0001420", -30) // subtracted from prev 4dB
+	err = m.UpdateTower(towerID1420, -30) // subtracted from prev 4dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
 	assert.Equal(t, float32(-15.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too high - capped at 30dB /////////////////////
-	err = m.UpdateTower("0001420", 50) // Added to prev -15dB
+	err = m.UpdateTower(towerID1420, 50) // Added to prev -15dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
 	assert.Equal(t, float32(30.0), tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with wrong name /////////////////////
-	err = m.UpdateTower("0001421", -3)
-	assert.Error(t, err, "unknown tower 0001421", "Expected an error for wrong name when adjusting power")
+	towerID1421 := newEcgi("0001421", utils.TestPlmnID)
+	err = m.UpdateTower(towerID1421, -3)
+	assert.Error(t, err, "unknown tower {0001421 315010}", "Expected an error for wrong name when adjusting power")
 
 	time.Sleep(time.Millisecond * 100)
 }
@@ -177,14 +179,14 @@ func Test_MakeNeighbors(t *testing.T) {
 	// tower num 2 is the top right - it's id is "0001422"
 	neighborIDs := makeNeighbors(2, towerParams)
 	assert.Equal(t, 2, len(neighborIDs), "Unexpected number of neighbors for 2")
-	assert.Equal(t, types.EcID("0001421"), neighborIDs[0])
-	assert.Equal(t, types.EcID("0001425"), neighborIDs[1])
+	assert.Equal(t, types.EcID("0001421"), neighborIDs[0].EcID)
+	assert.Equal(t, types.EcID("0001425"), neighborIDs[1].EcID)
 
 	// tower num 4 is the middle - it's id is "0001424"
 	neighborIDs4 := makeNeighbors(4, towerParams)
 	assert.Equal(t, 4, len(neighborIDs4), "Unexpected number of neighbors for 5")
-	assert.Equal(t, types.EcID("0001421"), neighborIDs4[0])
-	assert.Equal(t, types.EcID("0001423"), neighborIDs4[1])
-	assert.Equal(t, types.EcID("0001425"), neighborIDs4[2])
-	assert.Equal(t, types.EcID("0001427"), neighborIDs4[3])
+	assert.Equal(t, types.EcID("0001421"), neighborIDs4[0].EcID)
+	assert.Equal(t, types.EcID("0001423"), neighborIDs4[1].EcID)
+	assert.Equal(t, types.EcID("0001425"), neighborIDs4[2].EcID)
+	assert.Equal(t, types.EcID("0001427"), neighborIDs4[3].EcID)
 }

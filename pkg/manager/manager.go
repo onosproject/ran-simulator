@@ -35,12 +35,11 @@ var mgr Manager
 // Manager single point of entry for the trafficsim system.
 type Manager struct {
 	MapLayout          types.MapLayout
-	Towers             map[types.EcID]*types.Tower
+	Towers             map[types.ECGI]*types.Tower
 	TowersLock         *sync.RWMutex
 	Locations          map[string]*Location
-	Routes             map[types.RouteID]*types.Route
-	RoutesLock         *sync.RWMutex
-	UserEquipments     map[types.UEName]*types.Ue
+	Routes             map[types.Imsi]*types.Route
+	UserEquipments     map[types.Imsi]*types.Ue
 	UserEquipmentsLock *sync.RWMutex
 	Dispatcher         *dispatcher.Dispatcher
 	UeChannel          chan dispatcher.Event
@@ -62,7 +61,6 @@ func NewManager() (*Manager, error) {
 	log.Info("Creating Manager")
 	mgr = Manager{
 		TowersLock:         &sync.RWMutex{},
-		RoutesLock:         &sync.RWMutex{},
 		UserEquipmentsLock: &sync.RWMutex{},
 		Dispatcher:         dispatcher.NewDispatcher(),
 		UeChannel:          make(chan dispatcher.Event),

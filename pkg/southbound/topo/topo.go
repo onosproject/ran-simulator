@@ -54,18 +54,18 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string, serverParams utils.
 }
 
 // SyncToTopo updates the list of Tower instances on it
-func SyncToTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient, towers map[types.EcID]*types.Tower) {
+func SyncToTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient, towers map[types.ECGI]*types.Tower) {
 
 	for _, t := range towers {
 		topoDevice := createTowerForTopo(t)
 		resp, err := (*topoClient).Add(ctx, &topodevice.AddRequest{Device: topoDevice})
 		if err != nil {
-			log.Warnf("Could not add %s to onos-topo %s", topoTowerID(t.GetEcID()), err.Error())
+			log.Warnf("Could not add %s to onos-topo %s", topoTowerID(t.GetEcgi()), err.Error())
 			continue
 		}
-		if resp.GetDevice().ID != topodevice.ID(topoTowerID(t.GetEcID())) {
+		if resp.GetDevice().ID != topodevice.ID(topoTowerID(t.GetEcgi())) {
 			log.Errorf("Unexpected response from topo when adding %s. %v",
-				topoTowerID(t.GetEcID()), resp)
+				topoTowerID(t.GetEcgi()), resp)
 		}
 	}
 	log.Infof("%d tower devices created on onos-topo", len(towers))
@@ -82,7 +82,7 @@ func createTowerForTopo(tower *types.Tower) *topodevice.Device {
 	towerAttributes["createdby"] = utils.ServiceName
 
 	return &topodevice.Device{
-		ID:          topodevice.ID(topoTowerID(tower.GetEcID())),
+		ID:          topodevice.ID(topoTowerID(tower.GetEcgi())),
 		Address:     serviceEndpoint,
 		Version:     ranSimVersion,
 		Timeout:     &timeOut,
@@ -93,6 +93,6 @@ func createTowerForTopo(tower *types.Tower) *topodevice.Device {
 	}
 }
 
-func topoTowerID(towerID types.EcID) string {
-	return fmt.Sprintf("%s-%s", utils.TestPlmnID, towerID)
+func topoTowerID(towerID *types.ECGI) string {
+	return fmt.Sprintf("%s-%s", towerID.PlmnID, towerID.EcID)
 }

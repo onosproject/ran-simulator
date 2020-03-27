@@ -25,37 +25,31 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 )
 
-// ImsiBaseCbrs - from https://imsiadmin.com/cbrs-assignments
-const ImsiBaseCbrs = types.Imsi(315010999900000)
-
 // NewUserEquipments - create a new set of UEs (phone, car etc)
-func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) map[types.UEName]*types.Ue {
-	ues := make(map[types.UEName]*types.Ue)
+func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) map[types.Imsi]*types.Ue {
+	ues := make(map[types.Imsi]*types.Ue)
 
 	// There is already a route per UE
 	var u uint32
 	for u = 0; u < mapLayoutParams.MinUes; u++ {
 		ue := m.newUe(int(u))
-		ues[ue.Name] = ue
+		ues[ue.Imsi] = ue
 	}
 	return ues
 }
 
 func (m *Manager) newUe(ueIdx int) *types.Ue {
-	name := types.UEName(fmt.Sprintf("Ue-%04X", ueIdx+1))
-	routeName := types.RouteID(fmt.Sprintf("Route-%d", ueIdx))
-	route := m.Routes[routeName]
+	imsi := utils.ImsiGenerator(ueIdx)
+	route := m.Routes[imsi]
 	towers, distances := m.findClosestTowers(route.Waypoints[0])
 	m.TowersLock.RLock()
-	servingTowerDist := distanceToTower(m.Towers[towers[0]], route.Waypoints[0])
+	servingTowerDist := distanceToTower(m.Towers[*towers[0]], route.Waypoints[0])
 	m.TowersLock.RUnlock()
 	ue := &types.Ue{
-		Name:             name,
-		Imsi:             ImsiBaseCbrs + types.Imsi(ueIdx) + 1,
+		Imsi:             imsi,
 		Type:             "Car",
 		Position:         route.Waypoints[0],
 		Rotation:         0,
-		Route:            routeName,
 		ServingTower:     towers[0],
 		ServingTowerDist: servingTowerDist,
 		Tower1:           towers[0],
@@ -69,16 +63,17 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 		Metrics: &types.UeMetrics{
 			HoLatency:         0,
 			HoReportTimestamp: 0,
+			IsFirst:           true,
 		},
 	}
 
-	crnti, _ := m.NewCrnti(ue.ServingTower, ue.Name)
+	crnti, _ := m.NewCrnti(ue.ServingTower, ue.Imsi)
 	ue.Crnti = crnti
 
 	// Now would be a good time to update the Route colour
 	for _, t := range m.Towers {
-		if t.EcID == towers[0] {
-			m.Routes[routeName].Color = t.Color
+		if t.Ecgi == towers[0] {
+			m.Routes[imsi].Color = t.Color
 			break
 		}
 	}
@@ -88,9 +83,6 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 
 // SetNumberUes - change the number of active UEs
 func (m *Manager) SetNumberUes(numUes int) error {
-	mgr.UserEquipmentsLock.Lock()
-	defer mgr.UserEquipmentsLock.Unlock()
-
 	currentNum := len(m.UserEquipments)
 	if numUes < int(m.MapLayout.MinUes) {
 		return fmt.Errorf("number of UEs requested %d is below minimum %d", numUes, m.MapLayout.MinUes)
@@ -99,15 +91,17 @@ func (m *Manager) SetNumberUes(numUes int) error {
 	} else if numUes < currentNum {
 		log.Infof("Decreasing number of UEs from %d to %d", currentNum, numUes)
 		for ueidx := currentNum - 1; ueidx >= numUes; ueidx-- {
-			ueName := ueName(ueidx)
-			routeName := routeName(ueidx)
-			log.Infof("Removing Route %s, UE %s", routeName, ueName)
-			m.removeRoute(routeName)
-			ue, ok := m.UserEquipments[ueName]
+			imsi := utils.ImsiGenerator(ueidx)
+			log.Infof("Removing Route and UE %d", imsi)
+			mgr.UserEquipmentsLock.Lock()
+			m.removeRoute(imsi)
+			ue, ok := m.UserEquipments[imsi]
 			if !ok {
-				return fmt.Errorf("error removing UE %s (%d)", ueName, ueidx)
+				mgr.UserEquipmentsLock.Unlock()
+				return fmt.Errorf("error removing UE %d (%d)", imsi, ueidx)
 			}
-			delete(m.UserEquipments, ueName)
+			delete(m.UserEquipments, imsi)
+			mgr.UserEquipmentsLock.Unlock()
 			m.UeChannel <- dispatcher.Event{
 				Type:   trafficsim.Type_REMOVED,
 				Object: ue,
@@ -120,17 +114,20 @@ func (m *Manager) SetNumberUes(numUes int) error {
 			if err != nil {
 				return err
 			}
-			newRoute, err := m.newRoute(startLoc, ueidx, m.googleAPIKey, defaultColor)
+			imsi := utils.ImsiGenerator(ueidx)
+			newRoute, err := m.newRoute(startLoc, imsi, m.googleAPIKey, defaultColor)
 			if err != nil {
 				return err
 			}
-			m.Routes[newRoute.GetRouteID()] = newRoute
+			m.Routes[imsi] = newRoute
 			m.RouteChannel <- dispatcher.Event{
 				Type:   trafficsim.Type_ADDED,
 				Object: newRoute,
 			}
 			ue := m.newUe(ueidx)
-			m.UserEquipments[ue.GetName()] = ue
+			mgr.UserEquipmentsLock.Lock()
+			m.UserEquipments[ue.GetImsi()] = ue
+			mgr.UserEquipmentsLock.Unlock()
 			m.UeChannel <- dispatcher.Event{
 				Type:   trafficsim.Type_ADDED,
 				Object: ue,
@@ -143,19 +140,19 @@ func (m *Manager) SetNumberUes(numUes int) error {
 }
 
 // GetUe returns Ue based on its name
-func (m *Manager) GetUe(name types.UEName) (*types.Ue, error) {
+func (m *Manager) GetUe(imsi types.Imsi) (*types.Ue, error) {
 	m.UserEquipmentsLock.RLock()
 	defer m.UserEquipmentsLock.RUnlock()
-	ue, ok := m.UserEquipments[name]
+	ue, ok := m.UserEquipments[imsi]
 	if !ok {
-		return nil, fmt.Errorf("ue %s not found", name)
+		return nil, fmt.Errorf("ue %d not found", imsi)
 	}
 	return ue, nil
 }
 
 // UeHandover perform the handover on simulated UE
-func (m *Manager) UeHandover(name types.UEName, newTowerID types.EcID) error {
-	ue, err := m.GetUe(name)
+func (m *Manager) UeHandover(imsi types.Imsi, newTowerID *types.ECGI) error {
+	ue, err := m.GetUe(imsi)
 	if err != nil {
 		return err
 	}
@@ -165,7 +162,7 @@ func (m *Manager) UeHandover(name types.UEName, newTowerID types.EcID) error {
 	}
 	m.UserEquipmentsLock.Lock()
 	ue.ServingTower = newTowerID
-	newCrnti, err := m.NewCrnti(newTowerID, ue.Name)
+	newCrnti, err := m.NewCrnti(newTowerID, ue.Imsi)
 	if err != nil {
 		m.UserEquipmentsLock.Unlock()
 		return err
@@ -196,27 +193,20 @@ func (m *Manager) startMoving(params RoutesParams) {
 
 	for {
 		breakout := false // Needed to breakout of double for loop
-		for ueidx := 0; ueidx < len(m.Routes); ueidx++ {
-			ueName := ueName(ueidx)
-			routeName := routeName(ueidx)
-			ue, err := m.GetUe(ueName)
-			if err != nil {
-				log.Errorf(err.Error())
-				continue
-			}
-			err = m.moveUe(ue, m.Routes[routeName])
+		for imsi, ue := range m.UserEquipments {
+			err := m.moveUe(ue, m.Routes[imsi])
 			if err != nil && strings.HasPrefix(err.Error(), "end of route") {
-				oldRouteFinish := m.Routes[routeName].GetWaypoints()[len(m.Routes[routeName].GetWaypoints())-1]
-				log.Errorf("Need to do a new route for %s Start %v %v", ueName, oldRouteFinish, err)
+				oldRouteFinish := m.Routes[imsi].GetWaypoints()[len(m.Routes[imsi].GetWaypoints())-1]
+				log.Infof("Need to do a new route for %d Start %v %v", imsi, oldRouteFinish, err)
 				newRoute, err := m.newRoute(&Location{
 					Name:     "noname",
 					Position: *oldRouteFinish,
-				}, ueidx, params.APIKey, m.getColorForUe(ueName))
+				}, imsi, params.APIKey, m.getColorForUe(imsi))
 				if err != nil {
 					log.Fatalf("Error %s", err.Error())
 					breakout = true
 				}
-				m.Routes[routeName] = newRoute
+				m.Routes[imsi] = newRoute
 				m.RouteChannel <- dispatcher.Event{
 					Type:   trafficsim.Type_UPDATED,
 					Object: newRoute,
@@ -237,13 +227,13 @@ func (m *Manager) startMoving(params RoutesParams) {
 	log.Warnf("Stopped driving")
 }
 
-func (m *Manager) getColorForUe(ueName types.UEName) string {
-	ue, ok := m.UserEquipments[ueName]
+func (m *Manager) getColorForUe(imsi types.Imsi) string {
+	ue, ok := m.UserEquipments[imsi]
 	if !ok {
 		return ""
 	}
 	for _, t := range m.Towers {
-		if t.EcID == ue.ServingTower {
+		if t.Ecgi == ue.ServingTower {
 			return t.Color
 		}
 	}
@@ -255,7 +245,7 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 	for idx, wp := range route.GetWaypoints() {
 		if ue.Position.GetLng() == wp.GetLng() && ue.Position.GetLat() == wp.GetLat() {
 			if idx+1 == len(route.GetWaypoints()) {
-				return fmt.Errorf("end of route %s %d", route.GetRouteID(), idx)
+				return fmt.Errorf("end of route %d %d", route.GetRouteID(), idx)
 			}
 			ue.Position = route.Waypoints[idx+1]
 			ue.Rotation = uint32(utils.GetRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
@@ -282,24 +272,19 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("unexpectedly hit end of route %s %v %v", route.GetRouteID(), ue.Position, route.GetWaypoints()[0])
-}
-
-func ueName(idx int) types.UEName {
-	return types.UEName(fmt.Sprintf("Ue-%04X", idx+1))
+	return fmt.Errorf("unexpectedly hit end of route %d %v %v", route.GetRouteID(), ue.Position, route.GetWaypoints()[0])
 }
 
 // UeDeepCopy ...
 func UeDeepCopy(original *types.Ue) *types.Ue {
 	return &types.Ue{
-		Name: original.GetName(),
+		Imsi: original.GetImsi(),
 		Type: original.GetType(),
 		Position: &types.Point{
 			Lat: original.GetPosition().GetLat(),
 			Lng: original.GetPosition().GetLng(),
 		},
 		Rotation:         original.GetRotation(),
-		Route:            original.GetRoute(),
 		ServingTower:     original.GetServingTower(),
 		ServingTowerDist: original.GetServingTowerDist(),
 		Tower1:           original.GetTower1(),

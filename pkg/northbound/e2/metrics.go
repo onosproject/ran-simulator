@@ -20,8 +20,6 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
-	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
-	e2sm "github.com/onosproject/onos-ric/api/sb/e2sm"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
@@ -29,15 +27,20 @@ import (
 // UpdateTelemetryMetrics ...
 func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 	trafficSimMgr := manager.GetManager()
-	switch x := m.S.(type) {
-	case *e2.TelemetryMessage_RadioMeasReportPerUE:
+	switch m.MessageType {
+	case e2.MessageType_RADIO_MEAS_REPORT_PER_UE:
+		x, ok := m.S.(*e2.TelemetryMessage_RadioMeasReportPerUE)
+		if !ok {
+			log.Fatalf("Unexpected payload for RADIO_MEAS_REPORT_PER_UE message %v", m)
+		}
 		r := x.RadioMeasReportPerUE
-		name, err := trafficSimMgr.CrntiToName(types.Crnti(r.Crnti), types.EcID(r.Ecgi.Ecid))
+		towerID := toTypesEcgi(r.Ecgi)
+		name, err := trafficSimMgr.CrntiToName(types.Crnti(r.Crnti), &towerID)
 		if err != nil {
 			log.Errorf("ue %s/%s not found", r.Ecgi.Ecid, r.Crnti)
+			return
 		}
 		var ue *types.Ue
-		var ok bool
 		trafficSimMgr.UserEquipmentsLock.RLock()
 		if ue, ok = trafficSimMgr.UserEquipments[name]; !ok {
 			trafficSimMgr.UserEquipmentsLock.RUnlock()
@@ -58,10 +61,10 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 			}
 		}
 		trafficSimMgr.TowersLock.RLock()
-		servingTower := trafficSimMgr.Towers[ue.ServingTower]
+		servingTower := trafficSimMgr.Towers[*ue.ServingTower]
 		trafficSimMgr.TowersLock.RUnlock()
 
-		if servingTower.EcID != types.EcID(bestStationID.Ecid) || servingTower.PlmnID != types.PlmnID(bestStationID.PlmnId) {
+		if servingTower.Ecgi.EcID != types.EcID(bestStationID.Ecid) || servingTower.Ecgi.PlmnID != types.PlmnID(bestStationID.PlmnId) {
 			trafficSimMgr.UserEquipmentsLock.Lock()
 			if ue.Metrics.HoReportTimestamp == 0 {
 				ue.Metrics.HoReportTimestamp = time.Now().UnixNano()
@@ -72,35 +75,30 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 }
 
 // UpdateControlMetrics ...
-func UpdateControlMetrics(in *e2ap.RicControlRequest) {
+func UpdateControlMetrics(imsi types.Imsi) {
 	trafficSimMgr := manager.GetManager()
-	switch x := in.Msg.S.(type) {
-	case *e2sm.RicControlMessage_HORequest:
-		m := x.HORequest
-		trafficSimMgr.UserEquipmentsLock.Lock()
-		defer trafficSimMgr.UserEquipmentsLock.Unlock()
-		ueName, err := trafficSimMgr.CrntiToName(types.Crnti(m.Crnti), types.EcID(m.EcgiS.Ecid))
-		if err != nil {
-			log.Errorf("ue %s/%s not found", m.EcgiS.Ecid, m.Crnti)
-			return
+	trafficSimMgr.UserEquipmentsLock.Lock()
+	defer trafficSimMgr.UserEquipmentsLock.Unlock()
+	var ok bool
+	var ue *types.Ue
+	if ue, ok = trafficSimMgr.UserEquipments[imsi]; !ok {
+		log.Errorf("ue %s not found", imsi)
+		return
+	}
+	if ue.Metrics.IsFirst {
+		// Discard the first one as it may have been waiting for onos-ric-ho to startup
+		ue.Metrics.HoReportTimestamp = 0
+		ue.Metrics.IsFirst = false
+	} else if ue.Metrics.HoReportTimestamp != 0 {
+		ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
+		ue.Metrics.HoReportTimestamp = 0
+		tmpHOEvent := metrics.HOEvent{
+			Timestamp:    time.Now(),
+			Crnti:        ue.GetCrnti(),
+			ServingTower: *ue.ServingTower,
+			HOLatency:    ue.Metrics.HoLatency,
 		}
-		var ue *types.Ue
-		var ok bool
-		if ue, ok = trafficSimMgr.UserEquipments[ueName]; !ok {
-			log.Errorf("ue %s not found", ueName)
-			return
-		}
-		if ue.Metrics.HoReportTimestamp != 0 {
-			ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
-			ue.Metrics.HoReportTimestamp = 0
-			tmpHOEvent := metrics.HOEvent{
-				Timestamp:    time.Now(),
-				Crnti:        string(ue.GetCrnti()),
-				ServingTower: string(ue.GetServingTower()),
-				HOLatency:    ue.Metrics.HoLatency,
-			}
-			trafficSimMgr.LatencyChannel <- tmpHOEvent
-			log.Infof("%s Hand-over latency: %d microsec", ue.Name, ue.Metrics.HoLatency/1000)
-		}
+		trafficSimMgr.LatencyChannel <- tmpHOEvent
+		log.Infof("%d Hand-over latency: %d µs", ue.Imsi, ue.Metrics.HoLatency/1000)
 	}
 }
