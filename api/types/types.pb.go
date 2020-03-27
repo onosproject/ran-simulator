@@ -77,7 +77,7 @@ func (m *Point) GetLng() float32 {
 }
 
 type Route struct {
-	RouteID   RouteID  `protobuf:"bytes,1,opt,name=name,proto3,casttype=RouteID" json:"name,omitempty"`
+	RouteID   Imsi     `protobuf:"varint,1,opt,name=name,proto3,casttype=Imsi" json:"name,omitempty"`
 	Waypoints []*Point `protobuf:"bytes,2,rep,name=waypoints,proto3" json:"waypoints,omitempty"`
 	Color     string   `protobuf:"bytes,3,opt,name=color,proto3" json:"color,omitempty"`
 }
@@ -115,11 +115,11 @@ func (m *Route) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Route proto.InternalMessageInfo
 
-func (m *Route) GetRouteID() RouteID {
+func (m *Route) GetRouteID() Imsi {
 	if m != nil {
 		return m.RouteID
 	}
-	return ""
+	return 0
 }
 
 func (m *Route) GetWaypoints() []*Point {
@@ -137,23 +137,21 @@ func (m *Route) GetColor() string {
 }
 
 type Ue struct {
-	Name             UEName     `protobuf:"bytes,1,opt,name=name,proto3,casttype=UEName" json:"name,omitempty"`
+	Imsi             Imsi       `protobuf:"varint,1,opt,name=imsi,proto3,casttype=Imsi" json:"imsi,omitempty"`
 	Type             string     `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 	Position         *Point     `protobuf:"bytes,4,opt,name=position,proto3" json:"position,omitempty"`
 	Rotation         uint32     `protobuf:"varint,5,opt,name=rotation,proto3" json:"rotation,omitempty"`
-	Route            RouteID    `protobuf:"bytes,6,opt,name=route,proto3,casttype=RouteID" json:"route,omitempty"`
-	ServingTower     EcID       `protobuf:"bytes,7,opt,name=serving_tower,json=servingTower,proto3,casttype=EcID" json:"serving_tower,omitempty"`
+	ServingTower     *ECGI      `protobuf:"bytes,7,opt,name=serving_tower,json=servingTower,proto3" json:"serving_tower,omitempty"`
 	ServingTowerDist float32    `protobuf:"fixed32,8,opt,name=serving_tower_dist,json=servingTowerDist,proto3" json:"serving_tower_dist,omitempty"`
-	Tower1           EcID       `protobuf:"bytes,9,opt,name=tower1,proto3,casttype=EcID" json:"tower1,omitempty"`
+	Tower1           *ECGI      `protobuf:"bytes,9,opt,name=tower1,proto3" json:"tower1,omitempty"`
 	Tower1Dist       float32    `protobuf:"fixed32,10,opt,name=tower1_dist,json=tower1Dist,proto3" json:"tower1_dist,omitempty"`
-	Tower2           EcID       `protobuf:"bytes,11,opt,name=tower2,proto3,casttype=EcID" json:"tower2,omitempty"`
+	Tower2           *ECGI      `protobuf:"bytes,11,opt,name=tower2,proto3" json:"tower2,omitempty"`
 	Tower2Dist       float32    `protobuf:"fixed32,12,opt,name=tower2_dist,json=tower2Dist,proto3" json:"tower2_dist,omitempty"`
-	Tower3           EcID       `protobuf:"bytes,13,opt,name=tower3,proto3,casttype=EcID" json:"tower3,omitempty"`
+	Tower3           *ECGI      `protobuf:"bytes,13,opt,name=tower3,proto3" json:"tower3,omitempty"`
 	Tower3Dist       float32    `protobuf:"fixed32,14,opt,name=tower3_dist,json=tower3Dist,proto3" json:"tower3_dist,omitempty"`
 	Crnti            Crnti      `protobuf:"bytes,15,opt,name=crnti,proto3,casttype=Crnti" json:"crnti,omitempty"`
 	Admitted         bool       `protobuf:"varint,16,opt,name=admitted,proto3" json:"admitted,omitempty"`
 	Metrics          *UeMetrics `protobuf:"bytes,17,opt,name=metrics,proto3" json:"metrics,omitempty"`
-	Imsi             Imsi       `protobuf:"varint,18,opt,name=imsi,proto3,casttype=Imsi" json:"imsi,omitempty"`
 }
 
 func (m *Ue) Reset()         { *m = Ue{} }
@@ -189,11 +187,11 @@ func (m *Ue) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Ue proto.InternalMessageInfo
 
-func (m *Ue) GetName() UEName {
+func (m *Ue) GetImsi() Imsi {
 	if m != nil {
-		return m.Name
+		return m.Imsi
 	}
-	return ""
+	return 0
 }
 
 func (m *Ue) GetType() string {
@@ -217,18 +215,11 @@ func (m *Ue) GetRotation() uint32 {
 	return 0
 }
 
-func (m *Ue) GetRoute() RouteID {
-	if m != nil {
-		return m.Route
-	}
-	return ""
-}
-
-func (m *Ue) GetServingTower() EcID {
+func (m *Ue) GetServingTower() *ECGI {
 	if m != nil {
 		return m.ServingTower
 	}
-	return ""
+	return nil
 }
 
 func (m *Ue) GetServingTowerDist() float32 {
@@ -238,11 +229,11 @@ func (m *Ue) GetServingTowerDist() float32 {
 	return 0
 }
 
-func (m *Ue) GetTower1() EcID {
+func (m *Ue) GetTower1() *ECGI {
 	if m != nil {
 		return m.Tower1
 	}
-	return ""
+	return nil
 }
 
 func (m *Ue) GetTower1Dist() float32 {
@@ -252,11 +243,11 @@ func (m *Ue) GetTower1Dist() float32 {
 	return 0
 }
 
-func (m *Ue) GetTower2() EcID {
+func (m *Ue) GetTower2() *ECGI {
 	if m != nil {
 		return m.Tower2
 	}
-	return ""
+	return nil
 }
 
 func (m *Ue) GetTower2Dist() float32 {
@@ -266,11 +257,11 @@ func (m *Ue) GetTower2Dist() float32 {
 	return 0
 }
 
-func (m *Ue) GetTower3() EcID {
+func (m *Ue) GetTower3() *ECGI {
 	if m != nil {
 		return m.Tower3
 	}
-	return ""
+	return nil
 }
 
 func (m *Ue) GetTower3Dist() float32 {
@@ -301,18 +292,13 @@ func (m *Ue) GetMetrics() *UeMetrics {
 	return nil
 }
 
-func (m *Ue) GetImsi() Imsi {
-	if m != nil {
-		return m.Imsi
-	}
-	return 0
-}
-
 type UeMetrics struct {
 	// Latency (in nanoseconds) of the most recent hand-over
 	HoLatency int64 `protobuf:"varint,1,opt,name=ho_latency,json=hoLatency,proto3" json:"ho_latency,omitempty"`
 	// Handover report timestamp (in nanoseconds since epoch)
 	HoReportTimestamp int64 `protobuf:"varint,2,opt,name=ho_report_timestamp,json=hoReportTimestamp,proto3" json:"ho_report_timestamp,omitempty"`
+	// flag to indicate the first measurement
+	IsFirst bool `protobuf:"varint,3,opt,name=isFirst,proto3" json:"isFirst,omitempty"`
 }
 
 func (m *UeMetrics) Reset()         { *m = UeMetrics{} }
@@ -360,6 +346,13 @@ func (m *UeMetrics) GetHoReportTimestamp() int64 {
 		return m.HoReportTimestamp
 	}
 	return 0
+}
+
+func (m *UeMetrics) GetIsFirst() bool {
+	if m != nil {
+		return m.IsFirst
+	}
+	return false
 }
 
 type TowersParams struct {
@@ -452,26 +445,78 @@ func (m *TowersParams) GetMaxUEsPerTower() uint32 {
 	return 0
 }
 
+// station's unique ID
+type ECGI struct {
+	EcID   EcID   `protobuf:"bytes,1,opt,name=ecID,proto3,casttype=EcID" json:"ecID,omitempty"`
+	PlmnID PlmnID `protobuf:"bytes,2,opt,name=plmnID,proto3,casttype=PlmnID" json:"plmnID,omitempty"`
+}
+
+func (m *ECGI) Reset()         { *m = ECGI{} }
+func (m *ECGI) String() string { return proto.CompactTextString(m) }
+func (*ECGI) ProtoMessage()    {}
+func (*ECGI) Descriptor() ([]byte, []int) {
+	return fileDescriptor_386b2e9db948721e, []int{5}
+}
+func (m *ECGI) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ECGI) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ECGI.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ECGI) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ECGI.Merge(m, src)
+}
+func (m *ECGI) XXX_Size() int {
+	return m.Size()
+}
+func (m *ECGI) XXX_DiscardUnknown() {
+	xxx_messageInfo_ECGI.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ECGI proto.InternalMessageInfo
+
+func (m *ECGI) GetEcID() EcID {
+	if m != nil {
+		return m.EcID
+	}
+	return ""
+}
+
+func (m *ECGI) GetPlmnID() PlmnID {
+	if m != nil {
+		return m.PlmnID
+	}
+	return ""
+}
+
 type Tower struct {
-	EcID      EcID   `protobuf:"bytes,1,opt,name=ecID,proto3,casttype=EcID" json:"ecID,omitempty"`
-	PlmnID    PlmnID `protobuf:"bytes,2,opt,name=plmnID,proto3,casttype=PlmnID" json:"plmnID,omitempty"`
-	Location  *Point `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
-	Color     string `protobuf:"bytes,4,opt,name=color,proto3" json:"color,omitempty"`
-	MaxUEs    uint32 `protobuf:"varint,5,opt,name=maxUEs,proto3" json:"maxUEs,omitempty"`
-	Neighbors []EcID `protobuf:"bytes,6,rep,name=neighbors,proto3,casttype=EcID" json:"neighbors,omitempty"`
+	Ecgi      *ECGI   `protobuf:"bytes,1,opt,name=ecgi,proto3" json:"ecgi,omitempty"`
+	Location  *Point  `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
+	Color     string  `protobuf:"bytes,4,opt,name=color,proto3" json:"color,omitempty"`
+	MaxUEs    uint32  `protobuf:"varint,5,opt,name=maxUEs,proto3" json:"maxUEs,omitempty"`
+	Neighbors []*ECGI `protobuf:"bytes,6,rep,name=neighbors,proto3" json:"neighbors,omitempty"`
 	// The tower transmit power in decibels
 	TxPowerdB float32 `protobuf:"fixed32,7,opt,name=txPowerdB,proto3" json:"txPowerdB,omitempty"`
 	// crntis maps a ue's name to its crnti
-	CrntiMap   map[Crnti]UEName `protobuf:"bytes,9,rep,name=crntiMap,proto3,castkey=Crnti,castvalue=UEName" json:"crntiMap,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	CrntiIndex uint32           `protobuf:"varint,10,opt,name=crntiIndex,proto3" json:"crntiIndex,omitempty"`
-	Port       uint32           `protobuf:"varint,11,opt,name=port,proto3" json:"port,omitempty"`
+	CrntiMap   map[Crnti]Imsi `protobuf:"bytes,9,rep,name=crntiMap,proto3,castkey=Crnti,castvalue=Imsi" json:"crntiMap,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+	CrntiIndex uint32         `protobuf:"varint,10,opt,name=crntiIndex,proto3" json:"crntiIndex,omitempty"`
+	Port       uint32         `protobuf:"varint,11,opt,name=port,proto3" json:"port,omitempty"`
 }
 
 func (m *Tower) Reset()         { *m = Tower{} }
 func (m *Tower) String() string { return proto.CompactTextString(m) }
 func (*Tower) ProtoMessage()    {}
 func (*Tower) Descriptor() ([]byte, []int) {
-	return fileDescriptor_386b2e9db948721e, []int{5}
+	return fileDescriptor_386b2e9db948721e, []int{6}
 }
 func (m *Tower) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -500,18 +545,11 @@ func (m *Tower) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Tower proto.InternalMessageInfo
 
-func (m *Tower) GetEcID() EcID {
+func (m *Tower) GetEcgi() *ECGI {
 	if m != nil {
-		return m.EcID
+		return m.Ecgi
 	}
-	return ""
-}
-
-func (m *Tower) GetPlmnID() PlmnID {
-	if m != nil {
-		return m.PlmnID
-	}
-	return ""
+	return nil
 }
 
 func (m *Tower) GetLocation() *Point {
@@ -535,7 +573,7 @@ func (m *Tower) GetMaxUEs() uint32 {
 	return 0
 }
 
-func (m *Tower) GetNeighbors() []EcID {
+func (m *Tower) GetNeighbors() []*ECGI {
 	if m != nil {
 		return m.Neighbors
 	}
@@ -549,7 +587,7 @@ func (m *Tower) GetTxPowerdB() float32 {
 	return 0
 }
 
-func (m *Tower) GetCrntiMap() map[Crnti]UEName {
+func (m *Tower) GetCrntiMap() map[Crnti]Imsi {
 	if m != nil {
 		return m.CrntiMap
 	}
@@ -593,7 +631,7 @@ func (m *MapLayout) Reset()         { *m = MapLayout{} }
 func (m *MapLayout) String() string { return proto.CompactTextString(m) }
 func (*MapLayout) ProtoMessage()    {}
 func (*MapLayout) Descriptor() ([]byte, []int) {
-	return fileDescriptor_386b2e9db948721e, []int{6}
+	return fileDescriptor_386b2e9db948721e, []int{7}
 }
 func (m *MapLayout) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -684,76 +722,77 @@ func init() {
 	proto.RegisterType((*Ue)(nil), "ran.trafficsim.types.Ue")
 	proto.RegisterType((*UeMetrics)(nil), "ran.trafficsim.types.UeMetrics")
 	proto.RegisterType((*TowersParams)(nil), "ran.trafficsim.types.TowersParams")
+	proto.RegisterType((*ECGI)(nil), "ran.trafficsim.types.ECGI")
 	proto.RegisterType((*Tower)(nil), "ran.trafficsim.types.Tower")
-	proto.RegisterMapType((map[Crnti]UEName)(nil), "ran.trafficsim.types.Tower.CrntiMapEntry")
+	proto.RegisterMapType((map[Crnti]Imsi)(nil), "ran.trafficsim.types.Tower.CrntiMapEntry")
 	proto.RegisterType((*MapLayout)(nil), "ran.trafficsim.types.MapLayout")
 }
 
 func init() { proto.RegisterFile("api/types/types.proto", fileDescriptor_386b2e9db948721e) }
 
 var fileDescriptor_386b2e9db948721e = []byte{
-	// 976 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x55, 0xcf, 0x6f, 0x1b, 0x45,
-	0x14, 0xce, 0xfa, 0xc7, 0x66, 0xf7, 0x25, 0x0e, 0xc9, 0x34, 0x94, 0x55, 0x00, 0xdb, 0x58, 0x25,
-	0x32, 0x25, 0xb8, 0x22, 0x3e, 0x40, 0xe1, 0xe6, 0x24, 0x12, 0x96, 0x1a, 0x14, 0x4d, 0x1b, 0x0e,
-	0xbd, 0x58, 0xd3, 0xf5, 0xc4, 0x1e, 0xe1, 0xdd, 0x59, 0xcd, 0x4c, 0x9a, 0xa4, 0x47, 0x04, 0x17,
-	0x4e, 0xfc, 0x59, 0x1c, 0x7b, 0x41, 0xe2, 0xe4, 0x22, 0xe7, 0x5f, 0xe0, 0xe4, 0x0b, 0x68, 0xde,
-	0xae, 0xd7, 0x76, 0x6a, 0x29, 0x17, 0xfb, 0xcd, 0xf7, 0xbe, 0xfd, 0xe6, 0xcd, 0xbc, 0x1f, 0x03,
-	0x1f, 0xb2, 0x44, 0x3c, 0x31, 0x37, 0x09, 0xd7, 0xe9, 0x6f, 0x2b, 0x51, 0xd2, 0x48, 0xb2, 0xab,
-	0x58, 0xdc, 0x32, 0x8a, 0x5d, 0x5c, 0x88, 0x50, 0x8b, 0xa8, 0x85, 0xbe, 0xbd, 0xdd, 0x81, 0x1c,
-	0x48, 0x24, 0x3c, 0xb1, 0x56, 0xca, 0x6d, 0x7c, 0x09, 0xe5, 0x33, 0x29, 0x62, 0x43, 0xb6, 0xa1,
-	0x38, 0x62, 0x26, 0x70, 0xea, 0x4e, 0xb3, 0x40, 0xad, 0x89, 0x48, 0x3c, 0x08, 0x0a, 0x19, 0x12,
-	0x0f, 0x1a, 0xbf, 0x3a, 0x50, 0xa6, 0xf2, 0xd2, 0x70, 0xf2, 0x18, 0x4a, 0x31, 0x8b, 0x38, 0xd2,
-	0xfd, 0xce, 0xc3, 0xc9, 0xb8, 0xb6, 0x8e, 0x8e, 0xee, 0xf1, 0x74, 0x6e, 0x52, 0xe4, 0x90, 0xa7,
-	0xe0, 0x5f, 0xb1, 0x9b, 0xc4, 0xee, 0xa2, 0x83, 0x42, 0xbd, 0xd8, 0xdc, 0x38, 0xfc, 0xb8, 0xb5,
-	0x2a, 0xc4, 0x16, 0x46, 0x42, 0xe7, 0x6c, 0xb2, 0x0b, 0xe5, 0x50, 0x8e, 0xa4, 0x0a, 0x8a, 0x76,
-	0x1f, 0x9a, 0x2e, 0x1a, 0xbf, 0x95, 0xa1, 0x70, 0xce, 0xc9, 0xfe, 0x52, 0x0c, 0x64, 0x32, 0xae,
-	0x95, 0x7e, 0x64, 0x11, 0x9f, 0x8e, 0x6b, 0xee, 0xf9, 0x89, 0xb5, 0xb2, 0xfd, 0x09, 0x94, 0xac,
-	0x3c, 0x1e, 0xc4, 0xa7, 0x68, 0x93, 0x6f, 0xc0, 0x4b, 0xa4, 0x16, 0x46, 0xc8, 0x38, 0x28, 0xd5,
-	0x9d, 0xfb, 0x42, 0xca, 0xc9, 0x64, 0x0f, 0x3c, 0x25, 0x0d, 0xc3, 0x0f, 0xcb, 0x75, 0xa7, 0x59,
-	0xa1, 0xf9, 0x9a, 0x7c, 0x06, 0x65, 0x65, 0x4f, 0x1e, 0xb8, 0x18, 0xd1, 0xc6, 0xe2, 0x55, 0xa4,
-	0x1e, 0xf2, 0x15, 0x54, 0x34, 0x57, 0xaf, 0x45, 0x3c, 0xe8, 0x19, 0x79, 0xc5, 0x55, 0xb0, 0x8e,
-	0x54, 0x6f, 0x3a, 0xae, 0x95, 0x4e, 0xc2, 0xee, 0x31, 0xdd, 0xcc, 0xdc, 0x2f, 0xac, 0x97, 0x1c,
-	0x00, 0x59, 0xa2, 0xf7, 0xfa, 0x42, 0x9b, 0xc0, 0xc3, 0x8c, 0x6c, 0x2f, 0x32, 0x8f, 0x85, 0x36,
-	0xa4, 0x0e, 0x2e, 0xb2, 0xbe, 0x0e, 0xfc, 0x3b, 0xaa, 0x19, 0x4e, 0x6a, 0xb0, 0x91, 0x5a, 0xa9,
-	0x10, 0xa0, 0x10, 0xa4, 0xd0, 0x92, 0xc4, 0x61, 0xb0, 0xb1, 0x52, 0xe2, 0x30, 0x97, 0x38, 0x4c,
-	0x25, 0x36, 0x17, 0x24, 0x0e, 0x97, 0x24, 0xda, 0x41, 0x65, 0xa5, 0x44, 0x3b, 0x97, 0x68, 0xa7,
-	0x12, 0x5b, 0x0b, 0x12, 0x6d, 0x94, 0x68, 0x42, 0x39, 0x54, 0xb1, 0x11, 0xc1, 0x07, 0x79, 0x6a,
-	0xcb, 0x47, 0x16, 0x98, 0xce, 0x0c, 0x9a, 0x12, 0x6c, 0x3a, 0x58, 0x3f, 0x12, 0xc6, 0xf0, 0x7e,
-	0xb0, 0x5d, 0x77, 0x9a, 0x1e, 0xcd, 0xd7, 0xe4, 0x29, 0xac, 0x47, 0xdc, 0x28, 0x11, 0xea, 0x60,
-	0x07, 0x53, 0x5c, 0x5b, 0x9d, 0xe2, 0x73, 0x7e, 0x9a, 0xd2, 0xe8, 0x8c, 0x4f, 0x1e, 0x41, 0x49,
-	0x44, 0x5a, 0x04, 0xa4, 0xee, 0x34, 0x4b, 0x9d, 0x6d, 0x5b, 0x5a, 0xdd, 0x48, 0xdb, 0xed, 0xf1,
-	0x9f, 0xa2, 0xb7, 0xf1, 0x12, 0xfc, 0xfc, 0x5b, 0xf2, 0x29, 0xc0, 0x50, 0xf6, 0x46, 0xcc, 0xf0,
-	0x38, 0xbc, 0xc1, 0x9a, 0x2c, 0x52, 0x7f, 0x28, 0x9f, 0xa5, 0x00, 0x69, 0xc1, 0x83, 0xa1, 0xec,
-	0x29, 0x9e, 0x48, 0x65, 0x7a, 0x46, 0x44, 0x5c, 0x1b, 0x16, 0x25, 0x58, 0x93, 0x45, 0xba, 0x33,
-	0x94, 0x14, 0x3d, 0x2f, 0x66, 0x8e, 0xc6, 0xbf, 0x0e, 0x6c, 0x62, 0x66, 0xf5, 0x19, 0x53, 0x2c,
-	0xd2, 0xe4, 0x13, 0xf0, 0xf1, 0x86, 0xa8, 0xbc, 0xd2, 0x28, 0x5f, 0xa1, 0x73, 0x20, 0xf7, 0x1e,
-	0xc9, 0x91, 0x46, 0xd1, 0x99, 0xd7, 0x02, 0xe4, 0x31, 0x6c, 0xe3, 0xe2, 0x79, 0xc2, 0x42, 0x11,
-	0x0f, 0x7e, 0xe2, 0xca, 0x60, 0x47, 0x15, 0xe8, 0x7b, 0x38, 0x39, 0x80, 0x9d, 0x45, 0xec, 0x07,
-	0xa9, 0xc4, 0x1b, 0x6c, 0x91, 0x02, 0x7d, 0xdf, 0x41, 0xf6, 0x61, 0x6b, 0x24, 0x43, 0x2c, 0x7f,
-	0xfd, 0x3c, 0x64, 0x23, 0x8e, 0x4d, 0x51, 0xa0, 0x77, 0x50, 0xcb, 0x8b, 0xd8, 0xf5, 0xf9, 0x89,
-	0x3e, 0xe3, 0x0a, 0x8f, 0x85, 0x3d, 0x52, 0xa1, 0x77, 0xd0, 0xc6, 0x5f, 0x45, 0x28, 0xa7, 0xa5,
-	0xff, 0x08, 0x4a, 0x3c, 0xec, 0x1e, 0x67, 0xdd, 0x8d, 0x29, 0xb0, 0x45, 0x94, 0x17, 0x13, 0x7a,
-	0xc9, 0x01, 0xb8, 0xc9, 0x28, 0x8a, 0xbb, 0xc7, 0x69, 0x77, 0x77, 0x76, 0x27, 0xe3, 0x9a, 0x7b,
-	0x86, 0xc8, 0x34, 0xb7, 0x68, 0xc6, 0xb1, 0x5d, 0x3f, 0x8b, 0x0b, 0xcf, 0x7f, 0x5f, 0xd7, 0xcf,
-	0xc8, 0xf3, 0x39, 0x54, 0x5a, 0x98, 0x43, 0xe4, 0x21, 0xb8, 0x69, 0xf8, 0xd9, 0x24, 0xc8, 0x56,
-	0x64, 0x1f, 0xfc, 0x98, 0x8b, 0xc1, 0xf0, 0x95, 0x54, 0x3a, 0x70, 0xeb, 0xc5, 0xa5, 0x26, 0x98,
-	0xbb, 0x30, 0x69, 0xd7, 0x67, 0xf6, 0xb4, 0xfd, 0x0e, 0x0e, 0x82, 0x02, 0x9d, 0x03, 0xe4, 0x25,
-	0x78, 0x58, 0xe3, 0xa7, 0x2c, 0x09, 0x7c, 0x9c, 0x9a, 0x5f, 0xac, 0x0e, 0x16, 0xef, 0xab, 0x75,
-	0x94, 0x71, 0x4f, 0x62, 0xa3, 0x6e, 0x3a, 0x0f, 0x7e, 0x79, 0x97, 0x75, 0xca, 0xef, 0xef, 0xf2,
-	0x71, 0x98, 0xeb, 0x91, 0x2a, 0x00, 0xda, 0xdd, 0xb8, 0xcf, 0xaf, 0x71, 0x0c, 0x54, 0xe8, 0x02,
-	0x62, 0x47, 0xa6, 0x2d, 0x47, 0x1c, 0x02, 0x15, 0x8a, 0xf6, 0xde, 0xf7, 0x50, 0x59, 0xda, 0xc3,
-	0xbe, 0x0f, 0x3f, 0xf3, 0xb4, 0xd4, 0x7d, 0x6a, 0x4d, 0x7b, 0x4d, 0xaf, 0xd9, 0xe8, 0x72, 0x36,
-	0x6a, 0xd3, 0xc5, 0x77, 0x85, 0x6f, 0x9d, 0xc6, 0x7f, 0x0e, 0xf8, 0xa7, 0x2c, 0x79, 0xc6, 0x6e,
-	0xe4, 0xa5, 0x21, 0x6d, 0x70, 0x43, 0x1e, 0x1b, 0xae, 0xf0, 0xe3, 0x7b, 0xb2, 0x90, 0x51, 0x6d,
-	0x4c, 0x6f, 0xa4, 0x8c, 0xb2, 0xf7, 0x08, 0x6d, 0x8b, 0x5d, 0xb0, 0x3e, 0xc7, 0x64, 0x7a, 0x14,
-	0x6d, 0x7b, 0x36, 0x3d, 0x94, 0x57, 0x38, 0x78, 0x35, 0x26, 0xcc, 0xa3, 0x0b, 0x88, 0xbd, 0x75,
-	0xbb, 0xc2, 0x6b, 0xc6, 0xc4, 0x79, 0x74, 0x0e, 0x90, 0x8f, 0x60, 0x3d, 0x12, 0x71, 0xef, 0x92,
-	0xeb, 0xac, 0x42, 0xdd, 0x48, 0xc4, 0xe7, 0x5c, 0xa3, 0x83, 0x5d, 0xa3, 0x63, 0x7d, 0x9e, 0x6d,
-	0xae, 0xc9, 0xe7, 0xb0, 0x15, 0x5e, 0x2a, 0xc5, 0x63, 0xd3, 0x53, 0xe9, 0x9e, 0x1e, 0xfa, 0x2b,
-	0x19, 0x9a, 0x6e, 0xdb, 0x09, 0xfe, 0x9c, 0x54, 0x9d, 0xb7, 0x93, 0xaa, 0xf3, 0xcf, 0xa4, 0xea,
-	0xfc, 0x71, 0x5b, 0x5d, 0x7b, 0x7b, 0x5b, 0x5d, 0xfb, 0xfb, 0xb6, 0xba, 0xf6, 0xca, 0xc5, 0x97,
-	0xb8, 0xfd, 0x7f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x15, 0xf0, 0xb0, 0xd4, 0xce, 0x07, 0x00, 0x00,
+	// 975 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x55, 0xcd, 0x6f, 0x1b, 0x45,
+	0x14, 0xcf, 0xfa, 0x7b, 0x5f, 0xe2, 0xe0, 0x4c, 0x03, 0xac, 0x02, 0xd8, 0x96, 0xc5, 0x87, 0x81,
+	0xc8, 0x15, 0xf6, 0x81, 0x16, 0x0e, 0x48, 0x4e, 0x02, 0x58, 0x6a, 0x24, 0x6b, 0xda, 0x20, 0xc4,
+	0xc5, 0x9a, 0xae, 0x27, 0xf6, 0x08, 0xef, 0xce, 0x6a, 0x66, 0xdc, 0xc4, 0xbd, 0xd1, 0x23, 0x27,
+	0xfe, 0x25, 0x6e, 0x1c, 0x7b, 0xe4, 0x94, 0x22, 0xe7, 0x5f, 0xe0, 0x94, 0x0b, 0x68, 0xde, 0xac,
+	0x3f, 0xd2, 0x46, 0x49, 0x2f, 0xc9, 0x9b, 0xdf, 0xfb, 0xf9, 0xf7, 0xde, 0xcc, 0xfb, 0x58, 0x78,
+	0x97, 0x25, 0xe2, 0xbe, 0x99, 0x25, 0x5c, 0xbb, 0xbf, 0xad, 0x44, 0x49, 0x23, 0xc9, 0xae, 0x62,
+	0x71, 0xcb, 0x28, 0x76, 0x7a, 0x2a, 0x42, 0x2d, 0xa2, 0x16, 0xfa, 0xf6, 0x76, 0x47, 0x72, 0x24,
+	0x91, 0x70, 0xdf, 0x5a, 0x8e, 0xdb, 0xf8, 0x12, 0xf2, 0x7d, 0x29, 0x62, 0x43, 0x2a, 0x90, 0x9d,
+	0x30, 0x13, 0x78, 0x75, 0xaf, 0x99, 0xa1, 0xd6, 0x44, 0x24, 0x1e, 0x05, 0x99, 0x14, 0x89, 0x47,
+	0x8d, 0xdf, 0x3c, 0xc8, 0x53, 0x39, 0x35, 0x9c, 0x7c, 0x06, 0xb9, 0x98, 0x45, 0x1c, 0xe9, 0xb9,
+	0xee, 0xbd, 0xf9, 0x45, 0xad, 0x88, 0x8e, 0xde, 0xe1, 0xd5, 0x45, 0x2d, 0xd7, 0x8b, 0xb4, 0xa0,
+	0x48, 0x20, 0x0f, 0xc1, 0x3f, 0x63, 0xb3, 0xc4, 0x86, 0xd0, 0x41, 0xa6, 0x9e, 0x6d, 0x6e, 0xb6,
+	0x3f, 0x68, 0xdd, 0x94, 0x5f, 0x0b, 0xd3, 0xa0, 0x2b, 0x36, 0xd9, 0x85, 0x7c, 0x28, 0x27, 0x52,
+	0x05, 0xd9, 0xba, 0xd7, 0xf4, 0xa9, 0x3b, 0x34, 0x5e, 0xe4, 0x21, 0x73, 0xc2, 0xc9, 0xc7, 0x90,
+	0x13, 0x91, 0x16, 0x69, 0x02, 0x95, 0x79, 0x1a, 0x75, 0x15, 0xdd, 0x7a, 0x09, 0x81, 0x9c, 0x15,
+	0xc7, 0x3b, 0xf8, 0x14, 0x6d, 0xf2, 0x35, 0x94, 0x12, 0xa9, 0x85, 0x11, 0x32, 0x0e, 0x72, 0x75,
+	0xef, 0xae, 0x84, 0x96, 0x64, 0xb2, 0x07, 0x25, 0x25, 0x0d, 0xc3, 0x1f, 0xe6, 0xeb, 0x5e, 0xb3,
+	0x4c, 0x97, 0x67, 0xf2, 0x1d, 0x94, 0x35, 0x57, 0xcf, 0x44, 0x3c, 0x1a, 0x18, 0x79, 0xc6, 0x55,
+	0x50, 0x44, 0xe5, 0xbd, 0x9b, 0x95, 0x8f, 0x0e, 0x7e, 0xe8, 0xd1, 0xad, 0xf4, 0x07, 0x4f, 0x2c,
+	0x9f, 0xec, 0x03, 0xb9, 0x26, 0x30, 0x18, 0x0a, 0x6d, 0x82, 0x12, 0xbe, 0x7d, 0x65, 0x9d, 0x79,
+	0x28, 0xb4, 0x21, 0x6d, 0x28, 0x20, 0xeb, 0xab, 0xc0, 0xbf, 0x33, 0x4e, 0xca, 0x24, 0x35, 0xd8,
+	0x74, 0x96, 0x93, 0x06, 0x94, 0x06, 0x07, 0x5d, 0x13, 0x6d, 0x07, 0x9b, 0x6f, 0x29, 0xda, 0x5e,
+	0x8a, 0xb6, 0x9d, 0xe8, 0xd6, 0x9a, 0x68, 0xfb, 0x9a, 0x68, 0x27, 0x28, 0xbf, 0xa5, 0x68, 0x67,
+	0x29, 0xda, 0x71, 0xa2, 0xdb, 0x6b, 0xa2, 0x1d, 0x14, 0x6d, 0x42, 0x3e, 0x54, 0xb1, 0x11, 0xc1,
+	0x3b, 0xb6, 0xae, 0x5d, 0x32, 0xbf, 0xa8, 0xe5, 0x0f, 0x2c, 0x70, 0xb5, 0x30, 0xa8, 0x23, 0xd8,
+	0x9a, 0xb1, 0x61, 0x24, 0x8c, 0xe1, 0xc3, 0xa0, 0x52, 0xf7, 0x9a, 0x25, 0xba, 0x3c, 0x93, 0x87,
+	0x50, 0x8c, 0xb8, 0x51, 0x22, 0xd4, 0xc1, 0x0e, 0xe6, 0x56, 0xbb, 0x39, 0xb7, 0x13, 0x7e, 0xec,
+	0x68, 0x74, 0xc1, 0x6f, 0x18, 0xf0, 0x97, 0x28, 0xf9, 0x08, 0x60, 0x2c, 0x07, 0x13, 0x66, 0x78,
+	0x1c, 0xce, 0xb0, 0x21, 0xb3, 0xd4, 0x1f, 0xcb, 0x47, 0x0e, 0x20, 0x2d, 0xb8, 0x37, 0x96, 0x03,
+	0xc5, 0x13, 0xa9, 0xcc, 0xc0, 0x88, 0x88, 0x6b, 0xc3, 0xa2, 0x04, 0x5b, 0x32, 0x4b, 0x77, 0xc6,
+	0x92, 0xa2, 0xe7, 0xc9, 0xc2, 0x41, 0x02, 0x28, 0x0a, 0xfd, 0xbd, 0x50, 0xda, 0x60, 0xe3, 0x97,
+	0xe8, 0xe2, 0xd8, 0xf8, 0xd7, 0x83, 0x2d, 0xec, 0x01, 0xdd, 0x67, 0x8a, 0x45, 0x9a, 0x7c, 0x08,
+	0x3e, 0xbe, 0x0a, 0x95, 0x67, 0x1a, 0x03, 0x97, 0xe9, 0x0a, 0x58, 0x7a, 0x0f, 0xe4, 0x44, 0x63,
+	0xb8, 0x85, 0xd7, 0x02, 0xe4, 0x0b, 0xa8, 0xe0, 0xe1, 0x71, 0xc2, 0x42, 0x11, 0x8f, 0x7e, 0xe2,
+	0xca, 0xc5, 0xcb, 0xd0, 0x37, 0x70, 0xb2, 0x0f, 0x3b, 0xeb, 0xd8, 0x8f, 0x52, 0x89, 0xe7, 0x38,
+	0x3b, 0x19, 0xfa, 0xa6, 0x83, 0x7c, 0x0a, 0xdb, 0x13, 0x19, 0xe2, 0x5c, 0xe8, 0xc7, 0x21, 0x9b,
+	0x70, 0x9c, 0x96, 0x0c, 0x7d, 0x0d, 0xb5, 0xbc, 0x88, 0x9d, 0x9f, 0x1c, 0xe9, 0x3e, 0x57, 0x78,
+	0xad, 0xa0, 0x80, 0x49, 0xbe, 0x86, 0x36, 0x7e, 0x81, 0x9c, 0x6d, 0x0f, 0x3b, 0xf2, 0x3c, 0xec,
+	0x1d, 0xe2, 0x45, 0x7d, 0x37, 0xf2, 0x47, 0xa1, 0x5b, 0x38, 0xf6, 0x3f, 0x45, 0x2f, 0xd9, 0x87,
+	0x42, 0x32, 0x89, 0xe2, 0xde, 0xa1, 0x1b, 0xfa, 0xee, 0xee, 0xfc, 0xa2, 0x56, 0xe8, 0x23, 0x72,
+	0xb5, 0xb4, 0x68, 0xca, 0x69, 0xfc, 0x99, 0x85, 0xbc, 0x1b, 0xc0, 0x96, 0x55, 0x1f, 0xb9, 0x85,
+	0x72, 0x7b, 0x9b, 0x22, 0xcf, 0xae, 0x91, 0xc5, 0x7d, 0xf0, 0xdd, 0xee, 0x5a, 0x23, 0x0b, 0xf2,
+	0x6a, 0xad, 0xe5, 0xd6, 0xd6, 0x1a, 0x79, 0x0f, 0x0a, 0xee, 0xda, 0xe9, 0x6a, 0x49, 0x4f, 0xe4,
+	0x01, 0xf8, 0x31, 0x17, 0xa3, 0xf1, 0x53, 0xa9, 0x74, 0x50, 0xc0, 0xfd, 0x79, 0x5b, 0x6e, 0x2b,
+	0x32, 0x96, 0xff, 0xbc, 0x6f, 0xef, 0x36, 0xec, 0xe2, 0x3a, 0xca, 0xd0, 0x15, 0x40, 0x7e, 0x86,
+	0x12, 0x4e, 0xc8, 0x31, 0x4b, 0x02, 0x1f, 0x65, 0x3f, 0xbf, 0x59, 0x16, 0x5f, 0xa7, 0x75, 0x90,
+	0x72, 0x8f, 0x62, 0xa3, 0x66, 0xdd, 0x9d, 0x17, 0xaf, 0xd2, 0x39, 0xfb, 0xfd, 0x55, 0xba, 0x6f,
+	0x97, 0x6a, 0xa4, 0x0a, 0x80, 0x76, 0x2f, 0x1e, 0xf2, 0x73, 0x5c, 0x33, 0x65, 0xba, 0x86, 0xd8,
+	0x9d, 0x6c, 0x1b, 0x1e, 0x97, 0x4c, 0x99, 0xa2, 0xbd, 0xf7, 0x2d, 0x94, 0xaf, 0x45, 0xb0, 0xdf,
+	0x9e, 0x5f, 0xb9, 0x1b, 0x26, 0x9f, 0x5a, 0xd3, 0x3e, 0xdb, 0x33, 0x36, 0x99, 0xba, 0x5d, 0x9e,
+	0xa3, 0xee, 0xf0, 0x4d, 0xe6, 0x81, 0xd7, 0xf8, 0xcf, 0x03, 0xff, 0x98, 0x25, 0x8f, 0xd8, 0x4c,
+	0x4e, 0x0d, 0xe9, 0x40, 0x21, 0xe4, 0xb1, 0xe1, 0x2a, 0xad, 0xe4, 0xad, 0x55, 0x49, 0xa9, 0x36,
+	0xa7, 0xe7, 0x52, 0x46, 0xe9, 0xb7, 0x0e, 0x6d, 0x8b, 0x9d, 0xb2, 0x21, 0x4f, 0x87, 0x10, 0x6d,
+	0x7b, 0x37, 0x3d, 0x96, 0x67, 0xf8, 0xa9, 0xd3, 0x58, 0xc0, 0x12, 0x5d, 0x43, 0xec, 0x9b, 0xdb,
+	0x13, 0x3e, 0x32, 0x16, 0xb2, 0x44, 0x57, 0x00, 0x79, 0x1f, 0x8a, 0x91, 0x88, 0x07, 0x53, 0xae,
+	0xd3, 0x4e, 0x2f, 0x44, 0x22, 0x3e, 0xe1, 0x1a, 0x1d, 0xec, 0x1c, 0x1d, 0xc5, 0x55, 0xf5, 0xb9,
+	0x26, 0x9f, 0xc0, 0x76, 0x38, 0x55, 0x8a, 0xc7, 0x66, 0xa0, 0x5c, 0xcc, 0x12, 0xfa, 0xcb, 0x29,
+	0xea, 0xc2, 0x76, 0x83, 0xbf, 0xe6, 0x55, 0xef, 0xe5, 0xbc, 0xea, 0xfd, 0x33, 0xaf, 0x7a, 0x7f,
+	0x5c, 0x56, 0x37, 0x5e, 0x5e, 0x56, 0x37, 0xfe, 0xbe, 0xac, 0x6e, 0x3c, 0x2d, 0xe0, 0x57, 0xbe,
+	0xf3, 0x7f, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xf4, 0xeb, 0x7b, 0x2a, 0x08, 0x00, 0x00,
 }
 
 func (m *Point) Marshal() (dAtA []byte, err error) {
@@ -832,12 +871,10 @@ func (m *Route) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.RouteID) > 0 {
-		i -= len(m.RouteID)
-		copy(dAtA[i:], m.RouteID)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.RouteID)))
+	if m.RouteID != 0 {
+		i = encodeVarintTypes(dAtA, i, uint64(m.RouteID))
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -862,13 +899,6 @@ func (m *Ue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Imsi != 0 {
-		i = encodeVarintTypes(dAtA, i, uint64(m.Imsi))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0x90
-	}
 	if m.Metrics != nil {
 		{
 			size, err := m.Metrics.MarshalToSizedBuffer(dAtA[:i])
@@ -908,10 +938,15 @@ func (m *Ue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x75
 	}
-	if len(m.Tower3) > 0 {
-		i -= len(m.Tower3)
-		copy(dAtA[i:], m.Tower3)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.Tower3)))
+	if m.Tower3 != nil {
+		{
+			size, err := m.Tower3.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0x6a
 	}
@@ -921,10 +956,15 @@ func (m *Ue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x65
 	}
-	if len(m.Tower2) > 0 {
-		i -= len(m.Tower2)
-		copy(dAtA[i:], m.Tower2)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.Tower2)))
+	if m.Tower2 != nil {
+		{
+			size, err := m.Tower2.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0x5a
 	}
@@ -934,10 +974,15 @@ func (m *Ue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x55
 	}
-	if len(m.Tower1) > 0 {
-		i -= len(m.Tower1)
-		copy(dAtA[i:], m.Tower1)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.Tower1)))
+	if m.Tower1 != nil {
+		{
+			size, err := m.Tower1.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0x4a
 	}
@@ -947,19 +992,17 @@ func (m *Ue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x45
 	}
-	if len(m.ServingTower) > 0 {
-		i -= len(m.ServingTower)
-		copy(dAtA[i:], m.ServingTower)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.ServingTower)))
+	if m.ServingTower != nil {
+		{
+			size, err := m.ServingTower.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0x3a
-	}
-	if len(m.Route) > 0 {
-		i -= len(m.Route)
-		copy(dAtA[i:], m.Route)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.Route)))
-		i--
-		dAtA[i] = 0x32
 	}
 	if m.Rotation != 0 {
 		i = encodeVarintTypes(dAtA, i, uint64(m.Rotation))
@@ -985,12 +1028,10 @@ func (m *Ue) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.Name)))
+	if m.Imsi != 0 {
+		i = encodeVarintTypes(dAtA, i, uint64(m.Imsi))
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -1015,6 +1056,16 @@ func (m *UeMetrics) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.IsFirst {
+		i--
+		if m.IsFirst {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.HoReportTimestamp != 0 {
 		i = encodeVarintTypes(dAtA, i, uint64(m.HoReportTimestamp))
 		i--
@@ -1084,6 +1135,43 @@ func (m *TowersParams) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ECGI) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ECGI) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ECGI) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.PlmnID) > 0 {
+		i -= len(m.PlmnID)
+		copy(dAtA[i:], m.PlmnID)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.PlmnID)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.EcID) > 0 {
+		i -= len(m.EcID)
+		copy(dAtA[i:], m.EcID)
+		i = encodeVarintTypes(dAtA, i, uint64(len(m.EcID)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *Tower) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1118,11 +1206,9 @@ func (m *Tower) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		for k := range m.CrntiMap {
 			v := m.CrntiMap[k]
 			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintTypes(dAtA, i, uint64(len(v)))
+			i = encodeVarintTypes(dAtA, i, uint64(v))
 			i--
-			dAtA[i] = 0x12
+			dAtA[i] = 0x10
 			i -= len(k)
 			copy(dAtA[i:], k)
 			i = encodeVarintTypes(dAtA, i, uint64(len(k)))
@@ -1141,9 +1227,14 @@ func (m *Tower) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	if len(m.Neighbors) > 0 {
 		for iNdEx := len(m.Neighbors) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Neighbors[iNdEx])
-			copy(dAtA[i:], m.Neighbors[iNdEx])
-			i = encodeVarintTypes(dAtA, i, uint64(len(m.Neighbors[iNdEx])))
+			{
+				size, err := m.Neighbors[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTypes(dAtA, i, uint64(size))
+			}
 			i--
 			dAtA[i] = 0x32
 		}
@@ -1172,17 +1263,15 @@ func (m *Tower) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
-	if len(m.PlmnID) > 0 {
-		i -= len(m.PlmnID)
-		copy(dAtA[i:], m.PlmnID)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.PlmnID)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.EcID) > 0 {
-		i -= len(m.EcID)
-		copy(dAtA[i:], m.EcID)
-		i = encodeVarintTypes(dAtA, i, uint64(len(m.EcID)))
+	if m.Ecgi != nil {
+		{
+			size, err := m.Ecgi.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTypes(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1307,9 +1396,8 @@ func (m *Route) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.RouteID)
-	if l > 0 {
-		n += 1 + l + sovTypes(uint64(l))
+	if m.RouteID != 0 {
+		n += 1 + sovTypes(uint64(m.RouteID))
 	}
 	if len(m.Waypoints) > 0 {
 		for _, e := range m.Waypoints {
@@ -1330,9 +1418,8 @@ func (m *Ue) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovTypes(uint64(l))
+	if m.Imsi != 0 {
+		n += 1 + sovTypes(uint64(m.Imsi))
 	}
 	l = len(m.Type)
 	if l > 0 {
@@ -1345,33 +1432,29 @@ func (m *Ue) Size() (n int) {
 	if m.Rotation != 0 {
 		n += 1 + sovTypes(uint64(m.Rotation))
 	}
-	l = len(m.Route)
-	if l > 0 {
-		n += 1 + l + sovTypes(uint64(l))
-	}
-	l = len(m.ServingTower)
-	if l > 0 {
+	if m.ServingTower != nil {
+		l = m.ServingTower.Size()
 		n += 1 + l + sovTypes(uint64(l))
 	}
 	if m.ServingTowerDist != 0 {
 		n += 5
 	}
-	l = len(m.Tower1)
-	if l > 0 {
+	if m.Tower1 != nil {
+		l = m.Tower1.Size()
 		n += 1 + l + sovTypes(uint64(l))
 	}
 	if m.Tower1Dist != 0 {
 		n += 5
 	}
-	l = len(m.Tower2)
-	if l > 0 {
+	if m.Tower2 != nil {
+		l = m.Tower2.Size()
 		n += 1 + l + sovTypes(uint64(l))
 	}
 	if m.Tower2Dist != 0 {
 		n += 5
 	}
-	l = len(m.Tower3)
-	if l > 0 {
+	if m.Tower3 != nil {
+		l = m.Tower3.Size()
 		n += 1 + l + sovTypes(uint64(l))
 	}
 	if m.Tower3Dist != 0 {
@@ -1388,9 +1471,6 @@ func (m *Ue) Size() (n int) {
 		l = m.Metrics.Size()
 		n += 2 + l + sovTypes(uint64(l))
 	}
-	if m.Imsi != 0 {
-		n += 2 + sovTypes(uint64(m.Imsi))
-	}
 	return n
 }
 
@@ -1405,6 +1485,9 @@ func (m *UeMetrics) Size() (n int) {
 	}
 	if m.HoReportTimestamp != 0 {
 		n += 1 + sovTypes(uint64(m.HoReportTimestamp))
+	}
+	if m.IsFirst {
+		n += 2
 	}
 	return n
 }
@@ -1436,7 +1519,7 @@ func (m *TowersParams) Size() (n int) {
 	return n
 }
 
-func (m *Tower) Size() (n int) {
+func (m *ECGI) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1448,6 +1531,19 @@ func (m *Tower) Size() (n int) {
 	}
 	l = len(m.PlmnID)
 	if l > 0 {
+		n += 1 + l + sovTypes(uint64(l))
+	}
+	return n
+}
+
+func (m *Tower) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Ecgi != nil {
+		l = m.Ecgi.Size()
 		n += 1 + l + sovTypes(uint64(l))
 	}
 	if m.Location != nil {
@@ -1462,8 +1558,8 @@ func (m *Tower) Size() (n int) {
 		n += 1 + sovTypes(uint64(m.MaxUEs))
 	}
 	if len(m.Neighbors) > 0 {
-		for _, s := range m.Neighbors {
-			l = len(s)
+		for _, e := range m.Neighbors {
+			l = e.Size()
 			n += 1 + l + sovTypes(uint64(l))
 		}
 	}
@@ -1474,7 +1570,7 @@ func (m *Tower) Size() (n int) {
 		for k, v := range m.CrntiMap {
 			_ = k
 			_ = v
-			mapEntrySize := 1 + len(k) + sovTypes(uint64(len(k))) + 1 + len(v) + sovTypes(uint64(len(v)))
+			mapEntrySize := 1 + len(k) + sovTypes(uint64(len(k))) + 1 + sovTypes(uint64(v))
 			n += mapEntrySize + 1 + sovTypes(uint64(mapEntrySize))
 		}
 	}
@@ -1632,10 +1728,10 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RouteID", wireType)
 			}
-			var stringLen uint64
+			m.RouteID = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTypes
@@ -1645,24 +1741,11 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.RouteID |= Imsi(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTypes
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTypes
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RouteID = RouteID(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Waypoints", wireType)
@@ -1783,10 +1866,10 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Imsi", wireType)
 			}
-			var stringLen uint64
+			m.Imsi = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTypes
@@ -1796,24 +1879,11 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.Imsi |= Imsi(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTypes
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTypes
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = UEName(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
@@ -1901,43 +1971,11 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Route", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTypes
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTypes
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTypes
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Route = RouteID(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ServingTower", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTypes
@@ -1947,23 +1985,27 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTypes
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTypes
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ServingTower = EcID(dAtA[iNdEx:postIndex])
+			if m.ServingTower == nil {
+				m.ServingTower = &ECGI{}
+			}
+			if err := m.ServingTower.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 8:
 			if wireType != 5 {
@@ -1980,7 +2022,7 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tower1", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTypes
@@ -1990,23 +2032,27 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTypes
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTypes
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Tower1 = EcID(dAtA[iNdEx:postIndex])
+			if m.Tower1 == nil {
+				m.Tower1 = &ECGI{}
+			}
+			if err := m.Tower1.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 10:
 			if wireType != 5 {
@@ -2023,7 +2069,7 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tower2", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTypes
@@ -2033,23 +2079,27 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTypes
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTypes
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Tower2 = EcID(dAtA[iNdEx:postIndex])
+			if m.Tower2 == nil {
+				m.Tower2 = &ECGI{}
+			}
+			if err := m.Tower2.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 12:
 			if wireType != 5 {
@@ -2066,7 +2116,7 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tower3", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTypes
@@ -2076,23 +2126,27 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTypes
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTypes
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Tower3 = EcID(dAtA[iNdEx:postIndex])
+			if m.Tower3 == nil {
+				m.Tower3 = &ECGI{}
+			}
+			if err := m.Tower3.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 14:
 			if wireType != 5 {
@@ -2193,25 +2247,6 @@ func (m *Ue) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 18:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Imsi", wireType)
-			}
-			m.Imsi = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTypes
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Imsi |= Imsi(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTypes(dAtA[iNdEx:])
@@ -2303,6 +2338,26 @@ func (m *UeMetrics) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IsFirst", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.IsFirst = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTypes(dAtA[iNdEx:])
@@ -2470,7 +2525,7 @@ func (m *TowersParams) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Tower) Unmarshal(dAtA []byte) error {
+func (m *ECGI) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2493,10 +2548,10 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Tower: wiretype end group for non-group")
+			return fmt.Errorf("proto: ECGI: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Tower: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ECGI: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2562,6 +2617,95 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.PlmnID = PlmnID(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTypes(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Tower) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTypes
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Tower: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Tower: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ecgi", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTypes
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTypes
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTypes
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Ecgi == nil {
+				m.Ecgi = &ECGI{}
+			}
+			if err := m.Ecgi.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -2654,7 +2798,7 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Neighbors", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTypes
@@ -2664,23 +2808,25 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTypes
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTypes
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Neighbors = append(m.Neighbors, EcID(dAtA[iNdEx:postIndex]))
+			m.Neighbors = append(m.Neighbors, &ECGI{})
+			if err := m.Neighbors[len(m.Neighbors)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 7:
 			if wireType != 5 {
@@ -2723,10 +2869,10 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.CrntiMap == nil {
-				m.CrntiMap = make(map[Crnti]UEName)
+				m.CrntiMap = make(map[Crnti]Imsi)
 			}
 			var mapkey Crnti
-			var mapvalue UEName
+			var mapvalue uint64
 			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
@@ -2775,7 +2921,6 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 					mapkey = Crnti(dAtA[iNdEx:postStringIndexmapkey])
 					iNdEx = postStringIndexmapkey
 				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return ErrIntOverflowTypes
@@ -2785,24 +2930,11 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
+						mapvalue |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
 					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthTypes
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthTypes
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = UEName(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
 				} else {
 					iNdEx = entryPreIndex
 					skippy, err := skipTypes(dAtA[iNdEx:])
@@ -2818,7 +2950,7 @@ func (m *Tower) Unmarshal(dAtA []byte) error {
 					iNdEx += skippy
 				}
 			}
-			m.CrntiMap[Crnti(mapkey)] = ((UEName)(mapvalue))
+			m.CrntiMap[Crnti(mapkey)] = ((Imsi)(mapvalue))
 			iNdEx = postIndex
 		case 10:
 			if wireType != 0 {

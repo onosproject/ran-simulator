@@ -30,16 +30,17 @@ package main
 
 import (
 	"flag"
-	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
-	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
-	"github.com/onosproject/ran-simulator/pkg/utils"
-	"time"
-
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
+	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
+	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
+	"github.com/onosproject/ran-simulator/pkg/utils"
+	_ "net/http/pprof"
+	"runtime"
+	"time"
 )
 
 var log = liblog.GetDefaultLogger()
@@ -68,16 +69,31 @@ func main() {
 	metricsPort := flag.Int("metricsPort", 9090, "port for Prometheus metrics")
 	metricsAllHoEvents := flag.Bool("metricsAllHoEvents", true, "Export all HO events in metrics (only historgram if false)")
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
+	loglevel := flag.String("loglevel", "warn", "Initial log level - debug, info, warn, error")
 
-	//lines 93-109 are implemented according to
-	// https://github.com/kubernetes/klog/blob/master/examples/coexist_glog/coexist_glog.go
-	// because of libraries importing glog. With glog import we can't call log.InitFlags(nil) as per klog readme
-	// thus the alsologtostderr is not set properly and we issue multiple logs.
-	// Calling log.InitFlags(nil) throws panic with error `flag redefined: log_dir`
-	err := flag.Set("alsologtostderr", "true")
-	if err != nil {
-		log.Error("Cant' avoid double Error logging ", err)
+	initialLogLevel := liblog.WarnLevel
+	switch *loglevel {
+	case "debug":
+		initialLogLevel = liblog.DebugLevel
+	case "info":
+		initialLogLevel = liblog.InfoLevel
+	case "warn":
+		initialLogLevel = liblog.WarnLevel
+	case "error":
+		initialLogLevel = liblog.ErrorLevel
 	}
+
+	log.Infof("logs level: %s", initialLogLevel)
+	runtime.SetMutexProfileFraction(5)
+	log.SetLevel(initialLogLevel)
+	liblog.GetLogger("northbound").SetLevel(initialLogLevel)
+	liblog.GetLogger("northbound", "e2").SetLevel(initialLogLevel)
+	liblog.GetLogger("northbound", "trafficsim").SetLevel(initialLogLevel)
+	liblog.GetLogger("manager").SetLevel(initialLogLevel)
+	liblog.GetLogger("dispatcher").SetLevel(initialLogLevel)
+	liblog.GetLogger("southbound", "kubernetes").SetLevel(initialLogLevel)
+	liblog.GetLogger("southbound", "topo").SetLevel(initialLogLevel)
+
 	flag.Parse()
 
 	mapLayoutParams := types.MapLayout{
@@ -153,7 +169,7 @@ func main() {
 			towerNum := r**towerCols + c + 1 // Start at 1
 			go func() {
 				// Blocks here when server running
-				err := e2.NewTowerServer(towerNum, serverParams)
+				err := e2.NewTowerServer(towerNum, utils.TestPlmnID, serverParams)
 				if err != nil {
 					log.Fatal("Unable to start server ", err)
 				}

@@ -16,6 +16,7 @@ package metrics
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/api/types"
 	"net/http"
 	"sync"
 	"time"
@@ -28,8 +29,8 @@ import (
 // HOEvent is a structure for HO event
 type HOEvent struct {
 	Timestamp    time.Time
-	Crnti        string
-	ServingTower string
+	Crnti        types.Crnti
+	ServingTower types.ECGI
 	HOLatency    int64
 }
 
@@ -91,8 +92,8 @@ func exposeAllHOEvents() []prometheus.Counter {
 			Name:      "hoevents",
 			ConstLabels: prometheus.Labels{
 				"timestamp":    fmt.Sprintf("%d-%d-%d %d:%d:%d", e.Timestamp.Year(), e.Timestamp.Month(), e.Timestamp.Day(), e.Timestamp.Hour(), e.Timestamp.Minute(), e.Timestamp.Second()),
-				"crnti":        e.Crnti,
-				"servingtower": e.ServingTower,
+				"crnti":        string(e.Crnti),
+				"servingtower": string(e.ServingTower.EcID),
 			},
 		})
 		tmpHOEvent.Add(float64(e.HOLatency / 1e3))

@@ -36,7 +36,10 @@ const GrpcBasePort = 5150
 const ServiceName = "ran-simulator"
 
 // TestPlmnID - https://en.wikipedia.org/wiki/Mobile_country_code#Test_networks
-const TestPlmnID = "001001"
+const TestPlmnID = "315010"
+
+// ImsiBaseCbrs - from https://imsiadmin.com/cbrs-assignments
+const ImsiBaseCbrs = types.Imsi(315010999900000)
 
 // RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
 func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32, aspectRatio float32) types.Point {
@@ -127,4 +130,9 @@ func RandomColor() string {
 // EcIDForPort gives a consistent naming convention
 func EcIDForPort(towerPort int) types.EcID {
 	return types.EcID(fmt.Sprintf("%07X", towerPort))
+}
+
+// ImsiGenerator -- generate an Imsi from an index
+func ImsiGenerator(ueIdx int) types.Imsi {
+	return ImsiBaseCbrs + types.Imsi(ueIdx) + 1
 }

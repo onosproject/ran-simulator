@@ -23,11 +23,5 @@ type PlmnID string
 // Crnti is a UE ID relative to a tower
 type Crnti string
 
-// RouteID is a route ID
-type RouteID string
-
-// UEName is a name for a UE
-type UEName string
-
 // Imsi is a UE unique identifier
 type Imsi uint64

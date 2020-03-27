@@ -18,11 +18,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/onosproject/ran-simulator/pkg/utils"
-
 	e2 "github.com/onosproject/onos-ric/api/sb"
-	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
-	e2sm "github.com/onosproject/onos-ric/api/sb/e2sm"
+	"github.com/onosproject/onos-ric/api/sb/e2ap"
+	"github.com/onosproject/onos-ric/api/sb/e2sm"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
@@ -32,7 +30,7 @@ import (
 func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
 	c := make(chan e2ap.RicControlResponse)
 	defer close(c)
-	go ricControlRequest(s.GetPort(), s.GetEcID(), stream, c)
+	go ricControlRequest(s.GetPort(), s.GetECGI(), stream, c)
 	return ricControlResponse(s.GetPort(), stream, c)
 }
 
@@ -40,7 +38,7 @@ func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
 func (s *Server) SendControl(stream e2ap.E2AP_SendControlServer) error {
 	c := make(chan e2.ControlUpdate)
 	defer close(c)
-	go recvControlLoop(s.GetPort(), s.GetEcID(), stream, c)
+	go recvControlLoop(s.GetPort(), s.GetECGI(), stream, c)
 	return sendControlLoop(s.GetPort(), stream, c)
 }
 
@@ -74,7 +72,7 @@ func sendControlLoop(port int, stream e2ap.E2AP_SendControlServer, c chan e2.Con
 	}
 }
 
-func ricControlRequest(port int, towerID types.EcID, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) {
+func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
@@ -82,22 +80,29 @@ func ricControlRequest(port int, towerID types.EcID, stream e2ap.E2AP_RicControl
 			return
 		}
 		//log.Infof("Recv messageType %d", in.MessageType)
-		switch x := in.Msg.S.(type) {
-		case *e2sm.RicControlMessage_HORequest:
-			UpdateControlMetrics(in)
-			err = handleHORequest(towerID, x.HORequest)
-			if err != nil {
-				log.Error(err)
+		switch in.Hdr.MessageType {
+		case e2.MessageType_HO_REQUEST:
+			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_HORequest); ok {
+				err = handleHORequest(towerID, x.HORequest)
+				if err != nil {
+					log.Error(err)
+				}
+			} else {
+				log.Fatalf("Unexpected payload in MessageType_HO_REQUEST %v", in)
 			}
-		case *e2sm.RicControlMessage_RRMConfig:
-			handleRRMConfig(x.RRMConfig)
+		case e2.MessageType_RRM_CONFIG:
+			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_RRMConfig); ok {
+				handleRRMConfig(x.RRMConfig)
+			} else {
+				log.Fatalf("Unexpected payload in MessageType_RRM_CONFIG %v", in)
+			}
 		default:
-			log.Errorf("ControlResponse has unexpected type %T", x)
+			log.Errorf("ControlResponse has unexpected type %T", in.Hdr.MessageType)
 		}
 	}
 }
 
-func recvControlLoop(port int, towerID types.EcID, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
+func recvControlLoop(port int, towerID types.ECGI, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
@@ -136,58 +141,59 @@ func handleRRMConfig(req *e2.RRMConfig) {
 		powerAdjust = 3
 	}
 	trafficSimMgr := manager.GetManager()
-	err := trafficSimMgr.UpdateTower(types.EcID(req.Ecgi.Ecid), powerAdjust)
+	err := trafficSimMgr.UpdateTower(toTypesEcgi(req.Ecgi), powerAdjust)
 	if err != nil {
 		log.Warn(err.Error())
 	}
 }
 
-func handleHORequest(towerID types.EcID, req *e2.HORequest) error {
-	if towerID == types.EcID(req.EcgiS.Ecid) {
+func handleHORequest(towerID types.ECGI, req *e2.HORequest) error {
+	sourceEcgi := toTypesEcgi(req.EcgiS)
+	targetEcgi := toTypesEcgi(req.EcgiT)
+
+	if towerID.EcID == sourceEcgi.EcID && towerID.PlmnID == sourceEcgi.PlmnID {
 		log.Infof("Source handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
 		m := manager.GetManager()
-		ueName, err := m.CrntiToName(types.Crnti(req.Crnti), towerID)
+		imsi, err := m.CrntiToName(types.Crnti(req.Crnti), &towerID)
 		if err != nil {
 			log.Error(err)
 			return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, req.Crnti)
 		}
-		return m.UeHandover(ueName, types.EcID(req.EcgiT.Ecid))
-	} else if towerID == types.EcID(req.EcgiT.Ecid) {
+		UpdateControlMetrics(imsi)
+		return m.UeHandover(imsi, &targetEcgi)
+	} else if towerID.EcID == targetEcgi.EcID && towerID.PlmnID == targetEcgi.PlmnID {
 		log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
 		return nil
 	}
 	return fmt.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
 }
 
-func handleCellConfigRequest(port int, ecID types.EcID, c chan e2.ControlUpdate) {
+func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2.ControlUpdate) {
 	log.Infof("handleCellConfigRequest on Port %d", port)
 
 	trafficSimMgr := manager.GetManager()
 	trafficSimMgr.TowersLock.RLock()
 	defer trafficSimMgr.TowersLock.RUnlock()
-	tower, ok := trafficSimMgr.Towers[ecID]
+	tower, ok := trafficSimMgr.Towers[ecgi]
 	if !ok {
-		log.Warnf("Tower %s not found for handleCellConfigRequest on Port %d", ecID, port)
+		log.Warnf("Tower %s not found for handleCellConfigRequest on Port %d", ecgi, port)
 		return
 	}
 	cells := make([]*e2.CandScell, 0, 8)
 	for _, neighbor := range tower.Neighbors {
-		t := trafficSimMgr.Towers[neighbor]
+		t := trafficSimMgr.Towers[*neighbor]
+		e2Ecgi := toE2Ecgi(t.Ecgi)
 		cell := e2.CandScell{
-			Ecgi: &e2.ECGI{
-				PlmnId: string(t.PlmnID),
-				Ecid:   string(t.EcID),
-			}}
+			Ecgi: &e2Ecgi,
+		}
 		cells = append(cells, &cell)
 	}
+	e2Ecgi := toE2Ecgi(tower.Ecgi)
 	cellConfigReport := e2.ControlUpdate{
 		MessageType: e2.MessageType_CELL_CONFIG_REPORT,
 		S: &e2.ControlUpdate_CellConfigReport{
 			CellConfigReport: &e2.CellConfigReport{
-				Ecgi: &e2.ECGI{
-					PlmnId: string(tower.PlmnID),
-					Ecid:   string(tower.EcID),
-				},
+				Ecgi:               &e2Ecgi,
 				MaxNumConnectedUes: tower.MaxUEs,
 				CandScells:         cells,
 			},
@@ -195,15 +201,15 @@ func handleCellConfigRequest(port int, ecID types.EcID, c chan e2.ControlUpdate)
 	}
 
 	c <- cellConfigReport
-	log.Infof("handleCellConfigReport eci: %s", tower.EcID)
+	log.Infof("handleCellConfigReport eci: %v", tower.Ecgi)
 }
 
-func handleUeAdmissions(towerID types.EcID, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
+func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
 		trafficSimMgr.UserEquipmentsLock.Lock()
-		if ue.GetServingTower() != towerID {
+		if ue.GetServingTower().EcID != towerID.EcID || ue.GetServingTower().PlmnID != towerID.PlmnID {
 			trafficSimMgr.UserEquipmentsLock.Unlock()
 			continue
 		}
@@ -229,7 +235,7 @@ func handleUeAdmissions(towerID types.EcID, stream e2ap.E2AP_SendControlServer, 
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ue)
 			}
-			if ue.ServingTower != towerID {
+			if ue.ServingTower.EcID != towerID.EcID || ue.ServingTower.PlmnID != towerID.PlmnID {
 				continue // listen for the next event
 			}
 			if event.Type == trafficsim.Type_ADDED ||
@@ -257,15 +263,13 @@ func handleUeAdmissions(towerID types.EcID, stream e2ap.E2AP_SendControlServer, 
 	}
 }
 
-func formatUeAdmissionReq(eci types.EcID, crnti types.Crnti, imsi types.Imsi) *e2.ControlUpdate {
+func formatUeAdmissionReq(eci *types.ECGI, crnti types.Crnti, imsi types.Imsi) *e2.ControlUpdate {
+	e2Ecgi := toE2Ecgi(eci)
 	return &e2.ControlUpdate{
 		MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
 		S: &e2.ControlUpdate_UEAdmissionRequest{
 			UEAdmissionRequest: &e2.UEAdmissionRequest{
-				Ecgi: &e2.ECGI{
-					PlmnId: utils.TestPlmnID,
-					Ecid:   string(eci),
-				},
+				Ecgi:              &e2Ecgi,
 				Crnti:             string(crnti),
 				AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
 				Imsi:              uint64(imsi),
@@ -274,15 +278,13 @@ func formatUeAdmissionReq(eci types.EcID, crnti types.Crnti, imsi types.Imsi) *e
 	}
 }
 
-func formatUeReleaseInd(eci types.EcID, crnti types.Crnti) *e2.ControlUpdate {
+func formatUeReleaseInd(eci *types.ECGI, crnti types.Crnti) *e2.ControlUpdate {
+	e2Ecgi := toE2Ecgi(eci)
 	return &e2.ControlUpdate{
 		MessageType: e2.MessageType_UE_RELEASE_IND,
 		S: &e2.ControlUpdate_UEReleaseInd{
 			UEReleaseInd: &e2.UEReleaseInd{
-				Ecgi: &e2.ECGI{
-					PlmnId: utils.TestPlmnID,
-					Ecid:   string(eci),
-				},
+				Ecgi:         &e2Ecgi,
 				Crnti:        string(crnti),
 				ReleaseCause: e2.ReleaseCause_RELEASE_INACTIVITY,
 			},

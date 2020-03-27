@@ -45,8 +45,8 @@ type TowerIf interface {
 }
 
 // NewTowers - create a set of new towers
-func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.EcID]*types.Tower {
-	towers := make(map[types.EcID]*types.Tower)
+func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.ECGI]*types.Tower {
+	towers := make(map[types.ECGI]*types.Tower)
 
 	var r, c uint32
 	for r = 0; r < params.TowerRows; r++ {
@@ -54,17 +54,19 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.E
 			pos := getTowerPosition(r, c, params, mapLayout)
 			towerNum := r*params.TowerCols + c
 			towerPort := utils.GrpcBasePort + towerNum + 2 // Start at 5152 so it appears as 1420 in Hex
-			ecid := utils.EcIDForPort(int(towerPort))
-			towers[ecid] = &types.Tower{
+			ecgi := types.ECGI{
+				PlmnID: utils.TestPlmnID,
+				EcID:   utils.EcIDForPort(int(towerPort)),
+			}
+			towers[ecgi] = &types.Tower{
 				Location:   pos,
 				Color:      utils.RandomColor(),
-				PlmnID:     utils.TestPlmnID,
-				EcID:       ecid,
+				Ecgi:       &ecgi,
 				MaxUEs:     params.MaxUEsPerTower,
 				Neighbors:  makeNeighbors(int(towerNum), params),
 				TxPowerdB:  DefaultTxPower,
 				Port:       towerPort,
-				CrntiMap:   make(map[types.Crnti]types.UEName),
+				CrntiMap:   make(map[types.Crnti]types.Imsi),
 				CrntiIndex: 0,
 			}
 		}
@@ -76,11 +78,11 @@ func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.E
 // Find the closest tower to any point - return closest, candidate1 and candidate2
 // in order of distance
 // Note this does not take any account of serving - it's just about distance
-func (m *Manager) findClosestTowers(point *types.Point) ([]types.EcID, []float32) {
+func (m *Manager) findClosestTowers(point *types.Point) ([]*types.ECGI, []float32) {
 	var (
-		closest    types.EcID
-		candidate1 types.EcID
-		candidate2 types.EcID
+		closest    *types.ECGI
+		candidate1 *types.ECGI
+		candidate2 *types.ECGI
 	)
 
 	var (
@@ -97,32 +99,32 @@ func (m *Manager) findClosestTowers(point *types.Point) ([]types.EcID, []float32
 			candidate2Dist = candidate1Dist
 			candidate1 = closest
 			candidate1Dist = closestDist
-			closest = tower.EcID
+			closest = tower.Ecgi
 			closestDist = distance
 		} else if distance < candidate1Dist {
 			candidate2 = candidate1
 			candidate2Dist = candidate1Dist
-			candidate1 = tower.EcID
+			candidate1 = tower.Ecgi
 			candidate1Dist = distance
 		} else if distance < candidate2Dist {
-			candidate2 = tower.EcID
+			candidate2 = tower.Ecgi
 			candidate2Dist = distance
 		}
 	}
 	m.TowersLock.RUnlock()
 
-	return []types.EcID{closest, candidate1, candidate2}, []float32{closestDist, candidate1Dist, candidate2Dist}
+	return []*types.ECGI{closest, candidate1, candidate2}, []float32{closestDist, candidate1Dist, candidate2Dist}
 }
 
 // GetTower returns tower based on its name
-func (m *Manager) GetTower(name types.EcID) *types.Tower {
+func (m *Manager) GetTower(name types.ECGI) *types.Tower {
 	m.TowersLock.RLock()
 	defer m.TowersLock.RUnlock()
 	return m.Towers[name]
 }
 
 // UpdateTower Update a tower's properties - usually power level
-func (m *Manager) UpdateTower(tower types.EcID, powerAdjust float32) error {
+func (m *Manager) UpdateTower(tower types.ECGI, powerAdjust float32) error {
 	// Only the power can be updated at present
 	m.TowersLock.Lock()
 	t, ok := m.Towers[tower]
@@ -147,24 +149,24 @@ func (m *Manager) UpdateTower(tower types.EcID, powerAdjust float32) error {
 }
 
 // NewCrnti allocs a new crnti
-func (m *Manager) NewCrnti(servingTower types.EcID, ueName types.UEName) (types.Crnti, error) {
+func (m *Manager) NewCrnti(servingTower *types.ECGI, imsi types.Imsi) (types.Crnti, error) {
 	m.TowersLock.Lock()
 	defer m.TowersLock.Unlock()
-	tower, ok := m.Towers[servingTower]
+	tower, ok := m.Towers[*servingTower]
 	if !ok {
 		return "", fmt.Errorf("unknown tower %s", servingTower)
 	}
 	tower.CrntiIndex++
 	crnti := types.Crnti(fmt.Sprintf("%04X", tower.CrntiIndex%MaxCrnti))
-	tower.CrntiMap[crnti] = ueName
+	tower.CrntiMap[crnti] = imsi
 	return crnti, nil
 }
 
 // DelCrnti deletes a crnti
-func (m *Manager) DelCrnti(servingTower types.EcID, crnti types.Crnti) error {
+func (m *Manager) DelCrnti(servingTower *types.ECGI, crnti types.Crnti) error {
 	m.TowersLock.Lock()
 	defer m.TowersLock.Unlock()
-	tower, ok := m.Towers[servingTower]
+	tower, ok := m.Towers[*servingTower]
 	if !ok {
 		return fmt.Errorf("unknown tower %s", servingTower)
 	}
@@ -174,18 +176,18 @@ func (m *Manager) DelCrnti(servingTower types.EcID, crnti types.Crnti) error {
 }
 
 // CrntiToName ...
-func (m *Manager) CrntiToName(crnti types.Crnti, ecid types.EcID) (types.UEName, error) {
+func (m *Manager) CrntiToName(crnti types.Crnti, ecid *types.ECGI) (types.Imsi, error) {
 	m.TowersLock.RLock()
 	defer m.TowersLock.RUnlock()
-	tower, ok := m.Towers[ecid]
+	tower, ok := m.Towers[*ecid]
 	if !ok {
-		return "", fmt.Errorf("tower %s not found", ecid)
+		return 0, fmt.Errorf("tower %s not found", ecid)
 	}
-	ueName, ok := tower.CrntiMap[crnti]
+	imsi, ok := tower.CrntiMap[crnti]
 	if !ok {
-		return "", fmt.Errorf("crnti %s/%s not found", ecid, crnti)
+		return 0, fmt.Errorf("crnti %s/%s not found", ecid, crnti)
 	}
-	return ueName, nil
+	return imsi, nil
 }
 
 // Measure the distance between a point and a tower and return an answer in decimal degrees
@@ -197,8 +199,8 @@ func distanceToTower(tower *types.Tower, point *types.Point) float32 {
 	))
 }
 
-func makeNeighbors(id int, towerParams types.TowersParams) []types.EcID {
-	neighbors := make([]types.EcID, 0, 8)
+func makeNeighbors(id int, towerParams types.TowersParams) []*types.ECGI {
+	neighbors := make([]*types.ECGI, 0)
 
 	nrows := int(towerParams.TowerRows)
 	ncols := int(towerParams.TowerCols)
@@ -210,8 +212,8 @@ func makeNeighbors(id int, towerParams types.TowersParams) []types.EcID {
 		for y := max(0, j-1); y <= min(j+1, ncols-1); y++ {
 			if (x == i && y == j-1) || (x == i && y == j+1) || (x == i-1 && y == j) || (x == i+1 && y == j) {
 				towerID := x*nrows + y + 2 + utils.GrpcBasePort
-				towerEcID := utils.EcIDForPort(towerID)
-				neighbors = append(neighbors, towerEcID)
+				towerEcgi := newEcgi(utils.EcIDForPort(towerID), utils.TestPlmnID)
+				neighbors = append(neighbors, &towerEcgi)
 			}
 		}
 	}
@@ -232,4 +234,8 @@ func max(x, y int) int {
 		return x
 	}
 	return y
+}
+
+func newEcgi(id types.EcID, plmnID types.PlmnID) types.ECGI {
+	return types.ECGI{EcID: id, PlmnID: plmnID}
 }

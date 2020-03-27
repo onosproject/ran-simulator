@@ -27,7 +27,7 @@ message Point {
 }
 
 message Route {
-    string name = 1 [(gogoproto.customname) = "RouteID", (gogoproto.casttype) = "RouteID"];
+    uint64 name = 1 [(gogoproto.customname) = "RouteID", (gogoproto.casttype) = "Imsi"];
 
     repeated Point waypoints = 2;
 
@@ -35,7 +35,7 @@ message Route {
 }
 
 message Ue {
-    string name = 1 [(gogoproto.customname) = "Name", (gogoproto.casttype) = "UEName"];
+    uint64 imsi = 1 [(gogoproto.customname) = "Imsi", (gogoproto.casttype) = "Imsi"];
 
     string type = 2;
 
@@ -43,21 +43,19 @@ message Ue {
 
     uint32 rotation = 5;
 
-    string route = 6 [(gogoproto.casttype) = "RouteID"];
-
-    string serving_tower = 7 [(gogoproto.casttype) = "EcID"];
+    ECGI serving_tower = 7;
 
     float serving_tower_dist = 8;
 
-    string tower1 = 9 [(gogoproto.casttype) = "EcID"];
+    ECGI tower1 = 9;
 
     float tower1_dist = 10;
 
-    string tower2 = 11 [(gogoproto.casttype) = "EcID"];
+    ECGI tower2 = 11;
 
     float tower2_dist = 12;
 
-    string tower3 = 13 [(gogoproto.casttype) = "EcID"];
+    ECGI tower3 = 13;
 
     float tower3_dist = 14;
 
@@ -66,8 +64,6 @@ message Ue {
     bool admitted = 16;
 
     UeMetrics metrics = 17;
-
-    uint64 imsi = 18 [(gogoproto.customname) = "Imsi", (gogoproto.casttype) = "Imsi"];
 }
 
 message UeMetrics {
@@ -76,6 +72,9 @@ message UeMetrics {
 
     // Handover report timestamp (in nanoseconds since epoch)
     int64 ho_report_timestamp = 2;
+
+    // flag to indicate the first measurement
+    bool isFirst = 3;
 }
 
 message TowersParams {
@@ -98,10 +97,15 @@ message TowersParams {
     uint32 maxUEsPerTower = 6;
 }
 
-message Tower {
+// station's unique ID
+message ECGI {
     string ecID = 1 [(gogoproto.customname) = "EcID", (gogoproto.casttype) = "EcID"];
 
     string plmnID = 2 [(gogoproto.customname) = "PlmnID", (gogoproto.casttype) = "PlmnID"];
+}
+
+message Tower {
+    ECGI ecgi = 1;
 
     Point location = 3;
 
@@ -109,13 +113,13 @@ message Tower {
 
     uint32 maxUEs = 5;
 
-    repeated string neighbors = 6 [(gogoproto.casttype) = "EcID"];
+    repeated ECGI neighbors = 6;
 
     // The tower transmit power in decibels
     float txPowerdB = 7;
 
     // crntis maps a ue's name to its crnti
-    map<string, string> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "UEName"];
+    map<string, uint64> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "Imsi"];
 
     uint32 crntiIndex = 10;
 

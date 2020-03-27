@@ -52,7 +52,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 			assert.Equal(t, trafficsim.UpdateType_NOUPDATETYPE, updateEvent.UpdateType)
 			tower, ok := updateEvent.Object.(*types.Tower)
 			assert.Assert(t, ok, "Problem converting event object to Tower %v", updateEvent.Object)
-			assert.Equal(t, types.EcID("0001420"), tower.EcID)
+			assert.Equal(t, types.EcID("0001420"), tower.Ecgi.EcID)
 			mgr.TowersLock.RLock()
 			assert.Equal(t, float32(7), tower.GetTxPowerdB())
 			mgr.TowersLock.RUnlock()

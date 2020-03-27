@@ -21,6 +21,7 @@ import (
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"googlemaps.github.io/maps"
 	"math"
 	"math/rand"
@@ -39,17 +40,16 @@ type RoutesParams struct {
 
 // NewRoutes Create new routes, by taking two random locations and asking Google for
 // directions to get from one to the other
-func (m *Manager) NewRoutes(mapLayoutParams types.MapLayout, params RoutesParams) (map[types.RouteID]*types.Route, error) {
-	routes := make(map[types.RouteID]*types.Route)
+func (m *Manager) NewRoutes(mapLayoutParams types.MapLayout, params RoutesParams) (map[types.Imsi]*types.Route, error) {
+	routes := make(map[types.Imsi]*types.Route)
 
-	var r uint32
-	for r = 0; r < mapLayoutParams.MinUes; r++ {
+	for r := 0; r < int(mapLayoutParams.MinUes); r++ {
 		startLoc, err := m.getRandomLocation("")
 		if err != nil {
 			return nil, err
 		}
 		// Colour is dependent on UE tower and is not known at this stage
-		route, err := m.newRoute(startLoc, int(r), params.APIKey, defaultColor)
+		route, err := m.newRoute(startLoc, utils.ImsiGenerator(r), params.APIKey, defaultColor)
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +60,7 @@ func (m *Manager) NewRoutes(mapLayoutParams types.MapLayout, params RoutesParams
 	return routes, nil
 }
 
-func (m *Manager) removeRoute(routeName types.RouteID) {
+func (m *Manager) removeRoute(routeName types.Imsi) {
 	r, ok := m.Routes[routeName]
 	if ok {
 		delete(m.Routes, routeName)
@@ -73,7 +73,7 @@ func (m *Manager) removeRoute(routeName types.RouteID) {
 
 // If a googleAPIKey is given, them call the Google Directions API to get steps that
 // follow known streets and traffic rules
-func (m *Manager) newRoute(startLoc *Location, rID int, apiKey string, color string) (*types.Route, error) {
+func (m *Manager) newRoute(startLoc *Location, rID types.Imsi, apiKey string, color string) (*types.Route, error) {
 	endLoc, err := m.getRandomLocation(startLoc.Name)
 	if err != nil {
 		return nil, err
@@ -82,17 +82,17 @@ func (m *Manager) newRoute(startLoc *Location, rID int, apiKey string, color str
 	var points []*types.Point
 	if len(apiKey) >= googleAPIKeyMinLen {
 		points, err = googleRoute(startLoc, endLoc, apiKey)
-		log.Infof("Generated new %s with %d points using Google Directions", routeName(rID), len(points))
+		log.Infof("Generated new Route %d with %d points using Google Directions", rID, len(points))
 	} else {
 		points, err = randomRoute(startLoc, endLoc)
-		log.Infof("Generated new %s with %d points using Random Directions", routeName(rID), len(points))
+		log.Infof("Generated new Route %d with %d points using Random Directions", rID, len(points))
 	}
 	if err != nil {
 		return nil, err
 	}
 
 	route := types.Route{
-		RouteID:   routeName(rID),
+		RouteID:   rID,
 		Waypoints: points,
 		Color:     color,
 	}
@@ -166,8 +166,4 @@ func randomRoute(startLoc *Location, endLoc *Location) ([]*types.Point, error) {
 	points = append(points, &endLoc.Position)
 
 	return points, nil
-}
-
-func routeName(idx int) types.RouteID {
-	return types.RouteID(fmt.Sprintf("Route-%d", idx))
 }

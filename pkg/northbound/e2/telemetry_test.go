@@ -15,6 +15,7 @@
 package e2
 
 import (
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"testing"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
@@ -27,7 +28,7 @@ func Test_GenerateReport(t *testing.T) {
 	assert.Assert(t, mgr != nil, "Unexpectedly Manager is nil!")
 
 	mgr.UserEquipmentsLock.RLock()
-	ue1, ok := mgr.UserEquipments["Ue-0001"]
+	ue1, ok := mgr.UserEquipments[utils.ImsiGenerator(0)]
 	assert.Assert(t, ok, "Expected to find Ue-0001")
 	mgr.UserEquipmentsLock.RUnlock()
 

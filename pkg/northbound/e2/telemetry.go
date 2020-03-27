@@ -39,7 +39,7 @@ func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2ap.E2AP_SendTeleme
 	c := make(chan e2.TelemetryMessage)
 	defer close(c)
 	go func() {
-		err := radioMeasReportPerUE(s.GetPort(), s.GetEcID(), stream, c)
+		err := radioMeasReportPerUE(s.GetPort(), s.GetECGI(), stream, c)
 		if err != nil {
 			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
 		}
@@ -63,18 +63,18 @@ func sendTelemetryLoop(port int, stream e2ap.E2AP_SendTelemetryServer, c chan e2
 	}
 }
 
-func radioMeasReportPerUE(port int, towerID types.EcID, stream e2ap.E2AP_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_SendTelemetryServer, c chan e2.TelemetryMessage) error {
 	trafficSimMgr := manager.GetManager()
 
 	// replay any existing UE's
-	for _, ue := range trafficSimMgr.UserEquipments {
-		if ue.ServingTower != towerID {
-			continue
-		}
-		if ue.Admitted {
-			c <- generateReport(ue)
-		}
-	}
+	//for _, ue := range trafficSimMgr.UserEquipments {
+	//	if ue.ServingTower.EcID != towerID.EcID || ue.ServingTower.PlmnID != towerID.PlmnID {
+	//		continue
+	//	}
+	//	if ue.Admitted {
+	//		c <- generateReport(ue)
+	//	}
+	//}
 
 	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, stream)
 	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
@@ -92,7 +92,7 @@ func radioMeasReportPerUE(port int, towerID types.EcID, stream e2ap.E2AP_SendTel
 				if !ok {
 					log.Fatalf("Object %v could not be converted to UE", ueUpdate)
 				}
-				if ue.ServingTower != towerID {
+				if ue.ServingTower.EcID != towerID.EcID || ue.ServingTower.PlmnID != towerID.PlmnID {
 					continue
 				}
 				c <- generateReport(ue)
@@ -110,50 +110,42 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 	trafficSimMgr.TowersLock.RLock()
 	defer trafficSimMgr.TowersLock.RUnlock()
 
-	servingTower := trafficSimMgr.Towers[ue.ServingTower]
-	tower1 := trafficSimMgr.Towers[ue.Tower1]
-	tower2 := trafficSimMgr.Towers[ue.Tower2]
-	tower3 := trafficSimMgr.Towers[ue.Tower3]
+	servingTower := trafficSimMgr.Towers[*ue.ServingTower]
+	tower1 := trafficSimMgr.Towers[*ue.Tower1]
+	tower2 := trafficSimMgr.Towers[*ue.Tower2]
+	tower3 := trafficSimMgr.Towers[*ue.Tower3]
 
 	reports := make([]*e2.RadioRepPerServCell, 3)
 
 	reports[0] = new(e2.RadioRepPerServCell)
-	reports[0].Ecgi = &e2.ECGI{
-		PlmnId: string(tower1.PlmnID),
-		Ecid:   string(tower1.EcID),
-	}
+	tower1Ecgi := toE2Ecgi(tower1.Ecgi)
+	reports[0].Ecgi = &tower1Ecgi
 	reports[0].CqiHist = make([]uint32, 1)
 	reports[0].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.GetTxPowerdB())
 
 	reports[1] = new(e2.RadioRepPerServCell)
-	reports[1].Ecgi = &e2.ECGI{
-		PlmnId: string(tower2.PlmnID),
-		Ecid:   string(tower2.EcID),
-	}
+	tower2Ecgi := toE2Ecgi(tower2.Ecgi)
+	reports[1].Ecgi = &tower2Ecgi
 	reports[1].CqiHist = make([]uint32, 1)
 	reports[1].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.GetTxPowerdB())
 
 	reports[2] = new(e2.RadioRepPerServCell)
-	reports[2].Ecgi = &e2.ECGI{
-		PlmnId: string(tower3.PlmnID),
-		Ecid:   string(tower3.EcID),
-	}
+	tower3Ecgi := toE2Ecgi(tower2.Ecgi)
+	reports[2].Ecgi = &tower3Ecgi
 	reports[2].CqiHist = make([]uint32, 1)
 	reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
 
-	log.Infof("RadioMeasReport %s %s cqi:%d(%s),%d(%s),%d(%s)", servingTower.EcID, ue.Name,
+	log.Infof("RadioMeasReport %s %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, ue.Imsi,
 		reports[0].CqiHist[0], reports[0].Ecgi.Ecid,
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
 		reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
 
+	servingTower2Ecgi := toE2Ecgi(servingTower.Ecgi)
 	return e2.TelemetryMessage{
 		MessageType: e2.MessageType_RADIO_MEAS_REPORT_PER_UE,
 		S: &e2.TelemetryMessage_RadioMeasReportPerUE{
 			RadioMeasReportPerUE: &e2.RadioMeasReportPerUE{
-				Ecgi: &e2.ECGI{
-					PlmnId: string(servingTower.PlmnID),
-					Ecid:   string(servingTower.EcID),
-				},
+				Ecgi:                 &servingTower2Ecgi,
 				Crnti:                string(ue.Crnti),
 				RadioReportServCells: reports,
 			},

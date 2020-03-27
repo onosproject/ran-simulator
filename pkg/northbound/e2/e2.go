@@ -17,7 +17,8 @@ package e2
 import (
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
-	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
+	e2 "github.com/onosproject/onos-ric/api/sb"
+	"github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"google.golang.org/grpc"
@@ -26,13 +27,14 @@ import (
 var log = liblog.GetLogger("northbound", "e2")
 
 // NewTowerServer - start a new gRPC server per tower
-func NewTowerServer(towerIndex int, serverParams utils.ServerParams) error {
+func NewTowerServer(towerIndex int, plmnID types.PlmnID, serverParams utils.ServerParams) error {
 	port := utils.GrpcBasePort + towerIndex + 1 // Start at 5152 so this translates to 1420 in Hex
 	ecID := utils.EcIDForPort(port)
 	s := service.NewServer(service.NewServerConfig(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, int16(port), true))
 	s.AddService(Service{
 		port:      port,
 		towerEcID: ecID,
+		plmnID:    plmnID,
 	})
 
 	return s.Serve(func(started string) {
@@ -45,11 +47,12 @@ type Service struct {
 	service.Service
 	port      int
 	towerEcID types.EcID
+	plmnID    types.PlmnID
 }
 
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
-	server := &Server{port: s.port, towerEcID: s.towerEcID}
+	server := &Server{port: s.port, towerEcID: s.towerEcID, plmnID: s.plmnID}
 	e2ap.RegisterE2APServer(r, server)
 }
 
@@ -57,6 +60,7 @@ func (s Service) Register(r *grpc.Server) {
 type Server struct {
 	port      int
 	towerEcID types.EcID
+	plmnID    types.PlmnID
 }
 
 // GetPort - expose the port number
@@ -67,4 +71,32 @@ func (s *Server) GetPort() int {
 // GetEcID - expose the tower EcID
 func (s *Server) GetEcID() types.EcID {
 	return s.towerEcID
+}
+
+// GetPlmnID - expose the tower PlmnID
+func (s *Server) GetPlmnID() types.PlmnID {
+	return s.plmnID
+}
+
+// GetECGI - expose the tower Ecgi
+func (s *Server) GetECGI() types.ECGI {
+	return newEcgi(s.GetEcID(), s.GetPlmnID())
+}
+
+func toTypesEcgi(e2Ecgi *e2.ECGI) types.ECGI {
+	return types.ECGI{
+		EcID:   types.EcID(e2Ecgi.Ecid),
+		PlmnID: types.PlmnID(e2Ecgi.PlmnId),
+	}
+}
+
+func toE2Ecgi(e2Ecgi *types.ECGI) e2.ECGI {
+	return e2.ECGI{
+		Ecid:   string(e2Ecgi.EcID),
+		PlmnId: string(e2Ecgi.PlmnID),
+	}
+}
+
+func newEcgi(id types.EcID, plmnID types.PlmnID) types.ECGI {
+	return types.ECGI{EcID: id, PlmnID: plmnID}
 }
