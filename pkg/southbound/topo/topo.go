@@ -17,7 +17,6 @@ package topo
 import (
 	"context"
 	"fmt"
-	"github.com/atomix/go-client/pkg/client/util"
 	"github.com/onosproject/onos-lib-go/pkg/certs"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/southbound"
@@ -42,7 +41,7 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string, serverParams utils.
 	log.Infof("Connecting to ONOS Topo...%s", topoEndpoint)
 	// Attempt to create connection to the Topo
 	opts, err := certs.HandleCertArgs(&serverParams.KeyPath, &serverParams.CertPath)
-	opts = append(opts, grpc.WithStreamInterceptor(util.RetryingStreamClientInterceptor(100*time.Millisecond)))
+	opts = append(opts, grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(100*time.Millisecond)))
 	if err != nil {
 		log.Fatal(err)
 	}
