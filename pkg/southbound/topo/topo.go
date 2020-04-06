@@ -44,7 +44,7 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string, serverParams utils.
 	if err != nil {
 		log.Fatal(err)
 	}
-	opts = append(opts, grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(100*time.Millisecond)))
+	opts = append(opts, grpc.WithUnaryInterceptor(southbound.RetryingUnaryClientInterceptor()))
 	conn, err := southbound.Connect(ctx, topoEndpoint, "", "", opts...)
 	if err != nil {
 		log.Fatal("Failed to connect to %s. Retry. %s", topoEndpoint, err)
@@ -53,6 +53,7 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string, serverParams utils.
 }
 
 // SyncToTopo updates the list of Tower instances on it
+// Will block until topo comes available
 func SyncToTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient, towers map[types.ECGI]*types.Tower) {
 
 	for _, t := range towers {

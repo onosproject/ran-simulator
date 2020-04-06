@@ -102,7 +102,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 	ctx := context.Background()
 	m.TopoClient = topo.ConnectToTopo(ctx, topoEndpoint, serverParams)
-	topo.SyncToTopo(ctx, &m.TopoClient, m.Towers)
+	go topo.SyncToTopo(ctx, &m.TopoClient, m.Towers)
 }
 
 //Close kills the channels and manager related objects
