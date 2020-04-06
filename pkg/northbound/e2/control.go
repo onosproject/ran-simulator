@@ -28,9 +28,9 @@ import (
 
 // RicControl ...
 func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
+	go ricControlRequest(s.GetPort(), s.GetECGI(), stream)
 	c := make(chan e2ap.RicControlResponse)
 	defer close(c)
-	go ricControlRequest(s.GetPort(), s.GetECGI(), stream, c)
 	return ricControlResponse(s.GetPort(), stream, c)
 }
 
@@ -72,7 +72,7 @@ func sendControlLoop(port int, stream e2ap.E2AP_SendControlServer, c chan e2.Con
 	}
 }
 
-func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) {
+func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControlServer) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
