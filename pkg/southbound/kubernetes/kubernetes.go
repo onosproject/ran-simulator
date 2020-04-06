@@ -35,7 +35,7 @@ const NamespaceEnv = "NAMESPACE"
 const ServiceNameEnv = "SERVICENAME"
 
 // AddK8SServicePorts add a Port to the K8s service
-func AddK8SServicePorts(rangeStart int32, rangeEnd int32) {
+func AddK8SServicePorts(rangeStart int32, rangeEnd int32) error {
 	namespace := os.Getenv(NamespaceEnv)
 	serviceName := os.Getenv(ServiceNameEnv)
 	if serviceName == "" {
@@ -45,22 +45,26 @@ func AddK8SServicePorts(rangeStart int32, rangeEnd int32) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		log.Fatalf("Failed to access cluster config %s", err.Error())
+		log.Errorf("Failed to access cluster config %s", err.Error())
+		return err
 	}
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatalf("Failed to create client set %s", err.Error())
+		log.Errorf("Failed to create client set %s", err.Error())
+		return err
 	}
 	thisService, err := clientset.CoreV1().Services(namespace).Get(serviceName, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
 		log.Errorf("Service %s not found in namespace %s", serviceName, namespace)
-		return
+		return nil
 	} else if statusError, isStatus := err.(*errors.StatusError); isStatus {
-		log.Fatal("Error getting Service %s in namespace %s. Status: %v",
+		log.Error("Error getting Service %s in namespace %s. Status: %v",
 			serviceName, namespace, statusError.ErrStatus.Message)
+		return err
 	} else if err != nil {
-		log.Fatalf("Kubernetes API error %s", err.Error())
+		log.Errorf("Kubernetes API error %s", err.Error())
+		return err
 	}
 
 	for p := rangeStart; p < rangeEnd; p++ {
@@ -78,8 +82,10 @@ func AddK8SServicePorts(rangeStart int32, rangeEnd int32) {
 		// The ports may already exist if the ran-simulator pod is restarting
 		log.Infof("Error updating %s:%s. Status: %v %v",
 			namespace, serviceName, statusError.ErrStatus.Reason, statusError.ErrStatus.Message)
-		return
+		return nil
 	} else if err != nil {
-		log.Fatalf("Kubernetes API error when replacing service %s %s", serviceName, err.Error())
+		log.Errorf("Kubernetes API error when replacing service %s %s", serviceName, err.Error())
+		return err
 	}
+	return nil
 }

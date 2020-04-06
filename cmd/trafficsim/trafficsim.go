@@ -70,31 +70,10 @@ func main() {
 	metricsAllHoEvents := flag.Bool("metricsAllHoEvents", true, "Export all HO events in metrics (only historgram if false)")
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
 	loglevel := flag.String("loglevel", "warn", "Initial log level - debug, info, warn, error")
-
-	initialLogLevel := liblog.WarnLevel
-	switch *loglevel {
-	case "debug":
-		initialLogLevel = liblog.DebugLevel
-	case "info":
-		initialLogLevel = liblog.InfoLevel
-	case "warn":
-		initialLogLevel = liblog.WarnLevel
-	case "error":
-		initialLogLevel = liblog.ErrorLevel
-	}
-
-	log.Infof("logs level: %s", initialLogLevel)
-	runtime.SetMutexProfileFraction(5)
-	log.SetLevel(initialLogLevel)
-	liblog.GetLogger("northbound").SetLevel(initialLogLevel)
-	liblog.GetLogger("northbound", "e2").SetLevel(initialLogLevel)
-	liblog.GetLogger("northbound", "trafficsim").SetLevel(initialLogLevel)
-	liblog.GetLogger("manager").SetLevel(initialLogLevel)
-	liblog.GetLogger("dispatcher").SetLevel(initialLogLevel)
-	liblog.GetLogger("southbound", "kubernetes").SetLevel(initialLogLevel)
-	liblog.GetLogger("southbound", "topo").SetLevel(initialLogLevel)
+	addK8sSvcPorts := flag.Bool("addK8sSvcPorts", true, "Add K8S service ports per tower")
 
 	flag.Parse()
+	setLogLevel(*loglevel)
 
 	mapLayoutParams := types.MapLayout{
 		Center: &types.Point{
@@ -179,7 +158,12 @@ func main() {
 	// Add these new ports to the K8s service
 	rangeStart := utils.GrpcBasePort + 2
 	rangeEnd := rangeStart + *towerCols**towerRows
-	kubernetes.AddK8SServicePorts(int32(rangeStart), int32(rangeEnd))
+	if *addK8sSvcPorts {
+		err := kubernetes.AddK8SServicePorts(int32(rangeStart), int32(rangeEnd))
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
 
 	metricsParams := manager.MetricsParams{
 		Port:              *metricsPort,
@@ -220,4 +204,29 @@ func checkTowerLimits(rows int, cols int) {
 	if cols*rows > 1024 {
 		log.Fatal("Invalid number of Tower (Rows x Cols) - must not exceed 1024")
 	}
+}
+
+func setLogLevel(loglevel string) {
+	initialLogLevel := liblog.WarnLevel
+	switch loglevel {
+	case "debug":
+		initialLogLevel = liblog.DebugLevel
+	case "info":
+		initialLogLevel = liblog.InfoLevel
+	case "warn":
+		initialLogLevel = liblog.WarnLevel
+	case "error":
+		initialLogLevel = liblog.ErrorLevel
+	}
+
+	log.Infof("logs level: %s", initialLogLevel)
+	runtime.SetMutexProfileFraction(5)
+	log.SetLevel(initialLogLevel)
+	liblog.GetLogger("northbound").SetLevel(initialLogLevel)
+	liblog.GetLogger("northbound", "e2").SetLevel(initialLogLevel)
+	liblog.GetLogger("northbound", "trafficsim").SetLevel(initialLogLevel)
+	liblog.GetLogger("manager").SetLevel(initialLogLevel)
+	liblog.GetLogger("dispatcher").SetLevel(initialLogLevel)
+	liblog.GetLogger("southbound", "kubernetes").SetLevel(initialLogLevel)
+	liblog.GetLogger("southbound", "topo").SetLevel(initialLogLevel)
 }

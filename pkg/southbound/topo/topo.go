@@ -40,11 +40,11 @@ var log = logging.GetLogger("southbound", "topo")
 func ConnectToTopo(ctx context.Context, topoEndpoint string, serverParams utils.ServerParams) topodevice.DeviceServiceClient {
 	log.Infof("Connecting to ONOS Topo...%s", topoEndpoint)
 	// Attempt to create connection to the Topo
-	opts, err := certs.HandleCertArgs(&serverParams.KeyPath, &serverParams.CertPath)
-	opts = append(opts, grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(100*time.Millisecond)))
+	opts, err := certs.HandleCertPaths(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, true)
 	if err != nil {
 		log.Fatal(err)
 	}
+	opts = append(opts, grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(100*time.Millisecond)))
 	conn, err := southbound.Connect(ctx, topoEndpoint, "", "", opts...)
 	if err != nil {
 		log.Fatal("Failed to connect to %s. Retry. %s", topoEndpoint, err)
