@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/onosproject/onos-ric/api/sb"
 	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/onos-ric/api/sb/e2sm"
@@ -28,9 +29,9 @@ import (
 
 // RicControl ...
 func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
-	go ricControlRequest(s.GetPort(), s.GetECGI(), stream)
 	c := make(chan e2ap.RicControlResponse)
 	defer close(c)
+	go ricControlRequest(s.GetPort(), s.GetECGI(), stream, c)
 	return ricControlResponse(s.GetPort(), stream, c)
 }
 
@@ -38,7 +39,7 @@ func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
 func (s *Server) SendControl(stream e2ap.E2AP_SendControlServer) error {
 	c := make(chan e2.ControlUpdate)
 	defer close(c)
-	go recvControlLoop(s.GetPort(), s.GetECGI(), stream, c)
+	go recvControlLoop(s.GetECGI(), stream, c)
 	return sendControlLoop(s.GetPort(), stream, c)
 }
 
@@ -72,15 +73,17 @@ func sendControlLoop(port int, stream e2ap.E2AP_SendControlServer, c chan e2.Con
 	}
 }
 
-func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControlServer) {
+func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
 			log.Errorf("Unexpectedly ended when receiving Control responses on Port %d %s", port, err.Error())
 			return
 		}
-		//log.Infof("Recv messageType %d", in.MessageType)
+		//log.Infof("Recv messageType %d", in.GetHdr().GetMessageType())
 		switch in.Hdr.MessageType {
+		case e2.MessageType_CELL_CONFIG_REQUEST:
+			handleCellConfigRequest(port, towerID, c)
 		case e2.MessageType_HO_REQUEST:
 			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_HORequest); ok {
 				err = handleHORequest(towerID, x.HORequest)
@@ -102,22 +105,8 @@ func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControl
 	}
 }
 
-func recvControlLoop(port int, towerID types.ECGI, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
-	for {
-		in, err := stream.Recv()
-		if err == io.EOF || err != nil {
-			log.Errorf("Unexpectedly ended when receiving Control responses on Port %d %s", port, err.Error())
-			return
-		}
-		//log.Infof("Recv messageType %d", in.MessageType)
-		switch x := in.S.(type) {
-		case *e2.ControlResponse_CellConfigRequest:
-			handleCellConfigRequest(port, towerID, c)
-			go handleUeAdmissions(towerID, stream, c)
-		default:
-			log.Errorf("ControlResponse has unexpected type %T", x)
-		}
-	}
+func recvControlLoop(towerID types.ECGI, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
+	handleUeAdmissions(towerID, stream, c)
 }
 
 func handleRRMConfig(req *e2.RRMConfig) {
@@ -168,7 +157,7 @@ func handleHORequest(towerID types.ECGI, req *e2.HORequest) error {
 	return fmt.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
 }
 
-func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2.ControlUpdate) {
+func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicControlResponse) {
 	log.Infof("handleCellConfigRequest on Port %d", port)
 
 	trafficSimMgr := manager.GetManager()
@@ -189,13 +178,17 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2.ControlUpdate)
 		cells = append(cells, &cell)
 	}
 	e2Ecgi := toE2Ecgi(tower.Ecgi)
-	cellConfigReport := e2.ControlUpdate{
-		MessageType: e2.MessageType_CELL_CONFIG_REPORT,
-		S: &e2.ControlUpdate_CellConfigReport{
-			CellConfigReport: &e2.CellConfigReport{
-				Ecgi:               &e2Ecgi,
-				MaxNumConnectedUes: tower.MaxUEs,
-				CandScells:         cells,
+	cellConfigReport := e2ap.RicControlResponse{
+		Hdr: &e2sm.RicControlHeader{
+			MessageType: sb.MessageType_CELL_CONFIG_REPORT,
+		},
+		Msg: &e2sm.RicControlOutcome{
+			S: &e2sm.RicControlOutcome_CellConfigReport{
+				CellConfigReport: &e2.CellConfigReport{
+					Ecgi:               &e2Ecgi,
+					MaxNumConnectedUes: tower.MaxUEs,
+					CandScells:         cells,
+				},
 			},
 		},
 	}

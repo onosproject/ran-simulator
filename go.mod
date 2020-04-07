@@ -5,7 +5,8 @@ go 1.13
 require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/onosproject/onos-lib-go v0.0.0-20200402192250-b62cfb0d4bf8
-	github.com/onosproject/onos-ric v0.0.0-20200323192023-afc66fee3b37
+	github.com/onosproject/onos-ric v0.0.0-20200406184304-b6e48eb9c0f4
+	github.com/onosproject/onos-test v0.0.0-20200317133500-bc8ce404e274 // indirect
 	github.com/onosproject/onos-topo v0.0.0-20200306012916-78b9f54b370a
 	github.com/prometheus/client_golang v1.4.1
 	github.com/sergi/go-diff v1.1.0 // indirect
@@ -16,7 +17,7 @@ require (
 	google.golang.org/grpc v1.27.1
 	googlemaps.github.io/maps v0.0.0-20200124220646-5b7f2815585f
 	gotest.tools v2.2.0+incompatible
-	k8s.io/api v0.0.0-20190620073856-dcce3486da33
-	k8s.io/apimachinery v0.0.0-20190802060556-6fa4771c83b3
-	k8s.io/client-go v0.0.0-20190620074045-585a16d2e773
+	k8s.io/api v0.17.3
+	k8s.io/apimachinery v0.17.3
+	k8s.io/client-go v0.17.3
 )
