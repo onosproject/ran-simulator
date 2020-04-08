@@ -97,14 +97,14 @@ func main() {
 		log.Fatal("Invalid Map Centre Longitude - must be between -180 and 180 exclusive")
 	}
 
-	if mapLayoutParams.MaxUes < 10 || mapLayoutParams.MaxUes > 10000 {
-		log.Fatal("Invalid number for MaxUEs - must be between 10 and 10000")
+	if mapLayoutParams.MaxUes < 10 || mapLayoutParams.MaxUes > 1000000 {
+		log.Fatal("Invalid number for MaxUEs - must be between 10 and 1000000")
 	}
-	if mapLayoutParams.MinUes < 2 || mapLayoutParams.MinUes > 100 {
-		log.Fatal("Invalid number for MinUEs - must be between 2 and 100 inclusive")
+	if mapLayoutParams.MinUes < 2 || mapLayoutParams.MinUes > 1000 {
+		log.Fatal("Invalid number for MinUEs - must be between 2 and 1000 inclusive")
 	}
 	if mapLayoutParams.MinUes*2 > mapLayoutParams.MaxUes {
-		log.Fatal("Invalid number of MaxUEs:MinUEs - must be at least 2")
+		log.Fatal("Invalid ratio of MaxUEs:MinUEs - must be at least 2")
 	}
 
 	towerParams := types.TowersParams{
