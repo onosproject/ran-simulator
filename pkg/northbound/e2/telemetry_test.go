@@ -15,8 +15,9 @@
 package e2
 
 import (
-	"github.com/onosproject/ran-simulator/pkg/utils"
 	"testing"
+
+	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
 	"gotest.tools/assert"
@@ -33,12 +34,12 @@ func Test_GenerateReport(t *testing.T) {
 	mgr.UserEquipmentsLock.RUnlock()
 
 	msg := generateReport(ue1)
-	assert.Equal(t, e2.MessageType_RADIO_MEAS_REPORT_PER_UE, msg.MessageType)
-	rmrpu, ok := msg.S.(*e2.TelemetryMessage_RadioMeasReportPerUE)
+	assert.Equal(t, e2.MessageType_RADIO_MEAS_REPORT_PER_UE, msg.GetHdr().MessageType)
+	rmrpu := msg.GetMsg().GetRadioMeasReportPerUE()
 	assert.Assert(t, ok, "Expected msg.S to convert to RadioMeasReportPerUE")
-	assert.Equal(t, "0001", rmrpu.RadioMeasReportPerUE.Crnti)
-	assert.Equal(t, 3, len(rmrpu.RadioMeasReportPerUE.RadioReportServCells))
-	for _, rr := range rmrpu.RadioMeasReportPerUE.RadioReportServCells {
+	assert.Equal(t, "0001", rmrpu.GetCrnti())
+	assert.Equal(t, 3, len(rmrpu.GetRadioReportServCells()))
+	for _, rr := range rmrpu.GetRadioReportServCells() {
 		switch ecid := rr.Ecgi.Ecid; ecid {
 		case "0001420":
 		case "0001421":

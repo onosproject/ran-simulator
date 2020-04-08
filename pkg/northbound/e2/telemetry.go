@@ -18,7 +18,8 @@ import (
 	"fmt"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
-	e2ap "github.com/onosproject/onos-ric/api/sb/e2ap"
+	"github.com/onosproject/onos-ric/api/sb/e2ap"
+	"github.com/onosproject/onos-ric/api/sb/e2sm"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
@@ -36,7 +37,12 @@ func makeCqi(distance float32, txPowerdB float32) uint32 {
 
 // SendTelemetry ...
 func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2ap.E2AP_SendTelemetryServer) error {
-	c := make(chan e2.TelemetryMessage)
+	return nil
+}
+
+// RicSubscription ...
+func (s *Server) RicSubscription(stream e2ap.E2AP_RicSubscriptionServer) error {
+	c := make(chan e2ap.RicIndication)
 	defer close(c)
 	go func() {
 		err := radioMeasReportPerUE(s.GetPort(), s.GetECGI(), stream, c)
@@ -47,7 +53,7 @@ func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2ap.E2AP_SendTeleme
 	return sendTelemetryLoop(s.GetPort(), stream, c)
 }
 
-func sendTelemetryLoop(port int, stream e2ap.E2AP_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func sendTelemetryLoop(port int, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) error {
 	for {
 		select {
 		case msg := <-c:
@@ -63,7 +69,7 @@ func sendTelemetryLoop(port int, stream e2ap.E2AP_SendTelemetryServer, c chan e2
 	}
 }
 
-func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_SendTelemetryServer, c chan e2.TelemetryMessage) error {
+func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) error {
 	trafficSimMgr := manager.GetManager()
 
 	// replay any existing UE's
@@ -104,7 +110,7 @@ func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_SendTel
 	}
 }
 
-func generateReport(ue *types.Ue) e2.TelemetryMessage {
+func generateReport(ue *types.Ue) e2ap.RicIndication {
 	trafficSimMgr := manager.GetManager()
 
 	trafficSimMgr.TowersLock.RLock()
@@ -141,13 +147,17 @@ func generateReport(ue *types.Ue) e2.TelemetryMessage {
 		reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
 
 	servingTower2Ecgi := toE2Ecgi(servingTower.Ecgi)
-	return e2.TelemetryMessage{
-		MessageType: e2.MessageType_RADIO_MEAS_REPORT_PER_UE,
-		S: &e2.TelemetryMessage_RadioMeasReportPerUE{
-			RadioMeasReportPerUE: &e2.RadioMeasReportPerUE{
-				Ecgi:                 &servingTower2Ecgi,
-				Crnti:                string(ue.Crnti),
-				RadioReportServCells: reports,
+	return e2ap.RicIndication{
+		Hdr: &e2sm.RicIndicationHeader{
+			MessageType: e2.MessageType_RADIO_MEAS_REPORT_PER_UE,
+		},
+		Msg: &e2sm.RicIndicationMessage{
+			S: &e2sm.RicIndicationMessage_RadioMeasReportPerUE{
+				RadioMeasReportPerUE: &e2.RadioMeasReportPerUE{
+					Ecgi:                 &servingTower2Ecgi,
+					Crnti:                string(ue.Crnti),
+					RadioReportServCells: reports,
+				},
 			},
 		},
 	}

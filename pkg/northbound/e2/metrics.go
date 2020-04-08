@@ -20,27 +20,25 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
+	"github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
 
 // UpdateTelemetryMetrics ...
-func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
+func UpdateTelemetryMetrics(m *e2ap.RicIndication) {
 	trafficSimMgr := manager.GetManager()
-	switch m.MessageType {
+	switch m.GetHdr().GetMessageType() {
 	case e2.MessageType_RADIO_MEAS_REPORT_PER_UE:
-		x, ok := m.S.(*e2.TelemetryMessage_RadioMeasReportPerUE)
-		if !ok {
-			log.Fatalf("Unexpected payload for RADIO_MEAS_REPORT_PER_UE message %v", m)
-		}
-		r := x.RadioMeasReportPerUE
-		towerID := toTypesEcgi(r.Ecgi)
-		name, err := trafficSimMgr.CrntiToName(types.Crnti(r.Crnti), &towerID)
+		msg := m.GetMsg().GetRadioMeasReportPerUE()
+		towerID := toTypesEcgi(msg.GetEcgi())
+		name, err := trafficSimMgr.CrntiToName(types.Crnti(msg.GetCrnti()), &towerID)
 		if err != nil {
-			log.Errorf("ue %s/%s not found", r.Ecgi.Ecid, r.Crnti)
+			log.Errorf("ue %s/%s not found", msg.GetEcgi().GetEcid(), msg.GetCrnti())
 			return
 		}
 		var ue *types.Ue
+		var ok bool
 		trafficSimMgr.UserEquipmentsLock.RLock()
 		if ue, ok = trafficSimMgr.UserEquipments[name]; !ok {
 			trafficSimMgr.UserEquipmentsLock.RUnlock()
@@ -48,7 +46,7 @@ func UpdateTelemetryMetrics(m *e2.TelemetryMessage) {
 		}
 		trafficSimMgr.UserEquipmentsLock.RUnlock()
 
-		reports := r.RadioReportServCells
+		reports := msg.RadioReportServCells
 
 		bestCQI := reports[0].CqiHist[0]
 		bestStationID := reports[0].Ecgi
