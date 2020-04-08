@@ -83,6 +83,8 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 
 // SetNumberUes - change the number of active UEs
 func (m *Manager) SetNumberUes(numUes int) error {
+	m.UserEquipmentsMapLock.Lock()
+	defer m.UserEquipmentsMapLock.Unlock()
 	currentNum := len(m.UserEquipments)
 	if numUes < int(m.MapLayout.MinUes) {
 		return fmt.Errorf("number of UEs requested %d is below minimum %d", numUes, m.MapLayout.MinUes)
@@ -119,7 +121,9 @@ func (m *Manager) SetNumberUes(numUes int) error {
 			if err != nil {
 				return err
 			}
+			m.UserEquipmentsLock.Lock()
 			m.Routes[imsi] = newRoute
+			m.UserEquipmentsLock.Unlock()
 			m.RouteChannel <- dispatcher.Event{
 				Type:   trafficsim.Type_ADDED,
 				Object: newRoute,
@@ -193,10 +197,16 @@ func (m *Manager) startMoving(params RoutesParams) {
 
 	for {
 		breakout := false // Needed to breakout of double for loop
+		m.UserEquipmentsMapLock.Lock()
 		for imsi, ue := range m.UserEquipments {
-			err := m.moveUe(ue, m.Routes[imsi])
+			r, ok := m.Routes[imsi]
+			if !ok {
+				log.Warnf("Unable to retrieve route for %s", imsi)
+				continue
+			}
+			err := m.moveUe(ue, r)
 			if err != nil && strings.HasPrefix(err.Error(), "end of route") {
-				oldRouteFinish := m.Routes[imsi].GetWaypoints()[len(m.Routes[imsi].GetWaypoints())-1]
+				oldRouteFinish := r.GetWaypoints()[len(r.GetWaypoints())-1]
 				log.Infof("Need to do a new route for %d Start %v %v", imsi, oldRouteFinish, err)
 				newRoute, err := m.newRoute(&Location{
 					Name:     "noname",
@@ -219,6 +229,7 @@ func (m *Manager) startMoving(params RoutesParams) {
 				breakout = true
 			}
 		}
+		m.UserEquipmentsMapLock.Unlock()
 		time.Sleep(params.StepDelay)
 		if breakout {
 			break

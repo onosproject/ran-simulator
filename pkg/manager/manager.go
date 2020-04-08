@@ -34,20 +34,21 @@ var mgr Manager
 
 // Manager single point of entry for the trafficsim system.
 type Manager struct {
-	MapLayout          types.MapLayout
-	Towers             map[types.ECGI]*types.Tower
-	TowersLock         *sync.RWMutex
-	Locations          map[string]*Location
-	Routes             map[types.Imsi]*types.Route
-	UserEquipments     map[types.Imsi]*types.Ue
-	UserEquipmentsLock *sync.RWMutex
-	Dispatcher         *dispatcher.Dispatcher
-	UeChannel          chan dispatcher.Event
-	RouteChannel       chan dispatcher.Event
-	TowerChannel       chan dispatcher.Event
-	googleAPIKey       string
-	LatencyChannel     chan metrics.HOEvent
-	TopoClient         device.DeviceServiceClient
+	MapLayout             types.MapLayout
+	Towers                map[types.ECGI]*types.Tower
+	TowersLock            *sync.RWMutex
+	Locations             map[string]*Location
+	Routes                map[types.Imsi]*types.Route
+	UserEquipments        map[types.Imsi]*types.Ue
+	UserEquipmentsLock    *sync.RWMutex
+	UserEquipmentsMapLock *sync.RWMutex
+	Dispatcher            *dispatcher.Dispatcher
+	UeChannel             chan dispatcher.Event
+	RouteChannel          chan dispatcher.Event
+	TowerChannel          chan dispatcher.Event
+	googleAPIKey          string
+	LatencyChannel        chan metrics.HOEvent
+	TopoClient            device.DeviceServiceClient
 }
 
 // MetricsParams for the Prometheus exporter
@@ -60,13 +61,14 @@ type MetricsParams struct {
 func NewManager() (*Manager, error) {
 	log.Info("Creating Manager")
 	mgr = Manager{
-		TowersLock:         &sync.RWMutex{},
-		UserEquipmentsLock: &sync.RWMutex{},
-		Dispatcher:         dispatcher.NewDispatcher(),
-		UeChannel:          make(chan dispatcher.Event),
-		RouteChannel:       make(chan dispatcher.Event),
-		TowerChannel:       make(chan dispatcher.Event),
-		LatencyChannel:     make(chan metrics.HOEvent),
+		TowersLock:            &sync.RWMutex{},
+		UserEquipmentsLock:    &sync.RWMutex{},
+		UserEquipmentsMapLock: &sync.RWMutex{},
+		Dispatcher:            dispatcher.NewDispatcher(),
+		UeChannel:             make(chan dispatcher.Event),
+		RouteChannel:          make(chan dispatcher.Event),
+		TowerChannel:          make(chan dispatcher.Event),
+		LatencyChannel:        make(chan metrics.HOEvent),
 	}
 	return &mgr, nil
 }
