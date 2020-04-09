@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/onosproject/onos-ric/api/sb"
 	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/onos-ric/api/sb/e2sm"
@@ -35,30 +34,12 @@ func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
 	return ricControlResponse(s.GetPort(), stream, c)
 }
 
-// SendControl ...
+// SendControl ...To removed
 func (s *Server) SendControl(stream e2ap.E2AP_SendControlServer) error {
-	c := make(chan e2.ControlUpdate)
-	defer close(c)
-	go recvControlLoop(s.GetECGI(), stream, c)
-	return sendControlLoop(s.GetPort(), stream, c)
+	return nil
 }
 
 func ricControlResponse(port int, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) error {
-	for {
-		select {
-		case msg := <-c:
-			if err := stream.Send(&msg); err != nil {
-				log.Infof("send error %v", err)
-				return err
-			}
-		case <-stream.Context().Done():
-			log.Infof("Controller on Port %d has disconnected", port)
-			return nil
-		}
-	}
-}
-
-func sendControlLoop(port int, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) error {
 	for {
 		select {
 		case msg := <-c:
@@ -105,7 +86,7 @@ func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControl
 	}
 }
 
-func recvControlLoop(towerID types.ECGI, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
+func recvControlLoop(towerID types.ECGI, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) {
 	handleUeAdmissions(towerID, stream, c)
 }
 
@@ -180,7 +161,7 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicControlRe
 	e2Ecgi := toE2Ecgi(tower.Ecgi)
 	cellConfigReport := e2ap.RicControlResponse{
 		Hdr: &e2sm.RicControlHeader{
-			MessageType: sb.MessageType_CELL_CONFIG_REPORT,
+			MessageType: e2.MessageType_CELL_CONFIG_REPORT,
 		},
 		Msg: &e2sm.RicControlOutcome{
 			S: &e2sm.RicControlOutcome_CellConfigReport{
@@ -197,7 +178,7 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicControlRe
 	log.Infof("handleCellConfigReport eci: %v", tower.Ecgi)
 }
 
-func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_SendControlServer, c chan e2.ControlUpdate) {
+func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
@@ -256,30 +237,39 @@ func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_SendControlServer, 
 	}
 }
 
-func formatUeAdmissionReq(eci *types.ECGI, crnti types.Crnti, imsi types.Imsi) *e2.ControlUpdate {
+func formatUeAdmissionReq(eci *types.ECGI, crnti types.Crnti, imsi types.Imsi) *e2ap.RicIndication {
 	e2Ecgi := toE2Ecgi(eci)
-	return &e2.ControlUpdate{
-		MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
-		S: &e2.ControlUpdate_UEAdmissionRequest{
-			UEAdmissionRequest: &e2.UEAdmissionRequest{
-				Ecgi:              &e2Ecgi,
-				Crnti:             string(crnti),
-				AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
-				Imsi:              uint64(imsi),
+
+	return &e2ap.RicIndication{
+		Hdr: &e2sm.RicIndicationHeader{
+			MessageType: e2.MessageType_UE_ADMISSION_REQUEST,
+		},
+		Msg: &e2sm.RicIndicationMessage{
+			S: &e2sm.RicIndicationMessage_UEAdmissionRequest{
+				UEAdmissionRequest: &e2.UEAdmissionRequest{
+					Ecgi:              &e2Ecgi,
+					Crnti:             string(crnti),
+					AdmissionEstCause: e2.AdmEstCause_MO_SIGNALLING,
+					Imsi:              uint64(imsi),
+				},
 			},
 		},
 	}
 }
 
-func formatUeReleaseInd(eci *types.ECGI, crnti types.Crnti) *e2.ControlUpdate {
+func formatUeReleaseInd(eci *types.ECGI, crnti types.Crnti) *e2ap.RicIndication {
 	e2Ecgi := toE2Ecgi(eci)
-	return &e2.ControlUpdate{
-		MessageType: e2.MessageType_UE_RELEASE_IND,
-		S: &e2.ControlUpdate_UEReleaseInd{
-			UEReleaseInd: &e2.UEReleaseInd{
-				Ecgi:         &e2Ecgi,
-				Crnti:        string(crnti),
-				ReleaseCause: e2.ReleaseCause_RELEASE_INACTIVITY,
+	return &e2ap.RicIndication{
+		Hdr: &e2sm.RicIndicationHeader{
+			MessageType: e2.MessageType_UE_RELEASE_IND,
+		},
+		Msg: &e2sm.RicIndicationMessage{
+			S: &e2sm.RicIndicationMessage_UEReleaseInd{
+				UEReleaseInd: &e2.UEReleaseInd{
+					Ecgi:         &e2Ecgi,
+					Crnti:        string(crnti),
+					ReleaseCause: e2.ReleaseCause_RELEASE_INACTIVITY,
+				},
 			},
 		},
 	}

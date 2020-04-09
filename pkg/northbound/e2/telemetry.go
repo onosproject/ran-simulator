@@ -44,16 +44,17 @@ func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2ap.E2AP_SendTeleme
 func (s *Server) RicSubscription(stream e2ap.E2AP_RicSubscriptionServer) error {
 	c := make(chan e2ap.RicIndication)
 	defer close(c)
+	go recvControlLoop(s.GetECGI(), stream, c)
 	go func() {
 		err := radioMeasReportPerUE(s.GetPort(), s.GetECGI(), stream, c)
 		if err != nil {
 			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
 		}
 	}()
-	return sendTelemetryLoop(s.GetPort(), stream, c)
+	return sendIndication(s.GetPort(), stream, c)
 }
 
-func sendTelemetryLoop(port int, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) error {
+func sendIndication(port int, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) error {
 	for {
 		select {
 		case msg := <-c:
