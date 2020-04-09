@@ -68,6 +68,9 @@ all: build images
 publish: # @HELP publish version on github and dockerhub
 	./../build-tools/publish-version ${VERSION} onosproject/ran-simulator
 
+bumponosdeps: # @HELP update "onosproject" go dependencies and push patch to git.
+	./../build-tools/bump-onos-deps ${VERSION}
+
 clean: # @HELP remove all the build artifacts
 	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim
 	go clean -testcache github.com/onosproject/ran-simulator/...
