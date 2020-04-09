@@ -17,10 +17,11 @@ package manager
 
 import (
 	"context"
+	"sync"
+
 	"github.com/onosproject/onos-topo/api/device"
 	"github.com/onosproject/ran-simulator/pkg/southbound/topo"
 	"github.com/onosproject/ran-simulator/pkg/utils"
-	"sync"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
