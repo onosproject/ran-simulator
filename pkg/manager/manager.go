@@ -49,6 +49,7 @@ type Manager struct {
 	TowerChannel          chan dispatcher.Event
 	googleAPIKey          string
 	LatencyChannel        chan metrics.HOEvent
+	ResetMetricsChannel   chan bool
 	TopoClient            device.DeviceServiceClient
 }
 
@@ -70,6 +71,7 @@ func NewManager() (*Manager, error) {
 		RouteChannel:          make(chan dispatcher.Event),
 		TowerChannel:          make(chan dispatcher.Event),
 		LatencyChannel:        make(chan metrics.HOEvent),
+		ResetMetricsChannel:   make(chan bool),
 	}
 	return &mgr, nil
 }
@@ -101,7 +103,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 	go m.startMoving(routesParams)
 
-	go metrics.RunHOExposer(metricsParams.Port, m.LatencyChannel, metricsParams.ExportAllHOEvents)
+	go metrics.RunHOExposer(metricsParams.Port, m.LatencyChannel, metricsParams.ExportAllHOEvents, m.ResetMetricsChannel)
 
 	ctx := context.Background()
 	m.TopoClient = topo.ConnectToTopo(ctx, topoEndpoint, serverParams)

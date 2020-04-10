@@ -85,6 +85,9 @@ message SetNumberUEsResponse {
     uint32 number = 1;
 }
 
+message ResetMetricsMsg {
+}
+
 // Traffic - provides a stream of traffic data to GUI
 service Traffic {
     rpc GetMapLayout(MapLayoutRequest) returns (ran.trafficsim.types.MapLayout);
@@ -96,6 +99,8 @@ service Traffic {
     rpc ListUes(ListUesRequest) returns (stream ListUesResponse);
 
     rpc SetNumberUEs(SetNumberUEsRequest) returns (SetNumberUEsResponse);
+
+    rpc ResetMetrics(ResetMetricsMsg) returns (ResetMetricsMsg);
 }
 
 // Change event type

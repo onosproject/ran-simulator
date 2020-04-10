@@ -40,27 +40,33 @@ var allHOEvents []HOEvent
 var allHOEventsLock sync.RWMutex
 
 // RunHOExposer runs Prometheus exposer
-func RunHOExposer(port int, latencyChan chan HOEvent, exportAll bool) {
+func RunHOExposer(port int, latencyChan chan HOEvent, exportAll bool, resetChan chan bool) {
 	log.Infof("Starting Prometheus agent on http://:%d/metrics with All HO Events=%v", port, exportAll)
-	hoLatencyHistogram := prometheus.NewHistogram(
-		prometheus.HistogramOpts{
-			Namespace: "onosproject",
-			Subsystem: "ransimulator",
-			Name:      "hometrics",
-			Help:      "time (µs) from when RadioMeasReportUE is sent to when Handover is complete",
-			Buckets:   prometheus.ExponentialBuckets(1e3, 1.5, 20),
-		},
-	)
+	hoLatencyHistogram := createHistogram()
 	prometheus.MustRegister(hoLatencyHistogram)
 	go func() {
 		// block here until a latency measurement is received
 		for latency := range latencyChan {
+			if hoLatencyHistogram == nil { // If being reset
+				continue
+			}
 			hoLatencyHistogram.Observe(float64(latency.HOLatency / 1e3))
 			if exportAll {
 				allHOEventsLock.Lock()
 				allHOEvents = append(allHOEvents, latency)
 				allHOEventsLock.Unlock()
 			}
+		}
+	}()
+	go func() {
+		for range resetChan {
+			prometheus.Unregister(hoLatencyHistogram)
+			hoLatencyHistogram = nil
+			allHOEventsLock.Lock()
+			allHOEvents = nil
+			allHOEventsLock.Unlock()
+			hoLatencyHistogram = createHistogram()
+			prometheus.MustRegister(hoLatencyHistogram)
 		}
 	}()
 	if exportAll {
@@ -79,6 +85,18 @@ func RunHOExposer(port int, latencyChan chan HOEvent, exportAll bool) {
 	if err != nil {
 		log.Fatalf("error serving prometheus metrics %s", err.Error())
 	}
+}
+
+func createHistogram() prometheus.Histogram {
+	return prometheus.NewHistogram(
+		prometheus.HistogramOpts{
+			Namespace: "onosproject",
+			Subsystem: "ransimulator",
+			Name:      "hometrics",
+			Help:      "time (µs) from when RadioMeasReportUE is sent to when Handover is complete",
+			Buckets:   prometheus.ExponentialBuckets(1e3, 1.5, 20),
+		},
+	)
 }
 
 func exposeAllHOEvents() []prometheus.Counter {
