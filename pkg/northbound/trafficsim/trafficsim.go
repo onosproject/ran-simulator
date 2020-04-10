@@ -225,3 +225,11 @@ func (s *Server) SetNumberUEs(ctx context.Context, req *trafficsim.SetNumberUEsR
 	}
 	return &trafficsim.SetNumberUEsResponse{Number: numRoutes}, nil
 }
+
+// ResetMetrics resets the metrics on demand
+func (s *Server) ResetMetrics(ctx context.Context, req *trafficsim.ResetMetricsMsg) (*trafficsim.ResetMetricsMsg, error) {
+	manager.GetManager().ResetMetricsChannel <- true
+	log.Warn("Metrics reset")
+
+	return &trafficsim.ResetMetricsMsg{}, nil
+}

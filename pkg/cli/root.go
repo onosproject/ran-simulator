@@ -38,13 +38,14 @@ func Init() {
 // GetCommand returns the root command for the RAN service
 func GetCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ransim {get|set|watch|setnumues|log} [args]",
+		Use:   "ransim {get|set|watch|setnumues|resetmetrics|log} [args]",
 		Short: "ONOS RAN Simulator subsystem commands",
 	}
 
 	clilib.AddConfigFlags(cmd, defaultAddress)
 	cmd.AddCommand(clilib.GetConfigCommand())
 	cmd.AddCommand(getSetNumUEsCommand())
+	cmd.AddCommand(getResetMetricsCommand())
 	cmd.AddCommand(loglib.GetCommand())
 	return cmd
 }
