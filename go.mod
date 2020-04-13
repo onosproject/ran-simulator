@@ -1,12 +1,11 @@
 module github.com/onosproject/ran-simulator
 
-go 1.13
+go 1.14
 
 require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/onosproject/onos-lib-go v0.5.0
 	github.com/onosproject/onos-ric v0.5.0
-	github.com/onosproject/onos-test v0.0.0-20200317133500-bc8ce404e274 // indirect
 	github.com/onosproject/onos-topo v0.5.0
 	github.com/prometheus/client_golang v1.4.1
 	github.com/sergi/go-diff v1.1.0 // indirect
