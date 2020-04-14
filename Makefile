@@ -4,7 +4,8 @@ export GO111MODULE=on
 .PHONY: build
 
 RAN_SIMULATOR_VERSION := latest
-ONOS_BUILD_VERSION := stable
+ONOS_BUILD_VERSION := v0.5.0
+ONOS_PROTOC_VERSION := v0.5.0
 
 build: # @HELP build the Go binaries and run all validations (default)
 build:
@@ -40,7 +41,7 @@ protos: # @HELP compile the protobuf files (using protoc-go Docker)
 		-v `pwd`/../build-tools/licensing:/build-tools/licensing \
 		-w /go/src/github.com/onosproject/ran-simulator \
 		--entrypoint build/bin/compile-protos.sh \
-		onosproject/protoc-go:stable
+		onosproject/protoc-go:${ONOS_PROTOC_VERSION}
 
 ran-simulator-base-docker: # @HELP build ran-simulator base Docker image
 	@go mod vendor
