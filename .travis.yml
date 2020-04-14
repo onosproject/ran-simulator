@@ -3,7 +3,7 @@ sudo: false
 language: go
 
 go:
-  - '1.13.x'
+  - '1.14.x'
 
 services:
   - docker
@@ -20,7 +20,7 @@ cache:
     - $HOME/gopath/pkg/mod         # Cache the Go modules
 
 before_script:
-  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.23.6
+  - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.23.7
 
 jobs:
   include:
