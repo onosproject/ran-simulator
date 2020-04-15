@@ -55,6 +55,7 @@ github.com/atomix/api v0.0.0-20200207212403-a55e2fa6e823/go.mod h1:N+Jv8qV9klP+/
 github.com/atomix/api v0.0.0-20200211005812-591fe8b07ea8/go.mod h1:N+Jv8qV9klP+/RDAVxRbPdluB0cm1ZjKLDjd40/Ccv4=
 github.com/atomix/api v0.0.0-20200219005318-0350f11bfcde h1:r6a6Uqw4UIXQfuqJo5EzRgfDXZuHHJO7rb7QeKktLiI=
 github.com/atomix/api v0.0.0-20200219005318-0350f11bfcde/go.mod h1:N+Jv8qV9klP+/RDAVxRbPdluB0cm1ZjKLDjd40/Ccv4=
+github.com/atomix/api v0.1.0/go.mod h1:G8fCdKYiPhZMYTgfz7QAtw6JqIfY2szigiz/gILNY50=
 github.com/atomix/atomix-api v0.0.0-20190826211343-dd8f4db3bf77/go.mod h1:joWKUd0zIeYbAQ0vmYHGsnV03ZgRalhceHgnJ3EN0mI=
 github.com/atomix/atomix-api v0.0.0-20191002225141-1ee9c98c7dfd/go.mod h1:joWKUd0zIeYbAQ0vmYHGsnV03ZgRalhceHgnJ3EN0mI=
 github.com/atomix/atomix-api v0.0.0-20191005223910-aa620357faa0/go.mod h1:joWKUd0zIeYbAQ0vmYHGsnV03ZgRalhceHgnJ3EN0mI=
@@ -117,6 +118,7 @@ github.com/atomix/go-client v0.0.0-20200218200323-6fd69e684d05 h1:BXCRt2NzbiJDCR
 github.com/atomix/go-client v0.0.0-20200218200323-6fd69e684d05/go.mod h1:GWfCdTYMKNFkyf9lWHjuJeuPvNeuAjTui6Hi7JC0yrw=
 github.com/atomix/go-client v0.0.0-20200307025134-f638fa3fb644 h1:G58/XSZszNKlP7DkvFsdO7f29+QfsvIEwJ++fj5eGXI=
 github.com/atomix/go-client v0.0.0-20200307025134-f638fa3fb644/go.mod h1:dsxE5H6NSYpV7q/Dr9BTkzxSvL5xAs96bcDa2VPt19E=
+github.com/atomix/go-client v0.1.0/go.mod h1:ILrAqt6cUNOdPyifTt1yZ8f51HJ47AUWAzPEu3+bYro=
 github.com/atomix/go-framework v0.0.0-20200123235029-e29fc7d6e104/go.mod h1:Dn7tjt5LIRA/qr5afQZDh9hdtvK82uQpMrADYIlVtfQ=
 github.com/atomix/go-framework v0.0.0-20200124003840-f24758b13aa2/go.mod h1:vo5K/v+rc5mohoZIw9vbyj+Y/EGGaEdF6XVkEvM9CSM=
 github.com/atomix/go-framework v0.0.0-20200124061342-61b0ae5140c9/go.mod h1:G/yTdMGpfwbA2YXym/VEi7op3qZKd1jtGJX0sjcZmpQ=
@@ -380,6 +382,7 @@ github.com/grpc-ecosystem/go-grpc-middleware v1.0.0/go.mod h1:FiyG127CGDf3tlThmg
 github.com/grpc-ecosystem/go-grpc-middleware v1.0.1-0.20190118093823-f849b5445de4/go.mod h1:FiyG127CGDf3tlThmgyCl78X/SZQqEOJBCDaAfeWzPs=
 github.com/grpc-ecosystem/go-grpc-middleware v1.1.0 h1:THDBEeQ9xZ8JEaCLyLQqXMMdRqNr0QAUJTIkQAUtFjg=
 github.com/grpc-ecosystem/go-grpc-middleware v1.1.0/go.mod h1:f5nM7jw/oeRSadq3xCzHAvxcr8HZnzsqU6ILg/0NiiE=
+github.com/grpc-ecosystem/go-grpc-middleware v1.2.0/go.mod h1:mJzapYve32yjrKlk9GbyCZHuPgZsrbyIbyKhSzOpg6s=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 h1:Ovs26xHkKqVztRpIrF/92BcuyuQ/YW4NSIpoGtfXNho=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
 github.com/grpc-ecosystem/grpc-gateway v1.9.0 h1:bM6ZAFZmc/wPFaRDi0d5L7hGEZEx/2u+Tmr2evNHDiI=
@@ -490,6 +493,7 @@ github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/onosproject/helmit v0.0.0-20200327211207-6ee099c52d08/go.mod h1:n5Cx+l/S/d+V3DStbpfbo16eGeZ/G3Nbl7u2nY4Ofxc=
 github.com/onosproject/helmit v0.0.0-20200330181216-4d6d0cba5916/go.mod h1:xLBMRjyjNe95ZQ0wlRxhArSn5Nx5Uoql1yiGmfS2gYw=
+github.com/onosproject/helmit v0.5.0/go.mod h1:GwfwgPCBykeIOQJnii780T7J114+s4DLP8D/HUTdflk=
 github.com/onosproject/onos-cli v0.0.0-20200205222355-b174234b2ffa/go.mod h1:aUcsRKvZxiJOoT1KCUgp4iiDe71pvawPqPrXWoPmKjI=
 github.com/onosproject/onos-config v0.0.0-20191116095118-2ca4b5f98ae2/go.mod h1:KqXDEuf9d/uiHCL1iso0s8j3UUofZjCHUhs5pVWwJ0E=
 github.com/onosproject/onos-config v0.0.0-20200124182344-6c3f5eb1e6ed/go.mod h1:rQfBju27qOGvL7Qtvxo6H9TlvU0oEw91emQzS14hmnE=
@@ -506,6 +510,8 @@ github.com/onosproject/onos-ric v0.0.0-20200225182040-dcf370614b8e h1:vPNS9RSPDn
 github.com/onosproject/onos-ric v0.0.0-20200225182040-dcf370614b8e/go.mod h1:jIZgQQ7jmuAGM2UXaePWBPRf8pTWafJ3vsE39iE+TPk=
 github.com/onosproject/onos-ric v0.5.0 h1:P8dWODkLwhvfPNxIJNF9wkgxFG45VQD0lnrchkm4FH4=
 github.com/onosproject/onos-ric v0.5.0/go.mod h1:bdxPY/FT3+dwtbLlvDALepGSYRum+aKeDokdNmRP/+8=
+github.com/onosproject/onos-ric v0.5.1-0.20200414140408-697f8535b809 h1:71G2eHAym6xgviU+/ypCdnktCs3enSBVI7AUWPaml8s=
+github.com/onosproject/onos-ric v0.5.1-0.20200414140408-697f8535b809/go.mod h1:wkwv56lYG7a980tNoDyxs2bF22JO2go5eGLtgKKpvEg=
 github.com/onosproject/onos-test v0.0.0-20200124000609-2c23d699896e/go.mod h1:yL/WBZiJEjdBPtVRP7OkP6qdg9+kW1N+92c6xz12cSs=
 github.com/onosproject/onos-test v0.0.0-20200124030233-2ce11592f40b/go.mod h1:1LWbQObEmAY+C0jIQ2CPaD2vIoaMn5BfZ+39n5q9AAM=
 github.com/onosproject/onos-test v0.0.0-20200202125349-5b744e8890fb/go.mod h1:Nby//C8vU8SKh5Oh+WrTStE54VefuUSzMQQY0FrqMxo=
