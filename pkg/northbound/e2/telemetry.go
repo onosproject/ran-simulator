@@ -40,22 +40,6 @@ func (s *Server) RicSubscription(stream e2ap.E2AP_RicSubscriptionServer) error {
 	return nil
 }
 
-func sendIndication(port int, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) error {
-	for {
-		select {
-		case msg := <-c:
-			UpdateTelemetryMetrics(&msg)
-			if err := stream.Send(&msg); err != nil {
-				log.Infof("send error on Port %d %v", port, err)
-				return err
-			}
-		case <-stream.Context().Done():
-			log.Infof("Controller has disconnected on Port %d", port)
-			return nil
-		}
-	}
-}
-
 func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) error {
 	trafficSimMgr := manager.GetManager()
 
