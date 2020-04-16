@@ -5,9 +5,11 @@ go 1.14
 require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/onosproject/onos-lib-go v0.5.0
-	github.com/onosproject/onos-ric v0.5.0
+	github.com/onosproject/onos-ric v0.5.1-0.20200414140408-697f8535b809
+	github.com/onosproject/onos-test v0.0.0-20200222204048-99418ae1ce43 // indirect
 	github.com/onosproject/onos-topo v0.5.0
 	github.com/prometheus/client_golang v1.4.1
+	github.com/renstrom/dedent v1.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/cobra v0.0.6
 	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4 // indirect

@@ -35,42 +35,12 @@ func makeCqi(distance float32, txPowerdB float32) uint32 {
 	return cqi
 }
 
-// SendTelemetry ...
-func (s *Server) SendTelemetry(req *e2.L2MeasConfig, stream e2ap.E2AP_SendTelemetryServer) error {
+// RicSubscription ...
+func (s *Server) RicSubscription(stream e2ap.E2AP_RicSubscriptionServer) error {
 	return nil
 }
 
-// RicSubscription ...
-func (s *Server) RicSubscription(stream e2ap.E2AP_RicSubscriptionServer) error {
-	c := make(chan e2ap.RicIndication)
-	defer close(c)
-	go recvControlLoop(s.GetECGI(), stream, c)
-	go func() {
-		err := radioMeasReportPerUE(s.GetPort(), s.GetECGI(), stream, c)
-		if err != nil {
-			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
-		}
-	}()
-	return sendIndication(s.GetPort(), stream, c)
-}
-
-func sendIndication(port int, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) error {
-	for {
-		select {
-		case msg := <-c:
-			UpdateTelemetryMetrics(&msg)
-			if err := stream.Send(&msg); err != nil {
-				log.Infof("send error on Port %d %v", port, err)
-				return err
-			}
-		case <-stream.Context().Done():
-			log.Infof("Controller has disconnected on Port %d", port)
-			return nil
-		}
-	}
-}
-
-func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) error {
+func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) error {
 	trafficSimMgr := manager.GetManager()
 
 	// replay any existing UE's

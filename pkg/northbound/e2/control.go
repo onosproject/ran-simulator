@@ -28,21 +28,29 @@ import (
 
 // RicControl ...
 func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
-	c := make(chan e2ap.RicControlResponse)
-	defer close(c)
-	go ricControlRequest(s.GetPort(), s.GetECGI(), stream, c)
-	return ricControlResponse(s.GetPort(), stream, c)
-}
-
-// SendControl ...To removed
-func (s *Server) SendControl(stream e2ap.E2AP_SendControlServer) error {
 	return nil
 }
 
-func ricControlResponse(port int, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) error {
+// RicChan ...
+func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
+	c := make(chan e2ap.RicIndication)
+	defer close(c)
+	go ricControlRequest(s.GetPort(), s.GetECGI(), stream, c)
+	go recvControlLoop(s.GetECGI(), stream, c)
+	go func() {
+		err := radioMeasReportPerUE(s.GetPort(), s.GetECGI(), stream, c)
+		if err != nil {
+			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
+		}
+	}()
+	return ricControlResponse(s.GetPort(), stream, c)
+}
+
+func ricControlResponse(port int, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) error {
 	for {
 		select {
 		case msg := <-c:
+			UpdateTelemetryMetrics(&msg)
 			if err := stream.Send(&msg); err != nil {
 				log.Infof("send error %v", err)
 				return err
@@ -54,7 +62,7 @@ func ricControlResponse(port int, stream e2ap.E2AP_RicControlServer, c chan e2ap
 	}
 }
 
-func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControlServer, c chan e2ap.RicControlResponse) {
+func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF || err != nil {
@@ -86,7 +94,7 @@ func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicControl
 	}
 }
 
-func recvControlLoop(towerID types.ECGI, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) {
+func recvControlLoop(towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) {
 	handleUeAdmissions(towerID, stream, c)
 }
 
@@ -138,7 +146,7 @@ func handleHORequest(towerID types.ECGI, req *e2.HORequest) error {
 	return fmt.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
 }
 
-func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicControlResponse) {
+func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicIndication) {
 	log.Infof("handleCellConfigRequest on Port %d", port)
 
 	trafficSimMgr := manager.GetManager()
@@ -159,12 +167,12 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicControlRe
 		cells = append(cells, &cell)
 	}
 	e2Ecgi := toE2Ecgi(tower.Ecgi)
-	cellConfigReport := e2ap.RicControlResponse{
-		Hdr: &e2sm.RicControlHeader{
+	cellConfigReport := e2ap.RicIndication{
+		Hdr: &e2sm.RicIndicationHeader{
 			MessageType: e2.MessageType_CELL_CONFIG_REPORT,
 		},
-		Msg: &e2sm.RicControlOutcome{
-			S: &e2sm.RicControlOutcome_CellConfigReport{
+		Msg: &e2sm.RicIndicationMessage{
+			S: &e2sm.RicIndicationMessage_CellConfigReport{
 				CellConfigReport: &e2.CellConfigReport{
 					Ecgi:               &e2Ecgi,
 					MaxNumConnectedUes: tower.MaxUEs,
@@ -178,7 +186,7 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicControlRe
 	log.Infof("handleCellConfigReport eci: %v", tower.Ecgi)
 }
 
-func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_RicSubscriptionServer, c chan e2ap.RicIndication) {
+func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
