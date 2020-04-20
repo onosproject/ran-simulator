@@ -134,26 +134,26 @@ func (m *MapLayoutRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MapLayoutRequest proto.InternalMessageInfo
 
-type ListTowersRequest struct {
+type ListCellsRequest struct {
 	// subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
-	// after all towers have been streamed to the client
+	// after all cells have been streamed to the client
 	Subscribe bool `protobuf:"varint,1,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
 	// option to request only changes that happen after the call
 	WithoutReplay bool `protobuf:"varint,2,opt,name=withoutReplay,proto3" json:"withoutReplay,omitempty"`
 }
 
-func (m *ListTowersRequest) Reset()         { *m = ListTowersRequest{} }
-func (m *ListTowersRequest) String() string { return proto.CompactTextString(m) }
-func (*ListTowersRequest) ProtoMessage()    {}
-func (*ListTowersRequest) Descriptor() ([]byte, []int) {
+func (m *ListCellsRequest) Reset()         { *m = ListCellsRequest{} }
+func (m *ListCellsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListCellsRequest) ProtoMessage()    {}
+func (*ListCellsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_47869854f8356ea4, []int{1}
 }
-func (m *ListTowersRequest) XXX_Unmarshal(b []byte) error {
+func (m *ListCellsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ListTowersRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ListCellsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ListTowersRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ListCellsRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -163,51 +163,51 @@ func (m *ListTowersRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *ListTowersRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListTowersRequest.Merge(m, src)
+func (m *ListCellsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListCellsRequest.Merge(m, src)
 }
-func (m *ListTowersRequest) XXX_Size() int {
+func (m *ListCellsRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *ListTowersRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListTowersRequest.DiscardUnknown(m)
+func (m *ListCellsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListCellsRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ListTowersRequest proto.InternalMessageInfo
+var xxx_messageInfo_ListCellsRequest proto.InternalMessageInfo
 
-func (m *ListTowersRequest) GetSubscribe() bool {
+func (m *ListCellsRequest) GetSubscribe() bool {
 	if m != nil {
 		return m.Subscribe
 	}
 	return false
 }
 
-func (m *ListTowersRequest) GetWithoutReplay() bool {
+func (m *ListCellsRequest) GetWithoutReplay() bool {
 	if m != nil {
 		return m.WithoutReplay
 	}
 	return false
 }
 
-type ListTowersResponse struct {
-	// tower is the tower change on which the event occurred
-	Tower *types.Tower `protobuf:"bytes,1,opt,name=tower,proto3" json:"tower,omitempty"`
+type ListCellsResponse struct {
+	// cell is the cell change on which the event occurred
+	Cell *types.Cell `protobuf:"bytes,1,opt,name=cell,proto3" json:"cell,omitempty"`
 	// type is a qualification of the type of change being made
 	Type Type `protobuf:"varint,2,opt,name=type,proto3,enum=ran.trafficsim.Type" json:"type,omitempty"`
 }
 
-func (m *ListTowersResponse) Reset()         { *m = ListTowersResponse{} }
-func (m *ListTowersResponse) String() string { return proto.CompactTextString(m) }
-func (*ListTowersResponse) ProtoMessage()    {}
-func (*ListTowersResponse) Descriptor() ([]byte, []int) {
+func (m *ListCellsResponse) Reset()         { *m = ListCellsResponse{} }
+func (m *ListCellsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListCellsResponse) ProtoMessage()    {}
+func (*ListCellsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_47869854f8356ea4, []int{2}
 }
-func (m *ListTowersResponse) XXX_Unmarshal(b []byte) error {
+func (m *ListCellsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ListTowersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ListCellsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ListTowersResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ListCellsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -217,26 +217,26 @@ func (m *ListTowersResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *ListTowersResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListTowersResponse.Merge(m, src)
+func (m *ListCellsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListCellsResponse.Merge(m, src)
 }
-func (m *ListTowersResponse) XXX_Size() int {
+func (m *ListCellsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *ListTowersResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListTowersResponse.DiscardUnknown(m)
+func (m *ListCellsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListCellsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ListTowersResponse proto.InternalMessageInfo
+var xxx_messageInfo_ListCellsResponse proto.InternalMessageInfo
 
-func (m *ListTowersResponse) GetTower() *types.Tower {
+func (m *ListCellsResponse) GetCell() *types.Cell {
 	if m != nil {
-		return m.Tower
+		return m.Cell
 	}
 	return nil
 }
 
-func (m *ListTowersResponse) GetType() Type {
+func (m *ListCellsResponse) GetType() Type {
 	if m != nil {
 		return m.Type
 	}
@@ -598,8 +598,8 @@ func init() {
 	proto.RegisterEnum("ran.trafficsim.Type", Type_name, Type_value)
 	proto.RegisterEnum("ran.trafficsim.UpdateType", UpdateType_name, UpdateType_value)
 	proto.RegisterType((*MapLayoutRequest)(nil), "ran.trafficsim.MapLayoutRequest")
-	proto.RegisterType((*ListTowersRequest)(nil), "ran.trafficsim.ListTowersRequest")
-	proto.RegisterType((*ListTowersResponse)(nil), "ran.trafficsim.ListTowersResponse")
+	proto.RegisterType((*ListCellsRequest)(nil), "ran.trafficsim.ListCellsRequest")
+	proto.RegisterType((*ListCellsResponse)(nil), "ran.trafficsim.ListCellsResponse")
 	proto.RegisterType((*ListRoutesRequest)(nil), "ran.trafficsim.ListRoutesRequest")
 	proto.RegisterType((*ListRoutesResponse)(nil), "ran.trafficsim.ListRoutesResponse")
 	proto.RegisterType((*ListUesRequest)(nil), "ran.trafficsim.ListUesRequest")
@@ -612,46 +612,46 @@ func init() {
 func init() { proto.RegisterFile("api/trafficsim/trafficsim.proto", fileDescriptor_47869854f8356ea4) }
 
 var fileDescriptor_47869854f8356ea4 = []byte{
-	// 613 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x54, 0xcf, 0x6e, 0xda, 0x4e,
-	0x18, 0xc4, 0x84, 0xfc, 0xfb, 0x42, 0x12, 0x67, 0x7f, 0xd1, 0x4f, 0xc8, 0xad, 0x9c, 0xd4, 0xcd,
-	0x01, 0x45, 0x8a, 0xa1, 0x54, 0xbd, 0xb4, 0x27, 0x2a, 0x5b, 0x6d, 0x24, 0xb0, 0xe9, 0xc6, 0x4e,
-	0x94, 0x53, 0x65, 0xe8, 0x26, 0x71, 0x15, 0xb0, 0xe3, 0x5d, 0x2b, 0xe2, 0x01, 0x7a, 0xef, 0x33,
-	0xf4, 0x69, 0x7a, 0xcc, 0xb1, 0xc7, 0x0a, 0x5e, 0xa4, 0xf2, 0xda, 0x60, 0x30, 0x2e, 0x55, 0xa4,
-	0xf6, 0x82, 0xec, 0x61, 0x66, 0xf6, 0x9b, 0xe5, 0x1b, 0xe0, 0xc0, 0xf1, 0xdd, 0x1a, 0x0b, 0x9c,
-	0xab, 0x2b, 0xb7, 0x47, 0xdd, 0xfe, 0xcc, 0xa3, 0xea, 0x07, 0x1e, 0xf3, 0xd0, 0x4e, 0xe0, 0x0c,
-	0xd4, 0x14, 0x95, 0x5e, 0x5f, 0xbb, 0xec, 0x26, 0xec, 0xaa, 0x3d, 0xaf, 0x5f, 0xf3, 0x06, 0x1e,
-	0xf5, 0x03, 0xef, 0x33, 0xe9, 0xb1, 0x5a, 0xe0, 0x0c, 0x4e, 0xa8, 0xdb, 0x0f, 0x6f, 0x1d, 0xe6,
-	0x05, 0x35, 0xee, 0x3a, 0xf4, 0x09, 0x8d, 0x3f, 0x63, 0x2f, 0x05, 0x81, 0xd8, 0x76, 0xfc, 0x96,
-	0x33, 0xf4, 0x42, 0x86, 0xc9, 0x5d, 0x48, 0x28, 0x53, 0x2e, 0x60, 0xaf, 0xe5, 0x52, 0x66, 0x79,
-	0xf7, 0x24, 0xa0, 0x09, 0x88, 0x9e, 0xc2, 0x26, 0x0d, 0xbb, 0xb4, 0x17, 0xb8, 0x5d, 0x52, 0x11,
-	0x0e, 0x85, 0xea, 0x06, 0x4e, 0x01, 0x74, 0x04, 0xdb, 0xf7, 0x2e, 0xbb, 0xe1, 0x26, 0xfe, 0xad,
-	0x33, 0xac, 0x14, 0x39, 0x63, 0x1e, 0x54, 0xee, 0x00, 0xcd, 0x1a, 0x53, 0xdf, 0x1b, 0x50, 0x82,
-	0x5e, 0xc0, 0x2a, 0x8b, 0x10, 0xee, 0xba, 0xd5, 0x78, 0xa2, 0xce, 0xc7, 0x53, 0xe3, 0x71, 0xb9,
-	0x08, 0xc7, 0x4c, 0x54, 0x85, 0x52, 0x84, 0xf2, 0x53, 0x76, 0x1a, 0xfb, 0x59, 0x85, 0x35, 0xf4,
-	0x09, 0xe6, 0x8c, 0x49, 0x16, 0xec, 0x85, 0x8c, 0xfc, 0x8b, 0x2c, 0x13, 0xe3, 0x34, 0x4b, 0x10,
-	0x21, 0xcb, 0xb3, 0x70, 0x11, 0x8e, 0x99, 0x8f, 0xc8, 0x62, 0xc1, 0x4e, 0x74, 0xa4, 0xfd, 0x77,
-	0x83, 0x7c, 0x13, 0x60, 0x77, 0x6a, 0x9b, 0xc4, 0xa8, 0x42, 0x31, 0x9c, 0x64, 0xa8, 0xe4, 0x67,
-	0xb0, 0x09, 0x2e, 0x86, 0x8f, 0x98, 0x1e, 0xbd, 0x81, 0xad, 0xd0, 0xff, 0xe4, 0x30, 0xf2, 0x91,
-	0x0b, 0x56, 0xb8, 0x40, 0xca, 0x0a, 0x6c, 0x4e, 0xe1, 0x32, 0x08, 0xa7, 0xcf, 0xca, 0x09, 0xfc,
-	0x77, 0x46, 0x98, 0x11, 0xf6, 0xbb, 0x24, 0xb0, 0xf5, 0x69, 0xfe, 0xff, 0x61, 0x6d, 0xc0, 0x31,
-	0x3e, 0xeb, 0x36, 0x4e, 0xde, 0x14, 0x15, 0xf6, 0xe7, 0xe9, 0x49, 0xae, 0xdf, 0xf1, 0xf7, 0x60,
-	0x17, 0x13, 0x4a, 0x58, 0x9b, 0xb0, 0xc0, 0xed, 0xd1, 0x36, 0xbd, 0x3e, 0x7e, 0x05, 0xa5, 0xe8,
-	0x64, 0xb4, 0x01, 0x25, 0xc3, 0x34, 0x74, 0xb1, 0x80, 0x36, 0x61, 0xb5, 0xa9, 0x69, 0xba, 0x26,
-	0x0a, 0x68, 0x0b, 0xd6, 0xed, 0x8e, 0xd6, 0xb4, 0x74, 0x4d, 0x2c, 0x46, 0x2f, 0x58, 0x6f, 0x9b,
-	0xe7, 0xba, 0x26, 0xae, 0x1c, 0xeb, 0x00, 0x69, 0x04, 0x24, 0x42, 0xd9, 0x30, 0x63, 0xa6, 0x75,
-	0xd9, 0x89, 0x4c, 0xca, 0xb0, 0xd1, 0x31, 0xcf, 0x4e, 0xad, 0x53, 0xd3, 0x10, 0x85, 0xc8, 0xd2,
-	0x32, 0x2f, 0x74, 0x2c, 0x16, 0xa3, 0x2f, 0xde, 0x37, 0x0d, 0xcd, 0x3c, 0xd7, 0xb1, 0xb8, 0xd2,
-	0xf8, 0x52, 0x82, 0x75, 0x2b, 0xbe, 0x15, 0xf4, 0x01, 0xca, 0xef, 0x08, 0x9b, 0xb6, 0x14, 0x1d,
-	0x66, 0xef, 0x2c, 0x5b, 0x60, 0xe9, 0x20, 0xff, 0x27, 0x4b, 0x2d, 0x6c, 0x80, 0xb4, 0x88, 0xe8,
-	0x59, 0x96, 0xbe, 0xd0, 0x7e, 0x49, 0x59, 0x46, 0x89, 0x2f, 0xb7, 0x2e, 0x4c, 0x6c, 0xe3, 0x4e,
-	0xe4, 0xdb, 0xce, 0x15, 0x31, 0xdf, 0x76, 0xbe, 0x52, 0x75, 0x01, 0xb5, 0x60, 0x3d, 0x59, 0x50,
-	0x24, 0xe7, 0x09, 0xd2, 0x42, 0x2c, 0x26, 0xcf, 0x6c, 0x76, 0x5d, 0x40, 0x97, 0x50, 0x9e, 0xdd,
-	0x0d, 0xf4, 0x3c, 0x2b, 0xc9, 0x59, 0x34, 0xe9, 0x68, 0x39, 0x29, 0x59, 0xaf, 0x0e, 0x94, 0x67,
-	0xd7, 0x08, 0x2d, 0x4c, 0x93, 0x59, 0x32, 0xe9, 0x4f, 0x84, 0xb7, 0x95, 0xef, 0x23, 0x59, 0x78,
-	0x18, 0xc9, 0xc2, 0xcf, 0x91, 0x2c, 0x7c, 0x1d, 0xcb, 0x85, 0x87, 0xb1, 0x5c, 0xf8, 0x31, 0x96,
-	0x0b, 0xdd, 0x35, 0xfe, 0xff, 0xfd, 0xf2, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0x0c, 0xda, 0xee,
-	0xed, 0x2e, 0x06, 0x00, 0x00,
+	// 619 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x4f, 0xdb, 0x40,
+	0x10, 0x8d, 0x43, 0xf8, 0x1a, 0x02, 0x98, 0x2d, 0xaa, 0x22, 0xb7, 0x32, 0xd4, 0xe5, 0x80, 0x90,
+	0x70, 0x28, 0x55, 0x2f, 0xed, 0x89, 0xd6, 0x56, 0x8b, 0x44, 0xec, 0x74, 0xb1, 0x41, 0x9c, 0x2a,
+	0xc7, 0x5d, 0xc0, 0x95, 0x13, 0x1b, 0xef, 0x5a, 0x55, 0xae, 0xfd, 0x05, 0xfd, 0x0d, 0xfd, 0x35,
+	0x3d, 0x72, 0xec, 0xb1, 0x22, 0x7f, 0xa4, 0xf2, 0xda, 0xb5, 0x13, 0xc7, 0x4d, 0x85, 0xc4, 0x25,
+	0xb2, 0x27, 0xef, 0xbd, 0x99, 0xb7, 0x3b, 0xcf, 0xb0, 0xe5, 0x84, 0x5e, 0x9b, 0x45, 0xce, 0xe5,
+	0xa5, 0xe7, 0x52, 0xaf, 0x3f, 0xf6, 0xa8, 0x86, 0x51, 0xc0, 0x02, 0xb4, 0x16, 0x39, 0x03, 0xb5,
+	0xa8, 0x4a, 0xaf, 0xaf, 0x3c, 0x76, 0x1d, 0xf7, 0x54, 0x37, 0xe8, 0xb7, 0x83, 0x41, 0x40, 0xc3,
+	0x28, 0xf8, 0x42, 0x5c, 0xd6, 0x8e, 0x9c, 0xc1, 0x3e, 0xf5, 0xfa, 0xb1, 0xef, 0xb0, 0x20, 0x6a,
+	0x73, 0xd5, 0x61, 0x48, 0x68, 0xfa, 0x9b, 0x6a, 0x29, 0x08, 0xc4, 0x8e, 0x13, 0x9e, 0x38, 0xc3,
+	0x20, 0x66, 0x98, 0xdc, 0xc4, 0x84, 0x32, 0xe5, 0x0c, 0xc4, 0x13, 0x8f, 0xb2, 0x77, 0xc4, 0xf7,
+	0x69, 0x56, 0x43, 0x4f, 0x61, 0x99, 0xc6, 0x3d, 0xea, 0x46, 0x5e, 0x8f, 0xb4, 0x84, 0x6d, 0x61,
+	0x77, 0x09, 0x17, 0x05, 0xb4, 0x03, 0xab, 0x5f, 0x3d, 0x76, 0xcd, 0x35, 0x42, 0xdf, 0x19, 0xb6,
+	0xea, 0x1c, 0x31, 0x59, 0x54, 0xfa, 0xb0, 0x31, 0xa6, 0x4b, 0xc3, 0x60, 0x40, 0x09, 0x52, 0xa1,
+	0xe1, 0x12, 0xdf, 0xe7, 0x9a, 0x2b, 0x87, 0x92, 0x3a, 0xe9, 0x4d, 0x4d, 0x67, 0x4d, 0x28, 0x98,
+	0xe3, 0xd0, 0x2e, 0x34, 0x92, 0x1a, 0xef, 0xb0, 0x76, 0xb8, 0x59, 0xc6, 0x5b, 0xc3, 0x90, 0x60,
+	0x8e, 0x50, 0xce, 0xd3, 0x76, 0x38, 0x88, 0x19, 0x79, 0x50, 0x1f, 0x37, 0x80, 0xc6, 0x85, 0x33,
+	0x23, 0x2f, 0x60, 0x3e, 0x4a, 0x2a, 0x99, 0x93, 0x27, 0xd5, 0x4e, 0x38, 0x09, 0xa7, 0xc8, 0x7b,
+	0x78, 0xb1, 0x60, 0x2d, 0x69, 0x69, 0x3f, 0xac, 0x91, 0x1f, 0x02, 0xac, 0xe7, 0xb2, 0x99, 0x8d,
+	0x5d, 0xa8, 0xc7, 0x7f, 0x3d, 0xb4, 0xaa, 0x3d, 0xd8, 0x04, 0xd7, 0xe3, 0x7b, 0x4c, 0x8f, 0xde,
+	0xc0, 0x4a, 0x1c, 0x7e, 0x76, 0x18, 0xf9, 0xc4, 0x09, 0x73, 0x9c, 0x30, 0x75, 0xd5, 0x36, 0x87,
+	0x70, 0x1a, 0xc4, 0xf9, 0xb3, 0xb2, 0x0f, 0x8f, 0x4e, 0x09, 0x33, 0xe2, 0x7e, 0x8f, 0x44, 0xb6,
+	0x9e, 0xfb, 0x7f, 0x0c, 0x0b, 0x03, 0x5e, 0xe3, 0xb3, 0xae, 0xe2, 0xec, 0x4d, 0x51, 0x61, 0x73,
+	0x12, 0x9e, 0xf9, 0xfa, 0x17, 0x7e, 0x03, 0xd6, 0x31, 0xa1, 0x84, 0x75, 0x08, 0x8b, 0x3c, 0x97,
+	0x76, 0xe8, 0xd5, 0xde, 0x2b, 0x68, 0x24, 0x9d, 0xd1, 0x12, 0x34, 0x0c, 0xd3, 0xd0, 0xc5, 0x1a,
+	0x5a, 0x86, 0xf9, 0x23, 0x4d, 0xd3, 0x35, 0x51, 0x40, 0x2b, 0xb0, 0x68, 0x77, 0xb5, 0x23, 0x4b,
+	0xd7, 0xc4, 0x7a, 0xf2, 0x82, 0xf5, 0x8e, 0x79, 0xa6, 0x6b, 0xe2, 0xdc, 0x9e, 0x0e, 0x50, 0x58,
+	0x40, 0x22, 0x34, 0x0d, 0x33, 0x45, 0x5a, 0x17, 0xdd, 0x44, 0xa4, 0x09, 0x4b, 0x5d, 0xf3, 0xf4,
+	0xd8, 0x3a, 0x36, 0x0d, 0x51, 0x48, 0x24, 0x2d, 0xf3, 0x5c, 0xc7, 0x62, 0x3d, 0xf9, 0xe3, 0xc3,
+	0x91, 0xa1, 0x99, 0x67, 0x3a, 0x16, 0xe7, 0x0e, 0xbf, 0x35, 0x60, 0xd1, 0x4a, 0x4f, 0x05, 0x7d,
+	0x84, 0xe6, 0x7b, 0xc2, 0xf2, 0x80, 0xa2, 0xed, 0xf2, 0x99, 0x95, 0xb3, 0x2b, 0x6d, 0x55, 0x5f,
+	0x59, 0x21, 0x81, 0x61, 0x39, 0x0f, 0xe1, 0xb4, 0x5e, 0x39, 0xf7, 0xd2, 0xb3, 0x19, 0x88, 0xf4,
+	0x64, 0x0f, 0x04, 0x64, 0x03, 0x14, 0x81, 0x40, 0x95, 0x94, 0x89, 0x14, 0x4a, 0xca, 0x2c, 0x48,
+	0x2e, 0x7b, 0x02, 0x8b, 0xd9, 0x76, 0x22, 0xb9, 0x8a, 0x50, 0xa4, 0x61, 0xda, 0x76, 0x69, 0xad,
+	0x0f, 0x04, 0x74, 0x01, 0xcd, 0xf1, 0xc5, 0x40, 0xcf, 0xcb, 0x94, 0x8a, 0x2d, 0x93, 0x76, 0x66,
+	0x83, 0xb2, 0xdd, 0xea, 0x42, 0x73, 0x7c, 0x87, 0xd0, 0xd4, 0x34, 0xa5, 0x0d, 0x93, 0xfe, 0x07,
+	0x78, 0xdb, 0xfa, 0x79, 0x27, 0x0b, 0xb7, 0x77, 0xb2, 0xf0, 0xfb, 0x4e, 0x16, 0xbe, 0x8f, 0xe4,
+	0xda, 0xed, 0x48, 0xae, 0xfd, 0x1a, 0xc9, 0xb5, 0xde, 0x02, 0xff, 0x6e, 0xbf, 0xfc, 0x13, 0x00,
+	0x00, 0xff, 0xff, 0x3d, 0x1f, 0xb6, 0x3b, 0x26, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -667,7 +667,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type TrafficClient interface {
 	GetMapLayout(ctx context.Context, in *MapLayoutRequest, opts ...grpc.CallOption) (*types.MapLayout, error)
-	ListTowers(ctx context.Context, in *ListTowersRequest, opts ...grpc.CallOption) (Traffic_ListTowersClient, error)
+	ListCells(ctx context.Context, in *ListCellsRequest, opts ...grpc.CallOption) (Traffic_ListCellsClient, error)
 	ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (Traffic_ListRoutesClient, error)
 	ListUes(ctx context.Context, in *ListUesRequest, opts ...grpc.CallOption) (Traffic_ListUesClient, error)
 	SetNumberUEs(ctx context.Context, in *SetNumberUEsRequest, opts ...grpc.CallOption) (*SetNumberUEsResponse, error)
@@ -691,12 +691,12 @@ func (c *trafficClient) GetMapLayout(ctx context.Context, in *MapLayoutRequest, 
 	return out, nil
 }
 
-func (c *trafficClient) ListTowers(ctx context.Context, in *ListTowersRequest, opts ...grpc.CallOption) (Traffic_ListTowersClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[0], "/ran.trafficsim.Traffic/ListTowers", opts...)
+func (c *trafficClient) ListCells(ctx context.Context, in *ListCellsRequest, opts ...grpc.CallOption) (Traffic_ListCellsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[0], "/ran.trafficsim.Traffic/ListCells", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &trafficListTowersClient{stream}
+	x := &trafficListCellsClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -706,17 +706,17 @@ func (c *trafficClient) ListTowers(ctx context.Context, in *ListTowersRequest, o
 	return x, nil
 }
 
-type Traffic_ListTowersClient interface {
-	Recv() (*ListTowersResponse, error)
+type Traffic_ListCellsClient interface {
+	Recv() (*ListCellsResponse, error)
 	grpc.ClientStream
 }
 
-type trafficListTowersClient struct {
+type trafficListCellsClient struct {
 	grpc.ClientStream
 }
 
-func (x *trafficListTowersClient) Recv() (*ListTowersResponse, error) {
-	m := new(ListTowersResponse)
+func (x *trafficListCellsClient) Recv() (*ListCellsResponse, error) {
+	m := new(ListCellsResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -808,7 +808,7 @@ func (c *trafficClient) ResetMetrics(ctx context.Context, in *ResetMetricsMsg, o
 // TrafficServer is the server API for Traffic service.
 type TrafficServer interface {
 	GetMapLayout(context.Context, *MapLayoutRequest) (*types.MapLayout, error)
-	ListTowers(*ListTowersRequest, Traffic_ListTowersServer) error
+	ListCells(*ListCellsRequest, Traffic_ListCellsServer) error
 	ListRoutes(*ListRoutesRequest, Traffic_ListRoutesServer) error
 	ListUes(*ListUesRequest, Traffic_ListUesServer) error
 	SetNumberUEs(context.Context, *SetNumberUEsRequest) (*SetNumberUEsResponse, error)
@@ -822,8 +822,8 @@ type UnimplementedTrafficServer struct {
 func (*UnimplementedTrafficServer) GetMapLayout(ctx context.Context, req *MapLayoutRequest) (*types.MapLayout, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMapLayout not implemented")
 }
-func (*UnimplementedTrafficServer) ListTowers(req *ListTowersRequest, srv Traffic_ListTowersServer) error {
-	return status.Errorf(codes.Unimplemented, "method ListTowers not implemented")
+func (*UnimplementedTrafficServer) ListCells(req *ListCellsRequest, srv Traffic_ListCellsServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListCells not implemented")
 }
 func (*UnimplementedTrafficServer) ListRoutes(req *ListRoutesRequest, srv Traffic_ListRoutesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListRoutes not implemented")
@@ -860,24 +860,24 @@ func _Traffic_GetMapLayout_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Traffic_ListTowers_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ListTowersRequest)
+func _Traffic_ListCells_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ListCellsRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(TrafficServer).ListTowers(m, &trafficListTowersServer{stream})
+	return srv.(TrafficServer).ListCells(m, &trafficListCellsServer{stream})
 }
 
-type Traffic_ListTowersServer interface {
-	Send(*ListTowersResponse) error
+type Traffic_ListCellsServer interface {
+	Send(*ListCellsResponse) error
 	grpc.ServerStream
 }
 
-type trafficListTowersServer struct {
+type trafficListCellsServer struct {
 	grpc.ServerStream
 }
 
-func (x *trafficListTowersServer) Send(m *ListTowersResponse) error {
+func (x *trafficListCellsServer) Send(m *ListCellsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -978,8 +978,8 @@ var _Traffic_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "ListTowers",
-			Handler:       _Traffic_ListTowers_Handler,
+			StreamName:    "ListCells",
+			Handler:       _Traffic_ListCells_Handler,
 			ServerStreams: true,
 		},
 		{
@@ -1019,7 +1019,7 @@ func (m *MapLayoutRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ListTowersRequest) Marshal() (dAtA []byte, err error) {
+func (m *ListCellsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1029,12 +1029,12 @@ func (m *ListTowersRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ListTowersRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *ListCellsRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ListTowersRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ListCellsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1062,7 +1062,7 @@ func (m *ListTowersRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *ListTowersResponse) Marshal() (dAtA []byte, err error) {
+func (m *ListCellsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1072,12 +1072,12 @@ func (m *ListTowersResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ListTowersResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *ListCellsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ListTowersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ListCellsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1087,9 +1087,9 @@ func (m *ListTowersResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x10
 	}
-	if m.Tower != nil {
+	if m.Cell != nil {
 		{
-			size, err := m.Tower.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Cell.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1372,7 +1372,7 @@ func (m *MapLayoutRequest) Size() (n int) {
 	return n
 }
 
-func (m *ListTowersRequest) Size() (n int) {
+func (m *ListCellsRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1387,14 +1387,14 @@ func (m *ListTowersRequest) Size() (n int) {
 	return n
 }
 
-func (m *ListTowersResponse) Size() (n int) {
+func (m *ListCellsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Tower != nil {
-		l = m.Tower.Size()
+	if m.Cell != nil {
+		l = m.Cell.Size()
 		n += 1 + l + sovTrafficsim(uint64(l))
 	}
 	if m.Type != 0 {
@@ -1560,7 +1560,7 @@ func (m *MapLayoutRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ListTowersRequest) Unmarshal(dAtA []byte) error {
+func (m *ListCellsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1583,10 +1583,10 @@ func (m *ListTowersRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ListTowersRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: ListCellsRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListTowersRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ListCellsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1653,7 +1653,7 @@ func (m *ListTowersRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *ListTowersResponse) Unmarshal(dAtA []byte) error {
+func (m *ListCellsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1676,15 +1676,15 @@ func (m *ListTowersResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ListTowersResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: ListCellsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListTowersResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ListCellsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Tower", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Cell", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1711,10 +1711,10 @@ func (m *ListTowersResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Tower == nil {
-				m.Tower = &types.Tower{}
+			if m.Cell == nil {
+				m.Cell = &types.Cell{}
 			}
-			if err := m.Tower.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Cell.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

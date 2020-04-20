@@ -69,13 +69,13 @@ func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicChan
 func generateReport(ue *types.Ue) e2ap.RicIndication {
 	trafficSimMgr := manager.GetManager()
 
-	trafficSimMgr.TowersLock.RLock()
-	defer trafficSimMgr.TowersLock.RUnlock()
+	trafficSimMgr.CellsLock.RLock()
+	defer trafficSimMgr.CellsLock.RUnlock()
 
-	servingTower := trafficSimMgr.Towers[*ue.ServingTower]
-	tower1 := trafficSimMgr.Towers[*ue.Tower1]
-	tower2 := trafficSimMgr.Towers[*ue.Tower2]
-	tower3 := trafficSimMgr.Towers[*ue.Tower3]
+	servingTower := trafficSimMgr.Cells[*ue.ServingTower]
+	tower1 := trafficSimMgr.Cells[*ue.Tower1]
+	tower2 := trafficSimMgr.Cells[*ue.Tower2]
+	tower3 := trafficSimMgr.Cells[*ue.Tower3]
 
 	reports := make([]*e2.RadioRepPerServCell, 3)
 

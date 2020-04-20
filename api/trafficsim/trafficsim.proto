@@ -23,18 +23,18 @@ import "github.com/onosproject/ran-simulator/api/types/types.proto";
 message MapLayoutRequest {
 }
 
-message ListTowersRequest {
+message ListCellsRequest {
     // subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
-    // after all towers have been streamed to the client
+    // after all cells have been streamed to the client
     bool subscribe = 1;
 
     // option to request only changes that happen after the call
     bool withoutReplay = 2;
 }
 
-message ListTowersResponse {
-    // tower is the tower change on which the event occurred
-    ran.trafficsim.types.Tower tower = 1;
+message ListCellsResponse {
+    // cell is the cell change on which the event occurred
+    ran.trafficsim.types.Cell cell = 1;
 
     // type is a qualification of the type of change being made
     Type type = 2;
@@ -92,7 +92,7 @@ message ResetMetricsMsg {
 service Traffic {
     rpc GetMapLayout(MapLayoutRequest) returns (ran.trafficsim.types.MapLayout);
 
-    rpc ListTowers(ListTowersRequest) returns (stream ListTowersResponse);
+    rpc ListCells(ListCellsRequest) returns (stream ListCellsResponse);
 
     rpc ListRoutes(ListRoutesRequest) returns (stream ListRoutesResponse);
 

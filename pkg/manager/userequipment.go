@@ -41,10 +41,10 @@ func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params Rout
 func (m *Manager) newUe(ueIdx int) *types.Ue {
 	imsi := utils.ImsiGenerator(ueIdx)
 	route := m.Routes[imsi]
-	towers, distances := m.findClosestTowers(route.Waypoints[0])
-	m.TowersLock.RLock()
-	servingTowerDist := distanceToTower(m.Towers[*towers[0]], route.Waypoints[0])
-	m.TowersLock.RUnlock()
+	towers, distances := m.findClosestCells(route.Waypoints[0])
+	m.CellsLock.RLock()
+	servingTowerDist := distanceToCell(m.Cells[*towers[0]], route.Waypoints[0])
+	m.CellsLock.RUnlock()
 	ue := &types.Ue{
 		Imsi:             imsi,
 		Type:             "Car",
@@ -71,7 +71,7 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 	ue.Crnti = crnti
 
 	// Now would be a good time to update the Route colour
-	for _, t := range m.Towers {
+	for _, t := range m.Cells {
 		if t.Ecgi == towers[0] {
 			m.Routes[imsi].Color = t.Color
 			break
@@ -243,7 +243,7 @@ func (m *Manager) getColorForUe(imsi types.Imsi) string {
 	if !ok {
 		return ""
 	}
-	for _, t := range m.Towers {
+	for _, t := range m.Cells {
 		if t.Ecgi == ue.ServingTower {
 			return t.Color
 		}
@@ -260,7 +260,7 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			}
 			ue.Position = route.Waypoints[idx+1]
 			ue.Rotation = uint32(utils.GetRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
-			names, distances := m.findClosestTowers(ue.Position)
+			names, distances := m.findClosestCells(ue.Position)
 			updateType := trafficsim.UpdateType_POSITION
 			oldTower1 := ue.Tower1
 			oldTower2 := ue.Tower2

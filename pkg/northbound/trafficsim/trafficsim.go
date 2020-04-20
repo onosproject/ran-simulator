@@ -106,44 +106,44 @@ func (s *Server) ListRoutes(req *trafficsim.ListRoutesRequest, stream trafficsim
 	return nil
 }
 
-// ListTowers :
-func (s *Server) ListTowers(req *trafficsim.ListTowersRequest, stream trafficsim.Traffic_ListTowersServer) error {
+// ListCells :
+func (s *Server) ListCells(req *trafficsim.ListCellsRequest, stream trafficsim.Traffic_ListCellsServer) error {
 	if !req.WithoutReplay {
-		manager.GetManager().TowersLock.RLock()
-		for _, tower := range manager.GetManager().Towers {
-			resp := &trafficsim.ListTowersResponse{
-				Tower: tower,
-				Type:  trafficsim.Type_NONE,
+		manager.GetManager().CellsLock.RLock()
+		for _, cell := range manager.GetManager().Cells {
+			resp := &trafficsim.ListCellsResponse{
+				Cell: cell,
+				Type: trafficsim.Type_NONE,
 			}
 			err := stream.Send(resp)
 			if err != nil {
-				manager.GetManager().TowersLock.RUnlock()
+				manager.GetManager().CellsLock.RUnlock()
 				return err
 			}
 		}
-		manager.GetManager().TowersLock.RUnlock()
+		manager.GetManager().CellsLock.RUnlock()
 	}
 
 	if req.Subscribe {
-		streamID := fmt.Sprintf("tower-%p", stream)
-		listener, err := manager.GetManager().Dispatcher.RegisterTowerListener(streamID)
+		streamID := fmt.Sprintf("cell-%p", stream)
+		listener, err := manager.GetManager().Dispatcher.RegisterCellListener(streamID)
 		if err != nil {
 			log.Info("Failed setting up a listener for Ue events")
 			return err
 		}
-		defer manager.GetManager().Dispatcher.UnregisterTowerListener(streamID)
-		log.Infof("NBI Tower updates started on %s", streamID)
+		defer manager.GetManager().Dispatcher.UnregisterCellListener(streamID)
+		log.Infof("NBI Cell updates started on %s", streamID)
 
 		for {
 			select {
-			case towerEvent := <-listener:
-				tower, objOk := towerEvent.Object.(*types.Tower)
+			case cellEvent := <-listener:
+				cell, objOk := cellEvent.Object.(*types.Cell)
 				if !objOk {
-					return fmt.Errorf("could not cast object from event to Tower %v", towerEvent)
+					return fmt.Errorf("could not cast object from event to Cell %v", cellEvent)
 				}
-				msg := &trafficsim.ListTowersResponse{
-					Tower: tower,
-					Type:  towerEvent.Type,
+				msg := &trafficsim.ListCellsResponse{
+					Cell: cell,
+					Type: cellEvent.Type,
 				}
 				err := stream.SendMsg(msg)
 				if err != nil {
@@ -151,7 +151,7 @@ func (s *Server) ListTowers(req *trafficsim.ListTowersRequest, stream trafficsim
 					return err
 				}
 			case <-stream.Context().Done():
-				log.Infof("Client has disconnected ListTowers on %s", streamID)
+				log.Infof("Client has disconnected ListCells on %s", streamID)
 				return nil
 			}
 		}

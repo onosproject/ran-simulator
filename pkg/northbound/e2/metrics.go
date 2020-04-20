@@ -58,9 +58,9 @@ func UpdateTelemetryMetrics(m *e2ap.RicIndication) {
 				bestStationID = reports[i].Ecgi
 			}
 		}
-		trafficSimMgr.TowersLock.RLock()
-		servingTower := trafficSimMgr.Towers[*ue.ServingTower]
-		trafficSimMgr.TowersLock.RUnlock()
+		trafficSimMgr.CellsLock.RLock()
+		servingTower := trafficSimMgr.Cells[*ue.ServingTower]
+		trafficSimMgr.CellsLock.RUnlock()
 
 		if servingTower.Ecgi.EcID != types.EcID(bestStationID.Ecid) || servingTower.Ecgi.PlmnID != types.PlmnID(bestStationID.PlmnId) {
 			trafficSimMgr.UserEquipmentsLock.Lock()

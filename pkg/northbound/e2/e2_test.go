@@ -34,8 +34,9 @@ func setUpManager() (*manager.Manager, error) {
 		TowerCols:         2,
 		TowerSpacingVert:  0.01,
 		TowerSpacingHoriz: 0.01,
-		MaxUEsPerTower:    4,
+		MaxUEsPerCell:     4,
 		LocationsScale:    1.0,
+		AvgCellsPerTower:  3.0,
 	}
 	routesParams := manager.RoutesParams{
 		APIKey:    "",
@@ -51,9 +52,9 @@ func setUpManager() (*manager.Manager, error) {
 		return nil, err
 	}
 	mgr.MapLayout = mapLayout
-	mgr.TowersLock.Lock()
-	mgr.Towers = towers
-	mgr.TowersLock.Unlock()
+	mgr.CellsLock.Lock()
+	mgr.Cells = towers
+	mgr.CellsLock.Unlock()
 	mgr.Locations = locations
 
 	mgr.Routes, err = mgr.NewRoutes(mapLayout, routesParams)

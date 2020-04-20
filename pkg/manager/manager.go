@@ -36,8 +36,8 @@ var mgr Manager
 // Manager single point of entry for the trafficsim system.
 type Manager struct {
 	MapLayout             types.MapLayout
-	Towers                map[types.ECGI]*types.Tower
-	TowersLock            *sync.RWMutex
+	Cells                 map[types.ECGI]*types.Cell
+	CellsLock             *sync.RWMutex
 	Locations             map[string]*Location
 	Routes                map[types.Imsi]*types.Route
 	UserEquipments        map[types.Imsi]*types.Ue
@@ -63,7 +63,7 @@ type MetricsParams struct {
 func NewManager() (*Manager, error) {
 	log.Info("Creating Manager")
 	mgr = Manager{
-		TowersLock:            &sync.RWMutex{},
+		CellsLock:             &sync.RWMutex{},
 		UserEquipmentsLock:    &sync.RWMutex{},
 		UserEquipmentsMapLock: &sync.RWMutex{},
 		Dispatcher:            dispatcher.NewDispatcher(),
@@ -82,9 +82,9 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	metricsParams MetricsParams) {
 	log.Infof("Starting Manager with %v %v %v", mapLayoutParams, towerparams, routesParams)
 	m.MapLayout = mapLayoutParams
-	m.TowersLock.Lock()
-	m.Towers = NewTowers(towerparams, mapLayoutParams)
-	m.TowersLock.Unlock()
+	m.CellsLock.Lock()
+	m.Cells = NewTowers(towerparams, mapLayoutParams)
+	m.CellsLock.Unlock()
 	m.Locations = NewLocations(towerparams, mapLayoutParams)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes
 	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
@@ -92,7 +92,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
-	go m.Dispatcher.ListenTowerEvents(m.TowerChannel)
+	go m.Dispatcher.ListenCellEvents(m.TowerChannel)
 
 	var err error
 	m.Routes, err = m.NewRoutes(mapLayoutParams, routesParams)
@@ -107,7 +107,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 
 	ctx := context.Background()
 	m.TopoClient = topo.ConnectToTopo(ctx, topoEndpoint, serverParams)
-	go topo.SyncToTopo(ctx, &m.TopoClient, m.Towers)
+	go topo.SyncToTopo(ctx, &m.TopoClient, m.Cells)
 }
 
 //Close kills the channels and manager related objects
@@ -122,11 +122,11 @@ func (m *Manager) Close() {
 	for l := range m.Locations {
 		delete(m.Locations, l)
 	}
-	m.TowersLock.Lock()
-	for tid := range m.Towers {
-		delete(m.Towers, tid)
+	m.CellsLock.Lock()
+	for tid := range m.Cells {
+		delete(m.Cells, tid)
 	}
-	m.TowersLock.Unlock()
+	m.CellsLock.Unlock()
 	// TODO - clean up the topo entries on shutdown
 	log.Info("Closing Manager")
 }

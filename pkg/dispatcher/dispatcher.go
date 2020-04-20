@@ -28,8 +28,8 @@ type Dispatcher struct {
 	nbiUeListeners        map[string]chan Event
 	nbiRouteListenersLock sync.RWMutex
 	nbiRouteListeners     map[string]chan Event
-	nbiTowerListenersLock sync.RWMutex
-	nbiTowerListeners     map[string]chan Event
+	nbiCellListenersLock  sync.RWMutex
+	nbiCellListeners      map[string]chan Event
 }
 
 // NewDispatcher creates and initializes a new event dispatcher
@@ -37,7 +37,7 @@ func NewDispatcher() *Dispatcher {
 	return &Dispatcher{
 		nbiUeListeners:    make(map[string]chan Event),
 		nbiRouteListeners: make(map[string]chan Event),
-		nbiTowerListeners: make(map[string]chan Event),
+		nbiCellListeners:  make(map[string]chan Event),
 	}
 }
 
@@ -118,41 +118,41 @@ func (d *Dispatcher) UnregisterRouteListener(subscriber string) {
 	close(channel)
 }
 
-// ListenTowerEvents :
-func (d *Dispatcher) ListenTowerEvents(routeEventChannel <-chan Event) {
-	log.Info("Tower Event listener initialized")
+// ListenCellEvents :
+func (d *Dispatcher) ListenCellEvents(routeEventChannel <-chan Event) {
+	log.Info("Cell Event listener initialized")
 
-	for towerEvent := range routeEventChannel {
-		d.nbiTowerListenersLock.RLock()
-		for _, nbiChan := range d.nbiTowerListeners {
-			nbiChan <- towerEvent
+	for cellEvent := range routeEventChannel {
+		d.nbiCellListenersLock.RLock()
+		for _, nbiChan := range d.nbiCellListeners {
+			nbiChan <- cellEvent
 		}
-		d.nbiTowerListenersLock.RUnlock()
+		d.nbiCellListenersLock.RUnlock()
 	}
 }
 
-// RegisterTowerListener :
-func (d *Dispatcher) RegisterTowerListener(subscriber string) (chan Event, error) {
-	d.nbiTowerListenersLock.Lock()
-	defer d.nbiTowerListenersLock.Unlock()
-	if _, ok := d.nbiTowerListeners[subscriber]; ok {
-		return nil, fmt.Errorf("NBI Tower %s is already registered", subscriber)
+// RegisterCellListener :
+func (d *Dispatcher) RegisterCellListener(subscriber string) (chan Event, error) {
+	d.nbiCellListenersLock.Lock()
+	defer d.nbiCellListenersLock.Unlock()
+	if _, ok := d.nbiCellListeners[subscriber]; ok {
+		return nil, fmt.Errorf("NBI Cell %s is already registered", subscriber)
 	}
 	channel := make(chan Event)
-	d.nbiTowerListeners[subscriber] = channel
+	d.nbiCellListeners[subscriber] = channel
 	return channel, nil
 }
 
-// UnregisterTowerListener :
-func (d *Dispatcher) UnregisterTowerListener(subscriber string) {
-	d.nbiTowerListenersLock.Lock()
-	defer d.nbiTowerListenersLock.Unlock()
-	channel, ok := d.nbiTowerListeners[subscriber]
+// UnregisterCellListener :
+func (d *Dispatcher) UnregisterCellListener(subscriber string) {
+	d.nbiCellListenersLock.Lock()
+	defer d.nbiCellListenersLock.Unlock()
+	channel, ok := d.nbiCellListeners[subscriber]
 	if !ok {
 		log.Infof("Subscriber %s had not been registered", subscriber)
 		return
 	}
-	delete(d.nbiTowerListeners, subscriber)
+	delete(d.nbiCellListeners, subscriber)
 	close(channel)
 }
 
@@ -169,9 +169,9 @@ func (d *Dispatcher) GetListeners() []string {
 	for k := range d.nbiRouteListeners {
 		listenerKeys = append(listenerKeys, k)
 	}
-	d.nbiTowerListenersLock.RLock()
-	defer d.nbiTowerListenersLock.RUnlock()
-	for k := range d.nbiTowerListeners {
+	d.nbiCellListenersLock.RLock()
+	defer d.nbiCellListenersLock.RUnlock()
+	for k := range d.nbiCellListeners {
 		listenerKeys = append(listenerKeys, k)
 	}
 	return listenerKeys

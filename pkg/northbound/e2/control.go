@@ -145,23 +145,23 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicIndicatio
 	log.Infof("handleCellConfigRequest on Port %d", port)
 
 	trafficSimMgr := manager.GetManager()
-	trafficSimMgr.TowersLock.RLock()
-	tower, ok := trafficSimMgr.Towers[ecgi]
+	trafficSimMgr.CellsLock.RLock()
+	tower, ok := trafficSimMgr.Cells[ecgi]
 	if !ok {
 		log.Warnf("Tower %s not found for handleCellConfigRequest on Port %d", ecgi, port)
-		trafficSimMgr.TowersLock.RUnlock()
+		trafficSimMgr.CellsLock.RUnlock()
 		return
 	}
 	cells := make([]*e2.CandScell, 0, 8)
 	for _, neighbor := range tower.Neighbors {
-		t := trafficSimMgr.Towers[*neighbor]
+		t := trafficSimMgr.Cells[*neighbor]
 		e2Ecgi := toE2Ecgi(t.Ecgi)
 		cell := e2.CandScell{
 			Ecgi: &e2Ecgi,
 		}
 		cells = append(cells, &cell)
 	}
-	trafficSimMgr.TowersLock.RUnlock()
+	trafficSimMgr.CellsLock.RUnlock()
 	e2Ecgi := toE2Ecgi(tower.Ecgi)
 	cellConfigReport := e2ap.RicIndication{
 		Hdr: &e2sm.RicIndicationHeader{

@@ -35,7 +35,7 @@ func Test_findClosestTowers(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
 
-	m.Towers = NewTowers(
+	m.Cells = NewTowers(
 		types.TowersParams{
 			TowerRows:         3,
 			TowerCols:         3,
@@ -49,8 +49,8 @@ func Test_findClosestTowers(t *testing.T) {
 			ShowRoutes: false,
 		})
 
-	assert.Equal(t, 9, len(m.Towers), "Expected 9 towers to have been created")
-	for _, tower := range m.Towers {
+	assert.Equal(t, 9, len(m.Cells), "Expected 9 towers to have been created")
+	for _, tower := range m.Cells {
 		switch tower.Ecgi.EcID {
 		case "0001420":
 		case "0001421":
@@ -87,7 +87,7 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point outside the towers north-west
 	testPointA := &types.Point{Lat: 52.12345, Lng: -8.123}
-	towersA, distancesA := m.findClosestTowers(testPointA)
+	towersA, distancesA := m.findClosestCells(testPointA)
 	assert.Equal(t, 3, len(towersA), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesA), "Expected 3 tower distancesA in findClosest")
 	assert.Assert(t, distancesA[2] > distancesA[1], "Expected distance to be greater")
@@ -95,7 +95,7 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point outside the towers south-east
 	testPointB := &types.Point{Lat: 51.7654, Lng: -7.9876}
-	towersB, distancesB := m.findClosestTowers(testPointB)
+	towersB, distancesB := m.findClosestCells(testPointB)
 	assert.Equal(t, 3, len(towersB), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesB), "Expected 3 tower distancesA in findClosest")
 	assert.Assert(t, distancesB[2] > distancesB[1], "Expected distance to be greater")
@@ -103,7 +103,7 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point within the towers south-east of centre
 	testPointC := &types.Point{Lat: 51.980, Lng: -7.950}
-	towersC, distancesC := m.findClosestTowers(testPointC)
+	towersC, distancesC := m.findClosestCells(testPointC)
 	assert.Equal(t, 3, len(towersC), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesC), "Expected 3 tower distancesA in findClosest")
 	assert.Assert(t, distancesC[2] > distancesC[1], "Expected distance to be greater")
@@ -118,7 +118,7 @@ func Test_PowerAdjust(t *testing.T) {
 	const mapCenterLng = -8.0
 	const towerSpacingVert = 0.01
 	const towerSpacingHoriz = 0.02
-	m.Towers = NewTowers(
+	m.Cells = NewTowers(
 		types.TowersParams{
 			TowerRows:         1,
 			TowerCols:         1,
@@ -137,11 +137,11 @@ func Test_PowerAdjust(t *testing.T) {
 		}
 	}()
 
-	assert.Equal(t, 1, len(m.Towers), "Expected 1 tower to have been created")
+	assert.Equal(t, 1, len(m.Cells), "Expected 1 tower to have been created")
 	towerID1420 := newEcgi("0001420", utils.TestPlmnID)
 	err = m.UpdateTower(towerID1420, -6) // subtracted from initial 10dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
-	tower1, ok := m.Towers[towerID1420]
+	tower1, ok := m.Cells[towerID1420]
 	assert.Assert(t, ok)
 	assert.Equal(t, float32(4.0), tower1.TxPowerdB, "unexpected value for tower power")
 
