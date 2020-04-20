@@ -71,7 +71,7 @@ func main() {
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
 	loglevel := flag.String("loglevel", "warn", "Initial log level - debug, info, warn, error")
 	addK8sSvcPorts := flag.Bool("addK8sSvcPorts", true, "Add K8S service ports per tower")
-	avgCellPerTower := flag.Float64("avgCellPerTower", 3.0, "Cells to create per tower 2.0 to 4.0")
+	avgCellcPerTower := flag.Float64("avgCellcPerTower", 1.0, "Cells to create per tower 2.0 to 4.0")
 
 	flag.Parse()
 	setLogLevel(*loglevel)
@@ -115,7 +115,7 @@ func main() {
 		TowerSpacingHoriz: float32(*towerSpacingHoriz),
 		MaxUEsPerCell:     uint32(*maxUEsPerTower),
 		LocationsScale:    float32(*locationsScale),
-		AvgCellsPerTower:  float32(*avgCellPerTower),
+		AvgCellsPerTower:  float32(*avgCellcPerTower),
 	}
 	checkTowerLimits(*towerRows, *towerCols)
 	if towerParams.TowerSpacingVert < 0.001 || towerParams.TowerSpacingVert > 1.0 {
@@ -129,8 +129,8 @@ func main() {
 		log.Fatal("Invalid locationsScale - must be between 0.1 and 2.0")
 	}
 
-	if towerParams.AvgCellsPerTower < 2.0 || towerParams.AvgCellsPerTower > 4.0 {
-		log.Fatal("Invalid AvgCellsPerTower - must be between 2.0 and 4.0")
+	if towerParams.AvgCellsPerTower < 1.0 || towerParams.AvgCellsPerTower > 4.0 {
+		log.Fatal("Invalid AvgCellsPerTower - must be between 1.0 and 4.0")
 	}
 
 	routesParams := manager.RoutesParams{

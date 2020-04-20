@@ -83,7 +83,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	log.Infof("Starting Manager with %v %v %v", mapLayoutParams, towerparams, routesParams)
 	m.MapLayout = mapLayoutParams
 	m.CellsLock.Lock()
-	m.Cells = NewTowers(towerparams, mapLayoutParams)
+	m.Cells = NewCells(towerparams, mapLayoutParams)
 	m.CellsLock.Unlock()
 	m.Locations = NewLocations(towerparams, mapLayoutParams)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes

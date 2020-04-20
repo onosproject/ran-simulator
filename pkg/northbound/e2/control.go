@@ -114,7 +114,7 @@ func handleRRMConfig(req *e2.RRMConfig) {
 		powerAdjust = 3
 	}
 	trafficSimMgr := manager.GetManager()
-	err := trafficSimMgr.UpdateTower(toTypesEcgi(req.Ecgi), powerAdjust)
+	err := trafficSimMgr.UpdateCell(toTypesEcgi(req.Ecgi), powerAdjust)
 	if err != nil {
 		log.Warn(err.Error())
 	}

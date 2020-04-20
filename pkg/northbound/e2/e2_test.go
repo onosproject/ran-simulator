@@ -36,14 +36,14 @@ func setUpManager() (*manager.Manager, error) {
 		TowerSpacingHoriz: 0.01,
 		MaxUEsPerCell:     4,
 		LocationsScale:    1.0,
-		AvgCellsPerTower:  3.0,
+		AvgCellsPerTower:  1.0,
 	}
 	routesParams := manager.RoutesParams{
 		APIKey:    "",
 		StepDelay: 1000,
 	}
 
-	towers := manager.NewTowers(towerParams, mapLayout)
+	towers := manager.NewCells(towerParams, mapLayout)
 
 	locations := manager.NewLocations(towerParams, mapLayout)
 

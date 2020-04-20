@@ -43,7 +43,7 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 	route := m.Routes[imsi]
 	towers, distances := m.findClosestCells(route.Waypoints[0])
 	m.CellsLock.RLock()
-	servingTowerDist := distanceToCell(m.Cells[*towers[0]], route.Waypoints[0])
+	servingTowerDist := distanceToCellCentroid(m.Cells[*towers[0]], route.Waypoints[0])
 	m.CellsLock.RUnlock()
 	ue := &types.Ue{
 		Imsi:             imsi,
