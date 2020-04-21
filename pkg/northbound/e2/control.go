@@ -131,10 +131,13 @@ func handleHORequest(towerID types.ECGI, req *e2.HORequest) error {
 			imsi, err := m.CrntiToName(types.Crnti(crnti), &towerID)
 			if err != nil {
 				log.Error(err)
-				return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, crnti)
+				log.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, crnti)
 			}
 			UpdateControlMetrics(imsi)
-			m.UeHandover(imsi, &targetEcgi)
+			err = m.UeHandover(imsi, &targetEcgi)
+			if err != nil {
+				log.Error(err)
+			}
 		} else if towerID.EcID == targetEcgi.EcID && towerID.PlmnID == targetEcgi.PlmnID {
 			log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 		}
