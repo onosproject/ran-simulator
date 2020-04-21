@@ -39,12 +39,12 @@ func UpdateTelemetryMetrics(m *e2ap.RicIndication) {
 		}
 		var ue *types.Ue
 		var ok bool
-		trafficSimMgr.UserEquipmentsLock.RLock()
+		trafficSimMgr.UserEquipmentsMapLock.RLock()
 		if ue, ok = trafficSimMgr.UserEquipments[name]; !ok {
-			trafficSimMgr.UserEquipmentsLock.RUnlock()
+			trafficSimMgr.UserEquipmentsMapLock.RUnlock()
 			return
 		}
-		trafficSimMgr.UserEquipmentsLock.RUnlock()
+		trafficSimMgr.UserEquipmentsMapLock.RUnlock()
 
 		reports := msg.RadioReportServCells
 
@@ -75,19 +75,23 @@ func UpdateTelemetryMetrics(m *e2ap.RicIndication) {
 // UpdateControlMetrics ...
 func UpdateControlMetrics(imsi types.Imsi) {
 	trafficSimMgr := manager.GetManager()
-	trafficSimMgr.UserEquipmentsLock.Lock()
-	defer trafficSimMgr.UserEquipmentsLock.Unlock()
+	trafficSimMgr.UserEquipmentsMapLock.RLock()
 	var ok bool
 	var ue *types.Ue
 	if ue, ok = trafficSimMgr.UserEquipments[imsi]; !ok {
 		log.Errorf("ue %s not found", imsi)
+		trafficSimMgr.UserEquipmentsMapLock.RUnlock()
 		return
 	}
+	trafficSimMgr.UserEquipmentsMapLock.RUnlock()
 	if ue.Metrics.IsFirst {
 		// Discard the first one as it may have been waiting for onos-ric-ho to startup
+		trafficSimMgr.UserEquipmentsLock.Lock()
 		ue.Metrics.HoReportTimestamp = 0
 		ue.Metrics.IsFirst = false
+		trafficSimMgr.UserEquipmentsLock.Unlock()
 	} else if ue.Metrics.HoReportTimestamp != 0 {
+		trafficSimMgr.UserEquipmentsLock.Lock()
 		ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
 		ue.Metrics.HoReportTimestamp = 0
 		tmpHOEvent := metrics.HOEvent{
@@ -96,6 +100,7 @@ func UpdateControlMetrics(imsi types.Imsi) {
 			ServingTower: *ue.ServingTower,
 			HOLatency:    ue.Metrics.HoLatency,
 		}
+		trafficSimMgr.UserEquipmentsLock.Unlock()
 		trafficSimMgr.LatencyChannel <- tmpHOEvent
 		log.Infof("%d Hand-over latency: %d µs", ue.Imsi, ue.Metrics.HoLatency/1000)
 	}

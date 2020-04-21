@@ -26,11 +26,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
-// RicControl ...
-func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
-	return nil
-}
-
 // RicChan ...
 func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
 	c := make(chan e2ap.RicIndication)
@@ -50,7 +45,7 @@ func ricControlResponse(port int, stream e2ap.E2AP_RicChanServer, c chan e2ap.Ri
 	for {
 		select {
 		case msg := <-c:
-			UpdateTelemetryMetrics(&msg)
+			go UpdateTelemetryMetrics(&msg)
 			if err := stream.Send(&msg); err != nil {
 				log.Infof("send error %v", err)
 				return err
@@ -151,10 +146,10 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicIndicatio
 
 	trafficSimMgr := manager.GetManager()
 	trafficSimMgr.TowersLock.RLock()
-	defer trafficSimMgr.TowersLock.RUnlock()
 	tower, ok := trafficSimMgr.Towers[ecgi]
 	if !ok {
 		log.Warnf("Tower %s not found for handleCellConfigRequest on Port %d", ecgi, port)
+		trafficSimMgr.TowersLock.RUnlock()
 		return
 	}
 	cells := make([]*e2.CandScell, 0, 8)
@@ -166,6 +161,7 @@ func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicIndicatio
 		}
 		cells = append(cells, &cell)
 	}
+	trafficSimMgr.TowersLock.RUnlock()
 	e2Ecgi := toE2Ecgi(tower.Ecgi)
 	cellConfigReport := e2ap.RicIndication{
 		Hdr: &e2sm.RicIndicationHeader{
