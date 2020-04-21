@@ -26,11 +26,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
-// RicControl ...
-func (s *Server) RicControl(stream e2ap.E2AP_RicControlServer) error {
-	return nil
-}
-
 // RicChan ...
 func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
 	c := make(chan e2ap.RicIndication)

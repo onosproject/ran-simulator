@@ -35,23 +35,8 @@ func makeCqi(distance float32, txPowerdB float32) uint32 {
 	return cqi
 }
 
-// RicSubscription ...
-func (s *Server) RicSubscription(stream e2ap.E2AP_RicSubscriptionServer) error {
-	return nil
-}
-
 func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) error {
 	trafficSimMgr := manager.GetManager()
-
-	// replay any existing UE's
-	//for _, ue := range trafficSimMgr.UserEquipments {
-	//	if ue.ServingTower.EcID != towerID.EcID || ue.ServingTower.PlmnID != towerID.PlmnID {
-	//		continue
-	//	}
-	//	if ue.Admitted {
-	//		c <- generateReport(ue)
-	//	}
-	//}
 
 	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, stream)
 	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
