@@ -30,6 +30,10 @@ package main
 
 import (
 	"flag"
+	_ "net/http/pprof"
+	"runtime"
+	"time"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -38,9 +42,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
 	"github.com/onosproject/ran-simulator/pkg/utils"
-	_ "net/http/pprof"
-	"runtime"
-	"time"
 )
 
 var log = liblog.GetDefaultLogger()
