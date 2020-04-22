@@ -50,12 +50,12 @@ func Test_HandleRrmConfig(t *testing.T) {
 		case updateEvent := <-mgr.TowerChannel:
 			assert.Equal(t, trafficsim.Type_UPDATED, updateEvent.Type)
 			assert.Equal(t, trafficsim.UpdateType_NOUPDATETYPE, updateEvent.UpdateType)
-			tower, ok := updateEvent.Object.(*types.Tower)
+			cell, ok := updateEvent.Object.(*types.Cell)
 			assert.Assert(t, ok, "Problem converting event object to Tower %v", updateEvent.Object)
-			assert.Equal(t, types.EcID("0001420"), tower.Ecgi.EcID)
-			mgr.TowersLock.RLock()
-			assert.Equal(t, float32(7), tower.GetTxPowerdB())
-			mgr.TowersLock.RUnlock()
+			assert.Equal(t, types.EcID("0001420"), cell.Ecgi.EcID)
+			mgr.CellsLock.RLock()
+			assert.Equal(t, float32(7), cell.GetTxPowerdB())
+			mgr.CellsLock.RUnlock()
 		case <-time.After(time.Millisecond * 100):
 			t.Errorf("Timed out on Test_HandleRrmConfig")
 		}

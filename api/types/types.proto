@@ -26,6 +26,12 @@ message Point {
     float lng = 2;
 }
 
+message Sector {
+    int32 azimuth = 1;
+
+    int32 arc = 2;
+}
+
 message Route {
     uint64 name = 1 [(gogoproto.customname) = "RouteID", (gogoproto.casttype) = "Imsi"];
 
@@ -93,8 +99,11 @@ message TowersParams {
     // Ratio of random locations diameter to tower grid width
     float locationsScale = 5;
 
-    // Max num of UEs per tower
-    uint32 maxUEsPerTower = 6;
+    // Max num of UEs per cell
+    uint32 maxUEsPerCell = 6;
+
+    // Avg Cells per tower - between 2 and 4
+    float avgCellsPerTower = 7;
 }
 
 // station's unique ID
@@ -104,19 +113,21 @@ message ECGI {
     string plmnID = 2 [(gogoproto.customname) = "PlmnID", (gogoproto.casttype) = "PlmnID"];
 }
 
-message Tower {
+message Cell {
     ECGI ecgi = 1;
 
     Point location = 3;
 
-    string color = 4;
+    Sector sector = 4;
 
-    uint32 maxUEs = 5;
+    string color = 5;
 
-    repeated ECGI neighbors = 6;
+    uint32 maxUEs = 6;
 
-    // The tower transmit power in decibels
-    float txPowerdB = 7;
+    repeated ECGI neighbors = 7;
+
+    // The cell transmit power in decibels
+    float txPowerdB = 8;
 
     // crntis maps a ue's name to its crnti
     map<string, uint64> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "Imsi"];

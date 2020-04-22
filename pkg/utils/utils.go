@@ -128,8 +128,8 @@ func RandomColor() string {
 }
 
 // EcIDForPort gives a consistent naming convention
-func EcIDForPort(towerPort int) types.EcID {
-	return types.EcID(fmt.Sprintf("%07X", towerPort))
+func EcIDForPort(cellPort int) types.EcID {
+	return types.EcID(fmt.Sprintf("%07X", cellPort))
 }
 
 // ImsiGenerator -- generate an Imsi from an index

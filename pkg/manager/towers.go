@@ -21,10 +21,16 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"math"
+	"math/rand"
 )
 
-// DefaultTxPower - all base-stations start with this power level
-const DefaultTxPower = 10
+const (
+	// DefaultTxPower - all cells start with this power level
+	DefaultTxPower = 10
+
+	// PowerFactor - relate power to distance in decimal degrees
+	PowerFactor = 0.001
+)
 
 const defaultColor = "#000000"
 
@@ -39,46 +45,67 @@ const MaxCrnti = 65523
 // InvalidCrnti ...
 const InvalidCrnti = "0000"
 
-// TowerIf :
-type TowerIf interface {
+// CellIf :
+type CellIf interface {
 	GetPosition() types.Point
 }
 
-// NewTowers - create a set of new towers
-func NewTowers(params types.TowersParams, mapLayout types.MapLayout) map[types.ECGI]*types.Tower {
-	towers := make(map[types.ECGI]*types.Tower)
+// NewCells - create a set of new Cells
+func NewCells(params types.TowersParams, mapLayout types.MapLayout) map[types.ECGI]*types.Cell {
+	cells := make(map[types.ECGI]*types.Cell)
 
-	var r, c uint32
+	totalCells := uint32(math.Floor(float64(params.TowerRows*params.TowerCols) * float64(params.AvgCellsPerTower)))
+	minCellsPerTower := totalCells / (params.TowerRows * params.TowerCols)
+	remainder := uint32(math.Mod(float64(totalCells), float64(minCellsPerTower)))
+	extraCells := make([]uint32, remainder)
+	for i := range extraCells {
+		extraCells[i] = uint32(rand.Int31n(int32(params.TowerRows * params.TowerCols)))
+	}
+
+	var r, c, cellNum uint32
+	var cellPort = uint32(utils.GrpcBasePort + 1) // Start at 5152 so it appears as 1420 in Hex
 	for r = 0; r < params.TowerRows; r++ {
 		for c = 0; c < params.TowerCols; c++ {
-			pos := getTowerPosition(r, c, params, mapLayout)
 			towerNum := r*params.TowerCols + c
-			towerPort := utils.GrpcBasePort + towerNum + 2 // Start at 5152 so it appears as 1420 in Hex
-			ecgi := types.ECGI{
-				PlmnID: utils.TestPlmnID,
-				EcID:   utils.EcIDForPort(int(towerPort)),
+			pos := getTowerPosition(r, c, params, mapLayout)
+			numCells := minCellsPerTower
+			for _, e := range extraCells {
+				if e == towerNum {
+					numCells++
+				}
 			}
-			towers[ecgi] = &types.Tower{
-				Location:   pos,
-				Color:      utils.RandomColor(),
-				Ecgi:       &ecgi,
-				MaxUEs:     params.MaxUEsPerTower,
-				Neighbors:  makeNeighbors(int(towerNum), params),
-				TxPowerdB:  DefaultTxPower,
-				Port:       towerPort,
-				CrntiMap:   make(map[types.Crnti]types.Imsi),
-				CrntiIndex: 0,
+			for cellNum = 0; cellNum < numCells; cellNum++ {
+				cellPort++
+				ecgi := types.ECGI{
+					PlmnID: utils.TestPlmnID,
+					EcID:   utils.EcIDForPort(int(cellPort)),
+				}
+				cells[ecgi] = &types.Cell{
+					Location:   pos,
+					Color:      utils.RandomColor(),
+					Ecgi:       &ecgi,
+					MaxUEs:     params.MaxUEsPerCell,
+					Neighbors:  makeNeighbors(int(cellNum), params),
+					TxPowerdB:  DefaultTxPower,
+					Port:       cellPort,
+					CrntiMap:   make(map[types.Crnti]types.Imsi),
+					CrntiIndex: 0,
+					Sector: &types.Sector{
+						Azimuth: int32(float64(cellNum) / float64(numCells) * 360),
+						Arc:     int32(360 / numCells),
+					},
+				}
 			}
 		}
 	}
 
-	return towers
+	return cells
 }
 
-// Find the closest tower to any point - return closest, candidate1 and candidate2
+// Find the closest cell to any point - return closest, candidate1 and candidate2
 // in order of distance
 // Note this does not take any account of serving - it's just about distance
-func (m *Manager) findClosestTowers(point *types.Point) ([]*types.ECGI, []float32) {
+func (m *Manager) findClosestCells(point *types.Point) ([]*types.ECGI, []float32) {
 	var (
 		closest    *types.ECGI
 		candidate1 *types.ECGI
@@ -91,45 +118,45 @@ func (m *Manager) findClosestTowers(point *types.Point) ([]*types.ECGI, []float3
 		candidate2Dist float32 = math.MaxFloat32
 	)
 
-	m.TowersLock.RLock()
-	for _, tower := range m.Towers {
-		distance := distanceToTower(tower, point)
+	m.CellsLock.RLock()
+	for _, cell := range m.Cells {
+		distance := distanceToCellCentroid(cell, point)
 		if distance < closestDist {
 			candidate2 = candidate1
 			candidate2Dist = candidate1Dist
 			candidate1 = closest
 			candidate1Dist = closestDist
-			closest = tower.Ecgi
+			closest = cell.Ecgi
 			closestDist = distance
 		} else if distance < candidate1Dist {
 			candidate2 = candidate1
 			candidate2Dist = candidate1Dist
-			candidate1 = tower.Ecgi
+			candidate1 = cell.Ecgi
 			candidate1Dist = distance
 		} else if distance < candidate2Dist {
-			candidate2 = tower.Ecgi
+			candidate2 = cell.Ecgi
 			candidate2Dist = distance
 		}
 	}
-	m.TowersLock.RUnlock()
+	m.CellsLock.RUnlock()
 
 	return []*types.ECGI{closest, candidate1, candidate2}, []float32{closestDist, candidate1Dist, candidate2Dist}
 }
 
-// GetTower returns tower based on its name
-func (m *Manager) GetTower(name types.ECGI) *types.Tower {
-	m.TowersLock.RLock()
-	defer m.TowersLock.RUnlock()
-	return m.Towers[name]
+// GetCell returns tower based on its name
+func (m *Manager) GetCell(name types.ECGI) *types.Cell {
+	m.CellsLock.RLock()
+	defer m.CellsLock.RUnlock()
+	return m.Cells[name]
 }
 
-// UpdateTower Update a tower's properties - usually power level
-func (m *Manager) UpdateTower(tower types.ECGI, powerAdjust float32) error {
+// UpdateCell Update a tower's properties - usually power level
+func (m *Manager) UpdateCell(tower types.ECGI, powerAdjust float32) error {
 	// Only the power can be updated at present
-	m.TowersLock.Lock()
-	t, ok := m.Towers[tower]
+	m.CellsLock.Lock()
+	t, ok := m.Cells[tower]
 	if !ok {
-		m.TowersLock.Unlock()
+		m.CellsLock.Unlock()
 		return fmt.Errorf("unknown tower %s", tower)
 	}
 	currentPower := t.TxPowerdB
@@ -140,7 +167,7 @@ func (m *Manager) UpdateTower(tower types.ECGI, powerAdjust float32) error {
 	} else {
 		t.TxPowerdB += powerAdjust
 	}
-	m.TowersLock.Unlock()
+	m.CellsLock.Unlock()
 	m.TowerChannel <- dispatcher.Event{
 		Type:   trafficsim.Type_UPDATED,
 		Object: t,
@@ -150,9 +177,9 @@ func (m *Manager) UpdateTower(tower types.ECGI, powerAdjust float32) error {
 
 // NewCrnti allocs a new crnti
 func (m *Manager) NewCrnti(servingTower *types.ECGI, imsi types.Imsi) (types.Crnti, error) {
-	m.TowersLock.Lock()
-	defer m.TowersLock.Unlock()
-	tower, ok := m.Towers[*servingTower]
+	m.CellsLock.Lock()
+	defer m.CellsLock.Unlock()
+	tower, ok := m.Cells[*servingTower]
 	if !ok {
 		return "", fmt.Errorf("unknown tower %s", servingTower)
 	}
@@ -164,9 +191,9 @@ func (m *Manager) NewCrnti(servingTower *types.ECGI, imsi types.Imsi) (types.Crn
 
 // DelCrnti deletes a crnti
 func (m *Manager) DelCrnti(servingTower *types.ECGI, crnti types.Crnti) error {
-	m.TowersLock.Lock()
-	defer m.TowersLock.Unlock()
-	tower, ok := m.Towers[*servingTower]
+	m.CellsLock.Lock()
+	defer m.CellsLock.Unlock()
+	tower, ok := m.Cells[*servingTower]
 	if !ok {
 		return fmt.Errorf("unknown tower %s", servingTower)
 	}
@@ -177,9 +204,9 @@ func (m *Manager) DelCrnti(servingTower *types.ECGI, crnti types.Crnti) error {
 
 // CrntiToName ...
 func (m *Manager) CrntiToName(crnti types.Crnti, ecid *types.ECGI) (types.Imsi, error) {
-	m.TowersLock.RLock()
-	defer m.TowersLock.RUnlock()
-	tower, ok := m.Towers[*ecid]
+	m.CellsLock.RLock()
+	defer m.CellsLock.RUnlock()
+	tower, ok := m.Cells[*ecid]
 	if !ok {
 		return 0, fmt.Errorf("tower %s not found", ecid)
 	}
@@ -190,13 +217,33 @@ func (m *Manager) CrntiToName(crnti types.Crnti, ecid *types.ECGI) (types.Imsi, 
 	return imsi, nil
 }
 
-// Measure the distance between a point and a tower and return an answer in decimal degrees
-// Simple arithmetic is used, do not use for >= 180 degrees
-func distanceToTower(tower *types.Tower, point *types.Point) float32 {
+// Measure the distance between a point and a cell centroid and return an answer in decimal degrees
+// Simple arithmetic is used, do not use for lat or long diff >= 100 degrees
+func distanceToCellCentroid(cell *types.Cell, point *types.Point) float32 {
+	if cell.Sector.Arc == 360 || cell.Sector.Arc == 0 {
+		return float32(math.Hypot(
+			float64(cell.GetLocation().GetLat()-point.GetLat()),
+			float64(cell.GetLocation().GetLng()-point.GetLng()),
+		))
+	}
+	// Work out the location of the centroid of the cell - ref https://en.wikipedia.org/wiki/Circular_sector
+	alpha := 2 * math.Pi * float64(cell.Sector.Arc) / 360 / 2
+	dist := 2 * PowerToDist(cell.TxPowerdB) * math.Sin(alpha) / alpha / 3
+	var azRads float64 = 0
+	if cell.Sector.Azimuth != 90 {
+		azRads = math.Pi * 2 / float64(cell.Sector.Azimuth-90) / 360
+	}
+	centroidLat := math.Sin(azRads)*dist + float64(cell.Location.GetLat())
+	centroidLng := math.Cos(azRads)*dist + float64(cell.Location.GetLng())
 	return float32(math.Hypot(
-		float64(tower.GetLocation().GetLat()-point.GetLat()),
-		float64(tower.GetLocation().GetLng()-point.GetLng()),
+		centroidLat-float64(point.GetLat()),
+		centroidLng-float64(point.GetLng()),
 	))
+}
+
+// PowerToDist - convert power in dB to distance in decimal degrees
+func PowerToDist(power float32) float64 {
+	return math.Sqrt(math.Pow(10, float64(power)/10)) * PowerFactor
 }
 
 func makeNeighbors(id int, towerParams types.TowersParams) []*types.ECGI {
@@ -211,9 +258,9 @@ func makeNeighbors(id int, towerParams types.TowersParams) []*types.ECGI {
 	for x := max(0, i-1); x <= min(i+1, nrows-1); x++ {
 		for y := max(0, j-1); y <= min(j+1, ncols-1); y++ {
 			if (x == i && y == j-1) || (x == i && y == j+1) || (x == i-1 && y == j) || (x == i+1 && y == j) {
-				towerID := x*nrows + y + 2 + utils.GrpcBasePort
-				towerEcgi := newEcgi(utils.EcIDForPort(towerID), utils.TestPlmnID)
-				neighbors = append(neighbors, &towerEcgi)
+				cellID := x*nrows + y + 2 + utils.GrpcBasePort
+				cellEcgi := newEcgi(utils.EcIDForPort(cellID), utils.TestPlmnID)
+				neighbors = append(neighbors, &cellEcgi)
 			}
 		}
 	}

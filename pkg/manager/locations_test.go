@@ -38,7 +38,8 @@ func Test_NewLocations(t *testing.T) {
 		TowerSpacingVert:  0.02,
 		TowerSpacingHoriz: 0.02,
 		LocationsScale:    1.0,
-		MaxUEsPerTower:    4,
+		MaxUEsPerCell:     4,
+		AvgCellsPerTower:  3.0,
 	}
 
 	locations := NewLocations(towersParams, mapLayout)
