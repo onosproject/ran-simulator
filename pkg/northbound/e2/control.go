@@ -124,21 +124,26 @@ func handleHORequest(towerID types.ECGI, req *e2.HORequest) error {
 	sourceEcgi := toTypesEcgi(req.EcgiS)
 	targetEcgi := toTypesEcgi(req.EcgiT)
 
-	if towerID.EcID == sourceEcgi.EcID && towerID.PlmnID == sourceEcgi.PlmnID {
-		log.Infof("Source handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
-		m := manager.GetManager()
-		imsi, err := m.CrntiToName(types.Crnti(req.Crnti), &towerID)
-		if err != nil {
-			log.Error(err)
-			return fmt.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, req.Crnti)
+	for _, crnti := range req.Crntis {
+		if towerID.EcID == sourceEcgi.EcID && towerID.PlmnID == sourceEcgi.PlmnID {
+			log.Infof("Source handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
+			m := manager.GetManager()
+			imsi, err := m.CrntiToName(types.Crnti(crnti), &towerID)
+			if err != nil {
+				log.Error(err)
+				log.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, crnti)
+			}
+			UpdateControlMetrics(imsi)
+			err = m.UeHandover(imsi, &targetEcgi)
+			if err != nil {
+				log.Error(err)
+			}
+		} else if towerID.EcID == targetEcgi.EcID && towerID.PlmnID == targetEcgi.PlmnID {
+			log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 		}
-		UpdateControlMetrics(imsi)
-		return m.UeHandover(imsi, &targetEcgi)
-	} else if towerID.EcID == targetEcgi.EcID && towerID.PlmnID == targetEcgi.PlmnID {
-		log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
-		return nil
+		log.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 	}
-	return fmt.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, req.Crnti, req.EcgiT.Ecid)
+	return nil
 }
 
 func handleCellConfigRequest(port int, ecgi types.ECGI, c chan e2ap.RicIndication) {

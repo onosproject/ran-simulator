@@ -451,6 +451,8 @@ github.com/onosproject/onos-ric v0.6.0 h1:u8Bmk9D1YOlqHuBr4bQILnloKUJVnezQUuv71m
 github.com/onosproject/onos-ric v0.6.0/go.mod h1:oP7Z9fQQJSijLtfmsUEyS7cKmI1r2JS15+Bj1cY0yUQ=
 github.com/onosproject/onos-ric v0.6.1-0.20200421143235-185ab1aec5be h1:91tl/c/u+PEjfqlr1lxIFI1vLo0OzJiOv0Cp85HT9JM=
 github.com/onosproject/onos-ric v0.6.1-0.20200421143235-185ab1aec5be/go.mod h1:oP7Z9fQQJSijLtfmsUEyS7cKmI1r2JS15+Bj1cY0yUQ=
+github.com/onosproject/onos-ric v0.6.1-0.20200421224027-9e1de8870425 h1:+BqcDK9OgcvkQpwU3swIYtFeWHAWa4RN8391aThLNPo=
+github.com/onosproject/onos-ric v0.6.1-0.20200421224027-9e1de8870425/go.mod h1:oP7Z9fQQJSijLtfmsUEyS7cKmI1r2JS15+Bj1cY0yUQ=
 github.com/onosproject/onos-topo v0.6.0 h1:d7uQ7bUqdg4hjXJyD/Jl2V2Tom1RU2BEoLtoxsc74JE=
 github.com/onosproject/onos-topo v0.6.0/go.mod h1:wcWSoimPCYyqqqxKUmEea4kpp7b/0RBJ30r3LlEwEXM=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

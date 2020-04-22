@@ -6,7 +6,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/googleapis/gnostic v0.3.0 // indirect
 	github.com/onosproject/onos-lib-go v0.6.0
-	github.com/onosproject/onos-ric v0.6.1-0.20200421143235-185ab1aec5be
+	github.com/onosproject/onos-ric v0.6.1-0.20200421224027-9e1de8870425
 	github.com/onosproject/onos-topo v0.6.0
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/prometheus/client_golang v1.4.1
