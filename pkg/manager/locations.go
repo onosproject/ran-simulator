@@ -31,13 +31,13 @@ type Location struct {
 }
 
 // NewLocations - create a new set of locations
-func NewLocations(towersConfig config.TowerConfig, mapLayout types.MapLayout, aspectRatio float64) map[string]*Location {
+func NewLocations(towersConfig config.TowerConfig, maxUEs int) map[string]*Location {
 	locations := make(map[string]*Location)
 
-	minLat := mapLayout.GetCenter().GetLat()
-	maxLat := mapLayout.GetCenter().GetLat()
-	minLng := mapLayout.GetCenter().GetLng()
-	maxLng := mapLayout.GetCenter().GetLng()
+	minLat := towersConfig.MapCentre.GetLat()
+	maxLat := towersConfig.MapCentre.GetLat()
+	minLng := towersConfig.MapCentre.GetLng()
+	maxLng := towersConfig.MapCentre.GetLng()
 	for _, tower := range towersConfig.TowersLayout {
 		if tower.Latitude < minLat {
 			minLat = tower.Latitude
@@ -51,10 +51,9 @@ func NewLocations(towersConfig config.TowerConfig, mapLayout types.MapLayout, as
 		}
 	}
 	radius := math.Hypot(float64(maxLat-minLat), float64(maxLng-minLng)) / 2
-
-	var l uint32
-	for l = 0; l < (mapLayout.MaxUes * 2); l++ {
-		pos := utils.RandomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng(),
+	aspectRatio := utils.AspectRatio(&towersConfig.MapCentre)
+	for l := 0; l < (maxUEs * 2); l++ {
+		pos := utils.RandomLatLng(towersConfig.MapCentre.GetLat(), towersConfig.MapCentre.GetLng(),
 			radius, aspectRatio)
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{

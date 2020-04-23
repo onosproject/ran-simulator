@@ -17,7 +17,6 @@ package manager
 
 import (
 	"context"
-	"math"
 	"sync"
 
 	"github.com/onosproject/onos-topo/api/device"
@@ -83,19 +82,18 @@ func NewManager() (*Manager, error) {
 func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerConfig,
 	routesParams RoutesParams, topoEndpoint string, serverParams utils.ServerParams,
 	metricsParams MetricsParams) {
-	log.Infof("Starting Manager with %v %v %v", mapLayoutParams, towerConfig, routesParams)
+	log.Infof("Starting Manager with %v %v", mapLayoutParams, routesParams)
 
-	// Compensate for the narrowing of meridians at higher latitudes
-	aspectRatio := math.Cos(float64(2 * math.Pi * mapLayoutParams.Center.Lat / 360))
 	m.MapLayout = mapLayoutParams
 	m.CellsLock.Lock()
-	m.Cells = NewCells(towerConfig, aspectRatio)
+	m.Cells = NewCells(towerConfig)
 	m.CellsLock.Unlock()
-	m.Locations = NewLocations(towerConfig, mapLayoutParams, aspectRatio)
+	m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes))
 	m.MapLayout.MinUes = mapLayoutParams.MinUes
 	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
 	m.googleAPIKey = routesParams.APIKey
-	m.AspectRatio = aspectRatio
+	// Compensate for the narrowing of meridians at higher latitudes
+	m.AspectRatio = utils.AspectRatio(&towerConfig.MapCentre)
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)

@@ -77,3 +77,11 @@ func Test_GetRandomLngLat(t *testing.T) {
 		assert.Assert(t, pt.GetLat() < scale, "Expecting position %f to be within scale", pt.GetLat())
 	}
 }
+
+func Test_AzimuthToRads(t *testing.T) {
+	assert.Equal(t, math.Pi/2, AzimuthToRads(0))
+	assert.Equal(t, 0.0, AzimuthToRads(90))
+	assert.Equal(t, -math.Pi/2, AzimuthToRads(180))
+	assert.Equal(t, -math.Pi, AzimuthToRads(270))
+	assert.Equal(t, math.Round(10e6*math.Pi/3), math.Round(10e6*AzimuthToRads(30)))
+}

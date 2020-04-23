@@ -22,6 +22,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"math"
+	"sort"
 )
 
 const (
@@ -30,6 +31,9 @@ const (
 
 	// PowerFactor - relate power to distance in decimal degrees
 	PowerFactor = 0.005
+
+	// MaxNeighbours to find - useful limit for hex layouts
+	MaxNeighbours = 6
 )
 
 const defaultColor = "#000000"
@@ -51,7 +55,7 @@ type CellIf interface {
 }
 
 // NewCells - create a set of new Cells
-func NewCells(towersConfig config.TowerConfig, aspectRatio float64) map[types.ECGI]*types.Cell {
+func NewCells(towersConfig config.TowerConfig) map[types.ECGI]*types.Cell {
 	cells := make(map[types.ECGI]*types.Cell)
 
 	for _, tower := range towersConfig.TowersLayout {
@@ -69,7 +73,6 @@ func NewCells(towersConfig config.TowerConfig, aspectRatio float64) map[types.EC
 				Color:      utils.RandomColor(),
 				Ecgi:       &ecgi,
 				MaxUEs:     uint32(sector.MaxUEs),
-				Neighbors:  makeNeighbors(ecgi, towersConfig),
 				TxPowerdB:  sector.InitPowerDb,
 				Port:       uint32(sector.GrpcPort),
 				CrntiMap:   make(map[types.Crnti]types.Imsi),
@@ -79,9 +82,14 @@ func NewCells(towersConfig config.TowerConfig, aspectRatio float64) map[types.EC
 					Arc:     int32(sector.Arc),
 				},
 			}
-			cell.Sector.Centroid = centroidPosition(cell, aspectRatio)
+			cell.Sector.Centroid = centroidPosition(cell)
 			cells[ecgi] = cell
 		}
+	}
+
+	// go through again and update neighbours, now that all centroids have been calculated
+	for _, cell := range cells {
+		cell.Neighbors = makeNeighbors(cell, cells)
 	}
 
 	return cells
@@ -219,7 +227,7 @@ func distanceToCellCentroid(cell *types.Cell, point *types.Point) (float32, erro
 
 // Measure the distance between a point and a cell centroid and return an answer in decimal degrees
 // Simple arithmetic is used, do not use for lat or long diff >= 100 degrees
-func centroidPosition(cell *types.Cell, aspectRatio float64) *types.Point {
+func centroidPosition(cell *types.Cell) *types.Point {
 	if cell.Sector.Arc == 360 || cell.Sector.Arc == 0 {
 		return cell.Location
 	}
@@ -230,9 +238,10 @@ func centroidPosition(cell *types.Cell, aspectRatio float64) *types.Point {
 	if cell.Sector.Azimuth != 90 {
 		azRads = math.Pi * 2 * float64(90-cell.Sector.Azimuth) / 360
 	}
+	aspectRatio := utils.AspectRatio(cell.Location)
 	return &types.Point{
 		Lat: float32(math.Sin(azRads)*dist) + cell.Location.GetLat(),
-		Lng: float32(math.Cos(azRads)*dist / aspectRatio) + cell.Location.GetLng(),
+		Lng: float32(math.Cos(azRads)*dist/aspectRatio) + cell.Location.GetLng(),
 	}
 }
 
@@ -241,26 +250,39 @@ func PowerToDist(power float32) float64 {
 	return math.Sqrt(math.Pow(10, float64(power)/10)) * PowerFactor
 }
 
-func makeNeighbors(sector types.ECGI, towerConfig config.TowerConfig) []*types.ECGI {
-	neighbors := make([]*types.ECGI, 0)
-	// TODO generate list of neighbours
-	return neighbors
-}
-
-// min ...
-func min(x, y int) int {
-	if x < y {
-		return x
+// find the neighbours of a cell - not distance from towers, but from centroids
+func makeNeighbors(self *types.Cell, allCells map[types.ECGI]*types.Cell) []*types.ECGI {
+	type distance struct {
+		id   *types.ECGI
+		dist float64
 	}
-	return y
-}
+	distances := make([]distance, 0)
 
-// max ...
-func max(x, y int) int {
-	if x > y {
-		return x
+	selfCentroid := self.Sector.Centroid
+	for _, otherCell := range allCells {
+		if otherCell.Ecgi == self.Ecgi {
+			continue
+		}
+		dist := math.Hypot(
+			float64(selfCentroid.Lng-otherCell.Sector.Centroid.Lng),
+			float64(selfCentroid.Lat-otherCell.Sector.Centroid.Lat),
+		)
+		distances = append(distances, distance{id: otherCell.Ecgi, dist: dist})
 	}
-	return y
+	sort.Slice(distances, func(i, j int) bool {
+		return distances[i].dist < distances[j].dist
+	})
+
+	limit := len(allCells) - 1
+	if limit > MaxNeighbours {
+		limit = MaxNeighbours
+	}
+	neighbours := make([]*types.ECGI, limit)
+	for i := 0; i < limit; i++ {
+		neighbours[i] = distances[i].id
+	}
+
+	return neighbours
 }
 
 func newEcgi(id types.EcID, plmnID types.PlmnID) types.ECGI {

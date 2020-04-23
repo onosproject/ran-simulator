@@ -15,39 +15,36 @@
 package manager
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/config"
 	"gotest.tools/assert"
 	"testing"
 )
 
 func Test_NewLocations(t *testing.T) {
-	mapLayout := types.MapLayout{
-		Center:        &types.Point{Lat: 52.8, Lng: -8.2},
-		Zoom:          12,
-		Fade:          false,
-		ShowRoutes:    false,
-		ShowPower:     false,
-		MinUes:        3,
-		MaxUes:        30,
-		CurrentRoutes: 0,
-	}
+	towersConfig, err := config.GetTowerConfig("berlin-rectangular-4-1.yaml")
+	assert.NilError(t, err)
 
-	towersParams := types.TowersParams{
-		TowerRows:         2,
-		TowerCols:         2,
-		TowerSpacingVert:  0.02,
-		TowerSpacingHoriz: 0.02,
-		LocationsScale:    1.0,
-		MaxUEsPerCell:     4,
-		AvgCellsPerTower:  3.0,
-	}
-
-	locations := NewLocations(towersParams, mapLayout)
+	locations := NewLocations(towersConfig, 30)
 
 	assert.Equal(t, 60, len(locations), "Unexpected number of locations")
-	gridHalf := float32(towersParams.TowerCols-1) * towersParams.TowerSpacingHoriz / 2
-	minLng := mapLayout.GetCenter().GetLng() - gridHalf
-	maxLng := mapLayout.GetCenter().GetLng() + gridHalf
+
+	minLat := towersConfig.MapCentre.GetLat()
+	maxLat := towersConfig.MapCentre.GetLat()
+	minLng := towersConfig.MapCentre.GetLng()
+	maxLng := towersConfig.MapCentre.GetLng()
+	for _, tower := range towersConfig.TowersLayout {
+		if tower.Latitude < minLat {
+			minLat = tower.Latitude
+		} else if tower.Latitude > maxLat {
+			maxLat = tower.Latitude
+		}
+		if tower.Longitude < minLng {
+			minLng = tower.Longitude
+		} else if tower.Longitude > maxLng {
+			maxLng = tower.Longitude
+		}
+	}
+
 	for k, l := range locations {
 		assert.Assert(t, l.Position.GetLng() > minLng, "%s expected lng %f to be < than maxLng %f", k, l.Position.GetLng(), maxLng)
 		assert.Assert(t, l.Position.GetLng() < maxLng, "%s expected lng %f to be > than minLng %f", k, l.Position.GetLat(), minLng)

@@ -16,36 +16,29 @@ package e2
 
 import (
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
 func setUpManager() (*manager.Manager, error) {
-	mapLayout := types.MapLayout{
-		Center:     &types.Point{Lat: 52.0, Lng: 8.0},
-		Zoom:       12,
-		Fade:       false,
-		ShowRoutes: false,
-		ShowPower:  false,
-		MinUes:     5,
-		MaxUes:     5,
-	}
-	towerParams := types.TowersParams{
-		TowerRows:         2,
-		TowerCols:         2,
-		TowerSpacingVert:  0.01,
-		TowerSpacingHoriz: 0.01,
-		MaxUEsPerCell:     4,
-		LocationsScale:    1.0,
-		AvgCellsPerTower:  1.0,
-	}
 	routesParams := manager.RoutesParams{
 		APIKey:    "",
 		StepDelay: 1000,
 	}
 
-	towers := manager.NewCells(towerParams, mapLayout)
+	towersConfig, err := config.GetTowerConfig("berlin-rectangular-4-1.yaml")
+	if err != nil {
+		return nil, err
+	}
+	mapLayout := types.MapLayout{
+		Center: &towersConfig.MapCentre,
+		Zoom:   12,
+		MinUes: 3,
+	}
 
-	locations := manager.NewLocations(towerParams, mapLayout)
+	towers := manager.NewCells(towersConfig)
+
+	locations := manager.NewLocations(towersConfig, 5)
 
 	mgr, err := manager.NewManager()
 	if err != nil {

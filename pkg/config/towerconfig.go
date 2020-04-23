@@ -22,6 +22,7 @@ import (
 
 var towerConfig *TowerConfig
 
+// Sector - one side of the tower
 type Sector struct {
 	EcID        types.EcID `yaml:"ecid"`
 	GrpcPort    uint16     `yaml:"grpcport"`
@@ -31,6 +32,7 @@ type Sector struct {
 	InitPowerDb float32    `yaml:"initpowerdb"`
 }
 
+// TowersLayout an individual tower with sectors
 type TowersLayout struct {
 	TowerID   string       `yaml:"towerid"`
 	PlmnID    types.PlmnID `yaml:"plmnid"`
@@ -43,6 +45,11 @@ type TowersLayout struct {
 type TowerConfig struct {
 	MapCentre    types.Point
 	TowersLayout []TowersLayout
+}
+
+// Clear - reset the config - needed for tests
+func Clear() {
+	towerConfig = nil
 }
 
 // GetTowerConfig gets the onos-towerConfig configuration
@@ -87,6 +94,10 @@ func Checker(config *TowerConfig) error {
 			return fmt.Errorf("the PlmnID must be 6 chars: %s", tower.PlmnID)
 		}
 
+		if len(tower.Sectors) == 0 {
+			return fmt.Errorf("every tower must have at least 1 sector: %s", tower.TowerID)
+		}
+
 		for _, sector := range tower.Sectors {
 			if len(sector.EcID) != 7 {
 				return fmt.Errorf("the Ecid must be 7 chars: %s", sector.EcID)
@@ -110,7 +121,7 @@ func Checker(config *TowerConfig) error {
 				return fmt.Errorf("arc must be 1-360° %d", sector.Arc)
 			}
 
-			if sector.Azimuth < 0 || sector.Azimuth > 359 {
+			if sector.Azimuth > 359 {
 				return fmt.Errorf("azimuth must be 0-359° %d", sector.Azimuth)
 			}
 
@@ -120,44 +131,4 @@ func Checker(config *TowerConfig) error {
 		}
 	}
 	return nil
-}
-
-// HoneycombGenerator - used by the cli tool "honeycomb"
-func HoneycombGenerator(numTowers uint8, sectorsPerTower uint8, latitude float32,
-	longitude float32, plmnid types.PlmnID, ecidStart uint16, portstart uint16) *TowerConfig {
-
-	newConfig := TowerConfig{
-		MapCentre:types.Point{
-			Lat: latitude,
-			Lng: longitude,
-		},
-		TowersLayout: make([]TowersLayout, numTowers),
-	}
-	var t, s uint8
-	for t = 0; t < numTowers; t++ {
-		tower := TowersLayout{
-			TowerID:   fmt.Sprintf("Tower-%d", t+1),
-			PlmnID:    plmnid,
-			Latitude:  latitude + (float32(t)/1000), // TODO calculate for honeycomb
-			Longitude: longitude + (float32(t)/1000), // TODO calculate for honeycomb
-			Sectors:   make([]Sector, sectorsPerTower),
-		}
-		for s = 0; s < sectorsPerTower; s++ {
-			var azimuth uint16 = 0
-			if s > 0 {
-				azimuth = 360.0 * uint16(s) / uint16(sectorsPerTower)
-			}
-			sector := Sector{
-				EcID:        types.EcID(fmt.Sprintf("%07x", ecidStart + uint16(t * sectorsPerTower) + uint16(s))),
-				GrpcPort:    portstart + uint16(t * sectorsPerTower) + uint16(s),
-				Azimuth:     azimuth,
-				Arc:         360.0 / uint16(sectorsPerTower),
-				MaxUEs:      5,
-				InitPowerDb: 10,
-			}
-			tower.Sectors[s] = sector
-		}
-		newConfig.TowersLayout[t] = tower
-	}
-	return &newConfig
 }

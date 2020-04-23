@@ -19,7 +19,8 @@ import (
 	"testing"
 )
 
-func Test_LoadConfig(t *testing.T) {
+func Test_LoadConfig1(t *testing.T) {
+	towerConfig = nil
 	config, err := GetTowerConfig("berlin-honeycomb-4-3.yaml")
 	assert.NilError(t, err, "Unexpected error loading towerConfig")
 	assert.Equal(t, 4, len(config.TowersLayout), "Unexpected number of towers")
@@ -27,4 +28,37 @@ func Test_LoadConfig(t *testing.T) {
 	tower1 := config.TowersLayout[0]
 	assert.Equal(t, "Tower-1", tower1.TowerID)
 	assert.Equal(t, 3, len(tower1.Sectors))
+}
+
+func Test_LoadConfig2(t *testing.T) {
+	towerConfig = nil
+	config, err := GetTowerConfig("berlin-rectangular-4-1.yaml")
+	assert.NilError(t, err, "Unexpected error loading towerConfig")
+	assert.Equal(t, 4, len(config.TowersLayout), "Unexpected number of towers")
+
+	tower1 := config.TowersLayout[0]
+	assert.Equal(t, "Tower-1", tower1.TowerID)
+	assert.Equal(t, 1, len(tower1.Sectors))
+}
+
+func Test_LoadConfig3(t *testing.T) {
+	towerConfig = nil
+	config, err := GetTowerConfig("berlin-rectangular-9-1.yaml")
+	assert.NilError(t, err, "Unexpected error loading towerConfig")
+	assert.Equal(t, 9, len(config.TowersLayout), "Unexpected number of towers")
+
+	tower1 := config.TowersLayout[0]
+	assert.Equal(t, "Tower-1", tower1.TowerID)
+	assert.Equal(t, 1, len(tower1.Sectors))
+}
+
+func Test_LoadConfig4(t *testing.T) {
+	towerConfig = nil
+	config, err := GetTowerConfig("berlin-honeycomb-169-6.yaml")
+	assert.NilError(t, err, "Unexpected error loading towerConfig")
+	assert.Equal(t, 169, len(config.TowersLayout), "Unexpected number of towers")
+
+	tower1 := config.TowersLayout[0]
+	assert.Equal(t, "Tower-1", tower1.TowerID)
+	assert.Equal(t, 6, len(tower1.Sectors))
 }

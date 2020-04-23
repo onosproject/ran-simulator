@@ -17,6 +17,7 @@ package manager
 import (
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"gotest.tools/assert"
 	"math"
@@ -24,108 +25,26 @@ import (
 	"time"
 )
 
-const (
-	mapCenterLat           = 52.0
-	mapCenterLng           = -8.0
-	towerSpacingVert       = 0.01
-	towerSpacingHoriz      = 0.02
-	decimalDegreeTolerance = 0.0001
-)
-
 func Test_NewTowers(t *testing.T) {
-	cells := NewCells(
-		types.TowersParams{
-			TowerRows:         2,
-			TowerCols:         2,
-			TowerSpacingVert:  towerSpacingVert,
-			TowerSpacingHoriz: towerSpacingHoriz,
-			AvgCellsPerTower:  3.5,
-		},
-		types.MapLayout{
-			Center:     &types.Point{Lat: mapCenterLat, Lng: mapCenterLng},
-			Zoom:       12,
-			Fade:       false,
-			ShowRoutes: false,
-		})
+	config.Clear()
+	towerConfig, err := config.GetTowerConfig("berlin-honeycomb-4-3.yaml")
+	assert.NilError(t, err)
+	cells := NewCells(towerConfig)
 
-	assert.Equal(t, 14, len(cells), "Expected 14 cells to have been created")
+	assert.Equal(t, 12, len(cells), "Expected 12 cells to have been created")
 	for _, cell := range cells {
-		testLatitude(cell, t)
-		testLongitude(cell, t)
 		assert.Assert(t, cell.Sector.Azimuth >= 0 && cell.Sector.Azimuth <= 270, cell.Sector)
 		assert.Assert(t, cell.Sector.Arc >= 90 && cell.Sector.Arc <= 120, cell.Sector)
-	}
-}
-
-// gocyclo complained when they were all in the same function
-func testLatitude(cell *types.Cell, t *testing.T) {
-	switch cell.Ecgi.EcID {
-	case "0001420":
-	case "0001421":
-	case "0001422":
-	case "0001423":
-	case "0001424":
-	case "0001425":
-	case "0001426":
-		assert.Assert(t, cell.Location.GetLat()-mapCenterLat-towerSpacingVert/2 < decimalDegreeTolerance,
-			"cell %s off V", cell.Ecgi.EcID)
-	case "0001427":
-	case "0001428":
-	case "0001429":
-	case "000142A":
-	case "000142B":
-	case "000142C":
-	case "000142D":
-		assert.Assert(t, cell.Location.GetLat()-mapCenterLat+towerSpacingVert/2 < decimalDegreeTolerance,
-			"cell %s off V", cell.Ecgi.EcID)
-	default:
-		t.Errorf("Unexpected cell %s V", cell.Ecgi)
-	}
-}
-
-func testLongitude(cell *types.Cell, t *testing.T) {
-	switch cell.Ecgi.EcID {
-	case "0001420":
-	case "0001421":
-	case "0001422":
-	case "0001427":
-	case "0001428":
-	case "0001429":
-	case "000142A":
-		assert.Assert(t, cell.Location.GetLng()+mapCenterLng-towerSpacingHoriz/2 < decimalDegreeTolerance,
-			"cell %s off H", cell.Ecgi.EcID)
-	case "0001423":
-	case "0001424":
-	case "0001425":
-	case "0001426":
-	case "000142B":
-	case "000142C":
-	case "000142D":
-		assert.Assert(t, cell.Location.GetLng()+mapCenterLng+towerSpacingHoriz/2 < decimalDegreeTolerance,
-			"cell %s off H", cell.Ecgi.EcID)
-	default:
-		t.Errorf("Unexpected cell %s H", cell.Ecgi)
 	}
 }
 
 func Test_findClosestTowers(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
-
-	m.Cells = NewCells(
-		types.TowersParams{
-			TowerRows:         3,
-			TowerCols:         3,
-			TowerSpacingVert:  towerSpacingVert,
-			TowerSpacingHoriz: towerSpacingHoriz,
-			AvgCellsPerTower:  1,
-		},
-		types.MapLayout{
-			Center:     &types.Point{Lat: mapCenterLat, Lng: mapCenterLng},
-			Zoom:       12,
-			Fade:       false,
-			ShowRoutes: false,
-		})
+	config.Clear()
+	towerConfig, err := config.GetTowerConfig("berlin-rectangular-9-1.yaml")
+	assert.NilError(t, err)
+	m.Cells = NewCells(towerConfig)
 
 	assert.Equal(t, 9, len(m.Cells), "Expected 9 towers to have been created")
 
@@ -161,24 +80,11 @@ func Test_PowerAdjust(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
 
-	const mapCenterLat = 52.0
-	const mapCenterLng = -8.0
-	const towerSpacingVert = 0.01
-	const towerSpacingHoriz = 0.02
-	m.Cells = NewCells(
-		types.TowersParams{
-			TowerRows:         1,
-			TowerCols:         1,
-			TowerSpacingVert:  towerSpacingVert,
-			TowerSpacingHoriz: towerSpacingHoriz,
-			AvgCellsPerTower:  1.0,
-		},
-		types.MapLayout{
-			Center:     &types.Point{Lat: mapCenterLat, Lng: mapCenterLng},
-			Zoom:       12,
-			Fade:       false,
-			ShowRoutes: false,
-		})
+	config.Clear()
+	towerConfig, err := config.GetTowerConfig("berlin-rectangular-1-1.yaml")
+	assert.NilError(t, err)
+	m.Cells = NewCells(towerConfig)
+
 	go func() {
 		for event := range m.TowerChannel {
 			assert.Equal(t, trafficsim.Type_UPDATED, event.Type)
@@ -212,13 +118,9 @@ func Test_PowerAdjust(t *testing.T) {
 }
 
 func Test_MakeNeighbors(t *testing.T) {
-	towerParams := types.TowersParams{
-		TowerRows:         3,
-		TowerCols:         3,
-		TowerSpacingVert:  towerSpacingVert,
-		TowerSpacingHoriz: towerSpacingHoriz,
-		AvgCellsPerTower:  1.0,
-	}
+	config.Clear()
+	towerConfig, err := config.GetTowerConfig("berlin-rectangular-9-1.yaml")
+	assert.NilError(t, err)
 
 	// 1420 --- 1421 --- 1422
 	//   |        |        |
@@ -226,18 +128,34 @@ func Test_MakeNeighbors(t *testing.T) {
 	//   |        |        |
 	// 1426 --- 1427 --- 1428
 	// tower num 2 is the top right - it's id is "0001422"
-	neighborIDs := makeNeighbors(2, towerParams)
-	assert.Equal(t, 2, len(neighborIDs), "Unexpected number of neighbors for 2")
-	assert.Equal(t, types.EcID("0001421"), neighborIDs[0].EcID)
-	assert.Equal(t, types.EcID("0001425"), neighborIDs[1].EcID)
+	cell2Ecgi := types.ECGI{
+		EcID:   towerConfig.TowersLayout[2].Sectors[0].EcID,
+		PlmnID: towerConfig.TowersLayout[2].PlmnID,
+	}
+	cells := NewCells(towerConfig)
+	// The neighbors are already calculated in the above, but we do it
+	// explicitly here
+	neighborIDs := makeNeighbors(cells[cell2Ecgi], cells)
+	assert.Equal(t, 6, len(neighborIDs), "Unexpected number of neighbors for 1422")
+	assert.Equal(t, types.EcID("0001425"), neighborIDs[0].EcID)
+	assert.Equal(t, types.EcID("0001421"), neighborIDs[1].EcID)
 
 	// tower num 4 is the middle - it's id is "0001424"
-	neighborIDs4 := makeNeighbors(4, towerParams)
-	assert.Equal(t, 4, len(neighborIDs4), "Unexpected number of neighbors for 5")
-	assert.Equal(t, types.EcID("0001421"), neighborIDs4[0].EcID)
-	assert.Equal(t, types.EcID("0001423"), neighborIDs4[1].EcID)
-	assert.Equal(t, types.EcID("0001425"), neighborIDs4[2].EcID)
-	assert.Equal(t, types.EcID("0001427"), neighborIDs4[3].EcID)
+	cell4Ecgi := types.ECGI{
+		EcID:   towerConfig.TowersLayout[4].Sectors[0].EcID,
+		PlmnID: towerConfig.TowersLayout[4].PlmnID,
+	}
+	neighborIDs4 := makeNeighbors(cells[cell4Ecgi], cells)
+	assert.Equal(t, 6, len(neighborIDs4), "Unexpected number of neighbors for 1424")
+	for idx, n := range neighborIDs4 {
+		switch n.EcID {
+		case "0001421":
+		case "0001423":
+		case "0001425":
+		case "0001427":
+			assert.Assert(t, idx < 4, "Expected named cells to be in the closest 4")
+		}
+	}
 }
 
 func Test_distToTower1Sector(t *testing.T) {
@@ -284,7 +202,7 @@ func Test_distToTower2Sectors(t *testing.T) {
 		Lng: -8.01,
 	})
 	assert.NilError(t, err)
-	assert.Equal(t, 1512, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 2 sector tower")
+	assert.Equal(t, 2316, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 2 sector tower")
 }
 
 func Test_distToTower3Sectors(t *testing.T) {
@@ -310,22 +228,22 @@ func Test_distToTower3Sectors(t *testing.T) {
 			Lng: -8.01,
 		})
 	assert.NilError(t, err)
-	assert.Equal(t, 1583, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 3 sector tower")
+	assert.Equal(t, 2649, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 3 sector tower")
 }
 
 func Test_PowerToDist(t *testing.T) {
 	distm20 := PowerToDist(-20) // -20dB
-	assert.Equal(t, 10, int(math.Floor(distm20*1e5)))
+	assert.Equal(t, 50, int(math.Floor(distm20*1e5)))
 
 	distm10 := PowerToDist(-10) // -10dB
-	assert.Equal(t, 31, int(math.Floor(distm10*1e5)))
+	assert.Equal(t, 158, int(math.Floor(distm10*1e5)))
 
 	dist0 := PowerToDist(0) // 0dB
-	assert.Equal(t, 100, int(math.Floor(dist0*1e5)))
+	assert.Equal(t, 500, int(math.Floor(dist0*1e5)))
 
 	dist10 := PowerToDist(10)
-	assert.Equal(t, 316, int(math.Floor(dist10*1e5)))
+	assert.Equal(t, 1581, int(math.Floor(dist10*1e5)))
 
 	dist20 := PowerToDist(20)
-	assert.Equal(t, 1000, int(math.Floor(dist20*1e5)))
+	assert.Equal(t, 5000, int(math.Floor(dist20*1e5)))
 }
