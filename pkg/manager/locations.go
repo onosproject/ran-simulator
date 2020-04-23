@@ -16,7 +16,9 @@ package manager
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/utils"
+	"math"
 	"math/rand"
 
 	"github.com/onosproject/ran-simulator/api/types"
@@ -29,14 +31,31 @@ type Location struct {
 }
 
 // NewLocations - create a new set of locations
-func NewLocations(towersParams types.TowersParams, mapLayout types.MapLayout) map[string]*Location {
+func NewLocations(towersConfig config.TowerConfig, mapLayout types.MapLayout, aspectRatio float64) map[string]*Location {
 	locations := make(map[string]*Location)
+
+	minLat := mapLayout.GetCenter().GetLat()
+	maxLat := mapLayout.GetCenter().GetLat()
+	minLng := mapLayout.GetCenter().GetLng()
+	maxLng := mapLayout.GetCenter().GetLng()
+	for _, tower := range towersConfig.TowersLayout {
+		if tower.Latitude < minLat {
+			minLat = tower.Latitude
+		} else if tower.Latitude > maxLat {
+			maxLat = tower.Latitude
+		}
+		if tower.Longitude < minLng {
+			minLng = tower.Longitude
+		} else if tower.Longitude > maxLng {
+			maxLng = tower.Longitude
+		}
+	}
+	radius := math.Hypot(float64(maxLat-minLat), float64(maxLng-minLng)) / 2
+
 	var l uint32
-	aspectRatio := towersParams.TowerSpacingHoriz / towersParams.TowerSpacingVert
 	for l = 0; l < (mapLayout.MaxUes * 2); l++ {
 		pos := utils.RandomLatLng(mapLayout.Center.GetLat(), mapLayout.GetCenter().GetLng(),
-			towersParams.TowerSpacingHoriz*float32(towersParams.TowerCols-1)*towersParams.LocationsScale/2,
-			aspectRatio)
+			radius, aspectRatio)
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{
 			Name:     name,

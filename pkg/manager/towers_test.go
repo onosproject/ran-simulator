@@ -131,7 +131,8 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point outside the towers north-west
 	testPointA := &types.Point{Lat: 52.12345, Lng: -8.123}
-	towersA, distancesA := m.findClosestCells(testPointA)
+	towersA, distancesA, err := m.findClosestCells(testPointA)
+	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersA), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesA), "Expected 3 tower distancesA in findClosest")
 	assert.Assert(t, distancesA[2] > distancesA[1], "Expected distance to be greater")
@@ -139,7 +140,8 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point outside the towers south-east
 	testPointB := &types.Point{Lat: 51.7654, Lng: -7.9876}
-	towersB, distancesB := m.findClosestCells(testPointB)
+	towersB, distancesB, err := m.findClosestCells(testPointB)
+	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersB), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesB), "Expected 3 tower distancesA in findClosest")
 	assert.Assert(t, distancesB[2] > distancesB[1], "Expected distance to be greater")
@@ -147,7 +149,8 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point within the towers south-east of centre
 	testPointC := &types.Point{Lat: 51.980, Lng: -7.950}
-	towersC, distancesC := m.findClosestCells(testPointC)
+	towersC, distancesC, err := m.findClosestCells(testPointC)
+	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersC), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesC), "Expected 3 tower distancesA in findClosest")
 	assert.Assert(t, distancesC[2] > distancesC[1], "Expected distance to be greater")
@@ -238,63 +241,76 @@ func Test_MakeNeighbors(t *testing.T) {
 }
 
 func Test_distToTower1Sector(t *testing.T) {
-	dist := distanceToCellCentroid(
-		&types.Cell{
-			Location: &types.Point{
-				Lat: 52,
-				Lng: -8,
-			},
-			Sector: &types.Sector{
-				Azimuth: 0,
-				Arc:     360,
-			},
-			TxPowerdB: 10.0, // Does not matter in this case 360
+	cell := &types.Cell{
+		Location: &types.Point{
+			Lat: 52,
+			Lng: -8,
 		},
+		Sector: &types.Sector{
+			Azimuth: 0,
+			Arc:     360,
+		},
+		TxPowerdB: 10.0, // Does not matter in this case 360
+	}
+	cell.Sector.Centroid = centroidPosition(cell)
+	dist, err := distanceToCellCentroid(cell,
 		&types.Point{
 			Lat: 52.01,
 			Lng: -8.01,
 		})
+	assert.NilError(t, err)
 	assert.Equal(t, 1414, int(math.Floor(float64(dist*1e5))), "Unexpected distance for single sector tower")
 }
 
 func Test_distToTower2Sectors(t *testing.T) {
-	dist := distanceToCellCentroid(
-		&types.Cell{
-			Location: &types.Point{
-				Lat: 52,
-				Lng: -8,
-			},
-			Sector: &types.Sector{
-				Azimuth: 90,
-				Arc:     180,
-			},
-			TxPowerdB: 10.0,
+	cell := &types.Cell{
+		Location: &types.Point{
+			Lat: 52,
+			Lng: -8,
 		},
-		&types.Point{
-			Lat: 52.01,
-			Lng: -8.01,
-		})
-	assert.Equal(t, 1512, int(math.Floor(float64(dist*1e5))), "Unexpected distance for single sector tower")
+		Sector: &types.Sector{
+			Azimuth: 90,
+			Arc:     180,
+			Centroid: &types.Point{
+				Lat: 52.0001,
+				Lng: -8.0001,
+			},
+		},
+		TxPowerdB: 10.0,
+	}
+	cell.GetSector().Centroid = centroidPosition(cell)
+	dist, err := distanceToCellCentroid(cell, &types.Point{
+		Lat: 52.01,
+		Lng: -8.01,
+	})
+	assert.NilError(t, err)
+	assert.Equal(t, 1512, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 2 sector tower")
 }
 
 func Test_distToTower3Sectors(t *testing.T) {
-	dist := distanceToCellCentroid(
-		&types.Cell{
-			Location: &types.Point{
-				Lat: 52,
-				Lng: -8,
-			},
-			Sector: &types.Sector{
-				Azimuth: 120,
-				Arc:     120,
-			},
-			TxPowerdB: 10.0,
+	cell := &types.Cell{
+		Location: &types.Point{
+			Lat: 52,
+			Lng: -8,
 		},
+		Sector: &types.Sector{
+			Azimuth: 120,
+			Arc:     120,
+			Centroid: &types.Point{
+				Lat: 52.0001,
+				Lng: -8.0001,
+			},
+		},
+		TxPowerdB: 10.0,
+	}
+	cell.GetSector().Centroid = centroidPosition(cell)
+	dist, err := distanceToCellCentroid(cell,
 		&types.Point{
 			Lat: 52.01,
 			Lng: -8.01,
 		})
-	assert.Equal(t, 1542, int(math.Floor(float64(dist*1e5))), "Unexpected distance for single sector tower")
+	assert.NilError(t, err)
+	assert.Equal(t, 1583, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 3 sector tower")
 }
 
 func Test_PowerToDist(t *testing.T) {

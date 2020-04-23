@@ -42,7 +42,7 @@ const TestPlmnID = "315010"
 const ImsiBaseCbrs = types.Imsi(315010999900000)
 
 // RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
-func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32, aspectRatio float32) types.Point {
+func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float64, aspectRatio float64) types.Point {
 	var r = float64(radius)
 	y0 := float64(mapCenterLat)
 	x0 := float64(mapCenterLng)

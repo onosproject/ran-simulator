@@ -35,7 +35,7 @@ const NamespaceEnv = "NAMESPACE"
 const ServiceNameEnv = "SERVICENAME"
 
 // AddK8SServicePorts add a Port to the K8s service
-func AddK8SServicePorts(rangeStart int32, rangeEnd int32) error {
+func AddK8SServicePorts(ports []uint16) error {
 	namespace := os.Getenv(NamespaceEnv)
 	serviceName := os.Getenv(ServiceNameEnv)
 	if serviceName == "" {
@@ -67,16 +67,16 @@ func AddK8SServicePorts(rangeStart int32, rangeEnd int32) error {
 		return err
 	}
 
-	for p := rangeStart; p < rangeEnd; p++ {
+	for _, p := range ports {
 		newPort := v1.ServicePort{
 			Name:       fmt.Sprintf("e2port%d", p),
 			Protocol:   "TCP",
-			Port:       p,
-			TargetPort: intstr.IntOrString{IntVal: p},
+			Port:       int32(p),
+			TargetPort: intstr.IntOrString{IntVal: int32(p)},
 		}
 		thisService.Spec.Ports = append(thisService.Spec.Ports, newPort)
 	}
-	log.Infof("Service %s - appended ports %d-%d", serviceName, rangeStart, rangeEnd)
+	log.Infof("Service %s - appended %d ports", serviceName, len(ports))
 	_, err = clientset.CoreV1().Services(namespace).Update(thisService)
 	if statusError, isStatus := err.(*errors.StatusError); isStatus {
 		// The ports may already exist if the ran-simulator pod is restarting

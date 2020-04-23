@@ -30,6 +30,8 @@ message Sector {
     int32 azimuth = 1;
 
     int32 arc = 2;
+
+    Point centroid = 3;
 }
 
 message Route {
@@ -81,29 +83,6 @@ message UeMetrics {
 
     // flag to indicate the first measurement
     bool isFirst = 3;
-}
-
-message TowersParams {
-    // Number of rows of towers
-	uint32 towerRows = 1;
-
-    // Number of columns of towers
-	uint32 towerCols = 2;
-
-    // Tower spacing vert in degrees latitude
-    float towerSpacingVert = 3;
-
-    // Tower spacing horiz in degrees longitude
-	float towerSpacingHoriz = 4;
-
-    // Ratio of random locations diameter to tower grid width
-    float locationsScale = 5;
-
-    // Max num of UEs per cell
-    uint32 maxUEsPerCell = 6;
-
-    // Avg Cells per tower - between 2 and 4
-    float avgCellsPerTower = 7;
 }
 
 // station's unique ID
@@ -161,4 +140,7 @@ message MapLayout {
 
     // the current number of routes
     uint32 current_routes = 8;
+
+    // Ratio of random locations diameter to tower grid width
+    float locationsScale = 9;
 }

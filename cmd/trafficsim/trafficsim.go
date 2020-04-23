@@ -30,11 +30,10 @@ package main
 
 import (
 	"flag"
-	_ "net/http/pprof"
-	"runtime"
+	"github.com/onosproject/ran-simulator/pkg/config"
 	"time"
 
-	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
@@ -44,7 +43,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils"
 )
 
-var log = liblog.GetDefaultLogger()
+var log = logging.GetLogger("main")
 
 // The main entry point
 func main() {
@@ -52,51 +51,48 @@ func main() {
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
 	googleAPIKey := flag.String("googleAPIKey", "", "your google maps api key")
-	towerRows := flag.Int("towerRows", 3, "Number of rows of towers")
-	towerCols := flag.Int("towerCols", 3, "Number of columns of towers")
-	mapCenterLat := flag.Float64("mapCenterLat", 52.5200, "Map center latitude")
-	mapCenterLng := flag.Float64("mapCenterLng", 13.4050, "Map center longitude") // Berlin
+	flag.Int("towerRows", 0, "replaced by yaml") // TODO remove
+	flag.Int("towerCols", 0, "replaced by yaml") // TODO remove
+	flag.Float64("mapCenterLat", 0, "replaced by yaml") // TODO remove
+	flag.Float64("mapCenterLng", 0, "replaced by yaml") // TODO remove
 	zoom := flag.Float64("zoom", 13, "The starting Zoom level")
 	fade := flag.Bool("fade", true, "Show map as faded on start")
 	showRoutes := flag.Bool("showRoutes", true, "Show routes on start")
 	showPower := flag.Bool("showPower", true, "Show power as circle on start")
-	towerSpacingVert := flag.Float64("towerSpacingVert", 0.02, "Tower spacing vert in degrees latitude")
-	towerSpacingHoriz := flag.Float64("towerSpacingHoriz", 0.0333, "Tower spacing horiz in degrees longitude")
+	flag.Float64("towerSpacingVert", 0, "replaced by yaml") // TODO remove once removed from helm chart
+	flag.Float64("towerSpacingHoriz", 0, "replaced by yaml") // TODO remove
 	locationsScale := flag.Float64("locationsScale", 1.25, "Ratio of random locations diameter to tower grid width")
-	maxUEs := flag.Int("maxUEs", 300, "Max number of UEs for complete simulation")
-	minUEs := flag.Int("minUEs", 3, "Max number of UEs for complete simulation")
-	stepDelayMs := flag.Int("stepDelayMs", 1000, "delay between steps on route")
-	maxUEsPerTower := flag.Int("maxUEsPerTower", 5, "Max num of UEs per tower")
-	metricsPort := flag.Int("metricsPort", 9090, "port for Prometheus metrics")
+	maxUEs := flag.Uint("maxUEs", 300, "Max number of UEs for complete simulation")
+	minUEs := flag.Uint("minUEs", 3, "Max number of UEs for complete simulation")
+	stepDelayMs := flag.Uint("stepDelayMs", 1000, "delay between steps on route")
+	flag.Int("maxUEsPerTower", 0, "replaced by yaml") // TODO remove
+	metricsPort := flag.Uint("metricsPort", 9090, "port for Prometheus metrics")
 	metricsAllHoEvents := flag.Bool("metricsAllHoEvents", true, "Export all HO events in metrics (only historgram if false)")
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
-	loglevel := flag.String("loglevel", "warn", "Initial log level - debug, info, warn, error")
+	flag.String("loglevel", "", "replaced by yaml") // TODO remove
 	addK8sSvcPorts := flag.Bool("addK8sSvcPorts", true, "Add K8S service ports per tower")
-	avgCellcPerTower := flag.Float64("avgCellcPerTower", 1.0, "Cells to create per tower 2.0 to 4.0")
+	flag.Float64("avgCellcPerTower", 0, "replaced by yaml") // TODO remove
+	towerConfigFile := flag.String("towerConfigFile", "berlin-honeycomb-4-3.yaml", "the name of a tower configuration")
 
 	flag.Parse()
-	setLogLevel(*loglevel)
+
+	towersConfig, err := config.GetTowerConfig(*towerConfigFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Infof("Loaded config. %d towers", len(towersConfig.TowersLayout))
 
 	mapLayoutParams := types.MapLayout{
-		Center: &types.Point{
-			Lat: float32(*mapCenterLat),
-			Lng: float32(*mapCenterLng),
-		},
-		Zoom:       float32(*zoom),
-		ShowRoutes: *showRoutes,
-		Fade:       *fade,
-		ShowPower:  *showPower,
-		MinUes:     uint32(*minUEs),
-		MaxUes:     uint32(*maxUEs),
+		Zoom:           float32(*zoom),
+		ShowRoutes:     *showRoutes,
+		Fade:           *fade,
+		ShowPower:      *showPower,
+		MinUes:         uint32(*minUEs),
+		MaxUes:         uint32(*maxUEs),
+		LocationsScale: float32(*locationsScale),
 	}
 	if mapLayoutParams.Zoom < 10 || mapLayoutParams.Zoom > 15 {
 		log.Fatal("Invalid Zoom level - must be between 10 and 15 inclusive")
-	}
-	if mapLayoutParams.Center.GetLat() <= -90.0 || mapLayoutParams.Center.GetLat() >= 90.0 {
-		log.Fatal("Invalid Map Centre Latitude - must be between -90 and 90 exclusive")
-	}
-	if mapLayoutParams.Center.GetLng() <= -180.0 || mapLayoutParams.Center.GetLng() >= 180.0 {
-		log.Fatal("Invalid Map Centre Longitude - must be between -180 and 180 exclusive")
 	}
 
 	if mapLayoutParams.MaxUes < 10 || mapLayoutParams.MaxUes > 1000000 {
@@ -109,30 +105,7 @@ func main() {
 		log.Fatal("Invalid ratio of MaxUEs:MinUEs - must be at least 2")
 	}
 
-	towerParams := types.TowersParams{
-		TowerRows:         uint32(*towerRows),
-		TowerCols:         uint32(*towerCols),
-		TowerSpacingVert:  float32(*towerSpacingVert),
-		TowerSpacingHoriz: float32(*towerSpacingHoriz),
-		MaxUEsPerCell:     uint32(*maxUEsPerTower),
-		LocationsScale:    float32(*locationsScale),
-		AvgCellsPerTower:  float32(*avgCellcPerTower),
-	}
-	checkTowerLimits(*towerRows, *towerCols)
-	if towerParams.TowerSpacingVert < 0.001 || towerParams.TowerSpacingVert > 1.0 {
-		log.Fatal("Invalid vertical tower spacing - must be between 0.001 and 1.0 degree latitude inclusive")
-	}
-	if towerParams.TowerSpacingHoriz < 0.001 || towerParams.TowerSpacingHoriz > 1.0 {
-		log.Fatal("Invalid horizontal tower spacing - must be between 0.001 and 1.0 degree longitude inclusive")
-	}
-
-	if towerParams.LocationsScale < 0.1 || towerParams.LocationsScale > 2.0 {
-		log.Fatal("Invalid locationsScale - must be between 0.1 and 2.0")
-	}
-
-	if towerParams.AvgCellsPerTower < 1.0 || towerParams.AvgCellsPerTower > 4.0 {
-		log.Fatal("Invalid AvgCellsPerTower - must be between 1.0 and 4.0")
-	}
+	mapLayoutParams.Center = &towersConfig.MapCentre
 
 	routesParams := manager.RoutesParams{
 		APIKey:    *googleAPIKey,
@@ -150,12 +123,19 @@ func main() {
 		TopoEndpoint: *topoEndpoint,
 	}
 
-	for r := 0; r < *towerRows; r++ {
-		for c := 0; c < *towerCols; c++ {
-			towerNum := r**towerCols + c + 1 // Start at 1
+	allGrpcPorts := make([]uint16, 0)
+	for _, tower := range towersConfig.TowersLayout {
+		for _, sector := range tower.Sectors {
+			allGrpcPorts = append(allGrpcPorts, sector.GrpcPort)
+			log.Warnf("Handling Sector %s %s %d %d %d", tower.TowerID, sector.EcID, sector.GrpcPort, sector.Azimuth, sector.Arc)
+			ecgi := types.ECGI{
+				EcID:   sector.EcID,
+				PlmnID: tower.PlmnID,
+			}
+			portNum := sector.GrpcPort
 			go func() {
 				// Blocks here when server running
-				err := e2.NewTowerServer(towerNum, utils.TestPlmnID, serverParams)
+				err := e2.NewTowerServer(ecgi, portNum, serverParams)
 				if err != nil {
 					log.Fatal("Unable to start server ", err)
 				}
@@ -163,10 +143,8 @@ func main() {
 		}
 	}
 	// Add these new ports to the K8s service
-	rangeStart := utils.GrpcBasePort + 2
-	rangeEnd := rangeStart + *towerCols**towerRows
 	if *addK8sSvcPorts {
-		err := kubernetes.AddK8SServicePorts(int32(rangeStart), int32(rangeEnd))
+		err := kubernetes.AddK8SServicePorts(allGrpcPorts)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -183,7 +161,7 @@ func main() {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
-	mgr.Run(mapLayoutParams, towerParams, routesParams, *topoEndpoint, *metricsPort, serverParams, metricsParams)
+	mgr.Run(mapLayoutParams, towersConfig, routesParams, *topoEndpoint, serverParams, metricsParams)
 
 	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
 		log.Fatal("Unable to start trafficsim ", err)
@@ -211,29 +189,4 @@ func checkTowerLimits(rows int, cols int) {
 	if cols*rows > 1024 {
 		log.Fatal("Invalid number of Tower (Rows x Cols) - must not exceed 1024")
 	}
-}
-
-func setLogLevel(loglevel string) {
-	initialLogLevel := liblog.WarnLevel
-	switch loglevel {
-	case "debug":
-		initialLogLevel = liblog.DebugLevel
-	case "info":
-		initialLogLevel = liblog.InfoLevel
-	case "warn":
-		initialLogLevel = liblog.WarnLevel
-	case "error":
-		initialLogLevel = liblog.ErrorLevel
-	}
-
-	log.Infof("logs level: %s", initialLogLevel)
-	runtime.SetMutexProfileFraction(5)
-	log.SetLevel(initialLogLevel)
-	liblog.GetLogger("northbound").SetLevel(initialLogLevel)
-	liblog.GetLogger("northbound", "e2").SetLevel(initialLogLevel)
-	liblog.GetLogger("northbound", "trafficsim").SetLevel(initialLogLevel)
-	liblog.GetLogger("manager").SetLevel(initialLogLevel)
-	liblog.GetLogger("dispatcher").SetLevel(initialLogLevel)
-	liblog.GetLogger("southbound", "kubernetes").SetLevel(initialLogLevel)
-	liblog.GetLogger("southbound", "topo").SetLevel(initialLogLevel)
 }

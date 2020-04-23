@@ -61,7 +61,9 @@ func setUpManager() (*manager.Manager, error) {
 	if err != nil {
 		return nil, err
 	}
-	mgr.UserEquipments = mgr.NewUserEquipments(mapLayout, routesParams)
-
+	mgr.UserEquipments, err = mgr.NewUserEquipments(mapLayout, routesParams)
+	if err != nil {
+		return nil, err
+	}
 	return mgr, nil
 }

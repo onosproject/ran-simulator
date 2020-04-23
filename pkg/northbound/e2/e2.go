@@ -27,14 +27,12 @@ import (
 var log = liblog.GetLogger("northbound", "e2")
 
 // NewTowerServer - start a new gRPC server per tower
-func NewTowerServer(towerIndex int, plmnID types.PlmnID, serverParams utils.ServerParams) error {
-	port := utils.GrpcBasePort + towerIndex + 1 // Start at 5152 so this translates to 1420 in Hex
-	ecID := utils.EcIDForPort(port)
+func NewTowerServer(ecgi types.ECGI, port uint16, serverParams utils.ServerParams) error {
 	s := service.NewServer(service.NewServerConfig(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, int16(port), true))
 	s.AddService(Service{
-		port:      port,
-		towerEcID: ecID,
-		plmnID:    plmnID,
+		port:      int(port),
+		towerEcID: ecgi.EcID,
+		plmnID:    ecgi.PlmnID,
 	})
 
 	return s.Serve(func(started string) {
