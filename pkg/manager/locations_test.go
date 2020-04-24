@@ -24,7 +24,7 @@ func Test_NewLocations(t *testing.T) {
 	towersConfig, err := config.GetTowerConfig("berlin-rectangular-4-1.yaml")
 	assert.NilError(t, err)
 
-	locations := NewLocations(towersConfig, 30)
+	locations := NewLocations(towersConfig, 30, 0.99)
 
 	assert.Equal(t, 60, len(locations), "Unexpected number of locations")
 
@@ -46,8 +46,8 @@ func Test_NewLocations(t *testing.T) {
 	}
 
 	for k, l := range locations {
-		assert.Assert(t, l.Position.GetLng() > minLng, "%s expected lng %f to be < than maxLng %f", k, l.Position.GetLng(), maxLng)
-		assert.Assert(t, l.Position.GetLng() < maxLng, "%s expected lng %f to be > than minLng %f", k, l.Position.GetLat(), minLng)
+		assert.Assert(t, l.Position.GetLng() > minLng-0.1, "%s expected lng %f to be > than minLng %f", k, l.Position.GetLng(), minLng-0.1)
+		assert.Assert(t, l.Position.GetLng() < maxLng+0.1, "%s expected lng %f to be < than maxLng %f", k, l.Position.GetLng(), maxLng+0.1)
 	}
 
 }

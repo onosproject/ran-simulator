@@ -38,7 +38,7 @@ func setUpManager() (*manager.Manager, error) {
 
 	towers := manager.NewCells(towersConfig)
 
-	locations := manager.NewLocations(towersConfig, 5)
+	locations := manager.NewLocations(towersConfig, 5, 1)
 
 	mgr, err := manager.NewManager()
 	if err != nil {
