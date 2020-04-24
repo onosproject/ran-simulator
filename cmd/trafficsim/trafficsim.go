@@ -72,7 +72,7 @@ func main() {
 	flag.String("loglevel", "", "replaced by yaml") // TODO remove
 	addK8sSvcPorts := flag.Bool("addK8sSvcPorts", true, "Add K8S service ports per tower")
 	flag.Float64("avgCellcPerTower", 0, "replaced by yaml") // TODO remove
-	towerConfigName := flag.String("towerConfigName", "berlin-honeycomb-169-6.yaml", "the name of a tower configuration")
+	towerConfigName := flag.String("towerConfigName", "berlin-honeycomb-4-3.yaml", "the name of a tower configuration")
 
 	flag.Parse()
 
