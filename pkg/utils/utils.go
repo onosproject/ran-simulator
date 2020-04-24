@@ -51,7 +51,7 @@ func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float64, as
 
 	w := r * math.Sqrt(u)
 	t := 2 * math.Pi * v
-	x1 := w * math.Cos(t) * aspectRatio
+	x1 := w * math.Cos(t) / aspectRatio
 	y1 := w * math.Sin(t)
 
 	newY := roundToDecimal(y0+y1, 6)

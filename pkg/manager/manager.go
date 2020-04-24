@@ -88,7 +88,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 	m.CellsLock.Lock()
 	m.Cells = NewCells(towerConfig)
 	m.CellsLock.Unlock()
-	m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes))
+	m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes
 	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
 	m.googleAPIKey = routesParams.APIKey
