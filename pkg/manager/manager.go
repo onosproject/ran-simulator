@@ -25,6 +25,7 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
@@ -51,11 +52,12 @@ type Manager struct {
 	LatencyChannel        chan metrics.HOEvent
 	ResetMetricsChannel   chan bool
 	TopoClient            device.DeviceServiceClient
+	AspectRatio           float64
 }
 
 // MetricsParams for the Prometheus exporter
 type MetricsParams struct {
-	Port              int
+	Port              uint
 	ExportAllHOEvents bool
 }
 
@@ -77,18 +79,21 @@ func NewManager() (*Manager, error) {
 }
 
 // Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersParams,
-	routesParams RoutesParams, topoEndpoint string, metricsPort int, serverParams utils.ServerParams,
+func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerConfig,
+	routesParams RoutesParams, topoEndpoint string, serverParams utils.ServerParams,
 	metricsParams MetricsParams) {
-	log.Infof("Starting Manager with %v %v %v", mapLayoutParams, towerparams, routesParams)
+	log.Infof("Starting Manager with %v %v", mapLayoutParams, routesParams)
+
 	m.MapLayout = mapLayoutParams
 	m.CellsLock.Lock()
-	m.Cells = NewCells(towerparams, mapLayoutParams)
+	m.Cells = NewCells(towerConfig)
 	m.CellsLock.Unlock()
-	m.Locations = NewLocations(towerparams, mapLayoutParams)
+	m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes
 	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
 	m.googleAPIKey = routesParams.APIKey
+	// Compensate for the narrowing of meridians at higher latitudes
+	m.AspectRatio = utils.AspectRatio(&towerConfig.MapCentre)
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
@@ -99,11 +104,13 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerparams types.TowersP
 	if err != nil {
 		log.Fatalf("Error calculating routes %s", err.Error())
 	}
-	m.UserEquipments = m.NewUserEquipments(mapLayoutParams, routesParams)
-
+	m.UserEquipments, err = m.NewUserEquipments(mapLayoutParams, routesParams)
+	if err != nil {
+		log.Fatalf("Error creating new UEs %s", err.Error())
+	}
 	go m.startMoving(routesParams)
 
-	go metrics.RunHOExposer(metricsParams.Port, m.LatencyChannel, metricsParams.ExportAllHOEvents, m.ResetMetricsChannel)
+	go metrics.RunHOExposer(int(metricsParams.Port), m.LatencyChannel, metricsParams.ExportAllHOEvents, m.ResetMetricsChannel)
 
 	ctx := context.Background()
 	m.TopoClient = topo.ConnectToTopo(ctx, topoEndpoint, serverParams)

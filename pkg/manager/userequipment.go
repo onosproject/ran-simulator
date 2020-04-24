@@ -26,24 +26,34 @@ import (
 )
 
 // NewUserEquipments - create a new set of UEs (phone, car etc)
-func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) map[types.Imsi]*types.Ue {
+func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params RoutesParams) (map[types.Imsi]*types.Ue, error) {
 	ues := make(map[types.Imsi]*types.Ue)
 
 	// There is already a route per UE
 	var u uint32
 	for u = 0; u < mapLayoutParams.MinUes; u++ {
-		ue := m.newUe(int(u))
+		ue, err := m.newUe(int(u))
+		if err != nil {
+			return nil, err
+		}
 		ues[ue.Imsi] = ue
 	}
-	return ues
+	return ues, nil
 }
 
-func (m *Manager) newUe(ueIdx int) *types.Ue {
+func (m *Manager) newUe(ueIdx int) (*types.Ue, error) {
 	imsi := utils.ImsiGenerator(ueIdx)
 	route := m.Routes[imsi]
-	towers, distances := m.findClosestCells(route.Waypoints[0])
+	towers, distances, err := m.findClosestCells(route.Waypoints[0])
+	if err != nil {
+		return nil, err
+	}
 	m.CellsLock.RLock()
-	servingTowerDist := distanceToCellCentroid(m.Cells[*towers[0]], route.Waypoints[0])
+	servingTowerDist, err := distanceToCellCentroid(m.Cells[*towers[0]], route.Waypoints[0])
+	if err != nil {
+		m.CellsLock.RUnlock()
+		return nil, err
+	}
 	m.CellsLock.RUnlock()
 	ue := &types.Ue{
 		Imsi:             imsi,
@@ -78,7 +88,7 @@ func (m *Manager) newUe(ueIdx int) *types.Ue {
 		}
 	}
 
-	return ue
+	return ue, nil
 }
 
 // SetNumberUes - change the number of active UEs
@@ -128,7 +138,10 @@ func (m *Manager) SetNumberUes(numUes int) error {
 				Type:   trafficsim.Type_ADDED,
 				Object: newRoute,
 			}
-			ue := m.newUe(ueidx)
+			ue, err := m.newUe(ueidx)
+			if err != nil {
+				return err
+			}
 			mgr.UserEquipmentsLock.Lock()
 			m.UserEquipments[ue.GetImsi()] = ue
 			mgr.UserEquipmentsLock.Unlock()
@@ -260,7 +273,10 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			}
 			ue.Position = route.Waypoints[idx+1]
 			ue.Rotation = uint32(utils.GetRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
-			names, distances := m.findClosestCells(ue.Position)
+			names, distances, err := m.findClosestCells(ue.Position)
+			if err != nil {
+				return err
+			}
 			updateType := trafficsim.UpdateType_POSITION
 			oldTower1 := ue.Tower1
 			oldTower2 := ue.Tower2

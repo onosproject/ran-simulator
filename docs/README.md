@@ -12,8 +12,14 @@ The simulator has 2 main gRPC interfaces
 1. **e2** - for communicating to `onos-ric` - there is a separate port opened per
 cell site (tower) starting at port `5152-`
 
-> The number of towers can be chosen at startup with the `-towerCols` and the `-towerRows`
-> arguments shown below. After startup the number of towers cannot be changed.
+The number and position of towers are defined in a YAML file which is loaded
+at startup - use the `-towerConfigName` param.
+
+This can be changed as a value in the Helm chart at deploy time
+e.g. `--set towerConfigName=berlin-honeycomb-169-6.yaml`
+
+> After startup the number of towers cannot be changed.
+
 
 As towers are created at startup, updates are made to:
 
@@ -26,10 +32,10 @@ the port numbers added per cell site.
 > has to be given to the `ran-simulator` pod. This is done through the Helm Chart
 > as the role `ran-simulator-service-role` and the rolebinding `ran-simulator-access-services`
 
-The application is very tunable through startup parameters, and can be deployed
+The application is very tunable through startup parameters. It can be deployed
 only in a **Kubernetes** cluster. See [deployment](./deployment.md).
 
-## Google Maps API Key
+### Google Maps API Key
 The RAN Simulator can connect to Google's [Directions API] with a Google API Key.
 Google charges $5.00 per 1000 requests to the [Directions API], and so we do not put
 our API key up in the public domain.  
@@ -47,47 +53,40 @@ and their defaults
 docker run -it onosproject/ran-simulator:latest -help
 ...
 Usage of trafficsim:
-Usage of /tmp/go-build089760012/b001/exe/trafficsim:
+  -addK8sSvcPorts
+    	Add K8S service ports per tower (default true)
   -caPath string
-        path to CA certificate
+    	path to CA certificate
   -certPath string
-        path to client certificate
+    	path to client certificate
   -fade
-        Show map as faded on start (default true)
+    	Show map as faded on start (default true)
   -googleAPIKey string
-        your google maps api key
+    	your google maps api key
   -keyPath string
-        path to client private key
+    	path to client private key
   -locationsScale float
-        Ratio of random locations diameter to tower grid width (default 1)
-  -mapCenterLat float
-        Map center latitude (default 52.52)
-  -mapCenterLng float
-        Map center longitude (default 13.405)
-  -maxUEs int
-        Max number of UEs for complete simulation (default 300)
-  -maxUEsPerTower int
-        Max num of UEs per tower (default 5)
-  -metricsPort int
-        port for Prometheus metrics (default 9090)
-  -minUEs int
-        Max number of UEs for complete simulation (default 3)
+    	Ratio of random locations diameter to tower grid width (default 1.25)
+  -maxUEs uint
+    	Max number of UEs for complete simulation (default 300)
+  -metricsAllHoEvents
+    	Export all HO events in metrics (only historgram if false) (default true)
+  -metricsPort uint
+    	port for Prometheus metrics (default 9090)
+  -minUEs uint
+    	Max number of UEs for complete simulation (default 3)
   -showPower
-        Show power as circle on start (default true)
+    	Show power as circle on start (default true)
   -showRoutes
-        Show routes on start (default true)
-  -stepDelayMs int
-        delay between steps on route (default 1000)
-  -towerCols int
-        Number of columns of towers (default 3)
-  -towerRows int
-        Number of rows of towers (default 3)
-  -towerSpacingHoriz float
-        Tower spacing horiz in degrees longitude (default 0.02)
-  -towerSpacingVert float
-        Tower spacing vert in degrees latitude (default 0.02)
+    	Show routes on start (default true)
+  -stepDelayMs uint
+    	delay between steps on route (default 1000)
+  -topoEndpoint string
+    	Endpoint for the onos-topo service (default "onos-topo:5150")
+  -towerConfigName string
+    	the name of a tower configuration (default "berlin-honeycomb-169-6.yaml")
   -zoom float
-        The starting Zoom level (default 13)
+    	The starting Zoom level (default 13)
 ```
 
 > Some of these only have an effect when the onos-gui MapView is active
@@ -99,8 +98,32 @@ Usage of /tmp/go-build089760012/b001/exe/trafficsim:
 
 See [deployment.md](deployment.md) for how to change these for a Kubernetes deployment.
 
+## Creating the tower configuration files
+The YAML files can be created by hand, or by application. There is an
+application to create towers in a honeycomb (hexagonal) layout.
+
+Sample configurations are supplied with the build and stored in `/etc/onos/config`
+
+> These are copied from https://github.com/onosproject/ran-simulator/tree/master/pkg/config at build time.
+>
+> If a new layout is required that's not in the build, it can be mounted through
+> the Helm chart with a "ConfigMap" that mounts at `/etc/onos/config`
+
+To run the tool, first get it with:
+```bash
+go get github.com/onosproject/ran-simulator/cmd/honeycomb/honeycomb
+```
+
+and run it like:
+```bash
+go run github.com/onosproject/ran-simulator/cmd/honeycomb/honeycomb pkg/config/berlin-honeycomb-331-3.yaml \
+     --towers 331 --sectors-per-tower 3 -a 52.52 -g 13.405 -i 0.03
+```
+
 ## Browser access
 When deployed with the **onos-gui** application, the simulation can be accessed
 from a browser.
+
+The [Map View](https://docs.onosproject.org/onos-gui/docs/ran-gui/#map-view) is linked directly to the `ran-simulator`
 
 [Directions API]: https://developers.google.com/maps/documentation/directions/start

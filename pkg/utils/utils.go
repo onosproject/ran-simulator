@@ -15,7 +15,6 @@
 package utils
 
 import (
-	"fmt"
 	"github.com/onosproject/ran-simulator/api/types"
 	"math"
 	"math/rand"
@@ -42,8 +41,8 @@ const TestPlmnID = "315010"
 const ImsiBaseCbrs = types.Imsi(315010999900000)
 
 // RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
-func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32, aspectRatio float32) types.Point {
-	var r = float64(radius)
+func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float64, aspectRatio float64) types.Point {
+	var r = radius
 	y0 := float64(mapCenterLat)
 	x0 := float64(mapCenterLng)
 
@@ -52,7 +51,7 @@ func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float32, as
 
 	w := r * math.Sqrt(u)
 	t := 2 * math.Pi * v
-	x1 := w * math.Cos(t) * float64(aspectRatio)
+	x1 := w * math.Cos(t) / aspectRatio
 	y1 := w * math.Sin(t)
 
 	newY := roundToDecimal(y0+y1, 6)
@@ -127,12 +126,25 @@ func RandomColor() string {
 	return colorPalette[rand.Intn(39)]
 }
 
-// EcIDForPort gives a consistent naming convention
-func EcIDForPort(cellPort int) types.EcID {
-	return types.EcID(fmt.Sprintf("%07X", cellPort))
-}
-
 // ImsiGenerator -- generate an Imsi from an index
 func ImsiGenerator(ueIdx int) types.Imsi {
 	return ImsiBaseCbrs + types.Imsi(ueIdx) + 1
+}
+
+// AzimuthToRads - angle measured in degrees clockwise from north, expressed in rads from 3 o'clock anticlockwise
+func AzimuthToRads(azimuth float64) float64 {
+	if azimuth == 90 {
+		return 0
+	}
+	return DegreesToRads(90 - azimuth)
+}
+
+// DegreesToRads - general conversion of degrees to rads, both starting at 3 o'clock going anticlockwise
+func DegreesToRads(degrees float64) float64 {
+	return 2 * math.Pi * degrees / 360
+}
+
+// AspectRatio - Compensate for the narrowing of meridians at higher latitudes
+func AspectRatio(point *types.Point) float64 {
+	return math.Cos(DegreesToRads(float64(point.Lat)))
 }
