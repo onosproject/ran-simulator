@@ -27,4 +27,4 @@ require (
 	k8s.io/client-go v0.17.3
 )
 
-replace github.com/pmcxs/hexgrid => ../../pmcxs/hexgrid
+replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
