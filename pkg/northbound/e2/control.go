@@ -140,8 +140,9 @@ func handleHORequest(towerID types.ECGI, req *e2.HORequest) error {
 			}
 		} else if towerID.EcID == targetEcgi.EcID && towerID.PlmnID == targetEcgi.PlmnID {
 			log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
+		} else {
+			log.Errorf("Bad handleHORequest: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 		}
-		log.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", towerID, req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 	}
 	return nil
 }
@@ -192,6 +193,11 @@ func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c ch
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
 		trafficSimMgr.UserEquipmentsLock.Lock()
+		if ue.GetServingTower() == nil {
+			trafficSimMgr.UserEquipmentsLock.Unlock()
+			log.Errorf("handleUeAdmissions: ue out of coverage 1")
+			continue
+		}
 		if ue.GetServingTower().EcID != towerID.EcID || ue.GetServingTower().PlmnID != towerID.PlmnID {
 			trafficSimMgr.UserEquipmentsLock.Unlock()
 			continue
@@ -217,6 +223,10 @@ func handleUeAdmissions(towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c ch
 			ue, ok := event.Object.(*types.Ue)
 			if !ok {
 				log.Fatalf("Object %v could not be converted to UE", ue)
+			}
+			if ue.ServingTower == nil {
+				log.Errorf("handleUeAdmissions: ue out of coverage 2")
+				continue
 			}
 			if ue.ServingTower.EcID != towerID.EcID || ue.ServingTower.PlmnID != towerID.PlmnID {
 				continue // listen for the next event

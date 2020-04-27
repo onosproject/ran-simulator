@@ -53,6 +53,7 @@ type Manager struct {
 	ResetMetricsChannel   chan bool
 	TopoClient            device.DeviceServiceClient
 	AspectRatio           float64
+	callDropCqiThresh     uint32
 }
 
 // MetricsParams for the Prometheus exporter
@@ -94,6 +95,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 	m.googleAPIKey = routesParams.APIKey
 	// Compensate for the narrowing of meridians at higher latitudes
 	m.AspectRatio = utils.AspectRatio(&towerConfig.MapCentre)
+	m.callDropCqiThresh = 5
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
@@ -142,4 +144,9 @@ func (m *Manager) Close() {
 // Should be called only after NewManager and Run are done.
 func GetManager() *Manager {
 	return &mgr
+}
+
+// GetCallDropCqiThresh ...
+func (m *Manager) GetCallDropCqiThresh() uint32 {
+	return m.callDropCqiThresh
 }

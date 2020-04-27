@@ -57,13 +57,49 @@ func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicChan
 				if ue.ServingTower.EcID != towerID.EcID || ue.ServingTower.PlmnID != towerID.PlmnID {
 					continue
 				}
-				c <- generateReport(ue)
+				if inCoverageArea(ue) {
+					c <- generateReport(ue)
+				} else {
+					// release UE
+					err = trafficSimMgr.DelCrnti(ue.ServingTower, ue.Crnti)
+					if err != nil {
+						log.Error(err.Error())
+						continue
+					}
+					ueRelInd := formatUeReleaseInd(ue.ServingTower, ue.Crnti)
+					c <- *ueRelInd
+					log.Errorf("ue release, out of coverage area, eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
+					ue.Crnti = manager.InvalidCrnti
+					ue.ServingTower = nil
+					ue.ServingTowerDist = 0
+					ue.Admitted = false
+				}
 			}
 		case <-stream.Context().Done():
 			log.Infof("Controller has disconnected on Port %d", port)
 			return nil
 		}
 	}
+}
+
+// inCoverageArea uses the cqi values to check whether a UE has cell coverage.
+func inCoverageArea(ue *types.Ue) bool {
+	m := manager.GetManager()
+	thresh := m.GetCallDropCqiThresh()
+
+	m.CellsLock.RLock()
+	defer m.CellsLock.RUnlock()
+	tower1 := m.Cells[*ue.Tower1]
+	tower2 := m.Cells[*ue.Tower2]
+	tower3 := m.Cells[*ue.Tower3]
+	cqi1 := makeCqi(ue.Tower1Dist, tower1.GetTxPowerdB())
+	cqi2 := makeCqi(ue.Tower2Dist, tower2.GetTxPowerdB())
+	cqi3 := makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
+
+	if cqi1 <= thresh && cqi2 <= thresh && cqi3 <= thresh {
+		return false
+	}
+	return true
 }
 
 func generateReport(ue *types.Ue) e2ap.RicIndication {
