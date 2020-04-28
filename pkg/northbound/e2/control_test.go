@@ -47,7 +47,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 
 	go func() {
 		select {
-		case updateEvent := <-mgr.TowerChannel:
+		case updateEvent := <-mgr.CellsChannel:
 			assert.Equal(t, trafficsim.Type_UPDATED, updateEvent.Type)
 			assert.Equal(t, trafficsim.UpdateType_NOUPDATETYPE, updateEvent.UpdateType)
 			cell, ok := updateEvent.Object.(*types.Cell)

@@ -19,6 +19,7 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"github.com/pmcxs/hexgrid"
+	"math"
 )
 
 // HoneycombGenerator - used by the cli tool "honeycomb"
@@ -45,10 +46,14 @@ func HoneycombGenerator(numTowers uint, sectorsPerTower uint, latitude float32,
 			Longitude: longitude + points[t].Lng/aspectRatio,
 			Sectors:   make([]Sector, sectorsPerTower),
 		}
+		var azOffset uint = 0
+		if sectorsPerTower == 6 {
+			azOffset = uint(math.Mod(float64(t), 2) * 30)
+		}
 		for s = 0; s < sectorsPerTower; s++ {
-			var azimuth uint = 0
+			azimuth := azOffset
 			if s > 0 {
-				azimuth = 360.0 * s / sectorsPerTower
+				azimuth = 360.0*s/sectorsPerTower + azOffset
 			}
 			sector := Sector{
 				EcID:        types.EcID(fmt.Sprintf("%07x", ecidStart+uint16(t*sectorsPerTower)+uint16(s))),

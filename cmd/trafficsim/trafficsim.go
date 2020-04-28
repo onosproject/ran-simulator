@@ -51,27 +51,18 @@ func main() {
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
 	googleAPIKey := flag.String("googleAPIKey", "", "your google maps api key")
-	flag.Int("towerRows", 0, "replaced by yaml")        // TODO remove
-	flag.Int("towerCols", 0, "replaced by yaml")        // TODO remove
-	flag.Float64("mapCenterLat", 0, "replaced by yaml") // TODO remove
-	flag.Float64("mapCenterLng", 0, "replaced by yaml") // TODO remove
 	zoom := flag.Float64("zoom", 13, "The starting Zoom level")
 	fade := flag.Bool("fade", true, "Show map as faded on start")
 	showRoutes := flag.Bool("showRoutes", true, "Show routes on start")
 	showPower := flag.Bool("showPower", true, "Show power as circle on start")
-	flag.Float64("towerSpacingVert", 0, "replaced by yaml")  // TODO remove once removed from helm chart
-	flag.Float64("towerSpacingHoriz", 0, "replaced by yaml") // TODO remove
 	locationsScale := flag.Float64("locationsScale", 1.25, "Ratio of random locations diameter to tower grid width")
 	maxUEs := flag.Uint("maxUEs", 300, "Max number of UEs for complete simulation")
 	minUEs := flag.Uint("minUEs", 3, "Max number of UEs for complete simulation")
 	stepDelayMs := flag.Uint("stepDelayMs", 1000, "delay between steps on route")
-	flag.Int("maxUEsPerTower", 0, "replaced by yaml") // TODO remove
 	metricsPort := flag.Uint("metricsPort", 9090, "port for Prometheus metrics")
 	metricsAllHoEvents := flag.Bool("metricsAllHoEvents", true, "Export all HO events in metrics (only historgram if false)")
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
-	flag.String("loglevel", "", "replaced by yaml") // TODO remove
 	addK8sSvcPorts := flag.Bool("addK8sSvcPorts", true, "Add K8S service ports per tower")
-	flag.Float64("avgCellcPerTower", 0, "replaced by yaml") // TODO remove
 	towerConfigName := flag.String("towerConfigName", "berlin-honeycomb-4-3.yaml", "the name of a tower configuration")
 
 	flag.Parse()

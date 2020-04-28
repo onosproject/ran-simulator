@@ -104,19 +104,20 @@ application to create towers in a honeycomb (hexagonal) layout.
 
 Sample configurations are supplied with the build and stored in `/etc/onos/config`
 
-> These are copied from https://github.com/onosproject/ran-simulator/tree/master/pkg/config at build time.
+> These are copied from [https://github.com/onosproject/ran-simulator/tree/master/pkg/config](https://github.com/onosproject/ran-simulator/tree/master/pkg/config)
+> at build time.
 >
 > If a new layout is required that's not in the build, it can be mounted through
 > the Helm chart with a "ConfigMap" that mounts at `/etc/onos/config`
 
 To run the tool, first get it with:
 ```bash
-go get github.com/onosproject/ran-simulator/cmd/honeycomb/honeycomb
+go get github.com/onosproject/ran-simulator/cmd/honeycomb
 ```
 
 and run it like:
 ```bash
-go run github.com/onosproject/ran-simulator/cmd/honeycomb/honeycomb pkg/config/berlin-honeycomb-331-3.yaml \
+go run github.com/onosproject/ran-simulator/cmd/honeycomb pkg/config/berlin-honeycomb-331-3.yaml \
      --towers 331 --sectors-per-tower 3 -a 52.52 -g 13.405 -i 0.03
 ```
 

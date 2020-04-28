@@ -30,7 +30,10 @@ const (
 	DefaultTxPower = 10
 
 	// PowerFactor - relate power to distance in decimal degrees
-	PowerFactor = 0.005
+	PowerFactor = 0.001
+
+	// PowerBase - baseline for power to distance in decimal degrees
+	PowerBase = 0.013
 
 	// MaxNeighbours to find - useful limit for hex layouts
 	MaxNeighbours = 6
@@ -148,27 +151,28 @@ func (m *Manager) GetCell(name types.ECGI) *types.Cell {
 	return m.Cells[name]
 }
 
-// UpdateCell Update a tower's properties - usually power level
-func (m *Manager) UpdateCell(tower types.ECGI, powerAdjust float32) error {
+// UpdateCell Update a cell's properties - usually power level
+func (m *Manager) UpdateCell(cell types.ECGI, powerAdjust float32) error {
 	// Only the power can be updated at present
 	m.CellsLock.Lock()
-	t, ok := m.Cells[tower]
+	c, ok := m.Cells[cell]
 	if !ok {
 		m.CellsLock.Unlock()
-		return fmt.Errorf("unknown tower %s", tower)
+		return fmt.Errorf("unknown cell %s", cell)
 	}
-	currentPower := t.TxPowerdB
+	currentPower := c.TxPowerdB
 	if currentPower+powerAdjust < minPowerdB {
-		t.TxPowerdB = minPowerdB
+		c.TxPowerdB = minPowerdB
 	} else if currentPower+powerAdjust > maxPowerdB {
-		t.TxPowerdB = maxPowerdB
+		c.TxPowerdB = maxPowerdB
 	} else {
-		t.TxPowerdB += powerAdjust
+		c.TxPowerdB += powerAdjust
 	}
+	c.GetSector().Centroid = centroidPosition(c)
 	m.CellsLock.Unlock()
-	m.TowerChannel <- dispatcher.Event{
+	m.CellsChannel <- dispatcher.Event{
 		Type:   trafficsim.Type_UPDATED,
-		Object: t,
+		Object: c,
 	}
 	return nil
 }
@@ -247,7 +251,7 @@ func centroidPosition(cell *types.Cell) *types.Point {
 
 // PowerToDist - convert power in dB to distance in decimal degrees
 func PowerToDist(power float32) float64 {
-	return math.Sqrt(math.Pow(10, float64(power)/10)) * PowerFactor
+	return math.Sqrt(math.Pow(10, float64(power)/10))*PowerFactor + PowerBase
 }
 
 // find the neighbours of a cell - not distance from towers, but from centroids

@@ -1,0 +1,291 @@
+mapcentre:
+  lat: 52.52
+  lng: 13.405
+towerslayout:
+- towerid: Tower-1
+  plmnid: "315010"
+  latitude: 52.48536
+  longitude: 13.405
+  sectors:
+  - ecid: "0001420"
+    grpcport: 5152
+    azimuth: 0
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001421"
+    grpcport: 5153
+    azimuth: 60
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001422"
+    grpcport: 5154
+    azimuth: 120
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001423"
+    grpcport: 5155
+    azimuth: 180
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001424"
+    grpcport: 5156
+    azimuth: 240
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001425"
+    grpcport: 5157
+    azimuth: 300
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+- towerid: Tower-2
+  plmnid: "315010"
+  latitude: 52.50268
+  longitude: 13.454303
+  sectors:
+  - ecid: "0001426"
+    grpcport: 5158
+    azimuth: 30
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001427"
+    grpcport: 5159
+    azimuth: 90
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001428"
+    grpcport: 5160
+    azimuth: 150
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001429"
+    grpcport: 5161
+    azimuth: 210
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000142a
+    grpcport: 5162
+    azimuth: 270
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000142b
+    grpcport: 5163
+    azimuth: 330
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+- towerid: Tower-3
+  plmnid: "315010"
+  latitude: 52.50268
+  longitude: 13.355697
+  sectors:
+  - ecid: 000142c
+    grpcport: 5164
+    azimuth: 0
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000142d
+    grpcport: 5165
+    azimuth: 60
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000142e
+    grpcport: 5166
+    azimuth: 120
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000142f
+    grpcport: 5167
+    azimuth: 180
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001430"
+    grpcport: 5168
+    azimuth: 240
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001431"
+    grpcport: 5169
+    azimuth: 300
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+- towerid: Tower-4
+  plmnid: "315010"
+  latitude: 52.52
+  longitude: 13.405
+  sectors:
+  - ecid: "0001432"
+    grpcport: 5170
+    azimuth: 30
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001433"
+    grpcport: 5171
+    azimuth: 90
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001434"
+    grpcport: 5172
+    azimuth: 150
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001435"
+    grpcport: 5173
+    azimuth: 210
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001436"
+    grpcport: 5174
+    azimuth: 270
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001437"
+    grpcport: 5175
+    azimuth: 330
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+- towerid: Tower-5
+  plmnid: "315010"
+  latitude: 52.53732
+  longitude: 13.454303
+  sectors:
+  - ecid: "0001438"
+    grpcport: 5176
+    azimuth: 0
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001439"
+    grpcport: 5177
+    azimuth: 60
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000143a
+    grpcport: 5178
+    azimuth: 120
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000143b
+    grpcport: 5179
+    azimuth: 180
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000143c
+    grpcport: 5180
+    azimuth: 240
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000143d
+    grpcport: 5181
+    azimuth: 300
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+- towerid: Tower-6
+  plmnid: "315010"
+  latitude: 52.53732
+  longitude: 13.355697
+  sectors:
+  - ecid: 000143e
+    grpcport: 5182
+    azimuth: 30
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: 000143f
+    grpcport: 5183
+    azimuth: 90
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001440"
+    grpcport: 5184
+    azimuth: 150
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001441"
+    grpcport: 5185
+    azimuth: 210
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001442"
+    grpcport: 5186
+    azimuth: 270
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001443"
+    grpcport: 5187
+    azimuth: 330
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+- towerid: Tower-7
+  plmnid: "315010"
+  latitude: 52.55464
+  longitude: 13.405
+  sectors:
+  - ecid: "0001444"
+    grpcport: 5188
+    azimuth: 0
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001445"
+    grpcport: 5189
+    azimuth: 60
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001446"
+    grpcport: 5190
+    azimuth: 120
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001447"
+    grpcport: 5191
+    azimuth: 180
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001448"
+    grpcport: 5192
+    azimuth: 240
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
+  - ecid: "0001449"
+    grpcport: 5193
+    azimuth: 300
+    arc: 60
+    maxues: 5
+    initpowerdb: 10
