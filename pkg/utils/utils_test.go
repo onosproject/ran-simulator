@@ -85,3 +85,8 @@ func Test_AzimuthToRads(t *testing.T) {
 	assert.Equal(t, -math.Pi, AzimuthToRads(270))
 	assert.Equal(t, math.Round(10e6*math.Pi/3), math.Round(10e6*AzimuthToRads(30)))
 }
+
+func Test_AspectRatio(t *testing.T) {
+	ar := AspectRatio(&types.Point{Lat: 52.52, Lng: 13.13})
+	assert.Equal(t, 608, int(math.Round(ar*1e3)))
+}

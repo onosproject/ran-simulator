@@ -43,7 +43,7 @@ func getRootCommand() *cobra.Command {
 	}
 	cmd.Flags().UintP("towers", "t", 0, "number of towers")
 	_ = cmd.MarkFlagRequired("towers")
-	cmd.Flags().UintP("sectors-per-tower", "s", 3, "sectors per tower")
+	cmd.Flags().UintP("sectors-per-tower", "s", 3, "sectors per tower (3 or 6)")
 	cmd.Flags().Float32P("latitude", "a", 52.5200, "Map centre latitude in degrees")
 	cmd.Flags().Float32P("longitude", "g", 13.4050, "Map centre longitude in degrees")
 	cmd.Flags().String("plmnid", "315010", "PlmnID")
@@ -57,6 +57,9 @@ func getRootCommand() *cobra.Command {
 func runHoneycombCommand(cmd *cobra.Command, args []string) error {
 	numTowers, _ := cmd.Flags().GetUint("towers")
 	sectorsPerTower, _ := cmd.Flags().GetUint("sectors-per-tower")
+	if sectorsPerTower != 3 && sectorsPerTower != 6 {
+		return fmt.Errorf("only 3 or 6 are allowed for 'sectors-per-tower'")
+	}
 	latitude, _ := cmd.Flags().GetFloat32("latitude")
 	longitude, _ := cmd.Flags().GetFloat32("longitude")
 	plmnid, _ := cmd.Flags().GetString("plmnid")

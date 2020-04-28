@@ -86,7 +86,7 @@ func Test_PowerAdjust(t *testing.T) {
 	m.Cells = NewCells(towerConfig)
 
 	go func() {
-		for event := range m.TowerChannel {
+		for event := range m.CellsChannel {
 			assert.Equal(t, trafficsim.Type_UPDATED, event.Type)
 		}
 	}()
@@ -112,7 +112,7 @@ func Test_PowerAdjust(t *testing.T) {
 	///////// Try with wrong name /////////////////////
 	towerID1421 := newEcgi("0001421", utils.TestPlmnID)
 	err = m.UpdateCell(towerID1421, -3)
-	assert.Error(t, err, "unknown tower {0001421 315010}", "Expected an error for wrong name when adjusting power")
+	assert.Error(t, err, "unknown cell {0001421 315010}", "Expected an error for wrong name when adjusting power")
 
 	time.Sleep(time.Millisecond * 100)
 }
@@ -202,7 +202,7 @@ func Test_distToTower2Sectors(t *testing.T) {
 		Lng: -8.01,
 	})
 	assert.NilError(t, err)
-	assert.Equal(t, 2316, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 2 sector tower")
+	assert.Equal(t, 2338, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 2 sector tower")
 }
 
 func Test_distToTower3Sectors(t *testing.T) {
@@ -228,22 +228,25 @@ func Test_distToTower3Sectors(t *testing.T) {
 			Lng: -8.01,
 		})
 	assert.NilError(t, err)
-	assert.Equal(t, 2649, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 3 sector tower")
+	assert.Equal(t, 2677, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 3 sector tower")
 }
 
 func Test_PowerToDist(t *testing.T) {
 	distm20 := PowerToDist(-20) // -20dB
-	assert.Equal(t, 50, int(math.Floor(distm20*1e5)))
+	assert.Equal(t, 1309, int(math.Floor(distm20*1e5)))
 
 	distm10 := PowerToDist(-10) // -10dB
-	assert.Equal(t, 158, int(math.Floor(distm10*1e5)))
+	assert.Equal(t, 1331, int(math.Floor(distm10*1e5)))
 
 	dist0 := PowerToDist(0) // 0dB
-	assert.Equal(t, 500, int(math.Floor(dist0*1e5)))
+	assert.Equal(t, 1399, int(math.Floor(dist0*1e5)))
 
 	dist10 := PowerToDist(10)
-	assert.Equal(t, 1581, int(math.Floor(dist10*1e5)))
+	assert.Equal(t, 1616, int(math.Floor(dist10*1e5)))
 
 	dist20 := PowerToDist(20)
-	assert.Equal(t, 5000, int(math.Floor(dist20*1e5)))
+	assert.Equal(t, 2300, int(math.Floor(dist20*1e5)))
+
+	dist30 := PowerToDist(30)
+	assert.Equal(t, 4462, int(math.Floor(dist30*1e5)))
 }

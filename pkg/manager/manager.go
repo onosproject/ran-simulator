@@ -47,7 +47,7 @@ type Manager struct {
 	Dispatcher            *dispatcher.Dispatcher
 	UeChannel             chan dispatcher.Event
 	RouteChannel          chan dispatcher.Event
-	TowerChannel          chan dispatcher.Event
+	CellsChannel          chan dispatcher.Event
 	googleAPIKey          string
 	LatencyChannel        chan metrics.HOEvent
 	ResetMetricsChannel   chan bool
@@ -71,7 +71,7 @@ func NewManager() (*Manager, error) {
 		Dispatcher:            dispatcher.NewDispatcher(),
 		UeChannel:             make(chan dispatcher.Event),
 		RouteChannel:          make(chan dispatcher.Event),
-		TowerChannel:          make(chan dispatcher.Event),
+		CellsChannel:          make(chan dispatcher.Event),
 		LatencyChannel:        make(chan metrics.HOEvent),
 		ResetMetricsChannel:   make(chan bool),
 	}
@@ -97,7 +97,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
-	go m.Dispatcher.ListenCellEvents(m.TowerChannel)
+	go m.Dispatcher.ListenCellEvents(m.CellsChannel)
 
 	var err error
 	m.Routes, err = m.NewRoutes(mapLayoutParams, routesParams)
@@ -119,7 +119,7 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 
 //Close kills the channels and manager related objects
 func (m *Manager) Close() {
-	close(m.TowerChannel)
+	close(m.CellsChannel)
 	close(m.UeChannel)
 	close(m.RouteChannel)
 	close(m.LatencyChannel)
