@@ -31,6 +31,9 @@ package main
 import (
 	"flag"
 	"github.com/onosproject/ran-simulator/pkg/config"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -154,9 +157,21 @@ func main() {
 	}
 	mgr.Run(mapLayoutParams, towersConfig, routesParams, *topoEndpoint, serverParams, metricsParams)
 
-	if err = startServer(*caPath, *keyPath, *certPath); err != nil {
-		log.Fatal("Unable to start trafficsim ", err)
-	}
+	sigs := make(chan os.Signal, 1)
+	shutdown := make(chan bool, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		if err := startServer(*caPath, *keyPath, *certPath); err != nil {
+			log.Warnf("Unable to start server %s. Shutting down", err.Error())
+			shutdown <- true
+		}
+	}()
+	go func() {
+		sig := <-sigs
+		log.Warnf("Received the %v signal. Shutting down", sig)
+		shutdown <- true
+	}()
+	<-shutdown // Block here until bool arrives on channel
 	mgr.Close()
 }
 

@@ -96,11 +96,7 @@ func (m *Manager) SetNumberUes(numUes int) error {
 	m.UserEquipmentsMapLock.Lock()
 	defer m.UserEquipmentsMapLock.Unlock()
 	currentNum := len(m.UserEquipments)
-	if numUes < int(m.MapLayout.MinUes) {
-		return fmt.Errorf("number of UEs requested %d is below minimum %d", numUes, m.MapLayout.MinUes)
-	} else if numUes > int(m.MapLayout.MaxUes) {
-		return fmt.Errorf("number of UEs requested %d is above maximum %d", numUes, m.MapLayout.MaxUes)
-	} else if numUes < currentNum {
+	if numUes < currentNum {
 		log.Infof("Decreasing number of UEs from %d to %d", currentNum, numUes)
 		for ueidx := currentNum - 1; ueidx >= numUes; ueidx-- {
 			imsi := utils.ImsiGenerator(ueidx)

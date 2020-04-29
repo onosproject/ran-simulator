@@ -71,6 +71,21 @@ func SyncToTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient,
 	log.Infof("%d cell devices created on onos-topo", len(cells))
 }
 
+// RemoveFromTopo - on shutdown delete the cells from topo
+func RemoveFromTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient, cells map[types.ECGI]*types.Cell) {
+	for _, c := range cells {
+		topoDevice := &topodevice.Device{
+			ID: topodevice.ID(topoCellID(c.GetEcgi())),
+		}
+		_, err := (*topoClient).Remove(ctx, &topodevice.RemoveRequest{Device: topoDevice})
+		if err != nil {
+			log.Warnf("Could not remove %s to onos-topo %s", topoCellID(c.GetEcgi()), err.Error())
+			continue
+		}
+		log.Infof("Removed %s from topo", topoCellID(c.GetEcgi()))
+	}
+}
+
 // createCellForTopo -- prepare the cell to be added to onos-topo
 func createCellForTopo(cell *types.Cell) *topodevice.Device {
 	timeOut := time.Second * ranSimTimeoutSec

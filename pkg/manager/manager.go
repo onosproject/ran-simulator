@@ -18,6 +18,7 @@ package manager
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/onosproject/onos-topo/api/device"
 	"github.com/onosproject/ran-simulator/pkg/southbound/topo"
@@ -119,6 +120,12 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 
 //Close kills the channels and manager related objects
 func (m *Manager) Close() {
+	if err := m.SetNumberUes(0); err != nil {
+		log.Warnf("Unable to set number of UEs to 0 %s", err.Error())
+	}
+
+	go topo.RemoveFromTopo(context.Background(), &m.TopoClient, m.Cells)
+	time.Sleep(time.Second) // Wait for topo, but don't hang around if it can't be done
 	close(m.CellsChannel)
 	close(m.UeChannel)
 	close(m.RouteChannel)
@@ -135,7 +142,7 @@ func (m *Manager) Close() {
 	}
 	m.CellsLock.Unlock()
 	// TODO - clean up the topo entries on shutdown
-	log.Info("Closing Manager")
+	log.Warn("Closed Manager")
 }
 
 // GetManager returns the initialized and running instance of manager.
