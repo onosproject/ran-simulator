@@ -218,12 +218,22 @@ func (s *Server) ListUes(req *trafficsim.ListUesRequest, stream trafficsim.Traff
 // SetNumberUEs - change the number of UEs in the simulation
 // Cannot be set below the minimum or above the maximum
 func (s *Server) SetNumberUEs(ctx context.Context, req *trafficsim.SetNumberUEsRequest) (*trafficsim.SetNumberUEsResponse, error) {
-	numRoutes := req.GetNumber()
-	err := manager.GetManager().SetNumberUes(int(numRoutes))
+	numUes := req.GetNumber()
+	minUes := manager.GetManager().MapLayout.MinUes
+	maxUes := manager.GetManager().MapLayout.MaxUes
+	if numUes < minUes {
+		return nil, status.Errorf(codes.OutOfRange,
+			"number of UEs requested %d is below minimum %d", numUes, minUes)
+	} else if numUes > maxUes {
+		return nil, status.Errorf(codes.OutOfRange,
+			"number of UEs requested %d is above maximum %d", numUes, maxUes)
+	}
+
+	err := manager.GetManager().SetNumberUes(int(numUes))
 	if err != nil {
 		return nil, status.Error(codes.OutOfRange, err.Error())
 	}
-	return &trafficsim.SetNumberUEsResponse{Number: numRoutes}, nil
+	return &trafficsim.SetNumberUEsResponse{Number: numUes}, nil
 }
 
 // ResetMetrics resets the metrics on demand

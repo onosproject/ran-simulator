@@ -60,3 +60,21 @@ func setUpManager() (*manager.Manager, error) {
 	}
 	return mgr, nil
 }
+
+func stopManager(m *manager.Manager) {
+	close(m.CellsChannel)
+	close(m.UeChannel)
+	close(m.RouteChannel)
+	close(m.LatencyChannel)
+	for r := range m.Routes {
+		delete(m.Routes, r)
+	}
+	for l := range m.Locations {
+		delete(m.Locations, l)
+	}
+	m.CellsLock.Lock()
+	for tid := range m.Cells {
+		delete(m.Cells, tid)
+	}
+	m.CellsLock.Unlock()
+}

@@ -63,6 +63,5 @@ func Test_HandleRrmConfig(t *testing.T) {
 
 	handleRRMConfig(&testReq)
 	time.Sleep(time.Millisecond * 110)
-
-	mgr.Close()
+	stopManager(mgr)
 }
