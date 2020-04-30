@@ -65,6 +65,10 @@ func ricControlRequest(port int, towerID types.ECGI, stream e2ap.E2AP_RicChanSer
 			return
 		}
 		//log.Infof("Recv messageType %d", in.GetHdr().GetMessageType())
+		if in == nil || in.Hdr == nil || in.Msg == nil {
+			log.Errorf("Unexpected empty Control request message on Port %d %v", port, in)
+			return
+		}
 		switch in.Hdr.MessageType {
 		case e2.MessageType_CELL_CONFIG_REQUEST:
 			handleCellConfigRequest(port, towerID, c)
