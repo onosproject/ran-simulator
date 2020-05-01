@@ -29,7 +29,7 @@ import (
 
 const (
 	ranSimVersion    = "1.0.0"
-	ranSimType       = "RanSimulator"
+	ranSimType       = "E2Node"
 	ranSimTimeoutSec = 5
 )
 
