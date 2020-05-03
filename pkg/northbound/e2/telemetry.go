@@ -104,7 +104,7 @@ func generateReport(ue *types.Ue) e2ap.RicIndication {
 	reports[3].CqiHist = make([]uint32, 1)
 	reports[3].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
 
-	log.Infof("!!!RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
+	log.Infof("RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
 		reports[2].CqiHist[0], reports[2].Ecgi.Ecid,
 		reports[3].CqiHist[0], reports[3].Ecgi.Ecid)
