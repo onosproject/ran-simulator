@@ -283,6 +283,8 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			ue.Tower2Dist = distances[1]
 			ue.Tower3 = names[2]
 			ue.Tower3Dist = distances[2]
+			servingTowerDist, _ := distanceToCellCentroid(m.Cells[*ue.ServingTower], ue.Position)
+			ue.ServingTowerDist = servingTowerDist
 
 			if ue.Admitted && ue.Tower1 != oldTower1 || ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
 				updateType = trafficsim.UpdateType_TOWER
