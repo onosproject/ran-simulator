@@ -76,31 +76,38 @@ func generateReport(ue *types.Ue) e2ap.RicIndication {
 	tower1 := trafficSimMgr.Cells[*ue.Tower1]
 	tower2 := trafficSimMgr.Cells[*ue.Tower2]
 	tower3 := trafficSimMgr.Cells[*ue.Tower3]
+	sTower := trafficSimMgr.Cells[*ue.ServingTower]
 
-	reports := make([]*e2.RadioRepPerServCell, 3)
+	reports := make([]*e2.RadioRepPerServCell, 4)
 
 	reports[0] = new(e2.RadioRepPerServCell)
-	tower1Ecgi := toE2Ecgi(tower1.Ecgi)
-	reports[0].Ecgi = &tower1Ecgi
+	sTowerEcgi := toE2Ecgi(sTower.Ecgi)
+	reports[0].Ecgi = &sTowerEcgi
 	reports[0].CqiHist = make([]uint32, 1)
-	reports[0].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.GetTxPowerdB())
+	reports[0].CqiHist[0] = makeCqi(ue.ServingTowerDist, sTower.GetTxPowerdB())
 
 	reports[1] = new(e2.RadioRepPerServCell)
-	tower2Ecgi := toE2Ecgi(tower2.Ecgi)
-	reports[1].Ecgi = &tower2Ecgi
+	tower1Ecgi := toE2Ecgi(tower1.Ecgi)
+	reports[1].Ecgi = &tower1Ecgi
 	reports[1].CqiHist = make([]uint32, 1)
-	reports[1].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.GetTxPowerdB())
+	reports[1].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.GetTxPowerdB())
 
 	reports[2] = new(e2.RadioRepPerServCell)
-	tower3Ecgi := toE2Ecgi(tower2.Ecgi)
-	reports[2].Ecgi = &tower3Ecgi
+	tower2Ecgi := toE2Ecgi(tower2.Ecgi)
+	reports[2].Ecgi = &tower2Ecgi
 	reports[2].CqiHist = make([]uint32, 1)
-	reports[2].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
+	reports[2].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.GetTxPowerdB())
 
-	log.Infof("RadioMeasReport %s %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, ue.Imsi,
-		reports[0].CqiHist[0], reports[0].Ecgi.Ecid,
+	reports[3] = new(e2.RadioRepPerServCell)
+	tower3Ecgi := toE2Ecgi(tower3.Ecgi)
+	reports[3].Ecgi = &tower3Ecgi
+	reports[3].CqiHist = make([]uint32, 1)
+	reports[3].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
+
+	log.Infof("!!!RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
-		reports[2].CqiHist[0], reports[2].Ecgi.Ecid)
+		reports[2].CqiHist[0], reports[2].Ecgi.Ecid,
+		reports[3].CqiHist[0], reports[3].Ecgi.Ecid)
 
 	servingTower2Ecgi := toE2Ecgi(servingTower.Ecgi)
 	return e2ap.RicIndication{
