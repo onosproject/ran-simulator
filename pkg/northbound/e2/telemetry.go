@@ -69,20 +69,20 @@ func (s *Server) radioMeasReportPerUE() error {
 			for _, ue := range ues {
 				s.indChan <- generateReport(ue)
 			}
+		case <-s.stream.Context().Done():
+			log.Infof("Controller has disconnected on Port %d", s.GetPort())
+			return nil
 		}
 	}
 }
 
 func (s *Server) waitForConfig(configDone chan bool) {
 	ticker := time.NewTicker(500 * time.Millisecond)
-	for {
-		select {
-		case <-ticker.C:
-			if s.l2MeasConfig.RadioMeasReportPerUe != 0 {
-				ticker.Stop()
-				configDone <- true
-				return
-			}
+	for range ticker.C {
+		if s.l2MeasConfig.RadioMeasReportPerUe != 0 {
+			ticker.Stop()
+			configDone <- true
+			return
 		}
 	}
 }
