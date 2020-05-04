@@ -16,16 +16,20 @@ package e2
 
 import (
 	"fmt"
+	"time"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/onos-ric/api/sb/e2sm"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
 const e2TelemetryNbi = "e2TelemetryNbi"
+
+const ueChangeChannelLen = 1000
 
 func makeCqi(distance float32, txPowerdB float32) uint32 {
 	cqi := uint32(0.0001 * txPowerdB / (distance * distance))
@@ -35,35 +39,69 @@ func makeCqi(distance float32, txPowerdB float32) uint32 {
 	return cqi
 }
 
-func radioMeasReportPerUE(port int, towerID types.ECGI, stream e2ap.E2AP_RicChanServer, c chan e2ap.RicIndication) error {
+func (s *Server) radioMeasReportPerUE() error {
 	trafficSimMgr := manager.GetManager()
 
-	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, stream)
-	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
+	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, s.stream)
+	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID, ueChangeChannelLen)
 	defer trafficSimMgr.Dispatcher.UnregisterUeListener(streamID)
 	if err != nil {
+		log.Errorf("RegisterUeListener failed for ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
 		return err
 	}
-	log.Infof("Listening for changes on UEs with ServingTower=%s for Port %d", towerID, port)
+
+	log.Infof("Waiting for l2MeasConfig for ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
+	configDone := make(chan bool)
+	go s.waitForConfig(configDone)
+	<-configDone
+
+	s.telemetryTicker = time.NewTicker(time.Duration(s.l2MeasConfig.RadioMeasReportPerUe) * time.Millisecond)
+
+	log.Infof("Listening for changes on UEs with ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
+
 	for {
+		select {
+		case <-s.telemetryTicker.C:
+			ues, err := processUeChange(ueChangeChannel, s.stream)
+			if err != nil || ues == nil {
+				continue
+			}
+			for _, ue := range ues {
+				s.indChan <- generateReport(ue)
+			}
+		case <-s.stream.Context().Done():
+			log.Infof("Controller has disconnected on Port %d", s.GetPort())
+			return nil
+		}
+	}
+}
+
+func (s *Server) waitForConfig(configDone chan bool) {
+	ticker := time.NewTicker(500 * time.Millisecond)
+	for range ticker.C {
+		if s.l2MeasConfig.RadioMeasReportPerUe != 0 {
+			ticker.Stop()
+			configDone <- true
+			return
+		}
+	}
+}
+
+func processUeChange(ueChangeChannel chan dispatcher.Event, stream e2ap.E2AP_RicChanServer) ([]*types.Ue, error) {
+	var ues []*types.Ue
+	num := len(ueChangeChannel)
+	for i := 0; i < num; i++ {
 		select {
 		// block here and listen out for any updates to UEs
 		case ueUpdate := <-ueChangeChannel:
 			if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
-				ue, ok := ueUpdate.Object.(*types.Ue)
-				if !ok {
-					log.Fatalf("Object %v could not be converted to UE", ueUpdate)
-				}
-				if ue.ServingTower.EcID != towerID.EcID || ue.ServingTower.PlmnID != towerID.PlmnID {
-					continue
-				}
-				c <- generateReport(ue)
+				ues = append(ues, ueUpdate.Object.(*types.Ue))
 			}
 		case <-stream.Context().Done():
-			log.Infof("Controller has disconnected on Port %d", port)
-			return nil
+			return nil, fmt.Errorf("Controller has disconnected")
 		}
 	}
+	return ues, nil
 }
 
 func generateReport(ue *types.Ue) e2ap.RicIndication {

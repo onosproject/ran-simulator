@@ -36,6 +36,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 	mgr, err := setUpManager()
 	assert.NilError(t, err, "Unexpected error setting up manager")
 	assert.Assert(t, mgr != nil, "Unexpectedly Manager is nil!")
+	s := Server{}
 
 	testReq := e2.RRMConfig{
 		Ecgi: &e2.ECGI{
@@ -61,7 +62,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 		}
 	}()
 
-	handleRRMConfig(&testReq)
+	s.handleRRMConfig(&testReq)
 	time.Sleep(time.Millisecond * 110)
 	stopManager(mgr)
 }

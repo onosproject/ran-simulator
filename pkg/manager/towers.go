@@ -16,13 +16,14 @@ package manager
 
 import (
 	"fmt"
+	"math"
+	"sort"
+
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/utils"
-	"math"
-	"sort"
 )
 
 const (
@@ -205,10 +206,10 @@ func (m *Manager) DelCrnti(servingTower *types.ECGI, crnti types.Crnti) error {
 }
 
 // CrntiToName ...
-func (m *Manager) CrntiToName(crnti types.Crnti, ecid *types.ECGI) (types.Imsi, error) {
+func (m *Manager) CrntiToName(crnti types.Crnti, ecid types.ECGI) (types.Imsi, error) {
 	m.CellsLock.RLock()
 	defer m.CellsLock.RUnlock()
-	tower, ok := m.Cells[*ecid]
+	tower, ok := m.Cells[ecid]
 	if !ok {
 		return 0, fmt.Errorf("tower %s not found", ecid)
 	}

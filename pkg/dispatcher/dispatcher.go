@@ -16,8 +16,9 @@ package dispatcher
 
 import (
 	"fmt"
-	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"sync"
+
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
 var log = logging.GetLogger("dispatcher")
@@ -55,13 +56,17 @@ func (d *Dispatcher) ListenUeEvents(ueEventChannel <-chan Event) {
 }
 
 // RegisterUeListener :
-func (d *Dispatcher) RegisterUeListener(subscriber string) (chan Event, error) {
+func (d *Dispatcher) RegisterUeListener(subscriber string, buffLength ...int) (chan Event, error) {
 	d.nbiUeListenersLock.Lock()
 	defer d.nbiUeListenersLock.Unlock()
+	var num int
+	if buffLength != nil {
+		num = buffLength[0]
+	}
 	if _, ok := d.nbiUeListeners[subscriber]; ok {
 		return nil, fmt.Errorf("NBI UE %s is already registered", subscriber)
 	}
-	channel := make(chan Event)
+	channel := make(chan Event, num)
 	d.nbiUeListeners[subscriber] = channel
 	return channel, nil
 }

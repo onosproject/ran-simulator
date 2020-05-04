@@ -38,7 +38,7 @@ func Test_GenerateReport(t *testing.T) {
 	rmrpu := msg.GetMsg().GetRadioMeasReportPerUE()
 	assert.Assert(t, ok, "Expected msg.S to convert to RadioMeasReportPerUE")
 	assert.Equal(t, "0001", rmrpu.GetCrnti())
-	assert.Equal(t, 3, len(rmrpu.GetRadioReportServCells()))
+	assert.Equal(t, 4, len(rmrpu.GetRadioReportServCells()))
 	for _, rr := range rmrpu.GetRadioReportServCells() {
 		switch ecid := rr.Ecgi.Ecid; ecid {
 		case "0001420":

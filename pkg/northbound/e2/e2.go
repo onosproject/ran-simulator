@@ -15,6 +15,8 @@
 package e2
 
 import (
+	"time"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	e2 "github.com/onosproject/onos-ric/api/sb"
@@ -56,9 +58,13 @@ func (s Service) Register(r *grpc.Server) {
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-	port      int
-	towerEcID types.EcID
-	plmnID    types.PlmnID
+	port            int
+	towerEcID       types.EcID
+	plmnID          types.PlmnID
+	stream          e2ap.E2AP_RicChanServer
+	indChan         chan e2ap.RicIndication
+	l2MeasConfig    e2.L2MeasConfig
+	telemetryTicker *time.Ticker
 }
 
 // GetPort - expose the port number
