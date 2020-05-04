@@ -32,7 +32,7 @@ func UpdateTelemetryMetrics(m *e2ap.RicIndication) {
 	case e2.MessageType_RADIO_MEAS_REPORT_PER_UE:
 		msg := m.GetMsg().GetRadioMeasReportPerUE()
 		towerID := toTypesEcgi(msg.GetEcgi())
-		name, err := trafficSimMgr.CrntiToName(types.Crnti(msg.GetCrnti()), &towerID)
+		name, err := trafficSimMgr.CrntiToName(types.Crnti(msg.GetCrnti()), towerID)
 		if err != nil {
 			log.Errorf("ue %s/%s not found", msg.GetEcgi().GetEcid(), msg.GetCrnti())
 			return
