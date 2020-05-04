@@ -2,7 +2,7 @@
 set -e
 
 TOKEN=$1
-MESSAGE=",\"message\": \"Triggered by upstream build of onosproject/onos-config commit "`git rev-parse --short HEAD`"\""
+MESSAGE=",\"message\": \"Triggered by upstream build of onosproject/ran-simulator commit "`git rev-parse --short HEAD`"\""
 BRANCH="master"
 body="{
 \"request\": {
