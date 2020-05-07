@@ -21,9 +21,9 @@ package ran.trafficsim.types;
 import "gogoproto/gogo.proto";
 
 message Point {
-    float lat = 1;
+    double lat = 1;
 
-    float lng = 2;
+    double lng = 2;
 }
 
 message Sector {
@@ -53,19 +53,19 @@ message Ue {
 
     ECGI serving_tower = 7;
 
-    float serving_tower_dist = 8;
+    double serving_tower_strength = 8;
 
     ECGI tower1 = 9;
 
-    float tower1_dist = 10;
+    double tower1_strength = 10;
 
     ECGI tower2 = 11;
 
-    float tower2_dist = 12;
+    double tower2_strength = 12;
 
     ECGI tower3 = 13;
 
-    float tower3_dist = 14;
+    double tower3_strength = 14;
 
     string crnti = 15 [(gogoproto.customname) = "Crnti", (gogoproto.casttype) = "Crnti"];
 
@@ -106,7 +106,7 @@ message Cell {
     repeated ECGI neighbors = 7;
 
     // The cell transmit power in decibels
-    float txPowerdB = 8;
+    double txPowerdB = 8;
 
     // crntis maps a ue's name to its crnti
     map<string, uint64> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "Imsi"];

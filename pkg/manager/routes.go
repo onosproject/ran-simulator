@@ -130,8 +130,8 @@ func googleRoute(startLoc *Location, endLoc *Location, apiKey string) ([]*types.
 		}
 		for _, ll := range latLngs {
 			point := types.Point{
-				Lat: float32(ll.Lat),
-				Lng: float32(ll.Lng),
+				Lat: ll.Lat,
+				Lng: ll.Lng,
 			}
 			points = append(points, &point)
 		}
@@ -143,8 +143,8 @@ func googleRoute(startLoc *Location, endLoc *Location, apiKey string) ([]*types.
 // generate a route randomly - it will not follow the streets
 // Warning - this is a simple calculator that expect points to be on the same hemisphere
 func randomRoute(startLoc *Location, endLoc *Location) ([]*types.Point, error) {
-	routeWidth := float64(endLoc.Position.GetLng() - startLoc.Position.GetLng())
-	routeHeight := float64(endLoc.Position.GetLat() - startLoc.Position.GetLat())
+	routeWidth := endLoc.Position.GetLng() - startLoc.Position.GetLng()
+	routeHeight := endLoc.Position.GetLat() - startLoc.Position.GetLat()
 
 	directLength := math.Hypot(routeWidth, routeHeight)
 	// Try to have a step evey 1/stepsPerDecimalDegree of a decimal degree
@@ -155,8 +155,8 @@ func randomRoute(startLoc *Location, endLoc *Location) ([]*types.Point, error) {
 		if i == 0 {
 			randFactor = 0.0
 		}
-		deltaX := float32(routeWidth*float64(i)/float64(len(points)) + randFactor)
-		deltaY := float32(routeHeight*float64(i)/float64(len(points)) + randFactor)
+		deltaX := routeWidth*float64(i)/float64(len(points)) + randFactor
+		deltaY := routeHeight*float64(i)/float64(len(points)) + randFactor
 
 		points[i] = &types.Point{
 			Lng: startLoc.Position.GetLng() + deltaX,

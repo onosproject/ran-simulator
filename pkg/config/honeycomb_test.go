@@ -25,16 +25,16 @@ func Test_HexArray7(t *testing.T) {
 
 	var testcases = []struct {
 		pointidx uint
-		lat      float32
-		lng      float32
+		lat      float64
+		lng      float64
 	}{
-		{0, -0.017320508, 0},
-		{1, -0.008660254, 0.015},
-		{2, -0.008660254, -0.015},
+		{0, -0.017320508075688773, 0},
+		{1, -0.008660254037844387, 0.015},
+		{2, -0.008660254037844387, -0.015},
 		{3, 0.0, 0},
-		{4, 0.008660254, 0.015},
-		{5, 0.008660254, -0.015},
-		{6, 0.017320508, 0},
+		{4, 0.008660254037844387, 0.015},
+		{5, 0.008660254037844387, -0.015},
+		{6, 0.017320508075688773, 0},
 	}
 	for _, tc := range testcases {
 		assert.Equal(t, tc.lat, points[tc.pointidx].Lat, tc)
@@ -52,8 +52,8 @@ func Test_HexArrayN(t *testing.T) {
 
 	var testcases = []struct {
 		pointidx uint
-		lat      float32
-		lng      float32
+		lat      float64
+		lng      float64
 	}{
 		{9, 0, 0},
 	}

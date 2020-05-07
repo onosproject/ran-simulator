@@ -99,50 +99,90 @@ func NewCells(towersConfig config.TowerConfig) map[types.ECGI]*types.Cell {
 	return cells
 }
 
-// Find the closest cell to any point - return closest, candidate1 and candidate2
-// in order of distance
-// Note this does not take any account of serving - it's just about distance
-func (m *Manager) findClosestCells(point *types.Point) ([]*types.ECGI, []float32, error) {
+// Find the strongest power signal cell to any point - return strongest, candidate1 and candidate2
+// in order of power. This is derived from
+// 1. the distance of the point from cell
+// 2. the arc and the azimuth of the cell
+// 3. the power setting of the antenna
+// Note this does not take any account of who's serving - it's just about power
+// values are in dB
+func (m *Manager) findStrongestCells(point *types.Point) ([]*types.ECGI, []float64, error) {
 	var (
-		closest    *types.ECGI
+		strongest  *types.ECGI
 		candidate1 *types.ECGI
 		candidate2 *types.ECGI
 	)
 
 	var (
-		closestDist    float32 = math.MaxFloat32
-		candidate1Dist float32 = math.MaxFloat32
-		candidate2Dist float32 = math.MaxFloat32
+		strongestStr  = math.MaxFloat64
+		candidate1Str = math.MaxFloat64
+		candidate2Str = math.MaxFloat64
 	)
 
 	m.CellsLock.RLock()
 	for _, cell := range m.Cells {
-		distance, err := distanceToCellCentroid(cell, point)
-		if err != nil {
-			log.Errorf("Unable to get distance", err)
-			return nil, nil, err
-		}
-		if distance < closestDist {
+		strength := strengthAtPoint(point, cell)
+
+		if strength < strongestStr {
 			candidate2 = candidate1
-			candidate2Dist = candidate1Dist
-			candidate1 = closest
-			candidate1Dist = closestDist
-			closest = cell.Ecgi
-			closestDist = distance
-		} else if distance < candidate1Dist {
+			candidate2Str = candidate1Str
+			candidate1 = strongest
+			candidate1Str = strongestStr
+			strongest = cell.Ecgi
+			strongestStr = strength
+		} else if strength < candidate1Str {
 			candidate2 = candidate1
-			candidate2Dist = candidate1Dist
+			candidate2Str = candidate1Str
 			candidate1 = cell.Ecgi
-			candidate1Dist = distance
-		} else if distance < candidate2Dist {
+			candidate1Str = strength
+		} else if strength < candidate2Str {
 			candidate2 = cell.Ecgi
-			candidate2Dist = distance
+			candidate2Str = strength
 		}
 	}
 	m.CellsLock.RUnlock()
 
-	return []*types.ECGI{closest, candidate1, candidate2},
-		[]float32{closestDist, candidate1Dist, candidate2Dist}, nil
+	return []*types.ECGI{strongest, candidate1, candidate2},
+		[]float64{strongestStr, candidate1Str, candidate2Str}, nil
+}
+
+func strengthAtPoint(point *types.Point, cell *types.Cell) float64 {
+	distAtt := distanceAttenuation(point, cell)
+	angleAttr := angleAttenuation(point, cell)
+
+	return cell.TxPowerdB + distAtt + angleAttr
+}
+
+// distanceAttenuation is the antenna Gain as a function of the dist
+// a very rough approximation to take in to account the width of
+// the antenna beam. A 120° wide beam with 30° height will span ≅ 2x0.5 = 1 steradians
+// A 60° wide beam will be half that and so will have double the gain
+// https://en.wikipedia.org/wiki/Sector_antenna
+// https://en.wikipedia.org/wiki/Steradian
+func distanceAttenuation(point *types.Point, cell *types.Cell) float64 {
+	latDist := point.GetLat() - cell.GetLocation().GetLat()
+	realLngDist := (point.GetLng() - cell.GetLocation().GetLng()) / utils.AspectRatio(cell.GetLocation())
+	r := math.Hypot(latDist, realLngDist)
+	gain := 120.0 / float64(cell.GetSector().GetArc())
+	return 10 * math.Log10(gain*math.Sqrt(PowerFactor/r))
+}
+
+// angleAttenuation is the attenuation of power reaching a UE due to its
+// position off the centre of the beam in dB
+// It is an approximation of the directivity of the antenna
+// https://en.wikipedia.org/wiki/Radiation_pattern
+// https://en.wikipedia.org/wiki/Sector_antenna
+func angleAttenuation(point *types.Point, cell *types.Cell) float64 {
+
+	azRads := utils.AzimuthToRads(float64(cell.Sector.Azimuth))
+	pointRads := math.Atan((point.Lat - cell.Location.Lat) / (point.Lng - cell.Location.Lng))
+	angularOffset := math.Abs(azRads - pointRads)
+	angleScaling := float64(cell.Sector.Arc) / 120.0 // Compensate for narrower beams
+
+	// We just use a simple linear formula 0 => no loss
+	// 33° => -3dB for a 120° sector according to [2]
+	// assume this is 1:1 rads:attenuation e.g. 0.50 rads = 0.5 = -3dB attenuation
+	return 10 * math.Log10(1-(angularOffset/math.Pi/angleScaling))
 }
 
 // GetCell returns tower based on its name
@@ -162,12 +202,12 @@ func (m *Manager) UpdateCell(cell types.ECGI, powerAdjust float32) error {
 		return fmt.Errorf("unknown cell %s", cell)
 	}
 	currentPower := c.TxPowerdB
-	if currentPower+powerAdjust < minPowerdB {
+	if currentPower+float64(powerAdjust) < minPowerdB {
 		c.TxPowerdB = minPowerdB
-	} else if currentPower+powerAdjust > maxPowerdB {
+	} else if currentPower+float64(powerAdjust) > maxPowerdB {
 		c.TxPowerdB = maxPowerdB
 	} else {
-		c.TxPowerdB += powerAdjust
+		c.TxPowerdB += float64(powerAdjust)
 	}
 	c.GetSector().Centroid = centroidPosition(c)
 	m.CellsLock.Unlock()
@@ -220,17 +260,9 @@ func (m *Manager) CrntiToName(crnti types.Crnti, ecid types.ECGI) (types.Imsi, e
 	return imsi, nil
 }
 
-func distanceToCellCentroid(cell *types.Cell, point *types.Point) (float32, error) {
-	if cell == nil || cell.GetSector() == nil || cell.GetSector().Centroid == nil {
-		return 0, fmt.Errorf("cell centroid is not calculated")
-	}
-	return float32(math.Hypot(
-		float64(point.GetLat()-cell.GetSector().GetCentroid().GetLat()),
-		float64(point.GetLng()-cell.GetSector().GetCentroid().GetLng()),
-	)), nil
-}
-
 // Measure the distance between a point and a cell centroid and return an answer in decimal degrees
+// Centroid is used **only** for the display of the beam on the GUI and for
+// calculating Neighbours once at startup
 // Simple arithmetic is used, do not use for lat or long diff >= 100 degrees
 func centroidPosition(cell *types.Cell) *types.Point {
 	if cell.Sector.Arc == 360 || cell.Sector.Arc == 0 {
@@ -245,14 +277,16 @@ func centroidPosition(cell *types.Cell) *types.Point {
 	}
 	aspectRatio := utils.AspectRatio(cell.Location)
 	return &types.Point{
-		Lat: float32(math.Sin(azRads)*dist) + cell.Location.GetLat(),
-		Lng: float32(math.Cos(azRads)*dist/aspectRatio) + cell.Location.GetLng(),
+		Lat: math.Sin(azRads)*dist + cell.Location.GetLat(),
+		Lng: math.Cos(azRads)*dist/aspectRatio + cell.Location.GetLng(),
 	}
 }
 
 // PowerToDist - convert power in dB to distance in decimal degrees
-func PowerToDist(power float32) float64 {
-	return math.Sqrt(math.Pow(10, float64(power)/10))*PowerFactor + PowerBase
+// Like centroid this is now used only for calculating centroid, which is
+// only for the GUI and the neighbours
+func PowerToDist(power float64) float64 {
+	return math.Sqrt(math.Pow(10, power/10))*PowerFactor + PowerBase
 }
 
 // find the neighbours of a cell - not distance from towers, but from centroids
@@ -269,8 +303,8 @@ func makeNeighbors(self *types.Cell, allCells map[types.ECGI]*types.Cell) []*typ
 			continue
 		}
 		dist := math.Hypot(
-			float64(selfCentroid.Lng-otherCell.Sector.Centroid.Lng),
-			float64(selfCentroid.Lat-otherCell.Sector.Centroid.Lat),
+			selfCentroid.Lng-otherCell.Sector.Centroid.Lng,
+			selfCentroid.Lat-otherCell.Sector.Centroid.Lat,
 		)
 		distances = append(distances, distance{id: otherCell.Ecgi, dist: dist})
 	}

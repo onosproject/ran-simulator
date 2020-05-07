@@ -52,3 +52,23 @@ func Test_GenerateReport(t *testing.T) {
 	}
 	stopManager(mgr)
 }
+
+func Test_MakeCqi(t *testing.T) {
+
+	testCases := []struct {
+		strength float64
+		cqi      uint32
+	}{
+		{-5, 2},
+		{-4, 3},
+		{-1, 6},
+		{0, 7},
+		{1.0, 8},
+		{1.5, 9},
+		{3.0, 10},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.cqi, makeCqi(tc.strength), "unexpected cqi %d for strength %f", tc.cqi, tc.strength)
+	}
+}

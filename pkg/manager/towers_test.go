@@ -50,7 +50,7 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point outside the towers north-west
 	testPointA := &types.Point{Lat: 52.12345, Lng: -8.123}
-	towersA, distancesA, err := m.findClosestCells(testPointA)
+	towersA, distancesA, err := m.findStrongestCells(testPointA)
 	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersA), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesA), "Expected 3 tower distancesA in findClosest")
@@ -59,7 +59,7 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point outside the towers south-east
 	testPointB := &types.Point{Lat: 51.7654, Lng: -7.9876}
-	towersB, distancesB, err := m.findClosestCells(testPointB)
+	towersB, distancesB, err := m.findStrongestCells(testPointB)
 	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersB), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesB), "Expected 3 tower distancesA in findClosest")
@@ -68,7 +68,7 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point within the towers south-east of centre
 	testPointC := &types.Point{Lat: 51.980, Lng: -7.950}
-	towersC, distancesC, err := m.findClosestCells(testPointC)
+	towersC, distancesC, err := m.findStrongestCells(testPointC)
 	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersC), "Expected 3 tower names in findClosest")
 	assert.Equal(t, 3, len(distancesC), "Expected 3 tower distancesA in findClosest")
@@ -97,17 +97,17 @@ func Test_PowerAdjust(t *testing.T) {
 	assert.NilError(t, err, "Unexpected response from adjusting power")
 	tower1, ok := m.Cells[towerID1420]
 	assert.Assert(t, ok)
-	assert.Equal(t, float32(4.0), tower1.TxPowerdB, "unexpected value for tower power")
+	assert.Equal(t, 4.0, tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too low - capped at -15dB /////////////////////
 	err = m.UpdateCell(towerID1420, -30) // subtracted from prev 4dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
-	assert.Equal(t, float32(-15.0), tower1.TxPowerdB, "unexpected value for tower power")
+	assert.Equal(t, -15.0, tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with value too high - capped at 30dB /////////////////////
 	err = m.UpdateCell(towerID1420, 50) // Added to prev -15dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
-	assert.Equal(t, float32(30.0), tower1.TxPowerdB, "unexpected value for tower power")
+	assert.Equal(t, 30.0, tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with wrong name /////////////////////
 	towerID1421 := newEcgi("0001421", utils.TestPlmnID)
@@ -158,7 +158,7 @@ func Test_MakeNeighbors(t *testing.T) {
 	}
 }
 
-func Test_distToTower1Sector(t *testing.T) {
+func Test_StrengthToTower1Sector(t *testing.T) {
 	cell := &types.Cell{
 		Location: &types.Point{
 			Lat: 52,
@@ -170,17 +170,15 @@ func Test_distToTower1Sector(t *testing.T) {
 		},
 		TxPowerdB: 10.0, // Does not matter in this case 360
 	}
-	cell.Sector.Centroid = centroidPosition(cell)
-	dist, err := distanceToCellCentroid(cell,
+	strength := strengthAtPoint(
 		&types.Point{
 			Lat: 52.01,
 			Lng: -8.01,
-		})
-	assert.NilError(t, err)
-	assert.Equal(t, 1414, int(math.Floor(float64(dist*1e5))), "Unexpected distance for single sector tower")
+		}, cell)
+	assert.Equal(t, -2423.0, math.Round(strength*1e3), "Unexpected strength for single sector tower")
 }
 
-func Test_distToTower2Sectors(t *testing.T) {
+func Test_StrengthToTower2Sectors(t *testing.T) {
 	cell := &types.Cell{
 		Location: &types.Point{
 			Lat: 52,
@@ -189,23 +187,17 @@ func Test_distToTower2Sectors(t *testing.T) {
 		Sector: &types.Sector{
 			Azimuth: 90,
 			Arc:     180,
-			Centroid: &types.Point{
-				Lat: 52.0001,
-				Lng: -8.0001,
-			},
 		},
 		TxPowerdB: 10.0,
 	}
-	cell.GetSector().Centroid = centroidPosition(cell)
-	dist, err := distanceToCellCentroid(cell, &types.Point{
+	strength := strengthAtPoint(&types.Point{
 		Lat: 52.01,
 		Lng: -8.01,
-	})
-	assert.NilError(t, err)
-	assert.Equal(t, 2338, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 2 sector tower")
+	}, cell)
+	assert.Equal(t, 1045.0, math.Round(strength*1e3), "Unexpected strength for 2 sector tower")
 }
 
-func Test_distToTower3Sectors(t *testing.T) {
+func Test_StrengthToTower3Sectors(t *testing.T) {
 	cell := &types.Cell{
 		Location: &types.Point{
 			Lat: 52,
@@ -214,21 +206,15 @@ func Test_distToTower3Sectors(t *testing.T) {
 		Sector: &types.Sector{
 			Azimuth: 120,
 			Arc:     120,
-			Centroid: &types.Point{
-				Lat: 52.0001,
-				Lng: -8.0001,
-			},
 		},
 		TxPowerdB: 10.0,
 	}
-	cell.GetSector().Centroid = centroidPosition(cell)
-	dist, err := distanceToCellCentroid(cell,
+	strength := strengthAtPoint(
 		&types.Point{
-			Lat: 52.01,
-			Lng: -8.01,
-		})
-	assert.NilError(t, err)
-	assert.Equal(t, 2677, int(math.Floor(float64(dist*1e5))), "Unexpected distance for 3 sector tower")
+			Lat: 52.001, // Much closer
+			Lng: -8.001,
+		}, cell)
+	assert.Equal(t, 8219.0, math.Floor(strength*1e3), "Unexpected strength for 3 sector tower")
 }
 
 func Test_PowerToDist(t *testing.T) {
@@ -249,4 +235,106 @@ func Test_PowerToDist(t *testing.T) {
 
 	dist30 := PowerToDist(30)
 	assert.Equal(t, 4462, int(math.Floor(dist30*1e5)))
+}
+
+func Test_AngularAttenuationWideBeam(t *testing.T) {
+	cell := &types.Cell{
+		Ecgi: &types.ECGI{
+			EcID:   "test1",
+			PlmnID: utils.TestPlmnID,
+		},
+		Location: &types.Point{
+			Lat: 0,
+			Lng: 0,
+		},
+		Sector: &types.Sector{
+			Azimuth:  120, // Beam is facing south east
+			Arc:      120, // wide beam
+			Centroid: nil,
+		},
+	}
+
+	// try at 45° above 3 o'clock
+	point1 := &types.Point{
+		Lat: 0.02, // Further away
+		Lng: 0.02,
+	}
+	aAtt1 := angleAttenuation(point1, cell)
+	assert.Equal(t, -2341.0, math.Round(aAtt1*1e3))
+
+	dAtt1 := distanceAttenuation(point1, cell)
+	assert.Equal(t, -7258.0, math.Round(dAtt1*1e3))
+
+	// try at 0° - 3 o'clock
+	point2 := &types.Point{
+		Lat: 0.0,   // to the east
+		Lng: 0.001, //Closer
+	}
+	att2 := angleAttenuation(point2, cell)
+	assert.Equal(t, -792.0, math.Round(att2*1e3))
+
+	dAtt2 := distanceAttenuation(point2, cell)
+	assert.Equal(t, -0.0, math.Round(dAtt2*1e3)) // Zero as dist = 0.001 = PowerFactor = reference dist
+
+	// try at -30° - middle of beam at 120° azimuth - south east
+	point3 := &types.Point{
+		Lat: -0.0057735,
+		Lng: 0.01,
+	}
+	att3 := angleAttenuation(point3, cell)
+	assert.Equal(t, 0.0, math.Round(att3*1e3))
+
+	dAtt3 := distanceAttenuation(point3, cell)
+	assert.Equal(t, -5312.0, math.Round(dAtt3*1e3))
+}
+
+func Test_AngularAttenuationNarrowBeam(t *testing.T) {
+	cell := &types.Cell{
+		Ecgi: &types.ECGI{
+			EcID:   "test1",
+			PlmnID: utils.TestPlmnID,
+		},
+		Location: &types.Point{
+			Lat: 0,
+			Lng: 0,
+		},
+		Sector: &types.Sector{
+			Azimuth:  120, // Beam is facing south east
+			Arc:      60,  // narrow beam
+			Centroid: nil,
+		},
+	}
+
+	// try at 45°
+	point := &types.Point{
+		Lat: 0.02, // Further away
+		Lng: 0.02,
+	}
+	aAtt1 := angleAttenuation(point, cell)
+	assert.Equal(t, -7782.0, math.Round(aAtt1*1e3))
+
+	dAtt1 := distanceAttenuation(point, cell)
+	assert.Equal(t, -4247.0, math.Round(dAtt1*1e3))
+
+	// try at 0°
+	point2 := &types.Point{
+		Lat: 0.0,
+		Lng: 0.01,
+	}
+	aAtt2 := angleAttenuation(point2, cell)
+	assert.Equal(t, -1761.0, math.Round(aAtt2*1e3))
+
+	dAtt2 := distanceAttenuation(point2, cell)
+	assert.Equal(t, -1990.0, math.Round(dAtt2*1e3))
+
+	// try at -30° - middle of beam
+	point3 := &types.Point{
+		Lat: -0.0057735,
+		Lng: 0.01,
+	}
+	aAtt3 := angleAttenuation(point3, cell)
+	assert.Equal(t, 0.0, math.Round(aAtt3*1e3))
+
+	dAtt3 := distanceAttenuation(point3, cell)
+	assert.Equal(t, -2302.0, math.Round(dAtt3*1e3))
 }

@@ -50,7 +50,7 @@ func NewLocations(towersConfig config.TowerConfig, maxUEs int, locationsScale fl
 			maxLng = tower.Longitude
 		}
 	}
-	radius := float64(locationsScale) * math.Hypot(float64(maxLat-minLat), float64(maxLng-minLng)) / 2
+	radius := float64(locationsScale) * math.Hypot(maxLat-minLat, maxLng-minLng) / 2
 	aspectRatio := utils.AspectRatio(&towersConfig.MapCentre)
 	for l := 0; l < (maxUEs * 2); l++ {
 		pos := utils.RandomLatLng(towersConfig.MapCentre.GetLat(), towersConfig.MapCentre.GetLng(),

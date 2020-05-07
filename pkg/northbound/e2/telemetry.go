@@ -16,6 +16,7 @@ package e2
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
@@ -31,8 +32,10 @@ const e2TelemetryNbi = "e2TelemetryNbi"
 
 const ueChangeChannelLen = 1000
 
-func makeCqi(distance float32, txPowerdB float32) uint32 {
-	cqi := uint32(0.0001 * txPowerdB / (distance * distance))
+// Conversion of signal strength in dB to CQI
+func makeCqi(strengthdB float64) uint32 {
+	// TODO normalize this across the range
+	cqi := uint32(math.Round(strengthdB) + 7)
 	if cqi > 15 {
 		cqi = 15
 	}
@@ -122,25 +125,25 @@ func generateReport(ue *types.Ue) e2ap.RicIndication {
 	sTowerEcgi := toE2Ecgi(sTower.Ecgi)
 	reports[0].Ecgi = &sTowerEcgi
 	reports[0].CqiHist = make([]uint32, 1)
-	reports[0].CqiHist[0] = makeCqi(ue.ServingTowerDist, sTower.GetTxPowerdB())
+	reports[0].CqiHist[0] = makeCqi(ue.ServingTowerStrength)
 
 	reports[1] = new(e2.RadioRepPerServCell)
 	tower1Ecgi := toE2Ecgi(tower1.Ecgi)
 	reports[1].Ecgi = &tower1Ecgi
 	reports[1].CqiHist = make([]uint32, 1)
-	reports[1].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.GetTxPowerdB())
+	reports[1].CqiHist[0] = makeCqi(ue.Tower1Strength)
 
 	reports[2] = new(e2.RadioRepPerServCell)
 	tower2Ecgi := toE2Ecgi(tower2.Ecgi)
 	reports[2].Ecgi = &tower2Ecgi
 	reports[2].CqiHist = make([]uint32, 1)
-	reports[2].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.GetTxPowerdB())
+	reports[2].CqiHist[0] = makeCqi(ue.Tower2Strength)
 
 	reports[3] = new(e2.RadioRepPerServCell)
 	tower3Ecgi := toE2Ecgi(tower3.Ecgi)
 	reports[3].Ecgi = &tower3Ecgi
 	reports[3].CqiHist = make([]uint32, 1)
-	reports[3].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
+	reports[3].CqiHist[0] = makeCqi(ue.Tower3Strength)
 
 	log.Infof("RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,

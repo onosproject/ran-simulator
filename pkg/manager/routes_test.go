@@ -30,7 +30,7 @@ func Test_RandomRoute(t *testing.T) {
 	assert.Equal(t, len(points), 112)
 	prevLat := startLoc.Position.GetLat()
 	prevLng := startLoc.Position.GetLng()
-	tolerance := float32(1) / stepsPerDecimalDegree * 2
+	tolerance := 1.0 / stepsPerDecimalDegree * 2
 	for i, p := range points {
 		//t.Logf("Point %d: %f, %f", i, p.GetLat(), p.GetLng())
 		if i > 0 {

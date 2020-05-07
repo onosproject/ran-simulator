@@ -23,15 +23,15 @@ import (
 )
 
 // HoneycombGenerator - used by the cli tool "honeycomb"
-func HoneycombGenerator(numTowers uint, sectorsPerTower uint, latitude float32,
-	longitude float32, plmnid types.PlmnID, ecidStart uint16, portstart uint16, pitch float32) (*TowerConfig, error) {
+func HoneycombGenerator(numTowers uint, sectorsPerTower uint, latitude float64,
+	longitude float64, plmnid types.PlmnID, ecidStart uint16, portstart uint16, pitch float32) (*TowerConfig, error) {
 
 	mapCentre := types.Point{
 		Lat: latitude,
 		Lng: longitude,
 	}
 
-	aspectRatio := float32(utils.AspectRatio(&mapCentre))
+	aspectRatio := utils.AspectRatio(&mapCentre)
 	newConfig := TowerConfig{
 		MapCentre:    mapCentre,
 		TowersLayout: make([]TowersLayout, numTowers),
@@ -78,8 +78,8 @@ func hexMesh(pitch float64, numTowers uint) []*types.Point {
 	for _, h := range hexArray {
 		x, y := hexgrid.Point(hexgrid.HexToPixel(hexgrid.LayoutPointY00(pitch, pitch), h))
 		points = append(points, &types.Point{
-			Lat: float32(x),
-			Lng: float32(y),
+			Lat: x,
+			Lng: y,
 		})
 	}
 	return points
