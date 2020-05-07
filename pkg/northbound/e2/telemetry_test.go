@@ -33,7 +33,8 @@ func Test_GenerateReport(t *testing.T) {
 	assert.Assert(t, ok, "Expected to find Ue-0001")
 	mgr.UserEquipmentsLock.RUnlock()
 
-	msg := generateReport(ue1)
+	msg, err := generateReport(ue1)
+	assert.NilError(t, err)
 	assert.Equal(t, e2.MessageType_RADIO_MEAS_REPORT_PER_UE, msg.GetHdr().MessageType)
 	rmrpu := msg.GetMsg().GetRadioMeasReportPerUE()
 	assert.Assert(t, ok, "Expected msg.S to convert to RadioMeasReportPerUE")

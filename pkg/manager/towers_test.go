@@ -38,7 +38,7 @@ func Test_NewTowers(t *testing.T) {
 	}
 }
 
-func Test_findClosestTowers(t *testing.T) {
+func Test_findStrongestTowers(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
 	config.Clear()
@@ -50,30 +50,30 @@ func Test_findClosestTowers(t *testing.T) {
 
 	// Test a point outside the towers north-west
 	testPointA := &types.Point{Lat: 52.12345, Lng: -8.123}
-	towersA, distancesA, err := m.findStrongestCells(testPointA)
+	towersA, strengthsA, err := m.findStrongestCells(testPointA)
 	assert.NilError(t, err)
-	assert.Equal(t, 3, len(towersA), "Expected 3 tower names in findClosest")
-	assert.Equal(t, 3, len(distancesA), "Expected 3 tower distancesA in findClosest")
-	assert.Assert(t, distancesA[2] > distancesA[1], "Expected distance to be greater")
-	assert.Assert(t, distancesA[1] > distancesA[0], "Expected distance to be greater")
+	assert.Equal(t, 3, len(towersA), "Expected 3 tower names in findStrongestCells")
+	assert.Equal(t, 3, len(strengthsA), "Expected 3 tower strengths in findStrongestCells")
+	assert.Assert(t, strengthsA[2] < strengthsA[1], "Expected strength to be less")
+	assert.Assert(t, strengthsA[1] < strengthsA[0], "Expected strength to be less")
 
 	// Test a point outside the towers south-east
 	testPointB := &types.Point{Lat: 51.7654, Lng: -7.9876}
-	towersB, distancesB, err := m.findStrongestCells(testPointB)
+	towersB, strengthsB, err := m.findStrongestCells(testPointB)
 	assert.NilError(t, err)
-	assert.Equal(t, 3, len(towersB), "Expected 3 tower names in findClosest")
-	assert.Equal(t, 3, len(distancesB), "Expected 3 tower distancesA in findClosest")
-	assert.Assert(t, distancesB[2] > distancesB[1], "Expected distance to be greater")
-	assert.Assert(t, distancesB[1] > distancesB[0], "Expected distance to be greater")
+	assert.Equal(t, 3, len(towersB), "Expected 3 tower names in findStrongestCells")
+	assert.Equal(t, 3, len(strengthsB), "Expected 3 tower strengths in findStrongestCells")
+	assert.Assert(t, strengthsB[2] < strengthsB[1], "Expected strength to be less")
+	assert.Assert(t, strengthsB[1] < strengthsB[0], "Expected strength to be less")
 
 	// Test a point within the towers south-east of centre
 	testPointC := &types.Point{Lat: 51.980, Lng: -7.950}
-	towersC, distancesC, err := m.findStrongestCells(testPointC)
+	towersC, strengthsC, err := m.findStrongestCells(testPointC)
 	assert.NilError(t, err)
-	assert.Equal(t, 3, len(towersC), "Expected 3 tower names in findClosest")
-	assert.Equal(t, 3, len(distancesC), "Expected 3 tower distancesA in findClosest")
-	assert.Assert(t, distancesC[2] > distancesC[1], "Expected distance to be greater")
-	assert.Assert(t, distancesC[1] > distancesC[0], "Expected distance to be greater")
+	assert.Equal(t, 3, len(towersC), "Expected 3 tower names in findStrongestCells")
+	assert.Equal(t, 3, len(strengthsC), "Expected 3 tower strengths in findStrongestCells")
+	assert.Assert(t, strengthsC[2] < strengthsC[1], "Expected strength to be less")
+	assert.Assert(t, strengthsC[1] < strengthsC[0], "Expected strength to be less")
 }
 
 func Test_PowerAdjust(t *testing.T) {

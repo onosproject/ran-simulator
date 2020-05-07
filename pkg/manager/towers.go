@@ -113,29 +113,27 @@ func (m *Manager) findStrongestCells(point *types.Point) ([]*types.ECGI, []float
 		candidate2 *types.ECGI
 	)
 
-	var (
-		strongestStr  = math.MaxFloat64
-		candidate1Str = math.MaxFloat64
-		candidate2Str = math.MaxFloat64
-	)
+	strongestStr := -math.MaxFloat64
+	candidate1Str := -math.MaxFloat64
+	candidate2Str := -math.MaxFloat64
 
 	m.CellsLock.RLock()
 	for _, cell := range m.Cells {
 		strength := strengthAtPoint(point, cell)
 
-		if strength < strongestStr {
+		if strength > strongestStr {
 			candidate2 = candidate1
 			candidate2Str = candidate1Str
 			candidate1 = strongest
 			candidate1Str = strongestStr
 			strongest = cell.Ecgi
 			strongestStr = strength
-		} else if strength < candidate1Str {
+		} else if strength > candidate1Str {
 			candidate2 = candidate1
 			candidate2Str = candidate1Str
 			candidate1 = cell.Ecgi
 			candidate1Str = strength
-		} else if strength < candidate2Str {
+		} else if strength > candidate2Str {
 			candidate2 = cell.Ecgi
 			candidate2Str = strength
 		}
@@ -148,9 +146,9 @@ func (m *Manager) findStrongestCells(point *types.Point) ([]*types.ECGI, []float
 
 func strengthAtPoint(point *types.Point, cell *types.Cell) float64 {
 	distAtt := distanceAttenuation(point, cell)
-	angleAttr := angleAttenuation(point, cell)
+	angleAtt := angleAttenuation(point, cell)
 
-	return cell.TxPowerdB + distAtt + angleAttr
+	return cell.TxPowerdB + distAtt + angleAtt
 }
 
 // distanceAttenuation is the antenna Gain as a function of the dist
