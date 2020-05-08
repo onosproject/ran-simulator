@@ -1,4 +1,4 @@
-// Copyright 2020-present Open Networking Foundation.
+// Copyright 2019-present Open Networking Foundation.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package gnmi
 
-// EcID is a tower ID
-type EcID string
+import (
+	"fmt"
+	"github.com/openconfig/gnmi/proto/gnmi"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
-// PlmnID is a network ID
-type PlmnID string
-
-// Crnti is a UE ID relative to a tower
-type Crnti string
-
-// Imsi is a UE unique identifier
-type Imsi uint64
-
-// ConfigKey is the name of a configured attribute
-type ConfigKey string
-
-// ConfigValue is the value associated with the key
-type ConfigValue []byte
+// Subscribe implements gNMI Subscribe
+func (s *Server) Subscribe(stream gnmi.GNMI_SubscribeServer) error {
+	// TODO: Implement Subscribe if we add any state attributes to the model
+	return status.Error(codes.Unimplemented, fmt.Sprintf("gNMI Subscribe not yet supported on Port %d", s.port))
+}

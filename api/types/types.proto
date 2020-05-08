@@ -114,6 +114,8 @@ message Cell {
     uint32 crntiIndex = 10;
 
     uint32 port = 11;
+
+    map<string, bytes> configAttributes = 12 [(gogoproto.castkey) = "ConfigKey", (gogoproto.castvalue) = "ConfigValue"];
 }
 
 message MapLayout {
