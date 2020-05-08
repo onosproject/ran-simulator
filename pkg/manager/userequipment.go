@@ -44,32 +44,32 @@ func (m *Manager) NewUserEquipments(mapLayoutParams types.MapLayout, params Rout
 func (m *Manager) newUe(ueIdx int) (*types.Ue, error) {
 	imsi := utils.ImsiGenerator(ueIdx)
 	route := m.Routes[imsi]
-	towers, distances, err := m.findClosestCells(route.Waypoints[0])
+	towers, strengths, err := m.findStrongestCells(route.Waypoints[0])
 	if err != nil {
 		return nil, err
 	}
 	m.CellsLock.RLock()
-	servingTowerDist, err := distanceToCellCentroid(m.Cells[*towers[0]], route.Waypoints[0])
+	servingTowerStrength := strengthAtPoint(route.Waypoints[0], m.Cells[*towers[0]])
 	if err != nil {
 		m.CellsLock.RUnlock()
 		return nil, err
 	}
 	m.CellsLock.RUnlock()
 	ue := &types.Ue{
-		Imsi:             imsi,
-		Type:             "Car",
-		Position:         route.Waypoints[0],
-		Rotation:         0,
-		ServingTower:     towers[0],
-		ServingTowerDist: servingTowerDist,
-		Tower1:           towers[0],
-		Tower1Dist:       distances[0],
-		Tower2:           towers[1],
-		Tower2Dist:       distances[1],
-		Tower3:           towers[2],
-		Tower3Dist:       distances[2],
-		Admitted:         false,
-		Crnti:            InvalidCrnti,
+		Imsi:                 imsi,
+		Type:                 "Car",
+		Position:             route.Waypoints[0],
+		Rotation:             0,
+		ServingTower:         towers[0],
+		ServingTowerStrength: servingTowerStrength,
+		Tower1:               towers[0],
+		Tower1Strength:       strengths[0],
+		Tower2:               towers[1],
+		Tower2Strength:       strengths[1],
+		Tower3:               towers[2],
+		Tower3Strength:       strengths[2],
+		Admitted:             false,
+		Crnti:                InvalidCrnti,
 		Metrics: &types.UeMetrics{
 			HoLatency:         0,
 			HoReportTimestamp: 0,
@@ -269,7 +269,7 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			}
 			ue.Position = route.Waypoints[idx+1]
 			ue.Rotation = uint32(utils.GetRotationDegrees(route.Waypoints[idx], route.Waypoints[idx+1]) + 180)
-			names, distances, err := m.findClosestCells(ue.Position)
+			names, strengths, err := m.findStrongestCells(ue.Position)
 			if err != nil {
 				return err
 			}
@@ -278,13 +278,13 @@ func (m *Manager) moveUe(ue *types.Ue, route *types.Route) error {
 			oldTower2 := ue.Tower2
 			oldTower3 := ue.Tower3
 			ue.Tower1 = names[0]
-			ue.Tower1Dist = distances[0]
+			ue.Tower1Strength = strengths[0]
 			ue.Tower2 = names[1]
-			ue.Tower2Dist = distances[1]
+			ue.Tower2Strength = strengths[1]
 			ue.Tower3 = names[2]
-			ue.Tower3Dist = distances[2]
-			servingTowerDist, _ := distanceToCellCentroid(m.Cells[*ue.ServingTower], ue.Position)
-			ue.ServingTowerDist = servingTowerDist
+			ue.Tower3Strength = strengths[2]
+			servingTowerStrength := strengthAtPoint(ue.Position, m.Cells[*ue.ServingTower])
+			ue.ServingTowerStrength = servingTowerStrength
 
 			if ue.Admitted && ue.Tower1 != oldTower1 || ue.Tower2 != oldTower2 || ue.Tower3 != oldTower3 {
 				updateType = trafficsim.UpdateType_TOWER
@@ -309,17 +309,17 @@ func UeDeepCopy(original *types.Ue) *types.Ue {
 			Lat: original.GetPosition().GetLat(),
 			Lng: original.GetPosition().GetLng(),
 		},
-		Rotation:         original.GetRotation(),
-		ServingTower:     original.GetServingTower(),
-		ServingTowerDist: original.GetServingTowerDist(),
-		Tower1:           original.GetTower1(),
-		Tower1Dist:       original.GetTower1Dist(),
-		Tower2:           original.GetTower2(),
-		Tower2Dist:       original.GetTower2Dist(),
-		Tower3:           original.GetTower3(),
-		Tower3Dist:       original.GetTower3Dist(),
-		Crnti:            original.GetCrnti(),
-		Admitted:         original.GetAdmitted(),
+		Rotation:             original.GetRotation(),
+		ServingTower:         original.GetServingTower(),
+		ServingTowerStrength: original.GetServingTowerStrength(),
+		Tower1:               original.GetTower1(),
+		Tower1Strength:       original.GetTower1Strength(),
+		Tower2:               original.GetTower2(),
+		Tower2Strength:       original.GetTower2Strength(),
+		Tower3:               original.GetTower3(),
+		Tower3Strength:       original.GetTower3Strength(),
+		Crnti:                original.GetCrnti(),
+		Admitted:             original.GetAdmitted(),
 		Metrics: &types.UeMetrics{
 			HoLatency:         original.GetMetrics().GetHoLatency(),
 			HoReportTimestamp: original.GetMetrics().GetHoReportTimestamp(),

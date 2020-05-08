@@ -33,7 +33,8 @@ func Test_GenerateReport(t *testing.T) {
 	assert.Assert(t, ok, "Expected to find Ue-0001")
 	mgr.UserEquipmentsLock.RUnlock()
 
-	msg := generateReport(ue1)
+	msg, err := generateReport(ue1)
+	assert.NilError(t, err)
 	assert.Equal(t, e2.MessageType_RADIO_MEAS_REPORT_PER_UE, msg.GetHdr().MessageType)
 	rmrpu := msg.GetMsg().GetRadioMeasReportPerUE()
 	assert.Assert(t, ok, "Expected msg.S to convert to RadioMeasReportPerUE")
@@ -51,4 +52,24 @@ func Test_GenerateReport(t *testing.T) {
 		}
 	}
 	stopManager(mgr)
+}
+
+func Test_MakeCqi(t *testing.T) {
+
+	testCases := []struct {
+		strength float64
+		cqi      uint32
+	}{
+		{-5, 2},
+		{-4, 3},
+		{-1, 6},
+		{0, 7},
+		{1.0, 8},
+		{1.5, 9},
+		{3.0, 10},
+	}
+
+	for _, tc := range testCases {
+		assert.Equal(t, tc.cqi, makeCqi(tc.strength), "unexpected cqi %d for strength %f", tc.cqi, tc.strength)
+	}
 }

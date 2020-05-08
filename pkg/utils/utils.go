@@ -41,10 +41,10 @@ const TestPlmnID = "315010"
 const ImsiBaseCbrs = types.Imsi(315010999900000)
 
 // RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
-func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float64, aspectRatio float64) types.Point {
+func RandomLatLng(mapCenterLat float64, mapCenterLng float64, radius float64, aspectRatio float64) types.Point {
 	var r = radius
-	y0 := float64(mapCenterLat)
-	x0 := float64(mapCenterLng)
+	y0 := mapCenterLat
+	x0 := mapCenterLng
 
 	u := rand.Float64()
 	v := rand.Float64()
@@ -65,15 +65,15 @@ func RandomLatLng(mapCenterLat float32, mapCenterLng float32, radius float64, as
 /**
  * Rounds number to decimals
  */
-func roundToDecimal(value float64, decimals int) float32 {
+func roundToDecimal(value float64, decimals int) float64 {
 	intValue := value * math.Pow10(decimals)
-	return float32(math.Round(intValue) / math.Pow10(decimals))
+	return math.Round(intValue) / math.Pow10(decimals)
 }
 
 // GetRotationDegrees - get the rotation of the car
 func GetRotationDegrees(pointA *types.Point, pointB *types.Point) float64 {
-	deltaX := float64(pointB.GetLng() - pointA.GetLng())
-	deltaY := float64(pointB.GetLat() - pointA.GetLat())
+	deltaX := pointB.GetLng() - pointA.GetLng()
+	deltaY := pointB.GetLat() - pointA.GetLat()
 
 	return math.Atan2(deltaY, deltaX) * 180 / math.Pi
 }
@@ -146,5 +146,5 @@ func DegreesToRads(degrees float64) float64 {
 
 // AspectRatio - Compensate for the narrowing of meridians at higher latitudes
 func AspectRatio(point *types.Point) float64 {
-	return math.Cos(DegreesToRads(float64(point.Lat)))
+	return math.Cos(DegreesToRads(point.Lat))
 }

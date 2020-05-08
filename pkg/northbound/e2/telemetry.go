@@ -16,6 +16,7 @@ package e2
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
@@ -31,12 +32,17 @@ const e2TelemetryNbi = "e2TelemetryNbi"
 
 const ueChangeChannelLen = 1000
 
-func makeCqi(distance float32, txPowerdB float32) uint32 {
-	cqi := uint32(0.0001 * txPowerdB / (distance * distance))
+// Conversion of signal strength in dB to CQI
+// Here we just map 0 dB to the middle of the scale 0-15 CQI scale
+func makeCqi(strengthdB float64) uint32 {
+	cqi := math.Round(strengthdB) + 7
 	if cqi > 15 {
-		cqi = 15
+		return 15
+	} else if cqi < 0 {
+		return 0
 	}
-	return cqi
+
+	return uint32(cqi)
 }
 
 func (s *Server) radioMeasReportPerUE() error {
@@ -63,11 +69,21 @@ func (s *Server) radioMeasReportPerUE() error {
 		select {
 		case <-s.telemetryTicker.C:
 			ues, err := processUeChange(ueChangeChannel, s.stream)
-			if err != nil || ues == nil {
+			if err != nil {
+				log.Warnf("processUeChange returned error %v", err)
+				continue
+			}
+			if ues == nil {
+				log.Warn("processUeChange returned no ues")
 				continue
 			}
 			for _, ue := range ues {
-				s.indChan <- generateReport(ue)
+				report, err := generateReport(ue)
+				if err != nil {
+					log.Warnf("generateReport returned error %v", err)
+					continue
+				}
+				s.indChan <- report
 			}
 		case <-s.stream.Context().Done():
 			log.Infof("Controller has disconnected on Port %d", s.GetPort())
@@ -98,51 +114,63 @@ func processUeChange(ueChangeChannel chan dispatcher.Event, stream e2ap.E2AP_Ric
 				ues = append(ues, ueUpdate.Object.(*types.Ue))
 			}
 		case <-stream.Context().Done():
-			return nil, fmt.Errorf("Controller has disconnected")
+			return nil, fmt.Errorf("controller has disconnected")
 		}
 	}
 	return ues, nil
 }
 
-func generateReport(ue *types.Ue) e2ap.RicIndication {
+func generateReport(ue *types.Ue) (e2ap.RicIndication, error) {
 	trafficSimMgr := manager.GetManager()
+	if ue == nil {
+		return e2ap.RicIndication{}, fmt.Errorf("ue is empty when generating RicIndication")
+	}
 
 	trafficSimMgr.CellsLock.RLock()
 	defer trafficSimMgr.CellsLock.RUnlock()
 
-	servingTower := trafficSimMgr.Cells[*ue.ServingTower]
-	tower1 := trafficSimMgr.Cells[*ue.Tower1]
-	tower2 := trafficSimMgr.Cells[*ue.Tower2]
-	tower3 := trafficSimMgr.Cells[*ue.Tower3]
-	sTower := trafficSimMgr.Cells[*ue.ServingTower]
+	servingTower, servingOk := trafficSimMgr.Cells[*ue.ServingTower]
+	if !servingOk {
+		return e2ap.RicIndication{}, fmt.Errorf("serving tower not found %s", *ue.ServingTower)
+	}
+	tower1, t1ok := trafficSimMgr.Cells[*ue.Tower1]
+	tower2, t2ok := trafficSimMgr.Cells[*ue.Tower2]
+	tower3, t3ok := trafficSimMgr.Cells[*ue.Tower3]
 
 	reports := make([]*e2.RadioRepPerServCell, 4)
 
 	reports[0] = new(e2.RadioRepPerServCell)
-	sTowerEcgi := toE2Ecgi(sTower.Ecgi)
+	sTowerEcgi := toE2Ecgi(servingTower.Ecgi)
 	reports[0].Ecgi = &sTowerEcgi
 	reports[0].CqiHist = make([]uint32, 1)
-	reports[0].CqiHist[0] = makeCqi(ue.ServingTowerDist, sTower.GetTxPowerdB())
+	reports[0].CqiHist[0] = makeCqi(ue.ServingTowerStrength)
 
-	reports[1] = new(e2.RadioRepPerServCell)
-	tower1Ecgi := toE2Ecgi(tower1.Ecgi)
-	reports[1].Ecgi = &tower1Ecgi
-	reports[1].CqiHist = make([]uint32, 1)
-	reports[1].CqiHist[0] = makeCqi(ue.Tower1Dist, tower1.GetTxPowerdB())
+	if t1ok {
+		reports[1] = new(e2.RadioRepPerServCell)
+		tower1Ecgi := toE2Ecgi(tower1.Ecgi)
+		reports[1].Ecgi = &tower1Ecgi
+		reports[1].CqiHist = make([]uint32, 1)
+		reports[1].CqiHist[0] = makeCqi(ue.Tower1Strength)
+	}
 
-	reports[2] = new(e2.RadioRepPerServCell)
-	tower2Ecgi := toE2Ecgi(tower2.Ecgi)
-	reports[2].Ecgi = &tower2Ecgi
-	reports[2].CqiHist = make([]uint32, 1)
-	reports[2].CqiHist[0] = makeCqi(ue.Tower2Dist, tower2.GetTxPowerdB())
+	if t2ok {
+		reports[2] = new(e2.RadioRepPerServCell)
+		tower2Ecgi := toE2Ecgi(tower2.Ecgi)
+		reports[2].Ecgi = &tower2Ecgi
+		reports[2].CqiHist = make([]uint32, 1)
+		reports[2].CqiHist[0] = makeCqi(ue.Tower2Strength)
+	}
 
-	reports[3] = new(e2.RadioRepPerServCell)
-	tower3Ecgi := toE2Ecgi(tower3.Ecgi)
-	reports[3].Ecgi = &tower3Ecgi
-	reports[3].CqiHist = make([]uint32, 1)
-	reports[3].CqiHist[0] = makeCqi(ue.Tower3Dist, tower3.GetTxPowerdB())
+	if t3ok {
+		reports[3] = new(e2.RadioRepPerServCell)
+		tower3Ecgi := toE2Ecgi(tower3.Ecgi)
+		reports[3].Ecgi = &tower3Ecgi
+		reports[3].CqiHist = make([]uint32, 1)
+		reports[3].CqiHist[0] = makeCqi(ue.Tower3Strength)
+	}
 
-	log.Infof("RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
+	log.Infof("RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)",
+		servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
 		reports[2].CqiHist[0], reports[2].Ecgi.Ecid,
 		reports[3].CqiHist[0], reports[3].Ecgi.Ecid)
@@ -161,5 +189,5 @@ func generateReport(ue *types.Ue) e2ap.RicIndication {
 				},
 			},
 		},
-	}
+	}, nil
 }

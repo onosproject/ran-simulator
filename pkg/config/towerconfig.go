@@ -29,15 +29,15 @@ type Sector struct {
 	Azimuth     uint16     `yaml:"azimuth"`
 	Arc         uint16     `yaml:"arc"`
 	MaxUEs      uint16     `yaml:"maxues"`
-	InitPowerDb float32    `yaml:"initpowerdb"`
+	InitPowerDb float64    `yaml:"initpowerdb"`
 }
 
 // TowersLayout an individual tower with sectors
 type TowersLayout struct {
 	TowerID   string       `yaml:"towerid"`
 	PlmnID    types.PlmnID `yaml:"plmnid"`
-	Latitude  float32      `yaml:"latitude"`
-	Longitude float32      `yaml:"longitude"`
+	Latitude  float64      `yaml:"latitude"`
+	Longitude float64      `yaml:"longitude"`
 	Sectors   []Sector
 }
 

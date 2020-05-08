@@ -52,16 +52,16 @@ func Test_GetRotationDegrees(t *testing.T) {
 		Lng: Pos2Lng,
 	}
 	r1 := GetRotationDegrees(&centre, &p1)
-	assert.Equal(t, float64(45), math.Round(r1), "Unexpected r1")
+	assert.Equal(t, 45.0, math.Round(r1), "Unexpected r1")
 
 	r2 := GetRotationDegrees(&centre, &p2)
-	assert.Equal(t, float64(-136), math.Round(r2), "Unexpected r2")
+	assert.Equal(t, -135.0, math.Round(r2), "Unexpected r2")
 
 	r3 := GetRotationDegrees(&centre, &p3)
-	assert.Equal(t, float64(-45), math.Round(r3), "Unexpected r3")
+	assert.Equal(t, -45.0, math.Round(r3), "Unexpected r3")
 
 	r4 := GetRotationDegrees(&centre, &p4)
-	assert.Equal(t, float64(136), math.Round(r4), "Unexpected r4")
+	assert.Equal(t, 135.0, math.Round(r4), "Unexpected r4")
 }
 
 func Test_RandomColor(t *testing.T) {

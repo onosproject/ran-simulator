@@ -55,7 +55,7 @@ func Test_HandleRrmConfig(t *testing.T) {
 			assert.Assert(t, ok, "Problem converting event object to Tower %v", updateEvent.Object)
 			assert.Equal(t, types.EcID("0001420"), cell.Ecgi.EcID)
 			mgr.CellsLock.RLock()
-			assert.Equal(t, float32(7), cell.GetTxPowerdB())
+			assert.Equal(t, 7.0, cell.GetTxPowerdB())
 			mgr.CellsLock.RUnlock()
 		case <-time.After(time.Millisecond * 100):
 			t.Errorf("Timed out on Test_HandleRrmConfig")
