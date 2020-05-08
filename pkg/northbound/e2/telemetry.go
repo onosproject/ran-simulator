@@ -69,13 +69,19 @@ func (s *Server) radioMeasReportPerUE() error {
 		select {
 		case <-s.telemetryTicker.C:
 			ues, err := processUeChange(ueChangeChannel, s.stream)
-			if err != nil || ues == nil {
+			if err != nil {
+				log.Warnf("processUeChange returned error %v", err)
+				continue
+			}
+			if ues == nil {
+				log.Warn("processUeChange returned no ues")
 				continue
 			}
 			for _, ue := range ues {
 				report, err := generateReport(ue)
 				if err != nil {
-					return err
+					log.Warnf("generateReport returned error %v", err)
+					continue
 				}
 				s.indChan <- report
 			}
@@ -163,7 +169,8 @@ func generateReport(ue *types.Ue) (e2ap.RicIndication, error) {
 		reports[3].CqiHist[0] = makeCqi(ue.Tower3Strength)
 	}
 
-	log.Infof("RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)", servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
+	log.Infof("RadioMeasReport %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)",
+		servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
 		reports[2].CqiHist[0], reports[2].Ecgi.Ecid,
 		reports[3].CqiHist[0], reports[3].Ecgi.Ecid)

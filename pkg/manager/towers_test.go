@@ -42,38 +42,59 @@ func Test_findStrongestTowers(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
 	config.Clear()
-	towerConfig, err := config.GetTowerConfig("berlin-rectangular-9-1.yaml")
+	towerConfig, err := config.GetTowerConfig("berlin-honeycomb-4-3.yaml")
 	assert.NilError(t, err)
 	m.Cells = NewCells(towerConfig)
 
-	assert.Equal(t, 9, len(m.Cells), "Expected 9 towers to have been created")
+	assert.Equal(t, 12, len(m.Cells), "Expected 12 towers to have been created")
 
 	// Test a point outside the towers north-west
-	testPointA := &types.Point{Lat: 52.12345, Lng: -8.123}
+	testPointA := &types.Point{Lat: 52.54, Lng: 13.38}
 	towersA, strengthsA, err := m.findStrongestCells(testPointA)
 	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersA), "Expected 3 tower names in findStrongestCells")
 	assert.Equal(t, 3, len(strengthsA), "Expected 3 tower strengths in findStrongestCells")
 	assert.Assert(t, strengthsA[2] < strengthsA[1], "Expected strength to be less")
 	assert.Assert(t, strengthsA[1] < strengthsA[0], "Expected strength to be less")
+	assert.Assert(t, towersA[0].String() != towersA[1].String())
+	assert.Assert(t, towersA[0].String() != towersA[2].String())
+	assert.Assert(t, towersA[1].String() != towersA[2].String())
+	t.Logf("Cell %s (%f dB), Cell %s (%f dB), Cell %s (%f dB)",
+		towersA[0].EcID, math.Floor(strengthsA[0]*100)/100,
+		towersA[1].EcID, math.Floor(strengthsA[1]*100)/100,
+		towersA[2].EcID, math.Floor(strengthsA[2]*100)/100)
 
 	// Test a point outside the towers south-east
-	testPointB := &types.Point{Lat: 51.7654, Lng: -7.9876}
+	testPointB := &types.Point{Lat: 52.50, Lng: 13.37}
 	towersB, strengthsB, err := m.findStrongestCells(testPointB)
 	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersB), "Expected 3 tower names in findStrongestCells")
 	assert.Equal(t, 3, len(strengthsB), "Expected 3 tower strengths in findStrongestCells")
 	assert.Assert(t, strengthsB[2] < strengthsB[1], "Expected strength to be less")
 	assert.Assert(t, strengthsB[1] < strengthsB[0], "Expected strength to be less")
+	assert.Assert(t, towersB[0].String() != towersB[1].String())
+	assert.Assert(t, towersB[0].String() != towersB[2].String())
+	assert.Assert(t, towersB[1].String() != towersB[2].String())
+	t.Logf("Cell %s (%f dB), Cell %s (%f dB), Cell %s (%f dB)",
+		towersB[0].EcID, math.Floor(strengthsB[0]*100)/100,
+		towersB[1].EcID, math.Floor(strengthsB[1]*100)/100,
+		towersB[2].EcID, math.Floor(strengthsB[2]*100)/100)
 
 	// Test a point within the towers south-east of centre
-	testPointC := &types.Point{Lat: 51.980, Lng: -7.950}
+	testPointC := &types.Point{Lat: 52.50, Lng: 13.43}
 	towersC, strengthsC, err := m.findStrongestCells(testPointC)
 	assert.NilError(t, err)
 	assert.Equal(t, 3, len(towersC), "Expected 3 tower names in findStrongestCells")
 	assert.Equal(t, 3, len(strengthsC), "Expected 3 tower strengths in findStrongestCells")
 	assert.Assert(t, strengthsC[2] < strengthsC[1], "Expected strength to be less")
 	assert.Assert(t, strengthsC[1] < strengthsC[0], "Expected strength to be less")
+	assert.Assert(t, towersC[0].String() != towersC[1].String())
+	assert.Assert(t, towersC[0].String() != towersC[2].String())
+	assert.Assert(t, towersC[1].String() != towersC[2].String())
+	t.Logf("Cell %s (%f dB), Cell %s (%f dB), Cell %s (%f dB)",
+		towersC[0].EcID, math.Floor(strengthsC[0]*100)/100,
+		towersC[1].EcID, math.Floor(strengthsC[1]*100)/100,
+		towersC[2].EcID, math.Floor(strengthsC[2]*100)/100)
 }
 
 func Test_PowerAdjust(t *testing.T) {
@@ -175,7 +196,7 @@ func Test_StrengthToTower1Sector(t *testing.T) {
 			Lat: 52.01,
 			Lng: -8.01,
 		}, cell)
-	assert.Equal(t, -2423.0, math.Round(strength*1e3), "Unexpected strength for single sector tower")
+	assert.Equal(t, -1551.0, math.Round(strength*1e3), "Unexpected strength for single sector tower")
 }
 
 func Test_StrengthToTower2Sectors(t *testing.T) {
@@ -194,7 +215,7 @@ func Test_StrengthToTower2Sectors(t *testing.T) {
 		Lat: 52.01,
 		Lng: -8.01,
 	}, cell)
-	assert.Equal(t, 1045.0, math.Round(strength*1e3), "Unexpected strength for 2 sector tower")
+	assert.Equal(t, -1173.0, math.Round(strength*1e3), "Unexpected strength for 2 sector tower")
 }
 
 func Test_StrengthToTower3Sectors(t *testing.T) {
@@ -214,7 +235,7 @@ func Test_StrengthToTower3Sectors(t *testing.T) {
 			Lat: 52.001, // Much closer
 			Lng: -8.001,
 		}, cell)
-	assert.Equal(t, 8219.0, math.Floor(strength*1e3), "Unexpected strength for 3 sector tower")
+	assert.Equal(t, -2195.0, math.Floor(strength*1e3), "Unexpected strength for 3 sector tower")
 }
 
 func Test_PowerToDist(t *testing.T) {
@@ -248,9 +269,8 @@ func Test_AngularAttenuationWideBeam(t *testing.T) {
 			Lng: 0,
 		},
 		Sector: &types.Sector{
-			Azimuth:  120, // Beam is facing south east
-			Arc:      120, // wide beam
-			Centroid: nil,
+			Azimuth: 120, // Beam is facing south east
+			Arc:     120, // wide beam
 		},
 	}
 
@@ -286,6 +306,17 @@ func Test_AngularAttenuationWideBeam(t *testing.T) {
 
 	dAtt3 := distanceAttenuation(point3, cell)
 	assert.Equal(t, -5312.0, math.Round(dAtt3*1e3))
+
+	// try at 135° - north west - 10:30 o'clock
+	point4 := &types.Point{
+		Lat: 0.02,
+		Lng: -0.02,
+	}
+	att4 := angleAttenuation(point4, cell)
+	assert.Equal(t, -10792.0, math.Round(att4*1e3))
+
+	dAtt4 := distanceAttenuation(point4, cell)
+	assert.Equal(t, -7258.0, math.Round(dAtt4*1e3))
 }
 
 func Test_AngularAttenuationNarrowBeam(t *testing.T) {
@@ -299,9 +330,8 @@ func Test_AngularAttenuationNarrowBeam(t *testing.T) {
 			Lng: 0,
 		},
 		Sector: &types.Sector{
-			Azimuth:  120, // Beam is facing south east
-			Arc:      60,  // narrow beam
-			Centroid: nil,
+			Azimuth: 120, // Beam is facing south east
+			Arc:     60,  // narrow beam
 		},
 	}
 
@@ -337,4 +367,27 @@ func Test_AngularAttenuationNarrowBeam(t *testing.T) {
 
 	dAtt3 := distanceAttenuation(point3, cell)
 	assert.Equal(t, -2302.0, math.Round(dAtt3*1e3))
+}
+
+func Test_centroidPosition(t *testing.T) {
+	cell := &types.Cell{
+		Ecgi: &types.ECGI{
+			EcID:   "test1",
+			PlmnID: utils.TestPlmnID,
+		},
+		Location: &types.Point{
+			Lat: 0,
+			Lng: 0,
+		},
+		Sector: &types.Sector{
+			Azimuth: 120, // Beam is facing south east
+			Arc:     60,  // narrow beam
+		},
+	}
+
+	point := centroidPosition(cell)
+
+	assert.Equal(t, -0.0044563384065730675, point.GetLat())
+	assert.Equal(t, 0.007718604535905087, point.GetLng())
+
 }

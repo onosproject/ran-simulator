@@ -173,7 +173,7 @@ func distanceAttenuation(point *types.Point, cell *types.Cell) float64 {
 func angleAttenuation(point *types.Point, cell *types.Cell) float64 {
 
 	azRads := utils.AzimuthToRads(float64(cell.Sector.Azimuth))
-	pointRads := math.Atan((point.Lat - cell.Location.Lat) / (point.Lng - cell.Location.Lng))
+	pointRads := math.Atan2(point.Lat-cell.Location.Lat, point.Lng-cell.Location.Lng)
 	angularOffset := math.Abs(azRads - pointRads)
 	angleScaling := float64(cell.Sector.Arc) / 120.0 // Compensate for narrower beams
 
