@@ -85,7 +85,6 @@ func NewCells(towersConfig config.TowerConfig) map[types.ECGI]*types.Cell {
 					Azimuth: int32(sector.Azimuth),
 					Arc:     int32(sector.Arc),
 				},
-				ConfigAttributes: make(map[types.ConfigKey]types.ConfigValue),
 			}
 			cell.Sector.Centroid = centroidPosition(cell)
 			cells[ecgi] = cell

@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
+package gnmi
 
-// EcID is a tower ID
-type EcID string
-
-// PlmnID is a network ID
-type PlmnID string
-
-// Crnti is a UE ID relative to a tower
-type Crnti string
-
-// Imsi is a UE unique identifier
-type Imsi uint64
+const (
+	e2nodeIntervalsPdcpMeasReportPerUe    = "/e2node/intervals/PdcpMeasReportPerUe"
+	e2nodeIntervalsRadioMeasReportPerCell = "/e2node/intervals/RadioMeasReportPerCell"
+	e2nodeIntervalsRadioMeasReportPerUe   = "/e2node/intervals/RadioMeasReportPerUe"
+	e2nodeIntervalsSchedMeasReportPerCell = "/e2node/intervals/SchedMeasReportPerCell"
+	e2nodeIntervalsSchedMeasReportPerUe   = "/e2node/intervals/SchedMeasReportPerUe"
+)

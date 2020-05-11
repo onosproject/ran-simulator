@@ -17,6 +17,7 @@ package manager
 
 import (
 	"context"
+	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
 	"sync"
 	"time"
 
@@ -39,6 +40,7 @@ var mgr Manager
 type Manager struct {
 	MapLayout             types.MapLayout
 	Cells                 map[types.ECGI]*types.Cell
+	CellConfigs           map[types.ECGI]*e2node_1_0_0.Device
 	CellsLock             *sync.RWMutex
 	Locations             map[string]*Location
 	Routes                map[types.Imsi]*types.Route
@@ -88,6 +90,14 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 	m.MapLayout = mapLayoutParams
 	m.CellsLock.Lock()
 	m.Cells = NewCells(towerConfig)
+	m.CellConfigs = make(map[types.ECGI]*e2node_1_0_0.Device)
+	for ecgi := range m.Cells {
+		m.CellConfigs[ecgi] = &e2node_1_0_0.Device{
+			E2Node: &e2node_1_0_0.E2Node_E2Node{
+				Intervals: &e2node_1_0_0.E2Node_E2Node_Intervals{},
+			},
+		}
+	}
 	m.CellsLock.Unlock()
 	m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes

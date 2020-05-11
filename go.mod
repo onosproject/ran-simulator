@@ -6,6 +6,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.3
 	github.com/googleapis/gnostic v0.3.0 // indirect
+	github.com/onosproject/config-models/modelplugin/e2node-1.0.0 v0.0.0-20200511074107-7166e3a5247d
 	github.com/onosproject/onos-lib-go v0.6.2
 	github.com/onosproject/onos-ric v0.6.4
 	github.com/onosproject/onos-topo v0.6.0
@@ -19,7 +20,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.6.2
 	go.uber.org/multierr v1.4.0 // indirect
-	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/genproto v0.0.0-20200212174721-66ed5ce911ce // indirect
 	google.golang.org/grpc v1.27.1

@@ -15,55 +15,53 @@
 package gnmi
 
 import (
-	"github.com/openconfig/gnmi/proto/gnmi"
+	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
+	"github.com/onosproject/ran-simulator/api/types"
 	"gotest.tools/assert"
 	"testing"
 )
 
-func Test_TypedValueToBytes(t *testing.T) {
-	dec64Val1 := &gnmi.TypedValue{
-		Value: &gnmi.TypedValue_IntVal{
-			IntVal: 33,
+func setUpCell() (*types.ECGI, *e2node_1_0_0.Device) {
+	ecgi := types.ECGI{
+		EcID:   "315010",
+		PlmnID: "0001420",
+	}
+
+	var (
+		PdcpMeasReportPerUe    uint32 = 21
+		RadioMeasReportPerCell uint32 = 22
+		RadioMeasReportPerUe   uint32 = 23
+		SchedMeasReportPerCell uint32 = 24
+		SchedMeasReportPerUe   uint32 = 25
+	)
+
+	device := e2node_1_0_0.Device{
+		E2Node: &e2node_1_0_0.E2Node_E2Node{
+			Intervals: &e2node_1_0_0.E2Node_E2Node_Intervals{
+				PdcpMeasReportPerUe:    &PdcpMeasReportPerUe,
+				RadioMeasReportPerCell: &RadioMeasReportPerCell,
+				RadioMeasReportPerUe:   &RadioMeasReportPerUe,
+				SchedMeasReportPerCell: &SchedMeasReportPerCell,
+				SchedMeasReportPerUe:   &SchedMeasReportPerUe,
+			},
 		},
 	}
-	bytes, err := gnmiValueToBytes(dec64Val1)
-	assert.NilError(t, err)
-	assert.Equal(t, 2, len(bytes))
-	t.Logf("Bytes %v", bytes)
 
-	decoded, err := bytesToGnmiValue(bytes)
-	assert.NilError(t, err)
-	assert.Equal(t, "int_val:33 ", decoded.String())
+	return &ecgi, &device
 }
 
-func Test_TypedValueToBytes2(t *testing.T) {
-	typedValue := &gnmi.TypedValue{
-		Value: &gnmi.TypedValue_FloatVal{
-			FloatVal: 3.1,
-		},
-	}
-	bytes, err := gnmiValueToBytes(typedValue)
-	assert.NilError(t, err)
-	assert.Equal(t, 5, len(bytes))
-	t.Logf("Bytes %v", bytes)
+func Test_getE2nodeIntervalsPdcpMeasReportPerUe(t *testing.T) {
+	ecgi, device := setUpCell()
 
-	decoded, err := bytesToGnmiValue(bytes)
+	notif, err := getE2nodeIntervalsPdcpMeasReportPerUe(*ecgi, device)
 	assert.NilError(t, err)
-	assert.Equal(t, "float_val:3.1 ", decoded.String())
+	assert.Equal(t, `path:<elem:<name:"e2node" > elem:<name:"intervals" > elem:<name:"PdcpMeasReportPerUe" > > val:<uint_val:21 > `, notif.Update[0].String())
 }
 
-func Test_TypedValueToBytes3(t *testing.T) {
-	typedValue := &gnmi.TypedValue{
-		Value: &gnmi.TypedValue_StringVal{
-			StringVal: "This is a test",
-		},
-	}
-	bytes, err := gnmiValueToBytes(typedValue)
-	assert.NilError(t, err)
-	assert.Equal(t, 16, len(bytes))
-	t.Logf("Bytes %v", bytes)
+func Test_getE2nodeIntervalsPdcpMeasReportPerCell(t *testing.T) {
+	ecgi, device := setUpCell()
 
-	decoded, err := bytesToGnmiValue(bytes)
+	notif, err := getE2nodeIntervalsRadioMeasReportPerCell(*ecgi, device)
 	assert.NilError(t, err)
-	assert.Equal(t, `string_val:"This is a test" `, decoded.String())
+	assert.Equal(t, `path:<elem:<name:"e2node" > elem:<name:"intervals" > elem:<name:"RadioMeasReportPerCell" > > val:<uint_val:22 > `, notif.Update[0].String())
 }

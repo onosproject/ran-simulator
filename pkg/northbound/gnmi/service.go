@@ -54,7 +54,7 @@ type Server struct {
 
 // Capabilities implements gNMI Capabilities
 func (s *Server) Capabilities(ctx context.Context, req *gnmi.CapabilityRequest) (*gnmi.CapabilityResponse, error) {
-	log.Info("gNMI Capabilities requested for %s-%s", s.GetPlmnID(), s.GetEcID())
+	log.Infof("gNMI Capabilities requested for %s-%s", s.GetPlmnID(), s.GetEcID())
 	v, _ := getGNMIServiceVersion()
 	return &gnmi.CapabilityResponse{
 		SupportedModels: []*gnmi.ModelData{
