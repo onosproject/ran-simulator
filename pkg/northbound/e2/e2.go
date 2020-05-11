@@ -22,37 +22,22 @@ import (
 	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/utils"
 	"google.golang.org/grpc"
 )
 
 var log = liblog.GetLogger("northbound", "e2")
 
-// NewTowerServer - start a new gRPC server per tower
-func NewTowerServer(ecgi types.ECGI, port uint16, serverParams utils.ServerParams) error {
-	s := service.NewServer(service.NewServerConfig(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, int16(port), true))
-	s.AddService(Service{
-		port:      int(port),
-		towerEcID: ecgi.EcID,
-		plmnID:    ecgi.PlmnID,
-	})
-
-	return s.Serve(func(started string) {
-		log.Info("Started E2 server on ", started)
-	})
-}
-
 // Service is an implementation of e2 service.
 type Service struct {
 	service.Service
-	port      int
-	towerEcID types.EcID
-	plmnID    types.PlmnID
+	Port      int
+	TowerEcID types.EcID
+	PlmnID    types.PlmnID
 }
 
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
-	server := &Server{port: s.port, towerEcID: s.towerEcID, plmnID: s.plmnID}
+	server := &Server{port: s.Port, towerEcID: s.TowerEcID, plmnID: s.PlmnID}
 	e2ap.RegisterE2APServer(r, server)
 }
 
@@ -67,7 +52,7 @@ type Server struct {
 	telemetryTicker *time.Ticker
 }
 
-// GetPort - expose the port number
+// GetPort - expose the Port number
 func (s *Server) GetPort() int {
 	return s.port
 }

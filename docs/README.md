@@ -9,8 +9,8 @@ routes between different locations.
 The simulator has 2 main gRPC interfaces
 
 1. **trafficsim** - for communicating with the `onos-gui` - this is exposed on port `5150`
-1. **e2** - for communicating to `onos-ric` - there is a separate port opened per
-cell site (tower) starting at port `5152-`
+1. **e2** & **gnmi** - for communicating to `onos-ric` and `onos-config` - there
+is a separate port opened per cell site (tower) starting at port `5152-`
 
 The number and position of towers are defined in a YAML file which is loaded
 at startup - use the `-towerConfigName` param.
@@ -121,6 +121,33 @@ go run github.com/onosproject/ran-simulator/cmd/honeycomb pkg/config/berlin-hone
      --towers 331 --sectors-per-tower 3 -a 52.52 -g 13.405 -i 0.03
 ```
 
+## gNMI access
+Each Cell supports configuration through a [gNMI] interface, according to the YANG
+model [E2Node](https://github.com/onosproject/config-models/tree/master/modelplugin/e2node-1.0.0/yang).
+
+Usually we connect to `onos-config` and allow it to propagate the config changes
+through to each Cell. `onos-config` is aware of the existence of the gNMI interface
+on the Cell, because it is listed in `onos-topo`.
+
+It is also possible to connect directly to the gNMI interface on the Cell e.g. at `ran-simulator:5162`.
+
+For example to do a gNMI Get from inside the `onos-cli` pod - run:
+```bash
+gnmi_cli -get -address ran-simulator:5155 -proto "prefix: <>" -timeout 5s -en PROTO -alsologtostderr -insecure -client_crt /etc/ssl/certs/client1.crt -client_key /etc/ssl/certs/clie
+nt1.key -ca_crt /etc/ssl/certs/onfca.crt
+```
+
+To do a set
+```bash
+gnmi_cli -set -address ran-simulator:5155 \
+-proto "prefix: <elem: <name: 'e2node'> elem: <name: 'intervals'>> update: < path: <elem: <name: 'RadioMeasReportPerUe'>> val: <uint_val: 21>> update: < path: <elem: <name: 'SchedMeasReportPerUe'>> val: <uint_val: 22>>" \
+-timeout 5s -en PROTO -alsologtostderr -insecure \
+-client_crt /etc/ssl/certs/client1.crt -client_key /etc/ssl/certs/client1.key -ca_crt /etc/ssl/certs/onfca.crt
+```
+
+See [onos-config](https://docs.onosproject.org/onos-config/docs/gnmi/) for more
+details on how to install and use the `gnmi_cli` tool.
+
 ## Browser access
 When deployed with the **onos-gui** application, the simulation can be accessed
 from a browser.
@@ -128,3 +155,4 @@ from a browser.
 The [Map View](https://docs.onosproject.org/onos-gui/docs/ran-gui/#map-view) is linked directly to the `ran-simulator`
 
 [Directions API]: https://developers.google.com/maps/documentation/directions/start
+[gNMI]: https://datatracker.ietf.org/meeting/98/materials/slides-98-rtgwg-gnmi-intro-draft-openconfig-rtgwg-gnmi-spec-00

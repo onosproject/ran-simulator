@@ -31,6 +31,7 @@ package main
 import (
 	"flag"
 	"github.com/onosproject/ran-simulator/pkg/config"
+	"github.com/onosproject/ran-simulator/pkg/northbound"
 	"os"
 	"os/signal"
 	"syscall"
@@ -40,7 +41,6 @@ import (
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"github.com/onosproject/ran-simulator/pkg/northbound/e2"
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
 	"github.com/onosproject/ran-simulator/pkg/utils"
@@ -129,7 +129,7 @@ func main() {
 			portNum := sector.GrpcPort
 			go func() {
 				// Blocks here when server running
-				err := e2.NewTowerServer(ecgi, portNum, serverParams)
+				err := northbound.NewCellServer(ecgi, portNum, serverParams)
 				if err != nil {
 					log.Fatal("Unable to start server ", err)
 				}

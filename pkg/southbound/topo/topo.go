@@ -104,9 +104,11 @@ func createCellForTopo(cell *types.Cell) *topodevice.Device {
 		Version:     ranSimVersion,
 		Timeout:     &timeOut,
 		Credentials: topodevice.Credentials{},
-		TLS:         topodevice.TlsConfig{},
-		Type:        ranSimType,
-		Attributes:  cellAttributes,
+		TLS: topodevice.TlsConfig{
+			Insecure: true,
+		},
+		Type:       ranSimType,
+		Attributes: cellAttributes,
 	}
 }
 
