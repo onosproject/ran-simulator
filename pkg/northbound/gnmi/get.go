@@ -34,28 +34,45 @@ func (s *Server) Get(ctx context.Context, req *gnmi.GetRequest) (*gnmi.GetRespon
 	}
 
 	notifications := make([]*gnmi.Notification, 0)
+	prefixPath := utils.StrPath(req.GetPrefix())
+	if prefixPath == "/" {
+		prefixPath = ""
+	}
+	allRequested := true
+	namedAttrs := make(map[string]interface{})
 
-	if req.Path == nil || len(req.Path) == 0 {
-		// return everything that has a value
+	if req.Path != nil && len(req.Path) > 0 {
+		allRequested = false
+		for _, p := range req.GetPath() {
+			namedAttrs[prefixPath+utils.StrPath(p)] = struct{}{}
+		}
+	}
+
+	// return everything that has a value
+	if _, ok := namedAttrs[e2nodeIntervalsPdcpMeasReportPerUe]; ok || allRequested {
 		if notif, err := getE2nodeIntervalsPdcpMeasReportPerUe(s.GetECGI(), cellConfig); err == nil && notif != nil {
 			notifications = append(notifications, notif)
 		}
+	}
+	if _, ok := namedAttrs[e2nodeIntervalsRadioMeasReportPerCell]; ok || allRequested {
 		if notif, err := getE2nodeIntervalsRadioMeasReportPerCell(s.GetECGI(), cellConfig); err == nil && notif != nil {
 			notifications = append(notifications, notif)
 		}
+	}
+	if _, ok := namedAttrs[e2nodeIntervalsRadioMeasReportPerUe]; ok || allRequested {
 		if notif, err := getE2nodeIntervalsRadioMeasReportPerUe(s.GetECGI(), cellConfig); err == nil && notif != nil {
 			notifications = append(notifications, notif)
 		}
+	}
+	if _, ok := namedAttrs[e2nodeIntervalsSchedMeasReportPerCell]; ok || allRequested {
 		if notif, err := getE2nodeIntervalsSchedMeasReportPerCell(s.GetECGI(), cellConfig); err == nil && notif != nil {
 			notifications = append(notifications, notif)
 		}
+	}
+	if _, ok := namedAttrs[e2nodeIntervalsSchedMeasReportPerUe]; ok || allRequested {
 		if notif, err := getE2nodeIntervalsSchedMeasReportPerUe(s.GetECGI(), cellConfig); err == nil && notif != nil {
 			notifications = append(notifications, notif)
 		}
-
-	} else {
-		// TODO: Implement the rest of Get
-		return nil, status.Error(codes.Unimplemented, fmt.Sprintf("gNMI Get not yet supported on Port %d", s.port))
 	}
 
 	response := gnmi.GetResponse{
