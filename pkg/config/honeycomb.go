@@ -33,7 +33,6 @@ func HoneycombGenerator(numTowers uint, sectorsPerTower uint, latitude float64,
 
 	aspectRatio := utils.AspectRatio(&mapCentre)
 	newConfig := TowerConfig{
-		MapCentre:    mapCentre,
 		TowersLayout: make([]TowersLayout, numTowers),
 	}
 	points := hexMesh(float64(pitch), numTowers)

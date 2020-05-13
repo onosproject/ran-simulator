@@ -31,14 +31,14 @@ func setUpManager() (*manager.Manager, error) {
 		return nil, err
 	}
 	mapLayout := types.MapLayout{
-		Center: &towersConfig.MapCentre,
 		Zoom:   12,
 		MinUes: 3,
 	}
 
 	towers := manager.NewCells(towersConfig)
 
-	locations := manager.NewLocations(towersConfig, 5, 1)
+	centre, locations := manager.NewLocations(towersConfig, 5, 1)
+	mapLayout.Center = centre
 
 	mgr, err := manager.NewManager()
 	if err != nil {

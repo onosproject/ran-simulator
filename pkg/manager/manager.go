@@ -99,12 +99,12 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 		}
 	}
 	m.CellsLock.Unlock()
-	m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
+	m.MapLayout.Center, m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes
 	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
 	m.googleAPIKey = routesParams.APIKey
 	// Compensate for the narrowing of meridians at higher latitudes
-	m.AspectRatio = utils.AspectRatio(&towerConfig.MapCentre)
+	m.AspectRatio = utils.AspectRatio(m.MapLayout.Center)
 
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)

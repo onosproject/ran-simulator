@@ -1,6 +1,3 @@
-mapcentre:
-  lat: 42.03243
-  lng: -88.12621
 towerslayout:
 - towerid: Tower-1
   plmnid: "315010"
