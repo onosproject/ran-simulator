@@ -31,29 +31,32 @@ type Location struct {
 }
 
 // NewLocations - create a new set of locations
-func NewLocations(towersConfig config.TowerConfig, maxUEs int, locationsScale float32) map[string]*Location {
+func NewLocations(towersConfig config.TowerConfig, maxUEs int, locationsScale float32) (*types.Point, map[string]*Location) {
 	locations := make(map[string]*Location)
 
-	minLat := towersConfig.MapCentre.GetLat()
-	maxLat := towersConfig.MapCentre.GetLat()
-	minLng := towersConfig.MapCentre.GetLng()
-	maxLng := towersConfig.MapCentre.GetLng()
+	minLat := 90.0
+	maxLat := -90.0
+	minLng := 180.0
+	maxLng := -180.0
 	for _, tower := range towersConfig.TowersLayout {
 		if tower.Latitude < minLat {
 			minLat = tower.Latitude
-		} else if tower.Latitude > maxLat {
+		}
+		if tower.Latitude > maxLat {
 			maxLat = tower.Latitude
 		}
 		if tower.Longitude < minLng {
 			minLng = tower.Longitude
-		} else if tower.Longitude > maxLng {
+		}
+		if tower.Longitude > maxLng {
 			maxLng = tower.Longitude
 		}
 	}
+	centre := types.Point{Lat: minLat + (maxLat-minLat)/2, Lng: minLng + (maxLng-minLng)/2}
 	radius := float64(locationsScale) * math.Hypot(maxLat-minLat, maxLng-minLng) / 2
-	aspectRatio := utils.AspectRatio(&towersConfig.MapCentre)
+	aspectRatio := utils.AspectRatio(&centre)
 	for l := 0; l < (maxUEs * 2); l++ {
-		pos := utils.RandomLatLng(towersConfig.MapCentre.GetLat(), towersConfig.MapCentre.GetLng(),
+		pos := utils.RandomLatLng(centre.GetLat(), centre.GetLng(),
 			radius, aspectRatio)
 		name := fmt.Sprintf("Location-%d", l)
 		loc := Location{
@@ -63,7 +66,7 @@ func NewLocations(towersConfig config.TowerConfig, maxUEs int, locationsScale fl
 		locations[name] = &loc
 	}
 
-	return locations
+	return &centre, locations
 }
 
 func (m *Manager) getRandomLocation(exclude string) (*Location, error) {

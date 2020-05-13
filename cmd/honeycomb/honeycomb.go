@@ -79,7 +79,6 @@ func runHoneycombCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	viper.Set("mapcentre", newConfig.MapCentre)
 	viper.Set("towerslayout", newConfig.TowersLayout)
 	// Set the file name of the configurations file
 	viper.SetConfigName("onos")

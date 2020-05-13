@@ -17,30 +17,34 @@ package manager
 import (
 	"github.com/onosproject/ran-simulator/pkg/config"
 	"gotest.tools/assert"
+	"math"
 	"testing"
 )
 
-func Test_NewLocations(t *testing.T) {
-	towersConfig, err := config.GetTowerConfig("berlin-rectangular-4-1.yaml")
+func Test_NewLocations2(t *testing.T) {
+	towersConfig, err := config.GetTowerConfig("berlin-honeycomb-4-3.yaml")
 	assert.NilError(t, err)
 
-	locations := NewLocations(towersConfig, 30, 0.99)
-
+	centre, locations := NewLocations(towersConfig, 30, 0.99)
+	assert.Equal(t, 5252000.0, math.Round(centre.GetLat()*1e5))
+	assert.Equal(t, 1340500.0, math.Round(centre.GetLng()*1e5))
 	assert.Equal(t, 60, len(locations), "Unexpected number of locations")
 
-	minLat := towersConfig.MapCentre.GetLat()
-	maxLat := towersConfig.MapCentre.GetLat()
-	minLng := towersConfig.MapCentre.GetLng()
-	maxLng := towersConfig.MapCentre.GetLng()
+	minLat := centre.GetLat()
+	maxLat := centre.GetLat()
+	minLng := centre.GetLng()
+	maxLng := centre.GetLng()
 	for _, tower := range towersConfig.TowersLayout {
 		if tower.Latitude < minLat {
 			minLat = tower.Latitude
-		} else if tower.Latitude > maxLat {
+		}
+		if tower.Latitude > maxLat {
 			maxLat = tower.Latitude
 		}
 		if tower.Longitude < minLng {
 			minLng = tower.Longitude
-		} else if tower.Longitude > maxLng {
+		}
+		if tower.Longitude > maxLng {
 			maxLng = tower.Longitude
 		}
 	}

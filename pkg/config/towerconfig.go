@@ -43,7 +43,6 @@ type TowersLayout struct {
 
 // TowerConfig is the ran-simulator configuration
 type TowerConfig struct {
-	MapCentre    types.Point
 	TowersLayout []TowersLayout
 }
 
@@ -68,22 +67,24 @@ func GetTowerConfig(location string) (TowerConfig, error) {
 
 // Checker - check everything is within bounds
 func Checker(config *TowerConfig) error {
-	if config.MapCentre.Lat < -90 || config.MapCentre.Lat > 90 {
-		return fmt.Errorf("map centre latitude outside range -90, 90")
-	}
-	if config.MapCentre.Lng < -180 || config.MapCentre.Lng > 180 {
-		return fmt.Errorf("map centre longitude outside range -180, 180")
-	}
-
-	// Highly unlikely - no cell towers in mid atlantic
-	if config.MapCentre.Lat == 0 && config.MapCentre.Lng == 0 {
-		return fmt.Errorf("map centre invalid: 0,0")
-	}
 
 	ecgis := make(map[string]interface{})
 	grpcports := make(map[uint16]interface{})
 	latlngs := make(map[string]interface{})
 	for _, tower := range config.TowersLayout {
+
+		if tower.Latitude < -90 || tower.Latitude > 90 {
+			return fmt.Errorf("map centre latitude outside range -90, 90")
+		}
+		if tower.Longitude < -180 || tower.Longitude > 180 {
+			return fmt.Errorf("map centre longitude outside range -180, 180")
+		}
+
+		// Highly unlikely - no cell towers in mid atlantic
+		if tower.Latitude == 0 && tower.Longitude == 0 {
+			return fmt.Errorf("map centre invalid: 0,0")
+		}
+
 		latlng := fmt.Sprintf("%f %f", tower.Latitude, tower.Longitude)
 		if _, ok := latlngs[latlng]; ok {
 			return fmt.Errorf("%s lat lng repeated in %s", latlng, tower.TowerID)
