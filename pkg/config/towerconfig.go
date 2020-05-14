@@ -20,9 +20,11 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 )
 
+// Deprecated
 var towerConfig *TowerConfig
 
 // Sector - one side of the tower
+// Deprecated
 type Sector struct {
 	EcID        types.EcID `yaml:"ecid"`
 	GrpcPort    uint16     `yaml:"grpcport"`
@@ -33,6 +35,7 @@ type Sector struct {
 }
 
 // TowersLayout an individual tower with sectors
+// Deprecated
 type TowersLayout struct {
 	TowerID   string       `yaml:"towerid"`
 	PlmnID    types.PlmnID `yaml:"plmnid"`
@@ -42,16 +45,19 @@ type TowersLayout struct {
 }
 
 // TowerConfig is the ran-simulator configuration
+// Deprecated
 type TowerConfig struct {
 	TowersLayout []TowersLayout
 }
 
 // Clear - reset the config - needed for tests
+// Deprecated
 func Clear() {
 	towerConfig = nil
 }
 
 // GetTowerConfig gets the onos-towerConfig configuration
+// Deprecated
 func GetTowerConfig(location string) (TowerConfig, error) {
 	if towerConfig == nil {
 		towerConfig = &TowerConfig{}
@@ -66,6 +72,7 @@ func GetTowerConfig(location string) (TowerConfig, error) {
 }
 
 // Checker - check everything is within bounds
+// Deprecated
 func Checker(config *TowerConfig) error {
 
 	ecgis := make(map[string]interface{})
