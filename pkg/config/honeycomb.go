@@ -16,15 +16,19 @@ package config
 
 import (
 	"fmt"
+	"github.com/onosproject/onos-config/pkg/config/load"
+	topodevice "github.com/onosproject/onos-topo/api/device"
+	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/utils"
+	"github.com/openconfig/gnmi/proto/gnmi"
 	"github.com/pmcxs/hexgrid"
 	"math"
 )
 
-// HoneycombGenerator - used by the cli tool "honeycomb"
-func HoneycombGenerator(numTowers uint, sectorsPerTower uint, latitude float64,
-	longitude float64, plmnid types.PlmnID, ecidStart uint16, portstart uint16, pitch float32) (*TowerConfig, error) {
+// HoneycombTopoGenerator - used by the cli tool "honeycomb"
+func HoneycombTopoGenerator(numTowers uint, sectorsPerTower uint, latitude float64,
+	longitude float64, plmnid types.PlmnID, ecidStart uint16, portstart uint16, pitch float32) (*bulk.DeviceConfig, error) {
 
 	mapCentre := types.Point{
 		Lat: latitude,
@@ -32,41 +36,94 @@ func HoneycombGenerator(numTowers uint, sectorsPerTower uint, latitude float64,
 	}
 
 	aspectRatio := utils.AspectRatio(&mapCentre)
-	newConfig := TowerConfig{
-		TowersLayout: make([]TowersLayout, numTowers),
-	}
+	newTopoConfig := bulk.DeviceConfig{TopoDevices: make([]topodevice.Device, 0)}
+
 	points := hexMesh(float64(pitch), numTowers)
 	var t, s uint
 	for t = 0; t < numTowers; t++ {
-		tower := TowersLayout{
-			TowerID:   fmt.Sprintf("Tower-%d", t+1),
-			PlmnID:    plmnid,
-			Latitude:  latitude + points[t].Lat,
-			Longitude: longitude + points[t].Lng/aspectRatio,
-			Sectors:   make([]Sector, sectorsPerTower),
-		}
 		var azOffset uint = 0
 		if sectorsPerTower == 6 {
 			azOffset = uint(math.Mod(float64(t), 2) * 30)
 		}
 		for s = 0; s < sectorsPerTower; s++ {
+			ecID := types.EcID(fmt.Sprintf("%07x", ecidStart+uint16(t*sectorsPerTower)+uint16(s)))
+			grpcPort := portstart + uint16(t*sectorsPerTower) + uint16(s)
+			topoDevice := topodevice.Device{
+				ID:      topodevice.ID(fmt.Sprintf("%s-%s", string(plmnid), string(ecID))),
+				Address: fmt.Sprintf("ran-simulator:%d", grpcPort),
+				Version: "1.0.0",
+				TLS: topodevice.TlsConfig{
+					Insecure: true,
+				},
+				Type:        "E2Node",
+				Displayname: fmt.Sprintf("Tower %d Cell %d", t, s),
+				Attributes:  make(map[string]string),
+			}
 			azimuth := azOffset
 			if s > 0 {
 				azimuth = 360.0*s/sectorsPerTower + azOffset
 			}
-			sector := Sector{
-				EcID:        types.EcID(fmt.Sprintf("%07x", ecidStart+uint16(t*sectorsPerTower)+uint16(s))),
-				GrpcPort:    portstart + uint16(t*sectorsPerTower) + uint16(s),
-				Azimuth:     uint16(azimuth),
-				Arc:         360.0 / uint16(sectorsPerTower),
-				MaxUEs:      5,
-				InitPowerDb: 10,
-			}
-			tower.Sectors[s] = sector
+			topoDevice.Attributes["azimuth"] = fmt.Sprintf("%d", azimuth)
+			topoDevice.Attributes["arc"] = fmt.Sprintf("%d", 360.0/uint16(sectorsPerTower))
+			topoDevice.Attributes["plmnid"] = string(plmnid)
+			topoDevice.Attributes["ecid"] = string(ecID)
+			topoDevice.Attributes["latitude"] = fmt.Sprintf("%f", latitude+points[t].Lat)
+			topoDevice.Attributes["longitude"] = fmt.Sprintf("%f", longitude+points[t].Lng/aspectRatio)
+			newTopoConfig.TopoDevices = append(newTopoConfig.TopoDevices, topoDevice)
 		}
-		newConfig.TowersLayout[t] = tower
 	}
-	return &newConfig, nil
+	return &newTopoConfig, nil
+}
+
+// HoneycombConfigGenerator - used by the cli tool "honeycomb"
+func HoneycombConfigGenerator(numTowers uint, sectorsPerTower uint, plmnid types.PlmnID,
+	ecidStart uint16) (*load.ConfigGnmiSimple, error) {
+
+	newConfigConfig := load.ConfigGnmiSimple{
+		SetRequest: load.SetRequest{
+			Prefix: &gnmi.Path{
+				Elem: []*gnmi.PathElem{
+					{
+						Name: "e2node",
+					},
+				},
+			},
+			Update:  make([]*load.Update, 0),
+			Replace: make([]*load.Update, 0),
+			Delete:  make([]*gnmi.Path, 0),
+		},
+	}
+	var t, s uint
+	for t = 0; t < numTowers; t++ {
+		for s = 0; s < sectorsPerTower; s++ {
+			ecID := types.EcID(fmt.Sprintf("%07x", ecidStart+uint16(t*sectorsPerTower)+uint16(s)))
+
+			updateRadioMeasReportPerUe := &load.Update{
+				Path: &gnmi.Path{
+					Target: fmt.Sprintf("%s-%s", string(plmnid), string(ecID)),
+					Elem: []*gnmi.PathElem{
+						{Name: "intervals"},
+						{Name: "RadioMeasReportPerUe"},
+					},
+				},
+				Val: &load.TypedValue{UIntValue: &gnmi.TypedValue_UintVal{UintVal: 20}},
+			}
+			newConfigConfig.SetRequest.Update = append(newConfigConfig.SetRequest.Update, updateRadioMeasReportPerUe)
+
+			updateRadioMeasReportPerCell := &load.Update{
+				Path: &gnmi.Path{
+					Target: fmt.Sprintf("%s-%s", string(plmnid), string(ecID)),
+					Elem: []*gnmi.PathElem{
+						{Name: "intervals"},
+						{Name: "RadioMeasReportPerCell"},
+					},
+				},
+				Val: &load.TypedValue{UIntValue: &gnmi.TypedValue_UintVal{UintVal: 21}},
+			}
+			newConfigConfig.SetRequest.Update = append(newConfigConfig.SetRequest.Update, updateRadioMeasReportPerCell)
+		}
+	}
+	return &newConfigConfig, nil
 }
 
 func hexMesh(pitch float64, numTowers uint) []*types.Point {

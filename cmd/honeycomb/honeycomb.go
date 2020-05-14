@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/spf13/cobra"
@@ -34,12 +35,23 @@ func main() {
 
 func getRootCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:           "honeycomb outfile",
-		Short:         "ran-simulator config generation tool",
+		Use:   "honeycomb",
+		Short: "ran-simulator config generation tool",
+	}
+	cmd.AddCommand(getHoneycombTopoCommand())
+	cmd.AddCommand(getHoneycombConfigCommand())
+
+	return cmd
+}
+
+func getHoneycombTopoCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:           "topo outfile",
+		Short:         "ran-simulator config generation tool for onos-topo",
 		SilenceUsage:  false,
 		SilenceErrors: false,
 		Args:          cobra.ExactArgs(1),
-		RunE:          runHoneycombCommand,
+		RunE:          runHoneycombTopoCommand,
 	}
 	cmd.Flags().UintP("towers", "t", 0, "number of towers")
 	_ = cmd.MarkFlagRequired("towers")
@@ -50,11 +62,10 @@ func getRootCommand() *cobra.Command {
 	cmd.Flags().Uint16P("ecidstart", "e", 5152, "Ecid start")
 	cmd.Flags().Uint16P("portstart", "p", 5152, "Port start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
-
 	return cmd
 }
 
-func runHoneycombCommand(cmd *cobra.Command, args []string) error {
+func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	numTowers, _ := cmd.Flags().GetUint("towers")
 	sectorsPerTower, _ := cmd.Flags().GetUint("sectors-per-tower")
 	if sectorsPerTower != 3 && sectorsPerTower != 6 {
@@ -69,17 +80,64 @@ func runHoneycombCommand(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Creating honeycomb array of towers. Towers %d. Sectors: %d\n", numTowers, sectorsPerTower)
 
-	newConfig, err := config.HoneycombGenerator(numTowers, sectorsPerTower, latitude, longitude,
+	newTopo, err := config.HoneycombTopoGenerator(numTowers, sectorsPerTower, latitude, longitude,
 		types.PlmnID(plmnid), ecidStart, portStart, pitch)
 	if err != nil {
 		return err
 	}
-	err = config.Checker(newConfig)
+	err = bulk.Checker(newTopo)
 	if err != nil {
 		return err
 	}
 
-	viper.Set("towerslayout", newConfig.TowersLayout)
+	viper.Set("topodevices", newTopo.TopoDevices)
+	// Set the file name of the configurations file
+	viper.SetConfigName("onos")
+	viper.SetConfigType("yaml")
+	if err := viper.WriteConfigAs(args[0]); err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
+
+	fmt.Printf("Config YAML file written to %s\n", args[0])
+	return nil
+}
+
+func getHoneycombConfigCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:           "config outfile",
+		Short:         "ran-simulator config generation tool for onos-config",
+		SilenceUsage:  false,
+		SilenceErrors: false,
+		Args:          cobra.ExactArgs(1),
+		RunE:          runHoneycombConfigCommand,
+	}
+	cmd.Flags().UintP("towers", "t", 0, "number of towers")
+	_ = cmd.MarkFlagRequired("towers")
+	cmd.Flags().UintP("sectors-per-tower", "s", 3, "sectors per tower (3 or 6)")
+	cmd.Flags().String("plmnid", "315010", "PlmnID")
+	cmd.Flags().Uint16P("ecidstart", "e", 5152, "Ecid start")
+	return cmd
+}
+
+func runHoneycombConfigCommand(cmd *cobra.Command, args []string) error {
+	numTowers, _ := cmd.Flags().GetUint("towers")
+	sectorsPerTower, _ := cmd.Flags().GetUint("sectors-per-tower")
+	if sectorsPerTower != 3 && sectorsPerTower != 6 {
+		return fmt.Errorf("only 3 or 6 are allowed for 'sectors-per-tower'")
+	}
+	plmnid, _ := cmd.Flags().GetString("plmnid")
+	ecidStart, _ := cmd.Flags().GetUint16("ecidstart")
+
+	fmt.Printf("Creating honeycomb array of towers. Towers %d. Sectors: %d\n", numTowers, sectorsPerTower)
+
+	newConfig, err := config.HoneycombConfigGenerator(numTowers, sectorsPerTower,
+		types.PlmnID(plmnid), ecidStart)
+	if err != nil {
+		return err
+	}
+
+	viper.Set("setrequest", newConfig.SetRequest)
 	// Set the file name of the configurations file
 	viper.SetConfigName("onos")
 	viper.SetConfigType("yaml")
