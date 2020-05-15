@@ -15,18 +15,28 @@
 package manager
 
 import (
-	"github.com/onosproject/ran-simulator/pkg/config"
+	"github.com/onosproject/onos-topo/pkg/bulk"
+	"github.com/onosproject/ran-simulator/api/types"
 	"gotest.tools/assert"
 	"math"
 	"testing"
 )
 
 func Test_NewLocations2(t *testing.T) {
-	towersConfig, err := config.GetTowerConfig("berlin-honeycomb-4-3.yaml")
+	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-honeycomb-4-3-topo.yaml")
 	assert.NilError(t, err)
 
-	centre, locations := NewLocations(towersConfig, 30, 0.99)
-	assert.Equal(t, 5252000.0, math.Round(centre.GetLat()*1e5))
+	cells := make(map[types.ECGI]*types.Cell)
+
+	for _, td := range topoDeviceConfig.TopoDevices {
+		td := td //pin
+		cell, err := NewCell(&td)
+		assert.NilError(t, err)
+		cells[*cell.Ecgi] = cell
+	}
+
+	centre, locations := NewLocations(cells, 30, 0.99)
+	assert.Equal(t, 5250268.0, math.Round(centre.GetLat()*1e5))
 	assert.Equal(t, 1340500.0, math.Round(centre.GetLng()*1e5))
 	assert.Equal(t, 60, len(locations), "Unexpected number of locations")
 
@@ -34,18 +44,18 @@ func Test_NewLocations2(t *testing.T) {
 	maxLat := centre.GetLat()
 	minLng := centre.GetLng()
 	maxLng := centre.GetLng()
-	for _, tower := range towersConfig.TowersLayout {
-		if tower.Latitude < minLat {
-			minLat = tower.Latitude
+	for _, c := range cells {
+		if c.GetLocation().GetLat() < minLat {
+			minLat = c.GetLocation().GetLat()
 		}
-		if tower.Latitude > maxLat {
-			maxLat = tower.Latitude
+		if c.GetLocation().GetLat() > maxLat {
+			maxLat = c.GetLocation().GetLat()
 		}
-		if tower.Longitude < minLng {
-			minLng = tower.Longitude
+		if c.GetLocation().GetLng() < minLng {
+			minLng = c.GetLocation().GetLng()
 		}
-		if tower.Longitude > maxLng {
-			maxLng = tower.Longitude
+		if c.GetLocation().GetLng() > maxLng {
+			maxLng = c.GetLocation().GetLng()
 		}
 	}
 

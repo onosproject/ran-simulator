@@ -16,8 +16,13 @@ package manager
 
 import (
 	"fmt"
+	topodevice "github.com/onosproject/onos-topo/api/device"
+	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
 	"math"
 	"sort"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -58,7 +63,168 @@ type CellIf interface {
 	GetPosition() types.Point
 }
 
+// CellCreator - wrap the cell creation function
+func CellCreator(device *topodevice.Device) error {
+	cell, err := NewCell(device)
+	if err != nil {
+		return nil
+	}
+	log.Infof("Cell created %s", cell.Ecgi)
+
+	GetManager().Cells[*cell.Ecgi] = cell
+	GetManager().cellCreateTimer.Reset(time.Second)
+
+	return nil
+}
+
+// CellDeleter - wrap the cell deletion function
+func CellDeleter(device *topodevice.Device) error {
+	ecgi, err := ecgiFromTopoDevice(device)
+	if err != nil {
+		return err
+	}
+
+	log.Infof("Cell deleted %s", ecgi)
+
+	delete(GetManager().Cells, *ecgi)
+	return nil
+}
+
+// NewCell - create a new cell from a topodevice
+func NewCell(device *topodevice.Device) (*types.Cell, error) {
+	ecgi, err := ecgiFromTopoDevice(device)
+	if err != nil {
+		return nil, err
+	}
+
+	var latitude float64
+	if latitudeStr, ok := device.GetAttributes()[types.LatitudeKey]; ok {
+		if latitude, err = strconv.ParseFloat(latitudeStr, 64); err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("device %s does not have 'latitude' in attributes", device.ID)
+	}
+
+	var longitude float64
+	if longitudeStr, ok := device.GetAttributes()[types.LongitudeKey]; ok {
+		if longitude, err = strconv.ParseFloat(longitudeStr, 64); err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("device %s does not have 'longitude' in attributes", device.ID)
+	}
+	cellLoc := types.Point{
+		Lat: latitude,
+		Lng: longitude,
+	}
+
+	var azimuth int64
+	if azimuthStr, ok := device.GetAttributes()[types.AzimuthKey]; ok {
+		if azimuth, err = strconv.ParseInt(azimuthStr, 10, 32); err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("device %s does not have 'azimuth' in attributes", device.ID)
+	}
+
+	var arc int64
+	if arcStr, ok := device.GetAttributes()[types.ArcKey]; ok {
+		if arc, err = strconv.ParseInt(arcStr, 10, 32); err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf("device %s does not have 'arc' in attributes", device.ID)
+	}
+
+	var grpcPort int64
+	if grpcPortStr, ok := device.GetAttributes()[types.GrpcPortKey]; ok {
+		if grpcPort, err = strconv.ParseInt(grpcPortStr, 10, 32); err != nil {
+			return nil, err
+		}
+	} else {
+		// Try to parse it from the address
+		parts := strings.Split(device.GetAddress(), ":")
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("cannot parse address to get port number %s", device.GetAddress())
+		}
+		if grpcPort, err = strconv.ParseInt(parts[1], 10, 32); err != nil {
+			return nil, err
+		}
+	}
+
+	cell := &types.Cell{
+		Location:   &cellLoc,
+		Color:      utils.RandomColor(),
+		Ecgi:       ecgi,
+		TxPowerdB:  DefaultTxPower,
+		Port:       uint32(grpcPort),
+		CrntiMap:   make(map[types.Crnti]types.Imsi),
+		CrntiIndex: 0,
+		Sector: &types.Sector{
+			Azimuth: int32(azimuth),
+			Arc:     int32(arc),
+		},
+	}
+	cell.Sector.Centroid = centroidPosition(cell)
+
+	return cell, nil
+}
+
+func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
+	routesParams RoutesParams, serverParams utils.ServerParams,
+	newServerHandler NewServerHandler) {
+
+	for {
+		<-m.cellCreateTimer.C
+		m.MapLayout.Center, m.Locations = NewLocations(m.Cells,
+			int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
+		log.Infof("Cell creation post action. %d cells. Centre %f, %f",
+			len(GetManager().Cells), m.MapLayout.GetCenter().GetLat(), m.MapLayout.GetCenter().GetLng())
+
+		for _, cell := range m.Cells {
+			cell := cell //pin
+			go func() {
+				// Blocks here when server running
+				err := newServerHandler(*cell.Ecgi, uint16(cell.Port), serverParams)
+				if err != nil {
+					log.Fatal("Unable to start server ", err)
+				}
+			}()
+		}
+
+		if serverParams.AddK8sSvcPorts {
+			allGrpcPorts := make([]uint16, 0)
+			for _, cell := range m.Cells {
+				cell := cell //pin
+				allGrpcPorts = append(allGrpcPorts, uint16(cell.Port))
+			}
+			err := kubernetes.AddK8SServicePorts(allGrpcPorts)
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+		}
+
+		// Only start after 3 cells and if not started before
+		if len(m.Cells) > 3 && len(m.Routes) == 0 {
+			var err error
+			m.Routes, err = m.NewRoutes(mapLayoutParams, routesParams)
+			if err != nil {
+				log.Fatalf("Error calculating routes %s", err.Error())
+			}
+			m.UserEquipments, err = m.NewUserEquipments(mapLayoutParams, routesParams)
+			if err != nil {
+				log.Fatalf("Error creating new UEs %s", err.Error())
+			}
+			go m.startMoving(routesParams)
+		} else if len(m.Cells) <= 3 {
+			log.Warnf("Not creating UEs - must have 3 or more cells. Currently %d", m.Cells)
+		}
+	}
+}
+
 // NewCells - create a set of new Cells
+// Deprecated
 func NewCells(towersConfig config.TowerConfig) map[types.ECGI]*types.Cell {
 	cells := make(map[types.ECGI]*types.Cell)
 
@@ -322,6 +488,39 @@ func makeNeighbors(self *types.Cell, allCells map[types.ECGI]*types.Cell) []*typ
 	return neighbours
 }
 
+func ecgiFromTopoDevice(device *topodevice.Device) (*types.ECGI, error) {
+	var ecid types.EcID
+	if ecidStr, ok := device.GetAttributes()[types.EcidKey]; ok {
+		ecid = types.EcID(ecidStr)
+	}
+	var plmnid types.PlmnID
+	if plmnidStr, ok := device.GetAttributes()[types.PlmnIDKey]; ok {
+		plmnid = types.PlmnID(plmnidStr)
+	}
+	var ecgi types.ECGI
+	var err error
+	if ecid == "" || plmnid == "" { // If not found in attrs above use ID
+		if ecgi, err = ecgiFromTopoID(device.GetID()); err != nil {
+			return nil, err
+		}
+	} else {
+		ecgi = types.ECGI{PlmnID: plmnid, EcID: ecid}
+	}
+	return &ecgi, nil
+}
+
 func newEcgi(id types.EcID, plmnID types.PlmnID) types.ECGI {
 	return types.ECGI{EcID: id, PlmnID: plmnID}
+}
+
+// ecgiFromTopoID topo device is formatted like "315010-0001786" PlmnId-Ecid
+func ecgiFromTopoID(id topodevice.ID) (types.ECGI, error) {
+	if !strings.Contains(string(id), "-") {
+		return types.ECGI{}, fmt.Errorf("unexpected format for E2Node ID %s", id)
+	}
+	parts := strings.Split(string(id), "-")
+	if len(parts) != 2 {
+		return types.ECGI{}, fmt.Errorf("unexpected format for E2Node ID %s", id)
+	}
+	return types.ECGI{EcID: types.EcID(parts[1]), PlmnID: types.PlmnID(parts[0])}, nil
 }

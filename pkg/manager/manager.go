@@ -27,7 +27,6 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
@@ -36,13 +35,16 @@ var log = logging.GetLogger("manager")
 
 var mgr Manager
 
+// NewServerHandler a call back function to avoid import cycle
+type NewServerHandler func(ecgi types.ECGI, port uint16, serverParams utils.ServerParams) error
+
 // Manager single point of entry for the trafficsim system.
 type Manager struct {
 	MapLayout             types.MapLayout
 	Cells                 map[types.ECGI]*types.Cell
 	CellConfigs           map[types.ECGI]*e2node_1_0_0.Device
 	CellsLock             *sync.RWMutex
-	Locations             map[string]*Location
+	Locations             map[LocationID]*Location
 	Routes                map[types.Imsi]*types.Route
 	UserEquipments        map[types.Imsi]*types.Ue
 	UserEquipmentsLock    *sync.RWMutex
@@ -56,6 +58,7 @@ type Manager struct {
 	ResetMetricsChannel   chan bool
 	TopoClient            device.DeviceServiceClient
 	AspectRatio           float64
+	cellCreateTimer       *time.Timer
 }
 
 // MetricsParams for the Prometheus exporter
@@ -77,19 +80,20 @@ func NewManager() (*Manager, error) {
 		CellsChannel:          make(chan dispatcher.Event),
 		LatencyChannel:        make(chan metrics.HOEvent),
 		ResetMetricsChannel:   make(chan bool),
+		cellCreateTimer:       time.NewTimer(time.Second),
 	}
 	return &mgr, nil
 }
 
 // Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerConfig,
-	routesParams RoutesParams, topoEndpoint string, serverParams utils.ServerParams,
-	metricsParams MetricsParams) {
+func (m *Manager) Run(mapLayoutParams types.MapLayout, routesParams RoutesParams,
+	topoEndpoint string, serverParams utils.ServerParams,
+	metricsParams MetricsParams, newServerHandler NewServerHandler) {
 	log.Infof("Starting Manager with %v %v", mapLayoutParams, routesParams)
 
 	m.MapLayout = mapLayoutParams
 	m.CellsLock.Lock()
-	m.Cells = NewCells(towerConfig)
+	m.Cells = make(map[types.ECGI]*types.Cell)
 	m.CellConfigs = make(map[types.ECGI]*e2node_1_0_0.Device)
 	for ecgi := range m.Cells {
 		m.CellConfigs[ecgi] = &e2node_1_0_0.Device{
@@ -99,7 +103,8 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 		}
 	}
 	m.CellsLock.Unlock()
-	m.MapLayout.Center, m.Locations = NewLocations(towerConfig, int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
+	m.MapLayout.Center = &types.Point{}
+	m.Locations = make(map[LocationID]*Location)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes
 	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
 	m.googleAPIKey = routesParams.APIKey
@@ -110,22 +115,22 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, towerConfig config.TowerC
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
 	go m.Dispatcher.ListenCellEvents(m.CellsChannel)
 
-	var err error
-	m.Routes, err = m.NewRoutes(mapLayoutParams, routesParams)
-	if err != nil {
-		log.Fatalf("Error calculating routes %s", err.Error())
-	}
-	m.UserEquipments, err = m.NewUserEquipments(mapLayoutParams, routesParams)
-	if err != nil {
-		log.Fatalf("Error creating new UEs %s", err.Error())
-	}
-	go m.startMoving(routesParams)
+	m.Routes = make(map[types.Imsi]*types.Route)
+	m.UserEquipments = make(map[types.Imsi]*types.Ue)
 
 	go metrics.RunHOExposer(int(metricsParams.Port), m.LatencyChannel, metricsParams.ExportAllHOEvents, m.ResetMetricsChannel)
 
+	go m.afterCellCreation(mapLayoutParams, routesParams, serverParams, newServerHandler)
+
 	ctx := context.Background()
-	m.TopoClient = topo.ConnectToTopo(ctx, topoEndpoint, serverParams)
-	go topo.SyncToTopo(ctx, &m.TopoClient, m.Cells)
+
+	go func() {
+		var err error
+		m.TopoClient, err = topo.ConnectToTopo(ctx, topoEndpoint, serverParams, CellCreator, CellDeleter)
+		if err != nil {
+			log.Fatalf("Error connecting to onos-topo %v", err)
+		}
+	}()
 }
 
 //Close kills the channels and manager related objects
@@ -134,7 +139,6 @@ func (m *Manager) Close() {
 		log.Warnf("Unable to set number of UEs to 0 %s", err.Error())
 	}
 
-	go topo.RemoveFromTopo(context.Background(), &m.TopoClient, m.Cells)
 	time.Sleep(time.Second) // Wait for topo, but don't hang around if it can't be done
 	close(m.CellsChannel)
 	close(m.UeChannel)

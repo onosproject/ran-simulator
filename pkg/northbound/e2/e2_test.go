@@ -15,8 +15,8 @@
 package e2
 
 import (
+	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
@@ -26,7 +26,7 @@ func setUpManager() (*manager.Manager, error) {
 		StepDelay: 1000,
 	}
 
-	towersConfig, err := config.GetTowerConfig("berlin-rectangular-4-1.yaml")
+	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-rectangular-4-1-topo.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -35,9 +35,17 @@ func setUpManager() (*manager.Manager, error) {
 		MinUes: 3,
 	}
 
-	towers := manager.NewCells(towersConfig)
+	cells := make(map[types.ECGI]*types.Cell)
 
-	centre, locations := manager.NewLocations(towersConfig, 5, 1)
+	for _, td := range topoDeviceConfig.TopoDevices {
+		td := td //pin
+		cell, err := manager.NewCell(&td)
+		if err != nil {
+			return nil, err
+		}
+		cells[*cell.Ecgi] = cell
+	}
+	centre, locations := manager.NewLocations(cells, 5, 1)
 	mapLayout.Center = centre
 
 	mgr, err := manager.NewManager()
@@ -46,7 +54,7 @@ func setUpManager() (*manager.Manager, error) {
 	}
 	mgr.MapLayout = mapLayout
 	mgr.CellsLock.Lock()
-	mgr.Cells = towers
+	mgr.Cells = cells
 	mgr.CellsLock.Unlock()
 	mgr.Locations = locations
 
