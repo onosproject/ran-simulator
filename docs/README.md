@@ -1,32 +1,24 @@
 # Ran Simulator
 
 The Ran Simulator is part of µONOS and is meant to work alongside `onos-ric` and
-`onos-gui`.
+`onos-gui`, `onos-topo` and `onos-config`.
 
 The simulator mimics a collection of Cell Towers and a set of UE's moving along
 routes between different locations.
 
-The simulator has 2 main gRPC interfaces
+The simulator has 2 main gRPC interfaces:
 
 1. **trafficsim** - for communicating with the `onos-gui` - this is exposed on port `5150`
 1. **e2** & **gnmi** - for communicating to `onos-ric` and `onos-config` - there
-is a separate port opened per cell site (tower) starting at port `5152-`
+is a separate port opened per cell site (tower) usually starting at port `5152-`
 
-The number and position of towers are defined in a YAML file which is loaded
-at startup - use the `-towerConfigName` param.
+The number and position of towers is got from `onos-topo`. By default no towers
+are present in `onos-topo` when it is started from new. When a device (with type
+**E2Node** and version **1.0.0**) is created in `onos-topo`, the `ran-simulator`
+detects it and will:
 
-This can be changed as a value in the Helm chart at deploy time
-e.g. `--set towerConfigName=berlin-honeycomb-169-6.yaml`
-
-> After startup the number of towers cannot be changed.
-
-
-As towers are created at startup, updates are made to:
-
-1. **onos-topo** - a `device` is added to `onos-topo` per cell site (tower), with
-an address including the cell-site port number.
-1. **Kubernetes API** - the `ran-simulator` service is expanded after startup with
-the port numbers added per cell site.
+1. Create a gRPC server exposing E2 and gNMI interfaces for the specified **gnmiport**.
+1. call on the **Kubernetes API** to open the **gnmiport**.
 
 > For the Kubernetes service to be manipulated like this, the 'update' RBAC permission
 > has to be given to the `ran-simulator` pod. This is done through the Helm Chart
@@ -83,8 +75,6 @@ Usage of trafficsim:
     	delay between steps on route (default 1000)
   -topoEndpoint string
     	Endpoint for the onos-topo service (default "onos-topo:5150")
-  -towerConfigName string
-    	the name of a tower configuration (default "berlin-honeycomb-169-6.yaml")
   -zoom float
     	The starting Zoom level (default 13)
 ```
@@ -98,27 +88,46 @@ Usage of trafficsim:
 
 See [deployment.md](deployment.md) for how to change these for a Kubernetes deployment.
 
-## Creating the tower configuration files
+## Creating the tower/cell configuration files
 The YAML files can be created by hand, or by application. There is an
-application to create towers in a honeycomb (hexagonal) layout.
+application to create towers with sectors in a honeycomb (hexagonal) layout.
 
-Sample configurations are supplied with the build and stored in `/etc/onos/config`
+Sample outputs from this tool are in
+[ran-simulator/pkg/config](https://github.com/onosproject/ran-simulator/tree/master/pkg/config).
 
-> These are copied from [https://github.com/onosproject/ran-simulator/tree/master/pkg/config](https://github.com/onosproject/ran-simulator/tree/master/pkg/config)
-> at build time.
->
-> If a new layout is required that's not in the build, it can be mounted through
-> the Helm chart with a "ConfigMap" that mounts at `/etc/onos/config`
+> The sample configurations can be copied over to the `onos-cli` pod and run from there
+> with the `kubectl cp` command.
 
-To run the tool, first get it with:
+There are 2 types of file:
+
+1. *-topo.yaml files - these can be loaded in to `onos-topo` using the `onos-cli`
+command
+    1. like `onos topo load yaml <filename>-topo.yaml`
+1. *-gnmi.yaml files - these can be loaded in to `onos-config` using the `onos-cli`
+command
+    1. like `onos config load yaml <filename>-gnmi.yaml`
+
+To run the **honeycomb** generation tool, first get it with:
 ```bash
 go get github.com/onosproject/ran-simulator/cmd/honeycomb
 ```
 
-and run it like:
+and run it (for topo) like:
 ```bash
-go run github.com/onosproject/ran-simulator/cmd/honeycomb pkg/config/berlin-honeycomb-331-3.yaml \
+go run github.com/onosproject/ran-simulator/cmd/honeycomb topo pkg/config/berlin-honeycomb-331-3-topo.yaml \
      --towers 331 --sectors-per-tower 3 -a 52.52 -g 13.405 -i 0.03
+```
+
+### Adding devices individually
+Individual cells can be added to `onos-topo` using the `onos topo add device` but
+be aware that the Type must be "E2Node", the version "1.0.0" and the 6 attributes must
+be added "plmnid", "ecid", "longitude", "latitude", "azimuth" & "arc", or else the
+topo device will be ignored.
+
+```
+onos topo add device 315010-0001234 -a ran-simulator:4660 -t E2Node -v 1.0.0 \
+--insecure -d "New Tower" --attributes ecid=0001234 --attributes plmnid=315010 --attributes azimuth=0 \
+--attributes arc=120 --attributes grpcport=4660 --attributes latitude=52.468038 --attributes longitude=13.355697
 ```
 
 ## gNMI access

@@ -61,7 +61,8 @@ func (s *Server) radioMeasReportPerUE() error {
 	go s.waitForConfig(configDone)
 	<-configDone
 
-	s.telemetryTicker = time.NewTicker(time.Duration(s.l2MeasConfig.RadioMeasReportPerUe) * time.Millisecond)
+	// TODO replace this 500 value with a value from onos-config received on gnmi
+	s.telemetryTicker = time.NewTicker(time.Duration(500) * time.Millisecond)
 
 	log.Infof("Listening for changes on UEs with ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
 
@@ -74,7 +75,7 @@ func (s *Server) radioMeasReportPerUE() error {
 				continue
 			}
 			if ues == nil {
-				log.Warn("processUeChange returned no ues")
+				//log.Warn("processUeChange returned no ues")
 				continue
 			}
 			for _, ue := range ues {

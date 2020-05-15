@@ -26,7 +26,6 @@ import (
 
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 )
@@ -63,7 +62,7 @@ type CellIf interface {
 	GetPosition() types.Point
 }
 
-// CellCreator - wrap the cell creation function
+// CellCreator - wrap the NewCell function
 func CellCreator(device *topodevice.Device) error {
 	cell, err := NewCell(device)
 	if err != nil {
@@ -71,8 +70,12 @@ func CellCreator(device *topodevice.Device) error {
 	}
 	log.Infof("Cell created %s", cell.Ecgi)
 
-	GetManager().Cells[*cell.Ecgi] = cell
-	GetManager().cellCreateTimer.Reset(time.Second)
+	mgr := GetManager()
+	mgr.Cells[*cell.Ecgi] = cell
+	mgr.cellCreateTimer.Reset(time.Second)
+	// If no new cells have been created in the last second, then
+	// afterCellCreation below gets run. This allows bulk changes to be handled
+	// together
 
 	return nil
 }
@@ -84,9 +87,16 @@ func CellDeleter(device *topodevice.Device) error {
 		return err
 	}
 
-	log.Infof("Cell deleted %s", ecgi)
+	mgr := GetManager()
+	// TODO stop the gRPC server for this cell
 
-	delete(GetManager().Cells, *ecgi)
+	mgr.CellsLock.Lock()
+	defer mgr.CellsLock.Unlock()
+
+	delete(mgr.CellConfigs, *ecgi)
+	delete(mgr.Cells, *ecgi)
+
+	log.Infof("Cell deleted %s", ecgi)
 	return nil
 }
 
@@ -176,7 +186,7 @@ func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
 	newServerHandler NewServerHandler) {
 
 	for {
-		<-m.cellCreateTimer.C
+		<-m.cellCreateTimer.C // 1 second after cell(s) have been loaded
 		m.MapLayout.Center, m.Locations = NewLocations(m.Cells,
 			int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
 		log.Infof("Cell creation post action. %d cells. Centre %f, %f",
@@ -188,7 +198,7 @@ func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
 				// Blocks here when server running
 				err := newServerHandler(*cell.Ecgi, uint16(cell.Port), serverParams)
 				if err != nil {
-					log.Fatal("Unable to start server ", err)
+					log.Error("Unable to start server ", err)
 				}
 			}()
 		}
@@ -203,6 +213,11 @@ func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
 			if err != nil {
 				log.Fatal(err.Error())
 			}
+		}
+
+		for _, cell := range m.Cells {
+			cell := cell //pin
+			cell.Neighbors = makeNeighbors(cell, m.Cells)
 		}
 
 		// Only start after 3 cells and if not started before
@@ -221,48 +236,6 @@ func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
 			log.Warnf("Not creating UEs - must have 3 or more cells. Currently %d", m.Cells)
 		}
 	}
-}
-
-// NewCells - create a set of new Cells
-// Deprecated
-func NewCells(towersConfig config.TowerConfig) map[types.ECGI]*types.Cell {
-	cells := make(map[types.ECGI]*types.Cell)
-
-	for _, tower := range towersConfig.TowersLayout {
-		towerLoc := types.Point{
-			Lat: tower.Latitude,
-			Lng: tower.Longitude,
-		}
-		for _, sector := range tower.Sectors {
-			ecgi := types.ECGI{
-				PlmnID: tower.PlmnID,
-				EcID:   sector.EcID,
-			}
-			cell := &types.Cell{
-				Location:   &towerLoc,
-				Color:      utils.RandomColor(),
-				Ecgi:       &ecgi,
-				MaxUEs:     uint32(sector.MaxUEs),
-				TxPowerdB:  sector.InitPowerDb,
-				Port:       uint32(sector.GrpcPort),
-				CrntiMap:   make(map[types.Crnti]types.Imsi),
-				CrntiIndex: 0,
-				Sector: &types.Sector{
-					Azimuth: int32(sector.Azimuth),
-					Arc:     int32(sector.Arc),
-				},
-			}
-			cell.Sector.Centroid = centroidPosition(cell)
-			cells[ecgi] = cell
-		}
-	}
-
-	// go through again and update neighbours, now that all centroids have been calculated
-	for _, cell := range cells {
-		cell.Neighbors = makeNeighbors(cell, cells)
-	}
-
-	return cells
 }
 
 // Find the strongest power signal cell to any point - return strongest, candidate1 and candidate2

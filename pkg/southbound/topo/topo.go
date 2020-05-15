@@ -75,6 +75,7 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string,
 		}
 		switch in.Type {
 		case topodevice.ListResponse_NONE:
+		case topodevice.ListResponse_ADDED:
 			err := createHandler(in.GetDevice())
 			if err != nil {
 				log.Warnf("Unable to create cell from %s. %s", in.GetDevice().GetID(), err.Error())

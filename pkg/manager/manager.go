@@ -80,6 +80,11 @@ func NewManager() (*Manager, error) {
 		CellsChannel:          make(chan dispatcher.Event),
 		LatencyChannel:        make(chan metrics.HOEvent),
 		ResetMetricsChannel:   make(chan bool),
+		Cells:                 make(map[types.ECGI]*types.Cell),
+		CellConfigs:           make(map[types.ECGI]*e2node_1_0_0.Device),
+		Locations:             make(map[LocationID]*Location),
+		Routes:                make(map[types.Imsi]*types.Route),
+		UserEquipments:        make(map[types.Imsi]*types.Ue),
 		cellCreateTimer:       time.NewTimer(time.Second),
 	}
 	return &mgr, nil
@@ -93,8 +98,6 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, routesParams RoutesParams
 
 	m.MapLayout = mapLayoutParams
 	m.CellsLock.Lock()
-	m.Cells = make(map[types.ECGI]*types.Cell)
-	m.CellConfigs = make(map[types.ECGI]*e2node_1_0_0.Device)
 	for ecgi := range m.Cells {
 		m.CellConfigs[ecgi] = &e2node_1_0_0.Device{
 			E2Node: &e2node_1_0_0.E2Node_E2Node{
@@ -104,7 +107,6 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, routesParams RoutesParams
 	}
 	m.CellsLock.Unlock()
 	m.MapLayout.Center = &types.Point{}
-	m.Locations = make(map[LocationID]*Location)
 	m.MapLayout.MinUes = mapLayoutParams.MinUes
 	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
 	m.googleAPIKey = routesParams.APIKey
@@ -114,9 +116,6 @@ func (m *Manager) Run(mapLayoutParams types.MapLayout, routesParams RoutesParams
 	go m.Dispatcher.ListenUeEvents(m.UeChannel)
 	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
 	go m.Dispatcher.ListenCellEvents(m.CellsChannel)
-
-	m.Routes = make(map[types.Imsi]*types.Route)
-	m.UserEquipments = make(map[types.Imsi]*types.Ue)
 
 	go metrics.RunHOExposer(int(metricsParams.Port), m.LatencyChannel, metricsParams.ExportAllHOEvents, m.ResetMetricsChannel)
 
