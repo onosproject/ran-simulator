@@ -171,6 +171,7 @@ func NewCell(device *topodevice.Device) (*types.Cell, error) {
 		Port:       uint32(grpcPort),
 		CrntiMap:   make(map[types.Crnti]types.Imsi),
 		CrntiIndex: 0,
+		MaxUEs:     5,
 		Sector: &types.Sector{
 			Azimuth: int32(azimuth),
 			Arc:     int32(arc),
@@ -187,6 +188,9 @@ func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
 
 	for {
 		<-m.cellCreateTimer.C // 1 second after cell(s) have been loaded
+		if len(m.Cells) == 0 {
+			continue
+		}
 		m.MapLayout.Center, m.Locations = NewLocations(m.Cells,
 			int(mapLayoutParams.MaxUes), mapLayoutParams.LocationsScale)
 		log.Infof("Cell creation post action. %d cells. Centre %f, %f",
@@ -216,7 +220,7 @@ func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
 		}
 
 		for _, cell := range m.Cells {
-			cell := cell //pin
+			//cell := cell //pin
 			cell.Neighbors = makeNeighbors(cell, m.Cells)
 		}
 
@@ -233,7 +237,7 @@ func (m *Manager) afterCellCreation(mapLayoutParams types.MapLayout,
 			}
 			go m.startMoving(routesParams)
 		} else if len(m.Cells) <= 3 {
-			log.Warnf("Not creating UEs - must have 3 or more cells. Currently %d", m.Cells)
+			log.Warnf("Not creating UEs - must have 3 or more cells. Currently %d", len(m.Cells))
 		}
 	}
 }
