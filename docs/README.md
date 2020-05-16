@@ -117,6 +117,10 @@ and run it (for topo) like:
 go run github.com/onosproject/ran-simulator/cmd/honeycomb topo pkg/config/berlin-honeycomb-331-3-topo.yaml \
      --towers 331 --sectors-per-tower 3 -a 52.52 -g 13.405 -i 0.03
 ```
+or for config run it like:
+```bash
+go run github.com/onosproject/ran-simulator/cmd/honeycomb config pkg/config/berlin-honeycomb-331-3-gnmi.yaml -t 331 -s 3
+```
 
 ### Adding devices individually
 Individual cells can be added to `onos-topo` using the `onos topo add device` but

@@ -79,7 +79,7 @@ func UpdateControlMetrics(imsi types.Imsi) {
 	var ok bool
 	var ue *types.Ue
 	if ue, ok = trafficSimMgr.UserEquipments[imsi]; !ok {
-		log.Errorf("ue %s not found", imsi)
+		log.Errorf("ue %d not found", imsi)
 		trafficSimMgr.UserEquipmentsMapLock.RUnlock()
 		return
 	}

@@ -150,12 +150,13 @@ func (s *Server) handleHORequest(req *e2.HORequest) error {
 			imsi, err := m.CrntiToName(types.Crnti(crnti), s.GetECGI())
 			if err != nil {
 				log.Error(err)
-				log.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, crnti)
+				continue
 			}
 			UpdateControlMetrics(imsi)
 			err = m.UeHandover(imsi, &targetEcgi)
 			if err != nil {
 				log.Error(err)
+				continue
 			}
 		} else if s.GetECGI().EcID == targetEcgi.EcID && s.GetECGI().PlmnID == targetEcgi.PlmnID {
 			log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
