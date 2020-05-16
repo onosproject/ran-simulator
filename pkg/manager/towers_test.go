@@ -15,9 +15,9 @@
 package manager
 
 import (
+	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"gotest.tools/assert"
 	"math"
@@ -26,10 +26,17 @@ import (
 )
 
 func Test_NewTowers(t *testing.T) {
-	config.Clear()
-	towerConfig, err := config.GetTowerConfig("berlin-honeycomb-4-3.yaml")
+	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-honeycomb-4-3-topo.yaml")
 	assert.NilError(t, err)
-	cells := NewCells(towerConfig)
+
+	cells := make(map[types.ECGI]*types.Cell)
+
+	for _, td := range topoDeviceConfig.TopoDevices {
+		td := td //pin
+		cell, err := NewCell(&td)
+		assert.NilError(t, err)
+		cells[*cell.Ecgi] = cell
+	}
 
 	assert.Equal(t, 12, len(cells), "Expected 12 cells to have been created")
 	for _, cell := range cells {
@@ -40,11 +47,20 @@ func Test_NewTowers(t *testing.T) {
 
 func Test_findStrongestTowers(t *testing.T) {
 	m, err := NewManager()
-	assert.NilError(t, err, "Unexpected error creating manager")
-	config.Clear()
-	towerConfig, err := config.GetTowerConfig("berlin-honeycomb-4-3.yaml")
 	assert.NilError(t, err)
-	m.Cells = NewCells(towerConfig)
+	bulk.Clear()
+	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-honeycomb-4-3-topo.yaml")
+	assert.NilError(t, err)
+
+	cells := make(map[types.ECGI]*types.Cell)
+
+	for _, td := range topoDeviceConfig.TopoDevices {
+		td := td //pin
+		cell, err := NewCell(&td)
+		assert.NilError(t, err)
+		cells[*cell.Ecgi] = cell
+	}
+	m.Cells = cells
 
 	assert.Equal(t, 12, len(m.Cells), "Expected 12 towers to have been created")
 
@@ -100,11 +116,19 @@ func Test_findStrongestTowers(t *testing.T) {
 func Test_PowerAdjust(t *testing.T) {
 	m, err := NewManager()
 	assert.NilError(t, err, "Unexpected error creating manager")
-
-	config.Clear()
-	towerConfig, err := config.GetTowerConfig("berlin-rectangular-1-1.yaml")
+	bulk.Clear()
+	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-rectangular-4-1-topo.yaml")
 	assert.NilError(t, err)
-	m.Cells = NewCells(towerConfig)
+
+	cells := make(map[types.ECGI]*types.Cell)
+
+	for _, td := range topoDeviceConfig.TopoDevices {
+		td := td //pin
+		cell, err := NewCell(&td)
+		assert.NilError(t, err)
+		cells[*cell.Ecgi] = cell
+	}
+	m.Cells = cells
 
 	go func() {
 		for event := range m.CellsChannel {
@@ -112,7 +136,7 @@ func Test_PowerAdjust(t *testing.T) {
 		}
 	}()
 
-	assert.Equal(t, 1, len(m.Cells), "Expected 1 tower to have been created")
+	assert.Equal(t, 4, len(m.Cells), "Expected 4 towers to have been created")
 	towerID1420 := newEcgi("0001420", utils.TestPlmnID)
 	err = m.UpdateCell(towerID1420, -6) // subtracted from initial 10dB
 	assert.NilError(t, err, "Unexpected response from adjusting power")
@@ -131,17 +155,26 @@ func Test_PowerAdjust(t *testing.T) {
 	assert.Equal(t, 30.0, tower1.TxPowerdB, "unexpected value for tower power")
 
 	///////// Try with wrong name /////////////////////
-	towerID1421 := newEcgi("0001421", utils.TestPlmnID)
-	err = m.UpdateCell(towerID1421, -3)
-	assert.Error(t, err, "unknown cell {0001421 315010}", "Expected an error for wrong name when adjusting power")
+	towerID1431 := newEcgi("0001431", utils.TestPlmnID)
+	err = m.UpdateCell(towerID1431, -3)
+	assert.Error(t, err, "unknown cell {0001431 315010}", "Expected an error for wrong name when adjusting power")
 
 	time.Sleep(time.Millisecond * 100)
 }
 
 func Test_MakeNeighbors(t *testing.T) {
-	config.Clear()
-	towerConfig, err := config.GetTowerConfig("berlin-rectangular-9-1.yaml")
+	bulk.Clear()
+	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-rectangular-9-1-topo.yaml")
 	assert.NilError(t, err)
+
+	cells := make(map[types.ECGI]*types.Cell)
+
+	for _, td := range topoDeviceConfig.TopoDevices {
+		td := td //pin
+		cell, err := NewCell(&td)
+		assert.NilError(t, err)
+		cells[*cell.Ecgi] = cell
+	}
 
 	// 1420 --- 1421 --- 1422
 	//   |        |        |
@@ -150,10 +183,9 @@ func Test_MakeNeighbors(t *testing.T) {
 	// 1426 --- 1427 --- 1428
 	// tower num 2 is the top right - it's id is "0001422"
 	cell2Ecgi := types.ECGI{
-		EcID:   towerConfig.TowersLayout[2].Sectors[0].EcID,
-		PlmnID: towerConfig.TowersLayout[2].PlmnID,
+		EcID:   types.EcID(topoDeviceConfig.TopoDevices[2].Attributes[types.EcidKey]),
+		PlmnID: types.PlmnID(topoDeviceConfig.TopoDevices[2].Attributes[types.PlmnIDKey]),
 	}
-	cells := NewCells(towerConfig)
 	// The neighbors are already calculated in the above, but we do it
 	// explicitly here
 	neighborIDs := makeNeighbors(cells[cell2Ecgi], cells)
@@ -163,8 +195,8 @@ func Test_MakeNeighbors(t *testing.T) {
 
 	// tower num 4 is the middle - it's id is "0001424"
 	cell4Ecgi := types.ECGI{
-		EcID:   towerConfig.TowersLayout[4].Sectors[0].EcID,
-		PlmnID: towerConfig.TowersLayout[4].PlmnID,
+		EcID:   types.EcID(topoDeviceConfig.TopoDevices[4].Attributes[types.EcidKey]),
+		PlmnID: types.PlmnID(topoDeviceConfig.TopoDevices[4].Attributes[types.PlmnIDKey]),
 	}
 	neighborIDs4 := makeNeighbors(cells[cell4Ecgi], cells)
 	assert.Equal(t, 6, len(neighborIDs4), "Unexpected number of neighbors for 1424")

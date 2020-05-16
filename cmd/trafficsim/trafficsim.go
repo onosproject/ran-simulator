@@ -30,7 +30,6 @@ package main
 
 import (
 	"flag"
-	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/northbound"
 	"os"
 	"os/signal"
@@ -42,7 +41,6 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/onosproject/ran-simulator/pkg/northbound/trafficsim"
-	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 )
 
@@ -66,15 +64,10 @@ func main() {
 	metricsAllHoEvents := flag.Bool("metricsAllHoEvents", true, "Export all HO events in metrics (only historgram if false)")
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
 	addK8sSvcPorts := flag.Bool("addK8sSvcPorts", true, "Add K8S service ports per tower")
-	towerConfigName := flag.String("towerConfigName", "berlin-honeycomb-4-3.yaml", "the name of a tower configuration")
+	// TODO - remove the following - only after it's been removed from the Helm chart
+	flag.String("towerConfigName", "", "unused - config is got from topo")
 
 	flag.Parse()
-
-	towersConfig, err := config.GetTowerConfig(*towerConfigName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Infof("Loaded config. %s. %d towers", *towerConfigName, len(towersConfig.TowersLayout))
 
 	mapLayoutParams := types.MapLayout{
 		Zoom:           float32(*zoom),
@@ -109,37 +102,11 @@ func main() {
 	}
 
 	serverParams := utils.ServerParams{
-		CaPath:       *caPath,
-		KeyPath:      *keyPath,
-		CertPath:     *certPath,
-		TopoEndpoint: *topoEndpoint,
-	}
-
-	allGrpcPorts := make([]uint16, 0)
-	for _, tower := range towersConfig.TowersLayout {
-		for _, sector := range tower.Sectors {
-			allGrpcPorts = append(allGrpcPorts, sector.GrpcPort)
-			log.Warnf("Handling Sector %s %s %d %d %d", tower.TowerID, sector.EcID, sector.GrpcPort, sector.Azimuth, sector.Arc)
-			ecgi := types.ECGI{
-				EcID:   sector.EcID,
-				PlmnID: tower.PlmnID,
-			}
-			portNum := sector.GrpcPort
-			go func() {
-				// Blocks here when server running
-				err := northbound.NewCellServer(ecgi, portNum, serverParams)
-				if err != nil {
-					log.Fatal("Unable to start server ", err)
-				}
-			}()
-		}
-	}
-	// Add these new ports to the K8s service
-	if *addK8sSvcPorts {
-		err := kubernetes.AddK8SServicePorts(allGrpcPorts)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
+		CaPath:         *caPath,
+		KeyPath:        *keyPath,
+		CertPath:       *certPath,
+		TopoEndpoint:   *topoEndpoint,
+		AddK8sSvcPorts: *addK8sSvcPorts,
 	}
 
 	metricsParams := manager.MetricsParams{
@@ -153,7 +120,7 @@ func main() {
 		log.Fatal("Unable to load trafficsim ", err)
 		return
 	}
-	mgr.Run(mapLayoutParams, towersConfig, routesParams, *topoEndpoint, serverParams, metricsParams)
+	mgr.Run(mapLayoutParams, routesParams, *topoEndpoint, serverParams, metricsParams, northbound.NewCellServer)
 
 	sigs := make(chan os.Signal, 1)
 	shutdown := make(chan bool, 1)

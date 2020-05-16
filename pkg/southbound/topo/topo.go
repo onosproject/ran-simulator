@@ -16,7 +16,6 @@ package topo
 
 import (
 	"context"
-	"fmt"
 	"github.com/onosproject/onos-lib-go/pkg/certs"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/southbound"
@@ -24,20 +23,23 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"google.golang.org/grpc"
-	"time"
-)
-
-const (
-	ranSimVersion    = "1.0.0"
-	ranSimType       = "E2Node"
-	ranSimTimeoutSec = 5
+	"io"
 )
 
 var log = logging.GetLogger("southbound", "topo")
 
+// CellCreationHandler a call back function to avoid import cycle
+type CellCreationHandler func(device *topodevice.Device) error
+
+// CellDeletionHandler a call back function to avoid import cycle
+type CellDeletionHandler func(device *topodevice.Device) error
+
 // ConnectToTopo is a go function that listens for the connection of onos-topo and
-// updates the list of Cell instances on it
-func ConnectToTopo(ctx context.Context, topoEndpoint string, serverParams utils.ServerParams) topodevice.DeviceServiceClient {
+// listens out for Cell instances on it
+func ConnectToTopo(ctx context.Context, topoEndpoint string,
+	serverParams utils.ServerParams, createHandler CellCreationHandler,
+	deleteHandler CellDeletionHandler) (topodevice.DeviceServiceClient, error) {
+
 	log.Infof("Connecting to ONOS Topo...%s", topoEndpoint)
 	// Attempt to create connection to the Topo
 	opts, err := certs.HandleCertPaths(serverParams.CaPath, serverParams.KeyPath, serverParams.CertPath, true)
@@ -49,69 +51,44 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string, serverParams utils.
 	if err != nil {
 		log.Fatal("Failed to connect to %s. Retry. %s", topoEndpoint, err)
 	}
-	return topodevice.NewDeviceServiceClient(conn)
-}
 
-// SyncToTopo updates the list of Cell instances on it
-// Will block until topo comes available
-func SyncToTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient, cells map[types.ECGI]*types.Cell) {
-
-	for _, t := range cells {
-		topoDevice := createCellForTopo(t)
-		resp, err := (*topoClient).Add(ctx, &topodevice.AddRequest{Device: topoDevice})
+	topoClient := topodevice.NewDeviceServiceClient(conn)
+	stream, err := topoClient.List(context.Background(), &topodevice.ListRequest{Subscribe: true})
+	if err != nil {
+		return nil, err
+	}
+	for {
+		in, err := stream.Recv() // Block here and wait for events from topo
+		if err == io.EOF {
+			// read done.
+			return nil, nil
+		}
 		if err != nil {
-			log.Warnf("Could not add %s to onos-topo %s", topoCellID(t.GetEcgi()), err.Error())
+			return nil, err
+		}
+		if in.GetDevice().GetType() != types.E2NodeType {
 			continue
 		}
-		if resp.GetDevice().ID != topodevice.ID(topoCellID(t.GetEcgi())) {
-			log.Errorf("Unexpected response from topo when adding %s. %v",
-				topoCellID(t.GetEcgi()), resp)
-		}
-	}
-	log.Infof("%d cell devices created on onos-topo", len(cells))
-}
-
-// RemoveFromTopo - on shutdown delete the cells from topo
-func RemoveFromTopo(ctx context.Context, topoClient *topodevice.DeviceServiceClient, cells map[types.ECGI]*types.Cell) {
-	for _, c := range cells {
-		topoDevice := &topodevice.Device{
-			ID: topodevice.ID(topoCellID(c.GetEcgi())),
-		}
-		_, err := (*topoClient).Remove(ctx, &topodevice.RemoveRequest{Device: topoDevice})
-		if err != nil {
-			log.Warnf("Could not remove %s to onos-topo %s", topoCellID(c.GetEcgi()), err.Error())
+		if in.GetDevice().GetVersion() != types.E2NodeVersion100 {
+			log.Warnf("Only version %s of %s is supported", types.E2NodeVersion100, types.E2NodeType)
 			continue
 		}
-		log.Infof("Removed %s from topo", topoCellID(c.GetEcgi()))
+		switch in.Type {
+		case topodevice.ListResponse_NONE:
+		case topodevice.ListResponse_ADDED:
+			err := createHandler(in.GetDevice())
+			if err != nil {
+				log.Warnf("Unable to create cell from %s. %s", in.GetDevice().GetID(), err.Error())
+				continue
+			}
+		case topodevice.ListResponse_REMOVED:
+			err := deleteHandler(in.GetDevice())
+			if err != nil {
+				log.Warnf("Unable to delete cell from %s. %s", in.GetDevice().GetID(), err.Error())
+				continue
+			}
+		default:
+			log.Warnf("topo event type %s not yet handled for %s", in.Type, in.Device.ID)
+		}
 	}
-}
-
-// createCellForTopo -- prepare the cell to be added to onos-topo
-func createCellForTopo(cell *types.Cell) *topodevice.Device {
-	timeOut := time.Second * ranSimTimeoutSec
-	serviceEndpoint := fmt.Sprintf("%s:%d", utils.ServiceName, cell.GetPort())
-
-	cellAttributes := make(map[string]string)
-	cellAttributes["longitude"] = fmt.Sprintf("%f", cell.GetLocation().GetLng())
-	cellAttributes["latitude"] = fmt.Sprintf("%f", cell.GetLocation().GetLat())
-	cellAttributes["azimuth"] = fmt.Sprintf("%d", cell.GetSector().GetAzimuth())
-	cellAttributes["arc"] = fmt.Sprintf("%d", cell.GetSector().GetArc())
-	cellAttributes["createdby"] = utils.ServiceName
-
-	return &topodevice.Device{
-		ID:          topodevice.ID(topoCellID(cell.GetEcgi())),
-		Address:     serviceEndpoint,
-		Version:     ranSimVersion,
-		Timeout:     &timeOut,
-		Credentials: topodevice.Credentials{},
-		TLS: topodevice.TlsConfig{
-			Insecure: true,
-		},
-		Type:       ranSimType,
-		Attributes: cellAttributes,
-	}
-}
-
-func topoCellID(cellID *types.ECGI) string {
-	return fmt.Sprintf("%s-%s", cellID.PlmnID, cellID.EcID)
 }

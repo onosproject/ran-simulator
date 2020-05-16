@@ -37,11 +37,12 @@ type Service struct {
 
 // Register registers the e2 Service with the gRPC server.
 func (s Service) Register(r *grpc.Server) {
-	server := &Server{port: s.Port, towerEcID: s.TowerEcID, plmnID: s.PlmnID}
+	server := &Server{port: s.Port, towerEcID: s.TowerEcID, plmnID: s.PlmnID,
+		l2MeasConfig: e2.L2MeasConfig{RadioMeasReportPerUe: e2.L2MeasReportInterval_MS_500}}
 	e2ap.RegisterE2APServer(r, server)
 }
 
-// Server implements the TrafficSim gRPC service for administrative facilities.
+// Server implements the E2 gRPC service for administrative facilities.
 type Server struct {
 	port            int
 	towerEcID       types.EcID

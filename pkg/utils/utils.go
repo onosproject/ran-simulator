@@ -22,10 +22,11 @@ import (
 
 // ServerParams - params to start a new server
 type ServerParams struct {
-	CaPath       string
-	KeyPath      string
-	CertPath     string
-	TopoEndpoint string
+	CaPath         string
+	KeyPath        string
+	CertPath       string
+	TopoEndpoint   string
+	AddK8sSvcPorts bool
 }
 
 // GrpcBasePort - the base port for trafficsim - other e2 ports are stepped from this

@@ -72,13 +72,9 @@ func (s *Server) ricControlRequest() {
 		}
 		switch in.Hdr.MessageType {
 		case e2.MessageType_CELL_CONFIG_REQUEST:
-			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_CellConfigRequest); ok {
-				err = s.handleCellConfigRequest(x.CellConfigRequest)
-				if err != nil {
-					log.Error(err)
-				}
-			} else {
-				log.Fatalf("Unexpected payload in MessageType_HO_REQUEST %v", in)
+			err = s.handleCellConfigRequest()
+			if err != nil {
+				log.Error(err)
 			}
 		case e2.MessageType_HO_REQUEST:
 			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_HORequest); ok {
@@ -154,12 +150,13 @@ func (s *Server) handleHORequest(req *e2.HORequest) error {
 			imsi, err := m.CrntiToName(types.Crnti(crnti), s.GetECGI())
 			if err != nil {
 				log.Error(err)
-				log.Errorf("handleHORequest: ue %s/%s not found", req.EcgiS.Ecid, crnti)
+				continue
 			}
 			UpdateControlMetrics(imsi)
 			err = m.UeHandover(imsi, &targetEcgi)
 			if err != nil {
 				log.Error(err)
+				continue
 			}
 		} else if s.GetECGI().EcID == targetEcgi.EcID && s.GetECGI().PlmnID == targetEcgi.PlmnID {
 			log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
@@ -169,28 +166,28 @@ func (s *Server) handleHORequest(req *e2.HORequest) error {
 	return nil
 }
 
-func (s *Server) handleCellConfigRequest(req *e2.CellConfigRequest) error {
+func (s *Server) handleCellConfigRequest() error {
 	log.Infof("handleCellConfigRequest on Port %d", s.GetPort())
 
 	trafficSimMgr := manager.GetManager()
 	trafficSimMgr.CellsLock.RLock()
-	tower, ok := trafficSimMgr.Cells[s.GetECGI()]
+	cell, ok := trafficSimMgr.Cells[s.GetECGI()]
 	if !ok {
 		log.Warnf("Tower %s not found for handleCellConfigRequest on Port %d", s.GetECGI(), s.GetPort())
 		trafficSimMgr.CellsLock.RUnlock()
 		return nil
 	}
-	cells := make([]*e2.CandScell, 0, 8)
-	for _, neighbor := range tower.Neighbors {
-		t := trafficSimMgr.Cells[*neighbor]
-		e2Ecgi := toE2Ecgi(t.Ecgi)
-		cell := e2.CandScell{
-			Ecgi: &e2Ecgi,
+	nCells := make([]*e2.CandScell, 0, 8)
+	for _, neighbor := range cell.Neighbors {
+		nc := trafficSimMgr.Cells[*neighbor]
+		ncEcgi := toE2Ecgi(nc.Ecgi)
+		nCell := e2.CandScell{
+			Ecgi: &ncEcgi,
 		}
-		cells = append(cells, &cell)
+		nCells = append(nCells, &nCell)
 	}
 	trafficSimMgr.CellsLock.RUnlock()
-	e2Ecgi := toE2Ecgi(tower.Ecgi)
+	e2Ecgi := toE2Ecgi(cell.Ecgi)
 	cellConfigReport := e2ap.RicIndication{
 		Hdr: &e2sm.RicIndicationHeader{
 			MessageType: e2.MessageType_CELL_CONFIG_REPORT,
@@ -199,15 +196,15 @@ func (s *Server) handleCellConfigRequest(req *e2.CellConfigRequest) error {
 			S: &e2sm.RicIndicationMessage_CellConfigReport{
 				CellConfigReport: &e2.CellConfigReport{
 					Ecgi:               &e2Ecgi,
-					MaxNumConnectedUes: tower.MaxUEs,
-					CandScells:         cells,
+					MaxNumConnectedUes: cell.MaxUEs,
+					CandScells:         nCells,
 				},
 			},
 		},
 	}
 
 	s.indChan <- cellConfigReport
-	log.Infof("handleCellConfigReport eci: %v", tower.Ecgi)
+	log.Infof("handleCellConfigReport eci: %s. CCR %v", cell.GetEcgi().String(), cellConfigReport)
 
 	return nil
 }

@@ -51,11 +51,11 @@ func HoneycombTopoGenerator(numTowers uint, sectorsPerTower uint, latitude float
 			topoDevice := topodevice.Device{
 				ID:      topodevice.ID(fmt.Sprintf("%s-%s", string(plmnid), string(ecID))),
 				Address: fmt.Sprintf("ran-simulator:%d", grpcPort),
-				Version: "1.0.0",
+				Version: types.E2NodeVersion100,
 				TLS: topodevice.TlsConfig{
 					Insecure: true,
 				},
-				Type:        "E2Node",
+				Type:        types.E2NodeType,
 				Displayname: fmt.Sprintf("Tower %d Cell %d", t, s),
 				Attributes:  make(map[string]string),
 			}
@@ -63,12 +63,13 @@ func HoneycombTopoGenerator(numTowers uint, sectorsPerTower uint, latitude float
 			if s > 0 {
 				azimuth = 360.0*s/sectorsPerTower + azOffset
 			}
-			topoDevice.Attributes["azimuth"] = fmt.Sprintf("%d", azimuth)
-			topoDevice.Attributes["arc"] = fmt.Sprintf("%d", 360.0/uint16(sectorsPerTower))
-			topoDevice.Attributes["plmnid"] = string(plmnid)
-			topoDevice.Attributes["ecid"] = string(ecID)
-			topoDevice.Attributes["latitude"] = fmt.Sprintf("%f", latitude+points[t].Lat)
-			topoDevice.Attributes["longitude"] = fmt.Sprintf("%f", longitude+points[t].Lng/aspectRatio)
+			topoDevice.Attributes[types.AzimuthKey] = fmt.Sprintf("%d", azimuth)
+			topoDevice.Attributes[types.ArcKey] = fmt.Sprintf("%d", 360.0/uint16(sectorsPerTower))
+			topoDevice.Attributes[types.PlmnIDKey] = string(plmnid)
+			topoDevice.Attributes[types.EcidKey] = string(ecID)
+			topoDevice.Attributes[types.LatitudeKey] = fmt.Sprintf("%f", latitude+points[t].Lat)
+			topoDevice.Attributes[types.LongitudeKey] = fmt.Sprintf("%f", longitude+points[t].Lng/aspectRatio)
+			topoDevice.Attributes[types.GrpcPortKey] = fmt.Sprintf("%d", grpcPort)
 			newTopoConfig.TopoDevices = append(newTopoConfig.TopoDevices, topoDevice)
 		}
 	}

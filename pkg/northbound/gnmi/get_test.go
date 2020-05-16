@@ -16,8 +16,8 @@ package gnmi
 
 import (
 	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
+	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/config"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/openconfig/gnmi/proto/gnmi"
 	"golang.org/x/net/context"
@@ -26,16 +26,23 @@ import (
 )
 
 func setUpCell() (*manager.Manager, error) {
-	towerConfig, err := config.GetTowerConfig("berlin-honeycomb-4-3.yaml")
+	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-honeycomb-4-3-topo.yaml")
 	if err != nil {
 		return nil, err
 	}
-
 	mgr, err := manager.NewManager()
 	if err != nil {
 		return nil, err
 	}
-	mgr.Cells = manager.NewCells(towerConfig)
+
+	for _, td := range topoDeviceConfig.TopoDevices {
+		td := td //pin
+		cell, err := manager.NewCell(&td)
+		if err != nil {
+			return nil, err
+		}
+		mgr.Cells[*cell.Ecgi] = cell
+	}
 	mgr.CellConfigs = make(map[types.ECGI]*e2node_1_0_0.Device)
 
 	var (
