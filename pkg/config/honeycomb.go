@@ -17,6 +17,7 @@ package config
 import (
 	"fmt"
 	"github.com/onosproject/onos-config/pkg/config/load"
+	cfggnmi "github.com/onosproject/onos-config/pkg/northbound/gnmi"
 	topodevice "github.com/onosproject/onos-topo/api/device"
 	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -123,6 +124,17 @@ func HoneycombConfigGenerator(numTowers uint, sectorsPerTower uint, plmnid types
 			}
 			newConfigConfig.SetRequest.Update = append(newConfigConfig.SetRequest.Update, updateRadioMeasReportPerCell)
 		}
+	}
+
+	newConfigConfig.SetRequest.Extension = []*load.Extension{
+		{
+			ID:    cfggnmi.GnmiExtensionVersion,
+			Value: types.E2NodeVersion100,
+		},
+		{
+			ID:    cfggnmi.GnmiExtensionDeviceType,
+			Value: types.E2NodeType,
+		},
 	}
 	return &newConfigConfig, nil
 }

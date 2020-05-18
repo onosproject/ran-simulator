@@ -1,834 +1,204 @@
 setrequest:
   prefix:
-    element: []
-    origin: ""
     elem:
     - name: e2node
-      key: {}
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
-    target: ""
-    xxx_nounkeyedliteral: {}
-    xxx_unrecognized: []
-    xxx_sizecache: 0
   delete: []
   replace: []
   update:
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001420
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001420
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001421
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001421
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001422
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001422
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001423
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001423
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001424
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001424
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001425
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001425
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001426
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001426
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001427
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001427
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001428
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001428
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001429
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-0001429
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-000142a
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-000142a
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerUe
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-000142b
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 20
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
   - path:
-      element: []
-      origin: ""
       elem:
       - name: intervals
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       - name: RadioMeasReportPerCell
-        key: {}
-        xxx_nounkeyedliteral: {}
-        xxx_unrecognized: []
-        xxx_sizecache: 0
       target: 315010-000142b
-      xxx_nounkeyedliteral: {}
-      xxx_unrecognized: []
-      xxx_sizecache: 0
     val:
-      stringvalue: null
-      intvalue: null
       uintvalue:
         uintval: 21
-      boolvalue: null
-      bytesvalue: null
-      floatvalue: null
-      decimalvalue: null
-      leaflistvalue: null
-      anyvalue: null
-      jsonvalue: null
-      jsonietfvalue: null
-      asciivalue: null
-      protobytes: null
-    duplicates: 0
-  extension: []
+  extension:
+  - id: 101
+    value: 1.0.0
+  - id: 102
+    value: E2Node

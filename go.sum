@@ -203,6 +203,7 @@ github.com/docker/distribution v0.0.0-20191216044856-a8371794149d/go.mod h1:0+TT
 github.com/docker/distribution v2.7.1+incompatible/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/docker v0.7.3-0.20190327010347-be7ac8be2ae0/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/docker/docker v1.4.2-0.20200203170920-46ec8731fbce/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
+github.com/docker/docker v1.13.1 h1:IkZjBSIc8hBjLpqeAbeE5mca5mNgeatLHBy3GO78BWo=
 github.com/docker/docker v1.13.1/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/docker/docker-credential-helpers v0.6.3/go.mod h1:WRaJzqw3CTB9bk10avuGsjVBZsD05qeibJ1/TYlvc0Y=
 github.com/docker/go-connections v0.4.0/go.mod h1:Gbd7IOopHjR8Iph03tsViu4nIes5XhDvyHbTtUxmeec=
@@ -466,14 +467,17 @@ github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f/go.mod h1:ZdcZmHo+
 github.com/ncw/swift v1.0.47/go.mod h1:23YIA4yWVnGwv2dQlN4bB7egfYX6YLn0Yo/S6zZO/ZM=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
+github.com/onosproject/config-models/modelplugin/devicesim-1.0.0 v0.0.0-20200303111912-723f2289d4c2 h1:axUinnbVSkQL3mwiHo8quasbtX0tSND3HRgbCnPFq70=
 github.com/onosproject/config-models/modelplugin/devicesim-1.0.0 v0.0.0-20200303111912-723f2289d4c2/go.mod h1:fnlrrfeXk6J57vIQ329fnNiOVCCeja9JzTaldVUb1cg=
 github.com/onosproject/config-models/modelplugin/e2node-1.0.0 v0.0.0-20200511074107-7166e3a5247d h1:jYd2Hvvgymn+zsNeDPaEv4qr1ecbIEHMwbkMHMpHHqQ=
 github.com/onosproject/config-models/modelplugin/e2node-1.0.0 v0.0.0-20200511074107-7166e3a5247d/go.mod h1:407kda6Vngy5HedD29O0r/wznX+TFn+gvDwgWtV4XiM=
+github.com/onosproject/config-models/modelplugin/testdevice-1.0.0 v0.0.0-20200303111912-723f2289d4c2 h1:z885fAIiyK0nwhJcXzsLDa5eoLkQQMblj4KD5TVKVbg=
 github.com/onosproject/config-models/modelplugin/testdevice-1.0.0 v0.0.0-20200303111912-723f2289d4c2/go.mod h1:WNjaBJ0e2gl1y7uu45AXmKCI0oxgCqSftha+FGMJ2JE=
+github.com/onosproject/config-models/modelplugin/testdevice-2.0.0 v0.0.0-20200304144136-6992f473b240 h1:sI0zCRmIsUjpYf0MpgEsK2YLBpXcB4ynPHamoFybRGU=
 github.com/onosproject/config-models/modelplugin/testdevice-2.0.0 v0.0.0-20200304144136-6992f473b240/go.mod h1:kHe1VPG+H+ow9IQYy5DW4qLxZsT3yVSc+3aGrO0KuVY=
 github.com/onosproject/helmit v0.6.0/go.mod h1:ZvjMu26Kd19hCHzkpnUH1Zgv/htt7iZbPG1EsFXBlhc=
-github.com/onosproject/onos-config v0.6.2-0.20200514144633-a75fce1a2d6a h1:vg6GaUZ+duf71pa69DkN0V3Et5+c0emEOa6cXORGuPM=
-github.com/onosproject/onos-config v0.6.2-0.20200514144633-a75fce1a2d6a/go.mod h1:qvWyavnsbJPj5jrUtR0P9voi0ykHsA6N11tKkI1dvcA=
+github.com/onosproject/onos-config v0.6.2-0.20200518063903-172d1be96afe h1:KEptaOdHrx3P7Eya7uPgbBK0hX5YVMgE7oAUhdIwcR0=
+github.com/onosproject/onos-config v0.6.2-0.20200518063903-172d1be96afe/go.mod h1:qvWyavnsbJPj5jrUtR0P9voi0ykHsA6N11tKkI1dvcA=
 github.com/onosproject/onos-lib-go v0.6.0 h1:P0Te4gYgaC2s9WBzx+n9WoLu7k2kwzAmbWz5CmIEk+M=
 github.com/onosproject/onos-lib-go v0.6.0/go.mod h1:MBoPR4BPGajt9CeBEPxdl5zi9R+q/JxLqBGGN7/mL7I=
 github.com/onosproject/onos-lib-go v0.6.1/go.mod h1:MBoPR4BPGajt9CeBEPxdl5zi9R+q/JxLqBGGN7/mL7I=

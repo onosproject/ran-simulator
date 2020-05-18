@@ -16,7 +16,6 @@ setrequest:
   - path:
       elem:
       - name: intervals
-        key: {}
       - name: RadioMeasReportPerCell
       target: 315010-0001420
     val:
@@ -150,4 +149,8 @@ setrequest:
     val:
       uintvalue:
         uintval: 21
-  extension: []
+  extension:
+  - id: 101
+    value: 1.0.0
+  - id: 102
+    value: E2Node
