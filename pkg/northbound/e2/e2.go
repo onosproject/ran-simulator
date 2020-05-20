@@ -15,6 +15,8 @@
 package e2
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
@@ -51,6 +53,12 @@ type Server struct {
 	indChan         chan e2ap.RicIndication
 	l2MeasConfig    e2.L2MeasConfig
 	telemetryTicker *time.Ticker
+}
+
+// RicSubscribe - add tot he list of subscriptions
+func (s *Server) RicSubscribe(ctx context.Context, req *e2ap.RicSubscriptionRequest) (*e2ap.RicSubscriptionResponse, error) {
+
+	return nil, fmt.Errorf("not yet implemented")
 }
 
 // GetPort - expose the Port number
