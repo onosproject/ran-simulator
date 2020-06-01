@@ -24,6 +24,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"google.golang.org/grpc"
 	"io"
+	"time"
 )
 
 var log = logging.GetLogger("southbound", "topo")
@@ -46,7 +47,7 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string,
 	if err != nil {
 		log.Fatal(err)
 	}
-	opts = append(opts, grpc.WithUnaryInterceptor(southbound.RetryingUnaryClientInterceptor()))
+	opts = append(opts, grpc.WithStreamInterceptor(southbound.RetryingStreamClientInterceptor(time.Second)))
 	conn, err := southbound.Connect(ctx, topoEndpoint, "", "", opts...)
 	if err != nil {
 		log.Fatal("Failed to connect to %s. Retry. %s", topoEndpoint, err)
@@ -75,6 +76,11 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string,
 		}
 		switch in.Type {
 		case topodevice.ListResponse_NONE:
+			err := createHandler(in.GetDevice())
+			if err != nil {
+				log.Warnf("Unable to create cell from %s. %s", in.GetDevice().GetID(), err.Error())
+				continue
+			}
 		case topodevice.ListResponse_ADDED:
 			err := createHandler(in.GetDevice())
 			if err != nil {
