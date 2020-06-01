@@ -68,9 +68,18 @@ func CellCreator(device *topodevice.Device) error {
 	if err != nil {
 		return nil
 	}
-	log.Infof("Cell created %s", cell.Ecgi)
 
 	mgr := GetManager()
+
+	mgr.CellsLock.Lock()
+	defer mgr.CellsLock.Unlock()
+
+	if _, ok := mgr.Cells[*cell.Ecgi]; ok {
+		return nil
+	}
+
+	log.Infof("Cell created %s", cell.Ecgi)
+
 	mgr.Cells[*cell.Ecgi] = cell
 	mgr.cellCreateTimer.Reset(time.Second)
 	// If no new cells have been created in the last second, then
