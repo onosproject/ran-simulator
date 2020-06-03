@@ -16,6 +16,7 @@ package manager
 
 import (
 	"fmt"
+	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
 	topodevice "github.com/onosproject/onos-topo/api/device"
 	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
 	"math"
@@ -81,6 +82,16 @@ func CellCreator(device *topodevice.Device) error {
 	log.Infof("Cell created %s", cell.Ecgi)
 
 	mgr.Cells[*cell.Ecgi] = cell
+	mgr.CellConfigs[*cell.Ecgi] = &e2node_1_0_0.Device{
+		E2Node: &e2node_1_0_0.E2Node_E2Node{
+			Intervals: &e2node_1_0_0.E2Node_E2Node_Intervals{
+				PdcpMeasReportPerUe:    nil,
+				RadioMeasReportPerCell: nil,
+				RadioMeasReportPerUe:   nil,
+				SchedMeasReportPerCell: nil,
+				SchedMeasReportPerUe:   nil,
+			},
+		}}
 	mgr.cellCreateTimer.Reset(time.Second)
 	// If no new cells have been created in the last second, then
 	// afterCellCreation below gets run. This allows bulk changes to be handled
