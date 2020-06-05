@@ -15,14 +15,14 @@
 package e2
 
 import (
-	"context"
-	"fmt"
 	"time"
+
+	"github.com/onosproject/onos-ric/api/sb/e2ap"
 
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	e2 "github.com/onosproject/onos-ric/api/sb"
-	"github.com/onosproject/onos-ric/api/sb/e2ap"
+
 	"github.com/onosproject/ran-simulator/api/types"
 	"google.golang.org/grpc"
 )
@@ -53,12 +53,6 @@ type Server struct {
 	indChan         chan e2ap.RicIndication
 	l2MeasConfig    e2.L2MeasConfig
 	telemetryTicker *time.Ticker
-}
-
-// RicSubscribe - add tot he list of subscriptions
-func (s *Server) RicSubscribe(ctx context.Context, req *e2ap.RicSubscriptionRequest) (*e2ap.RicSubscriptionResponse, error) {
-
-	return nil, fmt.Errorf("not yet implemented")
 }
 
 // GetPort - expose the Port number

@@ -27,3 +27,5 @@ require (
 )
 
 replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
+
+replace github.com/onosproject/onos-ric => ../onos-ric
