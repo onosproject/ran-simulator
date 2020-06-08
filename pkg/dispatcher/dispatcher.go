@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020-presexnt Open Networking Foundation <info@opennetworking.org>
+// SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -14,7 +14,7 @@ import (
 
 var log = logging.GetLogger("dispatcher")
 
-// Dispatcher :
+// Dispatcher : dispatcher
 type Dispatcher struct {
 	nbiUeListenersLock    sync.RWMutex
 	nbiUeListeners        map[string]chan Event
