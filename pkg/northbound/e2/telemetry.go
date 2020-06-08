@@ -36,10 +36,10 @@ func makeCqi(strengthdB float64) uint32 {
 	return uint32(cqi)
 }
 
-func (s *Server) radioMeasReportPerUE() error {
+func (s *Server) radioMeasReportPerUE(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer, done <-chan struct{}) error {
 	trafficSimMgr := manager.GetManager()
 
-	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, s.stream)
+	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, stream)
 	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID, ueChangeChannelLen)
 	defer trafficSimMgr.Dispatcher.UnregisterUeListener(streamID)
 	if err != nil {
@@ -53,14 +53,14 @@ func (s *Server) radioMeasReportPerUE() error {
 	<-configDone
 
 	// TODO replace this 500 value with a value from onos-config received on gnmi
-	s.telemetryTicker = time.NewTicker(time.Duration(500) * time.Millisecond)
+	telemetryTicker := time.NewTicker(time.Duration(500) * time.Millisecond)
 
 	log.Infof("Listening for changes on UEs with ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
 
 	for {
 		select {
-		case <-s.telemetryTicker.C:
-			ues, err := processUeChange(ueChangeChannel, s.stream)
+		case <-telemetryTicker.C:
+			ues, err := processUeChange(ueChangeChannel, stream)
 			if err != nil {
 				log.Warnf("processUeChange returned error %v", err)
 				continue
@@ -75,10 +75,11 @@ func (s *Server) radioMeasReportPerUE() error {
 					log.Warnf("generateReport returned error %v", err)
 					continue
 				}
-				s.indChan <- report
+				indChan <- report
 			}
-		case <-s.stream.Context().Done():
+		case <-done:
 			log.Infof("Controller has disconnected on Port %d", s.GetPort())
+			telemetryTicker.Stop()
 			return nil
 		}
 	}

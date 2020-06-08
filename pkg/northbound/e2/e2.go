@@ -8,8 +8,6 @@ package e2
 import (
 	"context"
 	"fmt"
-	"time"
-
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	e2 "github.com/onosproject/onos-ric/api/sb"
@@ -37,13 +35,10 @@ func (s Service) Register(r *grpc.Server) {
 
 // Server implements the E2 gRPC service for administrative facilities.
 type Server struct {
-	port            int
-	towerEcID       types.EcID
-	plmnID          types.PlmnID
-	stream          e2ap.E2AP_RicChanServer
-	indChan         chan e2ap.RicIndication
-	l2MeasConfig    e2.L2MeasConfig
-	telemetryTicker *time.Ticker
+	port         int
+	towerEcID    types.EcID
+	plmnID       types.PlmnID
+	l2MeasConfig e2.L2MeasConfig
 }
 
 // RicSubscribe - add tot he list of subscriptions
