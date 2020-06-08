@@ -1,6 +1,6 @@
-// SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+// SPDX-FileCopyrightText: 2020-presexnt Open Networking Foundation <info@opennetworking.org>
 //
-// SPDX-License-Identifier: Apache-2.0x
+// SPDX-License-Identifier: Apache-2.0
 //
 
 package dispatcher
