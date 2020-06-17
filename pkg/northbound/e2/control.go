@@ -28,21 +28,20 @@ func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
 		return err
 	}
 	defer mgr.Dispatcher.UnregisterUeListener(streamID)
-	done := make(chan struct{})
 	go func() {
 		s.recvControlLoop(indChan, ueUpdatesLsnr)
 	}()
-	go s.ricControlResponse(indChan, stream, done)
+	go s.ricControlResponse(indChan, stream)
 	go func() {
-		err := s.radioMeasReportPerUE(indChan, stream, done)
+		err := s.radioMeasReportPerUE(indChan, stream)
 		if err != nil {
 			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
 		}
 	}()
-	return s.ricControlRequest(indChan, stream, done)
+	return s.ricControlRequest(indChan, stream)
 }
 
-func (s *Server) ricControlResponse(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer, done <-chan struct{}) {
+func (s *Server) ricControlResponse(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer) {
 	for {
 		select {
 		case msg := <-indChan:
@@ -51,14 +50,13 @@ func (s *Server) ricControlResponse(indChan chan e2ap.RicIndication, stream e2ap
 				log.Infof("send error %v", err)
 				return
 			}
-		case <-done:
+		case <-stream.Context().Done():
 			return
 		}
 	}
 }
 
-func (s *Server) ricControlRequest(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer, done chan struct{}) error {
-	defer close(done)
+func (s *Server) ricControlRequest(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer) error {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {

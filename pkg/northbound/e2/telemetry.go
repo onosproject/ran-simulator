@@ -36,7 +36,7 @@ func makeCqi(strengthdB float64) uint32 {
 	return uint32(cqi)
 }
 
-func (s *Server) radioMeasReportPerUE(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer, done <-chan struct{}) error {
+func (s *Server) radioMeasReportPerUE(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer) error {
 	trafficSimMgr := manager.GetManager()
 
 	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, stream)
@@ -77,7 +77,7 @@ func (s *Server) radioMeasReportPerUE(indChan chan e2ap.RicIndication, stream e2
 				}
 				indChan <- report
 			}
-		case <-done:
+		case <-stream.Context().Done():
 			log.Infof("Controller has disconnected on Port %d", s.GetPort())
 			telemetryTicker.Stop()
 			return nil
