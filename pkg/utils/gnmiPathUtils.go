@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2019-present Open Networking Foundation <info@opennetworking.org>
 //
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 //
 
 // Package utils implements various gNMI path manipulation facilities.
