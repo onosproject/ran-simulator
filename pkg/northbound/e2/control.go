@@ -7,6 +7,7 @@ package e2
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"io"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
@@ -19,51 +20,59 @@ import (
 
 // RicChan ...
 func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
-	s.indChan = make(chan e2ap.RicIndication)
-	s.stream = stream
-	defer close(s.indChan)
-	go s.ricControlRequest()
-	go s.recvControlLoop()
+	indChan := make(chan e2ap.RicIndication)
+	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
+	mgr := manager.GetManager()
+	ueUpdatesLsnr, err := mgr.Dispatcher.RegisterUeListener(streamID, ueChangeChannelLen)
+	if err != nil {
+		return err
+	}
+	defer mgr.Dispatcher.UnregisterUeListener(streamID)
 	go func() {
-		err := s.radioMeasReportPerUE()
+		s.recvControlLoop(indChan, ueUpdatesLsnr)
+	}()
+	go s.ricControlResponse(indChan, stream)
+	go func() {
+		err := s.radioMeasReportPerUE(indChan, stream)
 		if err != nil {
 			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
 		}
 	}()
-	return s.ricControlResponse()
+	return s.ricControlRequest(indChan, stream)
 }
 
-func (s *Server) ricControlResponse() error {
+func (s *Server) ricControlResponse(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer) {
 	for {
 		select {
-		case msg := <-s.indChan:
+		case msg := <-indChan:
 			go UpdateTelemetryMetrics(&msg)
-			if err := s.stream.Send(&msg); err != nil {
+			if err := stream.Send(&msg); err != nil {
 				log.Infof("send error %v", err)
-				return err
+				return
 			}
-		case <-s.stream.Context().Done():
-			log.Infof("Controller on Port %d has disconnected", s.GetPort())
-			return nil
+		case <-stream.Context().Done():
+			return
 		}
 	}
 }
 
-func (s *Server) ricControlRequest() {
+func (s *Server) ricControlRequest(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer) error {
 	for {
-		in, err := s.stream.Recv()
-		if err == io.EOF || err != nil {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		} else if err != nil {
 			log.Errorf("Unexpectedly ended when receiving Control responses on Port %d %s", s.GetPort(), err.Error())
-			return
+			return err
 		}
 		//log.Infof("Recv messageType %d", in.GetHdr().GetMessageType())
 		if in == nil || in.Hdr == nil || in.Msg == nil {
 			log.Errorf("Unexpected empty Control request message on Port %d %v", s.GetPort(), in)
-			return
+			return nil
 		}
 		switch in.Hdr.MessageType {
 		case e2.MessageType_CELL_CONFIG_REQUEST:
-			err = s.handleCellConfigRequest()
+			err = s.handleCellConfigRequest(indChan)
 			if err != nil {
 				log.Error(err)
 			}
@@ -94,8 +103,8 @@ func (s *Server) ricControlRequest() {
 	}
 }
 
-func (s *Server) recvControlLoop() {
-	s.handleUeAdmissions()
+func (s *Server) recvControlLoop(indChan chan e2ap.RicIndication, eventChan chan dispatcher.Event) {
+	s.handleUeAdmissions(indChan, eventChan)
 }
 
 func (s *Server) handleL2MeasConfig(req *e2.L2MeasConfig) {
@@ -151,13 +160,14 @@ func (s *Server) handleHORequest(req *e2.HORequest) error {
 			}
 		} else if s.GetECGI().EcID == targetEcgi.EcID && s.GetECGI().PlmnID == targetEcgi.PlmnID {
 			log.Infof("Target handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
+		} else {
+			log.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", s.GetECGI(), req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 		}
-		log.Errorf("unexpected handleHORequest on tower: %s %s/%s -> %s", s.GetECGI(), req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 	}
 	return nil
 }
 
-func (s *Server) handleCellConfigRequest() error {
+func (s *Server) handleCellConfigRequest(indChan chan e2ap.RicIndication) error {
 	log.Infof("handleCellConfigRequest on Port %d", s.GetPort())
 
 	trafficSimMgr := manager.GetManager()
@@ -194,13 +204,17 @@ func (s *Server) handleCellConfigRequest() error {
 		},
 	}
 
-	s.indChan <- cellConfigReport
+	defer func() {
+		_ = recover()
+	}()
+
+	indChan <- cellConfigReport
 	log.Infof("handleCellConfigReport eci: %s. CCR %v", cell.GetEcgi().String(), cellConfigReport)
 
 	return nil
 }
 
-func (s *Server) handleUeAdmissions() {
+func (s *Server) handleUeAdmissions(indChan chan e2ap.RicIndication, eventChan chan dispatcher.Event) {
 	trafficSimMgr := manager.GetManager()
 	// Initiate UE admissions - handle what's currently here and listen for others
 	for _, ue := range trafficSimMgr.UserEquipments {
@@ -210,51 +224,37 @@ func (s *Server) handleUeAdmissions() {
 			continue
 		}
 		ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti, ue.Imsi)
-		s.indChan <- *ueAdmReq
+		indChan <- *ueAdmReq
 		log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
 		ue.Admitted = true
 		trafficSimMgr.UserEquipmentsLock.Unlock()
 		trafficSimMgr.UeAdmitted(ue)
 	}
 
-	streamID := fmt.Sprintf("handleUeAdmissions-%p", s.stream)
-	ueUpdatesLsnr, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID)
-	if err != nil {
-		log.Fatalf("could not register for UE events")
-	}
-	defer trafficSimMgr.Dispatcher.UnregisterUeListener(streamID)
-	for {
-		// block here and listen for updates on UEs
-		select {
-		case event := <-ueUpdatesLsnr:
-			ue, ok := event.Object.(*types.Ue)
-			if !ok {
-				log.Fatalf("Object %v could not be converted to UE", ue)
+	for event := range eventChan {
+		ue, ok := event.Object.(*types.Ue)
+		if !ok {
+			log.Fatalf("Object %v could not be converted to UE", ue)
+		}
+		if ue.ServingTower.EcID != s.GetECGI().EcID || ue.ServingTower.PlmnID != s.GetECGI().PlmnID {
+			continue // listen for the next event
+		}
+		if event.Type == trafficsim.Type_ADDED ||
+			event.Type == trafficsim.Type_UPDATED && event.UpdateType == trafficsim.UpdateType_HANDOVER {
+			ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti, ue.Imsi)
+			indChan <- *ueAdmReq
+			log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
+			ue.Admitted = true
+		} else if event.Type == trafficsim.Type_REMOVED {
+			err := trafficSimMgr.DelCrnti(ue.ServingTower, ue.Crnti)
+			if err != nil {
+				log.Error(err.Error())
+				continue
 			}
-			if ue.ServingTower.EcID != s.GetECGI().EcID || ue.ServingTower.PlmnID != s.GetECGI().PlmnID {
-				continue // listen for the next event
-			}
-			if event.Type == trafficsim.Type_ADDED ||
-				event.Type == trafficsim.Type_UPDATED && event.UpdateType == trafficsim.UpdateType_HANDOVER {
-				ueAdmReq := formatUeAdmissionReq(ue.ServingTower, ue.Crnti, ue.Imsi)
-				s.indChan <- *ueAdmReq
-				log.Infof("ueAdmissionRequest eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
-				ue.Admitted = true
-			} else if event.Type == trafficsim.Type_REMOVED {
-				err = trafficSimMgr.DelCrnti(ue.ServingTower, ue.Crnti)
-				if err != nil {
-					log.Error(err.Error())
-					continue
-				}
-				ueRelInd := formatUeReleaseInd(ue.ServingTower, ue.Crnti)
-				s.indChan <- *ueRelInd
-				log.Infof("ueReleaseInd eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
-				ue.Crnti = manager.InvalidCrnti
-			}
-			// Nothing to be done for trafficsim.Type_UPDATED - they are handled by Telemetry
-		case <-s.stream.Context().Done():
-			log.Infof("Controller has disconnected")
-			return
+			ueRelInd := formatUeReleaseInd(ue.ServingTower, ue.Crnti)
+			indChan <- *ueRelInd
+			log.Infof("ueReleaseInd eci:%s crnti:%s", ue.ServingTower, ue.Crnti)
+			ue.Crnti = manager.InvalidCrnti
 		}
 	}
 }
