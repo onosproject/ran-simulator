@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+
 topodevices:
 - id: 315010-0001420
   address: ran-simulator:5152
