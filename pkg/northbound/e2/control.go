@@ -32,12 +32,6 @@ func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
 		s.recvControlLoop(indChan, ueUpdatesLsnr)
 	}()
 	go s.ricControlResponse(indChan, stream)
-	go func() {
-		err := s.radioMeasReportPerUE(indChan, stream)
-		if err != nil {
-			log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
-		}
-	}()
 	return s.ricControlRequest(indChan, stream)
 }
 
@@ -76,6 +70,12 @@ func (s *Server) ricControlRequest(indChan chan e2ap.RicIndication, stream e2ap.
 			if err != nil {
 				log.Error(err)
 			}
+			go func() {
+				err := s.radioMeasReportPerUE(indChan, stream)
+				if err != nil {
+					log.Errorf("Unable to send radioMeasReportPerUE on Port %d %s", s.GetPort(), err.Error())
+				}
+			}()
 		case e2.MessageType_HO_REQUEST:
 			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_HORequest); ok {
 				err = s.handleHORequest(x.HORequest)

@@ -15,7 +15,6 @@ import (
 	"github.com/onosproject/onos-ric/api/sb/e2sm"
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
@@ -50,34 +49,28 @@ func (s *Server) radioMeasReportPerUE(indChan chan e2ap.RicIndication, stream e2
 	go s.waitForConfig(configDone)
 	<-configDone
 
-	// TODO replace this 500 value with a value from onos-config received on gnmi
-	telemetryTicker := time.NewTicker(time.Duration(500) * time.Millisecond)
-
 	log.Infof("Listening for changes on UEs with ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
 
 	for {
 		select {
-		case <-telemetryTicker.C:
-			ues, err := processUeChange(ueChangeChannel, stream)
-			if err != nil {
-				log.Warnf("processUeChange returned error %v", err)
-				continue
-			}
-			if ues == nil {
-				//log.Warn("processUeChange returned no ues")
-				continue
-			}
-			for _, ue := range ues {
-				report, err := generateReport(ue)
-				if err != nil {
-					log.Warnf("generateReport returned error %v", err)
+		case ueUpdate := <-ueChangeChannel:
+			if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
+				ue, ok := ueUpdate.Object.(*types.Ue)
+				if !ok {
+					log.Fatalf("Object %v could not be converted to UE", ueUpdate)
+				}
+				if ue.ServingTower.EcID != s.GetECGI().EcID || ue.ServingTower.PlmnID != s.GetECGI().PlmnID {
 					continue
 				}
-				indChan <- report
+				ind, err := generateReport(ue)
+				if err != nil {
+					log.Warnf("generateReport returned error %v", err)
+				} else {
+					indChan <- ind
+				}
 			}
 		case <-stream.Context().Done():
 			log.Infof("Controller has disconnected on Port %d", s.GetPort())
-			telemetryTicker.Stop()
 			return nil
 		}
 	}
@@ -92,23 +85,6 @@ func (s *Server) waitForConfig(configDone chan bool) {
 			return
 		}
 	}
-}
-
-func processUeChange(ueChangeChannel chan dispatcher.Event, stream e2ap.E2AP_RicChanServer) ([]*types.Ue, error) {
-	var ues []*types.Ue
-	num := len(ueChangeChannel)
-	for i := 0; i < num; i++ {
-		select {
-		// block here and listen out for any updates to UEs
-		case ueUpdate := <-ueChangeChannel:
-			if ueUpdate.Type == trafficsim.Type_UPDATED && ueUpdate.UpdateType == trafficsim.UpdateType_TOWER {
-				ues = append(ues, ueUpdate.Object.(*types.Ue))
-			}
-		case <-stream.Context().Done():
-			return nil, fmt.Errorf("controller has disconnected")
-		}
-	}
-	return ues, nil
 }
 
 func generateReport(ue *types.Ue) (e2ap.RicIndication, error) {
