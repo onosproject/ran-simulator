@@ -23,7 +23,7 @@ func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
 	indChan := make(chan e2ap.RicIndication)
 	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
 	mgr := manager.GetManager()
-	ueUpdatesLsnr, err := mgr.Dispatcher.RegisterUeListener(streamID, ueChangeChannelLen)
+	ueUpdatesLsnr, err := mgr.Dispatcher.RegisterUeListener(streamID, int(mgr.MapLayout.MaxUes))
 	if err != nil {
 		return err
 	}

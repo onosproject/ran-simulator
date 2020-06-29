@@ -115,10 +115,10 @@ func (d *Dispatcher) UnregisterRouteListener(subscriber string) {
 }
 
 // ListenCellEvents :
-func (d *Dispatcher) ListenCellEvents(routeEventChannel <-chan Event) {
+func (d *Dispatcher) ListenCellEvents(cellEventChannel <-chan Event) {
 	log.Info("Cell Event listener initialized")
 
-	for cellEvent := range routeEventChannel {
+	for cellEvent := range cellEventChannel {
 		d.nbiCellListenersLock.RLock()
 		for _, nbiChan := range d.nbiCellListeners {
 			nbiChan <- cellEvent

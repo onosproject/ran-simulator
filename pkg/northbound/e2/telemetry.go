@@ -21,8 +21,6 @@ import (
 
 const e2TelemetryNbi = "e2TelemetryNbi"
 
-const ueChangeChannelLen = 1000
-
 // Conversion of signal strength in dB to CQI
 // Here we just map 0 dB to the middle of the scale 0-15 CQI scale
 func makeCqi(strengthdB float64) uint32 {
@@ -40,12 +38,12 @@ func (s *Server) radioMeasReportPerUE(indChan chan e2ap.RicIndication, stream e2
 	trafficSimMgr := manager.GetManager()
 
 	streamID := fmt.Sprintf("%s-%p", e2TelemetryNbi, stream)
-	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID, ueChangeChannelLen)
-	defer trafficSimMgr.Dispatcher.UnregisterUeListener(streamID)
+	ueChangeChannel, err := trafficSimMgr.Dispatcher.RegisterUeListener(streamID, int(trafficSimMgr.MapLayout.MaxUes))
 	if err != nil {
 		log.Errorf("RegisterUeListener failed for ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
 		return err
 	}
+	defer trafficSimMgr.Dispatcher.UnregisterUeListener(streamID)
 
 	log.Infof("Waiting for l2MeasConfig for ServingTower=%s for Port %d", s.GetECGI(), s.GetPort())
 	configDone := make(chan bool)

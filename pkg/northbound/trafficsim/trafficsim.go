@@ -64,11 +64,11 @@ func (s *Server) ListRoutes(req *trafficsim.ListRoutesRequest, stream trafficsim
 	if req.Subscribe {
 		streamID := fmt.Sprintf("route-%p", stream)
 		listener, err := manager.GetManager().Dispatcher.RegisterRouteListener(streamID)
-		defer manager.GetManager().Dispatcher.UnregisterRouteListener(streamID)
 		if err != nil {
 			log.Info("Failed setting up a listener for Route events")
 			return err
 		}
+		defer manager.GetManager().Dispatcher.UnregisterRouteListener(streamID)
 		log.Infof("NBI Route updates started on %s", streamID)
 
 		for {
@@ -103,7 +103,7 @@ func (s *Server) ListCells(req *trafficsim.ListCellsRequest, stream trafficsim.T
 		manager.GetManager().CellsLock.RLock()
 		for _, cell := range manager.GetManager().Cells {
 			resp := &trafficsim.ListCellsResponse{
-				Cell: cell,
+				Cell: manager.CellDeepCopyNomap(cell),
 				Type: trafficsim.Type_NONE,
 			}
 			err := stream.Send(resp)
@@ -133,7 +133,7 @@ func (s *Server) ListCells(req *trafficsim.ListCellsRequest, stream trafficsim.T
 					return fmt.Errorf("could not cast object from event to Cell %v", cellEvent)
 				}
 				msg := &trafficsim.ListCellsResponse{
-					Cell: cell,
+					Cell: manager.CellDeepCopyNomap(cell),
 					Type: cellEvent.Type,
 				}
 				err := stream.SendMsg(msg)
