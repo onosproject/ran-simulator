@@ -512,3 +512,33 @@ func ecgiFromTopoID(id topodevice.ID) (types.ECGI, error) {
 	}
 	return types.ECGI{EcID: types.EcID(parts[1]), PlmnID: types.PlmnID(parts[0])}, nil
 }
+
+// CellDeepCopyNomap - used when sending it up to GUI - no need to copy the map of Crnti or neighbours
+// had been causing concurrent write errors inside gRPC processing
+func CellDeepCopyNomap(original *types.Cell) *types.Cell {
+	return &types.Cell{
+		Ecgi: &types.ECGI{
+			EcID:   original.GetEcgi().GetEcID(),
+			PlmnID: original.GetEcgi().GetPlmnID(),
+		},
+		Location: &types.Point{
+			Lat: original.GetLocation().GetLat(),
+			Lng: original.GetLocation().GetLng(),
+		},
+		Sector: &types.Sector{
+			Azimuth: original.GetSector().GetAzimuth(),
+			Arc:     original.GetSector().GetArc(),
+			Centroid: &types.Point{
+				Lat: original.GetSector().GetCentroid().GetLat(),
+				Lng: original.GetSector().GetCentroid().GetLng(),
+			},
+		},
+		Color:      original.GetColor(),
+		MaxUEs:     original.GetMaxUEs(),
+		Neighbors:  nil, // not copied
+		TxPowerdB:  original.GetTxPowerdB(),
+		CrntiMap:   nil, // not copied
+		CrntiIndex: original.GetCrntiIndex(),
+		Port:       original.GetPort(),
+	}
+}
