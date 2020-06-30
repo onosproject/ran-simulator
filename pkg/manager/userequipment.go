@@ -7,6 +7,7 @@ package manager
 
 import (
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"strings"
 	"time"
@@ -155,7 +156,7 @@ func (m *Manager) GetUe(imsi types.Imsi) (*types.Ue, error) {
 }
 
 // UeHandover perform the handover on simulated UE
-func (m *Manager) UeHandover(imsi types.Imsi, newTowerID *types.ECGI) error {
+func (m *Manager) UeHandover(imsi types.Imsi, newTowerID *types.ECGI, t time.Time) error {
 	ue, err := m.GetUe(imsi)
 	if err != nil {
 		return err
@@ -173,7 +174,26 @@ func (m *Manager) UeHandover(imsi types.Imsi, newTowerID *types.ECGI) error {
 	}
 	ue.Crnti = newCrnti
 	ue.Admitted = false
-	m.UserEquipmentsLock.Unlock()
+	if ue.Metrics.IsFirst {
+		// Discard the first one as it may have been waiting for onos-ric-ho to startup
+		ue.Metrics.HoReportTimestamp = 0
+		ue.Metrics.IsFirst = false
+		m.UserEquipmentsLock.Unlock()
+	} else if ue.Metrics.HoReportTimestamp != 0 {
+		ue.Metrics.HoLatency = t.UnixNano() - ue.Metrics.HoReportTimestamp
+		ue.Metrics.HoReportTimestamp = 0
+		tmpHOEvent := metrics.HOEvent{
+			Timestamp:    t,
+			Crnti:        ue.GetCrnti(),
+			ServingTower: *ue.ServingTower,
+			HOLatency:    ue.Metrics.HoLatency,
+		}
+		m.UserEquipmentsLock.Unlock()
+		m.LatencyChannel <- tmpHOEvent
+		log.Infof("%s(%d) Hand-over latency: %d µs", ue.Crnti, ue.Imsi, ue.Metrics.HoLatency/1000)
+	} else {
+		m.UserEquipmentsLock.Unlock()
+	}
 	m.UeChannel <- dispatcher.Event{
 		Type:       trafficsim.Type_UPDATED,
 		UpdateType: trafficsim.UpdateType_HANDOVER,

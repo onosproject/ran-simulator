@@ -136,8 +136,8 @@ func generateReport(ue *types.Ue) (e2ap.RicIndication, error) {
 		reports[3].CqiHist[0] = makeCqi(ue.Tower3Strength)
 	}
 
-	log.Infof("RadioMeasReportPerUE %s [cqi:%d] %d cqi:%d(%s),%d(%s),%d(%s)",
-		servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Imsi,
+	log.Infof("RadioMeasReportPerUE %s [cqi:%d] %s(%d) cqi:%d(%s),%d(%s),%d(%s)",
+		servingTower.Ecgi.EcID, reports[0].CqiHist[0], ue.Crnti, ue.Imsi,
 		reports[1].CqiHist[0], reports[1].Ecgi.Ecid,
 		reports[2].CqiHist[0], reports[2].Ecgi.Ecid,
 		reports[3].CqiHist[0], reports[3].Ecgi.Ecid)

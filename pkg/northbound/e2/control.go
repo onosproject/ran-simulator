@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/onosproject/ran-simulator/pkg/dispatcher"
 	"io"
+	"time"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/onos-ric/api/sb/e2ap"
@@ -18,9 +19,16 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
+type hoMessage struct {
+	time    time.Time
+	report  *e2.RadioMeasReportPerUE
+	request *e2.HORequest
+}
+
 // RicChan ...
 func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
 	indChan := make(chan e2ap.RicIndication)
+	hoChan := make(chan hoMessage, 1000)
 	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
 	mgr := manager.GetManager()
 	ueUpdatesLsnr, err := mgr.Dispatcher.RegisterUeListener(streamID, int(mgr.MapLayout.MaxUes))
@@ -31,15 +39,16 @@ func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
 	go func() {
 		s.recvControlLoop(indChan, ueUpdatesLsnr)
 	}()
-	go s.ricControlResponse(indChan, stream)
-	return s.ricControlRequest(indChan, stream)
+	go s.handleHandovers(hoChan, stream)
+	go s.ricControlResponse(indChan, hoChan, stream)
+	return s.ricControlRequest(indChan, hoChan, stream)
 }
 
-func (s *Server) ricControlResponse(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer) {
+func (s *Server) ricControlResponse(indChan chan e2ap.RicIndication, hoChan chan hoMessage, stream e2ap.E2AP_RicChanServer) {
 	for {
 		select {
 		case msg := <-indChan:
-			go UpdateTelemetryMetrics(&msg)
+			hoChan <- hoMessage{time: time.Now(), report: msg.GetMsg().GetRadioMeasReportPerUE()}
 			if err := stream.Send(&msg); err != nil {
 				log.Infof("send error %v", err)
 				return
@@ -50,7 +59,7 @@ func (s *Server) ricControlResponse(indChan chan e2ap.RicIndication, stream e2ap
 	}
 }
 
-func (s *Server) ricControlRequest(indChan chan e2ap.RicIndication, stream e2ap.E2AP_RicChanServer) error {
+func (s *Server) ricControlRequest(indChan chan e2ap.RicIndication, hoChan chan hoMessage, stream e2ap.E2AP_RicChanServer) error {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -77,14 +86,7 @@ func (s *Server) ricControlRequest(indChan chan e2ap.RicIndication, stream e2ap.
 				}
 			}()
 		case e2.MessageType_HO_REQUEST:
-			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_HORequest); ok {
-				err = s.handleHORequest(x.HORequest)
-				if err != nil {
-					log.Error(err)
-				}
-			} else {
-				log.Fatalf("Unexpected payload in MessageType_HO_REQUEST %v", in)
-			}
+			hoChan <- hoMessage{time: time.Now(), request: in.Msg.GetHORequest()}
 		case e2.MessageType_RRM_CONFIG:
 			if x, ok := in.Msg.S.(*e2sm.RicControlMessage_RRMConfig); ok {
 				s.handleRRMConfig(x.RRMConfig)
@@ -139,21 +141,38 @@ func (s *Server) handleRRMConfig(req *e2.RRMConfig) {
 	}
 }
 
-func (s *Server) handleHORequest(req *e2.HORequest) error {
+func (s *Server) handleHandovers(hoChan <-chan hoMessage, stream e2ap.E2AP_RicChanServer) {
+	for {
+		select {
+		case msg := <-hoChan:
+			if msg.report != nil {
+				UpdateTelemetryMetrics(msg.report, msg.time)
+			} else if msg.request != nil {
+				err := s.handleHORequest(msg.request, msg.time)
+				if err != nil {
+					log.Errorf("Unable to handle HORequest: %s", err.Error())
+				}
+			}
+		case <-stream.Context().Done():
+			return
+		}
+	}
+}
+
+func (s *Server) handleHORequest(req *e2.HORequest, t time.Time) error {
 	sourceEcgi := toTypesEcgi(req.EcgiS)
 	targetEcgi := toTypesEcgi(req.EcgiT)
 
 	for _, crnti := range req.Crntis {
 		if s.GetECGI().EcID == sourceEcgi.EcID && s.GetECGI().PlmnID == sourceEcgi.PlmnID {
-			log.Infof("Source handleHORequest:  %s/%s -> %s", req.EcgiS.Ecid, crnti, req.EcgiT.Ecid)
 			m := manager.GetManager()
 			imsi, err := m.CrntiToName(types.Crnti(crnti), s.GetECGI())
 			if err != nil {
 				log.Error(err)
 				continue
 			}
-			UpdateControlMetrics(imsi)
-			err = m.UeHandover(imsi, &targetEcgi)
+			log.Infof("Source handleHORequest:  %s/%s(%d) -> %s", req.EcgiS.Ecid, crnti, imsi, req.EcgiT.Ecid)
+			err = m.UeHandover(imsi, &targetEcgi, t)
 			if err != nil {
 				log.Error(err)
 				continue
