@@ -11,88 +11,71 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
-	"github.com/onosproject/onos-ric/api/sb/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
 
 // UpdateTelemetryMetrics ...
-func UpdateTelemetryMetrics(m *e2ap.RicIndication) {
+func UpdateTelemetryMetrics(msg *e2.RadioMeasReportPerUE, t time.Time) {
 	trafficSimMgr := manager.GetManager()
-	switch m.GetHdr().GetMessageType() {
-	case e2.MessageType_RADIO_MEAS_REPORT_PER_UE:
-		msg := m.GetMsg().GetRadioMeasReportPerUE()
-		towerID := toTypesEcgi(msg.GetEcgi())
-		name, err := trafficSimMgr.CrntiToName(types.Crnti(msg.GetCrnti()), towerID)
-		if err != nil {
-			log.Errorf("ue %s/%s not found", msg.GetEcgi().GetEcid(), msg.GetCrnti())
-			return
-		}
-		var ue *types.Ue
-		var ok bool
-		trafficSimMgr.UserEquipmentsMapLock.RLock()
-		if ue, ok = trafficSimMgr.UserEquipments[name]; !ok {
-			trafficSimMgr.UserEquipmentsMapLock.RUnlock()
-			return
-		}
-		trafficSimMgr.UserEquipmentsMapLock.RUnlock()
-
-		reports := msg.RadioReportServCells
-
-		bestCQI := reports[0].CqiHist[0]
-		bestStationID := reports[0].Ecgi
-
-		for i := 1; i < len(reports); i++ {
-			temp := reports[i].CqiHist[0]
-			if bestCQI < temp {
-				bestCQI = temp
-				bestStationID = reports[i].Ecgi
-			}
-		}
-		trafficSimMgr.CellsLock.RLock()
-		servingTower := trafficSimMgr.Cells[*ue.ServingTower]
-		trafficSimMgr.CellsLock.RUnlock()
-
-		if servingTower.Ecgi.EcID != types.EcID(bestStationID.Ecid) || servingTower.Ecgi.PlmnID != types.PlmnID(bestStationID.PlmnId) {
-			trafficSimMgr.UserEquipmentsLock.Lock()
-			if ue.Metrics.HoReportTimestamp == 0 {
-				ue.Metrics.HoReportTimestamp = time.Now().UnixNano()
-			}
-			trafficSimMgr.UserEquipmentsLock.Unlock()
-		}
+	towerID := toTypesEcgi(msg.GetEcgi())
+	name, err := trafficSimMgr.CrntiToName(types.Crnti(msg.GetCrnti()), towerID)
+	if err != nil {
+		log.Errorf("ue %s/%s not found", msg.GetEcgi().GetEcid(), msg.GetCrnti())
+		return
 	}
-}
-
-// UpdateControlMetrics ...
-func UpdateControlMetrics(imsi types.Imsi) {
-	trafficSimMgr := manager.GetManager()
-	trafficSimMgr.UserEquipmentsMapLock.RLock()
-	var ok bool
 	var ue *types.Ue
-	if ue, ok = trafficSimMgr.UserEquipments[imsi]; !ok {
-		log.Errorf("ue %d not found", imsi)
+	var ok bool
+	trafficSimMgr.UserEquipmentsMapLock.RLock()
+	if ue, ok = trafficSimMgr.UserEquipments[name]; !ok {
 		trafficSimMgr.UserEquipmentsMapLock.RUnlock()
 		return
 	}
 	trafficSimMgr.UserEquipmentsMapLock.RUnlock()
-	if ue.Metrics.IsFirst {
-		// Discard the first one as it may have been waiting for onos-ric-ho to startup
+
+	reports := msg.RadioReportServCells
+
+	bestCQI := reports[0].CqiHist[0]
+	bestStationID := reports[0].Ecgi
+
+	for i := 1; i < len(reports); i++ {
+		temp := reports[i].CqiHist[0]
+		if bestCQI < temp {
+			bestCQI = temp
+			bestStationID = reports[i].Ecgi
+		}
+	}
+
+	trafficSimMgr.UserEquipmentsLock.RLock()
+	servingTowerID := toE2Ecgi(ue.ServingTower)
+	trafficSimMgr.UserEquipmentsLock.RUnlock()
+
+	if servingTowerID.Ecid != bestStationID.Ecid || servingTowerID.PlmnId != bestStationID.PlmnId {
 		trafficSimMgr.UserEquipmentsLock.Lock()
-		ue.Metrics.HoReportTimestamp = 0
-		ue.Metrics.IsFirst = false
-		trafficSimMgr.UserEquipmentsLock.Unlock()
-	} else if ue.Metrics.HoReportTimestamp != 0 {
-		trafficSimMgr.UserEquipmentsLock.Lock()
-		ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
-		ue.Metrics.HoReportTimestamp = 0
-		tmpHOEvent := metrics.HOEvent{
-			Timestamp:    time.Now(),
-			Crnti:        ue.GetCrnti(),
-			ServingTower: *ue.ServingTower,
-			HOLatency:    ue.Metrics.HoLatency,
+		m, err := generateReport(ue)
+		if err == nil {
+			msg := m.GetMsg().GetRadioMeasReportPerUE()
+			reports := msg.RadioReportServCells
+
+			bestCQI := reports[0].CqiHist[0]
+			bestStationID := reports[0].Ecgi
+
+			for i := 1; i < len(reports); i++ {
+				temp := reports[i].CqiHist[0]
+				if bestCQI < temp {
+					bestCQI = temp
+					bestStationID = reports[i].Ecgi
+				}
+			}
+
+			servingTowerID := toE2Ecgi(ue.ServingTower)
+			if servingTowerID.Ecid != bestStationID.Ecid || servingTowerID.PlmnId != bestStationID.PlmnId {
+				if ue.Metrics.HoReportTimestamp == 0 {
+					ue.Metrics.HoReportTimestamp = t.UnixNano()
+				}
+			} else {
+				ue.Metrics.HoReportTimestamp = 0
+			}
 		}
 		trafficSimMgr.UserEquipmentsLock.Unlock()
-		trafficSimMgr.LatencyChannel <- tmpHOEvent
-		log.Infof("%d Hand-over latency: %d µs", ue.Imsi, ue.Metrics.HoLatency/1000)
 	}
 }
