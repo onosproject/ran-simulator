@@ -12,7 +12,6 @@ import (
 
 	e2 "github.com/onosproject/onos-ric/api/sb"
 	"github.com/onosproject/ran-simulator/pkg/manager"
-	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
 )
 
 // UpdateTelemetryMetrics ...
@@ -78,37 +77,5 @@ func UpdateTelemetryMetrics(msg *e2.RadioMeasReportPerUE, t time.Time) {
 			}
 		}
 		trafficSimMgr.UserEquipmentsLock.Unlock()
-	}
-}
-
-// UpdateControlMetrics ...
-func UpdateControlMetrics(imsi types.Imsi) {
-	trafficSimMgr := manager.GetManager()
-	trafficSimMgr.UserEquipmentsMapLock.RLock()
-	var ok bool
-	var ue *types.Ue
-	if ue, ok = trafficSimMgr.UserEquipments[imsi]; !ok {
-		log.Errorf("ue %d not found", imsi)
-		trafficSimMgr.UserEquipmentsMapLock.RUnlock()
-		return
-	}
-	trafficSimMgr.UserEquipmentsMapLock.RUnlock()
-	trafficSimMgr.UserEquipmentsLock.Lock()
-	defer trafficSimMgr.UserEquipmentsLock.Unlock()
-	if ue.Metrics.IsFirst {
-		// Discard the first one as it may have been waiting for onos-ric-ho to startup
-		ue.Metrics.HoReportTimestamp = 0
-		ue.Metrics.IsFirst = false
-	} else if ue.Metrics.HoReportTimestamp != 0 {
-		ue.Metrics.HoLatency = time.Now().UnixNano() - ue.Metrics.HoReportTimestamp
-		ue.Metrics.HoReportTimestamp = 0
-		tmpHOEvent := metrics.HOEvent{
-			Timestamp:    time.Now(),
-			Crnti:        ue.GetCrnti(),
-			ServingTower: *ue.ServingTower,
-			HOLatency:    ue.Metrics.HoLatency,
-		}
-		trafficSimMgr.LatencyChannel <- tmpHOEvent
-		log.Infof("%s(%d) Hand-over latency: %d µs", ue.Crnti, ue.Imsi, ue.Metrics.HoLatency/1000)
 	}
 }

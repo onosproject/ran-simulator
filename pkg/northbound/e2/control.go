@@ -27,10 +27,10 @@ type hoMessage struct {
 
 // RicChan ...
 func (s *Server) RicChan(stream e2ap.E2AP_RicChanServer) error {
-	indChan := make(chan e2ap.RicIndication)
-	hoChan := make(chan hoMessage, 1000)
-	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
 	mgr := manager.GetManager()
+	indChan := make(chan e2ap.RicIndication)
+	hoChan := make(chan hoMessage, int(mgr.MapLayout.MaxUes))
+	streamID := fmt.Sprintf("handleUeAdmissions-%p", stream)
 	ueUpdatesLsnr, err := mgr.Dispatcher.RegisterUeListener(streamID, int(mgr.MapLayout.MaxUes))
 	if err != nil {
 		return err
