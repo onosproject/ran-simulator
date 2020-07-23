@@ -7,24 +7,25 @@ package gnmi
 
 import (
 	"context"
+	"testing"
+
 	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
 	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/manager"
 	"github.com/openconfig/gnmi/proto/gnmi"
 	"gotest.tools/assert"
-	"testing"
 )
 
 func Test_Set_simple(t *testing.T) {
-	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-honeycomb-4-3-topo.yaml")
+	topoConfig, err := bulk.GetTopoConfig("berlin-honeycomb-4-3-topo.yaml")
 	assert.NilError(t, err)
 
 	mgr, err := manager.NewManager()
 	assert.NilError(t, err)
-	for _, td := range topoDeviceConfig.TopoDevices {
+	for _, td := range topoConfig.TopoEntities {
 		td := td //pin
-		cell, err := manager.NewCell(&td)
+		cell, err := manager.NewCell(bulk.TopoEntityToTopoObject(&td))
 		assert.NilError(t, err)
 		mgr.Cells[*cell.Ecgi] = cell
 	}

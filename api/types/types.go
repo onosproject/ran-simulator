@@ -38,6 +38,9 @@ const (
 
 	// GrpcPortKey - used in topo device attributes
 	GrpcPortKey = "grpcport"
+
+	// AddressKey ...
+	AddressKey = "address"
 )
 
 const (

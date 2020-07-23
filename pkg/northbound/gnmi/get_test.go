@@ -6,6 +6,8 @@
 package gnmi
 
 import (
+	"testing"
+
 	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
 	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -13,11 +15,10 @@ import (
 	"github.com/openconfig/gnmi/proto/gnmi"
 	"golang.org/x/net/context"
 	"gotest.tools/assert"
-	"testing"
 )
 
 func setUpCell() (*manager.Manager, error) {
-	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-honeycomb-4-3-topo.yaml")
+	topoConfig, err := bulk.GetTopoConfig("berlin-honeycomb-4-3-topo.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -26,9 +27,9 @@ func setUpCell() (*manager.Manager, error) {
 		return nil, err
 	}
 
-	for _, td := range topoDeviceConfig.TopoDevices {
+	for _, td := range topoConfig.TopoEntities {
 		td := td //pin
-		cell, err := manager.NewCell(&td)
+		cell, err := manager.NewCell(bulk.TopoEntityToTopoObject(&td))
 		if err != nil {
 			return nil, err
 		}

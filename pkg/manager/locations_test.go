@@ -6,22 +6,23 @@
 package manager
 
 import (
+	"math"
+	"testing"
+
 	"github.com/onosproject/onos-topo/pkg/bulk"
 	"github.com/onosproject/ran-simulator/api/types"
 	"gotest.tools/assert"
-	"math"
-	"testing"
 )
 
 func Test_NewLocations2(t *testing.T) {
-	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-honeycomb-4-3-topo.yaml")
+	topoDeviceConfig, err := bulk.GetTopoConfig("berlin-honeycomb-4-3-topo.yaml")
 	assert.NilError(t, err)
 
 	cells := make(map[types.ECGI]*types.Cell)
 
-	for _, td := range topoDeviceConfig.TopoDevices {
+	for _, td := range topoDeviceConfig.TopoEntities {
 		td := td //pin
-		cell, err := NewCell(&td)
+		cell, err := NewCell(bulk.TopoEntityToTopoObject(&td))
 		assert.NilError(t, err)
 		cells[*cell.Ecgi] = cell
 	}
