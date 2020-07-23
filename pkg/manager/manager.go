@@ -8,11 +8,12 @@ package manager
 
 import (
 	"context"
-	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
 	"sync"
 	"time"
 
-	"github.com/onosproject/onos-topo/api/device"
+	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
+
+	device "github.com/onosproject/onos-topo/api/topo"
 	"github.com/onosproject/ran-simulator/pkg/southbound/topo"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
@@ -47,7 +48,7 @@ type Manager struct {
 	googleAPIKey          string
 	LatencyChannel        chan metrics.HOEvent
 	ResetMetricsChannel   chan bool
-	TopoClient            device.DeviceServiceClient
+	TopoClient            device.TopoClient
 	AspectRatio           float64
 	cellCreateTimer       *time.Timer
 }

@@ -17,7 +17,7 @@ func setUpManager() (*manager.Manager, error) {
 		StepDelay: 1000,
 	}
 
-	topoDeviceConfig, err := bulk.GetDeviceConfig("berlin-rectangular-4-1-topo.yaml")
+	topoConfig, err := bulk.GetTopoConfig("berlin-rectangular-4-1-topo.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +28,9 @@ func setUpManager() (*manager.Manager, error) {
 
 	cells := make(map[types.ECGI]*types.Cell)
 
-	for _, td := range topoDeviceConfig.TopoDevices {
+	for _, td := range topoConfig.TopoEntities {
 		td := td //pin
-		cell, err := manager.NewCell(&td)
+		cell, err := manager.NewCell(bulk.TopoEntityToTopoObject(&td))
 		if err != nil {
 			return nil, err
 		}

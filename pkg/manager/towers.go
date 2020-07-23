@@ -7,14 +7,15 @@ package manager
 
 import (
 	"fmt"
-	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
-	topodevice "github.com/onosproject/onos-topo/api/device"
-	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
+	"github.com/onosproject/onos-topo/api/topo"
+	"github.com/onosproject/ran-simulator/pkg/southbound/kubernetes"
 
 	"github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/api/types"
@@ -55,8 +56,8 @@ type CellIf interface {
 }
 
 // CellCreator - wrap the NewCell function
-func CellCreator(device *topodevice.Device) error {
-	cell, err := NewCell(device)
+func CellCreator(object *topo.Object) error {
+	cell, err := NewCell(object)
 	if err != nil {
 		return nil
 	}
@@ -92,8 +93,8 @@ func CellCreator(device *topodevice.Device) error {
 }
 
 // CellDeleter - wrap the cell deletion function
-func CellDeleter(device *topodevice.Device) error {
-	ecgi, err := ecgiFromTopoDevice(device)
+func CellDeleter(object *topo.Object) error {
+	ecgi, err := ecgiFromtopo(object)
 	if err != nil {
 		return err
 	}
@@ -111,29 +112,29 @@ func CellDeleter(device *topodevice.Device) error {
 	return nil
 }
 
-// NewCell - create a new cell from a topodevice
-func NewCell(device *topodevice.Device) (*types.Cell, error) {
-	ecgi, err := ecgiFromTopoDevice(device)
+// NewCell - create a new cell from a topo
+func NewCell(object *topo.Object) (*types.Cell, error) {
+	ecgi, err := ecgiFromtopo(object)
 	if err != nil {
 		return nil, err
 	}
 
 	var latitude float64
-	if latitudeStr, ok := device.GetAttributes()[types.LatitudeKey]; ok {
+	if latitudeStr, ok := object.GetAttributes()[types.LatitudeKey]; ok {
 		if latitude, err = strconv.ParseFloat(latitudeStr, 64); err != nil {
 			return nil, err
 		}
 	} else {
-		return nil, fmt.Errorf("device %s does not have 'latitude' in attributes", device.ID)
+		return nil, fmt.Errorf("device %s does not have 'latitude' in attributes", object.ID)
 	}
 
 	var longitude float64
-	if longitudeStr, ok := device.GetAttributes()[types.LongitudeKey]; ok {
+	if longitudeStr, ok := object.GetAttributes()[types.LongitudeKey]; ok {
 		if longitude, err = strconv.ParseFloat(longitudeStr, 64); err != nil {
 			return nil, err
 		}
 	} else {
-		return nil, fmt.Errorf("device %s does not have 'longitude' in attributes", device.ID)
+		return nil, fmt.Errorf("device %s does not have 'longitude' in attributes", object.ID)
 	}
 	cellLoc := types.Point{
 		Lat: latitude,
@@ -141,36 +142,38 @@ func NewCell(device *topodevice.Device) (*types.Cell, error) {
 	}
 
 	var azimuth int64
-	if azimuthStr, ok := device.GetAttributes()[types.AzimuthKey]; ok {
+	if azimuthStr, ok := object.GetAttributes()[types.AzimuthKey]; ok {
 		if azimuth, err = strconv.ParseInt(azimuthStr, 10, 32); err != nil {
 			return nil, err
 		}
 	} else {
-		return nil, fmt.Errorf("device %s does not have 'azimuth' in attributes", device.ID)
+		return nil, fmt.Errorf("device %s does not have 'azimuth' in attributes", object.ID)
 	}
 
 	var arc int64
-	if arcStr, ok := device.GetAttributes()[types.ArcKey]; ok {
+	if arcStr, ok := object.GetAttributes()[types.ArcKey]; ok {
 		if arc, err = strconv.ParseInt(arcStr, 10, 32); err != nil {
 			return nil, err
 		}
 	} else {
-		return nil, fmt.Errorf("device %s does not have 'arc' in attributes", device.ID)
+		return nil, fmt.Errorf("device %s does not have 'arc' in attributes", object.ID)
 	}
 
 	var grpcPort int64
-	if grpcPortStr, ok := device.GetAttributes()[types.GrpcPortKey]; ok {
+	if grpcPortStr, ok := object.GetAttributes()[types.GrpcPortKey]; ok {
 		if grpcPort, err = strconv.ParseInt(grpcPortStr, 10, 32); err != nil {
 			return nil, err
 		}
 	} else {
 		// Try to parse it from the address
-		parts := strings.Split(device.GetAddress(), ":")
-		if len(parts) != 2 {
-			return nil, fmt.Errorf("cannot parse address to get port number %s", device.GetAddress())
-		}
-		if grpcPort, err = strconv.ParseInt(parts[1], 10, 32); err != nil {
-			return nil, err
+		if addressStr, ok := object.GetAttributes()[types.AddressKey]; ok {
+			parts := strings.Split(addressStr, ":")
+			if len(parts) != 2 {
+				return nil, fmt.Errorf("cannot parse address to get port number %s", addressStr)
+			}
+			if grpcPort, err = strconv.ParseInt(parts[1], 10, 32); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -476,19 +479,19 @@ func makeNeighbors(self *types.Cell, allCells map[types.ECGI]*types.Cell) []*typ
 	return neighbours
 }
 
-func ecgiFromTopoDevice(device *topodevice.Device) (*types.ECGI, error) {
+func ecgiFromtopo(object *topo.Object) (*types.ECGI, error) {
 	var ecid types.EcID
-	if ecidStr, ok := device.GetAttributes()[types.EcidKey]; ok {
+	if ecidStr, ok := object.GetAttributes()[types.EcidKey]; ok {
 		ecid = types.EcID(ecidStr)
 	}
 	var plmnid types.PlmnID
-	if plmnidStr, ok := device.GetAttributes()[types.PlmnIDKey]; ok {
+	if plmnidStr, ok := object.GetAttributes()[types.PlmnIDKey]; ok {
 		plmnid = types.PlmnID(plmnidStr)
 	}
 	var ecgi types.ECGI
 	var err error
 	if ecid == "" || plmnid == "" { // If not found in attrs above use ID
-		if ecgi, err = ecgiFromTopoID(device.GetID()); err != nil {
+		if ecgi, err = ecgiFromTopoID(object.ID); err != nil {
 			return nil, err
 		}
 	} else {
@@ -502,7 +505,7 @@ func newEcgi(id types.EcID, plmnID types.PlmnID) types.ECGI {
 }
 
 // ecgiFromTopoID topo device is formatted like "315010-0001786" PlmnId-Ecid
-func ecgiFromTopoID(id topodevice.ID) (types.ECGI, error) {
+func ecgiFromTopoID(id topo.ID) (types.ECGI, error) {
 	if !strings.Contains(string(id), "-") {
 		return types.ECGI{}, fmt.Errorf("unexpected format for E2Node ID %s", id)
 	}
