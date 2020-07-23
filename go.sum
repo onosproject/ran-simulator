@@ -2,6 +2,7 @@ bazil.org/fuse v0.0.0-20160811212531-371fbbdaa898/go.mod h1:Xbm+BRKSBEpa4q4hTSxo
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.38.0/go.mod h1:990N+gfupTy94rShfmMCWGDn0LpTmnzTp2qbd1dvSRU=
+cloud.google.com/go v0.43.0 h1:banaiRPAM8kUVYneOSkhgcDsLzEvL25FinuiSZaH/2w=
 cloud.google.com/go v0.43.0/go.mod h1:BOSR3VbTLkk6FDC/TcffxP4NF/FFBGA5ku+jvKOP7pg=
 github.com/Azure/azure-sdk-for-go v16.2.1+incompatible/go.mod h1:9XXNKU+eRnpl9moKnB4QOLf1HestfXbmab5FXxiDBjc=
 github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78/go.mod h1:LmzpDX56iTiv29bbRTIsUNlaFfuhWRQBWjQdVyAevI8=
@@ -503,10 +504,6 @@ github.com/onosproject/onos-ric v0.6.7 h1:gZGGFlDiNUAjBz7lzLeR/HvZhorAKw4sIlc4Z8
 github.com/onosproject/onos-ric v0.6.7/go.mod h1:bmifnyJZ98WDzoqqBNrXVVZ+Q8tZL1FJuEO5qeFHsso=
 github.com/onosproject/onos-topo v0.6.3 h1:hvGSfJWCswxaCyjzNvBWntQJwfKpgL3NcDdicjWBKtc=
 github.com/onosproject/onos-topo v0.6.3/go.mod h1:YUxOPZz32u2QseaNa7UuHFHl1ivs+kG4a9ntR2/cYQ0=
-github.com/onosproject/onos-topo v0.6.9 h1:34/y20qJZH3DfmRYF4heStDhDrYlU1++mQxDKvYgrhY=
-github.com/onosproject/onos-topo v0.6.9/go.mod h1:vS9Ki9KzSphcNtryWQPy8iyOi689FuCXeSiL0AyXfMo=
-github.com/onosproject/onos-topo v0.6.11 h1:lPg7W0W5Ug1cIuvarKyVyRKnHqwGc2O6UrgNp2Gai7U=
-github.com/onosproject/onos-topo v0.6.11/go.mod h1:KbgwUk0CHIWM/VWMbQj+NiELmD9PUipxIPPNigI4s2o=
 github.com/onosproject/onos-topo v0.6.12 h1:aPeQuJk4MlDmGJYq3eJtnsGtbtnH8k2LkAWom+JkbG0=
 github.com/onosproject/onos-topo v0.6.12/go.mod h1:KbgwUk0CHIWM/VWMbQj+NiELmD9PUipxIPPNigI4s2o=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

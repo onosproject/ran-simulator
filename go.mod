@@ -14,7 +14,6 @@ require (
 	github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab
 	github.com/prometheus/client_golang v1.4.1
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/smartystreets/assertions v1.0.0 // indirect
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/viper v1.6.2
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a
