@@ -500,6 +500,8 @@ github.com/onosproject/onos-lib-go v0.6.5 h1:Sd+4TGmmeEdxduJnadDaKNehr8MpmTcrGPa
 github.com/onosproject/onos-lib-go v0.6.5/go.mod h1:CQV56xK6Djj9nG83OntLKMwZcVAMpUxhRXYDhNTMMbQ=
 github.com/onosproject/onos-lib-go v0.6.10 h1:cRSgYYV/IzRg/ttahv13C0KS3g9Ur7vLQ04CDZn6Pbk=
 github.com/onosproject/onos-lib-go v0.6.10/go.mod h1:rziMWU6yQa93ZSUGRJIPNqxWtbK1R7dYjyjxUcNep6k=
+github.com/onosproject/onos-lib-go v0.6.15 h1:9UcxMZW9/718mLe2Plc7Myz1XvJJGShHTzSujpdXCKc=
+github.com/onosproject/onos-lib-go v0.6.15/go.mod h1:WrNXx2u9DeKuAtOwcZJjrZeyNOfoyEyHepRXK3xH94E=
 github.com/onosproject/onos-ric v0.6.7 h1:gZGGFlDiNUAjBz7lzLeR/HvZhorAKw4sIlc4Z8yTvX0=
 github.com/onosproject/onos-ric v0.6.7/go.mod h1:bmifnyJZ98WDzoqqBNrXVVZ+Q8tZL1FJuEO5qeFHsso=
 github.com/onosproject/onos-topo v0.6.3 h1:hvGSfJWCswxaCyjzNvBWntQJwfKpgL3NcDdicjWBKtc=

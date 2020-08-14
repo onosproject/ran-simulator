@@ -7,7 +7,7 @@ require (
 	github.com/golang/protobuf v1.3.3
 	github.com/onosproject/config-models/modelplugin/e2node-1.0.0 v0.0.0-20200511074107-7166e3a5247d
 	github.com/onosproject/onos-config v0.6.5
-	github.com/onosproject/onos-lib-go v0.6.10
+	github.com/onosproject/onos-lib-go v0.6.15
 	github.com/onosproject/onos-ric v0.6.7
 	github.com/onosproject/onos-topo v0.6.12
 	github.com/openconfig/gnmi v0.0.0-20190823184014-89b2bf29312c
