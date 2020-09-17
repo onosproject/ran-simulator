@@ -32,7 +32,7 @@ before_install:
 jobs:
   include:
     - stage: tests
-      if: type == pull_request ||  fork == false
+      if: type == pull_request || fork == false
       script:
         - make coverage
     - stage: integration tests
@@ -40,7 +40,7 @@ jobs:
       script:
           - sh ../build-tools/build/travis/trigger-travis onosproject onos-test master "`git rev-parse --short HEAD`" $TRAVIS_ACCESS_TOKEN
     - stage: CLI build
-      if: type != pull_request
+      if: type != pull_request && fork == false
       script:
         - sh ../build-tools/build/travis/trigger-travis onosproject onos-cli master "`git rev-parse --short HEAD`" $TRAVIS_ACCESS_TOKEN
     - stage: release
