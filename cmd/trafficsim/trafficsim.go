@@ -55,6 +55,7 @@ func main() {
 	metricsAllHoEvents := flag.Bool("metricsAllHoEvents", true, "Export all HO events in metrics (only historgram if false)")
 	topoEndpoint := flag.String("topoEndpoint", "onos-topo:5150", "Endpoint for the onos-topo service")
 	addK8sSvcPorts := flag.Bool("addK8sSvcPorts", true, "Add K8S service ports per tower")
+	maxNumUesPerCell := flag.Uint("maxNumUesPerCell", 5, "Maximum number of UEs per cell")
 	// TODO - remove the following - only after it's been removed from the Helm chart
 	flag.String("towerConfigName", "", "unused - config is got from topo")
 
@@ -104,6 +105,8 @@ func main() {
 		Port:              *metricsPort,
 		ExportAllHOEvents: *metricsAllHoEvents,
 	}
+
+	manager.MaxNumUesPerCell = uint32(*maxNumUesPerCell)
 
 	log.Info("Starting trafficsim")
 	mgr, err := manager.NewManager()

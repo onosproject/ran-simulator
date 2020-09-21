@@ -55,6 +55,9 @@ type CellIf interface {
 	GetPosition() types.Point
 }
 
+// MaxNumUesPerCell is the variable to configure each Cell's maximum load - the number of maximum UEs
+var MaxNumUesPerCell uint32
+
 // CellCreator - wrap the NewCell function
 func CellCreator(object *topo.Object) error {
 	cell, err := NewCell(object)
@@ -185,7 +188,7 @@ func NewCell(object *topo.Object) (*types.Cell, error) {
 		Port:       uint32(grpcPort),
 		CrntiMap:   make(map[types.Crnti]types.Imsi),
 		CrntiIndex: 0,
-		MaxUEs:     5,
+		MaxUEs:     MaxNumUesPerCell,
 		Sector: &types.Sector{
 			Azimuth: int32(azimuth),
 			Arc:     int32(arc),
