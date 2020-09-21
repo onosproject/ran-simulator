@@ -55,6 +55,7 @@ type CellIf interface {
 	GetPosition() types.Point
 }
 
+// MaxNumUesPerCell is the variable to configure each Cell's maximum load - the number of maximum UEs
 var MaxNumUesPerCell uint32
 
 // CellCreator - wrap the NewCell function
