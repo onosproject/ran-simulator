@@ -45,8 +45,7 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string,
 	}
 
 	topoClient := topo.NewTopoClient(conn)
-	stream, err := topoClient.Subscribe(context.Background(), &topo.SubscribeRequest{
-		ID: topo.ID(topo.NullID), Noreplay: false})
+	stream, err := topoClient.Watch(context.Background(), &topo.WatchRequest{})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +58,7 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string,
 		if err != nil {
 			return nil, err
 		}
-		if in.Update.Object.Type != topo.Object_ENTITY {
+		if in.Event.Object.Type != topo.Object_ENTITY {
 			continue
 		}
 		/* TODO
@@ -68,29 +67,29 @@ func ConnectToTopo(ctx context.Context, topoEndpoint string,
 			continue
 		}
 		*/
-		switch in.Update.Type {
-		case topo.Update_UNSPECIFIED:
-			err := createHandler(in.Update.Object)
+		switch in.Event.Type {
+		case topo.EventType_NONE:
+			err := createHandler(&in.Event.Object)
 			if err != nil {
-				log.Warnf("Unable to create cell from %s. %s", in.Update.Object.ID, err.Error())
+				log.Warnf("Unable to create cell from %s. %s", in.Event.Object.ID, err.Error())
 				continue
 			}
-		case topo.Update_INSERT:
-			err := createHandler(in.Update.Object)
+		case topo.EventType_ADDED:
+			err := createHandler(&in.Event.Object)
 			if err != nil {
-				log.Warnf("Unable to create cell from %s. %s", in.Update.Object.ID, err.Error())
+				log.Warnf("Unable to create cell from %s. %s", in.Event.Object.ID, err.Error())
 				continue
 			}
-		case topo.Update_MODIFY:
+		case topo.EventType_UPDATED:
 			// TODO
-		case topo.Update_DELETE:
-			err := deleteHandler(in.Update.Object)
+		case topo.EventType_REMOVED:
+			err := deleteHandler(&in.Event.Object)
 			if err != nil {
-				log.Warnf("Unable to delete cell from %s. %s", in.Update.Object.ID, err.Error())
+				log.Warnf("Unable to delete cell from %s. %s", in.Event.Object.ID, err.Error())
 				continue
 			}
 		default:
-			log.Warnf("topo event type %s not yet handled for %s", in.Update.Type, in.Update.Object.ID)
+			log.Warnf("topo event type %s not yet handled for %s", in.Event.Type, in.Event.Object.ID)
 		}
 	}
 }
