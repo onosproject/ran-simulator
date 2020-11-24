@@ -1,0 +1,104 @@
+/*
+Copyright 2019-present Open Networking Foundation.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+syntax = "proto3";
+
+package atomix.election.service;
+
+import "google/protobuf/timestamp.proto";
+import "gogoproto/gogo.proto";
+
+// Election snapshot
+message ElectionSnapshot {
+    uint64 term = 1;
+    google.protobuf.Timestamp timestamp = 2 [(gogoproto.stdtime) = true];
+    ElectionRegistration leader = 3;
+    repeated ElectionRegistration candidates = 4;
+}
+
+// Election registration
+message ElectionRegistration {
+    string id = 1 [(gogoproto.customname) = "ID"];
+    uint64 session_id = 2 [(gogoproto.customname) = "SessionID"];
+}
+
+message EnterRequest {
+    string id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message EnterResponse {
+    Term term = 1;
+}
+
+message WithdrawRequest {
+    string id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message WithdrawResponse {
+    Term term = 2;
+}
+
+message AnointRequest {
+    string id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message AnointResponse {
+    Term term = 2;
+}
+
+message PromoteRequest {
+    string id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message PromoteResponse {
+    Term term = 2;
+}
+
+message EvictRequest {
+    string id = 1 [(gogoproto.customname) = "ID"];
+}
+
+message EvictResponse {
+    Term term = 2;
+}
+
+message GetTermRequest {
+
+}
+
+message GetTermResponse {
+    Term term = 2;
+}
+
+message ListenRequest {
+
+}
+
+message ListenResponse {
+    Type type = 1;
+    Term term = 2;
+
+    enum Type {
+        CHANGED = 0;
+    }
+}
+
+message Term {
+    uint64 id = 1 [(gogoproto.customname) = "ID"];
+    google.protobuf.Timestamp timestamp = 2 [(gogoproto.stdtime) = true];
+    string leader = 3;
+    repeated string candidates = 4;
+}

@@ -1,0 +1,25 @@
+topodevices:
+  - id: "315010-0001420"
+    displayname: "Tower-1 Cell-1"
+    address: "ran-simulator:5152"
+    type: "E2Node"
+    version: "1.0.0"
+    attributes:
+      azimuth: 0
+      arc: 120
+      plmnid: "315010"
+      ecid: "0001420"
+      latitude: 52.5350
+      longitude: 13.3885
+  - id: "315010-0001421"
+    displayname: "Tower-1 Cell-2"
+    address: "ran-simulator:5153"
+    type: "E2Node"
+    version: "1.0.0"
+    attributes:
+      azimuth: 0
+      arc: 120
+      plmnid: "315010"
+      ecid: "0001420"
+      latitude: 52.5350
+      longitude: 13.3885

@@ -1,0 +1,64 @@
+topokinds:
+  - id: "E2Node"
+    type: 3
+    obj:
+      kind:
+        name: "E2Node"
+    attributes:
+      displayname: "E2 Node"
+      address: ""
+      version: ""
+      plmnid: ""
+      ecid: ""
+      azimuth: 0
+      arc: 0
+      latitude: 00.000
+      longitude: 00.000
+  - id: "XnInterface"
+    type: 3
+    obj:
+      kind:
+        name: "XnInterface"
+    attributes:
+      displayname: "Xn Interface"
+topoentities:
+  - id: "315010-0001420"
+    type: 1
+    obj:
+      entity:
+        kindid: "E2Node"
+    attributes:
+      displayname: "Tower-1 Cell-1"
+      address: "ran-simulator:5152"
+      azimuth: 0
+      version: "1.0.0"
+      arc: 120
+      plmnid: "315010"
+      ecid: "0001420"
+      latitude: 52.5350
+      longitude: 13.3885
+  - id: "315010-0001421"
+    type: 1
+    obj:
+      entity:
+        kindid: "E2Node"
+    attributes:
+      displayname: "Tower-1 Cell-2"
+      address: "ran-simulator:5152"
+      version: "1.0.0"
+      azimuth: 120
+      arc: 120
+      plmnid: "315010"
+      ecid: "0001420"
+      latitude: 52.5350
+      longitude: 13.3885
+toporelations:
+  - id: "rel1"
+    type: 2
+    obj:
+      relation:
+        kindid: "XnInterface"
+        srcentityid: "315010-0001420"
+        tgtentityid: "315010-0001421"
+    attributes:
+      displayname: "Tower 1 - Tower 2"

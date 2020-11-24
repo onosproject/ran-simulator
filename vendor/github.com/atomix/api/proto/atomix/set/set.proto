@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package atomix.set;
+
+import "atomix/headers/headers.proto";
+
+message CreateRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message CreateResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message CloseRequest {
+    atomix.headers.RequestHeader header = 1;
+    bool delete = 2;
+}
+
+message CloseResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message SizeRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message SizeResponse {
+    atomix.headers.ResponseHeader header = 1;
+    uint32 size = 2;
+}
+
+message ContainsRequest {
+    atomix.headers.RequestHeader header = 1;
+    string value = 2;
+}
+
+message ContainsResponse {
+    atomix.headers.ResponseHeader header = 1;
+    bool contains = 2;
+}
+
+message AddRequest {
+    atomix.headers.RequestHeader header = 1;
+    string value = 2;
+}
+
+message AddResponse {
+    atomix.headers.ResponseHeader header = 1;
+    ResponseStatus status = 2;
+    bool added = 3;
+}
+
+message RemoveRequest {
+    atomix.headers.RequestHeader header = 1;
+    string value = 2;
+}
+
+message RemoveResponse {
+    atomix.headers.ResponseHeader header = 1;
+    ResponseStatus status = 2;
+    bool removed = 3;
+}
+
+message ClearRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message ClearResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message EventRequest {
+    atomix.headers.RequestHeader header = 1;
+    bool replay = 2;
+}
+
+message EventResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Type type = 2;
+    string value = 3;
+
+    enum Type {
+        NONE = 0;
+        ADDED = 1;
+        REMOVED = 2;
+    }
+}
+
+message IterateRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message IterateResponse {
+    atomix.headers.ResponseHeader header = 1;
+    string value = 2;
+}
+
+enum ResponseStatus {
+    OK = 0;
+    NOOP = 1;
+    WRITE_LOCK = 2;
+}
+
+// Set service
+service SetService {
+
+    // Create creates a set session
+    rpc Create (CreateRequest) returns (CreateResponse);
+
+    // Close closes a set
+    rpc Close (CloseRequest) returns (CloseResponse);
+
+    // Size gets the number of elements in the set
+    rpc Size (SizeRequest) returns (SizeResponse);
+
+    // Contains returns whether the set contains a value
+    rpc Contains (ContainsRequest) returns (ContainsResponse);
+
+    // Add adds a value to the set
+    rpc Add (AddRequest) returns (AddResponse);
+
+    // Remove removes a value from the set
+    rpc Remove (RemoveRequest) returns (RemoveResponse);
+
+    // Clear removes all values from the set
+    rpc Clear (ClearRequest) returns (ClearResponse);
+
+    // Events listens for set change events
+    rpc Events (EventRequest) returns (stream EventResponse);
+
+    // Iterate iterates through all values in the set
+    rpc Iterate (IterateRequest) returns (stream IterateResponse);
+
+}

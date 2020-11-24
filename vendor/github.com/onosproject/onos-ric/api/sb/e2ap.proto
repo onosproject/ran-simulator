@@ -1,0 +1,383 @@
+/*
+Copyright 2020-present Open Networking Foundation.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+syntax = "proto3";
+
+package interface.e2ap;
+
+/*
+-- **************************************************************
+--
+-- Interface Elementary Procedure Class
+--
+-- **************************************************************
+
+E2AP-ELEMENTARY-PROCEDURE ::= CLASS {
+    &InitiatingMessage                                        ,
+    &SuccessfulOutcome                            OPTIONAL    ,
+    &UnsuccessfulOutcome                        OPTIONAL    ,
+    &procedureCode                ProcedureCode    UNIQUE    ,
+    &criticality                Criticality        DEFAULT ignore
+}
+
+WITH SYNTAX {
+    INITIATING MESSAGE            &InitiatingMessage
+    [SUCCESSFUL OUTCOME            &SuccessfulOutcome]
+    [UNSUCCESSFUL OUTCOME        &UnsuccessfulOutcome]
+    PROCEDURE CODE                &procedureCode
+    [CRITICALITY                &criticality]
+}
+
+-- **************************************************************
+--
+-- Interface PDU Definition
+--
+-- **************************************************************
+
+E2AP-PDU ::= CHOICE {
+    initiatingMessage            InitiatingMessage,
+    successfulOutcome            SuccessfulOutcome,
+    unsuccessfulOutcome            UnsuccessfulOutcome,
+    ...
+}
+
+InitiatingMessage ::= SEQUENCE {
+    procedureCode    E2AP-ELEMENTARY-PROCEDURE.&procedureCode        ({E2AP-ELEMENTARY-PROCEDURES}),
+    criticality        E2AP-ELEMENTARY-PROCEDURE.&criticality            ({E2AP-ELEMENTARY-PROCEDURES}{@procedureCode}),
+    value            E2AP-ELEMENTARY-PROCEDURE.&InitiatingMessage    ({E2AP-ELEMENTARY-PROCEDURES}{@procedureCode})
+}
+
+SuccessfulOutcome ::= SEQUENCE {
+    procedureCode    E2AP-ELEMENTARY-PROCEDURE.&procedureCode        ({E2AP-ELEMENTARY-PROCEDURES}),
+    criticality        E2AP-ELEMENTARY-PROCEDURE.&criticality            ({E2AP-ELEMENTARY-PROCEDURES}{@procedureCode}),
+    value            E2AP-ELEMENTARY-PROCEDURE.&SuccessfulOutcome    ({E2AP-ELEMENTARY-PROCEDURES}{@procedureCode})
+}
+
+UnsuccessfulOutcome ::= SEQUENCE {
+    procedureCode    E2AP-ELEMENTARY-PROCEDURE.&procedureCode        ({E2AP-ELEMENTARY-PROCEDURES}),
+    criticality        E2AP-ELEMENTARY-PROCEDURE.&criticality            ({E2AP-ELEMENTARY-PROCEDURES}{@procedureCode}),
+    value            E2AP-ELEMENTARY-PROCEDURE.&UnsuccessfulOutcome    ({E2AP-ELEMENTARY-PROCEDURES}{@procedureCode})
+}
+
+-- **************************************************************
+--
+-- Interface Elementary Procedure List
+--
+-- **************************************************************
+
+E2AP-ELEMENTARY-PROCEDURES E2AP-ELEMENTARY-PROCEDURE ::= {
+    E2AP-ELEMENTARY-PROCEDURES-CLASS-1                    |
+    E2AP-ELEMENTARY-PROCEDURES-CLASS-2,    
+    ...
+}
+
+E2AP-ELEMENTARY-PROCEDURES-CLASS-1 E2AP-ELEMENTARY-PROCEDURE ::= {
+    ricSubscription                                        |
+    ricSubscriptionDelete                                |
+    ricServiceUpdate                                    |
+    ricControl                                            |
+    e2setup                                                |
+    reset,
+    ...
+}
+
+E2AP-ELEMENTARY-PROCEDURES-CLASS-2 E2AP-ELEMENTARY-PROCEDURE ::= {
+    ricIndication                                        |
+    ricServiceQuery                                        |
+    errorIndication,    
+    ...
+}
+
+-- **************************************************************
+--
+-- Interface Elementary Procedures
+--
+-- **************************************************************
+
+e2setup    E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        E2setupRequest
+    SUCCESSFUL OUTCOME        E2setupResponse
+    UNSUCCESSFUL OUTCOME    E2setupFailure
+    PROCEDURE CODE            id-E2setup
+    CRITICALITY                reject
+}
+
+errorIndication E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        ErrorIndication
+    PROCEDURE CODE            id-ErrorIndication
+    CRITICALITY                ignore
+}
+
+reset    E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        ResetRequest
+    SUCCESSFUL OUTCOME        ResetResponse
+    PROCEDURE CODE            id-Reset
+    CRITICALITY                reject
+}
+
+ricControl E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        RICcontrolRequest
+    SUCCESSFUL OUTCOME        RICcontrolAcknowledge
+    UNSUCCESSFUL OUTCOME    RICcontrolFailure
+    PROCEDURE CODE            id-RICcontrol
+    CRITICALITY                reject
+}
+
+ricIndication E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        RICindication
+    PROCEDURE CODE            id-RICindication
+    CRITICALITY                ignore
+}
+
+ricServiceQuery E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        RICserviceQuery
+    PROCEDURE CODE            id-RICserviceQuery
+    CRITICALITY                ignore
+}
+
+ricServiceUpdate E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        RICserviceUpdate
+    SUCCESSFUL OUTCOME        RICserviceUpdateAcknowledge
+    UNSUCCESSFUL OUTCOME    RICserviceUpdateFailure
+    PROCEDURE CODE            id-RICserviceUpdate
+    CRITICALITY                reject
+}
+
+ricSubscription E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        RICsubscriptionRequest
+    SUCCESSFUL OUTCOME        RICsubscriptionResponse
+    UNSUCCESSFUL OUTCOME    RICsubscriptionFailure
+    PROCEDURE CODE            id-RICsubscription
+    CRITICALITY                reject
+}
+
+ricSubscriptionDelete E2AP-ELEMENTARY-PROCEDURE ::= {
+    INITIATING MESSAGE        RICsubscriptionDeleteRequest
+    SUCCESSFUL OUTCOME        RICsubscriptionDeleteResponse
+    UNSUCCESSFUL OUTCOME    RICsubscriptionDeleteFailure
+    PROCEDURE CODE            id-RICsubscriptionDelete
+    CRITICALITY                reject
+}
+*/
+
+enum Criticality {
+	REJECT = 0;
+	IGNORE = 1;
+	NOTIFY = 2;
+}
+
+enum Presence {
+	OPTIONAL = 0;
+	CONDITIONAL = 1;
+	MANDATORY = 2;
+}
+
+/*
+ProcedureCode        ::= INTEGER (0..255)
+
+ProtocolIE-ID        ::= INTEGER (0..65535)
+*/
+
+enum TriggeringMessage {
+	INITIATING_MESSAGE = 0;
+	SUCCESSFUL_OUTCOME = 1;
+	UNSUCCESSFULL_OUTCOME = 2;
+}
+
+enum ProcedureCode {
+    PC_INVALID = 0;
+	E2_SETUP = 1;
+	ERROR_INDICATION = 2;
+	RESET = 3;
+	RIC_CONTROL = 4;
+	RIC_INDICATION = 5;
+	RIC_SERVICE_QUERY = 6;
+	RIC_SERVICE_UPDATE = 7;
+	RIC_SUBSCRIPTION = 8;
+	RIC_SUBSCRIPTION_DELETE= 9;
+}
+
+/*
+maxProtocolIEs                                INTEGER ::= 65535
+maxnoofErrors                                INTEGER ::= 256
+maxofRANfunctionID                            INTEGER ::= 256
+maxofRICactionID                            INTEGER ::= 16
+*/
+
+enum ProtocolIEId {
+    UNDEFINED = 0;
+	CAUSE = 1;
+	CRITICALITY_DIAGNOSTICS = 2;
+	GLOBAL_E2_NODE_ID = 3;
+	GLOBAL_RIC_ID = 4;
+	RAN_FUNCTION_ID = 5;
+	RAN_FUNCTION_ID_ITEM = 6;
+	RAN_FUNCTION_IE_CAUSE_ITEM = 7;
+	RAN_FUNCTION_ITEM = 8;
+	RAN_FUNCTIONS_ACCEPTED = 9;
+	RAN_FUNCTIONS_ADDED = 10;
+	RAN_FUNCTIONS_DELETED = 11;
+	RAN_FUNCTIONS_MODIFIED = 12;
+	RAN_FUNCTIONS_REJECTED = 13;
+	RIC_ACTION_ADMITTED_ITEM = 14;
+	RIC_ACTION_ID = 15;
+	RIC_ACTION_NOT_ADMITTED_ITEM = 16;
+	RIC_ACTIONS_ADMITTED = 17;
+	RIC_ACTIONS_NOT_ADMITTED = 18;
+	RIC_ACTION_TO_BE_SETUP_ITEM = 19;
+	RIC_CALL_PROCESS_ID = 20;
+	RIC_CONTROL_ACK_REQUEST = 21;
+	RIC_CONTROL_HEADER = 22;
+	RIC_CONTROL_MESSAGE = 23;
+	RIC_CONTROL_STATUS = 24;
+	RIC_INDICATION_HEADER = 25;
+	RIC_INDICATION_MESSAGE = 26;
+	RIC_INDICATION_SN = 27;
+	RIC_INDICATION_TYPE = 28;
+	RIC_REQUEST_ID = 29;
+	RIC_SUBSCRIPTION_DETAILS = 30;
+	TIME_TO_WAIT = 31;
+	RIC_CONTROL_OUTCOME = 32;
+}
+
+/*
+-- **************************************************************
+--
+-- Class Definition for Protocol IEs
+--
+-- **************************************************************
+
+E2AP-PROTOCOL-IES ::= CLASS {
+    &id                ProtocolIE-ID                    UNIQUE,
+    &criticality    Criticality,
+    &Value,
+    &presence        Presence
+}
+WITH SYNTAX {
+    ID                &id
+    CRITICALITY        &criticality
+    TYPE            &Value
+    PRESENCE        &presence
+}
+*/
+
+message E2apProtocolIE {
+    ProtocolIEId id = 1;
+    Criticality criticality = 2;
+    /* value */
+    Presence presence = 3;
+}
+
+/*
+-- **************************************************************
+--
+-- Class Definition for Protocol IEs
+--
+-- **************************************************************
+
+E2AP-PROTOCOL-IES-PAIR ::= CLASS {
+    &id                    ProtocolIE-ID                UNIQUE,
+    &firstCriticality    Criticality,
+    &FirstValue,
+    &secondCriticality    Criticality,
+    &SecondValue,
+    &presence            Presence
+}
+WITH SYNTAX {
+    ID                        &id
+    FIRST CRITICALITY        &firstCriticality
+    FIRST TYPE                &FirstValue
+    SECOND CRITICALITY        &secondCriticality
+    SECOND TYPE                &SecondValue
+    PRESENCE                &presence
+}
+*/
+
+message E2apProtocolIEsPair {
+    ProtocolIEId id = 1;
+    Criticality firstCriticality = 2;
+    /* firstValue = 3;*/
+    Criticality secondCriticality = 4;
+    /* secondValue = 5;*/
+    Presence presence = 6;
+}
+
+/*
+-- **************************************************************
+--
+-- Container for Protocol IEs
+--
+-- **************************************************************
+
+ProtocolIE-Container {E2AP-PROTOCOL-IES : IEsSetParam} ::= 
+    SEQUENCE (SIZE (0..maxProtocolIEs)) OF
+    ProtocolIE-Field {{IEsSetParam}}
+*/
+
+message ProtocolIEContainer {
+}
+
+/*
+ProtocolIE-SingleContainer {E2AP-PROTOCOL-IES : IEsSetParam} ::=
+    ProtocolIE-Field {{IEsSetParam}}
+*/
+
+message ProtocolIESingleContainer {
+}
+
+/*
+ProtocolIE-Field {E2AP-PROTOCOL-IES : IEsSetParam} ::= SEQUENCE {
+    id                E2AP-PROTOCOL-IES.&id                ({IEsSetParam}),
+    criticality        E2AP-PROTOCOL-IES.&criticality        ({IEsSetParam}{@id}),
+    value            E2AP-PROTOCOL-IES.&Value            ({IEsSetParam}{@id})
+}
+*/
+
+message ProtocolIEField {
+}
+
+/*
+-- **************************************************************
+--
+-- Container for Protocol IE Pairs
+--
+-- **************************************************************
+
+ProtocolIE-ContainerPair {E2AP-PROTOCOL-IES-PAIR : IEsSetParam} ::= 
+    SEQUENCE (SIZE (0..maxProtocolIEs)) OF
+    ProtocolIE-FieldPair {{IEsSetParam}}
+
+ProtocolIE-FieldPair {E2AP-PROTOCOL-IES-PAIR : IEsSetParam} ::= SEQUENCE {
+    id                    E2AP-PROTOCOL-IES-PAIR.&id                    ({IEsSetParam}),
+    firstCriticality    E2AP-PROTOCOL-IES-PAIR.&firstCriticality    ({IEsSetParam}{@id}),
+    firstValue            E2AP-PROTOCOL-IES-PAIR.&FirstValue            ({IEsSetParam}{@id}),
+    secondCriticality    E2AP-PROTOCOL-IES-PAIR.&secondCriticality    ({IEsSetParam}{@id}),
+    secondValue            E2AP-PROTOCOL-IES-PAIR.&SecondValue            ({IEsSetParam}{@id})
+}
+
+-- **************************************************************
+--
+-- Container Lists for Protocol IE Containers
+--
+-- **************************************************************
+
+ProtocolIE-ContainerList {INTEGER : lowerBound, INTEGER : upperBound, E2AP-PROTOCOL-IES : IEsSetParam} ::=
+    SEQUENCE (SIZE (lowerBound..upperBound)) OF
+    ProtocolIE-SingleContainer {{IEsSetParam}}
+
+ProtocolIE-ContainerPairList {INTEGER : lowerBound, INTEGER : upperBound, E2AP-PROTOCOL-IES-PAIR : IEsSetParam} ::=
+    SEQUENCE (SIZE (lowerBound..upperBound)) OF
+    ProtocolIE-ContainerPair {{IEsSetParam}}
+*/

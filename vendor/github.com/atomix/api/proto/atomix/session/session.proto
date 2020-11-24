@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+import "atomix/headers/headers.proto";
+import "gogoproto/gogo.proto";
+
+package atomix.session;
+
+message OpenSessionRequest {
+    atomix.headers.RequestHeader header = 1;
+    google.protobuf.Duration timeout = 2 [(gogoproto.stdduration) = true];
+}
+
+message OpenSessionResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message KeepAliveRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message KeepAliveResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message CloseSessionRequest {
+    atomix.headers.RequestHeader header = 1;
+    bool delete = 2;
+}
+
+message CloseSessionResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+// Session service
+service SessionService {
+    // OpenSession opens a new session
+    rpc OpenSession (OpenSessionRequest) returns (OpenSessionResponse);
+
+    // KeepAlive keeps a session alive
+    rpc KeepAlive (KeepAliveRequest) returns (KeepAliveResponse);
+
+    // CloseSession closes a session
+    rpc CloseSession (CloseSessionRequest) returns (CloseSessionResponse);
+}
