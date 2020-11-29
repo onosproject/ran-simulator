@@ -8,7 +8,7 @@ require (
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/onosproject/config-models/modelplugin/e2node-1.0.0 v0.0.0-20200511074107-7166e3a5247d
 	github.com/onosproject/onos-config v0.6.16
-	github.com/onosproject/onos-e2t v0.6.8 // indirect
+	github.com/onosproject/onos-e2t v0.6.8
 	github.com/onosproject/onos-lib-go v0.6.25
 	github.com/onosproject/onos-ric v0.6.7
 	github.com/onosproject/onos-topo v0.6.20

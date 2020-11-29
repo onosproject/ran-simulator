@@ -72,6 +72,8 @@ github.com/eapache/go-resiliency/breaker
 github.com/eapache/go-xerial-snappy
 # github.com/eapache/queue v1.1.0
 github.com/eapache/queue
+# github.com/envoyproxy/protoc-gen-validate v0.1.0
+github.com/envoyproxy/protoc-gen-validate/validate
 # github.com/ericchiang/oidc v0.0.0-20160908143337-11f62933e071
 github.com/ericchiang/oidc
 # github.com/fsnotify/fsnotify v1.4.7
@@ -132,6 +134,8 @@ github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
+# github.com/ishidawataru/sctp v0.0.0-20191218070446-00ab2ac2db07
+github.com/ishidawataru/sctp
 # github.com/jcmturner/gofork v1.0.0
 github.com/jcmturner/gofork/encoding/asn1
 github.com/jcmturner/gofork/x/crypto/pbkdf2
@@ -204,6 +208,19 @@ github.com/onosproject/onos-config/pkg/utils
 github.com/onosproject/onos-config/pkg/utils/values
 # github.com/onosproject/onos-e2t v0.6.8
 ## explicit
+github.com/onosproject/onos-e2t/api/e2ap/v1beta1
+github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes
+github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-constants
+github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apcontainers
+github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies
+github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents
+github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appdudescriptions
+github.com/onosproject/onos-e2t/pkg/protocols/e2
+github.com/onosproject/onos-e2t/pkg/protocols/e2/channels
+github.com/onosproject/onos-e2t/pkg/protocols/e2/procedures
+github.com/onosproject/onos-e2t/pkg/protocols/sctp
+github.com/onosproject/onos-e2t/pkg/southbound/e2ap/asn1cgo
+github.com/onosproject/onos-e2t/pkg/utils/async
 # github.com/onosproject/onos-lib-go v0.6.25
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging
@@ -214,6 +231,7 @@ github.com/onosproject/onos-lib-go/pkg/cli
 github.com/onosproject/onos-lib-go/pkg/cluster
 github.com/onosproject/onos-lib-go/pkg/config
 github.com/onosproject/onos-lib-go/pkg/env
+github.com/onosproject/onos-lib-go/pkg/errors
 github.com/onosproject/onos-lib-go/pkg/grpcinterceptors
 github.com/onosproject/onos-lib-go/pkg/logging
 github.com/onosproject/onos-lib-go/pkg/logging/cli
