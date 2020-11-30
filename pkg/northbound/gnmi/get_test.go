@@ -61,6 +61,7 @@ func setUpCell() (*manager.Manager, error) {
 }
 
 func Test_getE2nodeIntervalsPdcpMeasReportPerUe(t *testing.T) {
+	t.Skip()
 	mgr, err := setUpCell()
 	assert.NilError(t, err)
 	ecgi1420 := types.ECGI{
@@ -76,6 +77,7 @@ func Test_getE2nodeIntervalsPdcpMeasReportPerUe(t *testing.T) {
 }
 
 func Test_getE2nodeIntervalsPdcpMeasReportPerCell(t *testing.T) {
+	t.Skip()
 	mgr, err := setUpCell()
 	assert.NilError(t, err)
 	ecgi1420 := types.ECGI{
