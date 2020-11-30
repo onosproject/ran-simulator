@@ -9,6 +9,7 @@ ONOS_PROTOC_VERSION := v0.6.3
 
 build: # @HELP build the Go binaries and run all validations (default)
 build:
+	export GOPRIVATE="github.com/onosproject/*"
 	CGO_ENABLED=1 go build -o build/_output/trafficsim ./cmd/trafficsim
 
 test: # @HELP run the unit tests and source code validation
