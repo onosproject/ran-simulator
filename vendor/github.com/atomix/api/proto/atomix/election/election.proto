@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "atomix/headers/headers.proto";
+import "gogoproto/gogo.proto";
+
+package atomix.election;
+
+message CreateRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message CreateResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message CloseRequest {
+    atomix.headers.RequestHeader header = 1;
+    bool delete = 2;
+}
+
+message CloseResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message EnterRequest {
+    atomix.headers.RequestHeader header = 1;
+    string candidate_id = 2 [(gogoproto.customname) = "CandidateID"];
+}
+
+message EnterResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Term term = 2;
+}
+
+message WithdrawRequest {
+    atomix.headers.RequestHeader header = 1;
+    string candidate_id = 2 [(gogoproto.customname) = "CandidateID"];
+}
+
+message WithdrawResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Term term = 2;
+}
+
+message AnointRequest {
+    atomix.headers.RequestHeader header = 1;
+    string candidate_id = 2 [(gogoproto.customname) = "CandidateID"];
+}
+
+message AnointResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Term term = 2;
+}
+
+message PromoteRequest {
+    atomix.headers.RequestHeader header = 1;
+    string candidate_id = 2 [(gogoproto.customname) = "CandidateID"];
+}
+
+message PromoteResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Term term = 2;
+}
+
+message EvictRequest {
+    atomix.headers.RequestHeader header = 1;
+    string candidate_id = 2 [(gogoproto.customname) = "CandidateID"];
+}
+
+message EvictResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Term term = 2;
+}
+
+message GetTermRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message GetTermResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Term term = 2;
+}
+
+message EventRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message EventResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Type type = 2;
+    Term term = 3;
+
+    enum Type {
+        CHANGED = 0;
+    }
+}
+
+message Term {
+    uint64 id = 1 [(gogoproto.customname) = "ID"];
+    google.protobuf.Timestamp timestamp = 2 [(gogoproto.stdtime) = true];
+    string leader = 3;
+    repeated string candidates = 4;
+}
+
+// LeaderElectionService implements a distributed leader election
+service LeaderElectionService {
+
+    // Create creates a LeaderElection instance
+    rpc Create (CreateRequest) returns (CreateResponse);
+
+    // Close closes a LeaderElection instance
+    rpc Close (CloseRequest) returns (CloseResponse);
+
+    // Enter enters the leader election
+    rpc Enter (EnterRequest) returns (EnterResponse);
+
+    // Withdraw withdraws a candidate from the leader election
+    rpc Withdraw (WithdrawRequest) returns (WithdrawResponse);
+
+    // Anoint anoints a candidate leader
+    rpc Anoint (AnointRequest) returns (AnointResponse);
+
+    // Promote promotes a candidate
+    rpc Promote (PromoteRequest) returns (PromoteResponse);
+
+    // Evict evicts a candidate from the election
+    rpc Evict (EvictRequest) returns (EvictResponse);
+
+    // GetTerm gets the current leadership term
+    rpc GetTerm (GetTermRequest) returns (GetTermResponse);
+
+    // Events listens for leadership events
+    rpc Events (EventRequest) returns (stream EventResponse);
+
+}

@@ -1,0 +1,177 @@
+syntax = "proto3";
+
+package atomix.list;
+
+import "atomix/headers/headers.proto";
+
+message CreateRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message CreateResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message CloseRequest {
+    atomix.headers.RequestHeader header = 1;
+    bool delete = 2;
+}
+
+message CloseResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message SizeRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message SizeResponse {
+    atomix.headers.ResponseHeader header = 1;
+    uint32 size = 2;
+}
+
+message ContainsRequest {
+    atomix.headers.RequestHeader header = 1;
+    string value = 2;
+}
+
+message ContainsResponse {
+    atomix.headers.ResponseHeader header = 1;
+    bool contains = 2;
+}
+
+message AppendRequest {
+    atomix.headers.RequestHeader header = 1;
+    string value = 2;
+}
+
+message AppendResponse {
+    atomix.headers.ResponseHeader header = 1;
+    ResponseStatus status = 2;
+}
+
+message GetRequest {
+    atomix.headers.RequestHeader header = 1;
+    uint32 index = 2;
+}
+
+message GetResponse {
+    atomix.headers.ResponseHeader header = 1;
+    ResponseStatus status = 2;
+    string value = 3;
+}
+
+message SetRequest {
+    atomix.headers.RequestHeader header = 1;
+    uint32 index = 2;
+    string value = 3;
+}
+
+message SetResponse {
+    atomix.headers.ResponseHeader header = 1;
+    ResponseStatus status = 2;
+}
+
+message InsertRequest {
+    atomix.headers.RequestHeader header = 1;
+    uint32 index = 2;
+    string value = 3;
+}
+
+message InsertResponse {
+    atomix.headers.ResponseHeader header = 1;
+    ResponseStatus status = 2;
+}
+
+message RemoveRequest {
+    atomix.headers.RequestHeader header = 1;
+    uint32 index = 2;
+}
+
+message RemoveResponse {
+    atomix.headers.ResponseHeader header = 1;
+    ResponseStatus status = 2;
+    string value = 3;
+}
+
+message ClearRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message ClearResponse {
+    atomix.headers.ResponseHeader header = 1;
+}
+
+message EventRequest {
+    atomix.headers.RequestHeader header = 1;
+    bool replay = 2;
+}
+
+message EventResponse {
+    atomix.headers.ResponseHeader header = 1;
+    Type type = 2;
+    uint32 index = 3;
+    string value = 4;
+
+    enum Type {
+        NONE = 0;
+        ADDED = 1;
+        REMOVED = 2;
+    }
+}
+
+message IterateRequest {
+    atomix.headers.RequestHeader header = 1;
+}
+
+message IterateResponse {
+    atomix.headers.ResponseHeader header = 1;
+    string value = 2;
+}
+
+enum ResponseStatus {
+    OK = 0;
+    NOOP = 1;
+    WRITE_LOCK = 2;
+    OUT_OF_BOUNDS = 3;
+}
+
+// ListService implements a distributed list
+service ListService {
+
+    // Create creates a list session
+    rpc Create (CreateRequest) returns (CreateResponse);
+
+    // Close closes a list
+    rpc Close (CloseRequest) returns (CloseResponse);
+
+    // Size gets the number of elements in the list
+    rpc Size (SizeRequest) returns (SizeResponse);
+
+    // Contains returns whether the list contains a value
+    rpc Contains (ContainsRequest) returns (ContainsResponse);
+
+    // Append appends a value to the list
+    rpc Append (AppendRequest) returns (AppendResponse);
+
+    // Insert inserts a value at a specific index in the list
+    rpc Insert (InsertRequest) returns (InsertResponse);
+
+    // Get gets the value at an index in the list
+    rpc Get (GetRequest) returns (GetResponse);
+
+    // Set sets the value at an index in the list
+    rpc Set (SetRequest) returns (SetResponse);
+
+    // Remove removes an element from the list
+    rpc Remove (RemoveRequest) returns (RemoveResponse);
+
+    // Clear removes all elements from the list
+    rpc Clear (ClearRequest) returns (ClearResponse);
+
+    // Events listens for change events
+    rpc Events (EventRequest) returns (stream EventResponse);
+
+    // Iterate streams all values in the list
+    rpc Iterate (IterateRequest) returns (stream IterateResponse);
+}

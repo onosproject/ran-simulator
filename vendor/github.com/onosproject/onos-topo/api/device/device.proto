@@ -1,0 +1,275 @@
+/*
+Copyright 2019-present Open Networking Foundation.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+syntax = "proto3";
+
+// Package topo.device defines interfaces for managing devices.
+package topo.device;
+
+import "google/protobuf/duration.proto";
+import "gogoproto/gogo.proto";
+
+// Protocol to interact with a device
+enum Protocol {
+    //UNKNOWN_PROTOCOL constant needed to go around proto3 nullifying the 0 values
+    UNKNOWN_PROTOCOL = 0;
+
+    // GNMI protocol reference
+    GNMI = 1;
+
+    // P4RUNTIME protocol reference
+    P4RUNTIME = 2;
+
+    // GNOI protocol reference
+    GNOI = 3;
+
+    // E2 Control Plane Protocol
+    E2AP = 4;
+}
+
+//ConnectivityState represents the L3 reachability of a device from the service container (e.g. enos-config), independently of gRPC or the service itself (e.g. gNMI)
+enum ConnectivityState {
+    //UNKNOWN_CONNECTIVITY_STATE constant needed to go around proto3 nullifying the 0 values
+    UNKNOWN_CONNECTIVITY_STATE = 0;
+
+    // REACHABLE indicates the the service can reach the device at L3
+    REACHABLE = 1;
+
+    // UNREACHABLE indicates the the service can't reach the device at L3
+    UNREACHABLE = 2;
+}
+//ConnectivityState represents the state of a gRPC channel to the device from the service container
+enum ChannelState {
+    //UNKNOWN_CHANNEL_STATE constant needed to go around proto3 nullifying the 0 values
+    UNKNOWN_CHANNEL_STATE = 0;
+
+    // CONNECTED indicates the corresponding grpc channel is connected on this device
+    CONNECTED = 1;
+
+    // DISCONNECTED indicates the corresponding grpc channel is not connected on this device
+    DISCONNECTED = 2;
+}
+//ServiceState represents the state of the gRPC service (e.g. gNMI) to the device from the service container
+enum ServiceState {
+    //UNKNOWN_SERVICE_STATE constant needed to go around proto3 nullifying the 0 values
+    UNKNOWN_SERVICE_STATE = 0;
+
+    // AVAILABLE indicates the corresponding grpc service is available
+    AVAILABLE = 1;
+
+    // UNAVAILABLE indicates the corresponding grpc service is not available
+    UNAVAILABLE = 2;
+
+    // CONNECTING indicates the corresponding protocol is in the connecting phase on this device
+    CONNECTING = 3;
+}
+
+// AddRequest adds a device to the topology
+message AddRequest {
+    // device is the device to add
+    Device device = 1;
+}
+
+// AddResponse is sent in response to an AddDeviceRequest
+message AddResponse {
+    // device is the device with a revision number
+    Device device = 1;
+}
+
+// UpdateRequest updates a device
+message UpdateRequest {
+    // device is the updated device
+    Device device = 1;
+}
+
+// UpdateResponse is sent in response to an UpdateDeviceRequest
+message UpdateResponse {
+    // device is the device with updated revision
+    Device device = 1;
+}
+
+// GetRequest gets a device by ID
+message GetRequest {
+
+    // id is the unique device ID with which to lookup the device
+    string id = 1 [(gogoproto.customname) = "ID", (gogoproto.casttype) = "ID"];
+}
+
+// GetResponse carries a device
+message GetResponse {
+    // device is the device object
+    Device device = 1;
+}
+
+// ListRequest requests a stream of devices and changes
+// By default, the request requests a stream of all devices that are present in the topology when
+// the request is received by the service. However, if `subscribe` is `true`, the stream will remain
+// open after all devices have been sent and events that occur following the last device will be
+// streamed to the client until the stream is closed.
+message ListRequest {
+
+    // subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
+    // after all devices have been streamed to the client
+    bool subscribe = 1;
+}
+
+// ListResponse carries a single device event
+message ListResponse {
+
+    // type is the type of the event
+    Type type = 1;
+
+    // device is the device on which the event occurred
+    Device device = 2;
+
+    // Device event type
+    enum Type {
+        // NONE indicates this response does not represent a state change
+        NONE = 0;
+
+        // ADDED is an event which occurs when a device is added to the topology
+        ADDED = 1;
+
+        // UPDATED is an event which occurs when a device is updated
+        UPDATED = 2;
+
+        // REMOVED is an event which occurs when a device is removed from the topology
+        REMOVED = 3;
+    }
+}
+
+// RemoveRequest removes a device by ID
+message RemoveRequest {
+    // device is the device to remove
+    Device device = 1;
+}
+
+// RemoveResponse is sent in response to a RemoveDeviceRequest
+message RemoveResponse {
+
+}
+
+// Device contains information about a device
+message Device {
+
+    // id is a globally unique device identifier
+    string id = 1 [(gogoproto.customname) = "ID", (gogoproto.casttype) = "ID"];
+
+    // revision is the revision of the device
+    uint64 revision = 2 [(gogoproto.casttype) = "Revision"];
+
+    // address is the host:port of the device
+    string address = 3;
+
+    // target is the device target
+    string target = 4;
+
+    // version is the device software version
+    string version = 5;
+
+    // timeout indicates the device request timeout
+    google.protobuf.Duration timeout = 6 [(gogoproto.stdduration) = true];
+
+    // credentials contains the credentials for connecting to the device
+    Credentials credentials = 7 [(gogoproto.nullable) = false];
+
+    // tls is the device TLS configuration
+    TlsConfig tls = 8 [(gogoproto.customname) = "TLS", (gogoproto.nullable) = false];
+
+    // type is the type of the device
+    string type = 9 [(gogoproto.casttype) = "Type"];
+
+    // role is a role for the device
+    string role = 10 [(gogoproto.casttype) = "Role"];
+
+    // attributes is an arbitrary mapping of attribute keys/values
+    map<string, string> attributes = 11;
+
+    repeated ProtocolState protocols = 12;
+
+    // displayname is a user friendly tag
+    string displayname = 13;
+}
+
+// Credentials is the device credentials
+message Credentials {
+
+    // user is the user with which to connect to the device
+    string user = 1;
+
+    // password is the password for connecting to the device
+    string password = 2;
+}
+
+// Device TLS configuration
+message TlsConfig {
+
+    // caCert is the name of the device's CA certificate
+    string caCert = 3;
+
+    // cert is the name of the device's certificate
+    string cert = 4;
+
+    // key is the name of the device's TLS key
+    string key = 5;
+
+    // plain indicates whether to connect to the device over plaintext
+    bool plain = 6;
+
+    // insecure indicates whether to connect to the device with insecure communication
+    bool insecure = 7;
+}
+
+// ProtocolState contains information related to service and connectivity to a device
+message ProtocolState {
+
+    //The protocol to which state relates
+    Protocol protocol = 1;
+
+    //ConnectivityState contains the L3 connectivity information
+    ConnectivityState connectivityState = 2;
+
+    //ChannelState relates to the availability of the gRPC channel
+    ChannelState channelState = 3;
+
+    //ServiceState indicates the availability of the gRPC servic on top of the channel
+    ServiceState serviceState = 4;
+}
+
+// DeviceService provides an API for managing devices.
+service DeviceService {
+
+    // Add adds a device to the topology
+    rpc Add (AddRequest) returns (AddResponse) {
+    }
+
+    // Update updates a device
+    rpc Update (UpdateRequest) returns (UpdateResponse) {
+    }
+
+    // Get gets a device by ID
+    rpc Get (GetRequest) returns (GetResponse) {
+    }
+
+    // List gets a stream of device add/update/remove events
+    rpc List (ListRequest) returns (stream ListResponse) {
+    }
+
+    // Remove removes a device from the topology
+    rpc Remove (RemoveRequest) returns (RemoveResponse) {
+    }
+
+}

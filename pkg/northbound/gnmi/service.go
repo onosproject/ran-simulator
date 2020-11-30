@@ -7,18 +7,12 @@
 package gnmi
 
 import (
-	"bytes"
-	"compress/gzip"
 	"context"
-	"fmt"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/openconfig/gnmi/proto/gnmi"
 	"google.golang.org/grpc"
-	"io/ioutil"
 )
 
 var log = liblog.GetLogger("northbound", "gnmi")
@@ -46,7 +40,6 @@ type Server struct {
 // Capabilities implements gNMI Capabilities
 func (s *Server) Capabilities(ctx context.Context, req *gnmi.CapabilityRequest) (*gnmi.CapabilityResponse, error) {
 	log.Infof("gNMI Capabilities requested for %s-%s", s.GetPlmnID(), s.GetEcID())
-	v, _ := getGNMIServiceVersion()
 	return &gnmi.CapabilityResponse{
 		SupportedModels: []*gnmi.ModelData{
 			{
@@ -56,7 +49,7 @@ func (s *Server) Capabilities(ctx context.Context, req *gnmi.CapabilityRequest) 
 			},
 		},
 		SupportedEncodings: []gnmi.Encoding{gnmi.Encoding_PROTO},
-		GNMIVersion:        *v,
+		GNMIVersion:        "0.6.0",
 	}, nil
 }
 
@@ -82,28 +75,4 @@ func (s *Server) GetECGI() types.ECGI {
 
 func newEcgi(id types.EcID, plmnID types.PlmnID) types.ECGI {
 	return types.ECGI{EcID: id, PlmnID: plmnID}
-}
-
-// getGNMIServiceVersion returns a pointer to the gNMI service version string.
-// The method is non-trivial because of the way it is defined in the proto file.
-func getGNMIServiceVersion() (*string, error) {
-	gzB, _ := (&gnmi.Update{}).Descriptor()
-	r, err := gzip.NewReader(bytes.NewReader(gzB))
-	if err != nil {
-		return nil, fmt.Errorf("error in initializing gzip reader: %v", err)
-	}
-	defer r.Close()
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, fmt.Errorf("error in reading gzip data: %v", err)
-	}
-	desc := &descriptor.FileDescriptorProto{}
-	if err := proto.Unmarshal(b, desc); err != nil {
-		return nil, fmt.Errorf("error in unmarshaling proto: %v", err)
-	}
-	ver, err := proto.GetExtension(desc.Options, gnmi.E_GnmiService)
-	if err != nil {
-		return nil, fmt.Errorf("error in getting version from proto extension: %v", err)
-	}
-	return ver.(*string), nil
 }
