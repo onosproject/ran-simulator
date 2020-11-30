@@ -1,6 +1,6 @@
 **/_output
 *.DS_Store
 coverage.txt
-*.coverprofile
+*.coverprofile*
 .idea
 api/e2/e2-interface.proto

@@ -20,7 +20,10 @@ test: build deps linters license_check
 coverage: # @HELP generate unit test coverage data
 coverage: build deps linters license_check
 	export GOPRIVATE="github.com/onosproject/*"
-	./../build-tools/build/coveralls/coveralls-coverage ran-simulator xHYC7gvqJdxaScSObicSox1E6sraczouC
+	go test -covermode=count -coverprofile=onos.coverprofile github.com/onosproject/ran-simulator/pkg/...
+	cd .. && go get github.com/mattn/goveralls && cd ran-simulator
+	grep -v .pb.go onos.coverprofile >onos-nogrpc.coverprofile
+	goveralls -coverprofile=onos-nogrpc.coverprofile -service travis-pro -repotoken xHYC7gvqJdxaScSObicSox1E6sraczouC
 
 deps: # @HELP ensure that the required dependencies are in place
 	go build -v ./...
