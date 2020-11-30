@@ -27,7 +27,7 @@ before_install:
   - 'if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_BRANCH == "master" && $TRAVIS_SECURE_ENV_VARS == "true" ]] ; then
        openssl aes-256-cbc -K $encrypted_f217180e22ee_key -iv $encrypted_f217180e22ee_iv -in .ssh/id_rsa.enc -out ~/.ssh/id_rsa -d &&
        chmod 600 ~/.ssh/id_rsa &&
-       git config --global url."ssh://git@github.com/".insteadOf "https://github.com/"
+       git config --global url."ssh://git@github.com/".insteadOf "https://github.com/";
      fi'
 
 jobs:
