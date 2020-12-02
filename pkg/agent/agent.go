@@ -6,12 +6,14 @@ package agent
 
 import (
 	"context"
+
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/ran-simulator/pkg/registry"
 )
 
 // Agent is an E2 agent
@@ -24,20 +26,23 @@ type Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(address string) Agent {
+func NewE2Agent(registry *registry.ServiceModelRegistry, address string) Agent {
 	return &e2Agent{
-		address: address,
+		address:  address,
+		registry: registry,
 	}
 }
 
 // e2Agent is an E2 agent
 type e2Agent struct {
-	address string
-	channel e2.ClientChannel
+	address  string
+	channel  e2.ClientChannel
+	registry *registry.ServiceModelRegistry
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	panic("Handle a RICControl request")
+
 }
 
 func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
