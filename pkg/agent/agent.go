@@ -13,7 +13,7 @@ import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/registry"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
 // Agent is an E2 agent
