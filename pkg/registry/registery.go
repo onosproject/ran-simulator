@@ -5,7 +5,6 @@
 package registry
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
@@ -42,5 +41,5 @@ func (s *ServiceModelRegistry) GetServiceModel(id ID, sm interface{}) error {
 	if _, ok := s.serviceModels[id]; ok {
 		return nil
 	}
-	return fmt.Errorf("unknown service: %T", sm)
+	return errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
 }
