@@ -23,13 +23,13 @@ var _ servicemodel.ServiceModel = &ServiceModel{}
 type ServiceModel struct {
 }
 
-// RICControl ....
+// RICControl implements control handler for kpm service model
 func (sm *ServiceModel) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	panic("implement me")
 
 }
 
-// RICSubscription ...
+// RICSubscription implements subscription handler for kpm service model
 func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 
 	var ricActionsAccepted []*types.RicActionID
@@ -66,7 +66,7 @@ func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducon
 
 }
 
-// RICSubscriptionDelete ...
+// RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *ServiceModel) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	panic("implement me")
 }
