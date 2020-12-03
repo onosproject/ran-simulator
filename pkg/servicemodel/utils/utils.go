@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package kpm
+package utils
 
 import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
@@ -68,7 +68,8 @@ func WithActionsNotAdmitted(ricActionsNotAdmitted map[types.RicActionID]*e2apies
 	}
 }
 
-func createSubscriptionFailure(subscription *Subscription) (response *e2appducontents.RicsubscriptionFailure) {
+// CreateSubscriptionFailure creates subscription failure
+func CreateSubscriptionFailure(subscription *Subscription) (response *e2appducontents.RicsubscriptionFailure) {
 
 	ricRequestID := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
@@ -124,7 +125,8 @@ func createSubscriptionFailure(subscription *Subscription) (response *e2appducon
 	return resp
 }
 
-func createSubscriptionResponse(subscription *Subscription) (response *e2appducontents.RicsubscriptionResponse) {
+// CreateSubscriptionResponse creates subscription response
+func CreateSubscriptionResponse(subscription *Subscription) (response *e2appducontents.RicsubscriptionResponse) {
 	ricRequestID := e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),

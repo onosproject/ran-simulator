@@ -7,6 +7,8 @@ package kpm
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
+
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
@@ -46,20 +48,20 @@ func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducon
 		}
 		// TODO handle not admitted actions
 	}
-	subscription, _ := NewSubscription(
-		WithRequestID(reqID),
-		WithRanFuncID(ranFuncID),
-		WithRicInstanceID(ricInstanceID),
-		WithActionsAccepted(ricActionsAccepted),
-		WithActionsNotAdmitted(ricActionsNotAdmitted))
+	subscription, _ := utils.NewSubscription(
+		utils.WithRequestID(reqID),
+		utils.WithRanFuncID(ranFuncID),
+		utils.WithRicInstanceID(ricInstanceID),
+		utils.WithActionsAccepted(ricActionsAccepted),
+		utils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
-		subscriptionFailure := createSubscriptionFailure(subscription)
+		subscriptionFailure := utils.CreateSubscriptionFailure(subscription)
 		return nil, subscriptionFailure, nil
 	}
 
-	subscriptionResponse := createSubscriptionResponse(subscription)
+	subscriptionResponse := utils.CreateSubscriptionResponse(subscription)
 	return subscriptionResponse, nil, nil
 
 }
