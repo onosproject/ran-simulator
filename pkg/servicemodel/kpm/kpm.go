@@ -7,6 +7,10 @@ package kpm
 import (
 	"context"
 
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+
+	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
+
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 )
@@ -25,7 +29,39 @@ func (sm *ServiceModel) RICControl(ctx context.Context, request *e2appducontents
 
 // RICSubscription ...
 func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	panic("implement me")
+
+	var ricActionsAccepted []*types.RicActionID
+	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
+	actionList := request.ProtocolIes.E2ApProtocolIes30.Value.RicActionToBeSetupList.Value
+
+	reqID := request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId
+	ranFuncID := request.ProtocolIes.E2ApProtocolIes5.Value.Value
+	ricInstanceID := request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId
+
+	for _, action := range actionList {
+		actionID := types.RicActionID(action.Value.RicActionId.Value)
+		actionType := action.Value.RicActionType
+		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT {
+			ricActionsAccepted = append(ricActionsAccepted, &actionID)
+		}
+		// TODO handle not admitted actions
+	}
+	subscription, _ := NewSubscription(
+		WithRequestID(reqID),
+		WithRanFuncID(ranFuncID),
+		WithRicInstanceID(ricInstanceID),
+		WithActionsAccepted(ricActionsAccepted),
+		WithActionsNotAdmitted(ricActionsNotAdmitted))
+
+	// At least one required action must be accepted otherwise sends a subscription failure response
+	if len(ricActionsAccepted) == 0 {
+		subscriptionFailure := createSubscriptionFailure(subscription)
+		return nil, subscriptionFailure, nil
+	}
+
+	subscriptionResponse := createSubscriptionResponse(subscription)
+	return subscriptionResponse, nil, nil
+
 }
 
 // RICSubscriptionDelete ...

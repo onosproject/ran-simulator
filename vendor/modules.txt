@@ -220,6 +220,7 @@ github.com/onosproject/onos-e2t/pkg/protocols/e2/channels
 github.com/onosproject/onos-e2t/pkg/protocols/e2/procedures
 github.com/onosproject/onos-e2t/pkg/protocols/sctp
 github.com/onosproject/onos-e2t/pkg/southbound/e2ap/asn1cgo
+github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types
 github.com/onosproject/onos-e2t/pkg/utils/async
 # github.com/onosproject/onos-lib-go v0.6.25
 ## explicit
