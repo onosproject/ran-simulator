@@ -7,6 +7,8 @@ package agent
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
+
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
 	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
@@ -41,16 +43,51 @@ type e2Agent struct {
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	panic("Handle a RICControl request")
+	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	switch ranFuncID {
+	case registry.KPM:
+		var kpmService kpm.ServiceModel
+		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
+		if err != nil {
+			return nil, nil, err
+		}
+		return kpmService.RICControl(ctx, request)
+
+	}
+	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
 
 }
 
 func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	panic("Handle a RICSubscription request")
+	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	switch ranFuncID {
+	case registry.KPM:
+		var kpmService kpm.ServiceModel
+		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
+		if err != nil {
+			return nil, nil, err
+		}
+		return kpmService.RICSubscription(ctx, request)
+
+	}
+	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
+
 }
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	panic("Handle a RICSubscriptionDelete request")
+	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	switch ranFuncID {
+	case registry.KPM:
+		var kpmService kpm.ServiceModel
+		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
+		if err != nil {
+			return nil, nil, err
+		}
+		return kpmService.RICSubscriptionDelete(ctx, request)
+
+	}
+	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
+
 }
 
 func (a *e2Agent) Start() error {

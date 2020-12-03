@@ -20,6 +20,7 @@ type ServiceModel struct {
 // RICControl ....
 func (sm *ServiceModel) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	panic("implement me")
+
 }
 
 // RICSubscription ...

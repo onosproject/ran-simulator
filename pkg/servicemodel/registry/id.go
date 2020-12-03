@@ -6,3 +6,12 @@ package registry
 
 // ID Ran function ID
 type ID int32
+
+// TODO define them using standard Ran function IDs
+const (
+
+	// KPM
+	KPM ID = iota
+	// NI
+	NI
+)
