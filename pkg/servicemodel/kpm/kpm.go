@@ -61,6 +61,8 @@ func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducon
 		return nil, subscriptionFailure, nil
 	}
 
+	// TODO handle event trigger definitions
+
 	subscriptionResponse := utils.CreateSubscriptionResponse(subscription)
 	return subscriptionResponse, nil, nil
 

@@ -10,8 +10,10 @@ type ID int32
 // TODO define them using standard Ran function IDs
 const (
 
+	// INTERNAL
+	INTERNAL ID = iota
 	// KPM
-	KPM ID = iota
+	KPM
 	// NI
 	NI
 )
