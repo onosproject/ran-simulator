@@ -6,8 +6,9 @@ package registry
 
 import (
 	"context"
-	"fmt"
 	"testing"
+
+	"github.com/magiconair/properties/assert"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 
@@ -17,6 +18,7 @@ import (
 var _ servicemodel.ServiceModel = &mockServiceModel{}
 
 type mockServiceModel struct {
+	t *testing.T
 }
 
 func (sm mockServiceModel) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
@@ -24,8 +26,7 @@ func (sm mockServiceModel) RICControl(ctx context.Context, request *e2appduconte
 }
 
 func (sm mockServiceModel) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	//panic("implement me")
-	fmt.Println("test")
+	sm.t.Log("Test Ric Subscription")
 	return nil, nil, nil
 }
 
@@ -34,20 +35,21 @@ func (sm mockServiceModel) RICSubscriptionDelete(ctx context.Context, request *e
 }
 
 func TestRegisterServiceModel(t *testing.T) {
-	registry := &ServiceModelRegistry{
-		serviceModels: make(map[ID]servicemodel.ServiceModel),
+
+	registry := NewServiceModelRegistry()
+
+	m := &mockServiceModel{
+		t: t,
 	}
 
-	m := &mockServiceModel{}
-
-	testServiceModel := ServiceModel{
+	testServiceModelConfig := ServiceModelConfig{
 		ID:           INTERNAL,
 		ServiceModel: m,
 		Description:  "Test Service model",
 		Revision:     1,
 	}
 
-	if err := registry.RegisterServiceModel(testServiceModel); err != nil {
+	if err := registry.RegisterServiceModel(testServiceModelConfig); err != nil {
 		t.Fatalf("failed to register the service model")
 	}
 
@@ -55,6 +57,7 @@ func TestRegisterServiceModel(t *testing.T) {
 		t.Fatal("the service model does not exist", err)
 	}
 
-	_, _, _ = m.RICSubscription(context.TODO(), nil)
+	ranFunctions := registry.GetRanFunctions()
+	assert.Equal(t, len(ranFunctions), 1)
 
 }

@@ -20,7 +20,8 @@ type ServiceModelRegistry struct {
 	ranFunctions  types.RanFunctions
 }
 
-type ServiceModel struct {
+// ServiceModelConfig service model configuration
+type ServiceModelConfig struct {
 	ID           ID
 	ServiceModel servicemodel.ServiceModel
 	Description  string
@@ -31,20 +32,21 @@ type ServiceModel struct {
 func NewServiceModelRegistry() *ServiceModelRegistry {
 	return &ServiceModelRegistry{
 		serviceModels: make(map[ID]servicemodel.ServiceModel),
+		ranFunctions:  make(map[types.RanFunctionID]types.RanFunctionItem),
 	}
 }
 
 // RegisterServiceModel registers a service model
-func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
+func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModelConfig) error {
 	if _, exists := s.serviceModels[sm.ID]; exists {
 		return errors.New(errors.AlreadyExists, "the service model already registered")
 	}
 
-	/*ranFuncID := types.RanFunctionID(sm.ID)
+	ranFuncID := types.RanFunctionID(sm.ID)
 	s.ranFunctions[ranFuncID] = types.RanFunctionItem{
 		Description: types.RanFunctionDescription(sm.Description),
 		Revision:    types.RanFunctionRevision(sm.Revision),
-	}*/
+	}
 
 	s.mu.Lock()
 	s.serviceModels[sm.ID] = sm.ServiceModel
@@ -54,8 +56,7 @@ func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
 
 // GetServiceModel finds and initialize service model interface pointer
 func (s *ServiceModelRegistry) GetServiceModel(id ID, sm interface{}) error {
-	if serviceModel, ok := s.serviceModels[id]; ok {
-		sm = serviceModel
+	if _, ok := s.serviceModels[id]; ok {
 		return nil
 	}
 
