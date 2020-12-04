@@ -7,11 +7,12 @@ package agent
 import (
 	"context"
 
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
-
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
 	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
+
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
+
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
