@@ -68,7 +68,7 @@ func WithActionsNotAdmitted(ricActionsNotAdmitted map[types.RicActionID]*e2apies
 	}
 }
 
-// CreateSubscriptionFailure creates subscription failure
+// CreateSubscriptionFailure creates e2 subscription failure
 func CreateSubscriptionFailure(subscription *Subscription) (response *e2appducontents.RicsubscriptionFailure) {
 
 	ricRequestID := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes29{
@@ -125,7 +125,7 @@ func CreateSubscriptionFailure(subscription *Subscription) (response *e2appducon
 	return resp
 }
 
-// CreateSubscriptionResponse creates subscription response
+// CreateSubscriptionResponse creates e2 subscription response
 func CreateSubscriptionResponse(subscription *Subscription) (response *e2appducontents.RicsubscriptionResponse) {
 	ricRequestID := e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),

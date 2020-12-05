@@ -65,5 +65,6 @@ func (s *ServiceModelRegistry) GetServiceModel(id ID, sm interface{}) error {
 
 // GetRanFunctions returns the list of registered ran functions
 func (s *ServiceModelRegistry) GetRanFunctions() types.RanFunctions {
+
 	return s.ranFunctions
 }
