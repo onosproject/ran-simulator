@@ -29,7 +29,7 @@ func NewManager(config Config) *Manager {
 
 // Manager is a manager for the E2T service
 type Manager struct {
-	Config Config
+	Config  Config
 	e2agent agent.Agent
 }
 
