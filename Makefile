@@ -11,6 +11,7 @@ build: # @HELP build the Go binaries and run all validations (default)
 build:
 	export GOPRIVATE="github.com/onosproject/*"
 	CGO_ENABLED=1 go build -o build/_output/trafficsim ./cmd/trafficsim
+	CGO_ENABLED=1 go build -o build/_output/ransim ./cmd/ransim
 
 test: # @HELP run the unit tests and source code validation
 test: build deps linters license_check
@@ -78,7 +79,7 @@ bumponosdeps: # @HELP update "onosproject" go dependencies and push patch to git
 	./../build-tools/bump-onos-deps ${VERSION}
 
 clean: # @HELP remove all the build artifacts
-	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim
+	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim ./cmd/ransim/ransim
 	go clean -testcache github.com/onosproject/ran-simulator/...
 
 help:
