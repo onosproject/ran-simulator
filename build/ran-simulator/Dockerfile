@@ -7,7 +7,7 @@ RUN apk add libc6-compat
 
 USER nobody
 
-COPY --from=base /go/src/github.com/onosproject/ran-simulator/build/_output/trafficsim /usr/local/bin/trafficsim
+COPY --from=base /go/src/github.com/onosproject/ran-simulator/build/_output/ransim /usr/local/bin/ransim
 COPY pkg/config/*.yaml /etc/onos/config/
 
-ENTRYPOINT ["trafficsim"]
+ENTRYPOINT ["ransim"]
