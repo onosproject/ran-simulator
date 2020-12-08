@@ -21,12 +21,8 @@ package main
 
 import (
 	"flag"
-	"github.com/onosproject/ran-simulator/pkg/simmanager"
-	"os"
-	"os/signal"
-	"syscall"
-
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/simmanager"
 )
 
 var log = logging.GetLogger("main")
@@ -34,6 +30,7 @@ var log = logging.GetLogger("main")
 // The main entry point
 func main() {
 	log.Info("Starting simulator")
+	ready := make(chan bool)
 
 	caPath := flag.String("caPath", "", "path to CA certificate")
 	keyPath := flag.String("keyPath", "", "path to client private key")
@@ -49,9 +46,7 @@ func main() {
 	mgr := simmanager.NewManager(cfg)
 	mgr.Run()
 
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-	<-sigCh
+	<-ready
 
 	mgr.Close()
 }
