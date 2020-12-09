@@ -6,6 +6,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.1 // indirect
+	github.com/magiconair/properties v1.8.1
 	github.com/onosproject/config-models/modelplugin/e2node-1.0.0 v0.0.0-20200511074107-7166e3a5247d
 	github.com/onosproject/onos-config v0.6.16
 	github.com/onosproject/onos-e2t v0.6.8

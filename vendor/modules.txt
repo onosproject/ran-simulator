@@ -153,7 +153,9 @@ github.com/konsorten/go-windows-terminal-sequences
 github.com/kylelemons/godebug/diff
 github.com/kylelemons/godebug/pretty
 # github.com/magiconair/properties v1.8.1
+## explicit
 github.com/magiconair/properties
+github.com/magiconair/properties/assert
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
 github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/mitchellh/go-homedir v1.1.0
@@ -220,6 +222,7 @@ github.com/onosproject/onos-e2t/pkg/protocols/e2/channels
 github.com/onosproject/onos-e2t/pkg/protocols/e2/procedures
 github.com/onosproject/onos-e2t/pkg/protocols/sctp
 github.com/onosproject/onos-e2t/pkg/southbound/e2ap/asn1cgo
+github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types
 github.com/onosproject/onos-e2t/pkg/utils/async
 # github.com/onosproject/onos-lib-go v0.6.25
 ## explicit
