@@ -14,6 +14,9 @@ import (
 	"net"
 )
 
+// E2NodeHandler is a function for wrapping an E2NodeChannel
+type E2NodeHandler func(channel E2NodeChannel) procedures.E2NodeProcedures
+
 // E2NodeChannel is a channel for an E2 node
 type E2NodeChannel interface {
 	Channel
@@ -21,16 +24,17 @@ type E2NodeChannel interface {
 }
 
 // NewE2NodeChannel creates a new E2 node channel
-func NewE2NodeChannel(conn net.Conn, procs procedures.E2NodeProcedures, opts ...Option) E2NodeChannel {
+func NewE2NodeChannel(conn net.Conn, handler E2NodeHandler, opts ...Option) E2NodeChannel {
 	parent := newThreadSafeChannel(conn, opts...)
 	channel := &e2NodeChannel{
-		threadSafeChannel:     parent,
-		e2Setup:               procedures.NewE2SetupInitiator(parent.send),
-		ricControl:            procedures.NewRICControlProcedure(parent.send, procs),
-		ricIndication:         procedures.NewRICIndicationInitiator(parent.send),
-		ricSubscription:       procedures.NewRICSubscriptionProcedure(parent.send, procs),
-		ricSubscriptionDelete: procedures.NewRICSubscriptionDeleteProcedure(parent.send, procs),
+		threadSafeChannel: parent,
 	}
+	procs := handler(channel)
+	channel.e2Setup = procedures.NewE2SetupInitiator(parent.send)
+	channel.ricControl = procedures.NewRICControlProcedure(parent.send, procs)
+	channel.ricIndication = procedures.NewRICIndicationInitiator(parent.send)
+	channel.ricSubscription = procedures.NewRICSubscriptionProcedure(parent.send, procs)
+	channel.ricSubscriptionDelete = procedures.NewRICSubscriptionDeleteProcedure(parent.send, procs)
 	channel.open()
 	return channel
 }

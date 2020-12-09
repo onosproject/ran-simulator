@@ -21,9 +21,8 @@ func encodePerBuffer(valueType *C.asn_TYPE_descriptor_t,
 
 	perBuf := C.malloc(C.sizeof_uchar * 1024) // C allocated pointer
 	defer C.free(perBuf)
-	encRetVal, err := C.aper_encode_to_buffer(
-		valueType, nil, value,
-		perBuf, C.ulong(1024))
+
+	encRetVal, err := C.asn_encode_to_buffer(nil, C.ATS_ALIGNED_BASIC_PER, valueType, value, perBuf, C.ulong(1024))
 	if err != nil {
 		return nil, err
 	}

@@ -7,8 +7,6 @@ package agent
 import (
 	"context"
 	"fmt"
-	"os"
-
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
@@ -16,8 +14,11 @@ import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
+
+var log = logging.GetLogger("agent")
 
 // Agent is an E2 agent
 type Agent interface {
@@ -92,10 +93,15 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 func (a *e2Agent) Start() error {
-	client := e2.NewClient(a)
-	fmt.Fprintf(os.Stderr, "New client address %v\n", a.address)
-	channel, err := client.Connect(context.Background(), a.address)
-	fmt.Fprintf(os.Stderr, "client connected to channel %v\n", channel)
+	port := 36421
+	addr := fmt.Sprintf("%s:%d", a.address, port)
+	channel, err := e2.Connect(context.TODO(), addr,
+		func(channel e2.ClientChannel) e2.ClientInterface {
+			return &e2Agent{}
+		},
+	)
+
+	log.Infof("client connected to channel %v\n", channel)
 
 	if err != nil {
 		return err

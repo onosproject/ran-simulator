@@ -1306,10 +1306,19 @@ func decodeRicSubscriptionResponseIE(rsrIeC *C.RICsubscriptionResponse_IEs_t) (*
 		}
 
 	case C.RICsubscriptionResponse_IEs__value_PR_RICaction_NotAdmitted_List:
-		fallthrough // TODO Implement it
+		ranal, err := decodeRicActionNotAdmittedListBytes(rsrIeC.value.choice[:48])
+		if err != nil {
+			return nil, err
+		}
+		ret.E2ApProtocolIes18 = &e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes18{
+			Id:          int32(v1beta1.ProtocolIeIDRicactionsNotAdmitted),
+			Value:       ranal,
+			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+			Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
+		}
 
 	case C.RICsubscriptionResponse_IEs__value_PR_NOTHING:
-		return nil, fmt.Errorf("decodeRicSubscriptionResponseIE(). %v not yet implemneted", rsrIeC.value.present)
+		return nil, fmt.Errorf("decodeRicSubscriptionResponseIE(). Unexpected value.\n%v", rsrIeC.value.present)
 
 	default:
 		return nil, fmt.Errorf("decodeRicSubscriptionResponseIE(). unexpected choice %v", rsrIeC.value.present)
