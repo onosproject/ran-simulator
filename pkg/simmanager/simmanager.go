@@ -16,10 +16,12 @@ var log = logging.GetLogger("manager")
 
 // Config is a manager configuration
 type Config struct {
-	CAPath   string
-	KeyPath  string
-	CertPath string
-	GRPCPort int
+	CAPath     string
+	KeyPath    string
+	CertPath   string
+	GRPCPort   int
+	E2THost    string
+	E2SCTPPort int
 }
 
 // NewManager creates a new manager
@@ -47,13 +49,12 @@ func (m *Manager) Run() {
 // Start starts the manager
 func (m *Manager) Start() error {
 	registry := smregistry.NewServiceModelRegistry()
-	ips, err := net.LookupIP("onos-e2t")
+	ips, err := net.LookupIP(m.Config.E2THost)
 	if err != nil {
 		return err
 	}
 	addr := ips[0].String()
-	port := 36421
-	m.e2agent = agent.NewE2Agent(registry, addr, port)
+	m.e2agent = agent.NewE2Agent(registry, addr, m.Config.E2SCTPPort)
 	agentErr := m.e2agent.Start()
 	if agentErr != nil {
 		return agentErr

@@ -6,7 +6,7 @@ package types
 
 import "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 
-type RanFunctionDescription string
+type RanFunctionDescription []byte
 type RanFunctionRevision int
 type RanFunctionID uint8
 

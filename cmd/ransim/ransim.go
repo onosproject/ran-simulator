@@ -35,13 +35,18 @@ func main() {
 	caPath := flag.String("caPath", "", "path to CA certificate")
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
+	host := flag.String("host", "onos-e2t", "Host name of E2T server")
+	grpcPort := flag.Int("grpcPort", 5150, "GRPC port for e2T server")
+	sctpPort := flag.Int("sctpPort", 36421, "SCTP port for e2T server")
 	flag.Parse()
 
 	cfg := simmanager.Config{
-		CAPath:   *caPath,
-		KeyPath:  *keyPath,
-		CertPath: *certPath,
-		GRPCPort: 5150,
+		CAPath:     *caPath,
+		KeyPath:    *keyPath,
+		CertPath:   *certPath,
+		GRPCPort:   *grpcPort,
+		E2THost:    *host,
+		E2SCTPPort: *sctpPort,
 	}
 
 	mgr := simmanager.NewManager(cfg)
