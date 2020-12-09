@@ -52,7 +52,8 @@ func (m *Manager) Start() error {
 		return err
 	}
 	addr := ips[0].String()
-	m.e2agent = agent.NewE2Agent(registry, addr)
+	port := 36421
+	m.e2agent = agent.NewE2Agent(registry, addr, port)
 	agentErr := m.e2agent.Start()
 	if agentErr != nil {
 		return agentErr

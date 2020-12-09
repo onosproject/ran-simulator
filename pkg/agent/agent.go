@@ -30,9 +30,10 @@ type Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(registry *registry.ServiceModelRegistry, address string) Agent {
+func NewE2Agent(registry *registry.ServiceModelRegistry, address string, port int) Agent {
 	return &e2Agent{
 		address:  address,
+		port:     port,
 		registry: registry,
 	}
 }
@@ -40,6 +41,7 @@ func NewE2Agent(registry *registry.ServiceModelRegistry, address string) Agent {
 // e2Agent is an E2 agent
 type e2Agent struct {
 	address  string
+	port     int
 	channel  e2.ClientChannel
 	registry *registry.ServiceModelRegistry
 }
@@ -93,8 +95,7 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 func (a *e2Agent) Start() error {
-	port := 36421
-	addr := fmt.Sprintf("%s:%d", a.address, port)
+	addr := fmt.Sprintf("%s:%d", a.address, a.port)
 	channel, err := e2.Connect(context.TODO(), addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {
 			return &e2Agent{}
