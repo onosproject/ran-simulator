@@ -6,6 +6,8 @@ package agent
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
 
@@ -91,7 +93,10 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 func (a *e2Agent) Start() error {
 	client := e2.NewClient(a)
+	fmt.Fprintf(os.Stderr, "New client address %v\n", a.address)
 	channel, err := client.Connect(context.Background(), a.address)
+	fmt.Fprintf(os.Stderr, "client connected to channel %v\n", channel)
+
 	if err != nil {
 		return err
 	}

@@ -41,6 +41,7 @@ func main() {
 		CAPath:   *caPath,
 		KeyPath:  *keyPath,
 		CertPath: *certPath,
+		GRPCPort: 5150,
 	}
 
 	mgr := simmanager.NewManager(cfg)

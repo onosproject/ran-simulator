@@ -6,8 +6,10 @@ package simmanager
 
 import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/pkg/agent"
 	smregistry "github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"net"
 )
 
 var log = logging.GetLogger("manager")
@@ -17,6 +19,7 @@ type Config struct {
 	CAPath   string
 	KeyPath  string
 	CertPath string
+	GRPCPort int
 }
 
 // NewManager creates a new manager
@@ -44,13 +47,50 @@ func (m *Manager) Run() {
 // Start starts the manager
 func (m *Manager) Start() error {
 	registry := smregistry.NewServiceModelRegistry()
-	m.e2agent = agent.NewE2Agent(registry, "onos-e2t")
-	err := m.e2agent.Start()
-	return err
+	ips, err := net.LookupIP("onos-e2t")
+	if err != nil {
+		return err
+	}
+	addr := ips[0].String()
+	m.e2agent = agent.NewE2Agent(registry, addr)
+	agentErr := m.e2agent.Start()
+	if agentErr != nil {
+		return agentErr
+	}
+
+	nbErr := m.startNorthboundServer()
+	if nbErr != nil {
+		return nbErr
+	}
+	return nbErr
 }
 
 // Close kills the channels and manager related objects
 func (m *Manager) Close() {
 	log.Info("Closing Manager")
 	_ = m.e2agent.Stop()
+}
+
+// startSouthboundServer starts the northbound gRPC server
+func (m *Manager) startNorthboundServer() error {
+	s := northbound.NewServer(northbound.NewServerCfg(
+		m.Config.CAPath,
+		m.Config.KeyPath,
+		m.Config.CertPath,
+		int16(m.Config.GRPCPort),
+		true,
+		northbound.SecurityConfig{}))
+	s.AddService(logging.Service{})
+
+	doneCh := make(chan error)
+	go func() {
+		err := s.Serve(func(started string) {
+			log.Info("Started NBI on ", started)
+			close(doneCh)
+		})
+		if err != nil {
+			doneCh <- err
+		}
+	}()
+	return <-doneCh
 }
