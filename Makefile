@@ -55,7 +55,6 @@ ran-simulator-base-docker: # @HELP build ran-simulator base Docker image
 		--build-arg ONOS_BUILD_VERSION=${ONOS_BUILD_VERSION} \
 		--build-arg ONOS_MAKE_TARGET=build \
 		-t onosproject/ran-simulator-base:${RAN_SIMULATOR_VERSION}
-	@rm -rf vendor
 
 ran-simulator-docker: ran-simulator-base-docker # @HELP build ran-simulator Docker image
 	docker build . -f build/ran-simulator/Dockerfile \
@@ -79,7 +78,7 @@ bumponosdeps: # @HELP update "onosproject" go dependencies and push patch to git
 	./../build-tools/bump-onos-deps ${VERSION}
 
 clean: # @HELP remove all the build artifacts
-	rm -rf ./build/_output ./vendor ./cmd/trafficsim/trafficsim ./cmd/ransim/ransim
+	rm -rf ./build/_output ./cmd/trafficsim/trafficsim ./cmd/ransim/ransim
 	go clean -testcache github.com/onosproject/ran-simulator/...
 
 help:

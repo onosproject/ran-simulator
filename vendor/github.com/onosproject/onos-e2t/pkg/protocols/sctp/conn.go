@@ -8,7 +8,7 @@ import (
 	"context"
 	"github.com/ishidawataru/sctp"
 	"net"
-	"time"
+	"strconv"
 )
 
 // DialOptions is SCTP options
@@ -41,21 +41,26 @@ func Dial(ctx context.Context, address string, opts ...DialOption) (net.Conn, er
 		opt(&options)
 	}
 
-	ip, err := net.ResolveIPAddr("ip", address)
+	host, portStr, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, err
 	}
 
-	var init sctp.InitMsg
-	now := time.Now()
-	if deadline, ok := ctx.Deadline(); ok && deadline.After(now) {
-		init.MaxInitTimeout = uint16(deadline.Sub(now).Milliseconds())
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return nil, err
+	}
+
+	ip, err := net.ResolveIPAddr("ip", host)
+	if err != nil {
+		return nil, err
 	}
 
 	addr := &sctp.SCTPAddr{
 		IPAddrs: []net.IPAddr{*ip},
+		Port:    port,
 	}
-	conn, err := sctp.DialSCTPExt("sctp", nil, addr, init)
+	conn, err := sctp.DialSCTP("sctp", nil, addr)
 	if err != nil {
 		return nil, err
 	}

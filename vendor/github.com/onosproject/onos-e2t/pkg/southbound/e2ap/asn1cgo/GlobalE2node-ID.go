@@ -11,6 +11,7 @@ package asn1cgo
 //#include <assert.h>
 //#include "GlobalE2node-ID.h"
 //#include "GlobalE2node-gNB-ID.h"
+//#include "GlobalE2node-eNB-ID.h"
 import "C"
 import (
 	"encoding/binary"
@@ -32,6 +33,14 @@ func newGlobalE2nodeID(gnID *e2apies.GlobalE2NodeId) (*C.GlobalE2node_ID_t, erro
 			return nil, err
 		}
 		binary.LittleEndian.PutUint64(choiceC[0:], uint64(uintptr(unsafe.Pointer(globalgNBIDC))))
+	case *e2apies.GlobalE2NodeId_ENb:
+		prC = C.GlobalE2node_ID_PR_eNB
+
+		globalEnbIDC, err := newGlobalE2nodeeNBID(choice.ENb)
+		if err != nil {
+			return nil, err
+		}
+		binary.LittleEndian.PutUint64(choiceC[0:], uint64(uintptr(unsafe.Pointer(globalEnbIDC))))
 	default:
 		return nil, fmt.Errorf("handling of %v not yet implemented", choice)
 	}
@@ -60,6 +69,17 @@ func decodeGlobalE2NodeID(globalE2nodeIDchoice [48]byte) (*e2apies.GlobalE2NodeI
 
 		result.GlobalE2NodeId = &e2apies.GlobalE2NodeId_GNb{
 			GNb: gNB,
+		}
+	case C.GlobalE2node_ID_PR_eNB:
+		bufC := globalE2nodeIDchoice[8:16]
+		eNbC := *(**C.GlobalE2node_eNB_ID_t)(unsafe.Pointer(&bufC[0]))
+		eNB, err := decodeGlobalE2nodeeNBID(eNbC)
+		if err != nil {
+			return nil, fmt.Errorf("decodeGlobalE2nodeeNBID() %v", err)
+		}
+
+		result.GlobalE2NodeId = &e2apies.GlobalE2NodeId_ENb{
+			ENb: eNB,
 		}
 	default:
 		return nil, fmt.Errorf("decodeGlobalE2NodeID(). %v not yet implemneted", present)

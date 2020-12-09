@@ -13,7 +13,7 @@ package asn1cgo
 import "C"
 import (
 	"fmt"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
+	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"unsafe"
 )
@@ -65,7 +65,7 @@ func newGlobalgNBID(id *e2apies.GlobalgNbId) (*C.GlobalgNB_ID_t, error) {
 
 func decodeGlobalGnbID(globalGnbID *C.GlobalgNB_ID_t) (*e2apies.GlobalgNbId, error) {
 	result := new(e2apies.GlobalgNbId)
-	result.PlmnId = new(e2ap_commondatatypes.PlmnIdentity)
+	result.PlmnId = new(e2apcommondatatypes.PlmnIdentity)
 	var err error
 	result.PlmnId.Value = []byte(decodeOctetString(&globalGnbID.plmn_id))
 	result.GnbId, err = decodeGnbIDChoice(&globalGnbID.gnb_id)

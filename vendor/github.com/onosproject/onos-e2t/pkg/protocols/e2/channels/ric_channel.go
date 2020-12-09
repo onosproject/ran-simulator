@@ -14,6 +14,9 @@ import (
 	"net"
 )
 
+// RICHandler is a function for wrapping an RICChannel
+type RICHandler func(channel RICChannel) procedures.RICProcedures
+
 // RICChannel is a channel for an E2 node
 type RICChannel interface {
 	Channel
@@ -21,16 +24,17 @@ type RICChannel interface {
 }
 
 // NewRICChannel creates a new E2 node channel
-func NewRICChannel(conn net.Conn, procs procedures.RICProcedures, opts ...Option) RICChannel {
+func NewRICChannel(conn net.Conn, handler RICHandler, opts ...Option) RICChannel {
 	parent := newThreadSafeChannel(conn, opts...)
 	channel := &ricChannel{
-		threadSafeChannel:     parent,
-		e2Setup:               procedures.NewE2SetupProcedure(parent.send, procs),
-		ricControl:            procedures.NewRICControlInitiator(parent.send),
-		ricIndication:         procedures.NewRICIndicationProcedure(parent.send, procs),
-		ricSubscription:       procedures.NewRICSubscriptionInitiator(parent.send),
-		ricSubscriptionDelete: procedures.NewRICSubscriptionDeleteInitiator(parent.send),
+		threadSafeChannel: parent,
 	}
+	procs := handler(channel)
+	channel.e2Setup = procedures.NewE2SetupProcedure(parent.send, procs)
+	channel.ricControl = procedures.NewRICControlInitiator(parent.send)
+	channel.ricIndication = procedures.NewRICIndicationProcedure(parent.send, procs)
+	channel.ricSubscription = procedures.NewRICSubscriptionInitiator(parent.send)
+	channel.ricSubscriptionDelete = procedures.NewRICSubscriptionDeleteInitiator(parent.send)
 	channel.open()
 	return channel
 }

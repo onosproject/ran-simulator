@@ -72,7 +72,7 @@ github.com/eapache/go-resiliency/breaker
 github.com/eapache/go-xerial-snappy
 # github.com/eapache/queue v1.1.0
 github.com/eapache/queue
-# github.com/envoyproxy/protoc-gen-validate v0.1.0
+# github.com/envoyproxy/protoc-gen-validate v0.4.1
 github.com/envoyproxy/protoc-gen-validate/validate
 # github.com/ericchiang/oidc v0.0.0-20160908143337-11f62933e071
 github.com/ericchiang/oidc
@@ -87,7 +87,7 @@ github.com/gogo/protobuf/sortkeys
 github.com/gogo/protobuf/types
 # github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 github.com/golang/glog
-# github.com/golang/protobuf v1.4.2
+# github.com/golang/protobuf v1.4.3
 ## explicit
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/protoc-gen-go/descriptor
@@ -208,7 +208,7 @@ github.com/onosproject/onos-config/pkg/store/snapshot/network
 github.com/onosproject/onos-config/pkg/store/stream
 github.com/onosproject/onos-config/pkg/utils
 github.com/onosproject/onos-config/pkg/utils/values
-# github.com/onosproject/onos-e2t v0.6.8
+# github.com/onosproject/onos-e2t v0.6.12
 ## explicit
 github.com/onosproject/onos-e2t/api/e2ap/v1beta1
 github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes
@@ -268,8 +268,7 @@ github.com/openconfig/gnmi/value
 # github.com/openconfig/goyang v0.2.1
 github.com/openconfig/goyang/pkg/indent
 github.com/openconfig/goyang/pkg/yang
-# github.com/openconfig/ygot v0.8.11
-## explicit
+# github.com/openconfig/ygot v0.8.12
 github.com/openconfig/ygot/util
 github.com/openconfig/ygot/ygot
 github.com/openconfig/ygot/ytypes
@@ -294,6 +293,7 @@ github.com/prometheus/client_golang/prometheus/promhttp
 # github.com/prometheus/client_model v0.2.0
 github.com/prometheus/client_model/go
 # github.com/prometheus/common v0.9.1
+## explicit
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/common/model
@@ -307,7 +307,7 @@ github.com/rcrowley/go-metrics
 ## explicit
 # github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
-# github.com/spf13/afero v1.2.2
+# github.com/spf13/afero v1.3.4
 github.com/spf13/afero
 github.com/spf13/afero/mem
 # github.com/spf13/cast v1.3.0
@@ -343,7 +343,7 @@ golang.org/x/crypto/ed25519/internal/edwards25519
 golang.org/x/crypto/md4
 golang.org/x/crypto/pbkdf2
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/lint v0.0.0-20190930215403-16217165b5de
+# golang.org/x/lint v0.0.0-20200302205851-738671d3881b
 golang.org/x/lint
 golang.org/x/lint/golint
 # golang.org/x/net v0.0.0-20200707034311-ab3426394381
@@ -374,7 +374,7 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 golang.org/x/time/rate
-# golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
+# golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375
 golang.org/x/tools/go/analysis
 golang.org/x/tools/go/analysis/passes/inspect
 golang.org/x/tools/go/ast/astutil
@@ -386,8 +386,16 @@ golang.org/x/tools/go/internal/packagesdriver
 golang.org/x/tools/go/packages
 golang.org/x/tools/go/types/objectpath
 golang.org/x/tools/go/types/typeutil
+golang.org/x/tools/internal/analysisinternal
+golang.org/x/tools/internal/event
+golang.org/x/tools/internal/event/core
+golang.org/x/tools/internal/event/keys
+golang.org/x/tools/internal/event/label
 golang.org/x/tools/internal/gocommand
 golang.org/x/tools/internal/packagesinternal
+# golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
+golang.org/x/xerrors
+golang.org/x/xerrors/internal
 # google.golang.org/appengine v1.6.1
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/base
@@ -399,7 +407,7 @@ google.golang.org/appengine/urlfetch
 # google.golang.org/genproto v0.0.0-20200731012542-8145dea6a485
 ## explicit
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.33.1
+# google.golang.org/grpc v1.33.2
 ## explicit
 google.golang.org/grpc
 google.golang.org/grpc/attributes
@@ -529,7 +537,7 @@ gopkg.in/square/go-jose.v1/json
 gopkg.in/square/go-jose.v2
 gopkg.in/square/go-jose.v2/cipher
 gopkg.in/square/go-jose.v2/json
-# gopkg.in/yaml.v2 v2.2.8
+# gopkg.in/yaml.v2 v2.3.0
 gopkg.in/yaml.v2
 # gotest.tools v2.2.0+incompatible
 ## explicit

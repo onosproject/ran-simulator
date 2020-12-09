@@ -6,7 +6,7 @@ package agent
 
 import (
 	"context"
-
+	"fmt"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
@@ -14,8 +14,11 @@ import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
+
+var log = logging.GetLogger("agent")
 
 // Agent is an E2 agent
 type Agent interface {
@@ -27,9 +30,10 @@ type Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(registry *registry.ServiceModelRegistry, address string) Agent {
+func NewE2Agent(registry *registry.ServiceModelRegistry, address string, port int) Agent {
 	return &e2Agent{
 		address:  address,
+		port:     port,
 		registry: registry,
 	}
 }
@@ -37,6 +41,7 @@ func NewE2Agent(registry *registry.ServiceModelRegistry, address string) Agent {
 // e2Agent is an E2 agent
 type e2Agent struct {
 	address  string
+	port     int
 	channel  e2.ClientChannel
 	registry *registry.ServiceModelRegistry
 }
@@ -90,8 +95,15 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 func (a *e2Agent) Start() error {
-	client := e2.NewClient(a)
-	channel, err := client.Connect(context.Background(), a.address)
+	addr := fmt.Sprintf("%s:%d", a.address, a.port)
+	channel, err := e2.Connect(context.TODO(), addr,
+		func(channel e2.ClientChannel) e2.ClientInterface {
+			return &e2Agent{}
+		},
+	)
+
+	log.Infof("client connected to channel %v\n", channel)
+
 	if err != nil {
 		return err
 	}
