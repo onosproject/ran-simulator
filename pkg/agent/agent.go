@@ -7,6 +7,7 @@ package agent
 import (
 	"context"
 	"fmt"
+
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
@@ -31,11 +32,17 @@ type Agent interface {
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(registry *registry.ServiceModelRegistry, address string, port int) Agent {
+	err := registry.RegisterServiceModel(kpm.GetConfig())
+	if err != nil {
+
+	}
+
 	return &e2Agent{
 		address:  address,
 		port:     port,
 		registry: registry,
 	}
+
 }
 
 // e2Agent is an E2 agent
