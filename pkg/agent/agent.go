@@ -44,7 +44,7 @@ type e2Agent struct {
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	switch ranFuncID {
-	case registry.KPM:
+	case registry.Kpm:
 		var kpmService kpm.ServiceModel
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
@@ -60,7 +60,7 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	switch ranFuncID {
-	case registry.KPM:
+	case registry.Kpm:
 		var kpmService kpm.ServiceModel
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
@@ -76,7 +76,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	switch ranFuncID {
-	case registry.KPM:
+	case registry.Kpm:
 		var kpmService kpm.ServiceModel
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
@@ -98,14 +98,13 @@ func (a *e2Agent) Start() error {
 
 	setupRequest, err := utils.NewSetupRequest(
 		utils.WithRanFunctions(a.registry.GetRanFunctions()),
-		utils.WithPlmnID([]byte{'o', 'n', 'f'}))
+		utils.WithPlmnID("onf"))
 
 	if err != nil {
 		return err
 	}
 
 	e2SetupRequest := utils.CreateSetupRequest(setupRequest)
-
 	_, e2SetupFailure, err := channel.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		return errors.NewUnknown("E2 setup failed: %v", err)

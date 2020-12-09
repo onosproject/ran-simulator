@@ -15,7 +15,7 @@ import (
 // SetupRequest setup request
 type SetupRequest struct {
 	ranFunctions types.RanFunctions
-	plmnID       []byte
+	plmnID       string
 }
 
 // NewSetupRequest creates a new setup request
@@ -37,9 +37,16 @@ func WithRanFunctions(ranFunctions types.RanFunctions) func(*SetupRequest) {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID []byte) func(*SetupRequest) {
+func WithPlmnID(plmnID string) func(*SetupRequest) {
 	return func(request *SetupRequest) {
 		request.plmnID = plmnID
+
+	}
+}
+
+// WithE2NodeID sets E2 node ID
+func WithE2NodeID() func(*SetupRequest) {
+	return func(request *SetupRequest) {
 
 	}
 }
@@ -88,7 +95,7 @@ func CreateSetupRequest(request *SetupRequest) (setupRequest *e2appducontents.E2
 						GNb: &e2apies.GlobalE2NodeGnbId{
 							GlobalGNbId: &e2apies.GlobalgNbId{
 								PlmnId: &e2ap_commondatatypes.PlmnIdentity{
-									Value: request.plmnID,
+									Value: []byte(request.plmnID),
 								},
 								GnbId: &e2apies.GnbIdChoice{
 									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{

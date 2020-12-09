@@ -43,7 +43,7 @@ func TestRegisterServiceModel(t *testing.T) {
 	}
 
 	testServiceModelConfig := ServiceModelConfig{
-		ID:           INTERNAL,
+		ID:           Internal,
 		ServiceModel: m,
 		Description:  "Test Service model",
 		Revision:     1,
@@ -53,7 +53,7 @@ func TestRegisterServiceModel(t *testing.T) {
 		t.Fatalf("failed to register the service model")
 	}
 
-	if err := registry.GetServiceModel(INTERNAL, m); err != nil {
+	if err := registry.GetServiceModel(Internal, m); err != nil {
 		t.Fatal("the service model does not exist", err)
 	}
 
