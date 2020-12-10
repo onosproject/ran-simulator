@@ -25,6 +25,7 @@ var _ servicemodel.ServiceModel = &ServiceModel{}
 type ServiceModel struct {
 }
 
+// GetConfig returns service model config information
 func GetConfig() registry.ServiceModelConfig {
 	kpmSm := registry.ServiceModelConfig{
 		ID:           registry.Kpm,

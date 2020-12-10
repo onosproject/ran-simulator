@@ -31,16 +31,16 @@ type Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(registry *registry.ServiceModelRegistry, address string, port int) Agent {
-	err := registry.RegisterServiceModel(kpm.GetConfig())
+func NewE2Agent(reg *registry.ServiceModelRegistry, address string, port int) Agent {
+	err := reg.RegisterServiceModel(kpm.GetConfig())
 	if err != nil {
-
+		log.Error(err)
 	}
 
 	return &e2Agent{
 		address:  address,
 		port:     port,
-		registry: registry,
+		registry: reg,
 	}
 
 }
@@ -58,6 +58,7 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	switch ranFuncID {
 	case registry.Kpm:
 		var kpmService kpm.ServiceModel
+
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
 			return nil, nil, err
@@ -74,6 +75,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	switch ranFuncID {
 	case registry.Kpm:
 		var kpmService kpm.ServiceModel
+		log.Info("KPM service model:", ranFuncID, &a.registry)
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
 			return nil, nil, err
@@ -105,11 +107,9 @@ func (a *e2Agent) Start() error {
 	addr := fmt.Sprintf("%s:%d", a.address, a.port)
 	channel, err := e2.Connect(context.TODO(), addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {
-			return &e2Agent{}
+			return a
 		},
 	)
-
-	log.Infof("client connected to channel %v\n", channel)
 
 	if err != nil {
 		return err

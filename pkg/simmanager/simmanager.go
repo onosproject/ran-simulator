@@ -5,11 +5,12 @@
 package simmanager
 
 import (
+	"net"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/pkg/agent"
 	smregistry "github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
-	"net"
 )
 
 var log = logging.GetLogger("manager")
