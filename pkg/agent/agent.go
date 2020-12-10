@@ -75,7 +75,6 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	switch ranFuncID {
 	case registry.Kpm:
 		var kpmService kpm.ServiceModel
-		log.Info("KPM service model:", ranFuncID, &a.registry)
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
 			return nil, nil, err
