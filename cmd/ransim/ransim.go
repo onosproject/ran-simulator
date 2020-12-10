@@ -21,6 +21,7 @@ package main
 
 import (
 	"flag"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/simmanager"
 )
@@ -29,7 +30,7 @@ var log = logging.GetLogger("main")
 
 // The main entry point
 func main() {
-	log.Info("Starting simulator")
+	log.Info("Starting Ran simulator")
 	ready := make(chan bool)
 
 	caPath := flag.String("caPath", "", "path to CA certificate")

@@ -7,6 +7,8 @@ package kpm
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
 
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
@@ -21,6 +23,18 @@ var _ servicemodel.ServiceModel = &ServiceModel{}
 
 // ServiceModel kpm service model struct
 type ServiceModel struct {
+}
+
+// GetConfig returns service model config information
+func GetConfig() registry.ServiceModelConfig {
+	kpmSm := registry.ServiceModelConfig{
+		ID:           registry.Kpm,
+		ServiceModel: &ServiceModel{},
+		Description:  "KPM",
+		Revision:     1,
+	}
+
+	return kpmSm
 }
 
 // RICControl implements control handler for kpm service model
