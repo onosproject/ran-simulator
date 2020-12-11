@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
+	"github.com/onosproject/ran-simulator/pkg/utils/setup"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 
@@ -58,7 +58,6 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	switch ranFuncID {
 	case registry.Kpm:
 		var kpmService kpm.ServiceModel
-
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
 			return nil, nil, err
@@ -75,6 +74,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	switch ranFuncID {
 	case registry.Kpm:
 		var kpmService kpm.ServiceModel
+		kpmService.Channel = a.channel
 		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
 		if err != nil {
 			return nil, nil, err
@@ -114,15 +114,15 @@ func (a *e2Agent) Start() error {
 		return err
 	}
 
-	setupRequest, err := utils.NewSetupRequest(
-		utils.WithRanFunctions(a.registry.GetRanFunctions()),
-		utils.WithPlmnID("onf"))
+	setupRequest, err := setup.NewSetupRequest(
+		setup.WithRanFunctions(a.registry.GetRanFunctions()),
+		setup.WithPlmnID("onf"))
 
 	if err != nil {
 		return err
 	}
 
-	e2SetupRequest := utils.CreateSetupRequest(setupRequest)
+	e2SetupRequest := setup.CreateSetupRequest(setupRequest)
 	_, e2SetupFailure, err := channel.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		return errors.NewUnknown("E2 setup failed: %v", err)
