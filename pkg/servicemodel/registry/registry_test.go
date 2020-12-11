@@ -45,7 +45,7 @@ func TestRegisterServiceModel(t *testing.T) {
 	testServiceModelConfig := ServiceModelConfig{
 		ID:           Internal,
 		ServiceModel: m,
-		Description:  "Test Service model",
+		Description:  []byte{0x01, 0x02, 0x03, 0x04},
 		Revision:     1,
 	}
 

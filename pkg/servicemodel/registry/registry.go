@@ -5,12 +5,10 @@
 package registry
 
 import (
-	"sync"
-
-	"github.com/onosproject/ran-simulator/pkg/servicemodel"
-
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel"
+	"sync"
 )
 
 // ServiceModelRegistry stores list of registered service models
@@ -24,7 +22,7 @@ type ServiceModelRegistry struct {
 type ServiceModelConfig struct {
 	ID           ID
 	ServiceModel servicemodel.ServiceModel
-	Description  string
+	Description  []byte // ASN1 bytes from Service Model
 	Revision     int
 }
 
@@ -46,7 +44,7 @@ func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModelConfig) error
 
 	ranFuncID := types.RanFunctionID(sm.ID)
 	s.ranFunctions[ranFuncID] = types.RanFunctionItem{
-		Description: types.RanFunctionDescription(sm.Description),
+		Description: sm.Description,
 		Revision:    types.RanFunctionRevision(sm.Revision),
 	}
 	s.serviceModels[sm.ID] = sm.ServiceModel
