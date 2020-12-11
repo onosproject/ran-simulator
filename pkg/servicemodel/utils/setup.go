@@ -10,7 +10,10 @@ import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
+
+var log = logging.GetLogger("servicemodel", "utils", "setup")
 
 // SetupRequest setup request
 type SetupRequest struct {
@@ -112,5 +115,10 @@ func CreateSetupRequest(request *SetupRequest) (setupRequest *e2appducontents.E2
 			E2ApProtocolIes10: &ranFunctionList,
 		},
 	}
+	err := e2SetupRequest.Validate()
+	if err != nil {
+		log.Warnf("Validation error %s", err.Error())
+	}
+	log.Debugf("Created E2SetupRequest %v", e2SetupRequest)
 	return e2SetupRequest
 }
