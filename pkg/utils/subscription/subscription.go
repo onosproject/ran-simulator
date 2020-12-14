@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package utils
+package subscription
 
 import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
@@ -31,6 +31,21 @@ func NewSubscription(options ...func(*Subscription)) (*Subscription, error) {
 
 	return subscription, nil
 
+}
+
+// GetRanFuncID returns subscription ran function ID
+func (s *Subscription) GetRanFuncID() int32 {
+	return s.ranFuncID
+}
+
+// GetRicInstanceID returns subscription RicInstance ID
+func (s *Subscription) GetRicInstanceID() int32 {
+	return s.ricInstanceID
+}
+
+// GetReqID returns subscription request ID
+func (s *Subscription) GetReqID() int32 {
+	return s.reqID
 }
 
 // WithRequestID sets request ID

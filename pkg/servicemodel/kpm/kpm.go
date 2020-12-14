@@ -6,9 +6,16 @@ package kpm
 
 import (
 	"context"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"time"
 
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/utils"
+	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/indication"
+
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
+
+	"github.com/onosproject/onos-lib-go/pkg/logging"
+
+	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
@@ -18,8 +25,11 @@ import (
 
 var _ servicemodel.ServiceModel = &ServiceModel{}
 
+var log = logging.GetLogger("sm", "kpm")
+
 // ServiceModel kpm service model struct
 type ServiceModel struct {
+	Channel e2.ClientChannel
 }
 
 // GetConfig returns service model config information
@@ -34,6 +44,30 @@ func GetConfig() registry.ServiceModelConfig {
 	kpmSm.Description = ranFuncDescBytes
 
 	return kpmSm
+}
+
+func (sm *ServiceModel) reportIndication(ctx context.Context, interval time.Duration, subscription *subutils.Subscription) {
+
+	// TODO indication header and indication message should be generated using model plugins
+	indication, _ := indicationutils.NewIndication(
+		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
+		indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
+		indicationutils.WithRequestID(subscription.GetReqID()),
+		indicationutils.WithIndicationHeader(indicationHeaderBytes),
+		indicationutils.WithIndicationMessage(indicationMessageBytes))
+
+	ricIndication := indicationutils.CreateIndication(indication)
+
+	ticker := time.NewTicker(interval * time.Second)
+	for range ticker.C {
+		log.Info("Sending indication")
+		err := sm.Channel.RICIndication(ctx, ricIndication)
+		if err != nil {
+			log.Error("Sending indication report is failed:", err)
+			break
+		}
+	}
+
 }
 
 // RICControl implements control handler for kpm service model
@@ -61,22 +95,23 @@ func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducon
 		}
 		// TODO handle not admitted actions
 	}
-	subscription, _ := utils.NewSubscription(
-		utils.WithRequestID(reqID),
-		utils.WithRanFuncID(ranFuncID),
-		utils.WithRicInstanceID(ricInstanceID),
-		utils.WithActionsAccepted(ricActionsAccepted),
-		utils.WithActionsNotAdmitted(ricActionsNotAdmitted))
+	subscription, _ := subutils.NewSubscription(
+		subutils.WithRequestID(reqID),
+		subutils.WithRanFuncID(ranFuncID),
+		subutils.WithRicInstanceID(ricInstanceID),
+		subutils.WithActionsAccepted(ricActionsAccepted),
+		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
-		subscriptionFailure := utils.CreateSubscriptionFailure(subscription)
+		subscriptionFailure := subutils.CreateSubscriptionFailure(subscription)
 		return nil, subscriptionFailure, nil
 	}
 
 	// TODO handle event trigger definitions
 
-	subscriptionResponse := utils.CreateSubscriptionResponse(subscription)
+	subscriptionResponse := subutils.CreateSubscriptionResponse(subscription)
+	go sm.reportIndication(ctx, 1, subscription)
 	return subscriptionResponse, nil, nil
 
 }
@@ -85,6 +120,10 @@ func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducon
 func (sm *ServiceModel) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	panic("implement me")
 }
+
+var indicationMessageBytes = []byte{0x40, 0x00, 0x00, 0x6c, 0x1a, 0x4f, 0x70, 0x65, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x69, 0x6e, 0x67, 0x80, 0x00, 0x00, 0x0c, 0x72, 0x61, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72}
+
+var indicationHeaderBytes = []byte{0x3f, 0x0c, 0x4f, 0x4e, 0x46, 0x00, 0xd4, 0xbc, 0x08, 0x00, 0x0c, 0x00, 0x0d, 0x6f, 0x6e, 0x66, 0xef, 0xab, 0xd4, 0xbc, 0x00, 0x4f, 0x4e, 0x46, 0x98, 0x80, 0x53, 0x44, 0x31, 0x00, 0x00}
 
 var ranFuncDescBytes = []byte{
 	0x20, 0xC0, 0x4F, 0x52, 0x41, 0x4E, 0x2D, 0x45, 0x32, 0x53, 0x4D, 0x2D, 0x4B, 0x50, 0x4D, 0x00, 0x00, 0x05, 0x4F, 0x49,

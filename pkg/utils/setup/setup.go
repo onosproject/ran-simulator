@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package utils
+package setup
 
 import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
@@ -15,15 +15,15 @@ import (
 
 var log = logging.GetLogger("servicemodel", "utils", "setup")
 
-// SetupRequest setup request
-type SetupRequest struct {
+// Setup setup request
+type Setup struct {
 	ranFunctions types.RanFunctions
 	plmnID       string
 }
 
 // NewSetupRequest creates a new setup request
-func NewSetupRequest(options ...func(*SetupRequest)) (*SetupRequest, error) {
-	setup := &SetupRequest{}
+func NewSetupRequest(options ...func(*Setup)) (*Setup, error) {
+	setup := &Setup{}
 
 	for _, option := range options {
 		option(setup)
@@ -33,29 +33,29 @@ func NewSetupRequest(options ...func(*SetupRequest)) (*SetupRequest, error) {
 }
 
 // WithRanFunctions sets ran functions
-func WithRanFunctions(ranFunctions types.RanFunctions) func(*SetupRequest) {
-	return func(request *SetupRequest) {
+func WithRanFunctions(ranFunctions types.RanFunctions) func(*Setup) {
+	return func(request *Setup) {
 		request.ranFunctions = ranFunctions
 	}
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID string) func(*SetupRequest) {
-	return func(request *SetupRequest) {
+func WithPlmnID(plmnID string) func(*Setup) {
+	return func(request *Setup) {
 		request.plmnID = plmnID
 
 	}
 }
 
 // WithE2NodeID sets E2 node ID
-func WithE2NodeID() func(*SetupRequest) {
-	return func(request *SetupRequest) {
+func WithE2NodeID() func(*Setup) {
+	return func(request *Setup) {
 
 	}
 }
 
 // CreateSetupRequest creates e2 setup request
-func CreateSetupRequest(request *SetupRequest) (setupRequest *e2appducontents.E2SetupRequest) {
+func CreateSetupRequest(request *Setup) (setupRequest *e2appducontents.E2SetupRequest) {
 	ranFunctionList := e2appducontents.E2SetupRequestIes_E2SetupRequestIes10{
 		Id:          int32(v1beta1.ProtocolIeIDRanfunctionsAdded),
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
