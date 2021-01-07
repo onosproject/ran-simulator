@@ -229,14 +229,12 @@ github.com/onosproject/onos-lib-go/api/logging
 github.com/onosproject/onos-lib-go/pkg/atomix
 github.com/onosproject/onos-lib-go/pkg/auth
 github.com/onosproject/onos-lib-go/pkg/certs
-github.com/onosproject/onos-lib-go/pkg/cli
 github.com/onosproject/onos-lib-go/pkg/cluster
 github.com/onosproject/onos-lib-go/pkg/config
 github.com/onosproject/onos-lib-go/pkg/env
 github.com/onosproject/onos-lib-go/pkg/errors
 github.com/onosproject/onos-lib-go/pkg/grpcinterceptors
 github.com/onosproject/onos-lib-go/pkg/logging
-github.com/onosproject/onos-lib-go/pkg/logging/cli
 github.com/onosproject/onos-lib-go/pkg/logging/service
 github.com/onosproject/onos-lib-go/pkg/northbound
 github.com/onosproject/onos-lib-go/pkg/southbound
