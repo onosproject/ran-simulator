@@ -140,6 +140,49 @@ func FromStatus(status *status.Status) error {
 	}
 }
 
+// FromGRPC creates a typed error from a gRPC error
+func FromGRPC(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	stat, ok := status.FromError(err)
+	if !ok {
+		return New(Unknown, err.Error())
+	}
+
+	switch stat.Code() {
+	case codes.OK:
+		return nil
+	case codes.Unknown:
+		return New(Unknown, stat.Message())
+	case codes.Canceled:
+		return New(Canceled, stat.Message())
+	case codes.NotFound:
+		return New(NotFound, stat.Message())
+	case codes.AlreadyExists:
+		return New(AlreadyExists, stat.Message())
+	case codes.Unauthenticated:
+		return New(Unauthorized, stat.Message())
+	case codes.PermissionDenied:
+		return New(Forbidden, stat.Message())
+	case codes.FailedPrecondition:
+		return New(Conflict, stat.Message())
+	case codes.InvalidArgument:
+		return New(Invalid, stat.Message())
+	case codes.Unavailable:
+		return New(Unavailable, stat.Message())
+	case codes.Unimplemented:
+		return New(NotSupported, stat.Message())
+	case codes.DeadlineExceeded:
+		return New(Timeout, stat.Message())
+	case codes.Internal:
+		return New(Internal, stat.Message())
+	default:
+		return New(Unknown, stat.Message())
+	}
+}
+
 // FromAtomix creates a typed error from an Atomix error
 func FromAtomix(err error) error {
 	if err == nil {

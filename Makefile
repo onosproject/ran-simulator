@@ -10,7 +10,6 @@ ONOS_PROTOC_VERSION := v0.6.3
 build: # @HELP build the Go binaries and run all validations (default)
 build:
 	export GOPRIVATE="github.com/onosproject/*"
-	#CGO_ENABLED=1 go build -o build/_output/trafficsim ./cmd/trafficsim
 	CGO_ENABLED=1 go build -o build/_output/ransim ./cmd/ransim
 
 test: # @HELP run the unit tests and source code validation
@@ -28,13 +27,12 @@ coverage: build deps linters license_check
 	goveralls -coverprofile=onos-nogrpc.coverprofile -service travis-pro -repotoken xHYC7gvqJdxaScSObicSox1E6sraczouC
 
 deps: # @HELP ensure that the required dependencies are in place
-	go build -v ./pkg/... ./cmd/...
+	go build -v ./...
 	bash -c "diff -u <(echo -n) <(git diff go.mod)"
 	bash -c "diff -u <(echo -n) <(git diff go.sum)"
 
 linters: # @HELP examines Go source code and reports coding problems
-	cd cmd && golangci-lint run --timeout 30m
-	cd pkg && golangci-lint run --timeout 30m
+	golangci-lint run --timeout 30m
 
 license_check: # @HELP examine and ensure license headers exist
 	@if [ ! -d "../build-tools" ]; then cd .. && git clone https://github.com/onosproject/build-tools.git; fi

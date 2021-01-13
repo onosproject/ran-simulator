@@ -33,6 +33,7 @@ func main() {
 	log.Info("Starting Ran simulator")
 	ready := make(chan bool)
 
+	cfgPath := flag.String("config", "", "path to config YAML file")
 	caPath := flag.String("caPath", "", "path to CA certificate")
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
@@ -40,12 +41,21 @@ func main() {
 	modelPath := flag.String("modelPath", "", "path to the simulation model YAML file")
 	flag.Parse()
 
-	cfg := manager.Config{
-		CAPath:    *caPath,
-		KeyPath:   *keyPath,
-		CertPath:  *certPath,
-		GRPCPort:  *grpcPort,
-		ModelPath: *modelPath,
+	var cfg *manager.Config
+	var err error
+	if cfgPath != nil {
+		cfg, err = manager.LoadConfig(*cfgPath)
+		if err != nil {
+			return
+		}
+	} else {
+		cfg = &manager.Config{
+			CAPath:    *caPath,
+			KeyPath:   *keyPath,
+			CertPath:  *certPath,
+			GRPCPort:  *grpcPort,
+			ModelPath: *modelPath,
+		}
 	}
 
 	mgr := manager.NewManager(cfg)

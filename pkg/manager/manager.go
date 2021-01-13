@@ -10,6 +10,8 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	smregistry "github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"gopkg.in/yaml.v2"
+	"os"
 )
 
 var log = logging.GetLogger("manager")
@@ -26,14 +28,36 @@ type Config struct {
 }
 
 // NewManager creates a new manager
-func NewManager(config Config) *Manager {
+func NewManager(config *Config) *Manager {
 	log.Info("Creating Manager")
 	return &Manager{
-		Config:   config,
+		Config:   *config,
 		Model:    model.NewModel(),
 		Agents:   nil,
 		Registry: smregistry.NewServiceModelRegistry(),
 	}
+}
+
+// LoadConfig from the specified YAML file
+func LoadConfig(path string) (*Config, error) {
+	config := &Config{}
+
+	// Open config file
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// Init new YAML decode
+	d := yaml.NewDecoder(file)
+
+	// Start YAML decoding from file
+	if err := d.Decode(&config); err != nil {
+		return nil, err
+	}
+
+	return config, nil
 }
 
 // Manager is a manager for the E2T service
