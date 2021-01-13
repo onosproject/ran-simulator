@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package agent
+package e2agent
 
 import (
 	"context"
@@ -21,8 +21,8 @@ import (
 
 var log = logging.GetLogger("agent")
 
-// Agent is an E2 agent
-type Agent interface {
+// E2Agent is an E2 agent
+type E2Agent interface {
 	// Start starts the agent
 	Start() error
 
@@ -31,7 +31,7 @@ type Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(reg *registry.ServiceModelRegistry, address string, port int) Agent {
+func NewE2Agent(reg *registry.ServiceModelRegistry, address string, port int) E2Agent {
 	err := reg.RegisterServiceModel(kpm.GetConfig())
 	if err != nil {
 		log.Error(err)
@@ -141,6 +141,6 @@ func (a *e2Agent) Stop() error {
 	return nil
 }
 
-var _ Agent = &e2Agent{}
+var _ E2Agent = &e2Agent{}
 
 var _ e2.ClientInterface = &e2Agent{}

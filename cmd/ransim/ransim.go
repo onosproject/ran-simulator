@@ -23,7 +23,7 @@ import (
 	"flag"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/ran-simulator/pkg/simmanager"
+	"github.com/onosproject/ran-simulator/pkg/manager"
 )
 
 var log = logging.GetLogger("main")
@@ -36,21 +36,19 @@ func main() {
 	caPath := flag.String("caPath", "", "path to CA certificate")
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
-	host := flag.String("host", "onos-e2t", "Host name of E2T server")
 	grpcPort := flag.Int("grpcPort", 5150, "GRPC port for e2T server")
-	sctpPort := flag.Int("sctpPort", 36421, "SCTP port for e2T server")
+	modelPath := flag.String("modelPath", "", "path to the simulation model YAML file")
 	flag.Parse()
 
-	cfg := simmanager.Config{
-		CAPath:     *caPath,
-		KeyPath:    *keyPath,
-		CertPath:   *certPath,
-		GRPCPort:   *grpcPort,
-		E2THost:    *host,
-		E2SCTPPort: *sctpPort,
+	cfg := manager.Config{
+		CAPath:    *caPath,
+		KeyPath:   *keyPath,
+		CertPath:  *certPath,
+		GRPCPort:  *grpcPort,
+		ModelPath: *modelPath,
 	}
 
-	mgr := simmanager.NewManager(cfg)
+	mgr := manager.NewManager(cfg)
 	mgr.Run()
 
 	<-ready

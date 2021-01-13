@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 //
 
-package manager
+package model
 
 import (
 	"fmt"
@@ -17,14 +17,28 @@ import (
 // LocationID type - an alias for string
 type LocationID string
 
-// Location :
+// Location represents an abstract point on a geo map
 type Location struct {
 	Name     LocationID
 	Position types.Point
 }
 
-// NewLocations - create a new set of locations
-func NewLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScale float32) (*types.Point, map[LocationID]*Location) {
+// SimLocations represents an abstract geo map as a collection of named geo locations
+type SimLocations struct {
+	Centre    types.Point
+	Locations map[LocationID]*Location
+}
+
+// NewSimLocations creates a new set of locations from the specified set of simulated cells
+func NewSimLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScale float32) *SimLocations {
+	centre, locations := newLocations(cells, maxUEs, locationsScale)
+	return &SimLocations{
+		Centre:    centre,
+		Locations: locations,
+	}
+}
+
+func newLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScale float32) (types.Point, map[LocationID]*Location) {
 	locations := make(map[LocationID]*Location)
 
 	minLat := 90.0
@@ -60,10 +74,11 @@ func NewLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScale f
 		locations[name] = &loc
 	}
 
-	return &centre, locations
+	return centre, locations
 }
 
-func (m *Manager) getRandomLocation(exclude LocationID) (*Location, error) {
+// GetRandomLocation returns a random location from the set of simulated locations in this abstract geo map
+func (m *SimLocations) GetRandomLocation(exclude LocationID) (*Location, error) {
 	randomIndex := rand.Intn(len(m.Locations) - 1)
 	idx := 0
 	for name, loc := range m.Locations {
