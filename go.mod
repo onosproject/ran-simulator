@@ -12,6 +12,7 @@ require (
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/spf13/cobra v0.0.6 // indirect
 	github.com/spf13/viper v1.6.2 // indirect
+	github.com/stretchr/testify v1.6.1
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	google.golang.org/grpc v1.33.2
 	googlemaps.github.io/maps v0.0.0-20200124220646-5b7f2815585f // indirect

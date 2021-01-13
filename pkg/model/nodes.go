@@ -6,27 +6,32 @@
 package model
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
 	"sync"
 )
 
+// ECGI is a type alias for ECGI ID
+type ECGI string
+
+// SMID is a type alias for service model ID
+type SMID int32
+
 // SimNode represents a simulated RAN E2 node
 type SimNode struct {
-	ECGI          types.ECGI
-	ServiceModels []int32
-	// Cell types.Cell // for now just encapsulate gRPC API cell; to be decoupled
+	ECGI          ECGI
+	ServiceModels []SMID
+	// TODO: add other simulation attributes, i.e. locations, signal strength, neighbours, etc.
 }
 
 // SimNodes represents a collection of simulated RAN E2 nodes
 type SimNodes struct {
-	nodes map[types.ECGI]*SimNode
+	nodes map[ECGI]*SimNode
 	lock  *sync.RWMutex
 }
 
 // NewSimNodes creates a new and empty collection of simulated RAN E2 nodes
 func NewSimNodes() *SimNodes {
 	return &SimNodes{
-		nodes: make(map[types.ECGI]*SimNode),
+		nodes: make(map[ECGI]*SimNode),
 		lock:  &sync.RWMutex{},
 	}
 }
@@ -39,17 +44,17 @@ func (n *SimNodes) Add(node *SimNode) {
 }
 
 // Get the simulated E2 node with the specified EGGI; returns nil of no such node
-func (n *SimNodes) Get(ecgi types.ECGI) *SimNode {
+func (n *SimNodes) Get(ecgi ECGI) *SimNode {
 	n.lock.RLock()
-	defer n.lock.Unlock()
+	defer n.lock.RUnlock()
 	return n.nodes[ecgi]
 }
 
 // GetAll simulated E2 nodes in the collection
 func (n *SimNodes) GetAll() []*SimNode {
 	n.lock.RLock()
-	defer n.lock.Unlock()
-	all := make([]*SimNode, len(n.nodes))
+	defer n.lock.RUnlock()
+	all := make([]*SimNode, 0)
 	for _, v := range n.nodes {
 		all = append(all, v)
 	}
@@ -57,7 +62,7 @@ func (n *SimNodes) GetAll() []*SimNode {
 }
 
 // Remove the simulated E2 node with the specified EGGI; returns nil of no such node
-func (n *SimNodes) Remove(ecgi types.ECGI) *SimNode {
+func (n *SimNodes) Remove(ecgi ECGI) *SimNode {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	node := n.nodes[ecgi]

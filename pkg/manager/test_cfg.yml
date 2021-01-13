@@ -1,0 +1,5 @@
+caPath: /foo/ca
+certPath: /foo/cert
+keyPath: /foo/key
+grpcPort: 901
+modelPath: ../model/test_model.yml

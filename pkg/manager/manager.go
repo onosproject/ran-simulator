@@ -28,31 +28,32 @@ type Config struct {
 }
 
 // NewManager creates a new manager
-func NewManager(config *Config) *Manager {
+func NewManager(config *Config) (*Manager, error) {
 	log.Info("Creating Manager")
-	return &Manager{
+	mgr := &Manager{
 		Config:   *config,
 		Model:    model.NewModel(),
 		Agents:   nil,
 		Registry: smregistry.NewServiceModelRegistry(),
 	}
+
+	err := mgr.Model.Load(config.ModelPath)
+	if err != nil {
+		return nil, err
+	}
+	return mgr, nil
 }
 
 // LoadConfig from the specified YAML file
 func LoadConfig(path string) (*Config, error) {
-	config := &Config{}
-
-	// Open config file
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	// Init new YAML decode
 	d := yaml.NewDecoder(file)
-
-	// Start YAML decoding from file
+	config := &Config{}
 	if err := d.Decode(&config); err != nil {
 		return nil, err
 	}

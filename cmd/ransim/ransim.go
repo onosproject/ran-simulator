@@ -58,10 +58,10 @@ func main() {
 		}
 	}
 
-	mgr := manager.NewManager(cfg)
-	mgr.Run()
-
-	<-ready
-
-	mgr.Close()
+	mgr, err := manager.NewManager(cfg)
+	if err == nil {
+		mgr.Run()
+		<-ready
+		mgr.Close()
+	}
 }
