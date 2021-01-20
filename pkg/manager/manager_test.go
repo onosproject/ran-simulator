@@ -20,10 +20,16 @@ func TestLoadConfig(t *testing.T) {
 	}
 }
 
-func TestNewManager(t *testing.T) {
+func TestManagerBasics(t *testing.T) {
 	cfg, err := LoadConfig("test_cfg.yml")
 	assert.NoError(t, err, "unable to load config")
 
 	_, err = NewManager(cfg)
 	assert.NoError(t, err, "unable to create new manager")
+
+	//if err == nil {
+	//	assert.NoError(t, mgr.Start())
+	//	mgr.Close()
+	//}
+
 }

@@ -31,13 +31,13 @@ type Config struct {
 func NewManager(config *Config) (*Manager, error) {
 	log.Info("Creating Manager")
 	mgr := &Manager{
-		Config:   *config,
-		Model:    model.NewModel(),
-		Agents:   nil,
-		Registry: smregistry.NewServiceModelRegistry(),
+		config:   *config,
+		model:    model.NewModel(),
+		agents:   nil,
+		registry: smregistry.NewServiceModelRegistry(),
 	}
 
-	err := mgr.Model.Load(config.ModelPath)
+	err := mgr.model.Load(config.ModelPath)
 	if err != nil {
 		return nil, err
 	}
@@ -63,10 +63,11 @@ func LoadConfig(path string) (*Config, error) {
 
 // Manager is a manager for the E2T service
 type Manager struct {
-	Config   Config
-	Model    *model.Model
-	Agents   *e2agent.E2Agents
-	Registry *smregistry.ServiceModelRegistry
+	config   Config
+	model    *model.Model
+	agents   *e2agent.E2Agents
+	registry *smregistry.ServiceModelRegistry
+	server   *northbound.Server
 }
 
 // Run starts the manager and the associated services
@@ -79,8 +80,11 @@ func (m *Manager) Run() {
 
 // Start starts the manager
 func (m *Manager) Start() error {
-	// Start E2 agents watchdog
-	err := m.startE2Agents()
+	// Create the E2 agents for all simulated nodes and specified controllers
+	m.agents = e2agent.NewE2Agents(m.model.Nodes.GetAll(), m.registry, m.model.Controllers)
+
+	// S tart the E2 agents
+	err := m.agents.Start()
 	if err != nil {
 		return err
 	}
@@ -89,34 +93,20 @@ func (m *Manager) Start() error {
 	return m.startNorthboundServer()
 }
 
-func (m *Manager) startE2Agents() error {
-	//ips, err := net.LookupIP(m.Config.E2THost)
-	//if err != nil {
-	//	return err
-	//}
-	//addr := ips[0].String()
-	//m.e2agent = e2agent.NewE2Agent(registry, addr, m.Config.E2SCTPPort)
-	//agentErr := m.e2agent.Start()
-	//if agentErr != nil {
-	//	return agentErr
-	//}
-	return nil
-}
-
 // startSouthboundServer starts the northbound gRPC server
 func (m *Manager) startNorthboundServer() error {
-	s := northbound.NewServer(northbound.NewServerCfg(
-		m.Config.CAPath,
-		m.Config.KeyPath,
-		m.Config.CertPath,
-		int16(m.Config.GRPCPort),
+	m.server = northbound.NewServer(northbound.NewServerCfg(
+		m.config.CAPath,
+		m.config.KeyPath,
+		m.config.CertPath,
+		int16(m.config.GRPCPort),
 		true,
 		northbound.SecurityConfig{}))
-	s.AddService(logging.Service{})
+	m.server.AddService(logging.Service{})
 
 	doneCh := make(chan error)
 	go func() {
-		err := s.Serve(func(started string) {
+		err := m.server.Serve(func(started string) {
 			log.Info("Started NBI on ", started)
 			close(doneCh)
 		})
@@ -130,14 +120,10 @@ func (m *Manager) startNorthboundServer() error {
 // Close kills the channels and manager related objects
 func (m *Manager) Close() {
 	log.Info("Closing Manager")
-	stopE2Agents()
-	stopNorthboundServer()
+	_ = m.agents.Stop()
+	m.stopNorthboundServer()
 }
 
-func stopE2Agents() {
-	//_ = m.e2agent.Stop()
-}
-
-func stopNorthboundServer() {
-
+func (m *Manager) stopNorthboundServer() {
+	// TODO implementation requires ability to actually stop the server
 }

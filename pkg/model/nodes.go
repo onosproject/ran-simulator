@@ -19,6 +19,9 @@ type SMID int32
 type SimNode struct {
 	ECGI          ECGI
 	ServiceModels []SMID
+	Address       string
+	Port          int16
+
 	// TODO: add other simulation attributes, i.e. locations, signal strength, neighbours, etc.
 }
 

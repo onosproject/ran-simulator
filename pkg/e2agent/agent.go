@@ -7,7 +7,7 @@ package e2agent
 import (
 	"context"
 	"fmt"
-
+	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils/setup"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
@@ -31,26 +31,25 @@ type E2Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(reg *registry.ServiceModelRegistry, address string, port int) E2Agent {
+func NewE2Agent(node *model.SimNode, reg *registry.ServiceModelRegistry, controllers []*model.Controller) E2Agent {
 	err := reg.RegisterServiceModel(kpm.GetConfig())
 	if err != nil {
 		log.Error(err)
 	}
 
 	return &e2Agent{
-		address:  address,
-		port:     port,
-		registry: reg,
+		node:        node,
+		registry:    reg,
+		controllers: controllers,
 	}
-
 }
 
 // e2Agent is an E2 agent
 type e2Agent struct {
-	address  string
-	port     int
-	channel  e2.ClientChannel
-	registry *registry.ServiceModelRegistry
+	node        *model.SimNode
+	channel     e2.ClientChannel
+	controllers []*model.Controller
+	registry    *registry.ServiceModelRegistry
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
@@ -103,7 +102,7 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 func (a *e2Agent) Start() error {
-	addr := fmt.Sprintf("%s:%d", a.address, a.port)
+	addr := fmt.Sprintf("%s:%d", a.node.Address, a.node.Port)
 	channel, err := e2.Connect(context.TODO(), addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {
 			return a
