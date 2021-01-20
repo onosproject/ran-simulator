@@ -1,0 +1,12 @@
+controllers:
+  - address: 10.10.10.1
+    port: 9001
+  - address: 10.10.10.2
+    port: 9002
+nodes:
+  - ecgi: 90125-10001
+    sms: [ 1 ]
+  - ecgi: 90125-10002
+    sms: [ 1, 2 ]
+  - ecgi: 90125-10003
+    sms: [ 2 ]

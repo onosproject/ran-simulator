@@ -10,7 +10,6 @@ ONOS_PROTOC_VERSION := v0.6.3
 build: # @HELP build the Go binaries and run all validations (default)
 build:
 	export GOPRIVATE="github.com/onosproject/*"
-	CGO_ENABLED=1 go build -o build/_output/trafficsim ./cmd/trafficsim
 	CGO_ENABLED=1 go build -o build/_output/ransim ./cmd/ransim
 
 test: # @HELP run the unit tests and source code validation
@@ -37,7 +36,7 @@ linters: # @HELP examines Go source code and reports coding problems
 
 license_check: # @HELP examine and ensure license headers exist
 	@if [ ! -d "../build-tools" ]; then cd .. && git clone https://github.com/onosproject/build-tools.git; fi
-	./../build-tools/licensing/boilerplate.py -v --rootdir=${CURDIR} --boilerplate LicenseRef-ONF-Member-1.0
+	./../build-tools/licensing/boilerplate.py -v --rootdir=${CURDIR}/pkg --boilerplate LicenseRef-ONF-Member-1.0
 
 gofmt: # @HELP run the Go format validation
 	bash -c "diff -u <(echo -n) <(gofmt -d pkg/ cmd/ tests/)"

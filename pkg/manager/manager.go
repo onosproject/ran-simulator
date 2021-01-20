@@ -1,157 +1,129 @@
 // SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
-//
 
-// Package manager is is the main coordinator for the ONOS RAN subsystem.
 package manager
 
 import (
-	"context"
-	"sync"
-	"time"
-
-	"github.com/onosproject/config-models/modelplugin/e2node-1.0.0/e2node_1_0_0"
-
-	device "github.com/onosproject/onos-topo/api/topo"
-	"github.com/onosproject/ran-simulator/pkg/southbound/topo"
-	"github.com/onosproject/ran-simulator/pkg/utils"
-
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/dispatcher"
-	"github.com/onosproject/ran-simulator/pkg/northbound/metrics"
+	"github.com/onosproject/onos-lib-go/pkg/northbound"
+	"github.com/onosproject/ran-simulator/pkg/e2agent"
+	"github.com/onosproject/ran-simulator/pkg/model"
+	smregistry "github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"gopkg.in/yaml.v2"
+	"os"
 )
 
 var log = logging.GetLogger("manager")
 
-var mgr Manager
+// Config is a manager configuration
+type Config struct {
+	CAPath   string `yaml:"caPath"`
+	KeyPath  string `yaml:"keyPath"`
+	CertPath string `yaml:"certPath"`
+	GRPCPort int    `yaml:"grpcPort"`
 
-// NewServerHandler a call back function to avoid import cycle
-type NewServerHandler func(ecgi types.ECGI, port uint16, serverParams utils.ServerParams) error
-
-// Manager single point of entry for the trafficsim system.
-type Manager struct {
-	MapLayout             types.MapLayout
-	Cells                 map[types.ECGI]*types.Cell
-	CellConfigs           map[types.ECGI]*e2node_1_0_0.Device
-	CellsLock             *sync.RWMutex
-	Locations             map[LocationID]*Location
-	Routes                map[types.Imsi]*types.Route
-	UserEquipments        map[types.Imsi]*types.Ue
-	UserEquipmentsLock    *sync.RWMutex
-	UserEquipmentsMapLock *sync.RWMutex
-	Dispatcher            *dispatcher.Dispatcher
-	UeChannel             chan dispatcher.Event
-	RouteChannel          chan dispatcher.Event
-	CellsChannel          chan dispatcher.Event
-	googleAPIKey          string
-	LatencyChannel        chan metrics.HOEvent
-	ResetMetricsChannel   chan bool
-	TopoClient            device.TopoClient
-	AspectRatio           float64
-	cellCreateTimer       *time.Timer
+	// Path to the YAML file describing the environment model
+	ModelPath string `yaml:"modelPath"`
 }
 
-// MetricsParams for the Prometheus exporter
-type MetricsParams struct {
-	Port              uint
-	ExportAllHOEvents bool
-}
-
-// NewManager initializes the RAN subsystem.
-func NewManager() (*Manager, error) {
+// NewManager creates a new manager
+func NewManager(config *Config) (*Manager, error) {
 	log.Info("Creating Manager")
-	mgr = Manager{
-		CellsLock:             &sync.RWMutex{},
-		UserEquipmentsLock:    &sync.RWMutex{},
-		UserEquipmentsMapLock: &sync.RWMutex{},
-		Dispatcher:            dispatcher.NewDispatcher(),
-		UeChannel:             make(chan dispatcher.Event),
-		RouteChannel:          make(chan dispatcher.Event),
-		CellsChannel:          make(chan dispatcher.Event),
-		LatencyChannel:        make(chan metrics.HOEvent),
-		ResetMetricsChannel:   make(chan bool),
-		Cells:                 make(map[types.ECGI]*types.Cell),
-		CellConfigs:           make(map[types.ECGI]*e2node_1_0_0.Device),
-		Locations:             make(map[LocationID]*Location),
-		Routes:                make(map[types.Imsi]*types.Route),
-		UserEquipments:        make(map[types.Imsi]*types.Ue),
-		cellCreateTimer:       time.NewTimer(time.Second),
+	mgr := &Manager{
+		config:   *config,
+		model:    model.NewModel(),
+		agents:   nil,
+		registry: smregistry.NewServiceModelRegistry(),
 	}
-	return &mgr, nil
+
+	err := mgr.model.Load(config.ModelPath)
+	if err != nil {
+		return nil, err
+	}
+	return mgr, nil
 }
 
-// Run starts a synchronizer based on the devices and the northbound services.
-func (m *Manager) Run(mapLayoutParams types.MapLayout, routesParams RoutesParams,
-	topoEndpoint string, serverParams utils.ServerParams,
-	metricsParams MetricsParams, newServerHandler NewServerHandler) {
-	log.Infof("Starting Manager with %v %v", mapLayoutParams, routesParams)
-
-	m.MapLayout = mapLayoutParams
-	m.CellsLock.Lock()
-	for ecgi := range m.Cells {
-		m.CellConfigs[ecgi] = &e2node_1_0_0.Device{
-			E2Node: &e2node_1_0_0.E2Node_E2Node{
-				Intervals: &e2node_1_0_0.E2Node_E2Node_Intervals{},
-			},
-		}
+// LoadConfig from the specified YAML file
+func LoadConfig(path string) (*Config, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
 	}
-	m.CellsLock.Unlock()
-	m.MapLayout.Center = &types.Point{}
-	m.MapLayout.MinUes = mapLayoutParams.MinUes
-	m.MapLayout.MaxUes = mapLayoutParams.MaxUes
-	m.googleAPIKey = routesParams.APIKey
-	// Compensate for the narrowing of meridians at higher latitudes
-	m.AspectRatio = utils.AspectRatio(m.MapLayout.Center)
+	defer file.Close()
 
-	go m.Dispatcher.ListenUeEvents(m.UeChannel)
-	go m.Dispatcher.ListenRouteEvents(m.RouteChannel)
-	go m.Dispatcher.ListenCellEvents(m.CellsChannel)
+	d := yaml.NewDecoder(file)
+	config := &Config{}
+	if err := d.Decode(&config); err != nil {
+		return nil, err
+	}
 
-	go metrics.RunHOExposer(int(metricsParams.Port), m.LatencyChannel, metricsParams.ExportAllHOEvents, m.ResetMetricsChannel)
+	return config, nil
+}
 
-	go m.afterCellCreation(mapLayoutParams, routesParams, serverParams, newServerHandler)
+// Manager is a manager for the E2T service
+type Manager struct {
+	config   Config
+	model    *model.Model
+	agents   *e2agent.E2Agents
+	registry *smregistry.ServiceModelRegistry
+	server   *northbound.Server
+}
 
-	ctx := context.Background()
+// Run starts the manager and the associated services
+func (m *Manager) Run() {
+	log.Info("Running Manager")
+	if err := m.Start(); err != nil {
+		log.Fatal("Unable to run Manager", err)
+	}
+}
 
+// Start starts the manager
+func (m *Manager) Start() error {
+	// Create the E2 agents for all simulated nodes and specified controllers
+	m.agents = e2agent.NewE2Agents(m.model.Nodes.GetAll(), m.registry, m.model.Controllers)
+
+	// S tart the E2 agents
+	err := m.agents.Start()
+	if err != nil {
+		return err
+	}
+
+	// Start gRPC server
+	return m.startNorthboundServer()
+}
+
+// startSouthboundServer starts the northbound gRPC server
+func (m *Manager) startNorthboundServer() error {
+	m.server = northbound.NewServer(northbound.NewServerCfg(
+		m.config.CAPath,
+		m.config.KeyPath,
+		m.config.CertPath,
+		int16(m.config.GRPCPort),
+		true,
+		northbound.SecurityConfig{}))
+	m.server.AddService(logging.Service{})
+
+	doneCh := make(chan error)
 	go func() {
-		var err error
-		m.TopoClient, err = topo.ConnectToTopo(ctx, topoEndpoint, serverParams, CellCreator, CellDeleter)
+		err := m.server.Serve(func(started string) {
+			log.Info("Started NBI on ", started)
+			close(doneCh)
+		})
 		if err != nil {
-			log.Fatalf("Error connecting to onos-topo %v", err)
+			doneCh <- err
 		}
 	}()
+	return <-doneCh
 }
 
-//Close kills the channels and manager related objects
+// Close kills the channels and manager related objects
 func (m *Manager) Close() {
-	if err := m.SetNumberUes(0); err != nil {
-		log.Warnf("Unable to set number of UEs to 0 %s", err.Error())
-	}
-
-	time.Sleep(time.Second) // Wait for topo, but don't hang around if it can't be done
-	close(m.CellsChannel)
-	close(m.UeChannel)
-	close(m.RouteChannel)
-	close(m.LatencyChannel)
-	for r := range m.Routes {
-		delete(m.Routes, r)
-	}
-	for l := range m.Locations {
-		delete(m.Locations, l)
-	}
-	m.CellsLock.Lock()
-	for tid := range m.Cells {
-		delete(m.Cells, tid)
-	}
-	m.CellsLock.Unlock()
-	// TODO - clean up the topo entries on shutdown
-	log.Warn("Closed Manager")
+	log.Info("Closing Manager")
+	_ = m.agents.Stop()
+	m.stopNorthboundServer()
 }
 
-// GetManager returns the initialized and running instance of manager.
-// Should be called only after NewManager and Run are done.
-func GetManager() *Manager {
-	return &mgr
+func (m *Manager) stopNorthboundServer() {
+	// TODO implementation requires ability to actually stop the server
 }
