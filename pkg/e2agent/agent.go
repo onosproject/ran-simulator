@@ -112,6 +112,10 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 func (a *e2Agent) Start() error {
+	if len(a.node.Controllers) == 0 {
+		return errors.New(errors.Invalid, "no controller is associated with this node")
+	}
+
 	controller := a.model.GetController(a.node.Controllers[0])
 	addr := fmt.Sprintf("%s:%d", controller.Address, controller.Port)
 	channel, err := e2.Connect(context.TODO(), addr,

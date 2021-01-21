@@ -18,6 +18,7 @@ func TestModel(t *testing.T) {
 	assert.NoError(t, err)
 	err = yaml.Unmarshal(bytes, &model)
 	assert.NoError(t, err)
+	t.Log(model)
 	assert.Equal(t, len(model.Controllers), 2)
 	assert.Equal(t, len(model.Nodes), 2)
 	assert.Equal(t, model.Controllers["controller1"].Port, 36421)

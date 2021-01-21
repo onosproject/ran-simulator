@@ -7,11 +7,17 @@ package e2t
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/onosproject/ran-simulator/tests/utils"
 )
 
 // TestConnections
 func (s *TestSuite) TestConnections(t *testing.T) {
-	utils.CreateRanSimulatorWithName(t, "ran-simulator")
+	// Creates an instance of the simulator
+	simulator := utils.CreateRanSimulatorWithName(t, "ran-simulator")
+	simulator.Set("model.nodes.node2.ecgi", "90125-10003")
 
+	err := simulator.Install(true)
+	assert.NoError(t, err, "could not install device simulator %v", err)
 }
