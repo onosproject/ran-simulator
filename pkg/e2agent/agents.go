@@ -6,22 +6,21 @@ package e2agent
 
 import (
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
 // E2Agents represents a collection of E2 agents to allow centralized management
 type E2Agents struct {
-	Agents map[model.ECGI]E2Agent
+	Agents map[model.Ecgi]E2Agent
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
-func NewE2Agents(nodes []*model.SimNode, reg *registry.ServiceModelRegistry, controllers []*model.Controller) *E2Agents {
+func NewE2Agents(m *model.Model) *E2Agents {
 	agents := &E2Agents{
-		Agents: make(map[model.ECGI]E2Agent),
+		Agents: make(map[model.Ecgi]E2Agent),
 	}
 
-	for _, node := range nodes {
-		agents.Agents[node.ECGI] = NewE2Agent(node, reg, controllers)
+	for _, node := range m.Nodes {
+		agents.Agents[node.Ecgi] = NewE2Agent(node, m)
 	}
 	return agents
 }
@@ -29,6 +28,7 @@ func NewE2Agents(nodes []*model.SimNode, reg *registry.ServiceModelRegistry, con
 // Start all simulated node agents
 func (agents *E2Agents) Start() error {
 	for _, a := range agents.Agents {
+		log.Info("start agent:")
 		err := a.Start()
 		if err != nil {
 			return err

@@ -7,6 +7,7 @@ package e2agent
 import (
 	"context"
 	"fmt"
+
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils/setup"
 
@@ -31,25 +32,34 @@ type E2Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(node *model.SimNode, reg *registry.ServiceModelRegistry, controllers []*model.Controller) E2Agent {
-	err := reg.RegisterServiceModel(kpm.GetConfig())
-	if err != nil {
-		log.Error(err)
+func NewE2Agent(node model.Node, model *model.Model) E2Agent {
+	reg := registry.NewServiceModelRegistry()
+	serviceModels := node.ServiceModels
+	for _, smID := range serviceModels {
+		serviceModel := model.GetServiceModel(smID)
+		switch registry.ID(serviceModel.ID) {
+		case registry.Kpm:
+			err := reg.RegisterServiceModel(kpm.GetConfig())
+			if err != nil {
+				log.Error(err)
+			}
+
+		}
 	}
 
 	return &e2Agent{
-		node:        node,
-		registry:    reg,
-		controllers: controllers,
+		node:     node,
+		registry: reg,
+		model:    model,
 	}
 }
 
 // e2Agent is an E2 agent
 type e2Agent struct {
-	node        *model.SimNode
-	channel     e2.ClientChannel
-	controllers []*model.Controller
-	registry    *registry.ServiceModelRegistry
+	node     model.Node
+	model    *model.Model
+	channel  e2.ClientChannel
+	registry *registry.ServiceModelRegistry
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
@@ -102,7 +112,8 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 func (a *e2Agent) Start() error {
-	addr := fmt.Sprintf("%s:%d", a.node.Address, a.node.Port)
+	controller := a.model.GetController(a.node.Controllers[0])
+	addr := fmt.Sprintf("%s:%d", controller.Address, controller.Port)
 	channel, err := e2.Connect(context.TODO(), addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {
 			return a
@@ -124,9 +135,12 @@ func (a *e2Agent) Start() error {
 	e2SetupRequest := setup.CreateSetupRequest(setupRequest)
 	_, e2SetupFailure, err := channel.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
+		log.Error(err)
 		return errors.NewUnknown("E2 setup failed: %v", err)
 	} else if e2SetupFailure != nil {
-		return errors.NewInvalid("E2 setup failed")
+		err := errors.NewInvalid("E2 setup failed")
+		log.Error(err)
+		return err
 	}
 
 	a.channel = channel

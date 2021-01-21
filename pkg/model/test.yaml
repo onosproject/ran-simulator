@@ -1,0 +1,30 @@
+model:
+  nodes:
+    node1:
+      ecgi: "90125-10001"
+      controllers: [controller1]
+      servicemodels: [kpm, ni]
+    node2:
+      ecgi: "90125-10002"
+      controllers: [controller2]
+      servicemodels: [ni]
+
+  controllers:
+    controller1:
+      id : "E2T"
+      address: "onos-e2t"
+      port: "36421"
+    controller2:
+      id : "E2T"
+      address: "onos-e2t"
+      port: "36421"
+
+  servicemodels:
+    kpm:
+      id: 1
+      version: 1.0.0
+      description: "kpm service model"
+    ni:
+      id: 2
+      version: 1.0.0
+      description: "NI service model"

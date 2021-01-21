@@ -1,105 +1,82 @@
 // SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
-//
 
 package model
 
 import (
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
-// Model holds the information describing the simulated RAN environment.
+var log = logging.GetLogger("pkg", "model")
+
+type Ecgi string
+
 type Model struct {
-	Controllers []*Controller
-	Nodes       *SimNodes
-	Locations   *SimLocations
-	// MapLayout   *types.MapLayout
-	// AspectRatio float64 // fold into the map layout?
-	// UEs      *SimUserEquipment
-	// Routes   *SimRoutes
+	Nodes         map[string]Node         `yaml:"nodes"`
+	Controllers   map[string]Controller   `yaml:"controllers"`
+	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 }
 
-// Controller represents an E2T node of the RAN controller platform
+type Node struct {
+	Ecgi          Ecgi     `yaml:"ecgi"`
+	Controllers   []string `yaml:"controllers"`
+	ServiceModels []string `yaml:"servicemodels"`
+}
+
 type Controller struct {
-	Address string
-	Port    int
+	ID      string `yaml:"id"`
+	Address string `yaml:"address"`
+	Port    int    `yaml:"port"`
 }
 
-// NewModel creates a new model of the simulated environment
-func NewModel() *Model {
-	return &Model{
-		Nodes:     NewSimNodes(),
-		Locations: nil,
-	}
+type ServiceModel struct {
+	ID          int    `yaml:"id"`
+	Description string `yaml:"description"`
+	Version     string `yaml:"version"`
 }
 
-const (
-	controllersKey = "controllers"
-	nodesKey       = "nodes"
-)
-
-// Load from the specified YAML file
-func (m *Model) Load(path string) error {
-	file, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
+func (m *Model) GetNode(name string) Node {
+	if node, ok := m.Nodes[name]; ok {
+		return node
 	}
 
-	data := make(map[string]interface{})
-	err = yaml.Unmarshal(file, &data)
-	if err != nil {
-		return err
-	}
-
-	// Parse controllers
-	m.Controllers = make([]*Controller, 0)
-	if data[controllersKey] != nil {
-		for _, val := range data[controllersKey].([]interface{}) {
-			ctl, err := parseController(val)
-			if err == nil {
-				m.Controllers = append(m.Controllers, ctl)
-			}
-		}
-	}
-
-	// Parse the nodes next
-	if data[nodesKey] != nil {
-		for _, val := range data[nodesKey].([]interface{}) {
-			node, err := parseNode(val)
-			if err == nil {
-				m.Nodes.Add(node)
-			}
-		}
-	}
-
-	// TODO: parse map layout, locations, UE constraints, etc.
-	return nil
+	return Node{}
 }
 
-// Parse YAML for a controller entry
-func parseController(val interface{}) (*Controller, error) {
-	r := val.(map[interface{}]interface{})
-	return &Controller{
-		Address: r["address"].(string),
-		Port:    r["port"].(int),
-	}, nil
-}
-
-// Parse YAML for a simulated node entry
-func parseNode(val interface{}) (*SimNode, error) {
-	r := val.(map[interface{}]interface{})
-	ecgi := ECGI(r["ecgi"].(string))
-	smr := r["sms"].([]interface{})
-
-	sms := make([]SMID, 0)
-	for _, id := range smr {
-		sms = append(sms, SMID(id.(int)))
+func (m *Model) GetServiceModel(name string) ServiceModel {
+	if sm, ok := m.ServiceModels[name]; ok {
+		return sm
 	}
 
-	return &SimNode{
-		ECGI:          ecgi,
-		ServiceModels: sms,
-	}, nil
+	return ServiceModel{}
+}
+
+// GetAllNodes gets all of the simulated nodes
+func (m *Model) GetNodes() []Node {
+	var nodes []Node
+	for _, node := range m.Nodes {
+		nodes = append(nodes, node)
+	}
+
+	return nodes
+}
+
+// GetController gets a controller by a given name
+func (m *Model) GetController(name string) Controller {
+	if controller, ok := m.Controllers[name]; ok {
+		return controller
+	}
+
+	return Controller{}
+}
+
+// GetAllControllers gets all of the controllers
+func (m *Model) GetControllers() []Controller {
+	var controllers []Controller
+	for _, controller := range m.Controllers {
+		controllers = append(controllers, controller)
+	}
+
+	return controllers
 }
