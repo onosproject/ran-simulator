@@ -1,25 +1,28 @@
-model:
-  nodes:
+# SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+
+nodes:
     node1:
       ecgi: "90125-10001"
       controllers: [controller1]
-      servicemodels: [kpm, ni]
+      servicemodels: [kpm]
     node2:
       ecgi: "90125-10002"
       controllers: [controller2]
-      servicemodels: [ni]
+      servicemodels: [kpm]
 
-  controllers:
+controllers:
     controller1:
-      id : "E2T"
+      id : "controller1"
       address: "onos-e2t"
-      port: "36421"
+      port: 36421
     controller2:
-      id : "E2T"
+      id : "controller2"
       address: "onos-e2t"
-      port: "36421"
+      port: 36421
 
-  servicemodels:
+servicemodels:
     kpm:
       id: 1
       version: 1.0.0

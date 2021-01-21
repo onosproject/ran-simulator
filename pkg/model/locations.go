@@ -1,15 +1,15 @@
 // SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
-//
 
 package model
 
 import (
 	"fmt"
-	"github.com/onosproject/ran-simulator/pkg/utils"
 	"math"
 	"math/rand"
+
+	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	"github.com/onosproject/ran-simulator/api/types"
 )
