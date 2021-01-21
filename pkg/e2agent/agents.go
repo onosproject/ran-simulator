@@ -27,8 +27,9 @@ func NewE2Agents(m *model.Model) *E2Agents {
 
 // Start all simulated node agents
 func (agents *E2Agents) Start() error {
-	for _, a := range agents.Agents {
-		log.Info("start agent:")
+	log.Info("Starting E2 Agents")
+	for id, a := range agents.Agents {
+		log.Debug("Starting agent with ECGI:", id)
 		err := a.Start()
 		if err != nil {
 			return err
@@ -39,7 +40,9 @@ func (agents *E2Agents) Start() error {
 
 // Stop all simulated node agents
 func (agents *E2Agents) Stop() error {
-	for _, a := range agents.Agents {
+	log.Info("Stopping E2 Agents")
+	for id, a := range agents.Agents {
+		log.Debug("Stopping agent with ECGI:", id)
 		err := a.Stop()
 		if err != nil {
 			return err
