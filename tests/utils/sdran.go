@@ -1,8 +1,7 @@
-// SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
-//
-// SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+// SPDX-FileCopyrightText: ${year}-present Open Networking Foundation <info@opennetworking.org>
+// SPDX-License-Identifier: Apache-2.0
 
-package e2t
+package utils
 
 import (
 	"testing"

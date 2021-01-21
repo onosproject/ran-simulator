@@ -19,7 +19,7 @@ require (
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	google.golang.org/grpc v1.33.2
 	googlemaps.github.io/maps v0.0.0-20200124220646-5b7f2815585f // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
+	gopkg.in/yaml.v2 v2.3.0
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.17.3 // indirect

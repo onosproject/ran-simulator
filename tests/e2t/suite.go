@@ -6,16 +6,17 @@ package e2t
 
 import (
 	"github.com/onosproject/helmit/pkg/test"
+	"github.com/onosproject/ran-simulator/tests/utils"
 )
 
-// TestSuite is the primary onos-e2t test suite
+// TestSuite is the primary ran-simulator test suite
 type TestSuite struct {
 	test.Suite
 }
 
-// SetupTestSuite sets up the onos-e2t test suite
+// SetupTestSuite sets up the ran-simulator test suite
 func (s *TestSuite) SetupTestSuite() error {
-	sdran, err := CreateSdranRelease()
+	sdran, err := utils.CreateSdranRelease()
 	if err != nil {
 		return err
 	}
