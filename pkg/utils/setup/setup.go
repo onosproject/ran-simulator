@@ -19,6 +19,7 @@ var log = logging.GetLogger("servicemodel", "utils", "setup")
 type Setup struct {
 	ranFunctions types.RanFunctions
 	plmnID       string
+	e2NodeID     uint64
 }
 
 // NewSetupRequest creates a new setup request
@@ -48,9 +49,9 @@ func WithPlmnID(plmnID string) func(*Setup) {
 }
 
 // WithE2NodeID sets E2 node ID
-func WithE2NodeID() func(*Setup) {
+func WithE2NodeID(e2NodeID uint64) func(*Setup) {
 	return func(request *Setup) {
-
+		request.e2NodeID = e2NodeID
 	}
 }
 
@@ -103,7 +104,7 @@ func CreateSetupRequest(request *Setup) (setupRequest *e2appducontents.E2SetupRe
 								GnbId: &e2apies.GnbIdChoice{
 									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{
 										GnbId: &e2ap_commondatatypes.BitString{
-											Value: 0x9bcd4,
+											Value: request.e2NodeID,
 											Len:   22,
 										}},
 								},

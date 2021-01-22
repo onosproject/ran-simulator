@@ -7,6 +7,7 @@ package e2agent
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils/setup"
@@ -137,7 +138,8 @@ func (a *e2Agent) Start() error {
 
 	setupRequest, err := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
-		setup.WithPlmnID("onf"))
+		setup.WithPlmnID("onf"),
+		setup.WithE2NodeID(nodeId(a.node.Ecgi)))
 
 	if err != nil {
 		return err
@@ -156,6 +158,12 @@ func (a *e2Agent) Start() error {
 
 	a.channel = channel
 	return nil
+}
+
+func nodeId(ecgi model.Ecgi) uint64 {
+	h := fnv.New64a()
+	_, _ = h.Write([]byte(ecgi))
+	return h.Sum64()
 }
 
 func (a *e2Agent) Stop() error {
