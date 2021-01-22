@@ -45,12 +45,11 @@ type Manager struct {
 func (m *Manager) Run() {
 	log.Info("Running Manager")
 	if err := m.Start(); err != nil {
-		log.Fatal("Unable to run Manager:", err)
+		log.Error("Unable to run Manager:", err)
 	}
 }
 
-// Start starts the manager
-func (m *Manager) Start() error {
+func (m *Manager) startE2Agents() error {
 	// Create the E2 agents for all simulated nodes and specified controllers
 	err := model.Load(m.model)
 	if err != nil {
@@ -58,15 +57,36 @@ func (m *Manager) Start() error {
 		return err
 	}
 
-	m.agents = e2agent.NewE2Agents(m.model)
+	m.agents, err = e2agent.NewE2Agents(m.model)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	// Start the E2 agents
 	err = m.agents.Start()
 	if err != nil {
 		return err
 	}
 
+	return nil
+
+}
+
+// Start starts the manager
+func (m *Manager) Start() error {
+
 	// Start gRPC server
-	return m.startNorthboundServer()
+	err := m.startNorthboundServer()
+	if err != nil {
+		return err
+	}
+	// Start E2 agents
+	err = m.startE2Agents()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // startSouthboundServer starts the northbound gRPC server

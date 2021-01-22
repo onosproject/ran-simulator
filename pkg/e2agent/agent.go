@@ -32,16 +32,20 @@ type E2Agent interface {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(node model.Node, model *model.Model) E2Agent {
+func NewE2Agent(node model.Node, model *model.Model) (E2Agent, error) {
 	reg := registry.NewServiceModelRegistry()
-	serviceModels := node.ServiceModels
-	for _, smID := range serviceModels {
-		serviceModel := model.GetServiceModel(smID)
+	sms := node.ServiceModels
+	for _, smID := range sms {
+		serviceModel, err := model.GetServiceModel(smID)
+		if err != nil {
+			return nil, err
+		}
 		switch registry.ID(serviceModel.ID) {
 		case registry.Kpm:
 			err := reg.RegisterServiceModel(kpm.GetConfig())
 			if err != nil {
 				log.Error(err)
+				return nil, err
 			}
 
 		}
@@ -51,7 +55,7 @@ func NewE2Agent(node model.Node, model *model.Model) E2Agent {
 		node:     node,
 		registry: reg,
 		model:    model,
-	}
+	}, nil
 }
 
 // e2Agent is an E2 agent
@@ -116,7 +120,10 @@ func (a *e2Agent) Start() error {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
-	controller := a.model.GetController(a.node.Controllers[0])
+	controller, err := a.model.GetController(a.node.Controllers[0])
+	if err != nil {
+		return err
+	}
 	addr := fmt.Sprintf("%s:%d", controller.Address, controller.Port)
 	channel, err := e2.Connect(context.TODO(), addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {

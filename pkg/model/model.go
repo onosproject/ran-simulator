@@ -4,6 +4,8 @@
 
 package model
 
+import "github.com/onosproject/onos-lib-go/pkg/errors"
+
 // Ecgi Global E2 node ID
 type Ecgi string
 
@@ -41,21 +43,21 @@ type ServiceModel struct {
 }
 
 // GetNode gets a an e2 node
-func (m *Model) GetNode(name string) Node {
+func (m *Model) GetNode(name string) (Node, error) {
 	if node, ok := m.Nodes[name]; ok {
-		return node
+		return node, nil
 	}
 
-	return Node{}
+	return Node{}, errors.New(errors.NotFound, "node not found")
 }
 
 // GetServiceModel gets a service model  based on a given name
-func (m *Model) GetServiceModel(name string) ServiceModel {
+func (m *Model) GetServiceModel(name string) (ServiceModel, error) {
 	if sm, ok := m.ServiceModels[name]; ok {
-		return sm
+		return sm, nil
 	}
 
-	return ServiceModel{}
+	return ServiceModel{}, errors.New(errors.NotFound, "the service model not found")
 }
 
 // GetNodes gets all of the simulated nodes
@@ -69,12 +71,12 @@ func (m *Model) GetNodes() []Node {
 }
 
 // GetController gets a controller by a given name
-func (m *Model) GetController(name string) Controller {
+func (m *Model) GetController(name string) (Controller, error) {
 	if controller, ok := m.Controllers[name]; ok {
-		return controller
+		return controller, nil
 	}
 
-	return Controller{}
+	return Controller{}, errors.New(errors.NotFound, "controller not found")
 }
 
 // GetControllers gets all of the controllers

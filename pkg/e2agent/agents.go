@@ -14,15 +14,19 @@ type E2Agents struct {
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
-func NewE2Agents(m *model.Model) *E2Agents {
+func NewE2Agents(m *model.Model) (*E2Agents, error) {
 	agents := &E2Agents{
 		Agents: make(map[model.Ecgi]E2Agent),
 	}
 
 	for _, node := range m.Nodes {
-		agents.Agents[node.Ecgi] = NewE2Agent(node, m)
+		e2Node, err := NewE2Agent(node, m)
+		if err != nil {
+			return nil, err
+		}
+		agents.Agents[node.Ecgi] = e2Node
 	}
-	return agents
+	return agents, nil
 }
 
 // Start all simulated node agents
