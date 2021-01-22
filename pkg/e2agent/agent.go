@@ -139,7 +139,7 @@ func (a *e2Agent) Start() error {
 	setupRequest, err := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
 		setup.WithPlmnID("onf"),
-		setup.WithE2NodeID(nodeId(a.node.Ecgi)))
+		setup.WithE2NodeID(nodeID(a.node.Ecgi)))
 
 	if err != nil {
 		return err
@@ -160,7 +160,7 @@ func (a *e2Agent) Start() error {
 	return nil
 }
 
-func nodeId(ecgi model.Ecgi) uint64 {
+func nodeID(ecgi model.Ecgi) uint64 {
 	h := fnv.New64a()
 	_, _ = h.Write([]byte(ecgi))
 	return h.Sum64()
