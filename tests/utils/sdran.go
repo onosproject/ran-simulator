@@ -1,8 +1,7 @@
-// SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
-//
-// SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+// SPDX-FileCopyrightText: ${year}-present Open Networking Foundation <info@opennetworking.org>
+// SPDX-License-Identifier: Apache-2.0
 
-package e2t
+package utils
 
 import (
 	"testing"
@@ -10,7 +9,6 @@ import (
 	"github.com/onosproject/helmit/pkg/helm"
 	"github.com/onosproject/helmit/pkg/util/random"
 	"github.com/onosproject/onos-test/pkg/onostest"
-	"github.com/stretchr/testify/assert"
 )
 
 // CreateSdranRelease creates a helm release for an sd-ran instance
@@ -36,8 +34,5 @@ func CreateRanSimulatorWithName(t *testing.T, name string) *helm.HelmRelease {
 		Chart(name, onostest.SdranChartRepo).
 		Release(name).
 		Set("image.tag", "latest")
-	err := simulator.Install(true)
-	assert.NoError(t, err, "could not install device simulator %v", err)
-
 	return simulator
 }

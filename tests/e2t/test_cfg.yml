@@ -1,5 +1,0 @@
-caPath:
-certPath:
-keyPath:
-grpcPort: 901
-modelPath: test_model.yml

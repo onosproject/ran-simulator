@@ -9,88 +9,84 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	smregistry "github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
-	"gopkg.in/yaml.v2"
-	"os"
 )
 
 var log = logging.GetLogger("manager")
 
 // Config is a manager configuration
 type Config struct {
-	CAPath   string `yaml:"caPath"`
-	KeyPath  string `yaml:"keyPath"`
-	CertPath string `yaml:"certPath"`
-	GRPCPort int    `yaml:"grpcPort"`
-
-	// Path to the YAML file describing the environment model
-	ModelPath string `yaml:"modelPath"`
+	CAPath   string
+	KeyPath  string
+	CertPath string
+	GRPCPort int
 }
 
 // NewManager creates a new manager
 func NewManager(config *Config) (*Manager, error) {
 	log.Info("Creating Manager")
 	mgr := &Manager{
-		config:   *config,
-		model:    model.NewModel(),
-		agents:   nil,
-		registry: smregistry.NewServiceModelRegistry(),
+		config: *config,
+		agents: nil,
+		model:  &model.Model{},
 	}
 
-	err := mgr.model.Load(config.ModelPath)
-	if err != nil {
-		return nil, err
-	}
 	return mgr, nil
-}
-
-// LoadConfig from the specified YAML file
-func LoadConfig(path string) (*Config, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	d := yaml.NewDecoder(file)
-	config := &Config{}
-	if err := d.Decode(&config); err != nil {
-		return nil, err
-	}
-
-	return config, nil
 }
 
 // Manager is a manager for the E2T service
 type Manager struct {
-	config   Config
-	model    *model.Model
-	agents   *e2agent.E2Agents
-	registry *smregistry.ServiceModelRegistry
-	server   *northbound.Server
+	config Config
+	agents *e2agent.E2Agents
+	model  *model.Model
+	server *northbound.Server
 }
 
 // Run starts the manager and the associated services
 func (m *Manager) Run() {
 	log.Info("Running Manager")
 	if err := m.Start(); err != nil {
-		log.Fatal("Unable to run Manager", err)
+		log.Error("Unable to run Manager:", err)
 	}
 }
 
-// Start starts the manager
-func (m *Manager) Start() error {
+func (m *Manager) startE2Agents() error {
 	// Create the E2 agents for all simulated nodes and specified controllers
-	m.agents = e2agent.NewE2Agents(m.model.Nodes.GetAll(), m.registry, m.model.Controllers)
+	err := model.Load(m.model)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 
-	// S tart the E2 agents
-	err := m.agents.Start()
+	m.agents, err = e2agent.NewE2Agents(m.model)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	// Start the E2 agents
+	err = m.agents.Start()
 	if err != nil {
 		return err
 	}
 
+	return nil
+
+}
+
+// Start starts the manager
+func (m *Manager) Start() error {
+
 	// Start gRPC server
-	return m.startNorthboundServer()
+	err := m.startNorthboundServer()
+	if err != nil {
+		return err
+	}
+	// Start E2 agents
+	err = m.startE2Agents()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // startSouthboundServer starts the northbound gRPC server

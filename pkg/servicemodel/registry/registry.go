@@ -5,11 +5,18 @@
 package registry
 
 import (
+	"github.com/onosproject/onos-lib-go/pkg/logging"
+)
+
+import (
+	"sync"
+
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
-	"sync"
 )
+
+var log = logging.GetLogger("registry")
 
 // ServiceModelRegistry stores list of registered service models
 type ServiceModelRegistry struct {
@@ -36,6 +43,7 @@ func NewServiceModelRegistry() *ServiceModelRegistry {
 
 // RegisterServiceModel registers a service model
 func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModelConfig) error {
+	log.Debug("Register Service Model:", sm)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.serviceModels[sm.ID]; exists {

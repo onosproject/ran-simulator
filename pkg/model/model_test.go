@@ -5,27 +5,25 @@
 package model
 
 import (
-	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v2"
 )
 
-func TestModelBasics(t *testing.T) {
-	model := NewModel()
-	err := model.Load("test_model.yml")
-	assert.NoError(t, err, "unable to load model")
-	if err == nil {
-		// Check the controllers
-		assert.Equal(t, 2, len(model.Controllers), "incorrect number of controllers")
-		assert.Equal(t, "10.10.10.2", model.Controllers[1].Address, "incorrect controller address")
+func TestModel(t *testing.T) {
+	model := Model{}
+	bytes, err := ioutil.ReadFile("test.yaml")
+	assert.NoError(t, err)
+	err = yaml.Unmarshal(bytes, &model)
+	assert.NoError(t, err)
+	t.Log(model)
+	assert.Equal(t, len(model.Controllers), 2)
+	assert.Equal(t, len(model.Nodes), 2)
+	assert.Equal(t, model.Controllers["controller1"].Port, 36421)
+	assert.Equal(t, model.Controllers["controller2"].Port, 36421)
+	assert.Equal(t, model.ServiceModels["kpm"].Version, "1.0.0")
+	assert.Equal(t, model.ServiceModels["ni"].ID, 2)
 
-		// Check the nodes
-		assert.Equal(t, 3, len(model.Nodes.GetAll()), "incorrect number of nodes")
-		assert.Equal(t, 2, len(model.Nodes.Get("90125-10002").ServiceModels), "incorrect number of models")
-
-		// Check removal and retrieval of nodes
-		node := model.Nodes.Remove("90125-10001")
-		assert.NotNil(t, node)
-		assert.Equal(t, "90125-10001", string(node.ECGI), "incorrect node removed")
-		assert.Equal(t, 2, len(model.Nodes.GetAll()), "incorrect number of nodes")
-	}
 }
