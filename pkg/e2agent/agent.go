@@ -8,10 +8,12 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
+	"time"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils/setup"
 
+	"github.com/cenkalti/backoff"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
@@ -22,6 +24,11 @@ import (
 )
 
 var log = logging.GetLogger("agent")
+
+const (
+	backoffInterval = 10 * time.Millisecond
+	maxBackoffTime  = 5 * time.Second
+)
 
 // E2Agent is an E2 agent
 type E2Agent interface {
@@ -118,11 +125,48 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 }
 
+func newExpBackoff() *backoff.ExponentialBackOff {
+	b := backoff.NewExponentialBackOff()
+	b.InitialInterval = backoffInterval
+	// MaxInterval caps the RetryInterval
+	b.MaxInterval = maxBackoffTime
+	// Never stops retrying
+	b.MaxElapsedTime = 0
+	return b
+}
+
 func (a *e2Agent) Start() error {
 	if len(a.node.Controllers) == 0 {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
+	log.Info("%s is starting", a.node.Ecgi)
+	b := newExpBackoff()
+
+	// Attempt to connect to the E2T controller; use exponential back-off retry
+	count := 0
+	connectNotify := func(err error, t time.Duration) {
+		count++
+		log.Infof("%s failed to connect; retry after %v; attempt %d", a.node.Ecgi, b.GetElapsedTime(), count)
+	}
+
+	err := backoff.RetryNotify(a.connect, b, connectNotify)
+	if err != nil {
+		return err
+	}
+
+	// Attempt to negotiate E2 setup procedure; use exponential back-off retry
+	count = 0
+	setupNotify := func(err error, t time.Duration) {
+		count++
+		log.Infof("%s failed setup procedure; retry after %v; attempt %d", a.node.Ecgi, b.GetElapsedTime(), count)
+	}
+
+	err = backoff.RetryNotify(a.setup, b, setupNotify)
+	return err
+}
+
+func (a *e2Agent) connect() error {
 	controller, err := a.model.GetController(a.node.Controllers[0])
 	if err != nil {
 		return err
@@ -137,7 +181,11 @@ func (a *e2Agent) Start() error {
 	if err != nil {
 		return err
 	}
+	a.channel = channel
+	return nil
+}
 
+func (a *e2Agent) setup() error {
 	setupRequest, err := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
 		setup.WithPlmnID("onf"),
@@ -148,7 +196,7 @@ func (a *e2Agent) Start() error {
 	}
 
 	e2SetupRequest := setup.CreateSetupRequest(setupRequest)
-	_, e2SetupFailure, err := channel.E2Setup(context.Background(), e2SetupRequest)
+	_, e2SetupFailure, err := a.channel.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		log.Error(err)
 		return errors.NewUnknown("E2 setup failed: %v", err)
@@ -157,8 +205,6 @@ func (a *e2Agent) Start() error {
 		log.Error(err)
 		return err
 	}
-
-	a.channel = channel
 	return nil
 }
 

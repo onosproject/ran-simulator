@@ -3,6 +3,7 @@ module github.com/onosproject/ran-simulator
 go 1.14
 
 require (
+	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/magiconair/properties v1.8.1 // indirect
