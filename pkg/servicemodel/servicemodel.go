@@ -6,7 +6,7 @@ package servicemodel
 
 import "github.com/onosproject/onos-e2t/pkg/protocols/e2"
 
-// ServiceModel service model interface
-type ServiceModel interface {
+// Client service model client interface
+type Client interface {
 	e2.ClientInterface
 }

@@ -4,14 +4,14 @@
 
 package registry
 
-// ID Ran function ID
-type ID int32
+// RanFunctionID Ran function ID
+type RanFunctionID int32
 
 // TODO define them using standard Ran function IDs
 const (
 
 	// Internal
-	Internal ID = iota
+	Internal RanFunctionID = iota
 	// Kpm
 	Kpm
 	// Ni

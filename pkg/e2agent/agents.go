@@ -6,6 +6,7 @@ package e2agent
 
 import (
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 )
 
 // E2Agents represents a collection of E2 agents to allow centralized management
@@ -14,13 +15,13 @@ type E2Agents struct {
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
-func NewE2Agents(m *model.Model) (*E2Agents, error) {
+func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (*E2Agents, error) {
 	agents := &E2Agents{
 		Agents: make(map[model.Ecgi]E2Agent),
 	}
 
 	for _, node := range m.Nodes {
-		e2Node, err := NewE2Agent(node, m)
+		e2Node, err := NewE2Agent(node, m, modelPluginRegistry)
 		if err != nil {
 			return nil, err
 		}

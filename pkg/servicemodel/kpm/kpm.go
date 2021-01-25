@@ -8,12 +8,13 @@ import (
 	"context"
 	"time"
 
+	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
+
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
-	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
@@ -22,21 +23,26 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 )
 
-var _ servicemodel.ServiceModel = &ServiceModel{}
+var _ servicemodel.Client = &Client{
+	Config: GetConfig(),
+}
 
 var log = logging.GetLogger("sm", "kpm")
 
-// ServiceModel kpm service model struct
-type ServiceModel struct {
+// Client kpm service model client
+type Client struct {
 	Channel e2.ClientChannel
+	Config  registry.ServiceModel
 }
 
 // GetConfig returns service model config information
-func GetConfig() registry.ServiceModelConfig {
-	kpmSm := registry.ServiceModelConfig{
-		ID:           registry.Kpm,
-		ServiceModel: &ServiceModel{},
-		Revision:     1,
+func GetConfig() registry.ServiceModel {
+	kpmSm := registry.ServiceModel{
+		RanFunctionID: registry.Kpm,
+		ModelName:     "e2sm_kpm",
+		Client:        &Client{},
+		Revision:      1,
+		Version:       "v1.0.0",
 	}
 
 	kpmSm.Description = ranFuncDescBytes
@@ -44,8 +50,7 @@ func GetConfig() registry.ServiceModelConfig {
 	return kpmSm
 }
 
-func (sm *ServiceModel) reportIndication(ctx context.Context, interval time.Duration, subscription *subutils.Subscription) {
-
+func (sm *Client) reportIndication(ctx context.Context, interval time.Duration, subscription *subutils.Subscription) {
 	// TODO indication header and indication message should be generated using model plugins
 	indication, _ := indicationutils.NewIndication(
 		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
@@ -69,13 +74,14 @@ func (sm *ServiceModel) reportIndication(ctx context.Context, interval time.Dura
 }
 
 // RICControl implements control handler for kpm service model
-func (sm *ServiceModel) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
+func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	panic("implement me")
 
 }
 
 // RICSubscription implements subscription handler for kpm service model
-func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
+func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
+	log.Info("KPM RIC Subscription Called", sm.Config.ModelName)
 
 	var ricActionsAccepted []*types.RicActionID
 	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
@@ -115,7 +121,7 @@ func (sm *ServiceModel) RICSubscription(ctx context.Context, request *e2appducon
 }
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
-func (sm *ServiceModel) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
+func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	panic("implement me")
 }
 

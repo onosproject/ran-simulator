@@ -9,25 +9,38 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 )
 
 var log = logging.GetLogger("manager")
 
 // Config is a manager configuration
 type Config struct {
-	CAPath   string
-	KeyPath  string
-	CertPath string
-	GRPCPort int
+	CAPath              string
+	KeyPath             string
+	CertPath            string
+	GRPCPort            int
+	ServiceModelPlugins []string
 }
 
 // NewManager creates a new manager
 func NewManager(config *Config) (*Manager, error) {
 	log.Info("Creating Manager")
+
+	modelPluginRegistry := modelplugins.ModelPluginRegistry{
+		ModelPlugins: make(map[modelplugins.ModelFullName]modelplugins.ModelPlugin),
+	}
+	for _, smp := range config.ServiceModelPlugins {
+		if _, _, err := modelPluginRegistry.RegisterModelPlugin(smp); err != nil {
+			log.Error(err)
+		}
+	}
+
 	mgr := &Manager{
-		config: *config,
-		agents: nil,
-		model:  &model.Model{},
+		config:              *config,
+		agents:              nil,
+		model:               &model.Model{},
+		modelPluginRegistry: &modelPluginRegistry,
 	}
 
 	return mgr, nil
@@ -35,10 +48,11 @@ func NewManager(config *Config) (*Manager, error) {
 
 // Manager is a manager for the E2T service
 type Manager struct {
-	config Config
-	agents *e2agent.E2Agents
-	model  *model.Model
-	server *northbound.Server
+	config              Config
+	agents              *e2agent.E2Agents
+	model               *model.Model
+	modelPluginRegistry *modelplugins.ModelPluginRegistry
+	server              *northbound.Server
 }
 
 // Run starts the manager and the associated services
@@ -57,7 +71,7 @@ func (m *Manager) startE2Agents() error {
 		return err
 	}
 
-	m.agents, err = e2agent.NewE2Agents(m.model)
+	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry)
 	if err != nil {
 		log.Error(err)
 		return err
