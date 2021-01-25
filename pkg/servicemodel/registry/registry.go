@@ -43,13 +43,11 @@ func NewServiceModelRegistry() *ServiceModelRegistry {
 
 // RegisterServiceModel registers a service model
 func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModelConfig) error {
-	log.Debug("Register Service Model:", sm)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.serviceModels[sm.ID]; exists {
 		return errors.New(errors.AlreadyExists, "the service model already registered")
 	}
-
 	ranFuncID := types.RanFunctionID(sm.ID)
 	s.ranFunctions[ranFuncID] = types.RanFunctionItem{
 		Description: sm.Description,
@@ -60,13 +58,14 @@ func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModelConfig) error
 }
 
 // GetServiceModel finds and initialize service model interface pointer
-func (s *ServiceModelRegistry) GetServiceModel(id ID, sm interface{}) error {
+func (s *ServiceModelRegistry) GetServiceModel(id ID) (interface{}, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	if _, ok := s.serviceModels[id]; ok {
-		return nil
+	sm, ok := s.serviceModels[id]
+	if ok {
+		return sm, nil
 	}
-	return errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
+	return nil, errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
 }
 
 // GetRanFunctions returns the list of registered ran functions

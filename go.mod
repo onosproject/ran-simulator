@@ -5,9 +5,10 @@ go 1.14
 require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/magiconair/properties v1.8.1
+	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/onosproject/helmit v0.6.8
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0 // indirect
 	github.com/onosproject/onos-e2t v0.6.12
 	github.com/onosproject/onos-lib-go v0.7.0
 	github.com/onosproject/onos-test v0.6.4
@@ -18,6 +19,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	google.golang.org/grpc v1.33.2
+	google.golang.org/protobuf v1.25.0 // indirect
 	googlemaps.github.io/maps v0.0.0-20200124220646-5b7f2815585f // indirect
 	gopkg.in/yaml.v2 v2.3.0
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect

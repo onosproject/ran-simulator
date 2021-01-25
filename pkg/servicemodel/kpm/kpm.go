@@ -9,7 +9,6 @@ import (
 	"time"
 
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/indication"
-
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -40,7 +39,6 @@ func GetConfig() registry.ServiceModelConfig {
 		Revision:     1,
 	}
 
-	// TODO: Generate ASN1 bytes on the fly - can only be done through plugin
 	kpmSm.Description = ranFuncDescBytes
 
 	return kpmSm

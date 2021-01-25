@@ -594,12 +594,17 @@ github.com/onosproject/helmit v0.6.8 h1:f/DjOzQp/NFzbTClM7qn4WwQ5DgR/13OD1FWJ4Vx
 github.com/onosproject/helmit v0.6.8/go.mod h1:EorNGSNGWojXGxBEuiNmPScae+R2C5WYfg/13gKEPLw=
 github.com/onosproject/onos-api/go v0.6.8/go.mod h1:U10eWq2WOS9OnACITIebGcFA8dSvekCcSi3rmLY/rPA=
 github.com/onosproject/onos-api/go v0.6.9/go.mod h1:U10eWq2WOS9OnACITIebGcFA8dSvekCcSi3rmLY/rPA=
+github.com/onosproject/onos-api/go v0.6.10/go.mod h1:U10eWq2WOS9OnACITIebGcFA8dSvekCcSi3rmLY/rPA=
 github.com/onosproject/onos-api/go v0.7.0 h1:BjfN78bE/TXadUODrkYbaDsb1hyiV90dNiLoIkl5eV0=
 github.com/onosproject/onos-api/go v0.7.0/go.mod h1:HLfWE9aouIeOmi4soR6bxK2cZ33NbnFMvdyv9fmjaSg=
 github.com/onosproject/onos-config v0.6.16 h1:8pqx5TpA1awqOID3a2xGysVzDbAn+TabgIiQcXFHyAo=
 github.com/onosproject/onos-config v0.6.16/go.mod h1:hD5F/C36u6z4NPavca6bncg/8nDka3OP3ZRmCmA2AwI=
 github.com/onosproject/onos-config v0.7.1 h1:myp40878aapJwnZragBAAjeh84M8jVr04xhKdP64ols=
 github.com/onosproject/onos-config v0.7.1/go.mod h1:i7x6CqUdFZNDhbLlVySGWOHwEpjQC9v3h2UIZ49t6Xg=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.6.8 h1:8ujxQr+esczmqO3sv+nx4xP1HNOS6HORnji3DgahDk0=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.6.8/go.mod h1:r3LN0j7G2Ax5fj/KIwHDLRNqXqunkjprhjxANeH192o=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0 h1:GiJ3qsCjPcbDTCGogKh1eIiS/y0t4xpQ+SnLtFJVYy0=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0/go.mod h1:XhAq30aC7880EVt5ru0/SZbFgPh3uf2Ty1+L+xUB+9E=
 github.com/onosproject/onos-e2t v0.6.12 h1:B/eblYsn3rCv/KbdKjGNCLhm/oaoHaW3CpVkrLbDDZs=
 github.com/onosproject/onos-e2t v0.6.12/go.mod h1:pbxYC17KBvD/ilFVddzrM7ekycfyhWIhR/khfoo/xm8=
 github.com/onosproject/onos-lib-go v0.6.3 h1:AZNmgWssNxQiJWg5RrrFiAOmevMY+poNBwgBMAc/JeY=
