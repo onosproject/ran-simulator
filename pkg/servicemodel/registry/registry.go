@@ -43,6 +43,7 @@ func NewServiceModelRegistry() *ServiceModelRegistry {
 
 // RegisterServiceModel registers a service model
 func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModelConfig) error {
+	log.Info("Register Service Model:", sm)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.serviceModels[sm.ID]; exists {
