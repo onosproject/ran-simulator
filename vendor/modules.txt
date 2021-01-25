@@ -268,7 +268,6 @@ github.com/liggitt/tabwriter
 # github.com/magiconair/properties v1.8.1
 ## explicit
 github.com/magiconair/properties
-github.com/magiconair/properties/assert
 # github.com/mailru/easyjson v0.7.0
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
@@ -324,6 +323,8 @@ github.com/onosproject/helmit/pkg/test
 github.com/onosproject/helmit/pkg/util/files
 github.com/onosproject/helmit/pkg/util/logging
 github.com/onosproject/helmit/pkg/util/random
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0
+## explicit
 # github.com/onosproject/onos-e2t v0.6.12
 ## explicit
 github.com/onosproject/onos-e2t/api/e2ap/v1beta1
@@ -571,6 +572,7 @@ google.golang.org/grpc/stats
 google.golang.org/grpc/status
 google.golang.org/grpc/tap
 # google.golang.org/protobuf v1.25.0
+## explicit
 google.golang.org/protobuf/encoding/prototext
 google.golang.org/protobuf/encoding/protowire
 google.golang.org/protobuf/internal/descfmt

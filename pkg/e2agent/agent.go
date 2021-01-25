@@ -34,6 +34,7 @@ type E2Agent interface {
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model) (E2Agent, error) {
+	log.Info("Creating New E2 Agent")
 	reg := registry.NewServiceModelRegistry()
 	sms := node.ServiceModels
 	for _, smID := range sms {
@@ -71,12 +72,12 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	switch ranFuncID {
 	case registry.Kpm:
-		var kpmService kpm.ServiceModel
-		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
+		sm, err := a.registry.GetServiceModel(ranFuncID)
 		if err != nil {
 			return nil, nil, err
 		}
-		return kpmService.RICControl(ctx, request)
+		kpmSm := sm.(*kpm.ServiceModel)
+		return kpmSm.RICControl(ctx, request)
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
@@ -87,13 +88,13 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	switch ranFuncID {
 	case registry.Kpm:
-		var kpmService kpm.ServiceModel
-		kpmService.Channel = a.channel
-		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
+		sm, err := a.registry.GetServiceModel(ranFuncID)
 		if err != nil {
 			return nil, nil, err
 		}
-		return kpmService.RICSubscription(ctx, request)
+		kpmSm := sm.(*kpm.ServiceModel)
+		kpmSm.Channel = a.channel
+		return kpmSm.RICSubscription(ctx, request)
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
@@ -104,12 +105,13 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	switch ranFuncID {
 	case registry.Kpm:
-		var kpmService kpm.ServiceModel
-		err = a.registry.GetServiceModel(ranFuncID, &kpmService)
+
+		sm, err := a.registry.GetServiceModel(ranFuncID)
 		if err != nil {
 			return nil, nil, err
 		}
-		return kpmService.RICSubscriptionDelete(ctx, request)
+		kpmSm := sm.(*kpm.ServiceModel)
+		return kpmSm.RICSubscriptionDelete(ctx, request)
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
