@@ -8,10 +8,12 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
+	"time"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils/setup"
 
+	"github.com/cenkalti/backoff"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
@@ -22,6 +24,11 @@ import (
 )
 
 var log = logging.GetLogger("agent")
+
+const (
+	backoffInterval = 10 * time.Millisecond
+	maxBackoffTime  = 5 * time.Second
+)
 
 // E2Agent is an E2 agent
 type E2Agent interface {
@@ -123,6 +130,29 @@ func (a *e2Agent) Start() error {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
+	log.Info("%s is starting", a.node.Ecgi)
+	count := 0
+	b := backoff.NewExponentialBackOff()
+	b.InitialInterval = backoffInterval
+	// MaxInterval caps the RetryInterval
+	b.MaxInterval = maxBackoffTime
+	// Never stops retrying
+	b.MaxElapsedTime = 0
+
+	notify := func(err error, t time.Duration) {
+		count++
+		log.Infof("Failed to connect to %s. Retry after %v; attempt %d", a.node.Ecgi, b.GetElapsedTime(), count)
+	}
+
+	err := backoff.RetryNotify(a.connectAndSetup, b, notify)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *e2Agent) connectAndSetup() error {
 	controller, err := a.model.GetController(a.node.Controllers[0])
 	if err != nil {
 		return err
