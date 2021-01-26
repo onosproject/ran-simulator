@@ -64,6 +64,7 @@ func NewE2Agent(node model.Node, model *model.Model) (E2Agent, error) {
 		node:     node,
 		registry: reg,
 		model:    model,
+		subs:     newSubscriptions(),
 	}, nil
 }
 
@@ -73,7 +74,7 @@ type e2Agent struct {
 	model    *model.Model
 	channel  e2.ClientChannel
 	registry *registry.ServiceModelRegistry
-	subs     subscriptions
+	subs     *subscriptions
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
@@ -112,7 +113,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.ID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	a.subs.Remove(GenID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
+	a.subs.Remove(NewID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
 		request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
 		request.ProtocolIes.E2ApProtocolIes5.Value.Value))
 
@@ -143,7 +144,7 @@ func (a *e2Agent) Start() error {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
-	log.Info("%s is starting", a.node.Ecgi)
+	log.Infof("%s is starting; attempting to connect", a.node.Ecgi)
 	b := newExpBackoff()
 
 	// Attempt to connect to the E2T controller; use exponential back-off retry
@@ -152,6 +153,8 @@ func (a *e2Agent) Start() error {
 		count++
 		log.Infof("%s failed to connect; retry after %v; attempt %d", a.node.Ecgi, b.GetElapsedTime(), count)
 	}
+
+	log.Infof("%s connected; attempting setup", a.node.Ecgi)
 
 	err := backoff.RetryNotify(a.connect, b, connectNotify)
 	if err != nil {
@@ -166,6 +169,8 @@ func (a *e2Agent) Start() error {
 	}
 
 	err = backoff.RetryNotify(a.setup, b, setupNotify)
+
+	log.Infof("%s completed connection setup", a.node.Ecgi)
 	return err
 }
 

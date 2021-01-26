@@ -22,14 +22,14 @@ type Subscription struct {
 	Details *e2appducontents.RicsubscriptionDetails
 }
 
-// GenID returns the locally unique ID for the specified subscription add/delete request
-func GenID(instID int32, rqID int32, fnID int32) ID {
+// NewID returns the locally unique ID for the specified subscription add/delete request
+func NewID(instID int32, rqID int32, fnID int32) ID {
 	return ID(fmt.Sprintf("%d/%d/%d", instID, rqID, fnID))
 }
 
 // NewSubscription generates a subscription record from the E2AP subscription request
 func NewSubscription(e2apsub *e2appducontents.RicsubscriptionRequest) *Subscription {
-	id := GenID(e2apsub.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
+	id := NewID(e2apsub.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
 		e2apsub.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
 		e2apsub.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	return &Subscription{
@@ -37,6 +37,13 @@ func NewSubscription(e2apsub *e2appducontents.RicsubscriptionRequest) *Subscript
 		ReqID:   e2apsub.ProtocolIes.E2ApProtocolIes29.Value,
 		FnID:    e2apsub.ProtocolIes.E2ApProtocolIes5.Value,
 		Details: e2apsub.ProtocolIes.E2ApProtocolIes30.Value,
+	}
+}
+
+func newSubscriptions() *subscriptions {
+	return &subscriptions{
+		subs: make(map[ID]*Subscription),
+		mu:   sync.RWMutex{},
 	}
 }
 
