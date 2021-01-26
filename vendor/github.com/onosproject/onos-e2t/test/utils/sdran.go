@@ -25,15 +25,15 @@ func CreateSdranRelease() (*helm.HelmRelease, error) {
 	return sdran, nil
 }
 
-// CreateE2Simulator creates a device simulator
-func CreateE2Simulator(t *testing.T) *helm.HelmRelease {
-	return CreateE2SimulatorWithName(t, random.NewPetName(2))
+// CreateRanSimulator creates a ran simulator
+func CreateRanSimulator(t *testing.T) *helm.HelmRelease {
+	return CreateRanSimulatorWithName(t, random.NewPetName(2))
 }
 
-// CreateE2SimulatorWithName creates a device simulator
-func CreateE2SimulatorWithName(t *testing.T, name string) *helm.HelmRelease {
+// CreateRanSimulatorWithName creates a ran simulator
+func CreateRanSimulatorWithName(t *testing.T, name string) *helm.HelmRelease {
 	simulator := helm.
-		Chart("e2-simulator", onostest.SdranChartRepo).
+		Chart(name, onostest.SdranChartRepo).
 		Release(name).
 		Set("image.tag", "latest")
 	err := simulator.Install(true)

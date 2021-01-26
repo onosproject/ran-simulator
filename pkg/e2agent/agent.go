@@ -118,7 +118,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	a.subs.Remove(GenID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
+	a.subs.Remove(NewID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
 		request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
 		request.ProtocolIes.E2ApProtocolIes5.Value.Value))
 	sm, err := a.registry.GetServiceModel(ranFuncID)
@@ -151,7 +151,6 @@ func (a *e2Agent) Start() error {
 	if len(a.node.Controllers) == 0 {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
-
 
 	log.Infof("%s is starting; attempting to connect", a.node.Ecgi)
 	b := newExpBackoff()
