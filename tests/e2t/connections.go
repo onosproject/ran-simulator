@@ -19,5 +19,7 @@ func (s *TestSuite) TestConnections(t *testing.T) {
 	err := simulator.Install(true)
 	assert.NoError(t, err, "could not install device simulator %v", err)
 
-	// TODO retrieve list of connections in onos-e2t
+	connections, err := utils.GetE2Connections()
+	assert.NoError(t, err, "unable to connect to E2T admin service %v", err)
+	assert.Equal(t, 2, len(connections), "incorrect connection count")
 }
