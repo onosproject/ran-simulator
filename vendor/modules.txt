@@ -333,8 +333,6 @@ github.com/onosproject/helmit/pkg/util/random
 # github.com/onosproject/onos-api/go v0.7.0
 ## explicit
 github.com/onosproject/onos-api/go/onos/e2t/admin
-# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0
-## explicit
 github.com/onosproject/onos-api/go/onos/e2t/e2sm
 # github.com/onosproject/onos-e2t v0.7.0
 ## explicit
@@ -362,7 +360,7 @@ github.com/onosproject/onos-lib-go/pkg/grpcinterceptors
 github.com/onosproject/onos-lib-go/pkg/logging
 github.com/onosproject/onos-lib-go/pkg/logging/service
 github.com/onosproject/onos-lib-go/pkg/northbound
-# github.com/onosproject/onos-ric-sdk-go v0.6.7
+# github.com/onosproject/onos-ric-sdk-go v0.7.0
 ## explicit
 github.com/onosproject/onos-ric-sdk-go/pkg/e2/creds
 # github.com/onosproject/onos-test v0.6.4
