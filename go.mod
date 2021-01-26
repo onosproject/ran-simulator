@@ -9,9 +9,11 @@ require (
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/onosproject/helmit v0.6.8
+	github.com/onosproject/onos-api/go v0.7.0
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0 // indirect
 	github.com/onosproject/onos-e2t v0.6.12
 	github.com/onosproject/onos-lib-go v0.7.0
+	github.com/onosproject/onos-ric-sdk-go v0.6.7
 	github.com/onosproject/onos-test v0.6.4
 	github.com/prometheus/client_golang v1.4.1 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
