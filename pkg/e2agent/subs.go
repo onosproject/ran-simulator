@@ -71,7 +71,7 @@ func (s *subscriptions) List() []*Subscription {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	resp := make([]*Subscription, 0)
+	resp := make([]*Subscription, 0, len(s.subs))
 	for _, sub := range s.subs {
 		resp = append(resp, sub)
 	}
