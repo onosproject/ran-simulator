@@ -62,7 +62,7 @@ func (m *Model) GetServiceModel(name string) (ServiceModel, error) {
 
 // GetNodes gets all of the simulated nodes
 func (m *Model) GetNodes() []Node {
-	var nodes []Node
+	nodes := make([]Node, 0, len(m.Nodes))
 	for _, node := range m.Nodes {
 		nodes = append(nodes, node)
 	}

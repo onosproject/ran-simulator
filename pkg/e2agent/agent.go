@@ -76,6 +76,7 @@ type e2Agent struct {
 	model    *model.Model
 	channel  e2.ClientChannel
 	registry *registry.ServiceModelRegistry
+	subs     subscriptions
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
@@ -93,12 +94,12 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
-
 }
 
 func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	log.Debug("Received Subscription Request %v", request)
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+  a.subs.Add(NewSubscription(request))
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
 		return nil, nil, err
@@ -112,11 +113,14 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
-
 }
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+  
+	a.subs.Remove(GenID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
+		request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
+		request.ProtocolIes.E2ApProtocolIes5.Value.Value))
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
 		return nil, nil, err
@@ -131,7 +135,6 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
-
 }
 
 func newExpBackoff() *backoff.ExponentialBackOff {
