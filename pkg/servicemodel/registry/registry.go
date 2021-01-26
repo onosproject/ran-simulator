@@ -62,14 +62,14 @@ func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
 }
 
 // GetServiceModel finds and initialize service model interface pointer
-func (s *ServiceModelRegistry) GetServiceModel(id RanFunctionID) (interface{}, error) {
+func (s *ServiceModelRegistry) GetServiceModel(id RanFunctionID) (ServiceModel, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	sm, ok := s.serviceModels[id]
 	if ok {
 		return sm, nil
 	}
-	return nil, errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
+	return ServiceModel{}, errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
 }
 
 // GetRanFunctions returns the list of registered ran functions

@@ -23,23 +23,22 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 )
 
-var _ servicemodel.Client = &Client{
-	Config: GetConfig(),
-}
+var _ servicemodel.Client = &Client{}
 
 var log = logging.GetLogger("sm", "kpm")
 
 // Client kpm service model client
 type Client struct {
-	Channel e2.ClientChannel
-	Config  registry.ServiceModel
+	Channel      e2.ClientChannel
+	ServiceModel *registry.ServiceModel
 }
 
-// GetConfig returns service model config information
-func GetConfig() registry.ServiceModel {
+// NewServiceModel creates a new service model
+func NewServiceModel() registry.ServiceModel {
+	modelName := "e2sm_kpm"
 	kpmSm := registry.ServiceModel{
 		RanFunctionID: registry.Kpm,
-		ModelName:     "e2sm_kpm",
+		ModelName:     modelName,
 		Client:        &Client{},
 		Revision:      1,
 		Version:       "v1.0.0",
@@ -81,7 +80,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("KPM RIC Subscription Called", sm.Config.ModelName)
+	log.Info("RIC Subscription is called for service model:", sm.ServiceModel)
 
 	var ricActionsAccepted []*types.RicActionID
 	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause

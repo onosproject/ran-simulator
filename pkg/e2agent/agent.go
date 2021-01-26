@@ -53,10 +53,9 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
 		case registry.Kpm:
-			cfg := kpm.GetConfig()
-			cfg.ModelPluginRegistry = modelPluginRegistry
-
-			err := reg.RegisterServiceModel(cfg)
+			sm := kpm.NewServiceModel()
+			sm.ModelPluginRegistry = modelPluginRegistry
+			err := reg.RegisterServiceModel(sm)
 			if err != nil {
 				log.Error(err)
 				return nil, err
@@ -81,15 +80,16 @@ type e2Agent struct {
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	switch ranFuncID {
+	sm, err := a.registry.GetServiceModel(ranFuncID)
+	if err != nil {
+		return nil, nil, err
+	}
+	switch sm.RanFunctionID {
 	case registry.Kpm:
-		sm, err := a.registry.GetServiceModel(ranFuncID)
-		if err != nil {
-			return nil, nil, err
-		}
-		kpmSm := sm.(registry.ServiceModel)
-		kpmSm.Client.(*kpm.Client).Channel = a.channel
-		return kpmSm.Client.RICControl(ctx, request)
+		client := sm.Client.(*kpm.Client)
+		client.Channel = a.channel
+		client.ServiceModel = &sm
+		return client.RICControl(ctx, request)
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
@@ -97,18 +97,18 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 }
 
 func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("Ric subscription")
+	log.Debug("Received Subscription Request %v", request)
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	switch ranFuncID {
+	sm, err := a.registry.GetServiceModel(ranFuncID)
+	if err != nil {
+		return nil, nil, err
+	}
+	switch sm.RanFunctionID {
 	case registry.Kpm:
-		sm, err := a.registry.GetServiceModel(ranFuncID)
-		if err != nil {
-			return nil, nil, err
-		}
-		kpmSm := sm.(registry.ServiceModel)
-		log.Info("KPMSM test:", kpmSm.ModelName)
-		kpmSm.Client.(*kpm.Client).Channel = a.channel
-		return kpmSm.Client.RICSubscription(ctx, request)
+		client := sm.Client.(*kpm.Client)
+		client.Channel = a.channel
+		client.ServiceModel = &sm
+		return client.RICSubscription(ctx, request)
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
@@ -117,16 +117,17 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	switch ranFuncID {
-	case registry.Kpm:
+	sm, err := a.registry.GetServiceModel(ranFuncID)
+	if err != nil {
+		return nil, nil, err
+	}
 
-		sm, err := a.registry.GetServiceModel(ranFuncID)
-		if err != nil {
-			return nil, nil, err
-		}
-		kpmSm := sm.(registry.ServiceModel)
-		kpmSm.Client.(*kpm.Client).Channel = a.channel
-		return kpmSm.Client.RICSubscriptionDelete(ctx, request)
+	switch sm.RanFunctionID {
+	case registry.Kpm:
+		client := sm.Client.(*kpm.Client)
+		client.Channel = a.channel
+		client.ServiceModel = &sm
+		return client.RICSubscriptionDelete(ctx, request)
 
 	}
 	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
@@ -148,7 +149,7 @@ func (a *e2Agent) Start() error {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
-	log.Info("%s is starting", a.node.Ecgi)
+	log.Infof("%s is starting", a.node.Ecgi)
 	b := newExpBackoff()
 
 	// Attempt to connect to the E2T controller; use exponential back-off retry

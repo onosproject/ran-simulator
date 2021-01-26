@@ -57,7 +57,7 @@ func TestRegisterServiceModel(t *testing.T) {
 		t.Fatal("the service model does not exist", err)
 	}
 
-	testSm := sm.(ServiceModel)
+	testSm := sm
 
 	_, _, err = testSm.Client.RICSubscription(context.Background(), &e2appducontents.RicsubscriptionRequest{})
 	assert.NoError(t, err)
