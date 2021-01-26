@@ -28,11 +28,24 @@ import (
 
 var log = logging.GetLogger("main")
 
+type arrayFlags []string
+
+func (i *arrayFlags) String() string {
+	return "my string representation"
+}
+
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
 // The main entry point
 func main() {
 	log.Info("Starting Ran simulator")
 	ready := make(chan bool)
 
+	var serviceModelPlugins arrayFlags
+	flag.Var(&serviceModelPlugins, "serviceModel", "names of service model plugins to load (repeated)")
 	caPath := flag.String("caPath", "", "path to CA certificate")
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
@@ -40,10 +53,11 @@ func main() {
 	flag.Parse()
 
 	cfg := &manager.Config{
-		CAPath:   *caPath,
-		KeyPath:  *keyPath,
-		CertPath: *certPath,
-		GRPCPort: *grpcPort,
+		CAPath:              *caPath,
+		KeyPath:             *keyPath,
+		CertPath:            *certPath,
+		GRPCPort:            *grpcPort,
+		ServiceModelPlugins: serviceModelPlugins,
 	}
 
 	mgr, err := manager.NewManager(cfg)

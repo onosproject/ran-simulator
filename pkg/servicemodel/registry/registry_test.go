@@ -14,7 +14,7 @@ import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 )
 
-var _ servicemodel.ServiceModel = &mockServiceModel{}
+var _ servicemodel.Client = &mockServiceModel{}
 
 type mockServiceModel struct {
 	t *testing.T
@@ -41,11 +41,11 @@ func TestRegisterServiceModel(t *testing.T) {
 		t: t,
 	}
 
-	testServiceModelConfig := ServiceModelConfig{
-		ID:           Internal,
-		ServiceModel: m,
-		Description:  []byte{0x01, 0x02, 0x03, 0x04},
-		Revision:     1,
+	testServiceModelConfig := ServiceModel{
+		RanFunctionID: Internal,
+		Client:        m,
+		Description:   []byte{0x01, 0x02, 0x03, 0x04},
+		Revision:      1,
 	}
 
 	if err := registry.RegisterServiceModel(testServiceModelConfig); err != nil {
@@ -57,7 +57,9 @@ func TestRegisterServiceModel(t *testing.T) {
 		t.Fatal("the service model does not exist", err)
 	}
 
-	_, _, err = sm.(*mockServiceModel).RICSubscription(context.Background(), &e2appducontents.RicsubscriptionRequest{})
+	testSm := sm
+
+	_, _, err = testSm.Client.RICSubscription(context.Background(), &e2appducontents.RicsubscriptionRequest{})
 	assert.NoError(t, err)
 
 	ranFunctions := registry.GetRanFunctions()

@@ -2,8 +2,7 @@ ARG GMAP_RAN_BASE_VERSION=latest
 
 FROM onosproject/ran-simulator-base:$GMAP_RAN_BASE_VERSION as base
 
-FROM alpine:3.11
-RUN apk add libc6-compat
+FROM frolvlad/alpine-glibc:alpine-3.12
 
 USER nobody
 

@@ -52,7 +52,6 @@ func newBitString(bs *e2ap_commondatatypes.BitString) *C.BIT_STRING_t {
 		size:        C.ulong(numBytes),
 		bits_unused: C.int(bitsUnused),
 	}
-	fmt.Printf("Bit string %+v\n", bsC)
 	return &bsC
 }
 

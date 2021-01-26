@@ -5,14 +5,13 @@
 package registry
 
 import (
-	"github.com/onosproject/onos-lib-go/pkg/logging"
-)
-
-import (
 	"sync"
 
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 )
 
@@ -21,55 +20,59 @@ var log = logging.GetLogger("registry")
 // ServiceModelRegistry stores list of registered service models
 type ServiceModelRegistry struct {
 	mu            sync.RWMutex
-	serviceModels map[ID]servicemodel.ServiceModel
-	ranFunctions  types.RanFunctions
+	serviceModels map[RanFunctionID]ServiceModel
+	ranFunctions  e2aptypes.RanFunctions
 }
 
-// ServiceModelConfig service model configuration
-type ServiceModelConfig struct {
-	ID           ID
-	ServiceModel servicemodel.ServiceModel
-	Description  []byte // ASN1 bytes from Service Model
-	Revision     int
+// ServiceModel service model
+type ServiceModel struct {
+	RanFunctionID       RanFunctionID
+	ModelName           string
+	Version             string
+	Description         []byte // ASN1 bytes from Service Model
+	Revision            int
+	Client              servicemodel.Client
+	ModelPluginRegistry *modelplugins.ModelPluginRegistry
 }
 
 // NewServiceModelRegistry creates a service model registry
 func NewServiceModelRegistry() *ServiceModelRegistry {
 	return &ServiceModelRegistry{
-		serviceModels: make(map[ID]servicemodel.ServiceModel),
-		ranFunctions:  make(map[types.RanFunctionID]types.RanFunctionItem),
+		serviceModels: make(map[RanFunctionID]ServiceModel),
+		ranFunctions:  make(map[e2aptypes.RanFunctionID]e2aptypes.RanFunctionItem),
 	}
 }
 
 // RegisterServiceModel registers a service model
-func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModelConfig) error {
-	log.Info("Register Service Model:", sm)
+func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
+	log.Info("Register Service Model:", sm.ModelName)
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, exists := s.serviceModels[sm.ID]; exists {
+	if _, exists := s.serviceModels[sm.RanFunctionID]; exists {
 		return errors.New(errors.AlreadyExists, "the service model already registered")
 	}
-	ranFuncID := types.RanFunctionID(sm.ID)
-	s.ranFunctions[ranFuncID] = types.RanFunctionItem{
+	ranFuncID := e2aptypes.RanFunctionID(sm.RanFunctionID)
+	s.ranFunctions[ranFuncID] = e2aptypes.RanFunctionItem{
 		Description: sm.Description,
-		Revision:    types.RanFunctionRevision(sm.Revision),
+		Revision:    e2aptypes.RanFunctionRevision(sm.Revision),
 	}
-	s.serviceModels[sm.ID] = sm.ServiceModel
+	s.serviceModels[sm.RanFunctionID] = sm
+
 	return nil
 }
 
 // GetServiceModel finds and initialize service model interface pointer
-func (s *ServiceModelRegistry) GetServiceModel(id ID) (interface{}, error) {
+func (s *ServiceModelRegistry) GetServiceModel(id RanFunctionID) (ServiceModel, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	sm, ok := s.serviceModels[id]
 	if ok {
 		return sm, nil
 	}
-	return nil, errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
+	return ServiceModel{}, errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
 }
 
 // GetRanFunctions returns the list of registered ran functions
-func (s *ServiceModelRegistry) GetRanFunctions() types.RanFunctions {
+func (s *ServiceModelRegistry) GetRanFunctions() e2aptypes.RanFunctions {
 	return s.ranFunctions
 }
