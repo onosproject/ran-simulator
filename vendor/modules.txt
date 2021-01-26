@@ -332,9 +332,18 @@ github.com/onosproject/helmit/pkg/util/logging
 github.com/onosproject/helmit/pkg/util/random
 # github.com/onosproject/onos-api/go v0.7.0
 ## explicit
+github.com/onosproject/onos-api/go/onos/e2sub/endpoint
+github.com/onosproject/onos-api/go/onos/e2sub/subscription
+github.com/onosproject/onos-api/go/onos/e2sub/task
 github.com/onosproject/onos-api/go/onos/e2t/admin
 github.com/onosproject/onos-api/go/onos/e2t/e2sm
 # github.com/onosproject/onos-e2t v0.7.0
+github.com/onosproject/onos-api/go/onos/e2t/e2
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0
+## explicit
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies
+# github.com/onosproject/onos-e2t v0.6.12
 ## explicit
 github.com/onosproject/onos-e2t/api/e2ap/v1beta1
 github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes
@@ -350,6 +359,7 @@ github.com/onosproject/onos-e2t/pkg/protocols/sctp
 github.com/onosproject/onos-e2t/pkg/southbound/e2ap/asn1cgo
 github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types
 github.com/onosproject/onos-e2t/pkg/utils/async
+github.com/onosproject/onos-e2t/test/utils
 # github.com/onosproject/onos-lib-go v0.7.0
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging
@@ -362,7 +372,16 @@ github.com/onosproject/onos-lib-go/pkg/logging/service
 github.com/onosproject/onos-lib-go/pkg/northbound
 # github.com/onosproject/onos-ric-sdk-go v0.7.0
 ## explicit
+github.com/onosproject/onos-ric-sdk-go/pkg/app
+github.com/onosproject/onos-ric-sdk-go/pkg/e2
+github.com/onosproject/onos-ric-sdk-go/pkg/e2/connection
 github.com/onosproject/onos-ric-sdk-go/pkg/e2/creds
+github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding
+github.com/onosproject/onos-ric-sdk-go/pkg/e2/endpoint
+github.com/onosproject/onos-ric-sdk-go/pkg/e2/indication
+github.com/onosproject/onos-ric-sdk-go/pkg/e2/subscription
+github.com/onosproject/onos-ric-sdk-go/pkg/e2/subscriptiontask
+github.com/onosproject/onos-ric-sdk-go/pkg/e2/termination
 # github.com/onosproject/onos-test v0.6.4
 ## explicit
 github.com/onosproject/onos-test/pkg/onostest
@@ -988,3 +1007,4 @@ sigs.k8s.io/kustomize/pkg/types
 # sigs.k8s.io/yaml v1.1.0
 sigs.k8s.io/yaml
 # github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200229013735-71373c6105e3
+# github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
