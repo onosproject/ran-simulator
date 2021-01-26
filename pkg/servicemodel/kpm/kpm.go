@@ -75,13 +75,12 @@ func (sm *Client) reportIndication(ctx context.Context, interval time.Duration, 
 
 // RICControl implements control handler for kpm service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	panic("implement me")
-
+	return nil, nil, errors.New(errors.NotSupported, "Control operation is not supported")
 }
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("RIC Subscription is called for service model:", sm.ServiceModel)
+	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelName)
 
 	var ricActionsAccepted []*types.RicActionID
 	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
