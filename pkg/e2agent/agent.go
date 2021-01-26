@@ -43,7 +43,7 @@ type E2Agent interface {
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (E2Agent, error) {
-	log.Info("Creating New E2 Agent test")
+	log.Info("Creating New E2 Agent")
 	reg := registry.NewServiceModelRegistry()
 	sms := node.ServiceModels
 	for _, smID := range sms {
