@@ -4,8 +4,6 @@
 package utils
 
 import (
-	"testing"
-
 	"github.com/onosproject/helmit/pkg/helm"
 	"github.com/onosproject/helmit/pkg/util/random"
 	"github.com/onosproject/onos-test/pkg/onostest"
@@ -24,12 +22,12 @@ func CreateSdranRelease() (*helm.HelmRelease, error) {
 }
 
 // CreateRanSimulator creates a ran simulator
-func CreateRanSimulator(t *testing.T) *helm.HelmRelease {
-	return CreateRanSimulatorWithName(t, random.NewPetName(2))
+func CreateRanSimulator() *helm.HelmRelease {
+	return CreateRanSimulatorWithName(random.NewPetName(2))
 }
 
 // CreateRanSimulatorWithName creates a ran simulator
-func CreateRanSimulatorWithName(t *testing.T, name string) *helm.HelmRelease {
+func CreateRanSimulatorWithName(name string) *helm.HelmRelease {
 	simulator := helm.
 		Chart(name, onostest.SdranChartRepo).
 		Release(name).
