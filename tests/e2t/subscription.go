@@ -99,7 +99,7 @@ func (s *TestSuite) TestSubscription(t *testing.T) {
 	subReq, err := createSubscriptionRequest(nodeIDs[0])
 	assert.NilError(t, err)
 
-	_, err = client.Subscribe(ctx, subReq, ch)
+	subCtx, err := client.Subscribe(ctx, subReq, ch)
 	assert.NilError(t, err)
 
 	select {
@@ -107,7 +107,23 @@ func (s *TestSuite) TestSubscription(t *testing.T) {
 		t.Log(indicationMsg)
 
 	case <-time.After(20 * time.Second):
-		t.Fatal("test is failed because of timeout")
+		t.Fatal("failed to receive an indication")
 	}
+	assert.NilError(t, err)
 
+	// TODO: enable once subscription removal works
+	if false {
+		err = subCtx.Close()
+		assert.NilError(t, err)
+
+		select {
+		case <-ch:
+			t.Fatal("received an extraneous indication")
+
+		case <-time.After(4 * time.Second):
+			t.Log("all quiet on the western front")
+		}
+
+		assert.NilError(t, err)
+	}
 }

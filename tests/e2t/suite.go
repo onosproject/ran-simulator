@@ -20,5 +20,12 @@ func (s *TestSuite) SetupTestSuite() error {
 	if err != nil {
 		return err
 	}
-	return sdran.Install(true)
+	err = sdran.Install(true)
+	if err != nil {
+		return err
+	}
+
+	// Create an instance of the simulator
+	simulator := utils.CreateRanSimulatorWithName("ran-simulator")
+	return simulator.Install(true)
 }
