@@ -15,7 +15,7 @@ type Model struct {
 	Controllers   map[string]Controller   `yaml:"controllers"`
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 	UECount       uint                    `yaml:"ueCount"`
-	UEs           UERegistry			// Not intended to be loaded from the YAML file; created separately
+	UEs           UERegistry              // Not intended to be loaded from the YAML file; created separately
 
 	// TODO add more fields
 	// MapLayout   *types.MapLayout
