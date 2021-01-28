@@ -6,7 +6,7 @@ FROM frolvlad/alpine-glibc:alpine-3.12
 
 USER nobody
 
-COPY --from=base /go/src/github.com/onosproject/ran-simulator/build/_output/ransim /usr/local/bin/ransim
+COPY --from=base /go/src/github.com/onosproject/onos-e2t/build/_output/ransim /usr/local/bin/ransim
 # COPY pkg/config/*.yaml /etc/onos/config/
 
 ENTRYPOINT ["ransim"]
