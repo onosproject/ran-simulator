@@ -14,10 +14,12 @@ type Model struct {
 	Nodes         map[string]Node         `yaml:"nodes"`
 	Controllers   map[string]Controller   `yaml:"controllers"`
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
+	UECount       uint                    `yaml:"ueCount"`
+	UEs           UERegistry
+
 	// TODO add more fields
 	// MapLayout   *types.MapLayout
 	// AspectRatio float64 // fold into the map layout?
-	// UEs      *SimUserEquipment
 	// Routes   *SimRoutes
 }
 
