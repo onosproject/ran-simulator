@@ -19,11 +19,11 @@ func TestModel(t *testing.T) {
 	err = yaml.Unmarshal(bytes, &model)
 	assert.NoError(t, err)
 	t.Log(model)
-	assert.Equal(t, len(model.Controllers), 2)
-	assert.Equal(t, len(model.Nodes), 2)
-	assert.Equal(t, model.Controllers["controller1"].Port, 36421)
-	assert.Equal(t, model.Controllers["controller2"].Port, 36421)
-	assert.Equal(t, model.ServiceModels["kpm"].Version, "1.0.0")
-	assert.Equal(t, model.ServiceModels["ni"].ID, 2)
-
+	assert.Equal(t, 2, len(model.Controllers))
+	assert.Equal(t, 2, len(model.Nodes))
+	assert.Equal(t, 36421, model.Controllers["controller1"].Port)
+	assert.Equal(t, 36421, model.Controllers["controller2"].Port)
+	assert.Equal(t, "1.0.0", model.ServiceModels["kpm"].Version)
+	assert.Equal(t, 2, model.ServiceModels["ni"].ID)
+	assert.Equal(t, uint(12), model.UECount)
 }

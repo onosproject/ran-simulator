@@ -71,6 +71,9 @@ func (m *Manager) startE2Agents() error {
 		return err
 	}
 
+	// Create the UE registry primed with the specified number of UEs
+	m.model.UEs = model.NewUERegistry(m.model.UECount)
+
 	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry)
 	if err != nil {
 		log.Error(err)
