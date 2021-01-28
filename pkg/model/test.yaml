@@ -33,5 +33,6 @@ servicemodels:
       id: 2
       version: 1.0.0
       description: NI service model
+ueCount: 12
 
 
