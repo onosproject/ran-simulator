@@ -124,8 +124,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelFullName, sm.ServiceModel.ModelPluginRegistry.ModelPlugins)
-
+	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelFullName)
 	var ricActionsAccepted []*types.RicActionID
 	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
 	actionList := request.ProtocolIes.E2ApProtocolIes30.Value.RicActionToBeSetupList.Value
