@@ -27,7 +27,7 @@ type ServiceModelRegistry struct {
 // ServiceModel service model
 type ServiceModel struct {
 	RanFunctionID       RanFunctionID
-	ModelName           string
+	ModelFullName       modelplugins.ModelFullName
 	Version             string
 	Description         []byte // ASN1 bytes from Service Model
 	Revision            int
@@ -45,7 +45,7 @@ func NewServiceModelRegistry() *ServiceModelRegistry {
 
 // RegisterServiceModel registers a service model
 func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
-	log.Info("Register Service Model:", sm.ModelName)
+	log.Info("Register Service Model:", sm.ModelFullName)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.serviceModels[sm.RanFunctionID]; exists {

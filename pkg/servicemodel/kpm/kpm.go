@@ -8,8 +8,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
+	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder"
+	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
 
@@ -22,11 +24,17 @@ import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
+	"google.golang.org/protobuf/proto"
 )
 
 var _ servicemodel.Client = &Client{}
 
 var log = logging.GetLogger("sm", "kpm")
+
+const (
+	modelFullName = "e2sm_kpm-v1beta1"
+	version       = "v1beta1"
+)
 
 // Client kpm service model client
 type Client struct {
@@ -35,22 +43,57 @@ type Client struct {
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel() registry.ServiceModel {
-	modelName := "e2sm_kpm"
+func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (registry.ServiceModel, error) {
+	modelFullName := modelplugins.ModelFullName(modelFullName)
 	kpmSm := registry.ServiceModel{
-		RanFunctionID: registry.Kpm,
-		ModelName:     modelName,
-		Client:        &Client{},
-		Revision:      1,
-		Version:       "v1.0.0",
+		RanFunctionID:       registry.Kpm,
+		ModelFullName:       modelFullName,
+		Client:              &Client{},
+		Revision:            1,
+		Version:             version,
+		ModelPluginRegistry: modelPluginRegistry,
+	}
+	var ranFunctionShortName = "“ORAN-E2SM-KPM”"
+	var ranFunctionE2SmOid = "OID123"
+	var ranFunctionDescription = "KPM Monitor"
+	var ranFunctionInstance int32 = 1
+	var ricEventStyleType int32 = 1
+	var ricEventStyleName = "Periodic report"
+	var ricEventFormatType int32 = 5
+	var ricReportStyleType int32 = 1
+	var ricReportStyleName = "O-CU-CP Measurement Container for the 5GC connected deployment"
+	var ricIndicationHeaderFormatType int32 = 1
+	var ricIndicationMessageFormatType int32 = 1
+	ranFuncDescPdu, err := pdubuilder.CreateE2SmKpmRanfunctionDescriptionMsg(ranFunctionShortName, ranFunctionE2SmOid, ranFunctionDescription,
+		ranFunctionInstance, ricEventStyleType, ricEventStyleName, ricEventFormatType, ricReportStyleType, ricReportStyleName,
+		ricIndicationHeaderFormatType, ricIndicationMessageFormatType)
+	if err != nil {
+		log.Error(err)
+		return registry.ServiceModel{}, err
 	}
 
-	kpmSm.Description = ranFuncDescBytes
+	protoBytes, err := proto.Marshal(ranFuncDescPdu)
+	log.Debug("Proto bytes of KPM Ran Function Description:", protoBytes)
+	if err != nil {
+		log.Error(err)
+		return registry.ServiceModel{}, err
+	}
+	kpmModelPlugin := modelPluginRegistry.ModelPlugins[modelFullName]
+	if kpmModelPlugin == nil {
+		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
+	}
+	// TODO it panics and it should be fixed in kpm service model
+	/*ranFuncDescBytes, err = kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
+	if err != nil {
+		log.Error(err)
+		return registry.ServiceModel{}, err
+	}*/
 
-	return kpmSm
+	kpmSm.Description = ranFuncDescBytes
+	return kpmSm, nil
 }
 
-func (sm *Client) reportIndication(ctx context.Context, interval time.Duration, subscription *subutils.Subscription) {
+func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) {
 	// TODO indication header and indication message should be generated using model plugins
 	indication, _ := indicationutils.NewIndication(
 		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
@@ -61,7 +104,8 @@ func (sm *Client) reportIndication(ctx context.Context, interval time.Duration, 
 
 	ricIndication := indicationutils.CreateIndication(indication)
 
-	ticker := time.NewTicker(interval * time.Second)
+	intervalDuration := time.Duration(interval)
+	ticker := time.NewTicker(intervalDuration * time.Millisecond)
 	for range ticker.C {
 		log.Info("Sending indication")
 		err := sm.Channel.RICIndication(ctx, ricIndication)
@@ -80,7 +124,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelName)
+	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelFullName, sm.ServiceModel.ModelPluginRegistry.ModelPlugins)
 
 	var ricActionsAccepted []*types.RicActionID
 	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
@@ -111,10 +155,14 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, subscriptionFailure, nil
 	}
 
-	// TODO handle event trigger definitions
+	reportInterval, err := sm.getReportPeriod(request)
+	if err != nil {
+		subscriptionFailure := subutils.CreateSubscriptionFailure(subscription)
+		return nil, subscriptionFailure, err
+	}
 
 	subscriptionResponse := subutils.CreateSubscriptionResponse(subscription)
-	go sm.reportIndication(ctx, 1, subscription)
+	go sm.reportIndication(ctx, reportInterval, subscription)
 	return subscriptionResponse, nil, nil
 
 }
