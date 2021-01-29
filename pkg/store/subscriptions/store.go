@@ -2,13 +2,16 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package e2agent
+package subscriptions
 
 import (
 	"fmt"
+	"sync"
+
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
-	"sync"
 )
 
 // ID is an alias for string subscription ID
@@ -40,47 +43,74 @@ func NewSubscription(e2apsub *e2appducontents.RicsubscriptionRequest) *Subscript
 	}
 }
 
-func newSubscriptions() *subscriptions {
-	return &subscriptions{
-		subs: make(map[ID]*Subscription),
-		mu:   sync.RWMutex{},
+// NewStore creates a new subscription store
+func NewStore() *Subscriptions {
+	return &Subscriptions{
+		subscriptions: make(map[ID]*Subscription),
+		mu:            sync.RWMutex{},
 	}
 }
 
-type subscriptions struct {
-	subs map[ID]*Subscription
-	mu   sync.RWMutex
+// Store store interface
+type Store interface {
+	// Add   adds the specified subscription
+	Add(subscription *Subscription) error
+	// Remove removes the specified subscription
+	Remove(id ID) error
+	// Get gets a subscription based on a given ID
+	Get(id ID) (*Subscription, error)
+	// List lists subscriptions
+	List() ([]*Subscription, error)
+}
+
+// Subscriptions data structure for storing subscriptions
+type Subscriptions struct {
+	subscriptions map[ID]*Subscription
+	mu            sync.RWMutex
 }
 
 // Add adds the specified subscription
-func (s *subscriptions) Add(sub *Subscription) {
+func (s *Subscriptions) Add(sub *Subscription) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.subs[sub.ID] = sub
+	if sub.ID == "" {
+		return errors.New(errors.Invalid, "Subscription ID cannot be empty")
+	}
+	s.subscriptions[sub.ID] = sub
+	return nil
 }
 
 // Remove removes the specified subscription
-func (s *subscriptions) Remove(id ID) {
+func (s *Subscriptions) Remove(id ID) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	delete(s.subs, id)
+	if id == "" {
+		return errors.New(errors.Invalid, "ID cannot be empty")
+	}
+	delete(s.subscriptions, id)
+	return nil
 }
 
 // Get returns the subscription with the specified ID
-func (s *subscriptions) Get(id ID) *Subscription {
+func (s *Subscriptions) Get(id ID) (*Subscription, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.subs[id]
+	if val, ok := s.subscriptions[id]; ok {
+		return val, nil
+	}
+	return nil, errors.New(errors.NotFound, "subscription entry had not been found")
 }
 
 // List returns slice containing all current subscriptions
-func (s *subscriptions) List() []*Subscription {
+func (s *Subscriptions) List() ([]*Subscription, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	resp := make([]*Subscription, 0, len(s.subs))
-	for _, sub := range s.subs {
+	resp := make([]*Subscription, 0, len(s.subscriptions))
+	for _, sub := range s.subscriptions {
 		resp = append(resp, sub)
 	}
-	return resp
+	return resp, nil
 }
+
+var _ Store = &Subscriptions{}

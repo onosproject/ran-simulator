@@ -10,10 +10,14 @@ import (
 	"hash/fnv"
 	"time"
 
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/subscriptiondelete"
+
+	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/utils/setup"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
 
 	"github.com/cenkalti/backoff"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
@@ -43,7 +47,7 @@ type E2Agent interface {
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (E2Agent, error) {
-	log.Info("Creating New E2 Agent")
+	log.Info("Creating New E2 Agent for node")
 	reg := registry.NewServiceModelRegistry()
 	sms := node.ServiceModels
 	for _, smID := range sms {
@@ -69,7 +73,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		node:     node,
 		registry: reg,
 		model:    model,
-		subs:     newSubscriptions(),
+		subStore: subscriptions.NewStore(),
 	}, nil
 }
 
@@ -79,7 +83,7 @@ type e2Agent struct {
 	model    *model.Model
 	channel  e2.ClientChannel
 	registry *registry.ServiceModelRegistry
-	subs     *subscriptions
+	subStore *subscriptions.Subscriptions
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
@@ -93,36 +97,47 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		client := sm.Client.(*kpm.Client)
 		client.Channel = a.channel
 		client.ServiceModel = &sm
-		return client.RICControl(ctx, request)
+		response, failure, err = client.RICControl(ctx, request)
+	default:
+		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
 
 	}
-	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
+	return response, failure, err
 }
 
 func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Debug("Received Subscription Request %v", request)
-	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	a.subs.Add(NewSubscription(request))
+	log.Debugf("Received Subscription Request %v", request)
+	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
 		client.Channel = a.channel
 		client.ServiceModel = &sm
-		return client.RICSubscription(ctx, request)
+		response, failure, err = client.RICSubscription(ctx, request)
+	default:
+		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
 
 	}
-	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
+	// Ric subscription is failed so we are not going to update the store
+	if err != nil {
+		return response, failure, err
+	}
+	err = a.subStore.Add(subscriptions.NewSubscription(request))
+	if err != nil {
+		return response, failure, err
+	}
+	return response, failure, err
 }
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
+	log.Debugf("Received Subscription Delete Request %v", request)
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	a.subs.Remove(NewID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
-		request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
-		request.ProtocolIes.E2ApProtocolIes5.Value.Value))
+
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
 		return nil, nil, err
@@ -133,10 +148,24 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		client := sm.Client.(*kpm.Client)
 		client.Channel = a.channel
 		client.ServiceModel = &sm
-		return client.RICSubscriptionDelete(ctx, request)
+		response, failure, err = client.RICSubscriptionDelete(ctx, request)
+	default:
+		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
 
 	}
-	return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
+	// Ric subscription delete procedure is failed so we are not going to update subscriptions store
+	if err != nil {
+		return response, failure, err
+	}
+
+	id := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
+		subdeleteutils.GetRequesterID(request),
+		subdeleteutils.GetRanFunctionID(request))
+	err = a.subStore.Remove(id)
+	if err != nil {
+		return nil, nil, err
+	}
+	return response, failure, err
 }
 
 func newExpBackoff() *backoff.ExponentialBackOff {

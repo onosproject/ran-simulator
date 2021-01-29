@@ -127,11 +127,10 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelFullName)
 	var ricActionsAccepted []*types.RicActionID
 	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
-	actionList := request.ProtocolIes.E2ApProtocolIes30.Value.RicActionToBeSetupList.Value
-
-	reqID := request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId
-	ranFuncID := request.ProtocolIes.E2ApProtocolIes5.Value.Value
-	ricInstanceID := request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId
+	actionList := subutils.GetRicActionToBeSetupList(request)
+	reqID := subutils.GetRequesterID(request)
+	ranFuncID := subutils.GetRanFunctionID(request)
+	ricInstanceID := subutils.GetRicInstanceID(request)
 
 	for _, action := range actionList {
 		actionID := types.RicActionID(action.Value.RicActionId.Value)
@@ -151,7 +150,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		subscriptionFailure := subutils.CreateSubscriptionFailure(subscription)
-		return nil, subscriptionFailure, nil
+		return nil, subscriptionFailure, errors.New(errors.Forbidden, "no required action is accepted")
 	}
 
 	reportInterval, err := sm.getReportPeriod(request)
