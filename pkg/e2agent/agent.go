@@ -5,7 +5,9 @@
 package e2agent
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"fmt"
 	"hash/fnv"
 	"time"
@@ -57,7 +59,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
 		case registry.Kpm:
-			sm, err := kpm.NewServiceModel(modelPluginRegistry)
+			sm, err := kpm.NewServiceModel(node, model, modelPluginRegistry)
 			if err != nil {
 				return nil, err
 			}
@@ -183,17 +185,17 @@ func (a *e2Agent) Start() error {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
-	log.Infof("%s is starting; attempting to connect", a.node.Ecgi)
+	log.Infof("%s is starting; attempting to connect", a.node.EnbID)
 	b := newExpBackoff()
 
 	// Attempt to connect to the E2T controller; use exponential back-off retry
 	count := 0
 	connectNotify := func(err error, t time.Duration) {
 		count++
-		log.Infof("%s failed to connect; retry after %v; attempt %d", a.node.Ecgi, b.GetElapsedTime(), count)
+		log.Infof("%s failed to connect; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
 	}
 
-	log.Infof("%s connected; attempting setup", a.node.Ecgi)
+	log.Infof("%s connected; attempting setup", a.node.EnbID)
 
 	err := backoff.RetryNotify(a.connect, b, connectNotify)
 	if err != nil {
@@ -204,12 +206,12 @@ func (a *e2Agent) Start() error {
 	count = 0
 	setupNotify := func(err error, t time.Duration) {
 		count++
-		log.Infof("%s failed setup procedure; retry after %v; attempt %d", a.node.Ecgi, b.GetElapsedTime(), count)
+		log.Infof("%s failed setup procedure; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
 	}
 
 	err = backoff.RetryNotify(a.setup, b, setupNotify)
 
-	log.Infof("%s completed connection setup", a.node.Ecgi)
+	log.Infof("%s completed connection setup", a.node.EnbID)
 	return err
 }
 
@@ -233,10 +235,14 @@ func (a *e2Agent) connect() error {
 }
 
 func (a *e2Agent) setup() error {
+	e2GlobalID, err := nodeID(a.model.PlmnID, a.node.EnbID)
+	if err != nil {
+		return err
+	}
 	setupRequest, err := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
-		setup.WithPlmnID("onf"),
-		setup.WithE2NodeID(nodeID(a.node.Ecgi)))
+		setup.WithPlmnID(string(a.model.PlmnID)),
+		setup.WithE2NodeID(e2GlobalID))
 
 	if err != nil {
 		return err
@@ -255,10 +261,21 @@ func (a *e2Agent) setup() error {
 	return nil
 }
 
-func nodeID(ecgi model.Ecgi) uint64 {
+func nodeID(plmndID model.PlmnID, enbID model.EnbID) (uint64, error) {
+	gEnbID := model.GEnbID{
+		PlmnID: plmndID,
+		EnbID:  enbID,
+	}
+	buf := bytes.Buffer{}
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(gEnbID)
+	if err != nil {
+		return 0, err
+	}
+
 	h := fnv.New64a()
-	_, _ = h.Write([]byte(ecgi))
-	return h.Sum64()
+	_, _ = h.Write([]byte(buf.Bytes()))
+	return h.Sum64(), nil
 }
 
 func (a *e2Agent) Stop() error {

@@ -6,7 +6,12 @@ package kpm
 
 import (
 	"context"
+	"strconv"
 	"time"
+
+	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/indication/kpm"
+
+	"github.com/onosproject/ran-simulator/pkg/model"
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
@@ -43,7 +48,7 @@ type Client struct {
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	kpmSm := registry.ServiceModel{
 		RanFunctionID:       registry.Kpm,
@@ -52,6 +57,8 @@ func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (reg
 		Revision:            1,
 		Version:             version,
 		ModelPluginRegistry: modelPluginRegistry,
+		Node:                node,
+		Model:               model,
 	}
 	var ranFunctionShortName = "“ORAN-E2SM-KPM”"
 	var ranFunctionE2SmOid = "OID123"
@@ -94,12 +101,35 @@ func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (reg
 }
 
 func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) {
-	// TODO indication header and indication message should be generated using model plugins
+	gNbID, err := strconv.ParseUint(string(sm.ServiceModel.Node.EnbID), 10, 64)
+	newIndicationHeader, _ := kpmutils.NewIndicationHeader(
+		kpmutils.WithPlmnID(string(sm.ServiceModel.Model.PlmnID)),
+		kpmutils.WithFiveQi(0),
+		kpmutils.WithGnbId(gNbID),
+		kpmutils.WithSst("1"),
+		kpmutils.WithSd("SD1"),
+		kpmutils.WithPlmnIDnrcgi(string(sm.ServiceModel.Model.PlmnID)))
+
+	indicationHeader, err := kpmutils.CreateIndicationHeader(newIndicationHeader)
+	if err != nil {
+		log.Error(err)
+	}
+
+	indicationHeaderProtoBytes, err := proto.Marshal(indicationHeader)
+	if err != nil {
+		log.Error("Error in creating indication header proto bytes")
+	}
+	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	indicationHeaderAsn1Bytes, err := kpmModelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
+	if err != nil {
+		log.Error("Error in creating indication header ASN1 bytes", err)
+	}
+
 	indication, _ := indicationutils.NewIndication(
 		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
 		indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
 		indicationutils.WithRequestID(subscription.GetReqID()),
-		indicationutils.WithIndicationHeader(indicationHeaderBytes),
+		indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
 		indicationutils.WithIndicationMessage(indicationMessageBytes))
 
 	ricIndication := indicationutils.CreateIndication(indication)
@@ -171,8 +201,6 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 var indicationMessageBytes = []byte{0x40, 0x00, 0x00, 0x6c, 0x1a, 0x4f, 0x70, 0x65, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x69, 0x6e, 0x67, 0x80, 0x00, 0x00, 0x0c, 0x72, 0x61, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72}
-
-var indicationHeaderBytes = []byte{0x3f, 0x0c, 0x4f, 0x4e, 0x46, 0x00, 0xd4, 0xbc, 0x08, 0x00, 0x0c, 0x00, 0x0d, 0x6f, 0x6e, 0x66, 0xef, 0xab, 0xd4, 0xbc, 0x00, 0x4f, 0x4e, 0x46, 0x98, 0x80, 0x53, 0x44, 0x31, 0x00, 0x00}
 
 var ranFuncDescBytes = []byte{
 	0x20, 0xC0, 0x4F, 0x52, 0x41, 0x4E, 0x2D, 0x45, 0x32, 0x53, 0x4D, 0x2D, 0x4B, 0x50, 0x4D, 0x00, 0x00, 0x05, 0x4F, 0x49,

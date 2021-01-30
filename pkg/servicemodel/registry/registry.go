@@ -7,6 +7,8 @@ package registry
 import (
 	"sync"
 
+	"github.com/onosproject/ran-simulator/pkg/model"
+
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
@@ -33,6 +35,8 @@ type ServiceModel struct {
 	Revision            int
 	Client              servicemodel.Client
 	ModelPluginRegistry *modelplugins.ModelPluginRegistry
+	Node                model.Node
+	Model               *model.Model
 }
 
 // NewServiceModelRegistry creates a service model registry

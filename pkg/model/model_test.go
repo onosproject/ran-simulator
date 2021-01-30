@@ -26,4 +26,5 @@ func TestModel(t *testing.T) {
 	assert.Equal(t, "1.0.0", model.ServiceModels["kpm"].Version)
 	assert.Equal(t, 2, model.ServiceModels["ni"].ID)
 	assert.Equal(t, uint(12), model.UECount)
+	assert.Equal(t, PlmnID("onf"), model.PlmnID)
 }

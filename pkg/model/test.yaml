@@ -4,13 +4,13 @@
 
 nodes:
     node1:
-      ecgi: 90125-10001
+      enbID: 90125-10001
       controllers:
         - controller1
       servicemodels:
         - kpm
     node2:
-      ecgi: 90125-10002
+      enbID: 90125-10002
       controllers:
         - controller2
       servicemodels:
@@ -34,5 +34,6 @@ servicemodels:
       version: 1.0.0
       description: NI service model
 ueCount: 12
+plmnID: "onf"
 
 
