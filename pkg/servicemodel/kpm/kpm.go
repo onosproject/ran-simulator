@@ -101,11 +101,15 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 	return kpmSm, nil
 }
 
-func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) {
+func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
 	gNbID, err := strconv.ParseUint(string(sm.ServiceModel.Node.EnbID), 10, 64)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	newIndicationHeader, _ := kpmutils.NewIndicationHeader(
 		kpmutils.WithPlmnID(string(sm.ServiceModel.Model.PlmnID)),
-		kpmutils.WithGnbId(gNbID),
+		kpmutils.WithGnbID(gNbID),
 		kpmutils.WithSst("1"),
 		kpmutils.WithSd("SD1"),
 		kpmutils.WithPlmnIDnrcgi(string(sm.ServiceModel.Model.PlmnID)))
@@ -113,11 +117,13 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	indicationHeader, err := kpmutils.CreateIndicationHeader(newIndicationHeader)
 	if err != nil {
 		log.Error(err)
+		return err
 	}
 
 	indicationHeaderProtoBytes, err := proto.Marshal(indicationHeader)
 	if err != nil {
 		log.Error("Error in creating indication header proto bytes")
+		return err
 	}
 	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
 	indicationHeaderAsn1Bytes, err := kpmModelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
@@ -141,10 +147,10 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		err := sm.Channel.RICIndication(ctx, ricIndication)
 		if err != nil {
 			log.Error("Sending indication report is failed:", err)
-			break
+			return err
 		}
 	}
-
+	return nil
 }
 
 // RICControl implements control handler for kpm service model
@@ -156,7 +162,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelFullName)
 	var ricActionsAccepted []*types.RicActionID
-	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
+	ricActionsNotAdmitted := make(map[types.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
 	reqID := subutils.GetRequesterID(request)
 	ranFuncID := subutils.GetRanFunctionID(request)
@@ -165,10 +171,22 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	for _, action := range actionList {
 		actionID := types.RicActionID(action.Value.RicActionId.Value)
 		actionType := action.Value.RicActionType
+		// kpm service model supports report action and should be added to the
+		// list of accepted actions
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT {
 			ricActionsAccepted = append(ricActionsAccepted, &actionID)
 		}
-		// TODO handle not admitted actions
+		// kpm service model does not support INSERT and POLICY actions and
+		// should be added into the list of not admitted actions
+		if actionType == e2apies.RicactionType_RICACTION_TYPE_INSERT ||
+			actionType == e2apies.RicactionType_RICACTION_TYPE_POLICY {
+			cause := &e2apies.Cause{
+				Cause: &e2apies.Cause_RicRequest{
+					RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+				},
+			}
+			ricActionsNotAdmitted[actionID] = cause
+		}
 	}
 	subscription, _ := subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
@@ -190,7 +208,12 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	}
 
 	subscriptionResponse := subutils.CreateSubscriptionResponse(subscription)
-	go sm.reportIndication(ctx, reportInterval, subscription)
+	go func() {
+		err := sm.reportIndication(ctx, reportInterval, subscription)
+		if err != nil {
+			return
+		}
+	}()
 	return subscriptionResponse, nil, nil
 
 }

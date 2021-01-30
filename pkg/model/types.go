@@ -7,10 +7,10 @@ package model
 // EnbID  E2 node ID
 type EnbID string
 
-// PlmnID
+// PlmnID plmnID
 type PlmnID string
 
-// Ecgi
+// Ecgi Ecgi
 type Ecgi string
 
 // GEnbID global E2 node ID

@@ -10,6 +10,7 @@ import (
 	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
 )
 
+// IndicationHeader indication header for kpm service model
 type IndicationHeader struct {
 	plmnID      string
 	gNbCuUpID   int64
@@ -19,7 +20,7 @@ type IndicationHeader struct {
 	sd          string
 	fiveQi      int32
 	qCi         int32
-	gnbId       uint64
+	gnbID       uint64
 }
 
 // NewIndicationHeader creates a new indication header
@@ -41,15 +42,15 @@ func WithPlmnID(plmnID string) func(header *IndicationHeader) {
 }
 
 // WithGnbCuUpID sets gNBCuCpID
-func WithGNbCuUpID(gNbCuUpID int64) func(header *IndicationHeader) {
+func WithGnbCuUpID(gNbCuUpID int64) func(header *IndicationHeader) {
 	return func(header *IndicationHeader) {
 		header.gNbCuUpID = gNbCuUpID
 
 	}
 }
 
-// WithGNbDuID sets gNbDuID
-func WithGNbDuID(gNbDuID int64) func(header *IndicationHeader) {
+// WithGnbDuID sets gNbDuID
+func WithGnbDuID(gNbDuID int64) func(header *IndicationHeader) {
 	return func(header *IndicationHeader) {
 		header.gNbDuID = gNbDuID
 	}
@@ -90,10 +91,10 @@ func WithQci(qCi int32) func(header *IndicationHeader) {
 	}
 }
 
-// WithGnbId sets E2 global node ID
-func WithGnbId(gnbId uint64) func(header *IndicationHeader) {
+// WithGnbID sets E2 global node ID
+func WithGnbID(gnbID uint64) func(header *IndicationHeader) {
 	return func(header *IndicationHeader) {
-		header.gnbId = gnbId
+		header.gnbID = gnbID
 	}
 }
 
@@ -112,7 +113,7 @@ func CreateIndicationHeader(header *IndicationHeader) (*e2sm_kpm_ies.E2SmKpmIndi
 								GnbId: &e2sm_kpm_ies.GnbIdChoice{
 									GnbIdChoice: &e2sm_kpm_ies.GnbIdChoice_GnbId{
 										GnbId: &e2sm_kpm_ies.BitString{
-											Value: header.gnbId, //uint64
+											Value: header.gnbID, //uint64
 											Len:   22,           //uint32
 										},
 									},
@@ -133,7 +134,7 @@ func CreateIndicationHeader(header *IndicationHeader) (*e2sm_kpm_ies.E2SmKpmIndi
 					},
 					NRcellIdentity: &e2sm_kpm_ies.NrcellIdentity{
 						Value: &e2sm_kpm_ies.BitString{
-							Value: header.gnbId, //uint64
+							Value: header.gnbID, //uint64
 							Len:   36,           //uint32
 						},
 					},

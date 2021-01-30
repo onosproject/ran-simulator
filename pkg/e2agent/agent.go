@@ -274,7 +274,7 @@ func nodeID(plmndID model.PlmnID, enbID model.EnbID) (uint64, error) {
 	}
 
 	h := fnv.New64a()
-	_, _ = h.Write([]byte(buf.Bytes()))
+	_, _ = h.Write(buf.Bytes())
 	return h.Sum64(), nil
 }
 
