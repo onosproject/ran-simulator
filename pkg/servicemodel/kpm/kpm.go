@@ -19,6 +19,7 @@ import (
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
+	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/subscriptiondelete"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
@@ -104,7 +105,6 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	gNbID, err := strconv.ParseUint(string(sm.ServiceModel.Node.EnbID), 10, 64)
 	newIndicationHeader, _ := kpmutils.NewIndicationHeader(
 		kpmutils.WithPlmnID(string(sm.ServiceModel.Model.PlmnID)),
-		kpmutils.WithFiveQi(0),
 		kpmutils.WithGnbId(gNbID),
 		kpmutils.WithSst("1"),
 		kpmutils.WithSd("SD1"),
@@ -197,7 +197,17 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	return nil, nil, errors.New(errors.NotSupported, "Ric subscription delete is not supported")
+	reqID := subdeleteutils.GetRequesterID(request)
+	ranFuncID := subdeleteutils.GetRanFunctionID(request)
+	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
+
+	subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
+		subdeleteutils.WithRequestID(reqID),
+		subdeleteutils.WithRanFuncID(ranFuncID),
+		subdeleteutils.WithRicInstanceID(ricInstanceID))
+	subDeleteResponse := subdeleteutils.CreateSubscriptionDeleteResponse(subscriptionDelete)
+
+	return subDeleteResponse, nil, errors.New(errors.NotSupported, "Ric subscription delete is not supported")
 }
 
 var indicationMessageBytes = []byte{0x40, 0x00, 0x00, 0x6c, 0x1a, 0x4f, 0x70, 0x65, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x69, 0x6e, 0x67, 0x80, 0x00, 0x00, 0x0c, 0x72, 0x61, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72}
