@@ -66,6 +66,7 @@ func WithRicInstanceID(ricInstanceID int32) func(subscriptionDelete *Subscriptio
 	}
 }
 
+// WithCause sets cause of subscription delete failure
 func WithCause(cause *e2apies.Cause) func(subscriptionDelete *SubscriptionDelete) {
 	return func(subscriptionDelete *SubscriptionDelete) {
 		subscriptionDelete.cause = cause

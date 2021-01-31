@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package kpm
+package indication
 
 import (
 	"fmt"
@@ -10,8 +10,8 @@ import (
 	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
 )
 
-// IndicationHeader indication header for kpm service model
-type IndicationHeader struct {
+// Header indication header for kpm service model
+type Header struct {
 	plmnID      string
 	gNbCuUpID   int64
 	gNbDuID     int64
@@ -24,8 +24,8 @@ type IndicationHeader struct {
 }
 
 // NewIndicationHeader creates a new indication header
-func NewIndicationHeader(options ...func(header *IndicationHeader)) (*IndicationHeader, error) {
-	header := &IndicationHeader{}
+func NewIndicationHeader(options ...func(header *Header)) (*Header, error) {
+	header := &Header{}
 	for _, option := range options {
 		option(header)
 	}
@@ -34,72 +34,72 @@ func NewIndicationHeader(options ...func(header *IndicationHeader)) (*Indication
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID string) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithPlmnID(plmnID string) func(header *Header) {
+	return func(header *Header) {
 		header.plmnID = plmnID
 
 	}
 }
 
 // WithGnbCuUpID sets gNBCuCpID
-func WithGnbCuUpID(gNbCuUpID int64) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithGnbCuUpID(gNbCuUpID int64) func(header *Header) {
+	return func(header *Header) {
 		header.gNbCuUpID = gNbCuUpID
 
 	}
 }
 
 // WithGnbDuID sets gNbDuID
-func WithGnbDuID(gNbDuID int64) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithGnbDuID(gNbDuID int64) func(header *Header) {
+	return func(header *Header) {
 		header.gNbDuID = gNbDuID
 	}
 }
 
 // WithPlmnIDnrcgi sets plmnIDnrcgi
-func WithPlmnIDnrcgi(plmnIDnrcgi string) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithPlmnIDnrcgi(plmnIDnrcgi string) func(header *Header) {
+	return func(header *Header) {
 		header.plmnIDnrcgi = plmnIDnrcgi
 	}
 }
 
 // WithSst sets sst
-func WithSst(sst string) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithSst(sst string) func(header *Header) {
+	return func(header *Header) {
 		header.sst = sst
 	}
 }
 
 // WithSd sets sd
-func WithSd(sd string) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithSd(sd string) func(header *Header) {
+	return func(header *Header) {
 		header.sd = sd
 	}
 }
 
 // WithFiveQi sets fiveQi
-func WithFiveQi(fiveQi int32) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithFiveQi(fiveQi int32) func(header *Header) {
+	return func(header *Header) {
 		header.fiveQi = fiveQi
 	}
 }
 
 // WithQci sets Qci
-func WithQci(qCi int32) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithQci(qCi int32) func(header *Header) {
+	return func(header *Header) {
 		header.qCi = qCi
 	}
 }
 
 // WithGnbID sets E2 global node ID
-func WithGnbID(gnbID uint64) func(header *IndicationHeader) {
-	return func(header *IndicationHeader) {
+func WithGnbID(gnbID uint64) func(header *Header) {
+	return func(header *Header) {
 		header.gnbID = gnbID
 	}
 }
 
 // CreateIndicationHeader creates indication header for kpm service model
-func CreateIndicationHeader(header *IndicationHeader) (*e2sm_kpm_ies.E2SmKpmIndicationHeader, error) {
+func CreateIndicationHeader(header *Header) (*e2sm_kpm_ies.E2SmKpmIndicationHeader, error) {
 	e2SmKpmPdu := &e2sm_kpm_ies.E2SmKpmIndicationHeader{
 		E2SmKpmIndicationHeader: &e2sm_kpm_ies.E2SmKpmIndicationHeader_IndicationHeaderFormat1{
 			IndicationHeaderFormat1: &e2sm_kpm_ies.E2SmKpmIndicationHeaderFormat1{

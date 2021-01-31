@@ -2,19 +2,20 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package kpm
+package indication
 
 import (
 	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
 )
 
-type IndicationMessage struct {
+// Message indication message fields for kpm service model
+type Message struct {
 	numberOfActiveUes int32
 }
 
 // NewIndicationMessage creates a new indication message
-func NewIndicationMessage(options ...func(header *IndicationMessage)) (*IndicationMessage, error) {
-	msg := &IndicationMessage{}
+func NewIndicationMessage(options ...func(header *Message)) (*Message, error) {
+	msg := &Message{}
 	for _, option := range options {
 		option(msg)
 	}
@@ -23,13 +24,14 @@ func NewIndicationMessage(options ...func(header *IndicationMessage)) (*Indicati
 }
 
 // WithNumberOfActiveUes sets number of active UEs
-func WithNumberOfActiveUes(numOfActiveUes int32) func(msg *IndicationMessage) {
-	return func(msg *IndicationMessage) {
+func WithNumberOfActiveUes(numOfActiveUes int32) func(msg *Message) {
+	return func(msg *Message) {
 		msg.numberOfActiveUes = numOfActiveUes
 	}
 }
 
-func CreateIndicationMessage(indicationMessage *IndicationMessage) (*e2sm_kpm_ies.E2SmKpmIndicationMessage, error) {
+// CreateIndicationMessage creates indication message
+func CreateIndicationMessage(indicationMessage *Message) (*e2sm_kpm_ies.E2SmKpmIndicationMessage, error) {
 	e2SmIindicationMsg := e2sm_kpm_ies.E2SmKpmIndicationMessage_IndicationMessageFormat1{
 		IndicationMessageFormat1: &e2sm_kpm_ies.E2SmKpmIndicationMessageFormat1{
 			PmContainers: make([]*e2sm_kpm_ies.PmContainersList, 0),

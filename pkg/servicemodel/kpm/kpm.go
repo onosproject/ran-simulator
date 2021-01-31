@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/indication/kpm"
+	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm/indication"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
@@ -17,9 +17,9 @@ import (
 
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
-	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/indication"
-	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
-	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/subscriptiondelete"
+	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
+	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 

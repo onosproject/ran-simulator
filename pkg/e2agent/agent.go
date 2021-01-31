@@ -12,7 +12,7 @@ import (
 	"hash/fnv"
 	"time"
 
-	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/subscriptiondelete"
+	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
@@ -21,8 +21,8 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
-	"github.com/onosproject/ran-simulator/pkg/utils/setup"
-	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/setup"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
