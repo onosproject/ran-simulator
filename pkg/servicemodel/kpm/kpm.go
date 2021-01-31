@@ -90,7 +90,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 	if kpmModelPlugin == nil {
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}
-	// TODO it panics and it should be fixed in kpm service model
+	// TODO it panics and it should be fixed in kpm service model otherwise it panics
 	/*ranFuncDescBytes, err = kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
@@ -114,6 +114,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		kpmutils.WithSd("SD1"),
 		kpmutils.WithPlmnIDnrcgi(string(sm.ServiceModel.Model.PlmnID)))
 
+	// Creating an indication header
 	indicationHeader, err := kpmutils.CreateIndicationHeader(newIndicationHeader)
 	if err != nil {
 		log.Error(err)
@@ -129,7 +130,32 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	indicationHeaderAsn1Bytes, err := kpmModelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
 	if err != nil {
 		log.Error("Error in creating indication header ASN1 bytes", err)
+		return err
 	}
+	// Creating an indication message
+	newIndicationMessage, err := kpmutils.NewIndicationMessage(
+		kpmutils.WithNumberOfActiveUes(10))
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	indicationMessage, err := kpmutils.CreateIndicationMessage(newIndicationMessage)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	_, err = proto.Marshal(indicationMessage)
+	if err != nil {
+		log.Error("Error in creating indication header proto bytes")
+		return err
+	}
+
+	// TODO model plugin bug should be fixed to call this function otherwise it panics
+	/*indicationMessageAsn1Bytes, err := kpmModelPlugin.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
+	if err != nil {
+		log.Error(err)
+		return err
+	}*/
 
 	indication, _ := indicationutils.NewIndication(
 		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
@@ -229,6 +255,8 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		subdeleteutils.WithRanFuncID(ranFuncID),
 		subdeleteutils.WithRicInstanceID(ricInstanceID))
 	subDeleteResponse := subdeleteutils.CreateSubscriptionDeleteResponse(subscriptionDelete)
+
+	// TODO stop sending indication reports
 
 	return subDeleteResponse, nil, errors.New(errors.NotSupported, "Ric subscription delete is not supported")
 }

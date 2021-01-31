@@ -16,13 +16,13 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
+	"github.com/cenkalti/backoff"
+	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 	"github.com/onosproject/ran-simulator/pkg/utils/setup"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
-
-	"github.com/cenkalti/backoff"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
@@ -111,7 +111,13 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	log.Debugf("Received Subscription Request %v", request)
 	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
 	sm, err := a.registry.GetServiceModel(ranFuncID)
+
 	if err != nil {
+		// TODO If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
+		//  message which contains a RAN Function ID IE that was not previously
+		//  announced as a supported RAN function in the E2 Setup procedure or
+		//  the RIC Service Update procedure, the target E2 Node shall send the RIC SUBSCRIPTION FAILURE message
+		//  to the Near-RT RIC with an appropriate cause value.
 		return nil, nil, err
 	}
 
@@ -122,6 +128,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscription(ctx, request)
 	default:
+
 		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
 
 	}
@@ -142,7 +149,23 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
-		return nil, nil, err
+		//  If the target E2 Node receives a RIC SUBSCRIPTION DELETE REQUEST message contains a
+		//  RAN Function ID IE that was not previously announced as a supported RAN function
+		//  in the E2 Setup procedure or the RIC Service Update procedure, the target E2 Node
+		//  shall send the RIC SUBSCRIPTION DELETE FAILURE message to the Near-RT RIC.
+		//  The message shall contain with an appropriate cause value.
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
+			},
+		}
+		subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
+			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
+			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
+			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
+			subdeleteutils.WithCause(cause))
+		failure := subdeleteutils.CreateSubscriptionDeleteFailure(subscriptionDelete)
+		return nil, failure, err
 	}
 
 	switch sm.RanFunctionID {
@@ -151,9 +174,6 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		client.Channel = a.channel
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
-	default:
-		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
-
 	}
 	// Ric subscription delete procedure is failed so we are not going to update subscriptions store
 	if err != nil {

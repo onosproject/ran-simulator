@@ -98,7 +98,7 @@ func (s *Subscriptions) Get(id ID) (*Subscription, error) {
 	if val, ok := s.subscriptions[id]; ok {
 		return val, nil
 	}
-	return nil, errors.New(errors.NotFound, "subscription entry had not been found")
+	return nil, errors.New(errors.NotFound, "subscription entry has not been found")
 }
 
 // List returns slice containing all current subscriptions

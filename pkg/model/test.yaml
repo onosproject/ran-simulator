@@ -4,13 +4,13 @@
 
 nodes:
     node1:
-      enbID: 90125-10001
+      enbID: 123
       controllers:
         - controller1
       servicemodels:
         - kpm
     node2:
-      enbID: 90125-10002
+      enbID: 124
       controllers:
         - controller2
       servicemodels:

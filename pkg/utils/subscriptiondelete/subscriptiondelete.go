@@ -16,6 +16,7 @@ type SubscriptionDelete struct {
 	reqID         int32
 	ricInstanceID int32
 	ranFuncID     int32
+	cause         *e2apies.Cause
 	// TODO add more fields including cause of failure
 }
 
@@ -65,6 +66,12 @@ func WithRicInstanceID(ricInstanceID int32) func(subscriptionDelete *Subscriptio
 	}
 }
 
+func WithCause(cause *e2apies.Cause) func(subscriptionDelete *SubscriptionDelete) {
+	return func(subscriptionDelete *SubscriptionDelete) {
+		subscriptionDelete.cause = cause
+	}
+}
+
 // CreateSubscriptionDeleteFailure creates e2 subscription delete failure
 func CreateSubscriptionDeleteFailure(subscriptionDelete *SubscriptionDelete) (response *e2appducontents.RicsubscriptionDeleteFailure) {
 	ricRequestID := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes29{
@@ -85,10 +92,18 @@ func CreateSubscriptionDeleteFailure(subscriptionDelete *SubscriptionDelete) (re
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
+	causeOfFailure := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes1{
+		Id:          int32(v1beta1.ProtocolIeIDCause),
+		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
+		Value:       subscriptionDelete.cause,
+		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	}
+
 	resp := &e2appducontents.RicsubscriptionDeleteFailure{
 		ProtocolIes: &e2appducontents.RicsubscriptionDeleteFailureIes{
 			E2ApProtocolIes29: &ricRequestID,  //RIC request ID
 			E2ApProtocolIes5:  &ranFunctionID, //RAN function ID
+			E2ApProtocolIes1:  &causeOfFailure,
 		},
 	}
 
@@ -115,6 +130,7 @@ func CreateSubscriptionDeleteResponse(subscriptionDelete *SubscriptionDelete) (r
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
+
 	resp := &e2appducontents.RicsubscriptionDeleteResponse{
 		ProtocolIes: &e2appducontents.RicsubscriptionDeleteResponseIes{
 			E2ApProtocolIes29: &ricRequestID,  //RIC request ID
