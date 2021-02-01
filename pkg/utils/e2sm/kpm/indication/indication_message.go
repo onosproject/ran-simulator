@@ -6,6 +6,8 @@ package indication
 
 import (
 	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"google.golang.org/protobuf/proto"
 )
 
 // Message indication message fields for kpm service model
@@ -28,6 +30,27 @@ func WithNumberOfActiveUes(numOfActiveUes int32) func(msg *Message) {
 	return func(msg *Message) {
 		msg.numberOfActiveUes = numOfActiveUes
 	}
+}
+
+// CreateIndicationMessageAsn1Bytes creates ASN1 bytes from proto encoded indication message
+func CreateIndicationMessageAsn1Bytes(modelPlugin modelplugins.ModelPlugin, message *Message) ([]byte, error) {
+	indicationMessage, err := CreateIndicationMessage(message)
+	if err != nil {
+		return nil, err
+	}
+	indicationMessageProtoBytes, err := proto.Marshal(indicationMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO model plugin bug should be fixed to call this function otherwise it panics
+	indicationMessageAsn1Bytes, err := modelPlugin.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return indicationMessageAsn1Bytes, nil
+
 }
 
 // CreateIndicationMessage creates indication message

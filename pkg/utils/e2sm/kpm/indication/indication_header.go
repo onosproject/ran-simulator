@@ -7,6 +7,9 @@ package indication
 import (
 	"fmt"
 
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"google.golang.org/protobuf/proto"
+
 	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
 )
 
@@ -96,6 +99,27 @@ func WithGnbID(gnbID uint64) func(header *Header) {
 	return func(header *Header) {
 		header.gnbID = gnbID
 	}
+}
+
+// CreateIndicationHeaderAsn1Bytes creates ASN.1 bytes from a protobuf encoded indication header
+func CreateIndicationHeaderAsn1Bytes(modelPlugin modelplugins.ModelPlugin, header *Header) ([]byte, error) {
+	// Creating an indication header
+	indicationHeader, err := CreateIndicationHeader(header)
+	if err != nil {
+		return nil, err
+	}
+
+	indicationHeaderProtoBytes, err := proto.Marshal(indicationHeader)
+	if err != nil {
+		return nil, err
+	}
+
+	indicationHeaderAsn1Bytes, err := modelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
+
+	if err != nil {
+		return nil, err
+	}
+	return indicationHeaderAsn1Bytes, nil
 }
 
 // CreateIndicationHeader creates indication header for kpm service model

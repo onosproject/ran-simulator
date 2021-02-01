@@ -152,9 +152,6 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		client.Channel = a.channel
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscription(ctx, request)
-	default:
-		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
-
 	}
 	// Ric subscription is failed so we are not going to update the store
 	if err != nil {

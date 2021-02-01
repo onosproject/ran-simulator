@@ -107,55 +107,31 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		log.Error(err)
 		return err
 	}
-	newIndicationHeader, _ := kpmutils.NewIndicationHeader(
+	// Creates an indication header
+	header, _ := kpmutils.NewIndicationHeader(
 		kpmutils.WithPlmnID(string(sm.ServiceModel.Model.PlmnID)),
 		kpmutils.WithGnbID(gNbID),
 		kpmutils.WithSst("1"),
 		kpmutils.WithSd("SD1"),
 		kpmutils.WithPlmnIDnrcgi(string(sm.ServiceModel.Model.PlmnID)))
 
-	// Creating an indication header
-	indicationHeader, err := kpmutils.CreateIndicationHeader(newIndicationHeader)
+	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	indicationHeaderAsn1Bytes, err := kpmutils.CreateIndicationHeaderAsn1Bytes(kpmModelPlugin, header)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	indicationHeaderProtoBytes, err := proto.Marshal(indicationHeader)
-	if err != nil {
-		log.Error("Error in creating indication header proto bytes")
-		return err
-	}
-	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
-	indicationHeaderAsn1Bytes, err := kpmModelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
-	if err != nil {
-		log.Error("Error in creating indication header ASN1 bytes", err)
-		return err
-	}
 	// Creating an indication message
-	newIndicationMessage, err := kpmutils.NewIndicationMessage(
+	_, err = kpmutils.NewIndicationMessage(
 		kpmutils.WithNumberOfActiveUes(10))
 	if err != nil {
 		log.Error(err)
 		return err
 	}
-	indicationMessage, err := kpmutils.CreateIndicationMessage(newIndicationMessage)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	_, err = proto.Marshal(indicationMessage)
-	if err != nil {
-		log.Error("Error in creating indication header proto bytes")
-		return err
-	}
 
-	// TODO model plugin bug should be fixed to call this function otherwise it panics
-	/*indicationMessageAsn1Bytes, err := kpmModelPlugin.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
-	if err != nil {
-		log.Error(err)
-		return err
-	}*/
+	// TODO model plugin should be fixed otherwise it panics
+	//_, err = kpmutils.CreateIndicationMessageAsn1Bytes(kpmModelPlugin, message)
 
 	indication, _ := indicationutils.NewIndication(
 		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
