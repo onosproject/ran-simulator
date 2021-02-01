@@ -54,7 +54,7 @@ func createSubscriptionRequest(nodeID string) (subscription.SubscriptionDetails,
 	subReq := subscription.SubscriptionDetails{
 		E2NodeID: subscription.E2NodeID(nodeID),
 		ServiceModel: subscription.ServiceModel{
-			ID: subscription.ServiceModelID("test"),
+			ID: subscription.ServiceModelID("e2sm_kpm-v1beta1"),
 		},
 		EventTrigger: subscription.EventTrigger{
 			Payload: subscription.Payload{

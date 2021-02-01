@@ -12,6 +12,8 @@ import (
 	"hash/fnv"
 	"time"
 
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
@@ -49,7 +51,7 @@ type E2Agent interface {
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (E2Agent, error) {
-	log.Info("Creating New E2 Agent for node")
+	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
 	reg := registry.NewServiceModelRegistry()
 	sms := node.ServiceModels
 	for _, smID := range sms {
@@ -113,12 +115,35 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 
 	if err != nil {
-		// TODO If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
+		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
 		//  message which contains a RAN Function ID IE that was not previously
 		//  announced as a supported RAN function in the E2 Setup procedure or
 		//  the RIC Service Update procedure, the target E2 Node shall send the RIC SUBSCRIPTION FAILURE message
 		//  to the Near-RT RIC with an appropriate cause value.
-		return nil, nil, err
+		var ricActionsAccepted []*types.RicActionID
+		ricActionsNotAdmitted := make(map[types.RicActionID]*e2apies.Cause)
+		actionList := subutils.GetRicActionToBeSetupList(request)
+		reqID := subutils.GetRequesterID(request)
+		ranFuncID := subutils.GetRanFunctionID(request)
+		ricInstanceID := subutils.GetRicInstanceID(request)
+
+		for _, action := range actionList {
+			actionID := types.RicActionID(action.Value.RicActionId.Value)
+			cause := &e2apies.Cause{
+				Cause: &e2apies.Cause_RicRequest{
+					RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
+				},
+			}
+			ricActionsNotAdmitted[actionID] = cause
+		}
+		subscription, _ := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithActionsAccepted(ricActionsAccepted),
+			subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
+		failure := subutils.CreateSubscriptionFailure(subscription)
+		return nil, failure, err
 	}
 
 	switch sm.RanFunctionID {
@@ -128,7 +153,6 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscription(ctx, request)
 	default:
-
 		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
 
 	}
