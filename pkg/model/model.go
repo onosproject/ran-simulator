@@ -6,15 +6,13 @@ package model
 
 import "github.com/onosproject/onos-lib-go/pkg/errors"
 
-// Ecgi Global E2 node ID
-type Ecgi string
-
 // Model simulation model
 type Model struct {
 	Nodes         map[string]Node         `yaml:"nodes"`
 	Controllers   map[string]Controller   `yaml:"controllers"`
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 	UECount       uint                    `yaml:"ueCount"`
+	PlmnID        PlmnID                  `yaml:"plmnID"`
 	UEs           UERegistry              // Not intended to be loaded from the YAML file; created separately
 
 	// TODO add more fields
@@ -25,7 +23,7 @@ type Model struct {
 
 // Node e2 node
 type Node struct {
-	Ecgi          Ecgi     `yaml:"ecgi"`
+	EnbID         EnbID    `yaml:"enbID"`
 	Controllers   []string `yaml:"controllers"`
 	ServiceModels []string `yaml:"servicemodels"`
 }

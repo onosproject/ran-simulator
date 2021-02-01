@@ -6,14 +6,20 @@ package kpm
 
 import (
 	"context"
+	"strconv"
 	"time"
+
+	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm/indication"
+
+	"github.com/onosproject/ran-simulator/pkg/model"
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
-	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/indication"
-	subutils "github.com/onosproject/ran-simulator/pkg/utils/subscription"
+	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
+	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
@@ -43,7 +49,7 @@ type Client struct {
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	kpmSm := registry.ServiceModel{
 		RanFunctionID:       registry.Kpm,
@@ -52,6 +58,8 @@ func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (reg
 		Revision:            1,
 		Version:             version,
 		ModelPluginRegistry: modelPluginRegistry,
+		Node:                node,
+		Model:               model,
 	}
 	var ranFunctionShortName = "“ORAN-E2SM-KPM”"
 	var ranFunctionE2SmOid = "OID123"
@@ -82,7 +90,7 @@ func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (reg
 	if kpmModelPlugin == nil {
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}
-	// TODO it panics and it should be fixed in kpm service model
+	// TODO it panics and it should be fixed in kpm service model otherwise it panics
 	/*ranFuncDescBytes, err = kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
@@ -93,13 +101,43 @@ func NewServiceModel(modelPluginRegistry *modelplugins.ModelPluginRegistry) (reg
 	return kpmSm, nil
 }
 
-func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) {
-	// TODO indication header and indication message should be generated using model plugins
+func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+	gNbID, err := strconv.ParseUint(string(sm.ServiceModel.Node.EnbID), 10, 64)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	// Creates an indication header
+	header, _ := kpmutils.NewIndicationHeader(
+		kpmutils.WithPlmnID(string(sm.ServiceModel.Model.PlmnID)),
+		kpmutils.WithGnbID(gNbID),
+		kpmutils.WithSst("1"),
+		kpmutils.WithSd("SD1"),
+		kpmutils.WithPlmnIDnrcgi(string(sm.ServiceModel.Model.PlmnID)))
+
+	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	indicationHeaderAsn1Bytes, err := kpmutils.CreateIndicationHeaderAsn1Bytes(kpmModelPlugin, header)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	// Creating an indication message
+	_, err = kpmutils.NewIndicationMessage(
+		kpmutils.WithNumberOfActiveUes(10))
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	// TODO model plugin should be fixed otherwise it panics
+	//_, err = kpmutils.CreateIndicationMessageAsn1Bytes(kpmModelPlugin, message)
+
 	indication, _ := indicationutils.NewIndication(
 		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
 		indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
 		indicationutils.WithRequestID(subscription.GetReqID()),
-		indicationutils.WithIndicationHeader(indicationHeaderBytes),
+		indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
 		indicationutils.WithIndicationMessage(indicationMessageBytes))
 
 	ricIndication := indicationutils.CreateIndication(indication)
@@ -111,10 +149,10 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		err := sm.Channel.RICIndication(ctx, ricIndication)
 		if err != nil {
 			log.Error("Sending indication report is failed:", err)
-			break
+			return err
 		}
 	}
-
+	return nil
 }
 
 // RICControl implements control handler for kpm service model
@@ -126,20 +164,31 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelFullName)
 	var ricActionsAccepted []*types.RicActionID
-	var ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
-	actionList := request.ProtocolIes.E2ApProtocolIes30.Value.RicActionToBeSetupList.Value
-
-	reqID := request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId
-	ranFuncID := request.ProtocolIes.E2ApProtocolIes5.Value.Value
-	ricInstanceID := request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId
+	ricActionsNotAdmitted := make(map[types.RicActionID]*e2apies.Cause)
+	actionList := subutils.GetRicActionToBeSetupList(request)
+	reqID := subutils.GetRequesterID(request)
+	ranFuncID := subutils.GetRanFunctionID(request)
+	ricInstanceID := subutils.GetRicInstanceID(request)
 
 	for _, action := range actionList {
 		actionID := types.RicActionID(action.Value.RicActionId.Value)
 		actionType := action.Value.RicActionType
+		// kpm service model supports report action and should be added to the
+		// list of accepted actions
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT {
 			ricActionsAccepted = append(ricActionsAccepted, &actionID)
 		}
-		// TODO handle not admitted actions
+		// kpm service model does not support INSERT and POLICY actions and
+		// should be added into the list of not admitted actions
+		if actionType == e2apies.RicactionType_RICACTION_TYPE_INSERT ||
+			actionType == e2apies.RicactionType_RICACTION_TYPE_POLICY {
+			cause := &e2apies.Cause{
+				Cause: &e2apies.Cause_RicRequest{
+					RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+				},
+			}
+			ricActionsNotAdmitted[actionID] = cause
+		}
 	}
 	subscription, _ := subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
@@ -151,7 +200,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		subscriptionFailure := subutils.CreateSubscriptionFailure(subscription)
-		return nil, subscriptionFailure, nil
+		return nil, subscriptionFailure, errors.New(errors.Forbidden, "no required action is accepted")
 	}
 
 	reportInterval, err := sm.getReportPeriod(request)
@@ -161,19 +210,34 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	}
 
 	subscriptionResponse := subutils.CreateSubscriptionResponse(subscription)
-	go sm.reportIndication(ctx, reportInterval, subscription)
+	go func() {
+		err := sm.reportIndication(ctx, reportInterval, subscription)
+		if err != nil {
+			return
+		}
+	}()
 	return subscriptionResponse, nil, nil
 
 }
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	return nil, nil, errors.New(errors.NotSupported, "Ric subscription delete is not supported")
+	reqID := subdeleteutils.GetRequesterID(request)
+	ranFuncID := subdeleteutils.GetRanFunctionID(request)
+	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
+
+	subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
+		subdeleteutils.WithRequestID(reqID),
+		subdeleteutils.WithRanFuncID(ranFuncID),
+		subdeleteutils.WithRicInstanceID(ricInstanceID))
+	subDeleteResponse := subdeleteutils.CreateSubscriptionDeleteResponse(subscriptionDelete)
+
+	// TODO stop sending indication reports
+
+	return subDeleteResponse, nil, errors.New(errors.NotSupported, "Ric subscription delete is not supported")
 }
 
 var indicationMessageBytes = []byte{0x40, 0x00, 0x00, 0x6c, 0x1a, 0x4f, 0x70, 0x65, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x69, 0x6e, 0x67, 0x80, 0x00, 0x00, 0x0c, 0x72, 0x61, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72}
-
-var indicationHeaderBytes = []byte{0x3f, 0x0c, 0x4f, 0x4e, 0x46, 0x00, 0xd4, 0xbc, 0x08, 0x00, 0x0c, 0x00, 0x0d, 0x6f, 0x6e, 0x66, 0xef, 0xab, 0xd4, 0xbc, 0x00, 0x4f, 0x4e, 0x46, 0x98, 0x80, 0x53, 0x44, 0x31, 0x00, 0x00}
 
 var ranFuncDescBytes = []byte{
 	0x20, 0xC0, 0x4F, 0x52, 0x41, 0x4E, 0x2D, 0x45, 0x32, 0x53, 0x4D, 0x2D, 0x4B, 0x50, 0x4D, 0x00, 0x00, 0x05, 0x4F, 0x49,

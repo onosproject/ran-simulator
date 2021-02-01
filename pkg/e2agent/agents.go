@@ -11,13 +11,13 @@ import (
 
 // E2Agents represents a collection of E2 agents to allow centralized management
 type E2Agents struct {
-	Agents map[model.Ecgi]E2Agent
+	Agents map[model.EnbID]E2Agent
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
 func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (*E2Agents, error) {
 	agents := &E2Agents{
-		Agents: make(map[model.Ecgi]E2Agent),
+		Agents: make(map[model.EnbID]E2Agent),
 	}
 
 	for _, node := range m.Nodes {
@@ -25,7 +25,7 @@ func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRe
 		if err != nil {
 			return nil, err
 		}
-		agents.Agents[node.Ecgi] = e2Node
+		agents.Agents[node.EnbID] = e2Node
 	}
 	return agents, nil
 }
