@@ -12,6 +12,8 @@ import (
 	"hash/fnv"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
+
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
@@ -61,18 +63,28 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
 		case registry.Kpm:
-			sm, err := kpm.NewServiceModel(node, model, modelPluginRegistry)
+			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry)
 			if err != nil {
 				return nil, err
 			}
-			err = reg.RegisterServiceModel(sm)
+			err = reg.RegisterServiceModel(kpmSm)
 			if err != nil {
 				log.Error(err)
 				return nil, err
 			}
+		case registry.Rc:
+			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry)
+			if err != nil {
+				return nil, err
+			}
+			err = reg.RegisterServiceModel(rcSm)
+			if err != nil {
+				log.Error(err)
+				return nil, err
+			}
+
 		}
 	}
-
 	return &e2Agent{
 		node:     node,
 		registry: reg,
@@ -102,6 +114,12 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		client.Subscriptions = a.subStore
 		client.ServiceModel = &sm
 		response, failure, err = client.RICControl(ctx, request)
+	case registry.Rc:
+		client := sm.Client.(*rc.Client)
+		client.Subscriptions = a.subStore
+		client.ServiceModel = &sm
+		response, failure, err = client.RICControl(ctx, request)
+
 	default:
 		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
 
@@ -163,6 +181,12 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		client.Subscriptions = a.subStore
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscription(ctx, request)
+	case registry.Rc:
+		client := sm.Client.(*rc.Client)
+		client.Subscriptions = a.subStore
+		client.ServiceModel = &sm
+		response, failure, err = client.RICSubscription(ctx, request)
+
 	}
 	// Ric subscription is failed so we are not going to update the store
 	if err != nil {
@@ -207,6 +231,12 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		client.Subscriptions = a.subStore
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
+	case registry.Rc:
+		client := sm.Client.(*rc.Client)
+		client.Subscriptions = a.subStore
+		client.ServiceModel = &sm
+		response, failure, err = client.RICSubscriptionDelete(ctx, request)
+
 	}
 	// Ric subscription delete procedure is failed so we are not going to update subscriptions store
 	if err != nil {

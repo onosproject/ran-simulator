@@ -174,7 +174,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("RIC Subscription is called for service model:", sm.ServiceModel.ModelFullName)
+	log.Info("RIC Subscription request received for service model:", sm.ServiceModel.ModelFullName)
 	var ricActionsAccepted []*types.RicActionID
 	ricActionsNotAdmitted := make(map[types.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -237,7 +237,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Info("RIC subscription delete is called for service model:", sm.ServiceModel.ModelFullName)
+	log.Info("RIC subscription delete request is received for service model:", sm.ServiceModel.ModelFullName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
