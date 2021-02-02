@@ -138,16 +138,16 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	intervalDuration := time.Duration(interval)
 
 	sub, err := sm.Subscriptions.Get(subID)
-	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
+	ticker := time.NewTicker(intervalDuration * time.Millisecond)
 	if err != nil {
 		return err
 	}
 	for {
 		select {
-		case <-sub.Done:
+		case <-sub.Removed:
 			log.Debug("Report function is terminating for subscription:", subID)
 			return nil
-		case <-sub.Ticker.C:
+		case <-ticker.C:
 			log.Debug("Sending Indication Report for subscription:", sub.ID)
 			indication, _ := indicationutils.NewIndication(
 				indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
@@ -251,8 +251,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		subdeleteutils.WithRicInstanceID(ricInstanceID))
 	subDeleteResponse := subdeleteutils.CreateSubscriptionDeleteResponse(subscriptionDelete)
 	// Stops the goroutine sending the indication messages
-	sub.Ticker.Stop()
-	sub.Done <- true
+	sub.Removed <- true
 	return subDeleteResponse, nil, nil
 }
 

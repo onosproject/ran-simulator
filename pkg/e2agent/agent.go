@@ -213,7 +213,6 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	}
 
 	err = a.subStore.Remove(subID)
-	log.Info("Remove from store:", subID, a.subStore)
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
