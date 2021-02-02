@@ -99,7 +99,7 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
-		client.Channel = a.channel
+		client.Subscriptions = a.subStore
 		client.ServiceModel = &sm
 		response, failure, err = client.RICControl(ctx, request)
 	default:
@@ -113,6 +113,9 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	log.Debugf("Received Subscription Request %v", request)
 	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
 	sm, err := a.registry.GetServiceModel(ranFuncID)
+	id := subscriptions.NewID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
+		request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
+		request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 
 	if err != nil {
 		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
@@ -145,11 +148,19 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		failure := subutils.CreateSubscriptionFailure(subscription)
 		return nil, failure, err
 	}
+	subscription, err := subscriptions.NewSubscription(id, request, a.channel)
+	if err != nil {
+		return response, failure, err
+	}
+	err = a.subStore.Add(subscription)
+	if err != nil {
+		return response, failure, err
+	}
 
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
-		client.Channel = a.channel
+		client.Subscriptions = a.subStore
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscription(ctx, request)
 	}
@@ -157,19 +168,20 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	if err != nil {
 		return response, failure, err
 	}
-	err = a.subStore.Add(subscriptions.NewSubscription(request))
-	if err != nil {
-		return response, failure, err
-	}
+
 	return response, failure, err
 }
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	log.Debugf("Received Subscription Delete Request %v", request)
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	subID := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
+		subdeleteutils.GetRequesterID(request),
+		subdeleteutils.GetRanFunctionID(request))
 
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
+		log.Error(err)
 		//  If the target E2 Node receives a RIC SUBSCRIPTION DELETE REQUEST message contains a
 		//  RAN Function ID IE that was not previously announced as a supported RAN function
 		//  in the E2 Setup procedure or the RIC Service Update procedure, the target E2 Node
@@ -192,7 +204,7 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
-		client.Channel = a.channel
+		client.Subscriptions = a.subStore
 		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	}
@@ -201,11 +213,9 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		return response, failure, err
 	}
 
-	id := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
-		subdeleteutils.GetRequesterID(request),
-		subdeleteutils.GetRanFunctionID(request))
-	err = a.subStore.Remove(id)
+	err = a.subStore.Remove(subID)
 	if err != nil {
+		log.Error(err)
 		return nil, nil, err
 	}
 	return response, failure, err
@@ -236,12 +246,11 @@ func (a *e2Agent) Start() error {
 		log.Infof("%s failed to connect; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
 	}
 
-	log.Infof("%s connected; attempting setup", a.node.EnbID)
-
 	err := backoff.RetryNotify(a.connect, b, connectNotify)
 	if err != nil {
 		return err
 	}
+	log.Infof("%s connected; attempting setup", a.node.EnbID)
 
 	// Attempt to negotiate E2 setup procedure; use exponential back-off retry
 	count = 0
