@@ -199,8 +199,9 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
+		err := errors.New(errors.Forbidden, "no required action is accepted")
 		subscriptionFailure := subutils.CreateSubscriptionFailure(subscription)
-		return nil, subscriptionFailure, errors.New(errors.Forbidden, "no required action is accepted")
+		return nil, subscriptionFailure, err
 	}
 
 	reportInterval, err := sm.getReportPeriod(request)
