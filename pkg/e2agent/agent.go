@@ -99,6 +99,7 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
+		client.Subscriptions = a.subStore
 		client.ServiceModel = &sm
 		response, failure, err = client.RICControl(ctx, request)
 	default:
