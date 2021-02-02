@@ -7,6 +7,9 @@ package subscriptions
 import (
 	"fmt"
 	"sync"
+	"time"
+
+	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 
@@ -19,28 +22,33 @@ type ID string
 
 // Subscription is an auxiliary wrapper for tracking subscriptions by each E2 agent
 type Subscription struct {
-	ID      ID
-	ReqID   *e2apies.RicrequestId
-	FnID    *e2apies.RanfunctionId
-	Details *e2appducontents.RicsubscriptionDetails
+	ID        ID
+	ReqID     *e2apies.RicrequestId
+	FnID      *e2apies.RanfunctionId
+	Details   *e2appducontents.RicsubscriptionDetails
+	E2Channel e2.ClientChannel
+	Done      chan bool
+	Ticker    *time.Ticker
 }
 
 // NewID returns the locally unique ID for the specified subscription add/delete request
 func NewID(instID int32, rqID int32, fnID int32) ID {
-	return ID(fmt.Sprintf("%d/%d/%d", instID, rqID, fnID))
+	return ID(fmt.Sprintf("%d-%d-%d", instID, rqID, fnID))
 }
 
 // NewSubscription generates a subscription record from the E2AP subscription request
-func NewSubscription(e2apsub *e2appducontents.RicsubscriptionRequest) *Subscription {
-	id := NewID(e2apsub.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
-		e2apsub.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
-		e2apsub.ProtocolIes.E2ApProtocolIes5.Value.Value)
-	return &Subscription{
-		ID:      id,
-		ReqID:   e2apsub.ProtocolIes.E2ApProtocolIes29.Value,
-		FnID:    e2apsub.ProtocolIes.E2ApProtocolIes5.Value,
-		Details: e2apsub.ProtocolIes.E2ApProtocolIes30.Value,
+func NewSubscription(id ID, e2apsub *e2appducontents.RicsubscriptionRequest, ch e2.ClientChannel) (*Subscription, error) {
+	if id == "" {
+		return nil, errors.New(errors.Forbidden, "id cannot be empty")
 	}
+	return &Subscription{
+		ID:        id,
+		ReqID:     e2apsub.ProtocolIes.E2ApProtocolIes29.Value,
+		FnID:      e2apsub.ProtocolIes.E2ApProtocolIes5.Value,
+		Details:   e2apsub.ProtocolIes.E2ApProtocolIes30.Value,
+		E2Channel: ch,
+		Done:      make(chan bool, 1),
+	}, nil
 }
 
 // NewStore creates a new subscription store

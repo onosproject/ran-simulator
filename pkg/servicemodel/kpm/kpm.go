@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
+
 	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm/indication"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
@@ -16,7 +18,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder"
-	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
@@ -44,8 +45,8 @@ const (
 
 // Client kpm service model client
 type Client struct {
-	Channel      e2.ClientChannel
-	ServiceModel *registry.ServiceModel
+	Subscriptions *subscriptions.Subscriptions
+	ServiceModel  *registry.ServiceModel
 }
 
 // NewServiceModel creates a new service model
@@ -102,6 +103,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 }
 
 func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	gNbID, err := strconv.ParseUint(string(sm.ServiceModel.Node.EnbID), 10, 64)
 	if err != nil {
 		log.Error(err)
@@ -133,26 +135,36 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	// TODO model plugin should be fixed otherwise it panics
 	//_, err = kpmutils.CreateIndicationMessageAsn1Bytes(kpmModelPlugin, message)
 
-	indication, _ := indicationutils.NewIndication(
-		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
-		indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
-		indicationutils.WithRequestID(subscription.GetReqID()),
-		indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
-		indicationutils.WithIndicationMessage(indicationMessageBytes))
-
-	ricIndication := indicationutils.CreateIndication(indication)
-
 	intervalDuration := time.Duration(interval)
-	ticker := time.NewTicker(intervalDuration * time.Millisecond)
-	for range ticker.C {
-		log.Info("Sending indication")
-		err := sm.Channel.RICIndication(ctx, ricIndication)
-		if err != nil {
-			log.Error("Sending indication report is failed:", err)
-			return err
+
+	sub, err := sm.Subscriptions.Get(subID)
+	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
+	if err != nil {
+		return err
+	}
+	for {
+		select {
+		case <-sub.Done:
+			log.Debug("Report function is terminating for subscription:", subID)
+			return nil
+		case <-sub.Ticker.C:
+			log.Debug("Sending Indication Report for subscription:", sub.ID)
+			indication, _ := indicationutils.NewIndication(
+				indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
+				indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
+				indicationutils.WithRequestID(subscription.GetReqID()),
+				indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
+				indicationutils.WithIndicationMessage(indicationMessageBytes))
+
+			ricIndication := indicationutils.CreateIndication(indication)
+			err = sub.E2Channel.RICIndication(ctx, ricIndication)
+			if err != nil {
+				log.Error("Sending indication report is failed:", err)
+				return err
+			}
+
 		}
 	}
-	return nil
 }
 
 // RICControl implements control handler for kpm service model
@@ -211,6 +223,8 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	subscriptionResponse := subutils.CreateSubscriptionResponse(subscription)
 	go func() {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		err := sm.reportIndication(ctx, reportInterval, subscription)
 		if err != nil {
 			return
@@ -222,19 +236,24 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
+	log.Info("RIC subscription delete is called for service model:", sm.ServiceModel.ModelFullName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
-
+	subID := subscriptions.NewID(ricInstanceID, reqID, ranFuncID)
+	sub, err := sm.Subscriptions.Get(subID)
+	if err != nil {
+		return nil, nil, err
+	}
 	subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
 		subdeleteutils.WithRequestID(reqID),
 		subdeleteutils.WithRanFuncID(ranFuncID),
 		subdeleteutils.WithRicInstanceID(ricInstanceID))
 	subDeleteResponse := subdeleteutils.CreateSubscriptionDeleteResponse(subscriptionDelete)
-
-	// TODO stop sending indication reports
-
-	return subDeleteResponse, nil, errors.New(errors.NotSupported, "Ric subscription delete is not supported")
+	// Stops the goroutine sending the indication messages
+	sub.Ticker.Stop()
+	sub.Done <- true
+	return subDeleteResponse, nil, nil
 }
 
 var indicationMessageBytes = []byte{0x40, 0x00, 0x00, 0x6c, 0x1a, 0x4f, 0x70, 0x65, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x69, 0x6e, 0x67, 0x80, 0x00, 0x00, 0x0c, 0x72, 0x61, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72}
