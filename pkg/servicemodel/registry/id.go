@@ -16,4 +16,6 @@ const (
 	Kpm
 	// Ni
 	Ni
+	// Rc
+	Rc
 )

@@ -9,6 +9,7 @@ nodes:
         - controller1
       servicemodels:
         - kpm
+        - rc
     node2:
       enbID: 124
       controllers:
@@ -33,6 +34,10 @@ servicemodels:
       id: 2
       version: 1.0.0
       description: NI service model
+    rc:
+      id: 3
+      version: 1.0.0
+      description: RC service model
 ueCount: 12
 plmnID: "onf"
 

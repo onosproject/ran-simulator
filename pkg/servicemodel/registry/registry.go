@@ -76,6 +76,13 @@ func (s *ServiceModelRegistry) GetServiceModel(id RanFunctionID) (ServiceModel, 
 	return ServiceModel{}, errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
 }
 
+// GetServiceModels get all of the registered service models
+func (s *ServiceModelRegistry) GetServiceModels() map[RanFunctionID]ServiceModel {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.serviceModels
+}
+
 // GetRanFunctions returns the list of registered ran functions
 func (s *ServiceModelRegistry) GetRanFunctions() e2aptypes.RanFunctions {
 	return s.ranFunctions
