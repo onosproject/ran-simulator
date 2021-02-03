@@ -1,12 +1,23 @@
-ARG GMAP_RAN_BASE_VERSION=latest
+ARG ONOS_BUILD_VERSION=undefined
 
-FROM onosproject/ran-simulator-base:$GMAP_RAN_BASE_VERSION as base
+FROM onosproject/golang-build:v0.6.7 as build
+
+ENV GO111MODULE=on
+ARG ONOS_MAKE_TARGET=build
+
+COPY Makefile go.mod go.sum /go/src/github.com/onosproject/ran-simulator/
+COPY api/ /go/src/github.com/onosproject/ran-simulator/api/
+COPY cmd/ /go/src/github.com/onosproject/ran-simulator/cmd/
+COPY pkg/ /go/src/github.com/onosproject/ran-simulator/pkg/
+COPY vendor/ /go/src/github.com/onosproject/ran-simulator/vendor/
+
+RUN cd /go/src/github.com/onosproject/ran-simulator && GOFLAGS=-mod=vendor make ${ONOS_MAKE_TARGET}
 
 FROM frolvlad/alpine-glibc:alpine-3.12
 
 USER nobody
 
-COPY --from=base /go/src/github.com/onosproject/ran-simulator/build/_output/ransim /usr/local/bin/ransim
+COPY --from=build /go/src/github.com/onosproject/ran-simulator/build/_output/ransim /usr/local/bin/ransim
 # COPY pkg/config/*.yaml /etc/onos/config/
 
 ENTRYPOINT ["ransim"]
