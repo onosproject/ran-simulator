@@ -7,6 +7,7 @@ package subscriptions
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
 
@@ -26,7 +27,7 @@ type Subscription struct {
 	FnID      *e2apies.RanfunctionId
 	Details   *e2appducontents.RicsubscriptionDetails
 	E2Channel e2.ClientChannel
-	Removed   chan bool
+	Ticker    *time.Ticker
 }
 
 // NewID returns the locally unique ID for the specified subscription add/delete request
@@ -45,7 +46,6 @@ func NewSubscription(id ID, e2apsub *e2appducontents.RicsubscriptionRequest, ch 
 		FnID:      e2apsub.ProtocolIes.E2ApProtocolIes5.Value,
 		Details:   e2apsub.ProtocolIes.E2ApProtocolIes30.Value,
 		E2Channel: ch,
-		Removed:   make(chan bool, 1),
 	}, nil
 }
 

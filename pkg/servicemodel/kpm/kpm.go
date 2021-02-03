@@ -138,33 +138,27 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	intervalDuration := time.Duration(interval)
 
 	sub, err := sm.Subscriptions.Get(subID)
-	ticker := time.NewTicker(intervalDuration * time.Millisecond)
 	if err != nil {
 		return err
 	}
-	for {
-		select {
-		case <-sub.Removed:
-			log.Debug("Report function is terminating for subscription:", subID)
-			return nil
-		case <-ticker.C:
-			log.Debug("Sending Indication Report for subscription:", sub.ID)
-			indication, _ := indicationutils.NewIndication(
-				indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
-				indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
-				indicationutils.WithRequestID(subscription.GetReqID()),
-				indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
-				indicationutils.WithIndicationMessage(indicationMessageBytes))
+	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
+	for range sub.Ticker.C {
+		log.Debug("Sending Indication Report for subscription:", sub.ID)
+		indication, _ := indicationutils.NewIndication(
+			indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
+			indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
+			indicationutils.WithRequestID(subscription.GetReqID()),
+			indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
+			indicationutils.WithIndicationMessage(indicationMessageBytes))
 
-			ricIndication := indicationutils.CreateIndication(indication)
-			err = sub.E2Channel.RICIndication(ctx, ricIndication)
-			if err != nil {
-				log.Error("Sending indication report is failed:", err)
-				return err
-			}
-
+		ricIndication := indicationutils.CreateIndication(indication)
+		err = sub.E2Channel.RICIndication(ctx, ricIndication)
+		if err != nil {
+			log.Error("Sending indication report is failed:", err)
+			return err
 		}
 	}
+	return nil
 }
 
 // RICControl implements control handler for kpm service model
@@ -252,7 +246,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		subdeleteutils.WithRicInstanceID(ricInstanceID))
 	subDeleteResponse := subdeleteutils.CreateSubscriptionDeleteResponse(subscriptionDelete)
 	// Stops the goroutine sending the indication messages
-	sub.Removed <- true
+	sub.Ticker.Stop()
 	return subDeleteResponse, nil, nil
 }
 
