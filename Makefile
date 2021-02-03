@@ -4,7 +4,6 @@ export GO111MODULE=on
 .PHONY: build
 
 RAN_SIMULATOR_VERSION := latest
-ONOS_BUILD_VERSION := v0.6.7
 ONOS_PROTOC_VERSION := v0.6.7
 
 build: # @HELP build the Go binaries and run all validations (default)
