@@ -5,11 +5,8 @@
 package e2agent
 
 import (
-	"bytes"
 	"context"
-	"encoding/gob"
 	"fmt"
-	"hash/fnv"
 	"time"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
@@ -35,12 +32,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
-var log = logging.GetLogger("agent")
-
-const (
-	backoffInterval = 10 * time.Millisecond
-	maxBackoffTime  = 5 * time.Second
-)
+var log = logging.GetLogger("e2agent")
 
 // E2Agent is an E2 agent
 type E2Agent interface {
@@ -49,6 +41,15 @@ type E2Agent interface {
 
 	// Stop stops the agent
 	Stop() error
+}
+
+// e2Agent is an E2 agent
+type e2Agent struct {
+	node     model.Node
+	model    *model.Model
+	channel  e2.ClientChannel
+	registry *registry.ServiceModelRegistry
+	subStore *subscriptions.Subscriptions
 }
 
 // NewE2Agent creates a new E2 agent
@@ -93,15 +94,6 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 	}, nil
 }
 
-// e2Agent is an E2 agent
-type e2Agent struct {
-	node     model.Node
-	model    *model.Model
-	channel  e2.ClientChannel
-	registry *registry.ServiceModelRegistry
-	subStore *subscriptions.Subscriptions
-}
-
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	sm, err := a.registry.GetServiceModel(ranFuncID)
@@ -131,9 +123,9 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	log.Debugf("Received Subscription Request %v", request)
 	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
 	sm, err := a.registry.GetServiceModel(ranFuncID)
-	id := subscriptions.NewID(request.ProtocolIes.E2ApProtocolIes29.Value.RicInstanceId,
-		request.ProtocolIes.E2ApProtocolIes29.Value.RicRequestorId,
-		request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	id := subscriptions.NewID(subutils.GetRicInstanceID(request),
+		subutils.GetRequesterID(request),
+		subutils.GetRanFunctionID(request))
 
 	if err != nil {
 		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
@@ -202,6 +194,27 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	subID := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
 		subdeleteutils.GetRequesterID(request),
 		subdeleteutils.GetRanFunctionID(request))
+	_, err = a.subStore.Get(subID)
+	if err != nil {
+		log.Error(err)
+		//  If the target E2 Node receives a RIC SUBSCRIPTION DELETE REQUEST
+		//  message containing RIC Request ID IE that is not known, the target
+		//  E2 Node shall send the RIC SUBSCRIPTION DELETE FAILURE message
+		//  to the Near-RT RIC. The message shall contain the Cause IE with an appropriate value.
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_REQUEST_ID_UNKNOWN,
+			},
+		}
+		subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
+			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
+			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
+			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
+			subdeleteutils.WithCause(cause))
+		failure := subdeleteutils.CreateSubscriptionDeleteFailure(subscriptionDelete)
+		return nil, failure, err
+
+	}
 
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
@@ -251,16 +264,6 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	return response, failure, err
 }
 
-func newExpBackoff() *backoff.ExponentialBackOff {
-	b := backoff.NewExponentialBackOff()
-	b.InitialInterval = backoffInterval
-	// MaxInterval caps the RetryInterval
-	b.MaxInterval = maxBackoffTime
-	// Never stops retrying
-	b.MaxElapsedTime = 0
-	return b
-}
-
 func (a *e2Agent) Start() error {
 	if len(a.node.Controllers) == 0 {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
@@ -290,7 +293,6 @@ func (a *e2Agent) Start() error {
 	}
 
 	err = backoff.RetryNotify(a.setup, b, setupNotify)
-
 	log.Infof("%s completed connection setup", a.node.EnbID)
 	return err
 }
@@ -339,23 +341,6 @@ func (a *e2Agent) setup() error {
 		return err
 	}
 	return nil
-}
-
-func nodeID(plmndID model.PlmnID, enbID model.EnbID) (uint64, error) {
-	gEnbID := model.GEnbID{
-		PlmnID: plmndID,
-		EnbID:  enbID,
-	}
-	buf := bytes.Buffer{}
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(gEnbID)
-	if err != nil {
-		return 0, err
-	}
-
-	h := fnv.New64a()
-	_, _ = h.Write(buf.Bytes())
-	return h.Sum64(), nil
 }
 
 func (a *e2Agent) Stop() error {
