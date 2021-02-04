@@ -4,22 +4,18 @@
 
 package model
 
-import "sync"
+import (
+	"math/rand"
+	"sync"
+)
 
-// Imsi represents a unique UE identifier
-type Imsi uint64
+const (
+	minImsi = 10000
+	maxImsi = 99999
+)
 
 // UEType represents type of user-equipment
 type UEType string
-
-// Crnti is a tower-specific UE identifier
-type Crnti string
-
-// Coordinate represents a geographical location
-type Coordinate struct {
-	Lat float64
-	Lng float64
-}
 
 // UETower represents UE-tower relationship
 type UETower struct {
@@ -44,6 +40,9 @@ type UE struct {
 
 // UERegistry tracks inventory of user-equipment for the simulation
 type UERegistry interface {
+	// SetUECount updates the UE count and creates or deletes new UEs as needed
+	SetUECount(count uint)
+
 	// CreateUEs creates the specified number of UEs
 	CreateUEs(count uint)
 
@@ -75,11 +74,42 @@ func NewUERegistry(count uint) UERegistry {
 	return reg
 }
 
+func (r *registry) SetUECount(count uint) {
+	delta := len(r.ues) - int(count)
+	if delta < 0 {
+		r.CreateUEs(uint(-delta))
+	} else if delta > 0 {
+		r.removeSomeUEs(delta)
+	}
+}
+
+func (r *registry) removeSomeUEs(count int) {
+	c := count
+	for imsi := range r.ues {
+		if c == 0 {
+			break
+		}
+		r.DestroyUE(imsi)
+		c = c - 1
+	}
+}
+
 func (r *registry) CreateUEs(count uint) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	for i := uint(0); i < count; i++ {
-
+		// FIXME: fill in with more sensible values
+		ue := &UE{
+			Imsi:       Imsi(rand.Int63n(maxImsi-minImsi) + minImsi),
+			Type:       "phone",
+			Location:   Coordinate{0, 0},
+			Rotation:   0,
+			Tower:      &UETower{},
+			Crnti:      "90125",
+			Towers:     nil,
+			IsAdmitted: false,
+		}
+		r.ues[ue.Imsi] = ue
 	}
 }
 
