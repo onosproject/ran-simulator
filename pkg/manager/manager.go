@@ -10,6 +10,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"github.com/onosproject/ran-simulator/pkg/trafficsim"
 )
 
 var log = logging.GetLogger("manager")
@@ -116,6 +117,7 @@ func (m *Manager) startNorthboundServer() error {
 		true,
 		northbound.SecurityConfig{}))
 	m.server.AddService(logging.Service{})
+	m.server.AddService(trafficsim.NewService(m.model))
 
 	doneCh := make(chan error)
 	go func() {
