@@ -92,11 +92,11 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}
 	// TODO it panics and it should be fixed in kpm service model otherwise it panics
-	/*ranFuncDescBytes, err = kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
+	ranFuncDescBytes, err = kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
-	}*/
+	}
 
 	kpmSm.Description = ranFuncDescBytes
 	return kpmSm, nil

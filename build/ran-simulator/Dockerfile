@@ -3,6 +3,7 @@ ARG ONOS_BUILD_VERSION=undefined
 FROM onosproject/golang-build:v0.6.7 as build
 
 ENV GO111MODULE=on
+ENV GODEBUG=cgocheck=0
 ARG ONOS_MAKE_TARGET=build
 
 COPY Makefile go.mod go.sum /go/src/github.com/onosproject/ran-simulator/
