@@ -7,6 +7,7 @@ package e2
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/encoding"
 
@@ -131,6 +132,10 @@ type subContext struct {
 	cancel context.CancelFunc
 }
 
+func (s *subContext) ID() subapi.ID {
+	return s.sub.ID
+}
+
 // subscribe activates the subscription context
 // The given context.Context is the context within which the subscription must be created,
 // not the lifetime of the subscription. If the subscription cannot be created within the
@@ -154,7 +159,7 @@ func (c *subContext) subscribe(ctx context.Context, indCh chan<- indication.Indi
 	}
 
 	// The subscription is considered activated, and task events are processed in a separate goroutine.
-	go c.processTaskEvents(watchCh, indCh)
+	go c.processTaskEvents(watchCtx, watchCh, indCh)
 	return nil
 }
 
@@ -162,10 +167,22 @@ func (c *subContext) subscribe(ctx context.Context, indCh chan<- indication.Indi
 // When a task associated with this subscription is created, connect to the associated E2 termination
 // and open a stream for indications. When the task is reassigned to a new termination point, clean
 // up the prior stream and open a new stream to the new E2 termination point.
-func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh chan<- indication.Indication) {
-	// After the context is closed and the associated Watch call is canceled, the eventCh will be closed.
-	// The indications channel is closed to indicate the subscription has been cleaned up.
-	defer close(indCh)
+func (c *subContext) processTaskEvents(ctx context.Context, eventCh <-chan subtaskapi.Event, indCh chan<- indication.Indication) {
+	// Create a wait group to close the indications channel
+	wg := &sync.WaitGroup{}
+
+	// Wait for the watch context to be done
+	wg.Add(1)
+	go func() {
+		<-ctx.Done()
+		wg.Done()
+	}()
+
+	// Once the wait group is complete, close the indications channel
+	go func() {
+		wg.Wait()
+		close(indCh)
+	}()
 
 	var prevCancel context.CancelFunc
 	var prevEndpoint epapi.ID
@@ -186,8 +203,10 @@ func (c *subContext) processTaskEvents(eventCh <-chan subtaskapi.Event, indCh ch
 			if prevCancel != nil {
 				prevCancel()
 			}
+			wg.Add(1)
 			ctx, cancel := context.WithCancel(context.Background())
 			go func(epID epapi.ID) {
+				defer wg.Done()
 				defer cancel()
 				err := c.openStream(ctx, epID, indCh)
 				if err != nil {

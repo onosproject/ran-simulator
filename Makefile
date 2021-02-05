@@ -10,6 +10,7 @@ build: # @HELP build the Go binaries and run all validations (default)
 build:
 	export GOPRIVATE="github.com/onosproject/*"
 	go build -o build/_output/ransim ./cmd/ransim
+	go build -o build/_output/simcli ./cmd/simcli
 
 test: # @HELP run the unit tests and source code validation producing a golang style report
 test: build deps linters license_check

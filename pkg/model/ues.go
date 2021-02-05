@@ -19,7 +19,8 @@ type UEType string
 
 // UETower represents UE-tower relationship
 type UETower struct {
-	Ecgi     Ecgi
+	ID       GEnbID
+	Ecgi     Ecgi // Auxiliary form of association
 	Strength float64
 }
 
@@ -53,10 +54,10 @@ type UERegistry interface {
 	ListAllUEs() []*UE
 
 	// MoveUE update the tower affiliation of the specified UE
-	MoveUE(imsi Imsi, ecgi Ecgi, strength float64)
+	MoveUE(imsi Imsi, genbID GEnbID, strength float64)
 
 	// ListUEs returns an array of all UEs associated with the specified tower
-	ListUEs(ecgi Ecgi) []*UE
+	ListUEs(genbID GEnbID) []*UE
 }
 
 type registry struct {
@@ -129,22 +130,22 @@ func (r *registry) ListAllUEs() []*UE {
 	return list
 }
 
-func (r *registry) MoveUE(imsi Imsi, ecgi Ecgi, strength float64) {
+func (r *registry) MoveUE(imsi Imsi, genbID GEnbID, strength float64) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	ue := r.ues[imsi]
 	if ue != nil {
-		ue.Tower.Ecgi = ecgi
+		ue.Tower.ID = genbID
 		ue.Tower.Strength = strength
 	}
 }
 
-func (r *registry) ListUEs(ecgi Ecgi) []*UE {
+func (r *registry) ListUEs(genbID GEnbID) []*UE {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	list := make([]*UE, 0, len(r.ues))
 	for _, ue := range r.ues {
-		if ue.Tower.Ecgi == ecgi {
+		if ue.Tower.ID.EnbID == genbID.EnbID && ue.Tower.ID.PlmnID == genbID.PlmnID {
 			list = append(list, ue)
 		}
 	}
