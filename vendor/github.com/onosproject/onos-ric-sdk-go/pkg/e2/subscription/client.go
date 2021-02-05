@@ -21,6 +21,9 @@ var log = logging.GetLogger("e2", "subscription", "client")
 // Context is a subscription context
 type Context interface {
 	io.Closer
+
+	// ID returns the subscription identifier
+	ID() subapi.ID
 }
 
 // Client is an E2 subscription service client interface

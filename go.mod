@@ -11,7 +11,7 @@ require (
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0
 	github.com/onosproject/onos-e2t v0.7.0
 	github.com/onosproject/onos-lib-go v0.7.0
-	github.com/onosproject/onos-ric-sdk-go v0.7.0
+	github.com/onosproject/onos-ric-sdk-go v0.7.6
 	github.com/onosproject/onos-test v0.6.4
 	github.com/prometheus/client_golang v1.4.1 // indirect
 	github.com/spf13/cobra v1.1.1
