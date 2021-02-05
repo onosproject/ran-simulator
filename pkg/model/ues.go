@@ -20,6 +20,7 @@ type UEType string
 // UETower represents UE-tower relationship
 type UETower struct {
 	ID       GEnbID
+	Ecgi     Ecgi // Auxiliary form of association
 	Strength float64
 }
 
