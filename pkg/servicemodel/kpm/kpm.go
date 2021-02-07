@@ -82,7 +82,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 	}
 
 	protoBytes, err := proto.Marshal(ranFuncDescPdu)
-	log.Debug("Proto bytes of KPM Ran Function Description:", protoBytes)
+	log.Debug("Proto bytes of KPM service model Ran Function Description:", protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
