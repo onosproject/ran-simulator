@@ -116,6 +116,7 @@ func CreateSetupRequest(request *Setup) (setupRequest *e2appducontents.E2SetupRe
 			E2ApProtocolIes10: &ranFunctionList,
 		},
 	}
+
 	err := e2SetupRequest.Validate()
 	if err != nil {
 		log.Warnf("Validation error %s", err.Error())

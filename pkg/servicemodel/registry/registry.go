@@ -49,12 +49,13 @@ func NewServiceModelRegistry() *ServiceModelRegistry {
 
 // RegisterServiceModel registers a service model
 func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
-	log.Info("Register Service Model:", sm.ModelFullName)
+	log.Info("Register Service Model:", sm.ModelFullName, ":", sm.RanFunctionID)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.serviceModels[sm.RanFunctionID]; exists {
 		return errors.New(errors.AlreadyExists, "the service model already registered")
 	}
+
 	ranFuncID := e2aptypes.RanFunctionID(sm.RanFunctionID)
 	s.ranFunctions[ranFuncID] = e2aptypes.RanFunctionItem{
 		Description: sm.Description,

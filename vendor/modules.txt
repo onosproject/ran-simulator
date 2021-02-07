@@ -346,6 +346,10 @@ github.com/onosproject/onos-api/go/onos/e2t/e2sm
 ## explicit
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.4
+## explicit
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies
 # github.com/onosproject/onos-e2t v0.7.0
 ## explicit
 github.com/onosproject/onos-e2t/api/e2ap/v1beta1
