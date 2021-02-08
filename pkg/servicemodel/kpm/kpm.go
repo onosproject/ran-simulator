@@ -83,7 +83,6 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 	}
 
 	protoBytes, err := proto.Marshal(ranFuncDescPdu)
-	log.Debug("Proto bytes of KPM service model Ran Function Description:", protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
@@ -133,9 +132,11 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	}
 
 	indicationMessageBytes, err := kpmutils.CreateIndicationMessageAsn1Bytes(kpmModelPlugin, indMsg)
+	if err != nil {
+		return err
+	}
 
 	intervalDuration := time.Duration(interval)
-
 	sub, err := sm.Subscriptions.Get(subID)
 	if err != nil {
 		return err
