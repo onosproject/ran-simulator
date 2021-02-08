@@ -4,28 +4,28 @@
 
 package model
 
-import "github.com/onosproject/onos-lib-go/pkg/errors"
+import (
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+)
 
 // Model simulation model
 type Model struct {
+	MapLayout     MapLayout               `yaml:"layout"`
 	Nodes         map[string]Node         `yaml:"nodes"`
 	Controllers   map[string]Controller   `yaml:"controllers"`
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 	UECount       uint                    `yaml:"ueCount"`
 	PlmnID        PlmnID                  `yaml:"plmnID"`
 	UEs           UERegistry              // Not intended to be loaded from the YAML file; created separately
-
-	// TODO add more fields
-	// MapLayout   *types.MapLayout
-	// AspectRatio float64 // fold into the map layout?
 	// Routes   *SimRoutes
 }
 
 // Node e2 node
 type Node struct {
-	EnbID         EnbID    `yaml:"enbID"`
-	Controllers   []string `yaml:"controllers"`
-	ServiceModels []string `yaml:"servicemodels"`
+	EnbID         EnbID           `yaml:"enbID"`
+	Controllers   []string        `yaml:"controllers"`
+	ServiceModels []string        `yaml:"servicemodels"`
+	Cells         map[string]Cell `yaml:"cells"`
 }
 
 // Controller E2T endpoint information
@@ -33,6 +33,24 @@ type Controller struct {
 	ID      string `yaml:"id"`
 	Address string `yaml:"address"`
 	Port    int    `yaml:"port"`
+}
+
+// Cell represents a section of coverage
+type Cell struct {
+	Ecgi      Ecgi    `yaml:"ecgi"`
+	Sector    Sector  `yaml:"sector"`
+	Color     string  `yaml:"color"`
+	MaxUEs    uint32  `yaml:"maxUEs"`
+	Neighbors []Ecgi  `yaml:"neighbors"`
+	TxPowerDB float64 `yaml:"txPower"`
+
+	// TODO: should not be needed as it coincides with sector center.
+	//Location  Coordinate `yaml:"location"`
+
+	// TODO: add the following later or track them differently
+	//Crntis map
+	//CrntiIndex uint32     `yaml:"crntiIndex"`
+	//Port       uint32     `yaml:"port"`
 }
 
 // ServiceModel service model information

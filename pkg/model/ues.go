@@ -17,8 +17,8 @@ const (
 // UEType represents type of user-equipment
 type UEType string
 
-// UETower represents UE-tower relationship
-type UETower struct {
+// UECell represents UE-cell relationship
+type UECell struct {
 	ID       GEnbID
 	Ecgi     Ecgi // Auxiliary form of association
 	Strength float64
@@ -31,9 +31,9 @@ type UE struct {
 	Location Coordinate
 	Rotation uint32
 
-	Tower  *UETower
-	Crnti  Crnti
-	Towers []*UETower
+	Cell  *UECell
+	Crnti Crnti
+	Cells []*UECell
 
 	IsAdmitted bool
 	// Metrics
@@ -53,10 +53,10 @@ type UERegistry interface {
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs() []*UE
 
-	// MoveUE update the tower affiliation of the specified UE
+	// MoveUE update the cell affiliation of the specified UE
 	MoveUE(imsi Imsi, genbID GEnbID, strength float64)
 
-	// ListUEs returns an array of all UEs associated with the specified tower
+	// ListUEs returns an array of all UEs associated with the specified cell
 	ListUEs(genbID GEnbID) []*UE
 
 	// GetNumUes returns number of active UEs
@@ -108,9 +108,9 @@ func (r *registry) CreateUEs(count uint) {
 			Type:       "phone",
 			Location:   Coordinate{0, 0},
 			Rotation:   0,
-			Tower:      &UETower{},
+			Cell:       &UECell{},
 			Crnti:      "90125",
-			Towers:     nil,
+			Cells:      nil,
 			IsAdmitted: false,
 		}
 		r.ues[ue.Imsi] = ue
@@ -138,8 +138,8 @@ func (r *registry) MoveUE(imsi Imsi, genbID GEnbID, strength float64) {
 	defer r.lock.Unlock()
 	ue := r.ues[imsi]
 	if ue != nil {
-		ue.Tower.ID = genbID
-		ue.Tower.Strength = strength
+		ue.Cell.ID = genbID
+		ue.Cell.Strength = strength
 	}
 }
 
@@ -148,7 +148,7 @@ func (r *registry) ListUEs(genbID GEnbID) []*UE {
 	defer r.lock.RUnlock()
 	list := make([]*UE, 0, len(r.ues))
 	for _, ue := range r.ues {
-		if ue.Tower.ID.EnbID == genbID.EnbID && ue.Tower.ID.PlmnID == genbID.PlmnID {
+		if ue.Cell.ID.EnbID == genbID.EnbID && ue.Cell.ID.PlmnID == genbID.PlmnID {
 			list = append(list, ue)
 		}
 	}

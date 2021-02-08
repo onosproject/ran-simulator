@@ -74,21 +74,21 @@ func ueToAPI(ue *model.UE) *simtypes.Ue {
 		Crnti:    simtypes.Crnti(ue.Crnti),
 		Admitted: ue.IsAdmitted,
 	}
-	if ue.Tower != nil {
-		r.ServingTower = genbToAPI(ue.Tower.ID)
-		r.ServingTowerStrength = ue.Tower.Strength
+	if ue.Cell != nil {
+		r.ServingTower = genbToAPI(ue.Cell.ID)
+		r.ServingTowerStrength = ue.Cell.Strength
 	}
-	if len(ue.Towers) > 0 {
-		r.Tower1 = genbToAPI(ue.Towers[0].ID)
-		r.Tower1Strength = ue.Towers[0].Strength
+	if len(ue.Cells) > 0 {
+		r.Tower1 = genbToAPI(ue.Cells[0].ID)
+		r.Tower1Strength = ue.Cells[0].Strength
 	}
-	if len(ue.Towers) > 1 {
-		r.Tower1 = genbToAPI(ue.Towers[1].ID)
-		r.Tower1Strength = ue.Towers[1].Strength
+	if len(ue.Cells) > 1 {
+		r.Tower2 = genbToAPI(ue.Cells[1].ID)
+		r.Tower2Strength = ue.Cells[1].Strength
 	}
-	if len(ue.Towers) > 2 {
-		r.Tower1 = genbToAPI(ue.Towers[2].ID)
-		r.Tower1Strength = ue.Towers[2].Strength
+	if len(ue.Cells) > 2 {
+		r.Tower3 = genbToAPI(ue.Cells[2].ID)
+		r.Tower3Strength = ue.Cells[2].Strength
 	}
 	return r
 }

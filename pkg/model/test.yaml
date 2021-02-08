@@ -2,42 +2,93 @@
 #
 # SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
+layout:
+  center:
+    lat: 45.00
+    lng: -30.00
+  zoom: 0.8
+  aspect: 1.618
+  locationsScale: 1.0
+  fade: false
+  showRoutes: true
+  showPower: true
+
 nodes:
-    node1:
-      enbID: 123
-      controllers:
-        - controller1
-      servicemodels:
-        - kpm
-        - rc
-    node2:
-      enbID: 124
-      controllers:
-        - controller2
-      servicemodels:
-        - kpm
+  node1:
+    enbID: 123
+    controllers:
+      - controller1
+    servicemodels:
+      - kpm
+      - rc
+    cells:
+      cell1:
+        ecgi: 90125-01
+        sector:
+          center:
+            lat: 46.00
+            lng: 29.00
+          arc: 180.0
+          azimuth: 0.0
+        color: red
+      cell2:
+        ecgi: 90125-02
+        sector:
+          center:
+            lat: 46.00
+            lng: 29.00
+          arc: 180.0
+          azimuth: 180.0
+        color: blue
+
+  node2:
+    enbID: 124
+    controllers:
+      - controller2
+    servicemodels:
+      - kpm
+    cells:
+      cell1:
+        ecgi: 90126-01
+        sector:
+          center:
+            lat: 44.00
+            lng: 31.00
+          arc: 180.0
+          azimuth: 0.0
+        color: red
+      cell2:
+        ecgi: 90126-02
+        sector:
+          center:
+            lat: 44.00
+            lng: 31.00
+          arc: 180.0
+          azimuth: 180.0
+        color: blue
+
 controllers:
-    controller1:
-      id: E2T
-      address: onos-e2t
-      port: 36421
-    controller2:
-      id: E2T
-      address: onos-e2t
-      port: 36421
+  controller1:
+    id: E2T
+    address: onos-e2t
+    port: 36421
+  controller2:
+    id: E2T
+    address: onos-e2t
+    port: 36421
 servicemodels:
-    kpm:
-      id: 1
-      version: 1.0.0
-      description: kpm service model
-    ni:
-      id: 2
-      version: 1.0.0
-      description: NI service model
-    rc:
-      id: 3
-      version: 1.0.0
-      description: RC service model
+  kpm:
+    id: 1
+    version: 1.0.0
+    description: kpm service model
+  ni:
+    id: 2
+    version: 1.0.0
+    description: NI service model
+  rc:
+    id: 3
+    version: 1.0.0
+    description: RC service model
 ueCount: 12
 plmnID: "onf"
 

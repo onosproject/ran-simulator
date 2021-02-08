@@ -27,15 +27,15 @@ type Crnti string
 
 // Coordinate represents a geographical location
 type Coordinate struct {
-	Lat float64
-	Lng float64
+	Lat float64 `yaml:"lat"`
+	Lng float64 `yaml:"lng"`
 }
 
 // Sector represents a 2D arc emanating from a location
 type Sector struct {
-	Azimuth int32
-	Arc     int32
-	Center  Coordinate
+	Center  Coordinate `yaml:"center"`
+	Azimuth int32      `yaml:"azimuth"`
+	Arc     int32      `yaml:"arc"`
 }
 
 // Route represents a named series of points for tracking movement of user-equipment
