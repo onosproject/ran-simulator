@@ -44,9 +44,23 @@ type Server struct {
 	model *model.Model
 }
 
+func coordToAPI(coord model.Coordinate) *simtypes.Point {
+	return &types.Point{Lat: coord.Lat, Lng: coord.Lng}
+}
+
 // GetMapLayout :
 func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest) (*types.MapLayout, error) {
-	return nil, nil
+	return &types.MapLayout{
+		Center:         coordToAPI(s.model.MapLayout.Center),
+		Zoom:           s.model.MapLayout.Zoom,
+		Fade:           s.model.MapLayout.FadeMap,
+		ShowRoutes:     s.model.MapLayout.ShowRoutes,
+		ShowPower:      s.model.MapLayout.ShowPower,
+		LocationsScale: s.model.MapLayout.LocationsScale,
+		MinUes:         0,
+		MaxUes:         0,
+		CurrentRoutes:  0,
+	}, nil
 }
 
 // ListRoutes :
