@@ -43,7 +43,6 @@ func CreateIndicationMessageAsn1Bytes(modelPlugin modelplugins.ModelPlugin, mess
 		return nil, err
 	}
 
-	// TODO model plugin bug should be fixed to call this function otherwise it panics
 	indicationMessageAsn1Bytes, err := modelPlugin.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
 	if err != nil {
 		return nil, err

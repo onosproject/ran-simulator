@@ -58,6 +58,9 @@ type UERegistry interface {
 
 	// ListUEs returns an array of all UEs associated with the specified tower
 	ListUEs(genbID GEnbID) []*UE
+
+	// GetNumUes returns number of active UEs
+	GetNumUes() int
 }
 
 type registry struct {
@@ -150,4 +153,8 @@ func (r *registry) ListUEs(genbID GEnbID) []*UE {
 		}
 	}
 	return list
+}
+
+func (r *registry) GetNumUes() int {
+	return len(r.ues)
 }

@@ -47,6 +47,7 @@ const (
 type Client struct {
 	Subscriptions *subscriptions.Subscriptions
 	ServiceModel  *registry.ServiceModel
+	Model         *model.Model
 }
 
 // NewServiceModel creates a new service model
@@ -124,15 +125,14 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	}
 
 	// Creating an indication message
-	_, err = kpmutils.NewIndicationMessage(
-		kpmutils.WithNumberOfActiveUes(10))
+	indMsg, err := kpmutils.NewIndicationMessage(
+		kpmutils.WithNumberOfActiveUes(int32(sm.Model.UEs.GetNumUes())))
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
-	// TODO model plugin should be fixed otherwise it panics
-	//_, err = kpmutils.CreateIndicationMessageAsn1Bytes(kpmModelPlugin, message)
+	indicationMessageBytes, err := kpmutils.CreateIndicationMessageAsn1Bytes(kpmModelPlugin, indMsg)
 
 	intervalDuration := time.Duration(interval)
 
@@ -248,5 +248,3 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	sub.Ticker.Stop()
 	return subDeleteResponse, nil, nil
 }
-
-var indicationMessageBytes = []byte{0x40, 0x00, 0x00, 0x6c, 0x1a, 0x4f, 0x70, 0x65, 0x6e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x69, 0x6e, 0x67, 0x80, 0x00, 0x00, 0x0c, 0x72, 0x61, 0x6e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72}
