@@ -26,9 +26,11 @@ func TestTypes(t *testing.T) {
 
 	eci := ToECI(enbID, cellID)
 	ecgi := ToECGI(plmnID, eci)
+	genbID := ToGEnbID(plmnID, enbID)
 
 	assert.Equal(t, cellID, GetCellID(uint64(ecgi)), "incorrect CID")
 	assert.Equal(t, plmnID, GetPlmnID(uint64(ecgi)), "incorrect PLMNID")
 	assert.Equal(t, eci, GetECI(uint64(ecgi)), "incorrect ECI")
-	assert.Equal(t, enbID, GetEnbID(uint64(ecgi)), "incorrect EnbID")
+	assert.Equal(t, enbID, GetEnbID(uint64(ecgi)), "incorrect ECGI EnbID")
+	assert.Equal(t, enbID, GetEnbID(uint64(genbID)), "incorrect EnbID")
 }

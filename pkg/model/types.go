@@ -66,7 +66,7 @@ func ToECGI(plmnID PlmnID, eci ECI) ECGI {
 
 // ToGEnbID produces GEnbID from the specified components
 func ToGEnbID(plmnID PlmnID, enbID EnbID) GEnbID {
-	return GEnbID(uint(plmnID)<<28 | (uint(enbID) & mask20))
+	return GEnbID(uint(plmnID)<<28 | (uint(enbID) << 8 & mask20))
 }
 
 // GetPlmnID extracts PLMNID from the specified ECGI or GEnbID
