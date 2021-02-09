@@ -21,28 +21,28 @@ type SubscriptionDelete struct {
 }
 
 // NewSubscriptionDelete creates a new instance of subscription delete
-func NewSubscriptionDelete(options ...func(subscriptionDelete *SubscriptionDelete)) (*SubscriptionDelete, error) {
+func NewSubscriptionDelete(options ...func(subscriptionDelete *SubscriptionDelete)) *SubscriptionDelete {
 	subscriptionDelete := &SubscriptionDelete{}
 
 	for _, option := range options {
 		option(subscriptionDelete)
 	}
-	return subscriptionDelete, nil
+	return subscriptionDelete
 }
 
 // GetRanFuncID returns subscription ran function ID
-func (s *SubscriptionDelete) GetRanFuncID() int32 {
-	return s.ranFuncID
+func (subscriptionDelete *SubscriptionDelete) GetRanFuncID() int32 {
+	return subscriptionDelete.ranFuncID
 }
 
 // GetRicInstanceID returns subscription RicInstance ID
-func (s *SubscriptionDelete) GetRicInstanceID() int32 {
-	return s.ricInstanceID
+func (subscriptionDelete *SubscriptionDelete) GetRicInstanceID() int32 {
+	return subscriptionDelete.ricInstanceID
 }
 
 // GetReqID returns subscription request ID
-func (s *SubscriptionDelete) GetReqID() int32 {
-	return s.reqID
+func (subscriptionDelete *SubscriptionDelete) GetReqID() int32 {
+	return subscriptionDelete.reqID
 }
 
 // WithRequestID sets request ID
@@ -73,8 +73,8 @@ func WithCause(cause *e2apies.Cause) func(subscriptionDelete *SubscriptionDelete
 	}
 }
 
-// CreateSubscriptionDeleteFailure creates e2 subscription delete failure
-func CreateSubscriptionDeleteFailure(subscriptionDelete *SubscriptionDelete) (response *e2appducontents.RicsubscriptionDeleteFailure) {
+// BuildSubscriptionDeleteFailure builds subscription delete failure
+func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteFailure() (response *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
@@ -108,11 +108,11 @@ func CreateSubscriptionDeleteFailure(subscriptionDelete *SubscriptionDelete) (re
 		},
 	}
 
-	return resp
+	return resp, nil
 }
 
-// CreateSubscriptionDeleteResponse creates e2 subscription delete response
-func CreateSubscriptionDeleteResponse(subscriptionDelete *SubscriptionDelete) (response *e2appducontents.RicsubscriptionDeleteResponse) {
+// BuildSubscriptionDeleteResponse builds subscription delete response
+func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteResponse() (response *e2appducontents.RicsubscriptionDeleteResponse, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionDeleteResponseIes_RicsubscriptionDeleteResponseIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
@@ -139,6 +139,6 @@ func CreateSubscriptionDeleteResponse(subscriptionDelete *SubscriptionDelete) (r
 		},
 	}
 
-	return resp
+	return resp, nil
 
 }

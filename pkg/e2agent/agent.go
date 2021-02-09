@@ -149,14 +149,17 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 			}
 			ricActionsNotAdmitted[actionID] = cause
 		}
-		subscription, _ := subutils.NewSubscription(
+		subscription := subutils.NewSubscription(
 			subutils.WithRequestID(reqID),
 			subutils.WithRanFuncID(ranFuncID),
 			subutils.WithRicInstanceID(ricInstanceID),
 			subutils.WithActionsAccepted(ricActionsAccepted),
 			subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
-		failure := subutils.CreateSubscriptionFailure(subscription)
-		return nil, failure, err
+		failure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 	}
 	subscription, err := subscriptions.NewSubscription(id, request, a.channel)
 	if err != nil {
@@ -208,13 +211,16 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 				RicRequest: e2apies.CauseRic_CAUSE_RIC_REQUEST_ID_UNKNOWN,
 			},
 		}
-		subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
+		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
 			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
 			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
 			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
 			subdeleteutils.WithCause(cause))
-		failure := subdeleteutils.CreateSubscriptionDeleteFailure(subscriptionDelete)
-		return nil, failure, err
+		failure, err := subscriptionDelete.BuildSubscriptionDeleteFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 
 	}
 
@@ -231,13 +237,16 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 				RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
 			},
 		}
-		subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
+		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
 			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
 			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
 			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
 			subdeleteutils.WithCause(cause))
-		failure := subdeleteutils.CreateSubscriptionDeleteFailure(subscriptionDelete)
-		return nil, failure, err
+		failure, err := subscriptionDelete.BuildSubscriptionDeleteFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 	}
 
 	switch sm.RanFunctionID {
@@ -324,16 +333,16 @@ func (a *e2Agent) setup() error {
 	if err != nil {
 		return err
 	}
-	setupRequest, err := setup.NewSetupRequest(
+	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
 		setup.WithPlmnID(fmt.Sprintf("%d", a.model.PlmnID)),
 		setup.WithE2NodeID(e2GlobalID))
 
+	e2SetupRequest, err := setupRequest.Build()
 	if err != nil {
+		log.Error(err)
 		return err
 	}
-
-	e2SetupRequest := setup.CreateSetupRequest(setupRequest)
 	_, e2SetupFailure, err := a.channel.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		log.Error(err)

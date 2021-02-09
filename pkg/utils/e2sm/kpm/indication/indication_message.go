@@ -5,7 +5,7 @@
 package indication
 
 import (
-	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
+	e2smkpmies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 )
@@ -13,16 +13,17 @@ import (
 // Message indication message fields for kpm service model
 type Message struct {
 	numberOfActiveUes int32
+	// TODO add remaining files like cu-cp name and rancontainer
 }
 
 // NewIndicationMessage creates a new indication message
-func NewIndicationMessage(options ...func(header *Message)) (*Message, error) {
+func NewIndicationMessage(options ...func(message *Message)) *Message {
 	msg := &Message{}
 	for _, option := range options {
 		option(msg)
 	}
 
-	return msg, nil
+	return msg
 }
 
 // WithNumberOfActiveUes sets number of active UEs
@@ -32,9 +33,9 @@ func WithNumberOfActiveUes(numOfActiveUes int32) func(msg *Message) {
 	}
 }
 
-// CreateIndicationMessageAsn1Bytes creates ASN1 bytes from proto encoded indication message
-func CreateIndicationMessageAsn1Bytes(modelPlugin modelplugins.ModelPlugin, message *Message) ([]byte, error) {
-	indicationMessage, err := CreateIndicationMessage(message)
+// ToAsn1Bytes converts to Asn1 bytes
+func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ModelPlugin) ([]byte, error) {
+	indicationMessage, err := message.Build()
 	if err != nil {
 		return nil, err
 	}
@@ -49,39 +50,38 @@ func CreateIndicationMessageAsn1Bytes(modelPlugin modelplugins.ModelPlugin, mess
 	}
 
 	return indicationMessageAsn1Bytes, nil
-
 }
 
-// CreateIndicationMessage creates indication message
-func CreateIndicationMessage(indicationMessage *Message) (*e2sm_kpm_ies.E2SmKpmIndicationMessage, error) {
-	e2SmIindicationMsg := e2sm_kpm_ies.E2SmKpmIndicationMessage_IndicationMessageFormat1{
-		IndicationMessageFormat1: &e2sm_kpm_ies.E2SmKpmIndicationMessageFormat1{
-			PmContainers: make([]*e2sm_kpm_ies.PmContainersList, 0),
+// Build builds indication message for kpm service model
+func (message *Message) Build() (*e2smkpmies.E2SmKpmIndicationMessage, error) {
+	e2SmIindicationMsg := e2smkpmies.E2SmKpmIndicationMessage_IndicationMessageFormat1{
+		IndicationMessageFormat1: &e2smkpmies.E2SmKpmIndicationMessageFormat1{
+			PmContainers: make([]*e2smkpmies.PmContainersList, 0),
 		},
 	}
 
-	ocucpContainer := e2sm_kpm_ies.OcucpPfContainer{
-		GNbCuCpName: &e2sm_kpm_ies.GnbCuCpName{
+	ocucpContainer := e2smkpmies.OcucpPfContainer{
+		GNbCuCpName: &e2smkpmies.GnbCuCpName{
 			Value: "test", //string
 		},
-		CuCpResourceStatus: &e2sm_kpm_ies.OcucpPfContainer_CuCpResourceStatus001{
-			NumberOfActiveUes: indicationMessage.numberOfActiveUes, //int32
+		CuCpResourceStatus: &e2smkpmies.OcucpPfContainer_CuCpResourceStatus001{
+			NumberOfActiveUes: message.numberOfActiveUes, //int32
 		},
 	}
 
-	containerOcuCp1 := e2sm_kpm_ies.PmContainersList{
-		PerformanceContainer: &e2sm_kpm_ies.PfContainer{
-			PfContainer: &e2sm_kpm_ies.PfContainer_OCuCp{
+	containerOcuCp1 := e2smkpmies.PmContainersList{
+		PerformanceContainer: &e2smkpmies.PfContainer{
+			PfContainer: &e2smkpmies.PfContainer_OCuCp{
 				OCuCp: &ocucpContainer,
 			},
 		},
-		TheRancontainer: &e2sm_kpm_ies.RanContainer{
+		TheRancontainer: &e2smkpmies.RanContainer{
 			Value: []byte("rancontainer"),
 		},
 	}
 	e2SmIindicationMsg.IndicationMessageFormat1.PmContainers = append(e2SmIindicationMsg.IndicationMessageFormat1.PmContainers, &containerOcuCp1)
 
-	e2smKpmPdu := e2sm_kpm_ies.E2SmKpmIndicationMessage{
+	e2smKpmPdu := e2smkpmies.E2SmKpmIndicationMessage{
 		E2SmKpmIndicationMessage: &e2SmIindicationMsg,
 	}
 

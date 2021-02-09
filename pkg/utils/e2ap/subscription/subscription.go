@@ -22,30 +22,30 @@ type Subscription struct {
 }
 
 // NewSubscription creates a new instance of subscription
-func NewSubscription(options ...func(*Subscription)) (*Subscription, error) {
+func NewSubscription(options ...func(*Subscription)) *Subscription {
 	subscription := &Subscription{}
 
 	for _, option := range options {
 		option(subscription)
 	}
 
-	return subscription, nil
+	return subscription
 
 }
 
 // GetRanFuncID returns subscription ran function ID
-func (s *Subscription) GetRanFuncID() int32 {
-	return s.ranFuncID
+func (subscription *Subscription) GetRanFuncID() int32 {
+	return subscription.ranFuncID
 }
 
 // GetRicInstanceID returns subscription RicInstance ID
-func (s *Subscription) GetRicInstanceID() int32 {
-	return s.ricInstanceID
+func (subscription *Subscription) GetRicInstanceID() int32 {
+	return subscription.ricInstanceID
 }
 
 // GetReqID returns subscription request ID
-func (s *Subscription) GetReqID() int32 {
-	return s.reqID
+func (subscription *Subscription) GetReqID() int32 {
+	return subscription.reqID
 }
 
 // WithRequestID sets request ID
@@ -83,9 +83,8 @@ func WithActionsNotAdmitted(ricActionsNotAdmitted map[types.RicActionID]*e2apies
 	}
 }
 
-// CreateSubscriptionFailure creates e2 subscription failure
-func CreateSubscriptionFailure(subscription *Subscription) (response *e2appducontents.RicsubscriptionFailure) {
-
+// BuildSubscriptionFailure builds e2ap subscription failure
+func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appducontents.RicsubscriptionFailure, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
@@ -137,11 +136,11 @@ func CreateSubscriptionFailure(subscription *Subscription) (response *e2appducon
 		},
 	}
 
-	return resp
+	return resp, nil
 }
 
-// CreateSubscriptionResponse creates e2 subscription response
-func CreateSubscriptionResponse(subscription *Subscription) (response *e2appducontents.RicsubscriptionResponse) {
+// BuildSubscriptionResponse builds e2ap subscription response
+func (subscription *Subscription) BuildSubscriptionResponse() (response *e2appducontents.RicsubscriptionResponse, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
@@ -192,6 +191,5 @@ func CreateSubscriptionResponse(subscription *Subscription) (response *e2appduco
 		},
 	}
 
-	return resp
-
+	return resp, nil
 }

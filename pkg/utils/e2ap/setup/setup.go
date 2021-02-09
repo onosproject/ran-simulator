@@ -23,14 +23,14 @@ type Setup struct {
 }
 
 // NewSetupRequest creates a new setup request
-func NewSetupRequest(options ...func(*Setup)) (*Setup, error) {
+func NewSetupRequest(options ...func(*Setup)) *Setup {
 	setup := &Setup{}
 
 	for _, option := range options {
 		option(setup)
 	}
 
-	return setup, nil
+	return setup
 }
 
 // WithRanFunctions sets ran functions
@@ -55,8 +55,8 @@ func WithE2NodeID(e2NodeID uint64) func(*Setup) {
 	}
 }
 
-// CreateSetupRequest creates e2 setup request
-func CreateSetupRequest(request *Setup) (setupRequest *e2appducontents.E2SetupRequest) {
+// Build builds e2ap setup request
+func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err error) {
 	ranFunctionList := e2appducontents.E2SetupRequestIes_E2SetupRequestIes10{
 		Id:          int32(v1beta1.ProtocolIeIDRanfunctionsAdded),
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
@@ -117,10 +117,11 @@ func CreateSetupRequest(request *Setup) (setupRequest *e2appducontents.E2SetupRe
 		},
 	}
 
-	err := e2SetupRequest.Validate()
+	err = e2SetupRequest.Validate()
 	if err != nil {
 		log.Warnf("Validation error %s", err.Error())
+		return nil, err
 	}
 	log.Debugf("Created E2SetupRequest %v", e2SetupRequest)
-	return e2SetupRequest
+	return e2SetupRequest, nil
 }
