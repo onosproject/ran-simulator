@@ -44,9 +44,23 @@ type Server struct {
 	model *model.Model
 }
 
+func coordToAPI(coord model.Coordinate) *simtypes.Point {
+	return &types.Point{Lat: coord.Lat, Lng: coord.Lng}
+}
+
 // GetMapLayout :
 func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest) (*types.MapLayout, error) {
-	return nil, nil
+	return &types.MapLayout{
+		Center:         coordToAPI(s.model.MapLayout.Center),
+		Zoom:           s.model.MapLayout.Zoom,
+		Fade:           s.model.MapLayout.FadeMap,
+		ShowRoutes:     s.model.MapLayout.ShowRoutes,
+		ShowPower:      s.model.MapLayout.ShowPower,
+		LocationsScale: s.model.MapLayout.LocationsScale,
+		MinUes:         0,
+		MaxUes:         0,
+		CurrentRoutes:  0,
+	}, nil
 }
 
 // ListRoutes :
@@ -54,41 +68,63 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 	return nil
 }
 
+func cellToAPI(cell model.Cell) *simtypes.Cell {
+	r := &simtypes.Cell{
+		Ecgi:       simtypes.Ecgi(cell.Ecgi),
+		Location:   nil,
+		Sector:     nil,
+		Color:      "",
+		MaxUEs:     0,
+		Neighbors:  nil,
+		TxPowerdB:  0,
+		CrntiMap:   nil,
+		CrntiIndex: 0,
+		Port:       0,
+	}
+	return r
+}
+
 // ListCells :
 func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_ListCellsServer) error {
+	for _, node := range s.model.Nodes {
+		for _, cell := range node.Cells {
+			resp := &simapi.ListCellsResponse{
+				Cell: cellToAPI(cell),
+				Type: simapi.Type_NONE,
+			}
+			err := stream.Send(resp)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
-func genbToAPI(id model.GEnbID) *simtypes.ECGI {
-	return &simtypes.ECGI{
-		EcID:   simtypes.EcID(id.EnbID),
-		PlmnID: simtypes.PlmnID(id.PlmnID),
-	}
-}
 func ueToAPI(ue *model.UE) *simtypes.Ue {
 	r := &simtypes.Ue{
-		Imsi:     simtypes.Imsi(ue.Imsi),
+		Imsi:     simtypes.Imsi(ue.IMSI),
 		Type:     string(ue.Type),
 		Position: nil,
 		Rotation: ue.Rotation,
 		Crnti:    simtypes.Crnti(ue.Crnti),
 		Admitted: ue.IsAdmitted,
 	}
-	if ue.Tower != nil {
-		r.ServingTower = genbToAPI(ue.Tower.ID)
-		r.ServingTowerStrength = ue.Tower.Strength
+	if ue.Cell != nil {
+		r.ServingTower = simtypes.Ecgi(ue.Cell.ID)
+		r.ServingTowerStrength = ue.Cell.Strength
 	}
-	if len(ue.Towers) > 0 {
-		r.Tower1 = genbToAPI(ue.Towers[0].ID)
-		r.Tower1Strength = ue.Towers[0].Strength
+	if len(ue.Cells) > 0 {
+		r.Tower1 = simtypes.Ecgi(ue.Cells[0].ID)
+		r.Tower1Strength = ue.Cells[0].Strength
 	}
-	if len(ue.Towers) > 1 {
-		r.Tower1 = genbToAPI(ue.Towers[1].ID)
-		r.Tower1Strength = ue.Towers[1].Strength
+	if len(ue.Cells) > 1 {
+		r.Tower2 = simtypes.Ecgi(ue.Cells[1].ID)
+		r.Tower2Strength = ue.Cells[1].Strength
 	}
-	if len(ue.Towers) > 2 {
-		r.Tower1 = genbToAPI(ue.Towers[2].ID)
-		r.Tower1Strength = ue.Towers[2].Strength
+	if len(ue.Cells) > 2 {
+		r.Tower3 = simtypes.Ecgi(ue.Cells[2].ID)
+		r.Tower3Strength = ue.Cells[2].Strength
 	}
 	return r
 }

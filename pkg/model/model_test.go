@@ -27,5 +27,8 @@ func TestModel(t *testing.T) {
 	assert.Equal(t, 3, model.ServiceModels["rc"].ID)
 	assert.Equal(t, 2, model.ServiceModels["ni"].ID)
 	assert.Equal(t, uint(12), model.UECount)
-	assert.Equal(t, PlmnID("onf"), model.PlmnID)
+	assert.Equal(t, PlmnID(101), model.PlmnID)
+
+	assert.Equal(t, 2, len(model.Nodes["node1"].Cells))
+	assert.Equal(t, 44.0, model.Nodes["node2"].Cells["cell1"].Sector.Center.Lat)
 }

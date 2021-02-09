@@ -30,7 +30,7 @@ type SimLocations struct {
 }
 
 // NewSimLocations creates a new set of locations from the specified set of simulated cells
-func NewSimLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScale float32) *SimLocations {
+func NewSimLocations(cells map[ECGI]*types.Cell, maxUEs int, locationsScale float32) *SimLocations {
 	centre, locations := newLocations(cells, maxUEs, locationsScale)
 	return &SimLocations{
 		Centre:    centre,
@@ -38,7 +38,7 @@ func NewSimLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScal
 	}
 }
 
-func newLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScale float32) (types.Point, map[LocationID]*Location) {
+func newLocations(cells map[ECGI]*types.Cell, maxUEs int, locationsScale float32) (types.Point, map[LocationID]*Location) {
 	locations := make(map[LocationID]*Location)
 
 	minLat := 90.0

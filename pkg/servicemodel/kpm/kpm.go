@@ -6,6 +6,7 @@ package kpm
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -103,18 +104,18 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 
 func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
-	gNbID, err := strconv.ParseUint(string(sm.ServiceModel.Node.EnbID), 10, 64)
+	gNbID, err := strconv.ParseUint(fmt.Sprintf("%d", sm.ServiceModel.Node.EnbID), 10, 64)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 	// Creates an indication header
 	header, _ := kpmutils.NewIndicationHeader(
-		kpmutils.WithPlmnID(string(sm.ServiceModel.Model.PlmnID)),
+		kpmutils.WithPlmnID(fmt.Sprintf("%d", sm.ServiceModel.Model.PlmnID)),
 		kpmutils.WithGnbID(gNbID),
 		kpmutils.WithSst("1"),
 		kpmutils.WithSd("SD1"),
-		kpmutils.WithPlmnIDnrcgi(string(sm.ServiceModel.Model.PlmnID)))
+		kpmutils.WithPlmnIDnrcgi(fmt.Sprintf("%d", sm.ServiceModel.Model.PlmnID)))
 
 	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
 	indicationHeaderAsn1Bytes, err := kpmutils.CreateIndicationHeaderAsn1Bytes(kpmModelPlugin, header)
