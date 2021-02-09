@@ -10,7 +10,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
+	e2smkpmies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
 )
 
 // Header indication header for kpm service model
@@ -27,13 +27,13 @@ type Header struct {
 }
 
 // NewIndicationHeader creates a new indication header
-func NewIndicationHeader(options ...func(header *Header)) (*Header, error) {
+func NewIndicationHeader(options ...func(header *Header)) *Header {
 	header := &Header{}
 	for _, option := range options {
 		option(header)
 	}
 
-	return header, nil
+	return header
 }
 
 // WithPlmnID sets plmnID
@@ -101,10 +101,10 @@ func WithGnbID(gnbID uint64) func(header *Header) {
 	}
 }
 
-// CreateIndicationHeaderAsn1Bytes creates ASN.1 bytes from a protobuf encoded indication header
-func CreateIndicationHeaderAsn1Bytes(modelPlugin modelplugins.ModelPlugin, header *Header) ([]byte, error) {
+// ToAsn1Bytes converts header to asn1 bytes
+func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ModelPlugin) ([]byte, error) {
 	// Creating an indication header
-	indicationHeader, err := CreateIndicationHeader(header)
+	indicationHeader, err := header.Build()
 	if err != nil {
 		return nil, err
 	}
@@ -122,51 +122,51 @@ func CreateIndicationHeaderAsn1Bytes(modelPlugin modelplugins.ModelPlugin, heade
 	return indicationHeaderAsn1Bytes, nil
 }
 
-// CreateIndicationHeader creates indication header for kpm service model
-func CreateIndicationHeader(header *Header) (*e2sm_kpm_ies.E2SmKpmIndicationHeader, error) {
-	e2SmKpmPdu := &e2sm_kpm_ies.E2SmKpmIndicationHeader{
-		E2SmKpmIndicationHeader: &e2sm_kpm_ies.E2SmKpmIndicationHeader_IndicationHeaderFormat1{
-			IndicationHeaderFormat1: &e2sm_kpm_ies.E2SmKpmIndicationHeaderFormat1{
-				IdGlobalKpmnodeId: &e2sm_kpm_ies.GlobalKpmnodeId{
-					GlobalKpmnodeId: &e2sm_kpm_ies.GlobalKpmnodeId_GNb{
-						GNb: &e2sm_kpm_ies.GlobalKpmnodeGnbId{
-							GlobalGNbId: &e2sm_kpm_ies.GlobalgNbId{
-								PlmnId: &e2sm_kpm_ies.PlmnIdentity{
+// Build builds kpm indication header message
+func (header *Header) Build() (*e2smkpmies.E2SmKpmIndicationHeader, error) {
+	e2SmKpmPdu := &e2smkpmies.E2SmKpmIndicationHeader{
+		E2SmKpmIndicationHeader: &e2smkpmies.E2SmKpmIndicationHeader_IndicationHeaderFormat1{
+			IndicationHeaderFormat1: &e2smkpmies.E2SmKpmIndicationHeaderFormat1{
+				IdGlobalKpmnodeId: &e2smkpmies.GlobalKpmnodeId{
+					GlobalKpmnodeId: &e2smkpmies.GlobalKpmnodeId_GNb{
+						GNb: &e2smkpmies.GlobalKpmnodeGnbId{
+							GlobalGNbId: &e2smkpmies.GlobalgNbId{
+								PlmnId: &e2smkpmies.PlmnIdentity{
 									Value: []byte(header.plmnID),
 								},
-								GnbId: &e2sm_kpm_ies.GnbIdChoice{
-									GnbIdChoice: &e2sm_kpm_ies.GnbIdChoice_GnbId{
-										GnbId: &e2sm_kpm_ies.BitString{
+								GnbId: &e2smkpmies.GnbIdChoice{
+									GnbIdChoice: &e2smkpmies.GnbIdChoice_GnbId{
+										GnbId: &e2smkpmies.BitString{
 											Value: header.gnbID, //uint64
 											Len:   22,           //uint32
 										},
 									},
 								},
 							},
-							GNbCuUpId: &e2sm_kpm_ies.GnbCuUpId{
+							GNbCuUpId: &e2smkpmies.GnbCuUpId{
 								Value: header.gNbCuUpID, //int64
 							},
-							GNbDuId: &e2sm_kpm_ies.GnbDuId{
+							GNbDuId: &e2smkpmies.GnbDuId{
 								Value: header.gNbDuID, //int64
 							},
 						},
 					},
 				},
-				NRcgi: &e2sm_kpm_ies.Nrcgi{
-					PLmnIdentity: &e2sm_kpm_ies.PlmnIdentity{
+				NRcgi: &e2smkpmies.Nrcgi{
+					PLmnIdentity: &e2smkpmies.PlmnIdentity{
 						Value: []byte(header.plmnIDnrcgi),
 					},
-					NRcellIdentity: &e2sm_kpm_ies.NrcellIdentity{
-						Value: &e2sm_kpm_ies.BitString{
+					NRcellIdentity: &e2smkpmies.NrcellIdentity{
+						Value: &e2smkpmies.BitString{
 							Value: header.gnbID, //uint64
 							Len:   36,           //uint32
 						},
 					},
 				},
-				PLmnIdentity: &e2sm_kpm_ies.PlmnIdentity{
+				PLmnIdentity: &e2smkpmies.PlmnIdentity{
 					Value: []byte(header.plmnID),
 				},
-				SliceId: &e2sm_kpm_ies.Snssai{
+				SliceId: &e2smkpmies.Snssai{
 					SSt: []byte(header.sst),
 					SD:  []byte(header.sd),
 				},

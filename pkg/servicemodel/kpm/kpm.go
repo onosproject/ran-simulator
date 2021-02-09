@@ -110,7 +110,8 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		return err
 	}
 	// Creates an indication header
-	header, _ := kpmutils.NewIndicationHeader(
+
+	header := kpmutils.NewIndicationHeader(
 		kpmutils.WithPlmnID(fmt.Sprintf("%d", sm.ServiceModel.Model.PlmnID)),
 		kpmutils.WithGnbID(gNbID),
 		kpmutils.WithSst("1"),
@@ -118,21 +119,17 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		kpmutils.WithPlmnIDnrcgi(fmt.Sprintf("%d", sm.ServiceModel.Model.PlmnID)))
 
 	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
-	indicationHeaderAsn1Bytes, err := kpmutils.CreateIndicationHeaderAsn1Bytes(kpmModelPlugin, header)
+	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
 	// Creating an indication message
-	indMsg, err := kpmutils.NewIndicationMessage(
+	indicationMessage := kpmutils.NewIndicationMessage(
 		kpmutils.WithNumberOfActiveUes(int32(sm.Model.UEs.GetNumUes())))
-	if err != nil {
-		log.Error(err)
-		return err
-	}
 
-	indicationMessageBytes, err := kpmutils.CreateIndicationMessageAsn1Bytes(kpmModelPlugin, indMsg)
+	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		return err
 	}
@@ -145,14 +142,18 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
 	for range sub.Ticker.C {
 		log.Debug("Sending Indication Report for subscription:", sub.ID)
-		indication, _ := indicationutils.NewIndication(
+		indication := indicationutils.NewIndication(
 			indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
 			indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
 			indicationutils.WithRequestID(subscription.GetReqID()),
 			indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
 			indicationutils.WithIndicationMessage(indicationMessageBytes))
 
-		ricIndication := indicationutils.CreateIndication(indication)
+		ricIndication, err := indication.Build()
+		if err != nil {
+			log.Error("creating indication message is failed", err)
+			return err
+		}
 		err = sub.E2Channel.RICIndication(ctx, ricIndication)
 		if err != nil {
 			log.Error("Sending indication report is failed:", err)
@@ -197,7 +198,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
-	subscription, _ := subutils.NewSubscription(
+	subscription := subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
 		subutils.WithRanFuncID(ranFuncID),
 		subutils.WithRicInstanceID(ricInstanceID),
@@ -206,18 +207,28 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
-		err := errors.New(errors.Forbidden, "no required action is accepted")
-		subscriptionFailure := subutils.CreateSubscriptionFailure(subscription)
+
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		err = errors.New(errors.Forbidden, "no required action is accepted")
 		return nil, subscriptionFailure, err
 	}
 
 	reportInterval, err := sm.getReportPeriod(request)
 	if err != nil {
-		subscriptionFailure := subutils.CreateSubscriptionFailure(subscription)
-		return nil, subscriptionFailure, err
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, subscriptionFailure, nil
 	}
 
-	subscriptionResponse := subutils.CreateSubscriptionResponse(subscription)
+	subscriptionResponse, err := subscription.BuildSubscriptionResponse()
+	if err != nil {
+		return nil, nil, err
+	}
 	go func() {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -241,11 +252,14 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	if err != nil {
 		return nil, nil, err
 	}
-	subscriptionDelete, _ := subdeleteutils.NewSubscriptionDelete(
+	subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
 		subdeleteutils.WithRequestID(reqID),
 		subdeleteutils.WithRanFuncID(ranFuncID),
 		subdeleteutils.WithRicInstanceID(ricInstanceID))
-	subDeleteResponse := subdeleteutils.CreateSubscriptionDeleteResponse(subscriptionDelete)
+	subDeleteResponse, err := subscriptionDelete.BuildSubscriptionDeleteResponse()
+	if err != nil {
+		return nil, nil, err
+	}
 	// Stops the goroutine sending the indication messages
 	sub.Ticker.Stop()
 	return subDeleteResponse, nil, nil

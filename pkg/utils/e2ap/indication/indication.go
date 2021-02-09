@@ -19,17 +19,18 @@ type Indication struct {
 	indicationHeader  []byte
 	indicationMessage []byte
 	ricCallProcessID  []byte
+	// TODO add ric action ID and ric indication sn
 }
 
 // NewIndication creates a new indication
-func NewIndication(options ...func(*Indication)) (*Indication, error) {
+func NewIndication(options ...func(*Indication)) *Indication {
 	indication := &Indication{}
 
 	for _, option := range options {
 		option(indication)
 	}
 
-	return indication, nil
+	return indication
 
 }
 
@@ -68,8 +69,8 @@ func WithIndicationMessage(indicationMessage []byte) func(*Indication) {
 	}
 }
 
-// CreateIndication creates indication message
-func CreateIndication(indication *Indication) (e2Indication *e2appducontents.Ricindication) {
+// Build builds e2ap indication message
+func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindication, err error) {
 	ricIndication := &e2appducontents.Ricindication{
 		ProtocolIes: &e2appducontents.RicindicationIes{
 			E2ApProtocolIes29: &e2appducontents.RicindicationIes_RicindicationIes29{
@@ -138,6 +139,5 @@ func CreateIndication(indication *Indication) (e2Indication *e2appducontents.Ric
 		},
 	}
 
-	return ricIndication
-
+	return ricIndication, nil
 }
