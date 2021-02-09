@@ -51,6 +51,9 @@ type Route struct {
 	Color  string
 }
 
+const mask28 = 0xfffffff
+const mask20 = 0xfffff00
+
 // ToECI produces ECI from the specified components
 func ToECI(enbID EnbID, cid CellID) ECI {
 	return ECI(uint(enbID)<<8 | uint(cid))
@@ -58,25 +61,30 @@ func ToECI(enbID EnbID, cid CellID) ECI {
 
 // ToECGI produces ECGI from the specified components
 func ToECGI(plmnID PlmnID, eci ECI) ECGI {
-	return ECGI(uint(plmnID)<<28 | uint(eci))
+	return ECGI(uint(plmnID)<<28 | (uint(eci) & mask28))
 }
 
 // ToGEnbID produces GEnbID from the specified components
 func ToGEnbID(plmnID PlmnID, enbID EnbID) GEnbID {
-	return GEnbID(uint(plmnID)<<28 | uint(enbID))
+	return GEnbID(uint(plmnID)<<28 | (uint(enbID) & mask20))
 }
 
-// GetPlmnID extracts PLMNID from the specified identifier
+// GetPlmnID extracts PLMNID from the specified ECGI or GEnbID
 func GetPlmnID(id uint64) PlmnID {
 	return PlmnID(id >> 28)
 }
 
-// GetCellID extracts Cell ID from the specified identifier
+// GetCellID extracts Cell ID from the specified ECI, ECGI or GEnbID
 func GetCellID(id uint64) CellID {
 	return CellID(id & 0xff)
 }
 
-// GetECI extracts ECI from the specified identifier
+// GetEnbID extracts Enb ID from the specified ECGI or GEnbID
+func GetEnbID(id uint64) EnbID {
+	return EnbID((id & mask20) >> 8)
+}
+
+// GetECI extracts ECI from the specified ECGI or GEnbID
 func GetECI(id uint64) ECI {
-	return ECI(id & 0xffffff00)
+	return ECI(id & mask28)
 }
