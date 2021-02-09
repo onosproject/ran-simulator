@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	minImsi = 10000
-	maxImsi = 99999
+	minIMSI = 10000
+	maxIMSI = 99999
 )
 
 // UEType represents type of user-equipment
@@ -20,19 +20,19 @@ type UEType string
 // UECell represents UE-cell relationship
 type UECell struct {
 	ID       GEnbID
-	Ecgi     Ecgi // Auxiliary form of association
+	Ecgi     ECGI // Auxiliary form of association
 	Strength float64
 }
 
 // UE represents user-equipment, i.e. phone, IoT device, etc.
 type UE struct {
-	Imsi     Imsi
+	IMSI     IMSI
 	Type     UEType
 	Location Coordinate
 	Rotation uint32
 
 	Cell  *UECell
-	Crnti Crnti
+	Crnti CRNTI
 	Cells []*UECell
 
 	IsAdmitted bool
@@ -48,13 +48,13 @@ type UERegistry interface {
 	CreateUEs(count uint)
 
 	// DestroyUE destroy the specified UE
-	DestroyUE(imsi Imsi)
+	DestroyUE(IMSI IMSI)
 
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs() []*UE
 
 	// MoveUE update the cell affiliation of the specified UE
-	MoveUE(imsi Imsi, genbID GEnbID, strength float64)
+	MoveUE(IMSI IMSI, genbID GEnbID, strength float64)
 
 	// ListUEs returns an array of all UEs associated with the specified cell
 	ListUEs(genbID GEnbID) []*UE
@@ -65,14 +65,14 @@ type UERegistry interface {
 
 type registry struct {
 	lock sync.RWMutex
-	ues  map[Imsi]*UE
+	ues  map[IMSI]*UE
 }
 
 // NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start
 func NewUERegistry(count uint) UERegistry {
 	reg := &registry{
 		lock: sync.RWMutex{},
-		ues:  make(map[Imsi]*UE),
+		ues:  make(map[IMSI]*UE),
 	}
 	reg.CreateUEs(count)
 	return reg
@@ -89,11 +89,11 @@ func (r *registry) SetUECount(count uint) {
 
 func (r *registry) removeSomeUEs(count int) {
 	c := count
-	for imsi := range r.ues {
+	for IMSI := range r.ues {
 		if c == 0 {
 			break
 		}
-		r.DestroyUE(imsi)
+		r.DestroyUE(IMSI)
 		c = c - 1
 	}
 }
@@ -104,23 +104,23 @@ func (r *registry) CreateUEs(count uint) {
 	for i := uint(0); i < count; i++ {
 		// FIXME: fill in with more sensible values
 		ue := &UE{
-			Imsi:       Imsi(rand.Int63n(maxImsi-minImsi) + minImsi),
+			IMSI:       IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI),
 			Type:       "phone",
 			Location:   Coordinate{0, 0},
 			Rotation:   0,
 			Cell:       &UECell{},
-			Crnti:      "90125",
+			Crnti:      CRNTI(90125 + i),
 			Cells:      nil,
 			IsAdmitted: false,
 		}
-		r.ues[ue.Imsi] = ue
+		r.ues[ue.IMSI] = ue
 	}
 }
 
-func (r *registry) DestroyUE(imsi Imsi) {
+func (r *registry) DestroyUE(IMSI IMSI) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	delete(r.ues, imsi)
+	delete(r.ues, IMSI)
 }
 
 func (r *registry) ListAllUEs() []*UE {
@@ -133,10 +133,10 @@ func (r *registry) ListAllUEs() []*UE {
 	return list
 }
 
-func (r *registry) MoveUE(imsi Imsi, genbID GEnbID, strength float64) {
+func (r *registry) MoveUE(IMSI IMSI, genbID GEnbID, strength float64) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	ue := r.ues[imsi]
+	ue := r.ues[IMSI]
 	if ue != nil {
 		ue.Cell.ID = genbID
 		ue.Cell.Strength = strength
@@ -148,7 +148,7 @@ func (r *registry) ListUEs(genbID GEnbID) []*UE {
 	defer r.lock.RUnlock()
 	list := make([]*UE, 0, len(r.ues))
 	for _, ue := range r.ues {
-		if ue.Cell.ID.EnbID == genbID.EnbID && ue.Cell.ID.PlmnID == genbID.PlmnID {
+		if ue.Cell.ID == genbID {
 			list = append(list, ue)
 		}
 	}

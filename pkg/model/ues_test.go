@@ -28,15 +28,15 @@ func TestMoveUE(t *testing.T) {
 	ues := NewUERegistry(24)
 	assert.NotNil(t, ues, "unable to create UE registry")
 
-	id1 := GEnbID{PlmnID: "foo", EnbID: "bar"}
-	id2 := GEnbID{PlmnID: "foo", EnbID: "goo"}
+	id1 := GEnbID(100123)
+	id2 := GEnbID(100321)
 
 	for i, ue := range ues.ListAllUEs() {
 		id := id1
 		if i%3 == 0 {
 			id = id2
 		}
-		ues.MoveUE(ue.Imsi, id, rand.Float64())
+		ues.MoveUE(ue.IMSI, id, rand.Float64())
 	}
 
 	assert.Equal(t, 16, len(ues.ListUEs(id1)))

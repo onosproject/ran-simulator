@@ -30,10 +30,7 @@ func newExpBackoff() *backoff.ExponentialBackOff {
 }
 
 func nodeID(plmndID model.PlmnID, enbID model.EnbID) (uint64, error) {
-	gEnbID := model.GEnbID{
-		PlmnID: plmndID,
-		EnbID:  enbID,
-	}
+	gEnbID := model.ToGEnbID(plmndID, enbID)
 	buf := bytes.Buffer{}
 	enc := gob.NewEncoder(&buf)
 	err := enc.Encode(gEnbID)

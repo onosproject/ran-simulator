@@ -4,26 +4,32 @@
 
 package model
 
-// EnbID  E2 node ID
-type EnbID string
+// PlmnID is a globally unique network identifier (Public Land Mobile Network)
+type PlmnID uint32
 
-// PlmnID plmnID
-type PlmnID string
+// EnbID is an eNodeB Identifier
+type EnbID uint32
 
-// Ecgi Ecgi
-type Ecgi string
+// CellID is a node-local cell identifier
+type CellID uint8
 
-// GEnbID global E2 node ID
-type GEnbID struct {
-	PlmnID PlmnID
-	EnbID  EnbID
-}
+// ECI is a E-UTRAN Cell Identifier
+type ECI uint32
 
-// Imsi represents a unique UE identifier
-type Imsi uint64
+// GEnbID is a Globally eNodeB identifier
+type GEnbID uint64
 
-// Crnti is a tower-specific UE identifier
-type Crnti string
+// ECGI is E-UTRAN Cell Global Identifier
+type ECGI uint64
+
+// CRNTI is a cell-specific UE identifier
+type CRNTI uint32
+
+// MSIN is Mobile Subscriber Identification Number
+type MSIN uint32
+
+// IMSI is International Mobile Subscriber Identity
+type IMSI uint64
 
 // Coordinate represents a geographical location
 type Coordinate struct {
@@ -43,4 +49,34 @@ type Route struct {
 	Name   string
 	Points []*Coordinate
 	Color  string
+}
+
+// ToECI produces ECI from the specified components
+func ToECI(enbID EnbID, cid CellID) ECI {
+	return ECI(uint(enbID)<<8 | uint(cid))
+}
+
+// ToECGI produces ECGI from the specified components
+func ToECGI(plmnID PlmnID, eci ECI) ECGI {
+	return ECGI(uint(plmnID)<<28 | uint(eci))
+}
+
+// ToGEnbID produces GEnbID from the specified components
+func ToGEnbID(plmnID PlmnID, enbID EnbID) GEnbID {
+	return GEnbID(uint(plmnID)<<28 | uint(enbID))
+}
+
+// GetPlmnID extracts PLMNID from the specified identifier
+func GetPlmnID(id uint64) PlmnID {
+	return PlmnID(id >> 28)
+}
+
+// GetCellID extracts Cell ID from the specified identifier
+func GetCellID(id uint64) CellID {
+	return CellID(id & 0xff)
+}
+
+// GetECI extracts ECI from the specified identifier
+func GetECI(id uint64) ECI {
+	return ECI(id & 0xffffff00)
 }

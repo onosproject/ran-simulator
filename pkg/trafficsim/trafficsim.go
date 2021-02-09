@@ -68,20 +68,42 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 	return nil
 }
 
+func cellToAPI(cell model.Cell) *simtypes.Cell {
+	r := &simtypes.Cell{
+		Ecgi:       simtypes.Ecgi(cell.Ecgi),
+		Location:   nil,
+		Sector:     nil,
+		Color:      "",
+		MaxUEs:     0,
+		Neighbors:  nil,
+		TxPowerdB:  0,
+		CrntiMap:   nil,
+		CrntiIndex: 0,
+		Port:       0,
+	}
+	return r
+}
+
 // ListCells :
 func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_ListCellsServer) error {
+	for _, node := range s.model.Nodes {
+		for _, cell := range node.Cells {
+			resp := &simapi.ListCellsResponse{
+				Cell: cellToAPI(cell),
+				Type: simapi.Type_NONE,
+			}
+			err := stream.Send(resp)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
-func genbToAPI(id model.GEnbID) *simtypes.ECGI {
-	return &simtypes.ECGI{
-		EcID:   simtypes.EcID(id.EnbID),
-		PlmnID: simtypes.PlmnID(id.PlmnID),
-	}
-}
 func ueToAPI(ue *model.UE) *simtypes.Ue {
 	r := &simtypes.Ue{
-		Imsi:     simtypes.Imsi(ue.Imsi),
+		Imsi:     simtypes.Imsi(ue.IMSI),
 		Type:     string(ue.Type),
 		Position: nil,
 		Rotation: ue.Rotation,
@@ -89,19 +111,19 @@ func ueToAPI(ue *model.UE) *simtypes.Ue {
 		Admitted: ue.IsAdmitted,
 	}
 	if ue.Cell != nil {
-		r.ServingTower = genbToAPI(ue.Cell.ID)
+		r.ServingTower = simtypes.Ecgi(ue.Cell.ID)
 		r.ServingTowerStrength = ue.Cell.Strength
 	}
 	if len(ue.Cells) > 0 {
-		r.Tower1 = genbToAPI(ue.Cells[0].ID)
+		r.Tower1 = simtypes.Ecgi(ue.Cells[0].ID)
 		r.Tower1Strength = ue.Cells[0].Strength
 	}
 	if len(ue.Cells) > 1 {
-		r.Tower2 = genbToAPI(ue.Cells[1].ID)
+		r.Tower2 = simtypes.Ecgi(ue.Cells[1].ID)
 		r.Tower2Strength = ue.Cells[1].Strength
 	}
 	if len(ue.Cells) > 2 {
-		r.Tower3 = genbToAPI(ue.Cells[2].ID)
+		r.Tower3 = simtypes.Ecgi(ue.Cells[2].ID)
 		r.Tower3Strength = ue.Cells[2].Strength
 	}
 	return r

@@ -326,7 +326,7 @@ func (a *e2Agent) setup() error {
 	}
 	setupRequest, err := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
-		setup.WithPlmnID(string(a.model.PlmnID)),
+		setup.WithPlmnID(fmt.Sprintf("%d", a.model.PlmnID)),
 		setup.WithE2NodeID(e2GlobalID))
 
 	if err != nil {

@@ -23,7 +23,7 @@ nodes:
       - rc
     cells:
       cell1:
-        ecgi: 90125-01
+        ecgi: 1019012501
         sector:
           center:
             lat: 46.00
@@ -32,7 +32,7 @@ nodes:
           azimuth: 0.0
         color: red
       cell2:
-        ecgi: 90125-02
+        ecgi: 1019012502
         sector:
           center:
             lat: 46.00
@@ -49,7 +49,7 @@ nodes:
       - kpm
     cells:
       cell1:
-        ecgi: 90126-01
+        ecgi: 1019012601
         sector:
           center:
             lat: 44.00
@@ -58,7 +58,7 @@ nodes:
           azimuth: 0.0
         color: red
       cell2:
-        ecgi: 90126-02
+        ecgi: 9012602
         sector:
           center:
             lat: 44.00
@@ -90,6 +90,6 @@ servicemodels:
     version: 1.0.0
     description: RC service model
 ueCount: 12
-plmnID: "onf"
+plmnID: 101
 
 

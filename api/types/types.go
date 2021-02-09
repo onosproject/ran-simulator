@@ -5,16 +5,19 @@
 
 package types
 
-// EcID is a tower ID
-type EcID string
+// EcID is a cell ID
+type EcID uint64
 
 // PlmnID is a network ID
-type PlmnID string
+type PlmnID uint16
+
+// Ecgi is a globally unique cell ID
+type Ecgi uint64
 
 // Crnti is a UE ID relative to a tower
-type Crnti string
+type Crnti uint32
 
-// Imsi is a UE unique identifier
+// Imsi is a globally unique UE identifier
 type Imsi uint64
 
 const (

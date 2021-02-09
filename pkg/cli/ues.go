@@ -79,7 +79,7 @@ func runGetUEsCommand(cmd *cobra.Command, args []string) error {
 			break
 		}
 		ue := r.Ue
-		Output("%d  %s-%s   %v", ue.Imsi, ue.ServingTower.EcID, ue.ServingTower.PlmnID, ue.Admitted)
+		Output("%d  %d   %v", ue.Imsi, ue.ServingTower, ue.Admitted)
 	}
 	return nil
 }

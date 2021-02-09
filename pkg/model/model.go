@@ -37,11 +37,11 @@ type Controller struct {
 
 // Cell represents a section of coverage
 type Cell struct {
-	Ecgi      Ecgi    `yaml:"ecgi"`
+	Ecgi      ECGI    `yaml:"ecgi"`
 	Sector    Sector  `yaml:"sector"`
 	Color     string  `yaml:"color"`
 	MaxUEs    uint32  `yaml:"maxUEs"`
-	Neighbors []Ecgi  `yaml:"neighbors"`
+	Neighbors []ECGI  `yaml:"neighbors"`
 	TxPowerDB float64 `yaml:"txPower"`
 
 	// TODO: should not be needed as it coincides with sector center.

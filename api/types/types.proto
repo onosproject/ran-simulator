@@ -41,23 +41,23 @@ message Ue {
 
     uint32 rotation = 5;
 
-    ECGI serving_tower = 7;
+    uint64 serving_tower = 7 [(gogoproto.casttype) = "Ecgi"];
 
     double serving_tower_strength = 8;
 
-    ECGI tower1 = 9;
+    uint64 tower1 = 9 [(gogoproto.casttype) = "Ecgi"];
 
     double tower1_strength = 10;
 
-    ECGI tower2 = 11;
+    uint64 tower2 = 11 [(gogoproto.casttype) = "Ecgi"];
 
     double tower2_strength = 12;
 
-    ECGI tower3 = 13;
+    uint64 tower3 = 13 [(gogoproto.casttype) = "Ecgi"];
 
     double tower3_strength = 14;
 
-    string crnti = 15 [(gogoproto.customname) = "Crnti", (gogoproto.casttype) = "Crnti"];
+    uint32 crnti = 15 [(gogoproto.customname) = "Crnti", (gogoproto.casttype) = "Crnti"];
 
     bool admitted = 16;
 
@@ -75,15 +75,8 @@ message UeMetrics {
     bool isFirst = 3;
 }
 
-// station's unique ID
-message ECGI {
-    string ecID = 1 [(gogoproto.customname) = "EcID", (gogoproto.casttype) = "EcID"];
-
-    string plmnID = 2 [(gogoproto.customname) = "PlmnID", (gogoproto.casttype) = "PlmnID"];
-}
-
 message Cell {
-    ECGI ecgi = 1;
+    uint64 Ecgi = 1 [(gogoproto.customname) = "Ecgi", (gogoproto.casttype) = "Ecgi"];
 
     Point location = 3;
 
@@ -93,13 +86,13 @@ message Cell {
 
     uint32 maxUEs = 6;
 
-    repeated ECGI neighbors = 7;
+    repeated uint64 neighbors = 7 [(gogoproto.casttype) = "Ecgi"];
 
     // The cell transmit power in decibels
     double txPowerdB = 8;
 
     // crntis maps a ue's name to its crnti
-    map<string, uint64> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "Imsi"];
+    map<uint32, uint64> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "Imsi"];
 
     uint32 crntiIndex = 10;
 
