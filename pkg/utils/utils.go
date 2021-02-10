@@ -141,21 +141,3 @@ func DegreesToRads(degrees float64) float64 {
 func AspectRatio(point *types.Point) float64 {
 	return math.Cos(DegreesToRads(point.Lat))
 }
-
-// PlmnIDToByteArray
-func PlmnIDToByteArray(val uint32) []byte {
-	r := make([]byte, 3)
-	for i := uint32(0); i < 3; i++ {
-		r[i] = byte((val >> (8 * i)) & 0xff)
-	}
-	return r
-}
-
-// ByteArrayToPlmnID
-func ByteArrayToPlmnID(val []byte) uint32 {
-	r := uint32(0)
-	for i := uint32(0); i < 3; i++ {
-		r |= uint32(val[i]) << (8 * i)
-	}
-	return r
-}

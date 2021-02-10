@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/types"
+
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
 	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm/indication"
@@ -30,7 +32,7 @@ import (
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 	"google.golang.org/protobuf/proto"
 )
@@ -111,12 +113,14 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	}
 	// Creates an indication header
 
+	plmnID := types.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
+
 	header := kpmutils.NewIndicationHeader(
-		kpmutils.WithPlmnID(uint32(sm.ServiceModel.Model.PlmnID)),
+		kpmutils.WithPlmnID(plmnID.Value()),
 		kpmutils.WithGnbID(gNbID),
 		kpmutils.WithSst("1"),
 		kpmutils.WithSd("SD1"),
-		kpmutils.WithPlmnIDnrcgi(uint32(sm.ServiceModel.Model.PlmnID)))
+		kpmutils.WithPlmnIDnrcgi(plmnID.Value()))
 
 	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
@@ -171,15 +175,15 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	log.Info("RIC Subscription request received for service model:", sm.ServiceModel.ModelFullName)
-	var ricActionsAccepted []*types.RicActionID
-	ricActionsNotAdmitted := make(map[types.RicActionID]*e2apies.Cause)
+	var ricActionsAccepted []*e2aptypes.RicActionID
+	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
 	reqID := subutils.GetRequesterID(request)
 	ranFuncID := subutils.GetRanFunctionID(request)
 	ricInstanceID := subutils.GetRicInstanceID(request)
 
 	for _, action := range actionList {
-		actionID := types.RicActionID(action.Value.RicActionId.Value)
+		actionID := e2aptypes.RicActionID(action.Value.RicActionId.Value)
 		actionType := action.Value.RicActionType
 		// kpm service model supports report action and should be added to the
 		// list of accepted actions

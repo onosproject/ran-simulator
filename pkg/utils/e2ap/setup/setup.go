@@ -9,17 +9,17 @@ import (
 	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/ran-simulator/pkg/utils"
+	"github.com/onosproject/ran-simulator/pkg/types"
 )
 
 var log = logging.GetLogger("servicemodel", "utils", "setup")
 
 // Setup setup request
 type Setup struct {
-	ranFunctions types.RanFunctions
-	plmnID       uint32
+	ranFunctions e2aptypes.RanFunctions
+	plmnID       types.Uint24
 	e2NodeID     uint64
 }
 
@@ -35,14 +35,14 @@ func NewSetupRequest(options ...func(*Setup)) *Setup {
 }
 
 // WithRanFunctions sets ran functions
-func WithRanFunctions(ranFunctions types.RanFunctions) func(*Setup) {
+func WithRanFunctions(ranFunctions e2aptypes.RanFunctions) func(*Setup) {
 	return func(request *Setup) {
 		request.ranFunctions = ranFunctions
 	}
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID uint32) func(*Setup) {
+func WithPlmnID(plmnID types.Uint24) func(*Setup) {
 	return func(request *Setup) {
 		request.plmnID = plmnID
 
@@ -58,6 +58,7 @@ func WithE2NodeID(e2NodeID uint64) func(*Setup) {
 
 // Build builds e2ap setup request
 func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err error) {
+	//plmnID := types.NewUint24(request.plmnID)
 	ranFunctionList := e2appducontents.E2SetupRequestIes_E2SetupRequestIes10{
 		Id:          int32(v1beta1.ProtocolIeIDRanfunctionsAdded),
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
@@ -100,7 +101,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 						GNb: &e2apies.GlobalE2NodeGnbId{
 							GlobalGNbId: &e2apies.GlobalgNbId{
 								PlmnId: &e2ap_commondatatypes.PlmnIdentity{
-									Value: utils.PlmnIDToByteArray(request.plmnID),
+									Value: request.plmnID.ToBytes(),
 								},
 								GnbId: &e2apies.GnbIdChoice{
 									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{

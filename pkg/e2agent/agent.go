@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/onosproject/ran-simulator/pkg/utils"
+	"github.com/onosproject/ran-simulator/pkg/types"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
 
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
@@ -135,15 +135,15 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		//  announced as a supported RAN function in the E2 Setup procedure or
 		//  the RIC Service Update procedure, the target E2 Node shall send the RIC SUBSCRIPTION FAILURE message
 		//  to the Near-RT RIC with an appropriate cause value.
-		var ricActionsAccepted []*types.RicActionID
-		ricActionsNotAdmitted := make(map[types.RicActionID]*e2apies.Cause)
+		var ricActionsAccepted []*e2aptypes.RicActionID
+		ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 		actionList := subutils.GetRicActionToBeSetupList(request)
 		reqID := subutils.GetRequesterID(request)
 		ranFuncID := subutils.GetRanFunctionID(request)
 		ricInstanceID := subutils.GetRicInstanceID(request)
 
 		for _, action := range actionList {
-			actionID := types.RicActionID(action.Value.RicActionId.Value)
+			actionID := e2aptypes.RicActionID(action.Value.RicActionId.Value)
 			cause := &e2apies.Cause{
 				Cause: &e2apies.Cause_RicRequest{
 					RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
@@ -332,12 +332,13 @@ func (a *e2Agent) connect() error {
 
 func (a *e2Agent) setup() error {
 	e2GlobalID, err := nodeID(a.model.PlmnID, a.node.EnbID)
+	plmnID := types.NewUint24(uint32(a.model.PlmnID))
 	if err != nil {
 		return err
 	}
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
-		setup.WithPlmnID(uint32(a.model.PlmnID)),
+		setup.WithPlmnID(plmnID.Value()),
 		setup.WithE2NodeID(e2GlobalID))
 
 	e2SetupRequest, err := setupRequest.Build()
@@ -346,7 +347,6 @@ func (a *e2Agent) setup() error {
 		log.Error(err)
 		return err
 	}
-	log.Debug("PlmnID:", utils.ByteArrayToPlmnID(e2SetupRequest.ProtocolIes.E2ApProtocolIes3.Value.GetGNb().GlobalGNbId.PlmnId.Value))
 	_, e2SetupFailure, err := a.channel.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		log.Error(err)

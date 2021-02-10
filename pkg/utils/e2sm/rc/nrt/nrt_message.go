@@ -7,7 +7,7 @@ package nrt
 import (
 	"fmt"
 
-	"github.com/onosproject/ran-simulator/pkg/utils"
+	"github.com/onosproject/ran-simulator/pkg/types"
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 )
@@ -15,7 +15,7 @@ import (
 // Neighbour neighbour fields for nrt message
 type Neighbour struct {
 	nrIndex           int32
-	plmnID            uint32
+	plmnID            types.Uint24
 	eutraCellIdentity uint64
 	earfcn            int32
 	pci               int32
@@ -40,7 +40,7 @@ func WithNrIndex(nrIndex int32) func(neighbour *Neighbour) {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID uint32) func(neighbour *Neighbour) {
+func WithPlmnID(plmnID types.Uint24) func(neighbour *Neighbour) {
 	return func(neighbour *Neighbour) {
 		neighbour.plmnID = plmnID
 	}
@@ -82,7 +82,7 @@ func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 			CellGlobalId: &e2smrcpreies.CellGlobalId_EUtraCgi{
 				EUtraCgi: &e2smrcpreies.Eutracgi{
 					PLmnIdentity: &e2smrcpreies.PlmnIdentity{
-						Value: utils.PlmnIDToByteArray(neighbour.plmnID),
+						Value: neighbour.plmnID.ToBytes(),
 					},
 					EUtracellIdentity: &e2smrcpreies.EutracellIdentity{
 						Value: &e2smrcpreies.BitString{
