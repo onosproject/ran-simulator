@@ -12,7 +12,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"io"
-	"io/ioutil"
 	"net"
 	"testing"
 
@@ -20,7 +19,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
-	"gopkg.in/yaml.v2"
 )
 
 var lis *bufconn.Listener
@@ -31,13 +29,9 @@ func bufDialer(context.Context, string) (net.Conn, error) {
 
 func newTestService() (northbound.Service, error) {
 	m := &model.Model{}
-	bytes, err := ioutil.ReadFile("../../model/test.yaml")
+	err := model.LoadConfig(m, "../../model/test")
 	if err != nil {
-		return nil, err
-	}
-	err = yaml.Unmarshal(bytes, &m)
-	if err != nil {
-		return nil, err
+		return &Service{}, err
 	}
 	nodeStore := nodes.NewNodeRegistry(m.Nodes)
 	cellStore := cells.NewCellRegistry(m.Cells, nodeStore)

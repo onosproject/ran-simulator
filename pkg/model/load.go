@@ -5,58 +5,46 @@
 package model
 
 import (
-	"github.com/mitchellh/go-homedir"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
 const configDir = ".onos"
 
 var log = logging.GetLogger("manager", "load")
 
-// Load loads the model configuration
-func Load(model *Model) error {
-	home, err := homedir.Dir()
-	if err != nil {
-		return err
-	}
+// ViperConfigure Sets up viper for unmarshalling configuration file
+func ViperConfigure(configname string) {
+	// Set the file type of the configurations file
+	viper.SetConfigType("yaml")
 
 	// Set the file name of the configurations file
-	viper.SetConfigName("model")
+	viper.SetConfigName(configname)
 
 	// Set the path to look for the configurations file
 	viper.AddConfigPath("./" + configDir + "/config")
-	viper.AddConfigPath(home + "/" + configDir + "/config")
+	viper.AddConfigPath("$HOME/" + configDir + "/config")
 	viper.AddConfigPath("/etc/onos/config")
 	viper.AddConfigPath(".")
+}
 
-	viper.SetConfigType("yaml")
+// LoadConfig Loads model with data in configuration yaml file
+func LoadConfig(model *Model, configname string) error {
+	var err error
+
+	ViperConfigure(configname)
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Errorf("Unable to read config: %v", err)
-		return nil
-	}
-
-	// FIXME: coerce Viper to properly unmarshal top level entities, e.g. layout.
-	err = viper.Unmarshal(model)
-	if err != nil {
+		log.Errorf("Unable to read %s config: %v", configname, err)
 		return err
 	}
 
-	// Fallback method because Viper is unmarshalling top-level as a map...
-	if model.MapLayout.LocationsScale == 0.0 {
-		log.Infof("Viper is being stupid! %v", viper.AllSettings())
-		bytes, err := ioutil.ReadFile("/etc/onos/config/model.yaml")
-		if err != nil {
-			return err
-		}
-		err = yaml.Unmarshal(bytes, model)
-		if err != nil {
-			return err
-		}
-	}
+	err = viper.Unmarshal(model)
 
-	return nil
+	return err
+}
+
+// Load the model configuration.
+func Load(model *Model) error {
+	return LoadConfig(model, "model")
 }

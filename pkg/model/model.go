@@ -11,26 +11,26 @@ import (
 
 // Model simulation model
 type Model struct {
-	MapLayout     MapLayout               `yaml:"layout"`
-	Nodes         map[string]Node         `yaml:"nodes"`
-	Cells         map[string]Cell         `yaml:"cells"`
-	Controllers   map[string]Controller   `yaml:"controllers"`
-	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
-	UECount       uint                    `yaml:"ueCount"`
-	PlmnID        types.PlmnID            `yaml:"plmnID"`
+	MapLayout     MapLayout               `mapstructure:"layout"`
+	Nodes         map[string]Node         `mapstructure:"nodes"`
+	Cells         map[string]Cell         `mapstructure:"cells"`
+	Controllers   map[string]Controller   `mapstructure:"controllers"`
+	ServiceModels map[string]ServiceModel `mapstructure:"servicemodels"`
+	UECount       uint                    `mapstructure:"ueCount"`
+	PlmnID        types.PlmnID            `mapstructure:"plmnID"`
 }
 
 // Coordinate represents a geographical location
 type Coordinate struct {
-	Lat float64 `yaml:"lat"`
-	Lng float64 `yaml:"lng"`
+	Lat float64 `mapstructure:"lat"`
+	Lng float64 `mapstructure:"lng"`
 }
 
 // Sector represents a 2D arc emanating from a location
 type Sector struct {
-	Center  Coordinate `yaml:"center"`
-	Azimuth int32      `yaml:"azimuth"`
-	Arc     int32      `yaml:"arc"`
+	Center  Coordinate `mapstructure:"center"`
+	Azimuth int32      `mapstructure:"azimuth"`
+	Arc     int32      `mapstructure:"arc"`
 }
 
 // Route represents a named series of points for tracking movement of user-equipment
@@ -42,33 +42,31 @@ type Route struct {
 
 // Node e2 node
 type Node struct {
-	EnbID         types.EnbID  `yaml:"enbID"`
-	Controllers   []string     `yaml:"controllers"`
-	ServiceModels []string     `yaml:"servicemodels"`
-	Cells         []types.ECGI `yaml:"cells"`
-	Status        string       `yaml:"status"`
+	EnbID         types.EnbID  `mapstructure:"enbID"`
+	Controllers   []string     `mapstructure:"controllers"`
+	ServiceModels []string     `mapstructure:"servicemodels"`
+	Cells         []types.ECGI `mapstructure:"cells"`
+	Status        string       `mapstructure:"status"`
 }
 
 // Controller E2T endpoint information
 type Controller struct {
-	ID      string `yaml:"id"`
-	Address string `yaml:"address"`
-	Port    int    `yaml:"port"`
+	ID      string `mapstructure:"id"`
+	Address string `mapstructure:"address"`
+	Port    int    `mapstructure:"port"`
 }
 
 // Cell represents a section of coverage
 type Cell struct {
-	ECGI      types.ECGI   `yaml:"ecgi"`
-	Sector    Sector       `yaml:"sector"`
-	Color     string       `yaml:"color"`
-	MaxUEs    uint32       `yaml:"maxUEs"`
-	Neighbors []types.ECGI `yaml:"neighbors"`
-	TxPowerDB float64      `yaml:"txPower"`
-
-	// TODO: track tbhe following relationships differently via UERegistry
+	ECGI      types.ECGI   `mapstructure:"ecgi"`
+	Sector    Sector       `mapstructure:"sector"`
+	Color     string       `mapstructure:"color"`
+	MaxUEs    uint32       `mapstructure:"maxUEs"`
+	Neighbors []types.ECGI `mapstructure:"neighbors"`
+	TxPowerDB float64      `mapstructure:"txPower"`
 	//Crntis map
-	//CrntiIndex uint32     `yaml:"crntiIndex"`
-	//Port       uint32     `yaml:"port"`
+	//CrntiIndex uint32     `mapstructure:"crntiIndex"`
+	//Port       uint32     `mapstructure:"port"`
 }
 
 // UEType represents type of user-equipment
@@ -98,9 +96,9 @@ type UE struct {
 
 // ServiceModel service model information
 type ServiceModel struct {
-	ID          int    `yaml:"id"`
-	Description string `yaml:"description"`
-	Version     string `yaml:"version"`
+	ID          int    `mapstructure:"id"`
+	Description string `mapstructure:"description"`
+	Version     string `mapstructure:"version"`
 }
 
 // GetServiceModel gets a service model based on a given name.
