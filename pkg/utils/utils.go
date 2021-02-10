@@ -6,9 +6,10 @@
 package utils
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
 	"math"
 	"math/rand"
+
+	"github.com/onosproject/ran-simulator/api/types"
 )
 
 // ServerParams - params to start a new server

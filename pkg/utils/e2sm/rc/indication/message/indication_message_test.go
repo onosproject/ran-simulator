@@ -7,6 +7,8 @@ package message
 import (
 	"testing"
 
+	"github.com/onosproject/ran-simulator/pkg/types"
+
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/pcirange"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/nrt"
@@ -17,13 +19,14 @@ import (
 
 func TestCreateIndicationMessage(t *testing.T) {
 
+	plmnID := types.NewUint24(12345)
 	nrt1, err := nrt.NewNeighbour(
 		nrt.WithNrIndex(1),
 		nrt.WithPci(10),
 		nrt.WithEutraCellIdentity(15),
 		nrt.WithEarfcn(40),
 		nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
-		nrt.WithPlmnID("onf")).Build()
+		nrt.WithPlmnID(plmnID.Value())).Build()
 	assert.NoError(t, err)
 	nrt2, err := nrt.NewNeighbour(
 		nrt.WithNrIndex(2),
@@ -31,7 +34,7 @@ func TestCreateIndicationMessage(t *testing.T) {
 		nrt.WithEutraCellIdentity(25),
 		nrt.WithEarfcn(50),
 		nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_FEMTO),
-		nrt.WithPlmnID("onf")).Build()
+		nrt.WithPlmnID(plmnID.Value())).Build()
 	assert.NoError(t, err)
 
 	pciRange1, err := pcirange.NewPciRange(pcirange.WithLowerPci(10),
@@ -42,7 +45,7 @@ func TestCreateIndicationMessage(t *testing.T) {
 		pcirange.WithUpperPci(50)).Build()
 	assert.NoError(t, err)
 
-	indicationMessage, err := NewIndicationMessage(WithPlmnID("onf"),
+	indicationMessage, err := NewIndicationMessage(WithPlmnID(plmnID.Value()),
 		WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
 		WithEarfcn(20),
 		WithEutraCellIdentity(30),

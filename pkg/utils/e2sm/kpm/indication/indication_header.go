@@ -7,6 +7,8 @@ package indication
 import (
 	"fmt"
 
+	"github.com/onosproject/ran-simulator/pkg/types"
+
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
@@ -15,10 +17,10 @@ import (
 
 // Header indication header for kpm service model
 type Header struct {
-	plmnID      string
+	plmnID      types.Uint24
 	gNbCuUpID   int64
 	gNbDuID     int64
-	plmnIDnrcgi string
+	plmnIDnrcgi types.Uint24
 	sst         string
 	sd          string
 	fiveQi      int32
@@ -37,7 +39,7 @@ func NewIndicationHeader(options ...func(header *Header)) *Header {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID string) func(header *Header) {
+func WithPlmnID(plmnID types.Uint24) func(header *Header) {
 	return func(header *Header) {
 		header.plmnID = plmnID
 
@@ -60,7 +62,7 @@ func WithGnbDuID(gNbDuID int64) func(header *Header) {
 }
 
 // WithPlmnIDnrcgi sets plmnIDnrcgi
-func WithPlmnIDnrcgi(plmnIDnrcgi string) func(header *Header) {
+func WithPlmnIDnrcgi(plmnIDnrcgi types.Uint24) func(header *Header) {
 	return func(header *Header) {
 		header.plmnIDnrcgi = plmnIDnrcgi
 	}
@@ -132,7 +134,7 @@ func (header *Header) Build() (*e2smkpmies.E2SmKpmIndicationHeader, error) {
 						GNb: &e2smkpmies.GlobalKpmnodeGnbId{
 							GlobalGNbId: &e2smkpmies.GlobalgNbId{
 								PlmnId: &e2smkpmies.PlmnIdentity{
-									Value: []byte(header.plmnID),
+									Value: header.plmnID.ToBytes(),
 								},
 								GnbId: &e2smkpmies.GnbIdChoice{
 									GnbIdChoice: &e2smkpmies.GnbIdChoice_GnbId{
@@ -154,7 +156,7 @@ func (header *Header) Build() (*e2smkpmies.E2SmKpmIndicationHeader, error) {
 				},
 				NRcgi: &e2smkpmies.Nrcgi{
 					PLmnIdentity: &e2smkpmies.PlmnIdentity{
-						Value: []byte(header.plmnIDnrcgi),
+						Value: header.plmnIDnrcgi.ToBytes(),
 					},
 					NRcellIdentity: &e2smkpmies.NrcellIdentity{
 						Value: &e2smkpmies.BitString{
@@ -164,7 +166,7 @@ func (header *Header) Build() (*e2smkpmies.E2SmKpmIndicationHeader, error) {
 					},
 				},
 				PLmnIdentity: &e2smkpmies.PlmnIdentity{
-					Value: []byte(header.plmnID),
+					Value: header.plmnID.ToBytes(),
 				},
 				SliceId: &e2smkpmies.Snssai{
 					SSt: []byte(header.sst),

@@ -7,6 +7,8 @@ package header
 import (
 	"fmt"
 
+	"github.com/onosproject/ran-simulator/pkg/types"
+
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
@@ -15,7 +17,7 @@ import (
 
 // Header indication header for rc service model
 type Header struct {
-	plmnID            string
+	plmnID            types.Uint24
 	eutraCellIdentity uint64
 }
 
@@ -30,7 +32,7 @@ func NewIndicationHeader(options ...func(header *Header)) *Header {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID string) func(header *Header) {
+func WithPlmnID(plmnID types.Uint24) func(header *Header) {
 	return func(header *Header) {
 		header.plmnID = plmnID
 
@@ -53,7 +55,7 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 					CellGlobalId: &e2smrcpreies.CellGlobalId_EUtraCgi{
 						EUtraCgi: &e2smrcpreies.Eutracgi{
 							PLmnIdentity: &e2smrcpreies.PlmnIdentity{
-								Value: []byte(header.plmnID),
+								Value: header.plmnID.ToBytes(),
 							},
 							EUtracellIdentity: &e2smrcpreies.EutracellIdentity{
 								Value: &e2smrcpreies.BitString{
