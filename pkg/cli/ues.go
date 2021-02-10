@@ -35,7 +35,7 @@ func runGetUECountCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	Output("%d", countUEs(stream))
+	Output("%d\n", countUEs(stream))
 	return nil
 }
 
@@ -73,13 +73,14 @@ func runGetUEsCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	Output("%16s %16s %5s\n", "ECGI", "Serving Cell", "Admitted")
 	for {
 		r, err := stream.Recv()
 		if err != nil {
 			break
 		}
 		ue := r.Ue
-		Output("%d  %d   %v", ue.Imsi, ue.ServingTower, ue.Admitted)
+		Output("%16d %16d %v", ue.Imsi, ue.ServingTower, ue.Admitted)
 	}
 	return nil
 }
