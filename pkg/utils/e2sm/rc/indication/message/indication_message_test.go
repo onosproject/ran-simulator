@@ -23,7 +23,7 @@ func TestCreateIndicationMessage(t *testing.T) {
 		nrt.WithEutraCellIdentity(15),
 		nrt.WithEarfcn(40),
 		nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
-		nrt.WithPlmnID("onf")).Build()
+		nrt.WithPlmnID(12345)).Build()
 	assert.NoError(t, err)
 	nrt2, err := nrt.NewNeighbour(
 		nrt.WithNrIndex(2),
@@ -31,7 +31,7 @@ func TestCreateIndicationMessage(t *testing.T) {
 		nrt.WithEutraCellIdentity(25),
 		nrt.WithEarfcn(50),
 		nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_FEMTO),
-		nrt.WithPlmnID("onf")).Build()
+		nrt.WithPlmnID(12345)).Build()
 	assert.NoError(t, err)
 
 	pciRange1, err := pcirange.NewPciRange(pcirange.WithLowerPci(10),
@@ -42,7 +42,7 @@ func TestCreateIndicationMessage(t *testing.T) {
 		pcirange.WithUpperPci(50)).Build()
 	assert.NoError(t, err)
 
-	indicationMessage, err := NewIndicationMessage(WithPlmnID("onf"),
+	indicationMessage, err := NewIndicationMessage(WithPlmnID(12345),
 		WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
 		WithEarfcn(20),
 		WithEutraCellIdentity(30),

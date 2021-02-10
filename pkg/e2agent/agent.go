@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
 
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
@@ -339,10 +341,12 @@ func (a *e2Agent) setup() error {
 		setup.WithE2NodeID(e2GlobalID))
 
 	e2SetupRequest, err := setupRequest.Build()
+
 	if err != nil {
 		log.Error(err)
 		return err
 	}
+	log.Debug("PlmnID:", utils.ByteArrayToPlmnID(e2SetupRequest.ProtocolIes.E2ApProtocolIes3.Value.GetGNb().GlobalGNbId.PlmnId.Value))
 	_, e2SetupFailure, err := a.channel.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		log.Error(err)

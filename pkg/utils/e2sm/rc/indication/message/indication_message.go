@@ -7,6 +7,8 @@ package message
 import (
 	"fmt"
 
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
@@ -14,7 +16,7 @@ import (
 
 // Message indication message fields for rc service model
 type Message struct {
-	plmnID            string
+	plmnID            uint32
 	eutraCellIdentity uint64
 	earfcn            int32
 	cellSize          e2smrcpreies.CellSize
@@ -34,7 +36,7 @@ func NewIndicationMessage(options ...func(msg *Message)) *Message {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID string) func(message *Message) {
+func WithPlmnID(plmnID uint32) func(message *Message) {
 	return func(message *Message) {
 		message.plmnID = plmnID
 
@@ -96,7 +98,7 @@ func (message *Message) Build() (*e2smrcpreies.E2SmRcPreIndicationMessage, error
 		CellGlobalId: &e2smrcpreies.CellGlobalId_EUtraCgi{
 			EUtraCgi: &e2smrcpreies.Eutracgi{
 				PLmnIdentity: &e2smrcpreies.PlmnIdentity{
-					Value: []byte(message.plmnID),
+					Value: utils.PlmnIDToByteArray(message.plmnID),
 				},
 				EUtracellIdentity: &e2smrcpreies.EutracellIdentity{
 					Value: &e2smrcpreies.BitString{

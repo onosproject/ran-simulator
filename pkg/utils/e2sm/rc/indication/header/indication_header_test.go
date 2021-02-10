@@ -7,15 +7,17 @@ package header
 import (
 	"testing"
 
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateIndicationHeader(t *testing.T) {
-	indicationHeader, err := NewIndicationHeader(WithPlmnID("onf"),
+	indicationHeader, err := NewIndicationHeader(WithPlmnID(12345),
 		WithEutracellIdentity(32)).Build()
 	assert.NoError(t, err)
 
-	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value, []byte("onf"))
+	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value, utils.PlmnIDToByteArray(12345))
 	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetEUtraCgi().EUtracellIdentity.Value.Value, uint64(32))
 
 }
