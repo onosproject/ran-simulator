@@ -7,7 +7,6 @@ layout:
     lat: 45.00
     lng: -30.00
   zoom: 0.8
-  aspect: 1.618
   locationsScale: 1.0
   fade: false
   showRoutes: true

@@ -8,7 +8,6 @@ package model
 type MapLayout struct {
 	Center         Coordinate `yaml:"center"`
 	Zoom           float32    `yaml:"zoom"`
-	AspectRatio    float32    `yaml:"aspect"`
 	LocationsScale float32    `yaml:"locationsScale"`
 	FadeMap        bool       `yaml:"fadeMap"`
 	ShowRoutes     bool       `yaml:"showRoutes"`

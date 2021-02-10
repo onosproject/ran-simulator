@@ -115,6 +115,10 @@ message MapLayout {
     // Show power as circle on start
     bool showPower = 5;
 
+    // Ratio of random locations diameter to tower grid width
+    float locationsScale = 9;
+
+    // FIXME: These are deprecated; remove
     // Max number of UEs for complete simulation
     uint32 min_ues = 6;
 
@@ -124,6 +128,4 @@ message MapLayout {
     // the current number of routes
     uint32 current_routes = 8;
 
-    // Ratio of random locations diameter to tower grid width
-    float locationsScale = 9;
 }
