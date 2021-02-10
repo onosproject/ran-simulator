@@ -48,6 +48,38 @@ func coordToAPI(coord model.Coordinate) *simtypes.Point {
 	return &types.Point{Lat: coord.Lat, Lng: coord.Lng}
 }
 
+func sectorToAPI(sector model.Sector) *simtypes.Sector {
+	return &simtypes.Sector{
+		Azimuth:  sector.Azimuth,
+		Arc:      sector.Arc,
+		Centroid: coordToAPI(sector.Center),
+	}
+}
+
+func cellToAPI(cell model.Cell) *simtypes.Cell {
+	r := &simtypes.Cell{
+		Ecgi:       simtypes.Ecgi(cell.Ecgi),
+		Location:   coordToAPI(cell.Sector.Center),
+		Sector:     sectorToAPI(cell.Sector),
+		Color:      cell.Color,
+		MaxUEs:     cell.MaxUEs,
+		Neighbors:  neighborsToAPI(cell.Neighbors),
+		TxPowerdB:  cell.TxPowerDB,
+		CrntiMap:   nil,
+		CrntiIndex: 0,
+		Port:       0,
+	}
+	return r
+}
+
+func neighborsToAPI(neighbors []model.ECGI) []simtypes.Ecgi {
+	list := make([]simtypes.Ecgi, 0, len(neighbors))
+	for _, id := range neighbors {
+		list = append(list, simtypes.Ecgi(id))
+	}
+	return list
+}
+
 // GetMapLayout :
 func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest) (*types.MapLayout, error) {
 	return &types.MapLayout{
@@ -57,48 +89,7 @@ func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest)
 		ShowRoutes:     s.model.MapLayout.ShowRoutes,
 		ShowPower:      s.model.MapLayout.ShowPower,
 		LocationsScale: s.model.MapLayout.LocationsScale,
-		MinUes:         0,
-		MaxUes:         0,
-		CurrentRoutes:  0,
 	}, nil
-}
-
-// ListRoutes :
-func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic_ListRoutesServer) error {
-	return nil
-}
-
-func cellToAPI(cell model.Cell) *simtypes.Cell {
-	r := &simtypes.Cell{
-		Ecgi:       simtypes.Ecgi(cell.Ecgi),
-		Location:   nil,
-		Sector:     nil,
-		Color:      "",
-		MaxUEs:     0,
-		Neighbors:  nil,
-		TxPowerdB:  0,
-		CrntiMap:   nil,
-		CrntiIndex: 0,
-		Port:       0,
-	}
-	return r
-}
-
-// ListCells :
-func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_ListCellsServer) error {
-	for _, node := range s.model.Nodes {
-		for _, cell := range node.Cells {
-			resp := &simapi.ListCellsResponse{
-				Cell: cellToAPI(cell),
-				Type: simapi.Type_NONE,
-			}
-			err := stream.Send(resp)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
 
 func ueToAPI(ue *model.UE) *simtypes.Ue {
@@ -129,7 +120,33 @@ func ueToAPI(ue *model.UE) *simtypes.Ue {
 	return r
 }
 
-// ListUes :
+// ListRoutes provides means to list (and optionally monitor) simulated routes
+func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic_ListRoutesServer) error {
+	// TODO: reimplement list
+	// TODO: add watch capability
+	return nil
+}
+
+// ListCells provides means to list (and optionally monitor) simulated cells
+func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_ListCellsServer) error {
+	for _, node := range s.model.Nodes {
+		for _, cell := range node.Cells {
+			resp := &simapi.ListCellsResponse{
+				Cell: cellToAPI(cell),
+				Type: simapi.Type_NONE,
+			}
+			err := stream.Send(resp)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	// TODO: add watch capability
+	return nil
+}
+
+// ListUes provides means to list (and optionally monitor) simulated UEs
 func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
 	if !req.WithoutReplay {
 		for _, ue := range s.model.UEs.ListAllUEs() {
@@ -144,7 +161,7 @@ func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListU
 		}
 	}
 
-	// TODO: add subscription flag processing
+	// TODO: add watch capability
 	return nil
 }
 
@@ -158,5 +175,6 @@ func (s *Server) SetNumberUEs(ctx context.Context, req *simapi.SetNumberUEsReque
 
 // ResetMetrics resets the metrics on demand
 func (s *Server) ResetMetrics(ctx context.Context, req *simapi.ResetMetricsMsg) (*simapi.ResetMetricsMsg, error) {
+	// TODO: Reimplement
 	return nil, nil
 }

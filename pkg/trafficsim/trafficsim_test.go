@@ -9,6 +9,7 @@ import (
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"io"
+	"io/ioutil"
 	"net"
 	"testing"
 
@@ -16,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
+	"gopkg.in/yaml.v2"
 )
 
 var lis *bufconn.Listener
@@ -25,12 +27,17 @@ func bufDialer(context.Context, string) (net.Conn, error) {
 }
 
 func newTestService() (northbound.Service, error) {
-	return &Service{
-		model: &model.Model{
-			UECount: 10,
-			UEs:     model.NewUERegistry(10),
-		},
-	}, nil
+	m := &model.Model{}
+	bytes, err := ioutil.ReadFile("../model/test.yaml")
+	if err != nil {
+		return nil, err
+	}
+	err = yaml.Unmarshal(bytes, &m)
+	if err != nil {
+		return nil, err
+	}
+	m.UEs = model.NewUERegistry(m.UECount)
+	return &Service{model: m}, nil
 }
 
 func createServerConnection(t *testing.T) *grpc.ClientConn {
@@ -55,15 +62,29 @@ func createServerConnection(t *testing.T) *grpc.ClientConn {
 	return conn
 }
 
+func TestMapLayout(t *testing.T) {
+	client := simapi.NewTrafficClient(createServerConnection(t))
+	assert.NotNil(t, client, "unable to create gRPC client")
+
+	r, err := client.GetMapLayout(context.TODO(), &simapi.MapLayoutRequest{})
+	assert.NoError(t, err, "unable to get map layout")
+	assert.Equal(t, 45.0, r.Center.Lat, "incorrect latitude")
+	assert.Equal(t, -30.0, r.Center.Lng, "incorrect longitude")
+	assert.Equal(t, float32(0.8), r.Zoom, "incorrect zoom")
+	assert.Equal(t, float32(1.0), r.LocationsScale, "incorrect scale")
+	assert.Equal(t, false, r.Fade)
+	assert.Equal(t, true, r.ShowRoutes)
+	assert.Equal(t, true, r.ShowPower)
+}
+
 func TestServiceBasics(t *testing.T) {
-	conn := createServerConnection(t)
-	client := simapi.NewTrafficClient(conn)
+	client := simapi.NewTrafficClient(createServerConnection(t))
 	assert.NotNil(t, client, "unable to create gRPC client")
 
 	stream, err := client.ListUes(context.TODO(), &simapi.ListUesRequest{WithoutReplay: false})
 	assert.NoError(t, err, "unable to list UEs")
 
-	assert.Equal(t, 10, countUEs(t, stream), "incorrect UE count")
+	assert.Equal(t, 12, countItems(t, stream, &simapi.ListUesResponse{}), "incorrect UE count")
 	_, err = client.SetNumberUEs(context.TODO(), &simapi.SetNumberUEsRequest{
 		Number: 16,
 	})
@@ -71,17 +92,27 @@ func TestServiceBasics(t *testing.T) {
 
 	stream, err = client.ListUes(context.TODO(), &simapi.ListUesRequest{WithoutReplay: false})
 	assert.NoError(t, err, "unable to list UEs")
-	assert.Equal(t, 16, countUEs(t, stream), "incorrect revised UE count")
+	assert.Equal(t, 16, countItems(t, stream, &simapi.ListUesResponse{}), "incorrect revised UE count")
 }
 
-func countUEs(t *testing.T, stream simapi.Traffic_ListUesClient) int {
+func TestCellsBasics(t *testing.T) {
+	client := simapi.NewTrafficClient(createServerConnection(t))
+	assert.NotNil(t, client, "unable to create gRPC client")
+
+	stream, err := client.ListCells(context.TODO(), &simapi.ListCellsRequest{WithoutReplay: false})
+	assert.NoError(t, err, "unable to list UEs")
+
+	assert.Equal(t, 4, countItems(t, stream, &simapi.ListCellsResponse{}), "incorrect cell count")
+}
+
+func countItems(t *testing.T, stream grpc.ClientStream, msg interface{}) int {
 	count := 0
 	for {
-		_, err := stream.Recv()
+		err := stream.RecvMsg(msg)
 		if err == io.EOF {
 			break
 		}
-		assert.NoError(t, err, "unable to read UE stream")
+		assert.NoError(t, err, "unable to read stream")
 		count = count + 1
 	}
 	return count
