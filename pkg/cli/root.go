@@ -66,13 +66,14 @@ func GetRootCommand() *cobra.Command {
 
 func getGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get {cells,ues,ueCount} [args]",
+		Use:   "get {layout,cells,ues,ueCount} [args]",
 		Short: "RAN simulator get info commands",
 	}
 
 	clilib.AddConfigFlags(cmd, defaultAddress)
 
 	cmd.AddCommand(clilib.GetConfigCommand())
+	cmd.AddCommand(getLayoutCommand())
 	cmd.AddCommand(getCellsCommand())
 	cmd.AddCommand(getUEsCommand())
 	cmd.AddCommand(getUECountCommand())

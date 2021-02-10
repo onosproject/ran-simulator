@@ -18,7 +18,7 @@ FROM frolvlad/alpine-glibc:alpine-3.12
 USER nobody
 
 COPY --from=build /go/src/github.com/onosproject/ran-simulator/build/_output/ransim /usr/local/bin/ransim
-COPY --from=build /go/src/github.com/onosproject/ran-simulator/build/_output/simcli /usr/local/bin/sincli
+COPY --from=build /go/src/github.com/onosproject/ran-simulator/build/_output/simcli /usr/local/bin/simcli
 # COPY pkg/config/*.yaml /etc/onos/config/
 
 ENTRYPOINT ["ransim"]
