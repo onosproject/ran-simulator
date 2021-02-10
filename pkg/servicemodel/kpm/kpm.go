@@ -112,11 +112,11 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	// Creates an indication header
 
 	header := kpmutils.NewIndicationHeader(
-		kpmutils.WithPlmnID(fmt.Sprintf("%d", sm.ServiceModel.Model.PlmnID)),
+		kpmutils.WithPlmnID(uint32(sm.ServiceModel.Model.PlmnID)),
 		kpmutils.WithGnbID(gNbID),
 		kpmutils.WithSst("1"),
 		kpmutils.WithSd("SD1"),
-		kpmutils.WithPlmnIDnrcgi(fmt.Sprintf("%d", sm.ServiceModel.Model.PlmnID)))
+		kpmutils.WithPlmnIDnrcgi(uint32(sm.ServiceModel.Model.PlmnID)))
 
 	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)

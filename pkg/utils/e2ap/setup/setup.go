@@ -11,6 +11,7 @@ import (
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 )
 
 var log = logging.GetLogger("servicemodel", "utils", "setup")
@@ -18,7 +19,7 @@ var log = logging.GetLogger("servicemodel", "utils", "setup")
 // Setup setup request
 type Setup struct {
 	ranFunctions types.RanFunctions
-	plmnID       string
+	plmnID       uint32
 	e2NodeID     uint64
 }
 
@@ -41,7 +42,7 @@ func WithRanFunctions(ranFunctions types.RanFunctions) func(*Setup) {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID string) func(*Setup) {
+func WithPlmnID(plmnID uint32) func(*Setup) {
 	return func(request *Setup) {
 		request.plmnID = plmnID
 
@@ -99,7 +100,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 						GNb: &e2apies.GlobalE2NodeGnbId{
 							GlobalGNbId: &e2apies.GlobalgNbId{
 								PlmnId: &e2ap_commondatatypes.PlmnIdentity{
-									Value: []byte(request.plmnID),
+									Value: utils.PlmnIDToByteArray(request.plmnID),
 								},
 								GnbId: &e2apies.GnbIdChoice{
 									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{

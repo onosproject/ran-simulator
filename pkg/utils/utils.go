@@ -6,9 +6,10 @@
 package utils
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
 	"math"
 	"math/rand"
+
+	"github.com/onosproject/ran-simulator/api/types"
 )
 
 // ServerParams - params to start a new server
@@ -139,4 +140,12 @@ func DegreesToRads(degrees float64) float64 {
 // AspectRatio - Compensate for the narrowing of meridians at higher latitudes
 func AspectRatio(point *types.Point) float64 {
 	return math.Cos(DegreesToRads(point.Lat))
+}
+
+func PlmnIDToByteArray(val uint32) []byte {
+	r := make([]byte, 3)
+	for i := uint32(0); i < 3; i++ {
+		r[i] = byte((val >> (8 * i)) & 0xff)
+	}
+	return r
 }
