@@ -122,8 +122,8 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 }
 
 func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Debugf("Received Subscription Request %v", request)
 	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
+	log.Debugf("Received Subscription Request %v for ran function %d", request, ranFuncID)
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	id := subscriptions.NewID(subutils.GetRicInstanceID(request),
 		subutils.GetRequesterID(request),
@@ -196,8 +196,8 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 }
 
 func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Debugf("Received Subscription Delete Request %v", request)
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	log.Debugf("Received Subscription Delete Request %v for ran function ID %d", request, ranFuncID)
 	subID := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
 		subdeleteutils.GetRequesterID(request),
 		subdeleteutils.GetRanFunctionID(request))
