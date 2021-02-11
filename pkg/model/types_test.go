@@ -6,6 +6,7 @@
 package model
 
 import (
+	"fmt"
 	"gotest.tools/assert"
 	"testing"
 )
@@ -33,4 +34,16 @@ func TestTypes(t *testing.T) {
 	assert.Equal(t, eci, GetECI(uint64(ecgi)), "incorrect ECI")
 	assert.Equal(t, enbID, GetEnbID(uint64(ecgi)), "incorrect ECGI EnbID")
 	assert.Equal(t, enbID, GetEnbID(uint64(genbID)), "incorrect EnbID")
+}
+
+func TestSimValues(t *testing.T) {
+	plmnID := PlmnID(314)
+	enb1 := EnbID(144470)
+	enb2 := EnbID(144471)
+	ecgi11 := ToECGI(plmnID, ToECI(enb1, CellID(1)))
+	ecgi12 := ToECGI(plmnID, ToECI(enb1, CellID(2)))
+	ecgi21 := ToECGI(plmnID, ToECI(enb2, CellID(1)))
+	ecgi22 := ToECGI(plmnID, ToECI(enb2, CellID(2)))
+
+	fmt.Printf("%d\n%d\n%d\n%d\n", ecgi11, ecgi12, ecgi21, ecgi22)
 }
