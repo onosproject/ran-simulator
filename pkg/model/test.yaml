@@ -8,7 +8,7 @@ layout:
     lng: -30.00
   zoom: 0.8
   locationsScale: 1.0
-  fade: false
+  fade: true
   showRoutes: true
   showPower: true
 

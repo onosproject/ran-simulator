@@ -72,7 +72,7 @@ func TestMapLayout(t *testing.T) {
 	assert.Equal(t, -30.0, r.Center.Lng, "incorrect longitude")
 	assert.Equal(t, float32(0.8), r.Zoom, "incorrect zoom")
 	assert.Equal(t, float32(1.0), r.LocationsScale, "incorrect scale")
-	assert.Equal(t, false, r.Fade)
+	assert.Equal(t, true, r.Fade)
 	assert.Equal(t, true, r.ShowRoutes)
 	assert.Equal(t, true, r.ShowPower)
 }
