@@ -9,7 +9,7 @@ type MapLayout struct {
 	Center         Coordinate `yaml:"center"`
 	Zoom           float32    `yaml:"zoom"`
 	LocationsScale float32    `yaml:"locationsScale"`
-	FadeMap        bool       `yaml:"fadeMap"`
+	FadeMap        bool       `yaml:"fade"`
 	ShowRoutes     bool       `yaml:"showRoutes"`
 	ShowPower      bool       `yaml:"showPower"`
 }

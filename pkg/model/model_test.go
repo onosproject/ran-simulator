@@ -31,4 +31,7 @@ func TestModel(t *testing.T) {
 
 	assert.Equal(t, 2, len(model.Nodes["node1"].Cells))
 	assert.Equal(t, 44.0, model.Nodes["node2"].Cells["cell1"].Sector.Center.Lat)
+
+	assert.Equal(t, true, model.MapLayout.FadeMap)
+	assert.Equal(t, 45.0, model.MapLayout.Center.Lat)
 }
