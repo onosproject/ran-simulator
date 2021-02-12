@@ -146,8 +146,7 @@ func (sm Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 		if err != nil {
 			return nil, nil, err
 		}
-		err = errors.New(errors.Forbidden, "no required action is accepted")
-		return nil, subscriptionFailure, err
+		return nil, subscriptionFailure, nil
 	}
 
 	response, err = subscription.BuildSubscriptionResponse()
