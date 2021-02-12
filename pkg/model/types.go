@@ -33,15 +33,15 @@ type IMSI uint64
 
 // Coordinate represents a geographical location
 type Coordinate struct {
-	Lat float64 `yaml:"lat"`
-	Lng float64 `yaml:"lng"`
+	Lat float64 `mapstructure:"lat"`
+	Lng float64 `mapstructure:"lng"`
 }
 
 // Sector represents a 2D arc emanating from a location
 type Sector struct {
-	Center  Coordinate `yaml:"center"`
-	Azimuth int32      `yaml:"azimuth"`
-	Arc     int32      `yaml:"arc"`
+	Center  Coordinate `mapstructure:"center"`
+	Azimuth int32      `mapstructure:"azimuth"`
+	Arc     int32      `mapstructure:"arc"`
 }
 
 // Route represents a named series of points for tracking movement of user-equipment

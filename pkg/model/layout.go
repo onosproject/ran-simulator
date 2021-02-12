@@ -6,10 +6,10 @@ package model
 
 // MapLayout represents information required for geo-map visualizations
 type MapLayout struct {
-	Center         Coordinate `yaml:"center"`
-	Zoom           float32    `yaml:"zoom"`
-	LocationsScale float32    `yaml:"locationsScale"`
-	FadeMap        bool       `yaml:"fade"`
-	ShowRoutes     bool       `yaml:"showRoutes"`
-	ShowPower      bool       `yaml:"showPower"`
+	Center         Coordinate `mapstructure:"center"`
+	Zoom           float32    `mapstructure:"zoom"`
+	LocationsScale float32    `mapstructure:"locationsScale"`
+	FadeMap        bool       `mapstructure:"fade"`
+	ShowRoutes     bool       `mapstructure:"showRoutes"`
+	ShowPower      bool       `mapstructure:"showPower"`
 }

@@ -10,54 +10,54 @@ import (
 
 // Model simulation model
 type Model struct {
-	MapLayout     MapLayout               `yaml:"layout"`
-	Nodes         map[string]Node         `yaml:"nodes"`
-	Controllers   map[string]Controller   `yaml:"controllers"`
-	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
-	UECount       uint                    `yaml:"ueCount"`
-	PlmnID        PlmnID                  `yaml:"plmnID"`
+	MapLayout     MapLayout               `mapstructure:"layout"`
+	Nodes         map[string]Node         `mapstructure:"nodes"`
+	Controllers   map[string]Controller   `mapstructure:"controllers"`
+	ServiceModels map[string]ServiceModel `mapstructure:"servicemodels"`
+	UECount       uint                    `mapstructure:"ueCount"`
+	PlmnID        PlmnID                  `mapstructure:"plmnID"`
 	UEs           UERegistry              // Not intended to be loaded from the YAML file; created separately
 	// Routes   *SimRoutes
 }
 
 // Node e2 node
 type Node struct {
-	EnbID         EnbID           `yaml:"enbID"`
-	Controllers   []string        `yaml:"controllers"`
-	ServiceModels []string        `yaml:"servicemodels"`
-	Cells         map[string]Cell `yaml:"cells"`
+	EnbID         EnbID           `mapstructure:"enbID"`
+	Controllers   []string        `mapstructure:"controllers"`
+	ServiceModels []string        `mapstructure:"servicemodels"`
+	Cells         map[string]Cell `mapstructure:"cells"`
 }
 
 // Controller E2T endpoint information
 type Controller struct {
-	ID      string `yaml:"id"`
-	Address string `yaml:"address"`
-	Port    int    `yaml:"port"`
+	ID      string `mapstructure:"id"`
+	Address string `mapstructure:"address"`
+	Port    int    `mapstructure:"port"`
 }
 
 // Cell represents a section of coverage
 type Cell struct {
-	Ecgi      ECGI    `yaml:"ecgi"`
-	Sector    Sector  `yaml:"sector"`
-	Color     string  `yaml:"color"`
-	MaxUEs    uint32  `yaml:"maxUEs"`
-	Neighbors []ECGI  `yaml:"neighbors"`
-	TxPowerDB float64 `yaml:"txPower"`
+	Ecgi      ECGI    `mapstructure:"ecgi"`
+	Sector    Sector  `mapstructure:"sector"`
+	Color     string  `mapstructure:"color"`
+	MaxUEs    uint32  `mapstructure:"maxUEs"`
+	Neighbors []ECGI  `mapstructure:"neighbors"`
+	TxPowerDB float64 `mapstructure:"txPower"`
 
 	// TODO: should not be needed as it coincides with sector center.
-	//Location  Coordinate `yaml:"location"`
+	//Location  Coordinate `mapstructure:"location"`
 
 	// TODO: add the following later or track them differently
 	//Crntis map
-	//CrntiIndex uint32     `yaml:"crntiIndex"`
-	//Port       uint32     `yaml:"port"`
+	//CrntiIndex uint32     `mapstructure:"crntiIndex"`
+	//Port       uint32     `mapstructure:"port"`
 }
 
 // ServiceModel service model information
 type ServiceModel struct {
-	ID          int    `yaml:"id"`
-	Description string `yaml:"description"`
-	Version     string `yaml:"version"`
+	ID          int    `mapstructure:"id"`
+	Description string `mapstructure:"description"`
+	Version     string `mapstructure:"version"`
 }
 
 // GetNode gets a an e2 node
