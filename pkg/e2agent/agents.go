@@ -34,7 +34,7 @@ func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRe
 func (agents *E2Agents) Start() error {
 	log.Info("Starting E2 Agents")
 	for id, a := range agents.Agents {
-		log.Debug("Starting agent with ECGI:", id)
+		log.Debug("Starting agent with e2 node ID:", id)
 		err := a.Start()
 		if err != nil {
 			return err
@@ -47,7 +47,7 @@ func (agents *E2Agents) Start() error {
 func (agents *E2Agents) Stop() error {
 	log.Info("Stopping E2 Agents")
 	for id, a := range agents.Agents {
-		log.Debug("Stopping agent with ECGI:", id)
+		log.Debug("Stopping agent with e2 node ID:", id)
 		err := a.Stop()
 		if err != nil {
 			return err

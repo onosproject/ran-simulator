@@ -37,23 +37,28 @@ const (
 
 // Client kpm service model client
 type Client struct {
-	Subscriptions *subscriptions.Subscriptions
-	ServiceModel  *registry.ServiceModel
+	ServiceModel *registry.ServiceModel
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry, subStore *subscriptions.Subscriptions) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	rcSm := registry.ServiceModel{
 		RanFunctionID:       registry.Rc,
 		ModelFullName:       modelFullName,
-		Client:              &Client{},
 		Revision:            1,
 		Version:             version,
 		ModelPluginRegistry: modelPluginRegistry,
 		Node:                node,
 		Model:               model,
+		Subscriptions:       subStore,
 	}
+
+	rcClient := &Client{
+		ServiceModel: &rcSm,
+	}
+
+	rcSm.Client = rcClient
 
 	var ranFunctionShortName = string(modelFullName)
 	var ranFunctionE2SmOid = "OID124"
@@ -97,14 +102,14 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 }
 
 // RICControl implements control handler for RC service model
-func (sm Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
+func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	log.Info("Control Request is received for service model:", sm.ServiceModel.ModelFullName)
 	// TODO implements handler for control requests
 	return response, failure, err
 }
 
 // RICSubscription implements subscription handler for RC service model
-func (sm Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
+func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	log.Info("Ric Subscription Request is received for service model:", sm.ServiceModel.ModelFullName)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
@@ -159,13 +164,13 @@ func (sm Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 }
 
 // RICSubscriptionDelete implements subscription delete handler for RC service model
-func (sm Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
+func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	log.Info("Ric subscription delete request is received for service model:", sm.ServiceModel.ModelFullName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
 	subID := subscriptions.NewID(ricInstanceID, reqID, ranFuncID)
-	sub, err := sm.Subscriptions.Get(subID)
+	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 
 	if err != nil {
 		return nil, nil, err

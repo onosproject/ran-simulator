@@ -48,24 +48,28 @@ const (
 
 // Client kpm service model client
 type Client struct {
-	Subscriptions *subscriptions.Subscriptions
-	ServiceModel  *registry.ServiceModel
-	Model         *model.Model
+	ServiceModel *registry.ServiceModel
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry, subStore *subscriptions.Subscriptions) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	kpmSm := registry.ServiceModel{
 		RanFunctionID:       registry.Kpm,
 		ModelFullName:       modelFullName,
-		Client:              &Client{},
 		Revision:            1,
 		Version:             version,
 		ModelPluginRegistry: modelPluginRegistry,
 		Node:                node,
 		Model:               model,
+		Subscriptions:       subStore,
 	}
+	kpmClient := &Client{
+		ServiceModel: &kpmSm,
+	}
+
+	kpmSm.Client = kpmClient
+
 	var ranFunctionShortName = string(modelFullName)
 	var ranFunctionE2SmOid = "OID123"
 	var ranFunctionDescription = "KPM Monitor"
@@ -131,7 +135,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 
 	// Creating an indication message
 	indicationMessage := kpmutils.NewIndicationMessage(
-		kpmutils.WithNumberOfActiveUes(int32(sm.Model.UEs.GetNumUes())))
+		kpmutils.WithNumberOfActiveUes(int32(sm.ServiceModel.Model.UEs.GetNumUes())))
 
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
@@ -139,7 +143,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	}
 
 	intervalDuration := time.Duration(interval)
-	sub, err := sm.Subscriptions.Get(subID)
+	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return err
 	}
@@ -251,7 +255,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
 	subID := subscriptions.NewID(ricInstanceID, reqID, ranFuncID)
-	sub, err := sm.Subscriptions.Get(subID)
+	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return nil, nil, err
 	}
