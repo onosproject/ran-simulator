@@ -17,7 +17,7 @@ import (
 )
 
 func newRicActionID(raID *e2apies.RicactionId) *C.RICactionID_t {
-	raIDC := C.RICactionID_t(C.long(raID.GetValue()))
+	raIDC := C.RICactionID_t(raID.GetValue())
 	return &raIDC
 }
 

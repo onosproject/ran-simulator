@@ -13,6 +13,8 @@
 
 /* Including external dependencies */
 #include "ProtocolIE-ID.h"
+#include "CriticalityDiagnostics-IE-List.h"
+#include "CriticalityDiagnostics-IE-Item.h"
 #include "Criticality.h"
 #include "ANY.h"
 #include "asn_ioc.h"

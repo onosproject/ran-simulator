@@ -41,7 +41,7 @@ func decodeRicActionAdmittedListBytes(raalBytes []byte) (*e2appducontents.Ricact
 	size := C.int(binary.LittleEndian.Uint32(raalBytes[12:16]))
 
 	raalC := C.RICaction_Admitted_List_t{
-		list: C.struct___67{
+		list: C.struct___85{
 			array: array,
 			size:  size,
 			count: count,

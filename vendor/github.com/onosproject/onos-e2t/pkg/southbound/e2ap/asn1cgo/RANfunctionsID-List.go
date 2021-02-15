@@ -41,7 +41,7 @@ func decodeRanFunctionsIDListBytes(ranFunctionIDListChoice [112]byte) (*e2appduc
 	size := C.int(binary.LittleEndian.Uint32(ranFunctionIDListChoice[12:16]))
 
 	rfIDlC := C.RANfunctionsID_List_t{
-		list: C.struct___67{
+		list: C.struct___85{
 			array: array,
 			size:  size,
 			count: count,

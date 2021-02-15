@@ -93,7 +93,7 @@ func decodeRanFunctionsListBytes(ranFunctionListChoice [48]byte) (*e2appduconten
 	size := C.int(binary.LittleEndian.Uint32(ranFunctionListChoice[12:16]))
 
 	ranFunctionListChoiceC := C.RANfunctions_List_t{
-		list: C.struct___44{
+		list: C.struct___57{
 			array: array,
 			size:  size,
 			count: count,

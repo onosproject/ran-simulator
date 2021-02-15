@@ -6,12 +6,13 @@ package channels
 
 import (
 	"context"
+	"io"
+	"net"
+
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appdudescriptions"
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2/procedures"
 	"github.com/onosproject/onos-e2t/pkg/utils/async"
-	"io"
-	"net"
 )
 
 // RICHandler is a function for wrapping an RICChannel
@@ -110,7 +111,6 @@ func (c *ricChannel) RICSubscriptionDelete(ctx context.Context, request *e2appdu
 }
 
 func (c *ricChannel) Close() error {
-	defer c.conn.Close()
 	procedures := []procedures.ElementaryProcedure{
 		c.e2Setup,
 		c.ricControl,
@@ -118,9 +118,13 @@ func (c *ricChannel) Close() error {
 		c.ricSubscription,
 		c.ricSubscriptionDelete,
 	}
-	return async.Apply(len(procedures), func(i int) error {
+	err := async.Apply(len(procedures), func(i int) error {
 		return procedures[i].Close()
 	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 var _ RICChannel = &ricChannel{}
