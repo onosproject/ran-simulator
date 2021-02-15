@@ -58,6 +58,9 @@ type e2Agent struct {
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
 	reg := registry.NewServiceModelRegistry()
+
+	// Each new e2 agent has its own subscription store
+	subStore := subscriptions.NewStore()
 	sms := node.ServiceModels
 	for _, smID := range sms {
 		serviceModel, err := model.GetServiceModel(smID)
@@ -66,7 +69,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
 		case registry.Kpm:
-			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry)
+			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry, subStore)
 			if err != nil {
 				return nil, err
 			}
@@ -76,7 +79,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 				return nil, err
 			}
 		case registry.Rc:
-			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry)
+			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry, subStore)
 			if err != nil {
 				return nil, err
 			}
@@ -92,7 +95,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		node:     node,
 		registry: reg,
 		model:    model,
-		subStore: subscriptions.NewStore(),
+		subStore: subStore,
 	}, nil
 }
 
@@ -105,13 +108,9 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
-		client.Subscriptions = a.subStore
-		client.ServiceModel = &sm
 		response, failure, err = client.RICControl(ctx, request)
 	case registry.Rc:
 		client := sm.Client.(*rc.Client)
-		client.Subscriptions = a.subStore
-		client.ServiceModel = &sm
 		response, failure, err = client.RICControl(ctx, request)
 
 	default:
@@ -175,19 +174,13 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
-		client.Subscriptions = a.subStore
-		client.ServiceModel = &sm
-		client.Model = sm.Model
-
 		response, failure, err = client.RICSubscription(ctx, request)
 	case registry.Rc:
 		client := sm.Client.(*rc.Client)
-		client.Subscriptions = a.subStore
-		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscription(ctx, request)
 
 	}
-	// Ric subscription is failed so we are not going to update the store
+	// Ric subscription is failed
 	if err != nil {
 		return response, failure, err
 	}
@@ -254,14 +247,9 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
-		client.Subscriptions = a.subStore
-		client.ServiceModel = &sm
-		client.Model = sm.Model
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	case registry.Rc:
 		client := sm.Client.(*rc.Client)
-		client.Subscriptions = a.subStore
-		client.ServiceModel = &sm
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 
 	}
@@ -283,31 +271,31 @@ func (a *e2Agent) Start() error {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
-	log.Infof("%s is starting; attempting to connect", a.node.EnbID)
+	log.Infof("E2 node %d is starting; attempting to connect", a.node.EnbID)
 	b := newExpBackoff()
 
 	// Attempt to connect to the E2T controller; use exponential back-off retry
 	count := 0
 	connectNotify := func(err error, t time.Duration) {
 		count++
-		log.Infof("%s failed to connect; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
+		log.Infof("E2 node %d failed to connect; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
 	}
 
 	err := backoff.RetryNotify(a.connect, b, connectNotify)
 	if err != nil {
 		return err
 	}
-	log.Infof("%s connected; attempting setup", a.node.EnbID)
+	log.Infof("E2 node %d connected; attempting setup", a.node.EnbID)
 
 	// Attempt to negotiate E2 setup procedure; use exponential back-off retry
 	count = 0
 	setupNotify := func(err error, t time.Duration) {
 		count++
-		log.Infof("%s failed setup procedure; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
+		log.Infof("E2 node %d failed setup procedure; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
 	}
 
 	err = backoff.RetryNotify(a.setup, b, setupNotify)
-	log.Infof("%s completed connection setup", a.node.EnbID)
+	log.Infof("E2 node %d completed connection setup", a.node.EnbID)
 	return err
 }
 
