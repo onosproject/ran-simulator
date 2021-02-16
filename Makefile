@@ -6,11 +6,26 @@ export GO111MODULE=on
 RAN_SIMULATOR_VERSION := latest
 ONOS_PROTOC_VERSION := v0.6.7
 
+OUTPUT_DIR=./build/_output
+PLUGIN_DIR=./plugins
+
+PLUGINS=$(subst ${PLUGIN_DIR}/,,$(wildcard ${PLUGIN_DIR}/*))
+
 build: # @HELP build the Go binaries and run all validations (default)
-build:
+build: plugin
 	export GOPRIVATE="github.com/onosproject/*"
-	go build -o build/_output/ransim ./cmd/ransim
-	go build -o build/_output/simcli ./cmd/simcli
+	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/ransim ./cmd/ransim
+	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/simcli ./cmd/simcli
+
+$(PLUGINS):
+	export GOPRIVATE="github.com/onosproject/*"
+	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/ -buildmode=plugin ${PLUGIN_DIR}/$@
+
+.PHONY: plugin
+plugin: $(PLUGINS) # @HELP build libraries for plugins
+
+debug: BUILD_FLAGS += -gcflags=all="-N -l"
+debug: build # @HELP build the Go binaries with debug symbols
 
 test: # @HELP run the unit tests and source code validation producing a golang style report
 test: build deps linters license_check
@@ -78,7 +93,7 @@ bumponosdeps: # @HELP update "onosproject" go dependencies and push patch to git
 	./../build-tools/bump-onos-deps ${VERSION}
 
 clean: # @HELP remove all the build artifacts
-	rm -rf ./build/_output ./cmd/trafficsim/trafficsim ./cmd/ransim/ransim
+	rm -rf ${OUTPUT_DIR} ./cmd/trafficsim/trafficsim ./cmd/ransim/ransim
 	go clean -testcache github.com/onosproject/ran-simulator/...
 
 help:
