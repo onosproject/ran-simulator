@@ -40,7 +40,7 @@ func decodeRanFunctionsIDCauseListBytes(ranFunctionIDCauseListChoice [112]byte) 
 	size := C.int(binary.LittleEndian.Uint32(ranFunctionIDCauseListChoice[12:16]))
 
 	rfIDCauselC := C.RANfunctionsIDcause_List_t{
-		list: C.struct___73{
+		list: C.struct___92{
 			array: array,
 			size:  size,
 			count: count,

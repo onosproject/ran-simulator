@@ -664,6 +664,8 @@ github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.4 h1:HZowN8TrCe
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.4/go.mod h1:7L6EP4QiAwgtVXT1HbnEUslzpu5Nl+yz3MR/SYJd1nw=
 github.com/onosproject/onos-e2t v0.7.0 h1:yAHVQNkIeQWcgSRnProUsmEN7ZPFrMqSdH0E44GpxbQ=
 github.com/onosproject/onos-e2t v0.7.0/go.mod h1:4q6MeDAVT63LPLR1N0o/a/OZ3y+QHYRNrkfBRG/Ixvs=
+github.com/onosproject/onos-e2t v0.7.2 h1:jL8+98aODLAlwminYnnqc4ZckBf+seWPX+gse3ybJtM=
+github.com/onosproject/onos-e2t v0.7.2/go.mod h1:tOh6wgoj9RSbBBi9kurPxIhHS7mU+yDBRq8IWYKuy9g=
 github.com/onosproject/onos-lib-go v0.7.0 h1:+BxQc0K4nej8qsciArvk6QC3Do6VKQevbIegpR3Kil8=
 github.com/onosproject/onos-lib-go v0.7.0/go.mod h1:ttkK+fV2CULZFHiq6FBZ69i7/Nymi1Wow1DNy0Ik/2o=
 github.com/onosproject/onos-ric-sdk-go v0.7.0 h1:z24x5pT13q1kt9FdMy8Nnpz4a3GMfSuiNZ4cf5CE1qc=

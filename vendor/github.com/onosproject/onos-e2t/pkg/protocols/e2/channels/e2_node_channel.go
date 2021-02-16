@@ -93,7 +93,6 @@ func (c *e2NodeChannel) RICIndication(ctx context.Context, request *e2appduconte
 }
 
 func (c *e2NodeChannel) Close() error {
-	defer c.conn.Close()
 	procedures := []procedures.ElementaryProcedure{
 		c.e2Setup,
 		c.ricControl,
@@ -101,9 +100,13 @@ func (c *e2NodeChannel) Close() error {
 		c.ricSubscription,
 		c.ricSubscriptionDelete,
 	}
-	return async.Apply(len(procedures), func(i int) error {
+	err := async.Apply(len(procedures), func(i int) error {
 		return procedures[i].Close()
 	})
+	if err != nil {
+		return err
+	}
+	return c.threadSafeChannel.Close()
 }
 
 var _ E2NodeChannel = &e2NodeChannel{}

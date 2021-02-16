@@ -10,6 +10,7 @@ package asn1cgo
 //#include <stdlib.h>
 //#include <assert.h>
 //#include "Cause.h"
+//#include "CriticalityDiagnostics-IE-List.h"
 import "C"
 import (
 	"encoding/binary"

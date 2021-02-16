@@ -44,7 +44,7 @@ func decodeRicSubscriptionDetailsBytes(bytes []byte) (*e2appducontents.Ricsubscr
 			size: C.ulong(binary.LittleEndian.Uint64(bytes[8:])),
 		},
 		ricAction_ToBeSetup_List: C.RICactions_ToBeSetup_List_t{
-			list: C.struct___58{ // TODO: tie this down with a predictable name
+			list: C.struct___75{ // TODO: tie this down with a predictable name
 				array: array,
 				size:  size,
 				count: count,

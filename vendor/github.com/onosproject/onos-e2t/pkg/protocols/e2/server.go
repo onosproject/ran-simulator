@@ -21,8 +21,10 @@ type ServerInterface procedures.RICProcedures
 type ServerChannel channels.RICChannel
 
 // NewServer creates a new E2 server
-func NewServer() *Server {
-	return &Server{}
+func NewServer(opts ...sctp.ServerOption) *Server {
+	return &Server{
+		server: sctp.NewServer(opts...),
+	}
 }
 
 // Server is an E2 server
