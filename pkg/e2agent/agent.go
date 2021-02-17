@@ -43,6 +43,9 @@ type E2Agent interface {
 
 	// Stop stops the agent
 	Stop() error
+
+	// Gets SM
+	GetSM(id registry.RanFunctionID) (registry.ServiceModel, error)
 }
 
 // e2Agent is an E2 agent
@@ -352,6 +355,14 @@ func (a *e2Agent) Stop() error {
 		return a.channel.Close()
 	}
 	return nil
+}
+
+func (a *e2Agent) GetSM(id registry.RanFunctionID) (registry.ServiceModel, error) {
+	if sm, ok := a.registry.GetServiceModels()[id]; ok {
+		return sm, nil
+	}
+
+	return registry.ServiceModel{}, errors.New(errors.NotFound, "the service model not found")
 }
 
 var _ E2Agent = &e2Agent{}
