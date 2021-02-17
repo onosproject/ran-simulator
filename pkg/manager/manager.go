@@ -5,11 +5,14 @@
 package manager
 
 import (
+	"fmt"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/trafficsim"
 )
 
@@ -72,6 +75,12 @@ func (m *Manager) startE2Agents() error {
 		return err
 	}
 
+	err = m.LoadPlugins()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
 	// Create the UE registry primed with the specified number of UEs
 	m.model.UEs = model.NewUERegistry(m.model.UECount)
 
@@ -80,6 +89,14 @@ func (m *Manager) startE2Agents() error {
 		log.Error(err)
 		return err
 	}
+
+	// Load ModelPlugin data
+	err = m.LoadStartup()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
 	// Start the E2 agents
 	err = m.agents.Start()
 	if err != nil {
@@ -87,7 +104,6 @@ func (m *Manager) startE2Agents() error {
 	}
 
 	return nil
-
 }
 
 // Start starts the manager
@@ -141,4 +157,16 @@ func (m *Manager) Close() {
 
 func (m *Manager) stopNorthboundServer() {
 	// TODO implementation requires ability to actually stop the server
+}
+
+// Load shared libraries for ModelPlugins
+func (m *Manager) LoadPlugins() error {
+	for name, _ := range registry.StringToRanFunctionID {
+		libname := fmt.Sprintf("%s.so", name)
+		_, _, err := m.modelPluginRegistry.RegisterModelPlugin(libname)
+		if err != nil {
+			log.Warnf("Missing plugin %s", name)
+		}
+	}
+	return nil
 }
