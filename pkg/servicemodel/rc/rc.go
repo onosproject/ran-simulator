@@ -7,6 +7,8 @@ package rc
 import (
 	"context"
 
+	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
+
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
@@ -104,8 +106,18 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 // RICControl implements control handler for RC service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	log.Info("Control Request is received for service model:", sm.ServiceModel.ModelFullName)
-	// TODO implements handler for control requests
-	return response, failure, err
+	reqID := controlutils.GetRequesterID(request)
+	ranFuncID := controlutils.GetRanFunctionID(request)
+	ricInstanceID := controlutils.GetRicInstanceID(request)
+
+	// TODO react to CONTROL messages to update PCI for cells
+
+	response, _ = controlutils.NewControl(
+		controlutils.WithRanFuncID(ranFuncID),
+		controlutils.WithRequestID(reqID),
+		controlutils.WithRicInstanceID(ricInstanceID),
+		controlutils.WithRicControlOutcome(e2aptypes.RicControlOutcome("OK"))).BuildControlAcknowledge()
+	return response, nil, err
 }
 
 // RICSubscription implements subscription handler for RC service model
