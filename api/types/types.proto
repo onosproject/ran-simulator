@@ -72,7 +72,7 @@ message UeMetrics {
     int64 ho_report_timestamp = 2;
 
     // flag to indicate the first measurement
-    bool isFirst = 3;
+    bool is_first = 3;
 }
 
 message Cell {
@@ -84,17 +84,17 @@ message Cell {
 
     string color = 5;
 
-    uint32 maxUEs = 6;
+    uint32 max_ues = 6 [(gogoproto.customname) = "MaxUEs"];
 
     repeated uint64 neighbors = 7 [(gogoproto.casttype) = "ECGI"];
 
     // The cell transmit power in decibels
-    double txPowerdB = 8;
+    double tx_power_db = 8 [(gogoproto.customname) = "TxPowerdB"];
 
     // crntis maps a ue's name to its crnti
-    map<uint32, uint64> crntiMap = 9 [(gogoproto.castkey) = "CRNTI", (gogoproto.castvalue) = "IMSI"];
+    map<uint32, uint64> crnti_map = 9 [(gogoproto.castkey) = "CRNTI", (gogoproto.castvalue) = "IMSI"];
 
-    uint32 crntiIndex = 10;
+    uint32 crnti_index = 10;
 
     uint32 port = 11;
 }
@@ -102,9 +102,11 @@ message Cell {
 message Node {
     uint32 enbid = 1 [(gogoproto.customname) = "EnbID", (gogoproto.casttype) = "EnbID"];
 
-    string address = 2;
+    repeated string controllers = 2;
 
-    int32 port = 3;
+    repeated string service_models = 3;
+
+    repeated uint64 cell_ecgis = 4 [(gogoproto.customname) = "CellECGIs", (gogoproto.casttype) = "ECGI"];
 }
 
 message MapLayout {
@@ -118,13 +120,13 @@ message MapLayout {
     bool fade = 3;
 
     // Show routes on start
-    bool showRoutes = 4;
+    bool show_routes = 4;
 
     // Show power as circle on start
-    bool showPower = 5;
+    bool show_power = 5;
 
     // Ratio of random locations diameter to tower grid width
-    float locationsScale = 9;
+    float locations_scale = 9;
 
     // FIXME: These are deprecated; remove
     // Max number of UEs for complete simulation
