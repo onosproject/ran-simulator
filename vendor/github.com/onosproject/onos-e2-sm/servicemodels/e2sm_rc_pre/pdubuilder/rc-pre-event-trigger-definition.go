@@ -9,21 +9,14 @@ import (
 )
 
 func CreateE2SmRcPreEventTriggerDefinition(rtPeriod int32) (*e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition, error) {
-	if rtPeriod < 0 && rtPeriod > 19 {
-		return nil, fmt.Errorf("reportPeriodIe is out of range. Should be from 0 to 19")
-	}
-
-	policyTestItem := &e2sm_rc_pre_ies.TriggerConditionIeItem{
-		ReportPeriodIe: e2sm_rc_pre_ies.RtPeriodIe(rtPeriod),
-	}
 
 	eventDefinitionFormat1 := &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinitionFormat1{
-		PolicyTestList: make([]*e2sm_rc_pre_ies.TriggerConditionIeItem, 0),
+		TriggerType:       e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE,
+		ReportingPeriodMs: rtPeriod,
 	}
-	eventDefinitionFormat1.PolicyTestList = append(eventDefinitionFormat1.PolicyTestList, policyTestItem)
 
 	E2SmRcPrePdu := e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition{
-		E2SmRcPreEventTriggerDefinition: &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition_EventDefinitionFormat1{
+		E2SmRcPreEventTriggerDefinitionEventDefinitionFormats: &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition_EventDefinitionFormat1{
 			EventDefinitionFormat1: eventDefinitionFormat1,
 		},
 	}
