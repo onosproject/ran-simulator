@@ -110,7 +110,13 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
 
-	// TODO react to CONTROL messages to update PCI for cells
+	controlMessage, err := sm.getControlMessage(request)
+	if err != nil {
+		log.Error(err)
+	}
+	log.Debug("Control Message Proto:", controlMessage)
+
+	// TODO
 
 	response, _ = controlutils.NewControl(
 		controlutils.WithRanFuncID(ranFuncID),
@@ -199,4 +205,11 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 	// TODO stop the event triggers
 	return response, nil, nil
+}
+
+func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
+	if modelPlugin, ok := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[modelFullName]; ok {
+		return modelPlugin, nil
+	}
+	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
 }
