@@ -113,10 +113,18 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	controlMessage, err := sm.getControlMessage(request)
 	if err != nil {
 		log.Error(err)
+		return nil, nil, err
 	}
-	log.Debug("Control Message Proto:", controlMessage)
+	log.Debugf("Control Message Proto: %+v", controlMessage)
 
-	// TODO
+	controlHeader, err := sm.getControlHeader(request)
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+
+	log.Debugf("Control Header Proto: %+v", controlHeader)
+	// TODO implement RC control logic
 
 	response, _ = controlutils.NewControl(
 		controlutils.WithRanFuncID(ranFuncID),

@@ -5,9 +5,9 @@
 package rc
 
 import (
-	"github.com/golang/protobuf/proto"
 	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
+	"google.golang.org/protobuf/proto"
 )
 
 func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_rc_pre_ies.E2SmRcPreControlMessage, error) {

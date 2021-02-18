@@ -70,6 +70,7 @@ func WithCause(cause e2apies.Cause) func(*ErrorIndication) {
 	}
 }
 
+// Build builds an error indication message
 func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 	ricRequestID := e2appducontents.ErrorIndicationIes_ErrorIndicationIes29{
 		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
@@ -85,7 +86,7 @@ func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 		Id:          int32(v1beta1.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
-			Value: int32(e.ranFuncID),
+			Value: e.ranFuncID,
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 	}
@@ -107,8 +108,8 @@ func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 			TriggeringMessage:    e.failureTrigMsg,
 			ProcedureCriticality: e.failureCrit,
 			RicRequestorId: &e2apies.RicrequestId{
-				RicRequestorId: int32(e.reqID),
-				RicInstanceId:  int32(e.ricInstanceID),
+				RicRequestorId: e.reqID,
+				RicInstanceId:  e.ricInstanceID,
 			},
 			IEsCriticalityDiagnostics: &e2apies.CriticalityDiagnosticsIeList{
 				Value: make([]*e2apies.CriticalityDiagnosticsIeItem, 0),
