@@ -24,7 +24,7 @@ message ListCellsRequest {
 
 message ListCellsResponse {
     // cell is the cell change on which the event occurred
-    ran.trafficsim.types.Cell cell = 1;
+    ran.types.Cell cell = 1;
 
     // type is a qualification of the type of change being made
     Type type = 2;
@@ -41,7 +41,7 @@ message ListRoutesRequest {
 
 message ListRoutesResponse {
     // route is the route change on which the event occurred
-    ran.trafficsim.types.Route route = 1;
+    ran.types.Route route = 1;
 
     // type is a qualification of the type of change being made
     Type type = 2;
@@ -58,7 +58,7 @@ message ListUesRequest {
 
 message ListUesResponse {
     // Ue is the UserEquipment change on which the event occurred
-    ran.trafficsim.types.Ue ue = 1;
+    ran.types.Ue ue = 1;
 
     // type is a qualification of the type of change being made
     Type type = 2;
@@ -80,7 +80,7 @@ message ResetMetricsMsg {
 
 // Traffic - provides a stream of traffic data to GUI
 service Traffic {
-    rpc GetMapLayout(MapLayoutRequest) returns (ran.trafficsim.types.MapLayout);
+    rpc GetMapLayout(MapLayoutRequest) returns (ran.types.MapLayout);
 
     rpc ListCells(ListCellsRequest) returns (stream ListCellsResponse);
 

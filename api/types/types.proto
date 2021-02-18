@@ -6,7 +6,7 @@ SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
 syntax = "proto3";
 
-package ran.trafficsim.types;
+package ran.types;
 
 import "gogoproto/gogo.proto";
 
@@ -109,7 +109,7 @@ message Node {
 
 message MapLayout {
     // Map center latitude and longitude
-    ran.trafficsim.types.Point center = 1;
+    Point center = 1;
 
     // The starting Zoom level
     float zoom = 2;
@@ -137,3 +137,4 @@ message MapLayout {
     uint32 current_routes = 8;
 
 }
+
