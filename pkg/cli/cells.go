@@ -42,7 +42,7 @@ func runGetCellsCommand(cmd *cobra.Command, args []string) error {
 			break
 		}
 		cell := r.Cell
-		Output("%16d %7d %7d %5.2f %7.3f %7.3f %8s\n", cell.Ecgi, len(cell.CrntiMap), cell.MaxUEs, cell.TxPowerdB,
+		Output("%16d %7d %7d %5.2f %7.3f %7.3f %8s\n", cell.ECGI, len(cell.CrntiMap), cell.MaxUEs, cell.TxPowerdB,
 			cell.Location.Lat, cell.Location.Lng, cell.Color)
 	}
 	return nil

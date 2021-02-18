@@ -5,6 +5,7 @@
 package model
 
 import (
+	"github.com/onosproject/ran-simulator/api/types"
 	"math/rand"
 	"sync"
 )
@@ -19,20 +20,20 @@ type UEType string
 
 // UECell represents UE-cell relationship
 type UECell struct {
-	ID       GEnbID
-	Ecgi     ECGI // Auxiliary form of association
+	ID       types.GEnbID
+	Ecgi     types.ECGI // Auxiliary form of association
 	Strength float64
 }
 
 // UE represents user-equipment, i.e. phone, IoT device, etc.
 type UE struct {
-	IMSI     IMSI
+	IMSI     types.IMSI
 	Type     UEType
 	Location Coordinate
 	Rotation uint32
 
 	Cell  *UECell
-	Crnti CRNTI
+	CRNTI types.CRNTI
 	Cells []*UECell
 
 	IsAdmitted bool
@@ -48,16 +49,16 @@ type UERegistry interface {
 	CreateUEs(count uint)
 
 	// DestroyUE destroy the specified UE
-	DestroyUE(IMSI IMSI)
+	DestroyUE(IMSI types.IMSI)
 
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs() []*UE
 
 	// MoveUE update the cell affiliation of the specified UE
-	MoveUE(IMSI IMSI, genbID GEnbID, strength float64)
+	MoveUE(IMSI types.IMSI, genbID types.GEnbID, strength float64)
 
 	// ListUEs returns an array of all UEs associated with the specified cell
-	ListUEs(genbID GEnbID) []*UE
+	ListUEs(genbID types.GEnbID) []*UE
 
 	// GetNumUes returns number of active UEs
 	GetNumUes() int
@@ -65,14 +66,14 @@ type UERegistry interface {
 
 type registry struct {
 	lock sync.RWMutex
-	ues  map[IMSI]*UE
+	ues  map[types.IMSI]*UE
 }
 
 // NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start
 func NewUERegistry(count uint) UERegistry {
 	reg := &registry{
 		lock: sync.RWMutex{},
-		ues:  make(map[IMSI]*UE),
+		ues:  make(map[types.IMSI]*UE),
 	}
 	reg.CreateUEs(count)
 	return reg
@@ -104,12 +105,12 @@ func (r *registry) CreateUEs(count uint) {
 	for i := uint(0); i < count; i++ {
 		// FIXME: fill in with more sensible values
 		ue := &UE{
-			IMSI:       IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI),
+			IMSI:       types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI),
 			Type:       "phone",
 			Location:   Coordinate{0, 0},
 			Rotation:   0,
 			Cell:       &UECell{},
-			Crnti:      CRNTI(90125 + i),
+			CRNTI:      types.CRNTI(90125 + i),
 			Cells:      nil,
 			IsAdmitted: false,
 		}
@@ -117,7 +118,7 @@ func (r *registry) CreateUEs(count uint) {
 	}
 }
 
-func (r *registry) DestroyUE(IMSI IMSI) {
+func (r *registry) DestroyUE(IMSI types.IMSI) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	delete(r.ues, IMSI)
@@ -133,7 +134,7 @@ func (r *registry) ListAllUEs() []*UE {
 	return list
 }
 
-func (r *registry) MoveUE(IMSI IMSI, genbID GEnbID, strength float64) {
+func (r *registry) MoveUE(IMSI types.IMSI, genbID types.GEnbID, strength float64) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	ue := r.ues[IMSI]
@@ -143,7 +144,7 @@ func (r *registry) MoveUE(IMSI IMSI, genbID GEnbID, strength float64) {
 	}
 }
 
-func (r *registry) ListUEs(genbID GEnbID) []*UE {
+func (r *registry) ListUEs(genbID types.GEnbID) []*UE {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	list := make([]*UE, 0, len(r.ues))

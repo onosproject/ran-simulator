@@ -25,7 +25,7 @@ message Sector {
 }
 
 message Route {
-    uint64 name = 1 [(gogoproto.customname) = "RouteID", (gogoproto.casttype) = "Imsi"];
+    uint64 name = 1 [(gogoproto.customname) = "RouteID", (gogoproto.casttype) = "IMSI"];
 
     repeated Point waypoints = 2;
 
@@ -33,7 +33,7 @@ message Route {
 }
 
 message Ue {
-    uint64 imsi = 1 [(gogoproto.customname) = "Imsi", (gogoproto.casttype) = "Imsi"];
+    uint64 imsi = 1 [(gogoproto.customname) = "IMSI", (gogoproto.casttype) = "IMSI"];
 
     string type = 2;
 
@@ -41,23 +41,23 @@ message Ue {
 
     uint32 rotation = 5;
 
-    uint64 serving_tower = 7 [(gogoproto.casttype) = "Ecgi"];
+    uint64 serving_tower = 7 [(gogoproto.casttype) = "ECGI"];
 
     double serving_tower_strength = 8;
 
-    uint64 tower1 = 9 [(gogoproto.casttype) = "Ecgi"];
+    uint64 tower1 = 9 [(gogoproto.casttype) = "ECGI"];
 
     double tower1_strength = 10;
 
-    uint64 tower2 = 11 [(gogoproto.casttype) = "Ecgi"];
+    uint64 tower2 = 11 [(gogoproto.casttype) = "ECGI"];
 
     double tower2_strength = 12;
 
-    uint64 tower3 = 13 [(gogoproto.casttype) = "Ecgi"];
+    uint64 tower3 = 13 [(gogoproto.casttype) = "ECGI"];
 
     double tower3_strength = 14;
 
-    uint32 crnti = 15 [(gogoproto.customname) = "Crnti", (gogoproto.casttype) = "Crnti"];
+    uint32 crnti = 15 [(gogoproto.customname) = "CRNTI", (gogoproto.casttype) = "CRNTI"];
 
     bool admitted = 16;
 
@@ -76,7 +76,7 @@ message UeMetrics {
 }
 
 message Cell {
-    uint64 Ecgi = 1 [(gogoproto.customname) = "Ecgi", (gogoproto.casttype) = "Ecgi"];
+    uint64 ecgi = 1 [(gogoproto.customname) = "ECGI", (gogoproto.casttype) = "ECGI"];
 
     Point location = 3;
 
@@ -86,17 +86,25 @@ message Cell {
 
     uint32 maxUEs = 6;
 
-    repeated uint64 neighbors = 7 [(gogoproto.casttype) = "Ecgi"];
+    repeated uint64 neighbors = 7 [(gogoproto.casttype) = "ECGI"];
 
     // The cell transmit power in decibels
     double txPowerdB = 8;
 
     // crntis maps a ue's name to its crnti
-    map<uint32, uint64> crntiMap = 9 [(gogoproto.castkey) = "Crnti", (gogoproto.castvalue) = "Imsi"];
+    map<uint32, uint64> crntiMap = 9 [(gogoproto.castkey) = "CRNTI", (gogoproto.castvalue) = "IMSI"];
 
     uint32 crntiIndex = 10;
 
     uint32 port = 11;
+}
+
+message Node {
+    uint32 enbid = 1 [(gogoproto.customname) = "EnbID", (gogoproto.casttype) = "EnbID"];
+
+    string address = 2;
+
+    int32 port = 3;
 }
 
 message MapLayout {

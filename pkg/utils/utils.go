@@ -31,7 +31,7 @@ const ServiceName = "ran-simulator"
 const TestPlmnID = "315010"
 
 // ImsiBaseCbrs - from https://imsiadmin.com/cbrs-assignments
-const ImsiBaseCbrs = types.Imsi(315010999900000)
+const ImsiBaseCbrs = types.IMSI(315010999900000)
 
 // RandomLatLng - Generates a random latlng value in 1000 meter radius of loc
 func RandomLatLng(mapCenterLat float64, mapCenterLng float64, radius float64, aspectRatio float64) types.Point {
@@ -120,8 +120,8 @@ func RandomColor() string {
 }
 
 // ImsiGenerator -- generate an Imsi from an index
-func ImsiGenerator(ueIdx int) types.Imsi {
-	return ImsiBaseCbrs + types.Imsi(ueIdx) + 1
+func ImsiGenerator(ueIdx int) types.IMSI {
+	return ImsiBaseCbrs + types.IMSI(ueIdx) + 1
 }
 
 // AzimuthToRads - angle measured in degrees clockwise from north, expressed in rads from 3 o'clock anticlockwise

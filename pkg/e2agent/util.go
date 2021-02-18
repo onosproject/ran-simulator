@@ -7,11 +7,11 @@ package e2agent
 import (
 	"bytes"
 	"encoding/gob"
+	"github.com/onosproject/ran-simulator/api/types"
 	"hash/fnv"
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/onosproject/ran-simulator/pkg/model"
 )
 
 const (
@@ -29,8 +29,8 @@ func newExpBackoff() *backoff.ExponentialBackOff {
 	return b
 }
 
-func nodeID(plmndID model.PlmnID, enbID model.EnbID) (uint64, error) {
-	gEnbID := model.ToGEnbID(plmndID, enbID)
+func nodeID(plmndID types.PlmnID, enbID types.EnbID) (uint64, error) {
+	gEnbID := types.ToGEnbID(plmndID, enbID)
 	buf := bytes.Buffer{}
 	enc := gob.NewEncoder(&buf)
 	err := enc.Encode(gEnbID)
