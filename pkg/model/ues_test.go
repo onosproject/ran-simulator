@@ -6,6 +6,7 @@
 package model
 
 import (
+	"github.com/onosproject/ran-simulator/api/types"
 	"math/rand"
 	"testing"
 
@@ -28,8 +29,8 @@ func TestMoveUE(t *testing.T) {
 	ues := NewUERegistry(24)
 	assert.NotNil(t, ues, "unable to create UE registry")
 
-	id1 := GEnbID(100123)
-	id2 := GEnbID(100321)
+	id1 := types.GEnbID(100123)
+	id2 := types.GEnbID(100321)
 
 	for i, ue := range ues.ListAllUEs() {
 		id := id1

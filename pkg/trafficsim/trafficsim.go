@@ -58,26 +58,18 @@ func sectorToAPI(sector model.Sector) *simtypes.Sector {
 
 func cellToAPI(cell model.Cell) *simtypes.Cell {
 	r := &simtypes.Cell{
-		Ecgi:       simtypes.Ecgi(cell.Ecgi),
+		ECGI:       cell.Ecgi,
 		Location:   coordToAPI(cell.Sector.Center),
 		Sector:     sectorToAPI(cell.Sector),
 		Color:      cell.Color,
 		MaxUEs:     cell.MaxUEs,
-		Neighbors:  neighborsToAPI(cell.Neighbors),
+		Neighbors:  cell.Neighbors,
 		TxPowerdB:  cell.TxPowerDB,
 		CrntiMap:   nil,
 		CrntiIndex: 0,
 		Port:       0,
 	}
 	return r
-}
-
-func neighborsToAPI(neighbors []model.ECGI) []simtypes.Ecgi {
-	list := make([]simtypes.Ecgi, 0, len(neighbors))
-	for _, id := range neighbors {
-		list = append(list, simtypes.Ecgi(id))
-	}
-	return list
 }
 
 // GetMapLayout :
@@ -94,27 +86,27 @@ func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest)
 
 func ueToAPI(ue *model.UE) *simtypes.Ue {
 	r := &simtypes.Ue{
-		Imsi:     simtypes.Imsi(ue.IMSI),
+		IMSI:     ue.IMSI,
 		Type:     string(ue.Type),
 		Position: nil,
 		Rotation: ue.Rotation,
-		Crnti:    simtypes.Crnti(ue.Crnti),
+		CRNTI:    ue.CRNTI,
 		Admitted: ue.IsAdmitted,
 	}
 	if ue.Cell != nil {
-		r.ServingTower = simtypes.Ecgi(ue.Cell.ID)
+		r.ServingTower = simtypes.ECGI(ue.Cell.ID)
 		r.ServingTowerStrength = ue.Cell.Strength
 	}
 	if len(ue.Cells) > 0 {
-		r.Tower1 = simtypes.Ecgi(ue.Cells[0].ID)
+		r.Tower1 = simtypes.ECGI(ue.Cells[0].ID)
 		r.Tower1Strength = ue.Cells[0].Strength
 	}
 	if len(ue.Cells) > 1 {
-		r.Tower2 = simtypes.Ecgi(ue.Cells[1].ID)
+		r.Tower2 = simtypes.ECGI(ue.Cells[1].ID)
 		r.Tower2Strength = ue.Cells[1].Strength
 	}
 	if len(ue.Cells) > 2 {
-		r.Tower3 = simtypes.Ecgi(ue.Cells[2].ID)
+		r.Tower3 = simtypes.ECGI(ue.Cells[2].ID)
 		r.Tower3Strength = ue.Cells[2].Strength
 	}
 	return r

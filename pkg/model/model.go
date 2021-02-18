@@ -6,6 +6,7 @@ package model
 
 import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/ran-simulator/api/types"
 )
 
 // Model simulation model
@@ -15,14 +16,34 @@ type Model struct {
 	Controllers   map[string]Controller   `yaml:"controllers"`
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 	UECount       uint                    `yaml:"ueCount"`
-	PlmnID        PlmnID                  `yaml:"plmnID"`
+	PlmnID        types.PlmnID            `yaml:"plmnID"`
 	UEs           UERegistry              // Not intended to be loaded from the YAML file; created separately
 	// Routes   *SimRoutes
 }
 
+// Coordinate represents a geographical location
+type Coordinate struct {
+	Lat float64 `yaml:"lat"`
+	Lng float64 `yaml:"lng"`
+}
+
+// Sector represents a 2D arc emanating from a location
+type Sector struct {
+	Center  Coordinate `yaml:"center"`
+	Azimuth int32      `yaml:"azimuth"`
+	Arc     int32      `yaml:"arc"`
+}
+
+// Route represents a named series of points for tracking movement of user-equipment
+type Route struct {
+	Name   string
+	Points []*Coordinate
+	Color  string
+}
+
 // Node e2 node
 type Node struct {
-	EnbID         EnbID           `yaml:"enbID"`
+	EnbID         types.EnbID     `yaml:"enbID"`
 	Controllers   []string        `yaml:"controllers"`
 	ServiceModels []string        `yaml:"servicemodels"`
 	Cells         map[string]Cell `yaml:"cells"`
@@ -37,12 +58,12 @@ type Controller struct {
 
 // Cell represents a section of coverage
 type Cell struct {
-	Ecgi      ECGI    `yaml:"ecgi"`
-	Sector    Sector  `yaml:"sector"`
-	Color     string  `yaml:"color"`
-	MaxUEs    uint32  `yaml:"maxUEs"`
-	Neighbors []ECGI  `yaml:"neighbors"`
-	TxPowerDB float64 `yaml:"txPower"`
+	Ecgi      types.ECGI   `yaml:"ecgi"`
+	Sector    Sector       `yaml:"sector"`
+	Color     string       `yaml:"color"`
+	MaxUEs    uint32       `yaml:"maxUEs"`
+	Neighbors []types.ECGI `yaml:"neighbors"`
+	TxPowerDB float64      `yaml:"txPower"`
 
 	// TODO: should not be needed as it coincides with sector center.
 	//Location  Coordinate `yaml:"location"`
