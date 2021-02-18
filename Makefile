@@ -21,8 +21,8 @@ test: # @HELP run the unit tests and source code validation producing a golang s
 test: build deps linters license_check
 	go test -race github.com/onosproject/ran-simulator/...
 
-jenkins-test: build-tools # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
-jenkins-test: build deps license_check linters
+jenkins-test:  # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
+jenkins-test: build-tools build deps license_check linters
 	export GOPRIVATE="github.com/onosproject/*"
 	TEST_PACKAGES=github.com/onosproject/ran-simulator/pkg/... ./../build-tools/build/jenkins/make-unit
 
@@ -44,6 +44,9 @@ linters: golang-ci # @HELP examines Go source code and reports coding problems
 
 build-tools: # @HELP install the ONOS build tools if needed
 	@if [ ! -d "../build-tools" ]; then cd .. && git clone https://github.com/onosproject/build-tools.git; fi
+
+jenkins-tools: # @HELP installs tooling needed for Jenkins
+	cd .. && go get -u github.com/jstemmer/go-junit-report && go get github.com/t-yuki/gocover-cobertura
 
 golang-ci: # @HELP install golang-ci if not present
 	golangci-lint --version || curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b `go env GOPATH`/bin v1.36.0
@@ -78,6 +81,10 @@ all: build images
 
 publish: # @HELP publish version on github and dockerhub
 	./../build-tools/publish-version ${VERSION} onosproject/ran-simulator
+
+jenkins-publish: build-tools jenkins-tools # @HELP Jenkins calls this to publish artifacts
+	./build/bin/push-images
+	../build-tools/release-merge-commit
 
 bumponosdeps: # @HELP update "onosproject" go dependencies and push patch to git.
 	./../build-tools/bump-onos-deps ${VERSION}
