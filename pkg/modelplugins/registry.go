@@ -42,6 +42,12 @@ type ModelPlugin interface {
 	ActionDefinitionASN1toProto(asn1Bytes []byte) ([]byte, error)
 	ActionDefinitionProtoToASN1(protoBytes []byte) ([]byte, error)
 	DecodeRanFunctionDescription(asn1bytes []byte) (*e2smtypes.RanfunctionNameDef, *e2smtypes.RicEventTriggerList, *e2smtypes.RicReportList, error)
+	ControlHeaderASN1toProto(asn1Bytes []byte) ([]byte, error)
+	ControlHeaderProtoToASN1(protoBytes []byte) ([]byte, error)
+	ControlMessageASN1toProto(asn1Bytes []byte) ([]byte, error)
+	ControlMessageProtoToASN1(protoBytes []byte) ([]byte, error)
+	ControlOutcomeASN1toProto(asn1Bytes []byte) ([]byte, error)
+	ControlOutcomeProtoToASN1(protoBytes []byte) ([]byte, error)
 }
 
 // RegisterModelPlugin adds an external model plugin to the model registry at startup
