@@ -64,14 +64,14 @@ type UERegistry interface {
 	GetNumUes() int
 }
 
-type registry struct {
+type ueRegistry struct {
 	lock sync.RWMutex
 	ues  map[types.IMSI]*UE
 }
 
 // NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start
 func NewUERegistry(count uint) UERegistry {
-	reg := &registry{
+	reg := &ueRegistry{
 		lock: sync.RWMutex{},
 		ues:  make(map[types.IMSI]*UE),
 	}
@@ -79,7 +79,7 @@ func NewUERegistry(count uint) UERegistry {
 	return reg
 }
 
-func (r *registry) SetUECount(count uint) {
+func (r *ueRegistry) SetUECount(count uint) {
 	delta := len(r.ues) - int(count)
 	if delta < 0 {
 		r.CreateUEs(uint(-delta))
@@ -88,7 +88,7 @@ func (r *registry) SetUECount(count uint) {
 	}
 }
 
-func (r *registry) removeSomeUEs(count int) {
+func (r *ueRegistry) removeSomeUEs(count int) {
 	c := count
 	for IMSI := range r.ues {
 		if c == 0 {
@@ -99,7 +99,7 @@ func (r *registry) removeSomeUEs(count int) {
 	}
 }
 
-func (r *registry) CreateUEs(count uint) {
+func (r *ueRegistry) CreateUEs(count uint) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	for i := uint(0); i < count; i++ {
@@ -118,13 +118,13 @@ func (r *registry) CreateUEs(count uint) {
 	}
 }
 
-func (r *registry) DestroyUE(IMSI types.IMSI) {
+func (r *ueRegistry) DestroyUE(IMSI types.IMSI) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	delete(r.ues, IMSI)
 }
 
-func (r *registry) ListAllUEs() []*UE {
+func (r *ueRegistry) ListAllUEs() []*UE {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	list := make([]*UE, 0, len(r.ues))
@@ -134,7 +134,7 @@ func (r *registry) ListAllUEs() []*UE {
 	return list
 }
 
-func (r *registry) MoveUE(IMSI types.IMSI, genbID types.GEnbID, strength float64) {
+func (r *ueRegistry) MoveUE(IMSI types.IMSI, genbID types.GEnbID, strength float64) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	ue := r.ues[IMSI]
@@ -144,7 +144,7 @@ func (r *registry) MoveUE(IMSI types.IMSI, genbID types.GEnbID, strength float64
 	}
 }
 
-func (r *registry) ListUEs(genbID types.GEnbID) []*UE {
+func (r *ueRegistry) ListUEs(genbID types.GEnbID) []*UE {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	list := make([]*UE, 0, len(r.ues))
@@ -156,6 +156,6 @@ func (r *registry) ListUEs(genbID types.GEnbID) []*UE {
 	return list
 }
 
-func (r *registry) GetNumUes() int {
+func (r *ueRegistry) GetNumUes() int {
 	return len(r.ues)
 }

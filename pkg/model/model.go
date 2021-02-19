@@ -17,8 +17,10 @@ type Model struct {
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 	UECount       uint                    `yaml:"ueCount"`
 	PlmnID        types.PlmnID            `yaml:"plmnID"`
-	UEs           UERegistry              // Not intended to be loaded from the YAML file; created separately
-	// Routes   *SimRoutes
+
+	// Not intended to be loaded from the YAML file; created separately
+	UEs       UERegistry
+	NodeStore NodeRegistry
 }
 
 // Coordinate represents a geographical location
