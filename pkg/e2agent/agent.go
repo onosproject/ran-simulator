@@ -74,7 +74,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
 		case registry.Kpm:
-			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry, subStore)
+			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore)
 			if err != nil {
 				return nil, err
 			}
@@ -84,7 +84,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 				return nil, err
 			}
 		case registry.Rc:
-			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry, subStore)
+			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore)
 			if err != nil {
 				return nil, err
 			}
