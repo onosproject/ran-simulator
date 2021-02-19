@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
+
 	"github.com/onosproject/ran-simulator/pkg/types"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
@@ -100,9 +102,16 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	ranFuncID := registry.RanFunctionID(controlutils.GetRanFunctionID(request))
+	log.Debugf("Received Control Request %+v for ran function %d", request, ranFuncID)
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
+		// TODO If the target E2 Node receives a RIC CONTROL REQUEST message
+		//  which contains a RAN Function ID IE that was not previously announced as a s
+		//  supported RAN function in the E2 Setup procedure or the RIC Service Update procedure,
+		//  or the E2 Node does not support the specific RIC Control procedure action, then
+		//  the target E2 Node shall ignore message and send an ERROR INDICATION message to the Near-RT RIC.
+
 		return nil, nil, err
 	}
 	switch sm.RanFunctionID {
@@ -112,11 +121,11 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	case registry.Rc:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICControl(ctx, request)
-
-	default:
-		return nil, nil, errors.New(errors.NotSupported, "ran function id %v is not supported", ranFuncID)
-
 	}
+	if err != nil {
+		return nil, nil, err
+	}
+
 	return response, failure, err
 }
 
