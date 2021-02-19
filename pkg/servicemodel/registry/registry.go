@@ -5,6 +5,8 @@
 package registry
 
 import (
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"sync"
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
@@ -40,6 +42,8 @@ type ServiceModel struct {
 	Node                model.Node
 	Model               *model.Model
 	Subscriptions       *subscriptions.Subscriptions
+	Nodes               nodes.NodeRegistry
+	UEs                 ues.UERegistry
 }
 
 // NewServiceModelRegistry creates a service model registry

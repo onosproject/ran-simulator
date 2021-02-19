@@ -11,6 +11,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"github.com/onosproject/ran-simulator/pkg/trafficsim"
 )
 
@@ -56,6 +57,7 @@ type Manager struct {
 	modelPluginRegistry *modelplugins.ModelPluginRegistry
 	server              *northbound.Server
 	nodeStore           nodes.NodeRegistry
+	ueStore             ues.UERegistry
 }
 
 // Run starts the manager and the associated services
@@ -75,12 +77,12 @@ func (m *Manager) startE2Agents() error {
 	}
 
 	// Create the UE registry primed with the specified number of UEs
-	m.model.UEs = model.NewUERegistry(m.model.UECount)
+	m.ueStore = ues.NewUERegistry(m.model.UECount)
 
 	// Create the Node registry primed with the pre-loaded nodes
 	m.nodeStore = nodes.NewNodeRegistry(m.model.Nodes)
 
-	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry)
+	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry, m.nodeStore, m.ueStore)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -97,7 +99,6 @@ func (m *Manager) startE2Agents() error {
 
 // Start starts the manager
 func (m *Manager) Start() error {
-
 	// Start gRPC server
 	err := m.startNorthboundServer()
 	if err != nil {
@@ -122,7 +123,7 @@ func (m *Manager) startNorthboundServer() error {
 		true,
 		northbound.SecurityConfig{}))
 	m.server.AddService(logging.Service{})
-	m.server.AddService(trafficsim.NewService(m.model))
+	m.server.AddService(trafficsim.NewService(m.model, m.ueStore))
 
 	doneCh := make(chan error)
 	go func() {

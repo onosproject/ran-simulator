@@ -135,7 +135,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 
 	// Creating an indication message
 	indicationMessage := kpmutils.NewIndicationMessage(
-		kpmutils.WithNumberOfActiveUes(int32(sm.ServiceModel.Model.UEs.GetNumUes())))
+		kpmutils.WithNumberOfActiveUes(int32(sm.ServiceModel.UEs.GetUECount())))
 
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {

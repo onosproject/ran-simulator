@@ -17,9 +17,6 @@ type Model struct {
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 	UECount       uint                    `yaml:"ueCount"`
 	PlmnID        types.PlmnID            `yaml:"plmnID"`
-
-	// Not intended to be loaded from the YAML file; created separately
-	UEs UERegistry
 }
 
 // Coordinate represents a geographical location
@@ -73,6 +70,31 @@ type Cell struct {
 	//Crntis map
 	//CrntiIndex uint32     `yaml:"crntiIndex"`
 	//Port       uint32     `yaml:"port"`
+}
+
+// UEType represents type of user-equipment
+type UEType string
+
+// UECell represents UE-cell relationship
+type UECell struct {
+	ID       types.GEnbID
+	Ecgi     types.ECGI // Auxiliary form of association
+	Strength float64
+}
+
+// UE represents user-equipment, i.e. phone, IoT device, etc.
+type UE struct {
+	IMSI     types.IMSI
+	Type     UEType
+	Location Coordinate
+	Rotation uint32
+
+	Cell  *UECell
+	CRNTI types.CRNTI
+	Cells []*UECell
+
+	IsAdmitted bool
+	// Metrics
 }
 
 // ServiceModel service model information

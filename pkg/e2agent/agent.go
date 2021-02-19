@@ -7,6 +7,8 @@ package e2agent
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"time"
 
 	"github.com/onosproject/ran-simulator/pkg/types"
@@ -47,15 +49,18 @@ type E2Agent interface {
 
 // e2Agent is an E2 agent
 type e2Agent struct {
-	node     model.Node
-	model    *model.Model
-	channel  e2.ClientChannel
-	registry *registry.ServiceModelRegistry
-	subStore *subscriptions.Subscriptions
+	node      model.Node
+	model     *model.Model
+	channel   e2.ClientChannel
+	registry  *registry.ServiceModelRegistry
+	subStore  *subscriptions.Subscriptions
+	nodeStore nodes.NodeRegistry
+	ueStore   ues.UERegistry
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry) (E2Agent, error) {
+func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
+	nodeStore nodes.NodeRegistry, ueStore ues.UERegistry) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
 	reg := registry.NewServiceModelRegistry()
 
@@ -92,10 +97,12 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		}
 	}
 	return &e2Agent{
-		node:     node,
-		registry: reg,
-		model:    model,
-		subStore: subStore,
+		node:      node,
+		registry:  reg,
+		model:     model,
+		subStore:  subStore,
+		nodeStore: nodeStore,
+		ueStore:   ueStore,
 	}, nil
 }
 

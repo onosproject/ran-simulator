@@ -5,7 +5,6 @@
 package nodes
 
 import (
-	"github.com/google/uuid"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
@@ -36,8 +35,13 @@ type NodeEvent struct {
 	Type uint8
 }
 
+// WatchOptions allows tailoring the WatchNodes behaviour
+type WatchOptions struct {
+	Replay  bool
+	Monitor bool
+}
+
 type nodeWatcher struct {
-	id uuid.UUID
 	ch chan<- NodeEvent
 }
 
@@ -73,20 +77,6 @@ func NewNodeRegistry(nodes map[string]model.Node) NodeRegistry {
 
 	return reg
 }
-
-const (
-	// NONE indicates no change event
-	NONE uint8 = 0
-
-	// ADDED indicates new node was added
-	ADDED uint8 = 1
-
-	// UPDATED indicates an existing node was updated
-	UPDATED uint8 = 2
-
-	// DELETED indicates a node was deleted
-	DELETED uint8 = 3
-)
 
 func (nr *nodeRegistry) AddNode(node *model.Node) error {
 	nr.lock.Lock()
@@ -134,20 +124,25 @@ func (nr *nodeRegistry) DeleteNode(enbID types.EnbID) (*model.Node, error) {
 	return nil, errors.New(errors.NotFound, "node not found")
 }
 
-// WatchOptions allows tailoring the WatchNodes behaviour
-type WatchOptions struct {
-	Replay  bool
-	Monitor bool
-}
+const (
+	// NONE indicates no change event
+	NONE uint8 = 0
+
+	// ADDED indicates new node was added
+	ADDED uint8 = 1
+
+	// UPDATED indicates an existing node was updated
+	UPDATED uint8 = 2
+
+	// DELETED indicates a node was deleted
+	DELETED uint8 = 3
+)
 
 func (nr *nodeRegistry) WatchNodes(ch chan<- NodeEvent, options ...WatchOptions) {
 	monitor := len(options) == 0 || options[0].Monitor
 	replay := len(options) > 0 && options[0].Replay
 	go func() {
-		watcher := nodeWatcher{
-			id: uuid.UUID{},
-			ch: ch,
-		}
+		watcher := nodeWatcher{ch: ch}
 		if monitor {
 			nr.lock.RLock()
 			nr.watchers = append(nr.watchers, watcher)
