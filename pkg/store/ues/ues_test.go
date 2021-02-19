@@ -1,9 +1,8 @@
 // SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
-//
 
-package model
+package ues
 
 import (
 	"github.com/onosproject/ran-simulator/api/types"
@@ -37,7 +36,8 @@ func TestMoveUE(t *testing.T) {
 		if i%3 == 0 {
 			id = id2
 		}
-		ues.MoveUE(ue.IMSI, id, rand.Float64())
+		err := ues.MoveUE(ue.IMSI, id, rand.Float64())
+		assert.NoError(t, err)
 	}
 
 	assert.Equal(t, 16, len(ues.ListUEs(id1)))

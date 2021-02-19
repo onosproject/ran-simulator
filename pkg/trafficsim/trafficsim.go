@@ -13,35 +13,40 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	simtypes "github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"google.golang.org/grpc"
 )
 
 var log = liblog.GetLogger("trafficsim")
 
 // NewService returns a new trafficsim Service
-func NewService(model *model.Model) service.Service {
+func NewService(model *model.Model, ueStore ues.UERegistry) service.Service {
 	return &Service{
-		model: model,
+		model:   model,
+		ueStore: ueStore,
 	}
 }
 
 // Service is a Service implementation for administration.
 type Service struct {
 	service.Service
-	model *model.Model
+	model   *model.Model
+	ueStore ues.UERegistry
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
 func (s *Service) Register(r *grpc.Server) {
 	server := &Server{
-		model: s.model,
+		model:   s.model,
+		ueStore: s.ueStore,
 	}
 	simapi.RegisterTrafficServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-	model *model.Model
+	model   *model.Model
+	ueStore ues.UERegistry
 }
 
 func coordToAPI(coord model.Coordinate) *simtypes.Point {
@@ -141,7 +146,7 @@ func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_L
 // ListUes provides means to list (and optionally monitor) simulated UEs
 func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
 	if !req.WithoutReplay {
-		for _, ue := range s.model.UEs.ListAllUEs() {
+		for _, ue := range s.ueStore.ListAllUEs() {
 			resp := &simapi.ListUesResponse{
 				Ue:   ueToAPI(ue),
 				Type: simapi.Type_NONE,
@@ -161,7 +166,7 @@ func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListU
 func (s *Server) SetNumberUEs(ctx context.Context, req *simapi.SetNumberUEsRequest) (*simapi.SetNumberUEsResponse, error) {
 	ueCount := req.GetNumber()
 	log.Infof("Number of simulated UEs changed to %d", ueCount)
-	s.model.UEs.SetUECount(uint(ueCount))
+	s.ueStore.SetUECount(uint(ueCount))
 	return &simapi.SetNumberUEsResponse{Number: ueCount}, nil
 }
 

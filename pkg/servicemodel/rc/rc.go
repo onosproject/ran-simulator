@@ -6,6 +6,8 @@ package rc
 
 import (
 	"context"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 
@@ -43,7 +45,8 @@ type Client struct {
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry, subStore *subscriptions.Subscriptions) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
+	subStore *subscriptions.Subscriptions, nodeStore nodes.NodeRegistry, ueStore ues.UERegistry) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	rcSm := registry.ServiceModel{
 		RanFunctionID:       registry.Rc,
@@ -54,6 +57,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		Node:                node,
 		Model:               model,
 		Subscriptions:       subStore,
+		Nodes:               nodeStore,
+		UEs:                 ueStore,
 	}
 
 	rcClient := &Client{

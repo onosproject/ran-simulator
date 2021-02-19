@@ -7,6 +7,8 @@ package kpm
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"strconv"
 	"time"
 
@@ -52,7 +54,8 @@ type Client struct {
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry, subStore *subscriptions.Subscriptions) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
+	subStore *subscriptions.Subscriptions, nodeStore nodes.NodeRegistry, ueStore ues.UERegistry) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	kpmSm := registry.ServiceModel{
 		RanFunctionID:       registry.Kpm,
@@ -63,6 +66,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		Node:                node,
 		Model:               model,
 		Subscriptions:       subStore,
+		Nodes:               nodeStore,
+		UEs:                 ueStore,
 	}
 	kpmClient := &Client{
 		ServiceModel: &kpmSm,
@@ -135,7 +140,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 
 	// Creating an indication message
 	indicationMessage := kpmutils.NewIndicationMessage(
-		kpmutils.WithNumberOfActiveUes(int32(sm.ServiceModel.Model.UEs.GetNumUes())))
+		kpmutils.WithNumberOfActiveUes(int32(sm.ServiceModel.UEs.GetUECount())))
 
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {

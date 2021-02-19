@@ -8,6 +8,7 @@ import (
 	"context"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"io"
 	"io/ioutil"
 	"net"
@@ -36,8 +37,8 @@ func newTestService() (northbound.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	m.UEs = model.NewUERegistry(m.UECount)
-	return &Service{model: m}, nil
+	ueStore := ues.NewUERegistry(m.UECount)
+	return &Service{model: m, ueStore: ueStore}, nil
 }
 
 func createServerConnection(t *testing.T) *grpc.ClientConn {
