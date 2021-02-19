@@ -10,6 +10,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/trafficsim"
 )
 
@@ -54,6 +55,7 @@ type Manager struct {
 	model               *model.Model
 	modelPluginRegistry *modelplugins.ModelPluginRegistry
 	server              *northbound.Server
+	nodeStore           nodes.NodeRegistry
 }
 
 // Run starts the manager and the associated services
@@ -76,7 +78,7 @@ func (m *Manager) startE2Agents() error {
 	m.model.UEs = model.NewUERegistry(m.model.UECount)
 
 	// Create the Node registry primed with the pre-loaded nodes
-	m.model.NodeStore = model.NewNodeRegistry(m.model.Nodes)
+	m.nodeStore = nodes.NewNodeRegistry(m.model.Nodes)
 
 	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry)
 	if err != nil {

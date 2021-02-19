@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package model
+package nodes
 
 import (
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/model"
 	"io/ioutil"
 	"testing"
 
@@ -14,14 +15,14 @@ import (
 )
 
 func TestNodes(t *testing.T) {
-	model := Model{}
-	bytes, err := ioutil.ReadFile("test.yaml")
+	m := model.Model{}
+	bytes, err := ioutil.ReadFile("../../model/test.yaml")
 	assert.NoError(t, err)
-	err = yaml.Unmarshal(bytes, &model)
+	err = yaml.Unmarshal(bytes, &m)
 	assert.NoError(t, err)
-	t.Log(model)
+	t.Log(m)
 
-	reg := NewNodeRegistry(model.Nodes)
+	reg := NewNodeRegistry(m.Nodes)
 	assert.Equal(t, 2, countNodes(reg))
 
 	ch := make(chan NodeEvent)
@@ -36,11 +37,11 @@ func TestNodes(t *testing.T) {
 	assert.True(t, err != nil, "node should not exist")
 
 	go func() {
-		_ = reg.AddNode(&Node{
+		_ = reg.AddNode(&model.Node{
 			EnbID:         144472,
 			Controllers:   []string{"controller1"},
 			ServiceModels: []string{"kpm"},
-			Cells:         make(map[string]Cell),
+			Cells:         make(map[string]model.Cell),
 		})
 	}()
 
@@ -54,11 +55,11 @@ func TestNodes(t *testing.T) {
 	assert.Equal(t, types.EnbID(144472), node.EnbID)
 
 	go func() {
-		err := reg.UpdateNode(&Node{
+		err := reg.UpdateNode(&model.Node{
 			EnbID:         144472,
 			Controllers:   []string{"controller2"},
 			ServiceModels: []string{"kpm"},
-			Cells:         make(map[string]Cell),
+			Cells:         make(map[string]model.Cell),
 		})
 		assert.NoError(t, err, "node not updated")
 	}()
@@ -78,20 +79,20 @@ func TestNodes(t *testing.T) {
 	assert.Equal(t, DELETED, event.Type)
 	assert.Equal(t, 2, countNodes(reg))
 
-	err = reg.AddNode(&Node{
+	err = reg.AddNode(&model.Node{
 		EnbID:         144471,
 		Controllers:   []string{"controller1"},
 		ServiceModels: []string{"kpm"},
-		Cells:         make(map[string]Cell),
+		Cells:         make(map[string]model.Cell),
 	})
 	assert.True(t, err != nil, "node should already exist")
 	assert.Equal(t, 2, countNodes(reg))
 
-	err = reg.UpdateNode(&Node{
+	err = reg.UpdateNode(&model.Node{
 		EnbID:         144472,
 		Controllers:   []string{"controller1"},
 		ServiceModels: []string{"kpm"},
-		Cells:         make(map[string]Cell),
+		Cells:         make(map[string]model.Cell),
 	})
 	assert.True(t, err != nil, "node does not exist")
 

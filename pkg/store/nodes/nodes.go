@@ -2,28 +2,29 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package model
+package nodes
 
 import (
 	"github.com/google/uuid"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/model"
 	"sync"
 )
 
 // NodeRegistry tracks inventory of simulated E2 nodes.
 type NodeRegistry interface {
 	// AddNode adds the specified node to the registry
-	AddNode(node *Node) error
+	AddNode(node *model.Node) error
 
 	// GetNode retrieves the node with the specified EnbID
-	GetNode(enbID types.EnbID) (*Node, error)
+	GetNode(enbID types.EnbID) (*model.Node, error)
 
 	// UpdateNode updates the node
-	UpdateNode(node *Node) error
+	UpdateNode(node *model.Node) error
 
 	// DeleteNode deletes the node with the specified EnbID
-	DeleteNode(enbID types.EnbID) (*Node, error)
+	DeleteNode(enbID types.EnbID) (*model.Node, error)
 
 	// WatchNodes watches the node inventory events using the supplied channel
 	WatchNodes(ch chan<- NodeEvent, options ...WatchOptions)
@@ -31,7 +32,7 @@ type NodeRegistry interface {
 
 // NodeEvent represents a change in the node inventory
 type NodeEvent struct {
-	Node *Node
+	Node *model.Node
 	Type uint8
 }
 
@@ -40,7 +41,7 @@ type nodeWatcher struct {
 	ch chan<- NodeEvent
 }
 
-func (nr *nodeRegistry) notify(node *Node, eventType uint8) {
+func (nr *nodeRegistry) notify(node *model.Node, eventType uint8) {
 	event := NodeEvent{
 		Node: node,
 		Type: eventType,
@@ -52,15 +53,15 @@ func (nr *nodeRegistry) notify(node *Node, eventType uint8) {
 
 type nodeRegistry struct {
 	lock     sync.RWMutex
-	nodes    map[types.EnbID]*Node
+	nodes    map[types.EnbID]*model.Node
 	watchers []nodeWatcher
 }
 
 // NewNodeRegistry creates a new store abstraction from the specified fixed node map.
-func NewNodeRegistry(nodes map[string]Node) NodeRegistry {
+func NewNodeRegistry(nodes map[string]model.Node) NodeRegistry {
 	reg := &nodeRegistry{
 		lock:     sync.RWMutex{},
-		nodes:    make(map[types.EnbID]*Node),
+		nodes:    make(map[types.EnbID]*model.Node),
 		watchers: make([]nodeWatcher, 0, 8),
 	}
 
@@ -87,7 +88,7 @@ const (
 	DELETED uint8 = 3
 )
 
-func (nr *nodeRegistry) AddNode(node *Node) error {
+func (nr *nodeRegistry) AddNode(node *model.Node) error {
 	nr.lock.Lock()
 	defer nr.lock.Unlock()
 	if _, ok := nr.nodes[node.EnbID]; ok {
@@ -100,7 +101,7 @@ func (nr *nodeRegistry) AddNode(node *Node) error {
 
 }
 
-func (nr *nodeRegistry) GetNode(enbID types.EnbID) (*Node, error) {
+func (nr *nodeRegistry) GetNode(enbID types.EnbID) (*model.Node, error) {
 	nr.lock.RLock()
 	defer nr.lock.RUnlock()
 	if node, ok := nr.nodes[enbID]; ok {
@@ -110,7 +111,7 @@ func (nr *nodeRegistry) GetNode(enbID types.EnbID) (*Node, error) {
 	return nil, errors.New(errors.NotFound, "node not found")
 }
 
-func (nr *nodeRegistry) UpdateNode(node *Node) error {
+func (nr *nodeRegistry) UpdateNode(node *model.Node) error {
 	nr.lock.Lock()
 	defer nr.lock.Unlock()
 	if _, ok := nr.nodes[node.EnbID]; ok {
@@ -122,7 +123,7 @@ func (nr *nodeRegistry) UpdateNode(node *Node) error {
 	return errors.New(errors.NotFound, "node not found")
 }
 
-func (nr *nodeRegistry) DeleteNode(enbID types.EnbID) (*Node, error) {
+func (nr *nodeRegistry) DeleteNode(enbID types.EnbID) (*model.Node, error) {
 	nr.lock.Lock()
 	defer nr.lock.Unlock()
 	if node, ok := nr.nodes[enbID]; ok {

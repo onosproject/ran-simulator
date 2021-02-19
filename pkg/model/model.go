@@ -19,8 +19,7 @@ type Model struct {
 	PlmnID        types.PlmnID            `yaml:"plmnID"`
 
 	// Not intended to be loaded from the YAML file; created separately
-	UEs       UERegistry
-	NodeStore NodeRegistry
+	UEs UERegistry
 }
 
 // Coordinate represents a geographical location
