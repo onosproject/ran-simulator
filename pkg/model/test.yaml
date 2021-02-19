@@ -21,24 +21,8 @@ nodes:
       - kpm
       - rc
     cells:
-      cell1:
-        ecgi: 84325717505
-        sector:
-          center:
-            lat: 46.00
-            lng: 29.00
-          arc: 180.0
-          azimuth: 0.0
-        color: red
-      cell2:
-        ecgi: 84325717506
-        sector:
-          center:
-            lat: 46.00
-            lng: 29.00
-          arc: 180.0
-          azimuth: 180.0
-        color: blue
+      - 84325717505
+      - 84325717506
 
   node2:
     enbID: 144471
@@ -47,24 +31,46 @@ nodes:
     servicemodels:
       - kpm
     cells:
-      cell1:
-        ecgi: 84325717761
-        sector:
-          center:
-            lat: 44.00
-            lng: 31.00
-          arc: 180.0
-          azimuth: 0.0
-        color: red
-      cell2:
-        ecgi: 84325717762
-        sector:
-          center:
-            lat: 44.00
-            lng: 31.00
-          arc: 180.0
-          azimuth: 180.0
-        color: blue
+      - 84325717761
+      - 84325717762
+
+cells:
+  cell1:
+    ecgi: 84325717505
+    sector:
+      center:
+        lat: 46.00
+        lng: 29.00
+      arc: 180.0
+      azimuth: 0.0
+    color: red
+  cell2:
+    ecgi: 84325717506
+    sector:
+      center:
+        lat: 46.00
+        lng: 29.00
+      arc: 180.0
+      azimuth: 180.0
+    color: blue
+  cell3:
+    ecgi: 84325717761
+    sector:
+      center:
+        lat: 44.00
+        lng: 31.00
+      arc: 180.0
+      azimuth: 0.0
+    color: red
+  cell4:
+    ecgi: 84325717762
+    sector:
+      center:
+        lat: 44.00
+        lng: 31.00
+      arc: 180.0
+      azimuth: 180.0
+    color: blue
 
 controllers:
   controller1:

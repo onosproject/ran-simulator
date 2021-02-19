@@ -9,34 +9,36 @@ import (
 	"context"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	modelapi "github.com/onosproject/ran-simulator/api/model"
+	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"google.golang.org/grpc"
 )
 
 // NewService returns a new model Service
-func NewService(model *model.Model) service.Service {
+func NewService(nodeStore nodes.NodeRegistry) service.Service {
 	return &Service{
-		model: model,
+		nodeStore: nodeStore,
 	}
 }
 
 // Service is a Service implementation for administration.
 type Service struct {
 	service.Service
-	model *model.Model
+	nodeStore nodes.NodeRegistry
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
 func (s *Service) Register(r *grpc.Server) {
 	server := &Server{
-		model: s.model,
+		s.nodeStore,
 	}
 	modelapi.RegisterNodeModelServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-	model *model.Model
+	nodeStore nodes.NodeRegistry
 }
 
 // CreateNode creates a new simulated E2 node
@@ -46,17 +48,47 @@ func (s *Server) CreateNode(ctx context.Context, request *modelapi.CreateNodeReq
 
 // GetNode retrieves the specified simulated E2 node
 func (s *Server) GetNode(ctx context.Context, request *modelapi.GetNodeRequest) (*modelapi.GetNodeResponse, error) {
-	panic("implement me")
+	node, err := s.nodeStore.GetNode(request.EnbID)
+	if err != nil {
+		return nil, err
+	}
+	return &modelapi.GetNodeResponse{Node: nodeToAPI(node)}, nil
+}
+
+func nodeToAPI(node *model.Node) *types.Node {
+	return &types.Node{
+		EnbID:         node.EnbID,
+		Controllers:   node.Controllers,
+		ServiceModels: node.ServiceModels,
+		CellECGIs:     node.Cells,
+	}
+}
+
+func nodeToModel(node *types.Node) *model.Node {
+	return &model.Node{
+		EnbID:         node.EnbID,
+		Controllers:   node.Controllers,
+		ServiceModels: node.ServiceModels,
+		Cells:         node.CellECGIs,
+	}
 }
 
 // UpdateNode updates the specified simulated E2 node
 func (s *Server) UpdateNode(ctx context.Context, request *modelapi.UpdateNodeRequest) (*modelapi.UpdateNodeResponse, error) {
-	panic("implement me")
+	err := s.nodeStore.UpdateNode(nodeToModel(request.Node))
+	if err != nil {
+		return nil, err
+	}
+	return &modelapi.UpdateNodeResponse{}, nil
 }
 
 // DeleteNode deletes the specified simulated E2 node
 func (s *Server) DeleteNode(ctx context.Context, request *modelapi.DeleteNodeRequest) (*modelapi.DeleteNodeResponse, error) {
-	panic("implement me")
+	_, err := s.nodeStore.DeleteNode(request.EnbID)
+	if err != nil {
+		return nil, err
+	}
+	return &modelapi.DeleteNodeResponse{}, nil
 }
 
 // WatchNodes monitors changes to the inventory of E2 nodes

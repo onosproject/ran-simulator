@@ -63,7 +63,7 @@ func sectorToAPI(sector model.Sector) *simtypes.Sector {
 
 func cellToAPI(cell model.Cell) *simtypes.Cell {
 	r := &simtypes.Cell{
-		ECGI:       cell.Ecgi,
+		ECGI:       cell.ECGI,
 		Location:   coordToAPI(cell.Sector.Center),
 		Sector:     sectorToAPI(cell.Sector),
 		Color:      cell.Color,
@@ -126,16 +126,14 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 
 // ListCells provides means to list (and optionally monitor) simulated cells
 func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_ListCellsServer) error {
-	for _, node := range s.model.Nodes {
-		for _, cell := range node.Cells {
-			resp := &simapi.ListCellsResponse{
-				Cell: cellToAPI(cell),
-				Type: simapi.Type_NONE,
-			}
-			err := stream.Send(resp)
-			if err != nil {
-				return err
-			}
+	for _, cell := range s.model.Cells {
+		resp := &simapi.ListCellsResponse{
+			Cell: cellToAPI(cell),
+			Type: simapi.Type_NONE,
+		}
+		err := stream.Send(resp)
+		if err != nil {
+			return err
 		}
 	}
 

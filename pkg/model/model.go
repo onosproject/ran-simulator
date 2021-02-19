@@ -13,6 +13,7 @@ import (
 type Model struct {
 	MapLayout     MapLayout               `yaml:"layout"`
 	Nodes         map[string]Node         `yaml:"nodes"`
+	Cells         map[string]Cell         `yaml:"cells"`
 	Controllers   map[string]Controller   `yaml:"controllers"`
 	ServiceModels map[string]ServiceModel `yaml:"servicemodels"`
 	UECount       uint                    `yaml:"ueCount"`
@@ -41,10 +42,10 @@ type Route struct {
 
 // Node e2 node
 type Node struct {
-	EnbID         types.EnbID     `yaml:"enbID"`
-	Controllers   []string        `yaml:"controllers"`
-	ServiceModels []string        `yaml:"servicemodels"`
-	Cells         map[string]Cell `yaml:"cells"`
+	EnbID         types.EnbID  `yaml:"enbID"`
+	Controllers   []string     `yaml:"controllers"`
+	ServiceModels []string     `yaml:"servicemodels"`
+	Cells         []types.ECGI `yaml:"cells"`
 }
 
 // Controller E2T endpoint information
@@ -56,7 +57,7 @@ type Controller struct {
 
 // Cell represents a section of coverage
 type Cell struct {
-	Ecgi      types.ECGI   `yaml:"ecgi"`
+	ECGI      types.ECGI   `yaml:"ecgi"`
 	Sector    Sector       `yaml:"sector"`
 	Color     string       `yaml:"color"`
 	MaxUEs    uint32       `yaml:"maxUEs"`
@@ -75,7 +76,7 @@ type UEType string
 // UECell represents UE-cell relationship
 type UECell struct {
 	ID       types.GEnbID
-	Ecgi     types.ECGI // Auxiliary form of association
+	ECGI     types.ECGI // Auxiliary form of association
 	Strength float64
 }
 

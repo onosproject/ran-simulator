@@ -41,7 +41,7 @@ func TestNodes(t *testing.T) {
 			EnbID:         144472,
 			Controllers:   []string{"controller1"},
 			ServiceModels: []string{"kpm"},
-			Cells:         make(map[string]model.Cell),
+			Cells:         []types.ECGI{1234, 4321},
 		})
 	}()
 
@@ -59,7 +59,7 @@ func TestNodes(t *testing.T) {
 			EnbID:         144472,
 			Controllers:   []string{"controller2"},
 			ServiceModels: []string{"kpm"},
-			Cells:         make(map[string]model.Cell),
+			Cells:         []types.ECGI{1234, 4321},
 		})
 		assert.NoError(t, err, "node not updated")
 	}()
@@ -83,7 +83,7 @@ func TestNodes(t *testing.T) {
 		EnbID:         144471,
 		Controllers:   []string{"controller1"},
 		ServiceModels: []string{"kpm"},
-		Cells:         make(map[string]model.Cell),
+		Cells:         []types.ECGI{1234, 4321},
 	})
 	assert.True(t, err != nil, "node should already exist")
 	assert.Equal(t, 2, countNodes(reg))
@@ -92,7 +92,7 @@ func TestNodes(t *testing.T) {
 		EnbID:         144472,
 		Controllers:   []string{"controller1"},
 		ServiceModels: []string{"kpm"},
-		Cells:         make(map[string]model.Cell),
+		Cells:         []types.ECGI{1234, 4321},
 	})
 	assert.True(t, err != nil, "node does not exist")
 
