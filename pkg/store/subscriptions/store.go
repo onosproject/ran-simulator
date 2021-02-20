@@ -67,12 +67,19 @@ type Store interface {
 	Get(id ID) (*Subscription, error)
 	// List lists subscriptions
 	List() ([]*Subscription, error)
+	// Len number of subscriptions
+	Len() (int, error)
 }
 
 // Subscriptions data structure for storing subscriptions
 type Subscriptions struct {
 	subscriptions map[ID]*Subscription
 	mu            sync.RWMutex
+}
+
+// Len number of subscriptions
+func (s *Subscriptions) Len() (int, error) {
+	return len(s.subscriptions), nil
 }
 
 // Add adds the specified subscription
