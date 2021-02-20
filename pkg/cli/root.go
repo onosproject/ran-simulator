@@ -74,6 +74,7 @@ func getGetCommand() *cobra.Command {
 
 	cmd.AddCommand(clilib.GetConfigCommand())
 	cmd.AddCommand(getLayoutCommand())
+	cmd.AddCommand(getNodesCommand())
 	cmd.AddCommand(getCellsCommand())
 	cmd.AddCommand(getUEsCommand())
 	cmd.AddCommand(getUECountCommand())

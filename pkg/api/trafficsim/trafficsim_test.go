@@ -8,6 +8,7 @@ import (
 	"context"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"io"
 	"io/ioutil"
@@ -29,7 +30,7 @@ func bufDialer(context.Context, string) (net.Conn, error) {
 
 func newTestService() (northbound.Service, error) {
 	m := &model.Model{}
-	bytes, err := ioutil.ReadFile("../model/test.yaml")
+	bytes, err := ioutil.ReadFile("../../model/test.yaml")
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +39,8 @@ func newTestService() (northbound.Service, error) {
 		return nil, err
 	}
 	ueStore := ues.NewUERegistry(m.UECount)
-	return &Service{model: m, ueStore: ueStore}, nil
+	cellStore := cells.NewCellRegistry(m.Cells)
+	return &Service{model: m, cellStore: cellStore, ueStore: ueStore}, nil
 }
 
 func createServerConnection(t *testing.T) *grpc.ClientConn {

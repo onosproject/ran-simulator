@@ -6,10 +6,13 @@ package nodes
 
 import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"sync"
 )
+
+var log = liblog.GetLogger("store", "nodes")
 
 // NodeRegistry tracks inventory of simulated E2 nodes.
 type NodeRegistry interface {
@@ -63,6 +66,7 @@ type nodeRegistry struct {
 
 // NewNodeRegistry creates a new store abstraction from the specified fixed node map.
 func NewNodeRegistry(nodes map[string]model.Node) NodeRegistry {
+	log.Infof("Creating registry from model with %d nodes", len(nodes))
 	reg := &nodeRegistry{
 		lock:     sync.RWMutex{},
 		nodes:    make(map[types.EnbID]*model.Node),
@@ -75,6 +79,7 @@ func NewNodeRegistry(nodes map[string]model.Node) NodeRegistry {
 		reg.nodes[node.EnbID] = &node
 	}
 
+	log.Infof("Created registry primed with %d nodes", len(reg.nodes))
 	return reg
 }
 
@@ -86,7 +91,7 @@ func (nr *nodeRegistry) AddNode(node *model.Node) error {
 	}
 
 	nr.nodes[node.EnbID] = node
-	go nr.notify(node, ADDED)
+	nr.notify(node, ADDED)
 	return nil
 
 }
@@ -139,6 +144,7 @@ const (
 )
 
 func (nr *nodeRegistry) WatchNodes(ch chan<- NodeEvent, options ...WatchOptions) {
+	log.Infof("WatchNode: %v (#%d)\n", options, len(nr.nodes))
 	monitor := len(options) == 0 || options[0].Monitor
 	replay := len(options) > 0 && options[0].Replay
 	go func() {

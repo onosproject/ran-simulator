@@ -37,12 +37,13 @@ func TestNodes(t *testing.T) {
 	assert.True(t, err != nil, "node should not exist")
 
 	go func() {
-		_ = reg.AddNode(&model.Node{
+		err := reg.AddNode(&model.Node{
 			EnbID:         144472,
 			Controllers:   []string{"controller1"},
 			ServiceModels: []string{"kpm"},
 			Cells:         []types.ECGI{1234, 4321},
 		})
+		assert.NoError(t, err, "node not added")
 	}()
 
 	event, ok := <-ch

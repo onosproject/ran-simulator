@@ -8,8 +8,7 @@ package cli
 import (
 	"context"
 	"github.com/onosproject/onos-lib-go/pkg/cli"
-	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
-
+	modelapi "github.com/onosproject/ran-simulator/api/model"
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +28,8 @@ func runGetCellsCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer conn.Close()
 
-	client := simapi.NewTrafficClient(conn)
-	stream, err := client.ListCells(context.Background(), &simapi.ListCellsRequest{})
+	client := modelapi.NewCellModelClient(conn)
+	stream, err := client.WatchCells(context.Background(), &modelapi.WatchCellsRequest{NoReplay: false, NoSubscribe: true})
 	if err != nil {
 		return err
 	}

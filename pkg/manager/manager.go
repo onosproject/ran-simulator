@@ -7,12 +7,15 @@ package manager
 import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
+	cellapi "github.com/onosproject/ran-simulator/pkg/api/cells"
+	nodeapi "github.com/onosproject/ran-simulator/pkg/api/nodes"
+	"github.com/onosproject/ran-simulator/pkg/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	"github.com/onosproject/ran-simulator/pkg/trafficsim"
 )
 
 var log = logging.GetLogger("manager")
@@ -57,6 +60,7 @@ type Manager struct {
 	modelPluginRegistry *modelplugins.ModelPluginRegistry
 	server              *northbound.Server
 	nodeStore           nodes.NodeRegistry
+	cellStore           cells.CellRegistry
 	ueStore             ues.UERegistry
 }
 
@@ -68,39 +72,26 @@ func (m *Manager) Run() {
 	}
 }
 
-func (m *Manager) startE2Agents() error {
-	// Create the E2 agents for all simulated nodes and specified controllers
+// Start starts the manager
+func (m *Manager) Start() error {
+	// Load the model data
 	err := model.Load(m.model)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
 
+	// Create the node registry primed with the pre-loaded nodes
+	m.nodeStore = nodes.NewNodeRegistry(m.model.Nodes)
+
+	// Create the cell registry primed with the pre-loaded cells
+	m.cellStore = cells.NewCellRegistry(m.model.Cells)
+
 	// Create the UE registry primed with the specified number of UEs
 	m.ueStore = ues.NewUERegistry(m.model.UECount)
 
-	// Create the Node registry primed with the pre-loaded nodes
-	m.nodeStore = nodes.NewNodeRegistry(m.model.Nodes)
-
-	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry, m.nodeStore, m.ueStore)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-	// Start the E2 agents
-	err = m.agents.Start()
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
-// Start starts the manager
-func (m *Manager) Start() error {
 	// Start gRPC server
-	err := m.startNorthboundServer()
+	err = m.startNorthboundServer()
 	if err != nil {
 		return err
 	}
@@ -123,7 +114,9 @@ func (m *Manager) startNorthboundServer() error {
 		true,
 		northbound.SecurityConfig{}))
 	m.server.AddService(logging.Service{})
-	m.server.AddService(trafficsim.NewService(m.model, m.ueStore))
+	m.server.AddService(nodeapi.NewService(m.nodeStore))
+	m.server.AddService(cellapi.NewService(m.cellStore))
+	m.server.AddService(trafficsim.NewService(m.model, m.cellStore, m.ueStore))
 
 	doneCh := make(chan error)
 	go func() {
@@ -136,6 +129,23 @@ func (m *Manager) startNorthboundServer() error {
 		}
 	}()
 	return <-doneCh
+}
+
+func (m *Manager) startE2Agents() error {
+	// Create the E2 agents for all simulated nodes and specified controllers
+	var err error
+	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry, m.nodeStore, m.ueStore)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	// Start the E2 agents
+	err = m.agents.Start()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Close kills the channels and manager related objects
