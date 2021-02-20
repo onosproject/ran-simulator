@@ -42,8 +42,14 @@ func TestMoveUE(t *testing.T) {
 	ues := NewUERegistry(18, cellStore)
 	assert.NotNil(t, ues, "unable to create UE registry")
 
+	// Get a cell ECGI
 	ecgi1 := cellStore.GetRandomCell().ECGI
+
+	// Get another cell ECGI; make sure it's different than the first.
 	ecgi2 := cellStore.GetRandomCell().ECGI
+	for ecgi1 == ecgi2 {
+		ecgi2 = cellStore.GetRandomCell().ECGI
+	}
 
 	for i, ue := range ues.ListAllUEs() {
 		ecgi := ecgi1
