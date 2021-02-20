@@ -73,14 +73,14 @@ func runGetUEsCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	Output("%16s %16s %5s\n", "IMSI", "Serving Cell", "Admitted")
+	Output("%-16s %-16s %-5s\n", "IMSI", "Serving Cell", "Admitted")
 	for {
 		r, err := stream.Recv()
 		if err != nil {
 			break
 		}
 		ue := r.Ue
-		Output("%16d %16d %5t\n", ue.IMSI, ue.ServingTower, ue.Admitted)
+		Output("%-16d %-16d %-5t\n", ue.IMSI, ue.ServingTower, ue.Admitted)
 	}
 	return nil
 }

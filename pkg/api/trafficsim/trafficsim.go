@@ -13,6 +13,7 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	simtypes "github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"google.golang.org/grpc"
 )
@@ -20,67 +21,43 @@ import (
 var log = liblog.GetLogger("trafficsim")
 
 // NewService returns a new trafficsim Service
-func NewService(model *model.Model, ueStore ues.UERegistry) service.Service {
+func NewService(model *model.Model, cellStore cells.CellRegistry, ueStore ues.UERegistry) service.Service {
 	return &Service{
-		model:   model,
-		ueStore: ueStore,
+		model:     model,
+		cellStore: cellStore,
+		ueStore:   ueStore,
 	}
 }
 
 // Service is a Service implementation for administration.
 type Service struct {
 	service.Service
-	model   *model.Model
-	ueStore ues.UERegistry
+	model     *model.Model
+	cellStore cells.CellRegistry
+	ueStore   ues.UERegistry
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
 func (s *Service) Register(r *grpc.Server) {
 	server := &Server{
-		model:   s.model,
-		ueStore: s.ueStore,
+		model:     s.model,
+		cellStore: s.cellStore,
+		ueStore:   s.ueStore,
 	}
 	simapi.RegisterTrafficServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-	model   *model.Model
-	ueStore ues.UERegistry
-}
-
-func coordToAPI(coord model.Coordinate) *simtypes.Point {
-	return &types.Point{Lat: coord.Lat, Lng: coord.Lng}
-}
-
-func sectorToAPI(sector model.Sector) *simtypes.Sector {
-	return &simtypes.Sector{
-		Azimuth:  sector.Azimuth,
-		Arc:      sector.Arc,
-		Centroid: coordToAPI(sector.Center),
-	}
-}
-
-func cellToAPI(cell model.Cell) *simtypes.Cell {
-	r := &simtypes.Cell{
-		ECGI:       cell.Ecgi,
-		Location:   coordToAPI(cell.Sector.Center),
-		Sector:     sectorToAPI(cell.Sector),
-		Color:      cell.Color,
-		MaxUEs:     cell.MaxUEs,
-		Neighbors:  cell.Neighbors,
-		TxPowerdB:  cell.TxPowerDB,
-		CrntiMap:   nil,
-		CrntiIndex: 0,
-		Port:       0,
-	}
-	return r
+	model     *model.Model
+	cellStore cells.CellRegistry
+	ueStore   ues.UERegistry
 }
 
 // GetMapLayout :
 func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest) (*types.MapLayout, error) {
 	return &types.MapLayout{
-		Center:         coordToAPI(s.model.MapLayout.Center),
+		Center:         &types.Point{Lat: s.model.MapLayout.Center.Lat, Lng: s.model.MapLayout.Center.Lng},
 		Zoom:           s.model.MapLayout.Zoom,
 		Fade:           s.model.MapLayout.FadeMap,
 		ShowRoutes:     s.model.MapLayout.ShowRoutes,
@@ -124,42 +101,35 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 	return nil
 }
 
-// ListCells provides means to list (and optionally monitor) simulated cells
-func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_ListCellsServer) error {
-	for _, node := range s.model.Nodes {
-		for _, cell := range node.Cells {
-			resp := &simapi.ListCellsResponse{
-				Cell: cellToAPI(cell),
-				Type: simapi.Type_NONE,
-			}
-			err := stream.Send(resp)
-			if err != nil {
-				return err
-			}
+// ListUes provides means to list (and optionally monitor) simulated UEs
+func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
+	ch := make(chan ues.UEEvent)
+	log.Infof("UE Store: %v", s.ueStore)
+	s.ueStore.WatchUEs(ch, ues.WatchOptions{Replay: !req.WithoutReplay, Monitor: req.Subscribe})
+
+	for event := range ch {
+		resp := &simapi.ListUesResponse{
+			Ue:   ueToAPI(event.UE),
+			Type: eventType(event.Type),
+		}
+		err := stream.Send(resp)
+		if err != nil {
+			return err
 		}
 	}
-
-	// TODO: add watch capability
 	return nil
 }
 
-// ListUes provides means to list (and optionally monitor) simulated UEs
-func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
-	if !req.WithoutReplay {
-		for _, ue := range s.ueStore.ListAllUEs() {
-			resp := &simapi.ListUesResponse{
-				Ue:   ueToAPI(ue),
-				Type: simapi.Type_NONE,
-			}
-			err := stream.Send(resp)
-			if err != nil {
-				return err
-			}
-		}
+func eventType(t uint8) simapi.Type {
+	if t == ues.ADDED {
+		return simapi.Type_ADDED
+	} else if t == ues.UPDATED {
+		return simapi.Type_ADDED
+	} else if t == ues.DELETED {
+		return simapi.Type_ADDED
+	} else {
+		return simapi.Type_NONE
 	}
-
-	// TODO: add watch capability
-	return nil
 }
 
 // SetNumberUEs changes the number of UEs in the simulation

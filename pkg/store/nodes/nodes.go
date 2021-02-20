@@ -6,10 +6,13 @@ package nodes
 
 import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"sync"
 )
+
+var log = liblog.GetLogger("store", "nodes")
 
 // NodeRegistry tracks inventory of simulated E2 nodes.
 type NodeRegistry interface {
@@ -45,12 +48,12 @@ type nodeWatcher struct {
 	ch chan<- NodeEvent
 }
 
-func (nr *nodeRegistry) notify(node *model.Node, eventType uint8) {
+func (r *nodeRegistry) notify(node *model.Node, eventType uint8) {
 	event := NodeEvent{
 		Node: node,
 		Type: eventType,
 	}
-	for _, watcher := range nr.watchers {
+	for _, watcher := range r.watchers {
 		watcher.ch <- event
 	}
 }
@@ -63,6 +66,7 @@ type nodeRegistry struct {
 
 // NewNodeRegistry creates a new store abstraction from the specified fixed node map.
 func NewNodeRegistry(nodes map[string]model.Node) NodeRegistry {
+	log.Infof("Creating registry from model with %d nodes", len(nodes))
 	reg := &nodeRegistry{
 		lock:     sync.RWMutex{},
 		nodes:    make(map[types.EnbID]*model.Node),
@@ -75,50 +79,51 @@ func NewNodeRegistry(nodes map[string]model.Node) NodeRegistry {
 		reg.nodes[node.EnbID] = &node
 	}
 
+	log.Infof("Created registry primed with %d nodes", len(reg.nodes))
 	return reg
 }
 
-func (nr *nodeRegistry) AddNode(node *model.Node) error {
-	nr.lock.Lock()
-	defer nr.lock.Unlock()
-	if _, ok := nr.nodes[node.EnbID]; ok {
+func (r *nodeRegistry) AddNode(node *model.Node) error {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	if _, ok := r.nodes[node.EnbID]; ok {
 		return errors.New(errors.NotFound, "node with EnbID already exists")
 	}
 
-	nr.nodes[node.EnbID] = node
-	go nr.notify(node, ADDED)
+	r.nodes[node.EnbID] = node
+	r.notify(node, ADDED)
 	return nil
 
 }
 
-func (nr *nodeRegistry) GetNode(enbID types.EnbID) (*model.Node, error) {
-	nr.lock.RLock()
-	defer nr.lock.RUnlock()
-	if node, ok := nr.nodes[enbID]; ok {
+func (r *nodeRegistry) GetNode(enbID types.EnbID) (*model.Node, error) {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+	if node, ok := r.nodes[enbID]; ok {
 		return node, nil
 	}
 
 	return nil, errors.New(errors.NotFound, "node not found")
 }
 
-func (nr *nodeRegistry) UpdateNode(node *model.Node) error {
-	nr.lock.Lock()
-	defer nr.lock.Unlock()
-	if _, ok := nr.nodes[node.EnbID]; ok {
-		nr.nodes[node.EnbID] = node
-		nr.notify(node, UPDATED)
+func (r *nodeRegistry) UpdateNode(node *model.Node) error {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	if _, ok := r.nodes[node.EnbID]; ok {
+		r.nodes[node.EnbID] = node
+		r.notify(node, UPDATED)
 		return nil
 	}
 
 	return errors.New(errors.NotFound, "node not found")
 }
 
-func (nr *nodeRegistry) DeleteNode(enbID types.EnbID) (*model.Node, error) {
-	nr.lock.Lock()
-	defer nr.lock.Unlock()
-	if node, ok := nr.nodes[enbID]; ok {
-		delete(nr.nodes, enbID)
-		nr.notify(node, DELETED)
+func (r *nodeRegistry) DeleteNode(enbID types.EnbID) (*model.Node, error) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	if node, ok := r.nodes[enbID]; ok {
+		delete(r.nodes, enbID)
+		r.notify(node, DELETED)
 		return node, nil
 	}
 	return nil, errors.New(errors.NotFound, "node not found")
@@ -138,21 +143,22 @@ const (
 	DELETED uint8 = 3
 )
 
-func (nr *nodeRegistry) WatchNodes(ch chan<- NodeEvent, options ...WatchOptions) {
+func (r *nodeRegistry) WatchNodes(ch chan<- NodeEvent, options ...WatchOptions) {
+	log.Infof("WatchNodes: %v (#%d)\n", options, len(r.nodes))
 	monitor := len(options) == 0 || options[0].Monitor
 	replay := len(options) > 0 && options[0].Replay
 	go func() {
 		watcher := nodeWatcher{ch: ch}
 		if monitor {
-			nr.lock.RLock()
-			nr.watchers = append(nr.watchers, watcher)
-			nr.lock.RUnlock()
+			r.lock.RLock()
+			r.watchers = append(r.watchers, watcher)
+			r.lock.RUnlock()
 		}
 
 		if replay {
-			nr.lock.RLock()
-			defer nr.lock.RUnlock()
-			for _, node := range nr.nodes {
+			r.lock.RLock()
+			defer r.lock.RUnlock()
+			for _, node := range r.nodes {
 				ch <- NodeEvent{Node: node, Type: NONE}
 			}
 			if !monitor {
