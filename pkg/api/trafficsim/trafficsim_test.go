@@ -38,7 +38,7 @@ func newTestService() (northbound.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	ueStore := ues.NewUERegistry(m.UECount)
+	ueStore := ues.NewUERegistry(m.UECount, cells.NewCellRegistry(m.Cells))
 	cellStore := cells.NewCellRegistry(m.Cells)
 	return &Service{model: m, cellStore: cellStore, ueStore: ueStore}, nil
 }
@@ -96,16 +96,6 @@ func TestServiceBasics(t *testing.T) {
 	stream, err = client.ListUes(context.TODO(), &simapi.ListUesRequest{WithoutReplay: false})
 	assert.NoError(t, err, "unable to list UEs")
 	assert.Equal(t, 16, countItems(t, stream, &simapi.ListUesResponse{}), "incorrect revised UE count")
-}
-
-func TestCellsBasics(t *testing.T) {
-	client := simapi.NewTrafficClient(createServerConnection(t))
-	assert.NotNil(t, client, "unable to create gRPC client")
-
-	stream, err := client.ListCells(context.TODO(), &simapi.ListCellsRequest{WithoutReplay: false})
-	assert.NoError(t, err, "unable to list UEs")
-
-	assert.Equal(t, 4, countItems(t, stream, &simapi.ListCellsResponse{}), "incorrect cell count")
 }
 
 func countItems(t *testing.T, stream grpc.ClientStream, msg interface{}) int {

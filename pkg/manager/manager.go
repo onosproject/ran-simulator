@@ -88,7 +88,7 @@ func (m *Manager) Start() error {
 	m.cellStore = cells.NewCellRegistry(m.model.Cells)
 
 	// Create the UE registry primed with the specified number of UEs
-	m.ueStore = ues.NewUERegistry(m.model.UECount)
+	m.ueStore = ues.NewUERegistry(m.model.UECount, m.cellStore)
 
 	// Start gRPC server
 	err = m.startNorthboundServer()
@@ -113,6 +113,7 @@ func (m *Manager) startNorthboundServer() error {
 		int16(m.config.GRPCPort),
 		true,
 		northbound.SecurityConfig{}))
+
 	m.server.AddService(logging.Service{})
 	m.server.AddService(nodeapi.NewService(m.nodeStore))
 	m.server.AddService(cellapi.NewService(m.cellStore))

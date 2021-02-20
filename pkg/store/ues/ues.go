@@ -6,16 +6,20 @@ package ues
 
 import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"math/rand"
 	"sync"
 )
 
 const (
-	minIMSI = 10000
-	maxIMSI = 99999
+	minIMSI = 1000000
+	maxIMSI = 9999999
 )
+
+var log = liblog.GetLogger("store", "ues")
 
 // UERegistry tracks inventory of user-equipment for the simulation
 type UERegistry interface {
@@ -35,13 +39,13 @@ type UERegistry interface {
 	DestroyUE(imsi types.IMSI) (*model.UE, error)
 
 	// MoveUE update the cell affiliation of the specified UE
-	MoveUE(imsi types.IMSI, genbID types.GEnbID, strength float64) error
+	MoveUE(imsi types.IMSI, ecgi types.ECGI, strength float64) error
 
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs() []*model.UE
 
 	// ListUEs returns an array of all UEs associated with the specified cell
-	ListUEs(genbID types.GEnbID) []*model.UE
+	ListUEs(ecgi types.ECGI) []*model.UE
 
 	// WatchUEs watches the UE inventory events using the supplied channel
 	WatchUEs(ch chan<- UEEvent, options ...WatchOptions)
@@ -74,18 +78,23 @@ func (r *ueRegistry) notify(ue *model.UE, eventType uint8) {
 }
 
 type ueRegistry struct {
-	lock     sync.RWMutex
-	ues      map[types.IMSI]*model.UE
-	watchers []ueWatcher
+	lock      sync.RWMutex
+	ues       map[types.IMSI]*model.UE
+	watchers  []ueWatcher
+	cellStore cells.CellRegistry
 }
 
-// NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start
-func NewUERegistry(count uint) UERegistry {
+// NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start.
+// UEs will be semi-randomly distributed between the specified cells
+func NewUERegistry(count uint, cellStore cells.CellRegistry) UERegistry {
+	log.Infof("Creating registry from model with %d UEs", count)
 	reg := &ueRegistry{
-		lock: sync.RWMutex{},
-		ues:  make(map[types.IMSI]*model.UE),
+		lock:      sync.RWMutex{},
+		ues:       make(map[types.IMSI]*model.UE),
+		cellStore: cellStore,
 	}
 	reg.CreateUEs(count)
+	log.Infof("Created registry primed with %d UEs", len(reg.ues))
 	return reg
 }
 
@@ -117,13 +126,23 @@ func (r *ueRegistry) CreateUEs(count uint) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	for i := uint(0); i < count; i++ {
-		// FIXME: fill in with more sensible values
+		imsi := types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI)
+		if _, ok := r.ues[imsi]; ok {
+			// FIXME: more robust check for duplicates
+			imsi = types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI)
+		}
+
+		ecgi := r.cellStore.GetRandomCell().ECGI
 		ue := &model.UE{
-			IMSI:       types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI),
-			Type:       "phone",
-			Location:   model.Coordinate{Lat: 0, Lng: 0},
-			Rotation:   0,
-			Cell:       &model.UECell{},
+			IMSI:     imsi,
+			Type:     "phone",
+			Location: model.Coordinate{Lat: 0, Lng: 0},
+			Rotation: 0,
+			Cell: &model.UECell{
+				ID:       types.GEnbID(ecgi), // placeholder
+				ECGI:     ecgi,
+				Strength: rand.Float64() * 100,
+			},
 			CRNTI:      types.CRNTI(90125 + i),
 			Cells:      nil,
 			IsAdmitted: false,
@@ -163,11 +182,11 @@ func (r *ueRegistry) ListAllUEs() []*model.UE {
 	return list
 }
 
-func (r *ueRegistry) MoveUE(imsi types.IMSI, genbID types.GEnbID, strength float64) error {
+func (r *ueRegistry) MoveUE(imsi types.IMSI, ecgi types.ECGI, strength float64) error {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	if ue, ok := r.ues[imsi]; ok {
-		ue.Cell.ID = genbID
+		ue.Cell.ECGI = ecgi
 		ue.Cell.Strength = strength
 		r.notify(ue, UPDATED)
 		return nil
@@ -175,12 +194,12 @@ func (r *ueRegistry) MoveUE(imsi types.IMSI, genbID types.GEnbID, strength float
 	return errors.New(errors.NotFound, "UE not found")
 }
 
-func (r *ueRegistry) ListUEs(genbID types.GEnbID) []*model.UE {
+func (r *ueRegistry) ListUEs(ecgi types.ECGI) []*model.UE {
 	r.lock.RLock()
 	defer r.lock.RUnlock()
 	list := make([]*model.UE, 0, len(r.ues))
 	for _, ue := range r.ues {
-		if ue.Cell.ID == genbID {
+		if ue.Cell.ECGI == ecgi {
 			list = append(list, ue)
 		}
 	}
@@ -202,6 +221,7 @@ const (
 )
 
 func (r *ueRegistry) WatchUEs(ch chan<- UEEvent, options ...WatchOptions) {
+	log.Infof("WatchUEs: %v (#%d)\n", options, len(r.ues))
 	monitor := len(options) == 0 || options[0].Monitor
 	replay := len(options) > 0 && options[0].Replay
 	go func() {

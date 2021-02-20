@@ -9,6 +9,8 @@ import (
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"math/rand"
+	"reflect"
 	"sync"
 )
 
@@ -30,6 +32,9 @@ type CellRegistry interface {
 
 	// WatchCells watches the cell inventory events using the supplied channel
 	WatchCells(ch chan<- CellEvent, options ...WatchOptions)
+
+	// GetRandomCell retrieves a random cell from the registry
+	GetRandomCell() *model.Cell
 }
 
 // CellEvent represents a change in the cell inventory
@@ -144,7 +149,7 @@ const (
 )
 
 func (r *cellRegistry) WatchCells(ch chan<- CellEvent, options ...WatchOptions) {
-	log.Infof("WatchNode: %v\n", options)
+	log.Infof("WatchCells: %v (#%d)\n", options, len(r.cells))
 	monitor := len(options) == 0 || options[0].Monitor
 	replay := len(options) > 0 && options[0].Replay
 	go func() {
@@ -166,4 +171,10 @@ func (r *cellRegistry) WatchCells(ch chan<- CellEvent, options ...WatchOptions) 
 			}
 		}
 	}()
+}
+
+func (r *cellRegistry) GetRandomCell() *model.Cell {
+	keys := reflect.ValueOf(r.cells).MapKeys()
+	ecgi := types.ECGI(keys[rand.Intn(len(keys))].Uint())
+	return r.cells[ecgi]
 }

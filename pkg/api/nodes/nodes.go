@@ -64,7 +64,11 @@ func nodeToModel(node *types.Node) *model.Node {
 
 // CreateNode creates a new simulated E2 node
 func (s *Server) CreateNode(ctx context.Context, request *modelapi.CreateNodeRequest) (*modelapi.CreateNodeResponse, error) {
-	panic("implement me")
+	err := s.nodeStore.AddNode(nodeToModel(request.Node))
+	if err != nil {
+		return nil, err
+	}
+	return &modelapi.CreateNodeResponse{}, nil
 }
 
 // GetNode retrieves the specified simulated E2 node

@@ -54,38 +54,10 @@ type Server struct {
 	ueStore   ues.UERegistry
 }
 
-func coordToAPI(coord model.Coordinate) *simtypes.Point {
-	return &types.Point{Lat: coord.Lat, Lng: coord.Lng}
-}
-
-func sectorToAPI(sector model.Sector) *simtypes.Sector {
-	return &simtypes.Sector{
-		Azimuth:  sector.Azimuth,
-		Arc:      sector.Arc,
-		Centroid: coordToAPI(sector.Center),
-	}
-}
-
-func cellToAPI(cell model.Cell) *simtypes.Cell {
-	r := &simtypes.Cell{
-		ECGI:       cell.ECGI,
-		Location:   coordToAPI(cell.Sector.Center),
-		Sector:     sectorToAPI(cell.Sector),
-		Color:      cell.Color,
-		MaxUEs:     cell.MaxUEs,
-		Neighbors:  cell.Neighbors,
-		TxPowerdB:  cell.TxPowerDB,
-		CrntiMap:   nil,
-		CrntiIndex: 0,
-		Port:       0,
-	}
-	return r
-}
-
 // GetMapLayout :
 func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest) (*types.MapLayout, error) {
 	return &types.MapLayout{
-		Center:         coordToAPI(s.model.MapLayout.Center),
+		Center:         &types.Point{Lat: s.model.MapLayout.Center.Lat, Lng: s.model.MapLayout.Center.Lng},
 		Zoom:           s.model.MapLayout.Zoom,
 		Fade:           s.model.MapLayout.FadeMap,
 		ShowRoutes:     s.model.MapLayout.ShowRoutes,
@@ -126,25 +98,6 @@ func ueToAPI(ue *model.UE) *simtypes.Ue {
 func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic_ListRoutesServer) error {
 	// TODO: reimplement list
 	// TODO: add watch capability
-	return nil
-}
-
-// ListCells provides means to list (and optionally monitor) simulated cells
-func (s *Server) ListCells(req *simapi.ListCellsRequest, stream simapi.Traffic_ListCellsServer) error {
-	ch := make(chan cells.CellEvent)
-	log.Infof("Cell Store: %v", s.cellStore)
-	s.cellStore.WatchCells(ch, cells.WatchOptions{Replay: !req.WithoutReplay, Monitor: req.Subscribe})
-
-	for event := range ch {
-		resp := &simapi.ListCellsResponse{
-			Cell: cellToAPI(*event.Cell),
-			Type: eventType(event.Type),
-		}
-		err := stream.Send(resp)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

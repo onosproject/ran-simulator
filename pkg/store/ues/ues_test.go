@@ -5,15 +5,28 @@
 package ues
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+func cellStore(t *testing.T) cells.CellRegistry {
+	m := model.Model{}
+	bytes, err := ioutil.ReadFile("../../model/test.yaml")
+	assert.NoError(t, err)
+	err = yaml.Unmarshal(bytes, &m)
+	assert.NoError(t, err)
+	t.Log(m)
+	return cells.NewCellRegistry(m.Cells)
+}
+
 func TestUERegistry(t *testing.T) {
-	ues := NewUERegistry(16)
+	ues := NewUERegistry(16, cellStore(t))
 	assert.NotNil(t, ues, "unable to create UE registry")
 	assert.Equal(t, 16, len(ues.ListAllUEs()))
 
@@ -25,21 +38,22 @@ func TestUERegistry(t *testing.T) {
 }
 
 func TestMoveUE(t *testing.T) {
-	ues := NewUERegistry(24)
+	cellStore := cellStore(t)
+	ues := NewUERegistry(18, cellStore)
 	assert.NotNil(t, ues, "unable to create UE registry")
 
-	id1 := types.GEnbID(100123)
-	id2 := types.GEnbID(100321)
+	ecgi1 := cellStore.GetRandomCell().ECGI
+	ecgi2 := cellStore.GetRandomCell().ECGI
 
 	for i, ue := range ues.ListAllUEs() {
-		id := id1
+		ecgi := ecgi1
 		if i%3 == 0 {
-			id = id2
+			ecgi = ecgi2
 		}
-		err := ues.MoveUE(ue.IMSI, id, rand.Float64())
+		err := ues.MoveUE(ue.IMSI, ecgi, rand.Float64())
 		assert.NoError(t, err)
 	}
 
-	assert.Equal(t, 16, len(ues.ListUEs(id1)))
-	assert.Equal(t, 8, len(ues.ListUEs(id2)))
+	assert.Equal(t, 12, len(ues.ListUEs(ecgi1)))
+	assert.Equal(t, 6, len(ues.ListUEs(ecgi2)))
 }

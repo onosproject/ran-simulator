@@ -34,14 +34,14 @@ func runGetCellsCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	Output("%16s %7s %7s %5s %7s %7s %8s\n", "ECGI", "#UEs", "Max UEs", "TxDB", "Lat", "Lng", "Color")
+	Output("%-16s %7s %7s %7s %9s %9s %-8s\n", "ECGI", "#UEs", "Max UEs", "TxDB", "Lat", "Lng", "Color")
 	for {
 		r, err := stream.Recv()
 		if err != nil {
 			break
 		}
 		cell := r.Cell
-		Output("%16d %7d %7d %5.2f %7.3f %7.3f %8s\n", cell.ECGI, len(cell.CrntiMap), cell.MaxUEs, cell.TxPowerdB,
+		Output("%-16d %7d %7d %7.2f %9.3f %9.3f %-8s\n", cell.ECGI, len(cell.CrntiMap), cell.MaxUEs, cell.TxPowerdB,
 			cell.Location.Lat, cell.Location.Lng, cell.Color)
 	}
 	return nil

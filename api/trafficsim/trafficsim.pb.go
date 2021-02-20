@@ -134,115 +134,6 @@ func (m *MapLayoutRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MapLayoutRequest proto.InternalMessageInfo
 
-type ListCellsRequest struct {
-	// subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
-	// after all cells have been streamed to the client
-	Subscribe bool `protobuf:"varint,1,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
-	// option to request only changes that happen after the call
-	WithoutReplay bool `protobuf:"varint,2,opt,name=withoutReplay,proto3" json:"withoutReplay,omitempty"`
-}
-
-func (m *ListCellsRequest) Reset()         { *m = ListCellsRequest{} }
-func (m *ListCellsRequest) String() string { return proto.CompactTextString(m) }
-func (*ListCellsRequest) ProtoMessage()    {}
-func (*ListCellsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{1}
-}
-func (m *ListCellsRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ListCellsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListCellsRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ListCellsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListCellsRequest.Merge(m, src)
-}
-func (m *ListCellsRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *ListCellsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListCellsRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListCellsRequest proto.InternalMessageInfo
-
-func (m *ListCellsRequest) GetSubscribe() bool {
-	if m != nil {
-		return m.Subscribe
-	}
-	return false
-}
-
-func (m *ListCellsRequest) GetWithoutReplay() bool {
-	if m != nil {
-		return m.WithoutReplay
-	}
-	return false
-}
-
-type ListCellsResponse struct {
-	// cell is the cell change on which the event occurred
-	Cell *types.Cell `protobuf:"bytes,1,opt,name=cell,proto3" json:"cell,omitempty"`
-	// type is a qualification of the type of change being made
-	Type Type `protobuf:"varint,2,opt,name=type,proto3,enum=ran.trafficsim.Type" json:"type,omitempty"`
-}
-
-func (m *ListCellsResponse) Reset()         { *m = ListCellsResponse{} }
-func (m *ListCellsResponse) String() string { return proto.CompactTextString(m) }
-func (*ListCellsResponse) ProtoMessage()    {}
-func (*ListCellsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{2}
-}
-func (m *ListCellsResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ListCellsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ListCellsResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ListCellsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListCellsResponse.Merge(m, src)
-}
-func (m *ListCellsResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *ListCellsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListCellsResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListCellsResponse proto.InternalMessageInfo
-
-func (m *ListCellsResponse) GetCell() *types.Cell {
-	if m != nil {
-		return m.Cell
-	}
-	return nil
-}
-
-func (m *ListCellsResponse) GetType() Type {
-	if m != nil {
-		return m.Type
-	}
-	return Type_NONE
-}
-
 type ListRoutesRequest struct {
 	// subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
 	// after all routes have been streamed to the client
@@ -255,7 +146,7 @@ func (m *ListRoutesRequest) Reset()         { *m = ListRoutesRequest{} }
 func (m *ListRoutesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListRoutesRequest) ProtoMessage()    {}
 func (*ListRoutesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{3}
+	return fileDescriptor_47869854f8356ea4, []int{1}
 }
 func (m *ListRoutesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -309,7 +200,7 @@ func (m *ListRoutesResponse) Reset()         { *m = ListRoutesResponse{} }
 func (m *ListRoutesResponse) String() string { return proto.CompactTextString(m) }
 func (*ListRoutesResponse) ProtoMessage()    {}
 func (*ListRoutesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{4}
+	return fileDescriptor_47869854f8356ea4, []int{2}
 }
 func (m *ListRoutesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -364,7 +255,7 @@ func (m *ListUesRequest) Reset()         { *m = ListUesRequest{} }
 func (m *ListUesRequest) String() string { return proto.CompactTextString(m) }
 func (*ListUesRequest) ProtoMessage()    {}
 func (*ListUesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{5}
+	return fileDescriptor_47869854f8356ea4, []int{3}
 }
 func (m *ListUesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -420,7 +311,7 @@ func (m *ListUesResponse) Reset()         { *m = ListUesResponse{} }
 func (m *ListUesResponse) String() string { return proto.CompactTextString(m) }
 func (*ListUesResponse) ProtoMessage()    {}
 func (*ListUesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{6}
+	return fileDescriptor_47869854f8356ea4, []int{4}
 }
 func (m *ListUesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -478,7 +369,7 @@ func (m *SetNumberUEsRequest) Reset()         { *m = SetNumberUEsRequest{} }
 func (m *SetNumberUEsRequest) String() string { return proto.CompactTextString(m) }
 func (*SetNumberUEsRequest) ProtoMessage()    {}
 func (*SetNumberUEsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{7}
+	return fileDescriptor_47869854f8356ea4, []int{5}
 }
 func (m *SetNumberUEsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -522,7 +413,7 @@ func (m *SetNumberUEsResponse) Reset()         { *m = SetNumberUEsResponse{} }
 func (m *SetNumberUEsResponse) String() string { return proto.CompactTextString(m) }
 func (*SetNumberUEsResponse) ProtoMessage()    {}
 func (*SetNumberUEsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{8}
+	return fileDescriptor_47869854f8356ea4, []int{6}
 }
 func (m *SetNumberUEsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -565,7 +456,7 @@ func (m *ResetMetricsMsg) Reset()         { *m = ResetMetricsMsg{} }
 func (m *ResetMetricsMsg) String() string { return proto.CompactTextString(m) }
 func (*ResetMetricsMsg) ProtoMessage()    {}
 func (*ResetMetricsMsg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{9}
+	return fileDescriptor_47869854f8356ea4, []int{7}
 }
 func (m *ResetMetricsMsg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -598,8 +489,6 @@ func init() {
 	proto.RegisterEnum("ran.trafficsim.Type", Type_name, Type_value)
 	proto.RegisterEnum("ran.trafficsim.UpdateType", UpdateType_name, UpdateType_value)
 	proto.RegisterType((*MapLayoutRequest)(nil), "ran.trafficsim.MapLayoutRequest")
-	proto.RegisterType((*ListCellsRequest)(nil), "ran.trafficsim.ListCellsRequest")
-	proto.RegisterType((*ListCellsResponse)(nil), "ran.trafficsim.ListCellsResponse")
 	proto.RegisterType((*ListRoutesRequest)(nil), "ran.trafficsim.ListRoutesRequest")
 	proto.RegisterType((*ListRoutesResponse)(nil), "ran.trafficsim.ListRoutesResponse")
 	proto.RegisterType((*ListUesRequest)(nil), "ran.trafficsim.ListUesRequest")
@@ -612,46 +501,43 @@ func init() {
 func init() { proto.RegisterFile("api/trafficsim/trafficsim.proto", fileDescriptor_47869854f8356ea4) }
 
 var fileDescriptor_47869854f8356ea4 = []byte{
-	// 618 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x4f, 0x9c, 0x50,
-	0x14, 0x1d, 0x66, 0xc6, 0xaf, 0xeb, 0xa8, 0xf8, 0x6a, 0x1a, 0x43, 0x5a, 0xb4, 0x68, 0x1a, 0x63,
-	0x22, 0xd3, 0xd8, 0x74, 0xd3, 0xae, 0x6c, 0xa1, 0xad, 0x89, 0x03, 0x93, 0x27, 0x68, 0x5c, 0x35,
-	0x40, 0x9f, 0x4a, 0xc3, 0x0c, 0x94, 0xf7, 0x48, 0x33, 0xff, 0xa2, 0xbb, 0xfe, 0xa5, 0x2e, 0x5d,
-	0x76, 0xd9, 0xe8, 0x8f, 0xe8, 0xb6, 0xe1, 0x41, 0x81, 0xc1, 0x71, 0x1a, 0x13, 0x37, 0x13, 0xb8,
-	0xef, 0x9c, 0xf3, 0xce, 0xbd, 0x73, 0x2e, 0xb0, 0xe1, 0x44, 0x7e, 0x97, 0xc5, 0xce, 0xf9, 0xb9,
-	0xef, 0x51, 0x7f, 0x50, 0x79, 0x54, 0xa3, 0x38, 0x64, 0x21, 0x5a, 0x8e, 0x9d, 0xa1, 0x5a, 0x56,
-	0xa5, 0xd7, 0x17, 0x3e, 0xbb, 0x4c, 0x5c, 0xd5, 0x0b, 0x07, 0xdd, 0x70, 0x18, 0xd2, 0x28, 0x0e,
-	0xbf, 0x10, 0x8f, 0x75, 0x63, 0x67, 0xb8, 0x47, 0xfd, 0x41, 0x12, 0x38, 0x2c, 0x8c, 0xbb, 0x5c,
-	0x75, 0x14, 0x11, 0x9a, 0xfd, 0x66, 0x5a, 0x0a, 0x02, 0xb1, 0xe7, 0x44, 0x47, 0xce, 0x28, 0x4c,
-	0x18, 0x26, 0x5f, 0x13, 0x42, 0x99, 0x72, 0x02, 0xe2, 0x91, 0x4f, 0xd9, 0x3b, 0x12, 0x04, 0x34,
-	0xaf, 0xa1, 0x27, 0xb0, 0x40, 0x13, 0x97, 0x7a, 0xb1, 0xef, 0x92, 0x75, 0x61, 0x53, 0xd8, 0x99,
-	0xc7, 0x65, 0x01, 0x6d, 0xc3, 0xd2, 0x37, 0x9f, 0x5d, 0x72, 0x8d, 0x28, 0x70, 0x46, 0xeb, 0x4d,
-	0x8e, 0x18, 0x2f, 0x2a, 0x2e, 0xac, 0x56, 0x74, 0x69, 0x14, 0x0e, 0x29, 0x41, 0x5b, 0xd0, 0xf6,
-	0x48, 0x10, 0x70, 0xcd, 0xc5, 0xfd, 0x15, 0x95, 0xf7, 0xc6, 0x0d, 0xa6, 0x38, 0xcc, 0x0f, 0xd1,
-	0x0e, 0xb4, 0xd3, 0x1a, 0x97, 0x5d, 0xde, 0x5f, 0x53, 0xc7, 0x07, 0xa0, 0x5a, 0xa3, 0x88, 0x60,
-	0x8e, 0x50, 0x4e, 0xb3, 0x3b, 0x70, 0x98, 0x30, 0xf2, 0xa0, 0xe6, 0xcf, 0x01, 0x55, 0x85, 0x73,
-	0xf7, 0xcf, 0x61, 0x26, 0x4e, 0x2b, 0xb9, 0x7d, 0xb1, 0x62, 0x9f, 0x23, 0x71, 0x76, 0x7c, 0x8f,
-	0x06, 0x2c, 0x58, 0x4e, 0xef, 0xb1, 0x1f, 0xd6, 0xfd, 0x0f, 0x01, 0x56, 0x0a, 0xd9, 0xdc, 0xfb,
-	0x53, 0x68, 0x26, 0xff, 0x8c, 0x2f, 0x55, 0x8c, 0xdb, 0x04, 0x37, 0x93, 0x7b, 0x58, 0x46, 0x6f,
-	0x60, 0x31, 0x89, 0x3e, 0x3b, 0x8c, 0x7c, 0xe2, 0x84, 0x16, 0x27, 0x48, 0x75, 0x82, 0xcd, 0x21,
-	0x9c, 0x06, 0x49, 0xf1, 0xac, 0xec, 0xc1, 0xa3, 0x63, 0xc2, 0x8c, 0x64, 0xe0, 0x92, 0xd8, 0xd6,
-	0x8b, 0xa6, 0x1f, 0xc3, 0xec, 0x90, 0xd7, 0xb8, 0xc1, 0x25, 0x9c, 0xbf, 0x29, 0x2a, 0xac, 0x8d,
-	0xc3, 0xf3, 0x66, 0xee, 0xc2, 0xaf, 0xc2, 0x0a, 0x26, 0x94, 0xb0, 0x1e, 0x61, 0xb1, 0xef, 0xd1,
-	0x1e, 0xbd, 0xd8, 0x7d, 0x05, 0xed, 0xf4, 0x66, 0x34, 0x0f, 0x6d, 0xc3, 0x34, 0x74, 0xb1, 0x81,
-	0x16, 0x60, 0xe6, 0x40, 0xd3, 0x74, 0x4d, 0x14, 0xd0, 0x22, 0xcc, 0xd9, 0x7d, 0xed, 0xc0, 0xd2,
-	0x35, 0xb1, 0x99, 0xbe, 0x60, 0xbd, 0x67, 0x9e, 0xe8, 0x9a, 0xd8, 0xda, 0xd5, 0x01, 0xca, 0x16,
-	0x90, 0x08, 0x1d, 0xc3, 0xcc, 0x90, 0xd6, 0x59, 0x3f, 0x15, 0xe9, 0xc0, 0x7c, 0xdf, 0x3c, 0x3e,
-	0xb4, 0x0e, 0x4d, 0x43, 0x14, 0x52, 0x49, 0xcb, 0x3c, 0xd5, 0xb1, 0xd8, 0x4c, 0x0f, 0x3e, 0x1e,
-	0x18, 0x9a, 0x79, 0xa2, 0x63, 0xb1, 0xb5, 0xff, 0xa7, 0x05, 0x73, 0x56, 0x36, 0x15, 0xf4, 0x1e,
-	0x3a, 0x1f, 0x08, 0x2b, 0xf6, 0x0f, 0x6d, 0xd6, 0x67, 0x56, 0x5f, 0x4d, 0x69, 0xad, 0xf2, 0x3f,
-	0x95, 0x3c, 0x0c, 0x0b, 0xc5, 0x62, 0xdd, 0x16, 0xa9, 0xef, 0xb2, 0xf4, 0x6c, 0x0a, 0x22, 0x1b,
-	0xe7, 0x0b, 0x01, 0xd9, 0x00, 0x65, 0xde, 0xd1, 0x44, 0xca, 0xd8, 0x92, 0x49, 0xca, 0x34, 0x48,
-	0x21, 0x7b, 0x04, 0x73, 0x79, 0x0e, 0x91, 0x3c, 0x89, 0x50, 0xe6, 0x5e, 0xda, 0xb8, 0xf3, 0xbc,
-	0x50, 0x3b, 0x83, 0x4e, 0x35, 0x0d, 0x68, 0xab, 0x4e, 0x99, 0x10, 0x2d, 0x69, 0x7b, 0x3a, 0x28,
-	0x0f, 0x54, 0x1f, 0x3a, 0xd5, 0xe0, 0xa0, 0x5b, 0x6e, 0x6a, 0xb1, 0x92, 0xfe, 0x07, 0x78, 0xbb,
-	0xfe, 0xf3, 0x5a, 0x16, 0xae, 0xae, 0x65, 0xe1, 0xf7, 0xb5, 0x2c, 0x7c, 0xbf, 0x91, 0x1b, 0x57,
-	0x37, 0x72, 0xe3, 0xd7, 0x8d, 0xdc, 0x70, 0x67, 0xf9, 0xb7, 0xf8, 0xe5, 0xdf, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0x33, 0xda, 0x29, 0x7d, 0xfa, 0x05, 0x00, 0x00,
+	// 572 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcb, 0x6e, 0xd3, 0x40,
+	0x14, 0x8d, 0x93, 0xb4, 0x49, 0x6f, 0x1e, 0x75, 0x87, 0x08, 0x45, 0x16, 0xb8, 0xc5, 0x54, 0xa8,
+	0xaa, 0x54, 0x07, 0x05, 0xb1, 0x81, 0x55, 0x90, 0x0d, 0x54, 0x4a, 0xec, 0xc8, 0xb5, 0x5b, 0x75,
+	0x85, 0x9c, 0x30, 0x69, 0x8d, 0x9a, 0xd8, 0x78, 0x66, 0x84, 0xf2, 0x17, 0xec, 0xf8, 0x00, 0x7e,
+	0x86, 0x65, 0x97, 0x2c, 0x51, 0xf2, 0x23, 0xc8, 0x63, 0x13, 0x3b, 0xee, 0x03, 0x21, 0xb1, 0x89,
+	0xec, 0x3b, 0xe7, 0x9c, 0x39, 0xf7, 0xde, 0x13, 0xc3, 0xae, 0x1b, 0x78, 0x1d, 0x1a, 0xba, 0x93,
+	0x89, 0x37, 0x26, 0xde, 0x34, 0xf3, 0xa8, 0x06, 0xa1, 0x4f, 0x7d, 0xd4, 0x0c, 0xdd, 0x99, 0x9a,
+	0x56, 0xa5, 0x57, 0x17, 0x1e, 0xbd, 0x64, 0x23, 0x75, 0xec, 0x4f, 0x3b, 0xfe, 0xcc, 0x27, 0x41,
+	0xe8, 0x7f, 0xc2, 0x63, 0xda, 0x09, 0xdd, 0xd9, 0x11, 0xf1, 0xa6, 0xec, 0xca, 0xa5, 0x7e, 0xd8,
+	0xe1, 0xaa, 0xf3, 0x00, 0x93, 0xf8, 0x37, 0xd6, 0x52, 0x10, 0x88, 0x03, 0x37, 0xe8, 0xbb, 0x73,
+	0x9f, 0x51, 0x0b, 0x7f, 0x66, 0x98, 0x50, 0xe5, 0x0c, 0x76, 0xfa, 0x1e, 0xa1, 0x96, 0xcf, 0x28,
+	0x26, 0x49, 0x11, 0x3d, 0x82, 0x2d, 0xc2, 0x46, 0x64, 0x1c, 0x7a, 0x23, 0xdc, 0x16, 0xf6, 0x84,
+	0x83, 0xaa, 0x95, 0x16, 0xd0, 0x3e, 0x34, 0xbe, 0x78, 0xf4, 0x92, 0x8b, 0x04, 0x57, 0xee, 0xbc,
+	0x5d, 0xe4, 0x88, 0xf5, 0xa2, 0x32, 0x01, 0x94, 0x15, 0x26, 0x81, 0x3f, 0x23, 0x18, 0x3d, 0x83,
+	0x8d, 0x30, 0xaa, 0x70, 0xd5, 0x5a, 0x57, 0x54, 0x79, 0x7b, 0xdc, 0x23, 0x47, 0x5a, 0xf1, 0x31,
+	0x3a, 0x80, 0x72, 0x54, 0xe5, 0xd2, 0xcd, 0x6e, 0x4b, 0x5d, 0x9f, 0x82, 0x6a, 0xcf, 0x03, 0x6c,
+	0x71, 0x84, 0x62, 0x43, 0x33, 0xba, 0xc7, 0xf9, 0xbf, 0xee, 0xbf, 0x09, 0xb0, 0xbd, 0x92, 0x4d,
+	0xbc, 0x3f, 0x86, 0x22, 0xfb, 0x63, 0xbc, 0x91, 0x31, 0xee, 0x60, 0xab, 0xc8, 0xfe, 0xc1, 0x32,
+	0x7a, 0x0d, 0x35, 0x16, 0x7c, 0x74, 0x29, 0xfe, 0xc0, 0x09, 0x25, 0x4e, 0x90, 0xf2, 0x04, 0x87,
+	0x43, 0x38, 0x0d, 0xd8, 0xea, 0x59, 0x39, 0x82, 0x07, 0x27, 0x98, 0x1a, 0x6c, 0x3a, 0xc2, 0xa1,
+	0xa3, 0xaf, 0x9a, 0x7e, 0x08, 0x9b, 0x33, 0x5e, 0xe3, 0x06, 0x1b, 0x56, 0xf2, 0xa6, 0xa8, 0xd0,
+	0x5a, 0x87, 0x27, 0xcd, 0xdc, 0x85, 0xdf, 0x81, 0x6d, 0x0b, 0x13, 0x4c, 0x07, 0x98, 0x86, 0xde,
+	0x98, 0x0c, 0xc8, 0xc5, 0xe1, 0x4b, 0x28, 0x47, 0x37, 0xa3, 0x2a, 0x94, 0x0d, 0xd3, 0xd0, 0xc5,
+	0x02, 0xda, 0x82, 0x8d, 0x9e, 0xa6, 0xe9, 0x9a, 0x28, 0xa0, 0x1a, 0x54, 0x9c, 0xa1, 0xd6, 0xb3,
+	0x75, 0x4d, 0x2c, 0x46, 0x2f, 0x96, 0x3e, 0x30, 0x4f, 0x75, 0x4d, 0x2c, 0x1d, 0xea, 0x00, 0x69,
+	0x0b, 0x48, 0x84, 0xba, 0x61, 0xc6, 0x48, 0xfb, 0x7c, 0x18, 0x89, 0xd4, 0xa1, 0x3a, 0x34, 0x4f,
+	0x8e, 0xed, 0x63, 0xd3, 0x10, 0x85, 0x48, 0xd2, 0x36, 0xcf, 0x74, 0x4b, 0x2c, 0x46, 0x07, 0xef,
+	0x7b, 0x86, 0x66, 0x9e, 0xea, 0x96, 0x58, 0xea, 0x7e, 0x2f, 0x41, 0xc5, 0x8e, 0xa7, 0x82, 0xde,
+	0x42, 0xfd, 0x1d, 0xa6, 0xab, 0x0c, 0xa3, 0xbd, 0xfc, 0xcc, 0xf2, 0xf1, 0x96, 0x5a, 0x99, 0x3d,
+	0xa5, 0x3c, 0x07, 0x20, 0xcd, 0x26, 0x7a, 0x92, 0x57, 0xb9, 0xf1, 0x87, 0x90, 0x94, 0xfb, 0x20,
+	0xf1, 0x44, 0x9f, 0x0b, 0xa8, 0x0f, 0x95, 0x24, 0x33, 0x48, 0xbe, 0x8d, 0x90, 0x66, 0x54, 0xda,
+	0xbd, 0xf3, 0x7c, 0xa5, 0x76, 0x0e, 0xf5, 0xec, 0xe6, 0xd0, 0xd3, 0x3c, 0xe5, 0x96, 0x18, 0x48,
+	0xfb, 0xf7, 0x83, 0x92, 0xe5, 0x0f, 0xa1, 0x9e, 0x5d, 0x32, 0xba, 0xe1, 0x26, 0x17, 0x01, 0xe9,
+	0x6f, 0x80, 0x37, 0xed, 0x1f, 0x0b, 0x59, 0xb8, 0x5e, 0xc8, 0xc2, 0xaf, 0x85, 0x2c, 0x7c, 0x5d,
+	0xca, 0x85, 0xeb, 0xa5, 0x5c, 0xf8, 0xb9, 0x94, 0x0b, 0xa3, 0x4d, 0xfe, 0xed, 0x79, 0xf1, 0x3b,
+	0x00, 0x00, 0xff, 0xff, 0xa9, 0x26, 0xbf, 0x06, 0xea, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -667,7 +553,6 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type TrafficClient interface {
 	GetMapLayout(ctx context.Context, in *MapLayoutRequest, opts ...grpc.CallOption) (*types.MapLayout, error)
-	ListCells(ctx context.Context, in *ListCellsRequest, opts ...grpc.CallOption) (Traffic_ListCellsClient, error)
 	ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (Traffic_ListRoutesClient, error)
 	ListUes(ctx context.Context, in *ListUesRequest, opts ...grpc.CallOption) (Traffic_ListUesClient, error)
 	SetNumberUEs(ctx context.Context, in *SetNumberUEsRequest, opts ...grpc.CallOption) (*SetNumberUEsResponse, error)
@@ -691,40 +576,8 @@ func (c *trafficClient) GetMapLayout(ctx context.Context, in *MapLayoutRequest, 
 	return out, nil
 }
 
-func (c *trafficClient) ListCells(ctx context.Context, in *ListCellsRequest, opts ...grpc.CallOption) (Traffic_ListCellsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[0], "/ran.trafficsim.Traffic/ListCells", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &trafficListCellsClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type Traffic_ListCellsClient interface {
-	Recv() (*ListCellsResponse, error)
-	grpc.ClientStream
-}
-
-type trafficListCellsClient struct {
-	grpc.ClientStream
-}
-
-func (x *trafficListCellsClient) Recv() (*ListCellsResponse, error) {
-	m := new(ListCellsResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 func (c *trafficClient) ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (Traffic_ListRoutesClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[1], "/ran.trafficsim.Traffic/ListRoutes", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[0], "/ran.trafficsim.Traffic/ListRoutes", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -756,7 +609,7 @@ func (x *trafficListRoutesClient) Recv() (*ListRoutesResponse, error) {
 }
 
 func (c *trafficClient) ListUes(ctx context.Context, in *ListUesRequest, opts ...grpc.CallOption) (Traffic_ListUesClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[2], "/ran.trafficsim.Traffic/ListUes", opts...)
+	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[1], "/ran.trafficsim.Traffic/ListUes", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -808,7 +661,6 @@ func (c *trafficClient) ResetMetrics(ctx context.Context, in *ResetMetricsMsg, o
 // TrafficServer is the server API for Traffic service.
 type TrafficServer interface {
 	GetMapLayout(context.Context, *MapLayoutRequest) (*types.MapLayout, error)
-	ListCells(*ListCellsRequest, Traffic_ListCellsServer) error
 	ListRoutes(*ListRoutesRequest, Traffic_ListRoutesServer) error
 	ListUes(*ListUesRequest, Traffic_ListUesServer) error
 	SetNumberUEs(context.Context, *SetNumberUEsRequest) (*SetNumberUEsResponse, error)
@@ -821,9 +673,6 @@ type UnimplementedTrafficServer struct {
 
 func (*UnimplementedTrafficServer) GetMapLayout(ctx context.Context, req *MapLayoutRequest) (*types.MapLayout, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMapLayout not implemented")
-}
-func (*UnimplementedTrafficServer) ListCells(req *ListCellsRequest, srv Traffic_ListCellsServer) error {
-	return status.Errorf(codes.Unimplemented, "method ListCells not implemented")
 }
 func (*UnimplementedTrafficServer) ListRoutes(req *ListRoutesRequest, srv Traffic_ListRoutesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListRoutes not implemented")
@@ -858,27 +707,6 @@ func _Traffic_GetMapLayout_Handler(srv interface{}, ctx context.Context, dec fun
 		return srv.(TrafficServer).GetMapLayout(ctx, req.(*MapLayoutRequest))
 	}
 	return interceptor(ctx, in, info, handler)
-}
-
-func _Traffic_ListCells_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ListCellsRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(TrafficServer).ListCells(m, &trafficListCellsServer{stream})
-}
-
-type Traffic_ListCellsServer interface {
-	Send(*ListCellsResponse) error
-	grpc.ServerStream
-}
-
-type trafficListCellsServer struct {
-	grpc.ServerStream
-}
-
-func (x *trafficListCellsServer) Send(m *ListCellsResponse) error {
-	return x.ServerStream.SendMsg(m)
 }
 
 func _Traffic_ListRoutes_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -978,11 +806,6 @@ var _Traffic_serviceDesc = grpc.ServiceDesc{
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "ListCells",
-			Handler:       _Traffic_ListCells_Handler,
-			ServerStreams: true,
-		},
-		{
 			StreamName:    "ListRoutes",
 			Handler:       _Traffic_ListRoutes_Handler,
 			ServerStreams: true,
@@ -1016,89 +839,6 @@ func (m *MapLayoutRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *ListCellsRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListCellsRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListCellsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.WithoutReplay {
-		i--
-		if m.WithoutReplay {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Subscribe {
-		i--
-		if m.Subscribe {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *ListCellsResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *ListCellsResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *ListCellsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Type != 0 {
-		i = encodeVarintTrafficsim(dAtA, i, uint64(m.Type))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Cell != nil {
-		{
-			size, err := m.Cell.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintTrafficsim(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1372,37 +1112,6 @@ func (m *MapLayoutRequest) Size() (n int) {
 	return n
 }
 
-func (m *ListCellsRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Subscribe {
-		n += 2
-	}
-	if m.WithoutReplay {
-		n += 2
-	}
-	return n
-}
-
-func (m *ListCellsResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Cell != nil {
-		l = m.Cell.Size()
-		n += 1 + l + sovTrafficsim(uint64(l))
-	}
-	if m.Type != 0 {
-		n += 1 + sovTrafficsim(uint64(m.Type))
-	}
-	return n
-}
-
 func (m *ListRoutesRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1536,207 +1245,6 @@ func (m *MapLayoutRequest) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MapLayoutRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTrafficsim(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthTrafficsim
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthTrafficsim
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListCellsRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTrafficsim
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListCellsRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListCellsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Subscribe", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTrafficsim
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Subscribe = bool(v != 0)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WithoutReplay", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTrafficsim
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.WithoutReplay = bool(v != 0)
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTrafficsim(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthTrafficsim
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthTrafficsim
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *ListCellsResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTrafficsim
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: ListCellsResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ListCellsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cell", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTrafficsim
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthTrafficsim
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthTrafficsim
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Cell == nil {
-				m.Cell = &types.Cell{}
-			}
-			if err := m.Cell.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			m.Type = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTrafficsim
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Type |= Type(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTrafficsim(dAtA[iNdEx:])

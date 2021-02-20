@@ -81,7 +81,11 @@ func sectorToAPI(sector model.Sector) *types.Sector {
 
 // CreateCell creates a new simulated cell
 func (s *Server) CreateCell(ctx context.Context, request *modelapi.CreateCellRequest) (*modelapi.CreateCellResponse, error) {
-	panic("implement me")
+	err := s.cellStore.AddCell(cellToModel(request.Cell))
+	if err != nil {
+		return nil, err
+	}
+	return &modelapi.CreateCellResponse{}, nil
 }
 
 // GetCell retrieves the specified simulated cell
