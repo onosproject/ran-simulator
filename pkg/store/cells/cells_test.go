@@ -7,6 +7,7 @@ package cells
 import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"io/ioutil"
 	"testing"
 
@@ -22,7 +23,7 @@ func TestCells(t *testing.T) {
 	assert.NoError(t, err)
 	t.Log(m)
 
-	reg := NewCellRegistry(m.Cells)
+	reg := NewCellRegistry(m.Cells, nodes.NewNodeRegistry(m.Nodes))
 	assert.Equal(t, 4, countCells(reg))
 
 	ch := make(chan CellEvent)

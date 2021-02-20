@@ -7,6 +7,7 @@ package ues
 import (
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"math/rand"
@@ -22,7 +23,7 @@ func cellStore(t *testing.T) cells.CellRegistry {
 	err = yaml.Unmarshal(bytes, &m)
 	assert.NoError(t, err)
 	t.Log(m)
-	return cells.NewCellRegistry(m.Cells)
+	return cells.NewCellRegistry(m.Cells, nodes.NewNodeRegistry(m.Nodes))
 }
 
 func TestUERegistry(t *testing.T) {
