@@ -61,8 +61,9 @@ func cellToModel(cell *types.Cell) *model.Cell {
 	return &model.Cell{
 		ECGI: cell.ECGI,
 		Sector: model.Sector{
-			Center: model.Coordinate{Lat: cell.Sector.Centroid.Lat, Lng: cell.Sector.Centroid.Lng},
-			Arc:    cell.Sector.Arc, Azimuth: cell.Sector.Azimuth,
+			Center:  model.Coordinate{Lat: cell.Sector.Centroid.Lat, Lng: cell.Sector.Centroid.Lng},
+			Arc:     cell.Sector.Arc,
+			Azimuth: cell.Sector.Azimuth,
 		},
 		Color:     cell.Color,
 		MaxUEs:    cell.MaxUEs,

@@ -12,6 +12,7 @@ import (
 	modelapi "github.com/onosproject/ran-simulator/api/model"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/spf13/cobra"
+	"google.golang.org/grpc"
 	"strconv"
 )
 
@@ -21,6 +22,20 @@ func getNodesCommand() *cobra.Command {
 		Short: "Get all E2 nodes",
 		RunE:  runGetNodesCommand,
 	}
+	cmd.Flags().Bool("no-headers", false, "disables output headers")
+	return cmd
+}
+
+func createNodeCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "node <enbid> [field options]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Create an E2 node",
+		RunE:  runCreateNodeCommand,
+	}
+	cmd.Flags().UintSlice("cells", []uint{}, "cell ECGIs")
+	cmd.Flags().StringSlice("service-models", []string{}, "supported service models")
+	cmd.Flags().StringSlice("controllers", []string{}, "E2T controller")
 	return cmd
 }
 
@@ -44,20 +59,28 @@ func deleteNodeCommand() *cobra.Command {
 	return cmd
 }
 
-func runGetNodesCommand(cmd *cobra.Command, args []string) error {
+func getNodeClient(cmd *cobra.Command) (modelapi.NodeModelClient, *grpc.ClientConn, error) {
 	conn, err := cli.GetConnection(cmd)
+	if err != nil {
+		return nil, nil, err
+	}
+	return modelapi.NewNodeModelClient(conn), conn, nil
+}
+
+func runGetNodesCommand(cmd *cobra.Command, args []string) error {
+	client, conn, err := getNodeClient(cmd)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
-
-	client := modelapi.NewNodeModelClient(conn)
 	stream, err := client.WatchNodes(context.Background(), &modelapi.WatchNodesRequest{NoReplay: false, NoSubscribe: true})
 	if err != nil {
 		return err
 	}
 
-	Output("%-16s %-32s %-16s %-20s\n", "EnbID", "Cell ECGIs", "Service Models", "E2T Controllers")
+	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
+		Output("%-16s %-32s %-16s %-20s\n", "EnbID", "Cell ECGIs", "Service Models", "E2T Controllers")
+	}
 	for {
 		r, err := stream.Recv()
 		if err != nil {
@@ -69,19 +92,53 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func optionsToNode(cmd *cobra.Command, node *types.Node) (*types.Node, error) {
+	cells, _ := cmd.Flags().GetUintSlice("cells")
+	models, _ := cmd.Flags().GetStringSlice("service-models")
+	controllers, _ := cmd.Flags().GetStringSlice("controllers")
+
+	node.CellECGIs = toECGIs(cells)
+	node.ServiceModels = models
+	node.Controllers = controllers
+	return node, nil
+}
+
+func runCreateNodeCommand(cmd *cobra.Command, args []string) error {
+	enbid, err := strconv.ParseUint(args[0], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	client, conn, err := getNodeClient(cmd)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	node, err := optionsToNode(cmd, &types.Node{EnbID: types.EnbID(enbid)})
+	if err != nil {
+		return err
+	}
+
+	_, err = client.CreateNode(context.Background(), &modelapi.CreateNodeRequest{Node: node})
+	if err != nil {
+		return err
+	}
+	Output("Node %d created\n", enbid)
+	return nil
+}
+
 func runGetNodeCommand(cmd *cobra.Command, args []string) error {
 	enbid, err := strconv.ParseUint(args[0], 10, 64)
 	if err != nil {
 		return err
 	}
 
-	conn, err := cli.GetConnection(cmd)
+	client, conn, err := getNodeClient(cmd)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
-
-	client := modelapi.NewNodeModelClient(conn)
 	res, err := client.GetNode(context.Background(), &modelapi.GetNodeRequest{EnbID: types.EnbID(enbid)})
 	if err != nil {
 		return err
@@ -99,13 +156,11 @@ func runDeleteNodeCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	conn, err := cli.GetConnection(cmd)
+	client, conn, err := getNodeClient(cmd)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
-
-	client := modelapi.NewNodeModelClient(conn)
 	_, err = client.DeleteNode(context.Background(), &modelapi.DeleteNodeRequest{EnbID: types.EnbID(enbid)})
 	if err != nil {
 		return err
@@ -113,6 +168,14 @@ func runDeleteNodeCommand(cmd *cobra.Command, args []string) error {
 
 	Output("Node %d deleted\n", enbid)
 	return nil
+}
+
+func toECGIs(ids []uint) []types.ECGI {
+	ecgis := make([]types.ECGI, 0, len(ids))
+	for _, id := range ids {
+		ecgis = append(ecgis, types.ECGI(id))
+	}
+	return ecgis
 }
 
 func catECGIs(ecgis []types.ECGI) string {

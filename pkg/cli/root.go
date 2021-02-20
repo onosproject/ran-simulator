@@ -59,7 +59,7 @@ func GetRootCommand() *cobra.Command {
 	cmd.AddCommand(getCreateCommand())
 	cmd.AddCommand(getDeleteCommand())
 	cmd.AddCommand(getGetCommand())
-	//cmd.AddCommand(getSetCommand())
+	//cmd.AddCommand(getUpdateCommand())
 
 	cmd.AddCommand(getCompletionCommand())
 
@@ -72,8 +72,8 @@ func getCreateCommand() *cobra.Command {
 		Short: "Commands for creating simulated entities",
 	}
 
-	//cmd.AddCommand(createNodeCommand())
-	//cmd.AddCommand(createCellCommand())
+	cmd.AddCommand(createNodeCommand())
+	cmd.AddCommand(createCellCommand())
 	return cmd
 }
 
