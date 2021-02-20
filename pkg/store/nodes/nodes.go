@@ -30,6 +30,9 @@ type NodeRegistry interface {
 
 	// WatchNodes watches the node inventory events using the supplied channel
 	WatchNodes(ch chan<- NodeEvent, options ...WatchOptions)
+
+	// Prune the node that has the specified cell
+	PruneCell(ecgi types.ECGI)
 }
 
 // NodeEvent represents a change in the node inventory
@@ -116,6 +119,25 @@ func (r *nodeRegistry) UpdateNode(node *model.Node) error {
 	}
 
 	return errors.New(errors.NotFound, "node not found")
+}
+
+func (r *nodeRegistry) PruneCell(ecgi types.ECGI) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	for _, node := range r.nodes {
+		for i, e := range node.Cells {
+			if e == ecgi {
+				node.Cells = removeECGI(node.Cells, i)
+				r.notify(node, UPDATED)
+				return
+			}
+		}
+	}
+}
+
+func removeECGI(ecgis []types.ECGI, i int) []types.ECGI {
+	ecgis[len(ecgis)-1], ecgis[i] = ecgis[i], ecgis[len(ecgis)-1]
+	return ecgis[:len(ecgis)-1]
 }
 
 func (r *nodeRegistry) DeleteNode(enbID types.EnbID) (*model.Node, error) {

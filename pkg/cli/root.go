@@ -56,27 +56,57 @@ func GetRootCommand() *cobra.Command {
 		SilenceUsage:           true,
 		SilenceErrors:          true,
 	}
+	cmd.AddCommand(getCreateCommand())
+	cmd.AddCommand(getDeleteCommand())
 	cmd.AddCommand(getGetCommand())
-	//cmd.AddCommand(getSetCommand())
+	//cmd.AddCommand(getUpdateCommand())
 
 	cmd.AddCommand(getCompletionCommand())
 
 	return cmd
 }
 
+func getCreateCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create {node,cell} [args]",
+		Short: "Commands for creating simulated entities",
+	}
+
+	cmd.AddCommand(createNodeCommand())
+	cmd.AddCommand(createCellCommand())
+	return cmd
+}
+
+func getDeleteCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "delete {node,cell} [args]",
+		Short: "Commands for deleting simulated entities",
+	}
+	cmd.AddCommand(deleteNodeCommand())
+	cmd.AddCommand(deleteCellCommand())
+	return cmd
+}
+
 func getGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get {layout,cells,ues,ueCount} [args]",
-		Short: "RAN simulator get info commands",
+		Short: "Commands for retrieving RAN simulator model and other information",
 	}
 
 	clilib.AddConfigFlags(cmd, defaultAddress)
 
 	cmd.AddCommand(clilib.GetConfigCommand())
 	cmd.AddCommand(getLayoutCommand())
+
 	cmd.AddCommand(getNodesCommand())
+	cmd.AddCommand(getNodeCommand())
+
 	cmd.AddCommand(getCellsCommand())
+	cmd.AddCommand(getCellCommand())
+
 	cmd.AddCommand(getUEsCommand())
+	//cmd.AddCommand(getUECommand())
+
 	cmd.AddCommand(getUECountCommand())
 	return cmd
 }

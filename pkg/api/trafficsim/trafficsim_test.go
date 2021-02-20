@@ -9,6 +9,7 @@ import (
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"io"
 	"io/ioutil"
@@ -38,8 +39,9 @@ func newTestService() (northbound.Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	ueStore := ues.NewUERegistry(m.UECount, cells.NewCellRegistry(m.Cells))
-	cellStore := cells.NewCellRegistry(m.Cells)
+	nodeStore := nodes.NewNodeRegistry(m.Nodes)
+	cellStore := cells.NewCellRegistry(m.Cells, nodeStore)
+	ueStore := ues.NewUERegistry(m.UECount, cellStore)
 	return &Service{model: m, cellStore: cellStore, ueStore: ueStore}, nil
 }
 

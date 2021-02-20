@@ -85,7 +85,7 @@ func (m *Manager) Start() error {
 	m.nodeStore = nodes.NewNodeRegistry(m.model.Nodes)
 
 	// Create the cell registry primed with the pre-loaded cells
-	m.cellStore = cells.NewCellRegistry(m.model.Cells)
+	m.cellStore = cells.NewCellRegistry(m.model.Cells, m.nodeStore)
 
 	// Create the UE registry primed with the specified number of UEs
 	m.ueStore = ues.NewUERegistry(m.model.UECount, m.cellStore)

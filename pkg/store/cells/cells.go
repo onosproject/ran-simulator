@@ -9,6 +9,7 @@ import (
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"math/rand"
 	"reflect"
 	"sync"
@@ -64,18 +65,20 @@ func (r *cellRegistry) notify(cell *model.Cell, eventType uint8) {
 }
 
 type cellRegistry struct {
-	lock     sync.RWMutex
-	cells    map[types.ECGI]*model.Cell
-	watchers []cellWatcher
+	lock      sync.RWMutex
+	cells     map[types.ECGI]*model.Cell
+	watchers  []cellWatcher
+	nodeStore nodes.NodeRegistry
 }
 
 // NewCellRegistry creates a new store abstraction from the specified fixed cell map.
-func NewCellRegistry(cells map[string]model.Cell) CellRegistry {
+func NewCellRegistry(cells map[string]model.Cell, nodeStore nodes.NodeRegistry) CellRegistry {
 	log.Infof("Creating registry from model with %d cells", len(cells))
 	reg := &cellRegistry{
-		lock:     sync.RWMutex{},
-		cells:    make(map[types.ECGI]*model.Cell),
-		watchers: make([]cellWatcher, 0, 8),
+		lock:      sync.RWMutex{},
+		cells:     make(map[types.ECGI]*model.Cell),
+		watchers:  make([]cellWatcher, 0, 8),
+		nodeStore: nodeStore,
 	}
 
 	// Copy the Cells into our own map
@@ -129,6 +132,7 @@ func (r *cellRegistry) DeleteCell(ecgi types.ECGI) (*model.Cell, error) {
 	if cell, ok := r.cells[ecgi]; ok {
 		delete(r.cells, ecgi)
 		r.notify(cell, DELETED)
+		r.nodeStore.PruneCell(ecgi)
 		return cell, nil
 	}
 	return nil, errors.New(errors.NotFound, "cell not found")
