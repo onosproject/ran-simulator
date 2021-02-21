@@ -107,6 +107,8 @@ message Node {
     repeated string service_models = 3;
 
     repeated uint64 cell_ecgis = 4 [(gogoproto.customname) = "CellECGIs", (gogoproto.casttype) = "ECGI"];
+
+    string status = 5;
 }
 
 message MapLayout {

@@ -18,6 +18,8 @@ service NodeModel {
     rpc UpdateNode(UpdateNodeRequest) returns (UpdateNodeResponse);
     rpc DeleteNode(DeleteNodeRequest) returns (DeleteNodeResponse);
     rpc WatchNodes(WatchNodesRequest) returns (stream WatchNodesResponse);
+
+    rpc AgentControl(AgentControlRequest) returns (AgentControlResponse);
 }
 
 // Node messages
@@ -58,6 +60,18 @@ message WatchNodesRequest {
 message WatchNodesResponse {
     ran.types.Node node = 1;
     EventType type = 2;
+}
+
+message AgentControlRequest {
+    uint32 enbid = 1 [(gogoproto.customname) = "EnbID", (gogoproto.casttype) = "github.com/onosproject/ran-simulator/api/types.EnbID"];
+
+    string command = 2; // start, stop, drop, reconnect, etc.
+
+    repeated string args = 3; // optional command parameters
+}
+
+message AgentControlResponse {
+    ran.types.Node node = 1;
 }
 
 

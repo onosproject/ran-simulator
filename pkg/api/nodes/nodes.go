@@ -50,6 +50,7 @@ func nodeToAPI(node *model.Node) *types.Node {
 		Controllers:   node.Controllers,
 		ServiceModels: node.ServiceModels,
 		CellECGIs:     node.Cells,
+		Status:        node.Status,
 	}
 }
 
@@ -59,6 +60,7 @@ func nodeToModel(node *types.Node) *model.Node {
 		Controllers:   node.Controllers,
 		ServiceModels: node.ServiceModels,
 		Cells:         node.CellECGIs,
+		Status:        node.Status,
 	}
 }
 
@@ -127,4 +129,20 @@ func (s *Server) WatchNodes(request *modelapi.WatchNodesRequest, server modelapi
 		}
 	}
 	return nil
+}
+
+// AgentControl allows control over the lifecycle of the agent running on behalf of the simulated E2 node
+func (s *Server) AgentControl(ctx context.Context, request *modelapi.AgentControlRequest) (*modelapi.AgentControlResponse, error) {
+	node, err := s.nodeStore.GetNode(request.EnbID)
+	if err != nil {
+		return nil, err
+	}
+	log.Infof("Requested '%s' of agent %d", request.Command, node.EnbID)
+	// TODO: implement agent stop|start, implement connection drop|reconnect, etc.
+	// For now, just put the command into the status
+	err = s.nodeStore.SetStatus(node.EnbID, request.Command)
+	if err != nil {
+		return nil, err
+	}
+	return &modelapi.AgentControlResponse{Node: nodeToAPI(node)}, nil
 }

@@ -61,6 +61,9 @@ func GetRootCommand() *cobra.Command {
 	cmd.AddCommand(getGetCommand())
 	//cmd.AddCommand(getUpdateCommand())
 
+	cmd.AddCommand(startNodeCommand())
+	cmd.AddCommand(stopNodeCommand())
+
 	cmd.AddCommand(getCompletionCommand())
 
 	return cmd

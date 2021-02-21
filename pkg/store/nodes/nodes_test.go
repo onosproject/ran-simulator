@@ -70,6 +70,15 @@ func TestNodes(t *testing.T) {
 	assert.Equal(t, UPDATED, event.Type)
 
 	go func() {
+		err := reg.SetStatus(144472, "started")
+		assert.NoError(t, err, "node status not updated")
+	}()
+
+	event, ok = <-ch
+	assert.True(t, ok)
+	assert.Equal(t, UPDATED, event.Type)
+
+	go func() {
 		n, err := reg.DeleteNode(types.EnbID(144472))
 		assert.NoError(t, err, "node not deleted")
 		assert.Equal(t, types.EnbID(144472), n.EnbID, "incorrect node deleted")
