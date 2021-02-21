@@ -46,6 +46,7 @@ type Node struct {
 	Controllers   []string     `yaml:"controllers"`
 	ServiceModels []string     `yaml:"servicemodels"`
 	Cells         []types.ECGI `yaml:"cells"`
+	Status        string       `yaml:"status"`
 }
 
 // Controller E2T endpoint information

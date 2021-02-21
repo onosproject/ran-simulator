@@ -59,6 +59,26 @@ func deleteNodeCommand() *cobra.Command {
 	return cmd
 }
 
+func startNodeCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "start <enbid>",
+		Args:  cobra.ExactArgs(1),
+		Short: "Start E2 node agent",
+		RunE:  runStartNodeCommand,
+	}
+	return cmd
+}
+
+func stopNodeCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "stop <enbid>",
+		Args:  cobra.ExactArgs(1),
+		Short: "Stop E2 node agent",
+		RunE:  runStopNodeCommand,
+	}
+	return cmd
+}
+
 func getNodeClient(cmd *cobra.Command) (modelapi.NodeModelClient, *grpc.ClientConn, error) {
 	conn, err := cli.GetConnection(cmd)
 	if err != nil {
@@ -79,7 +99,7 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
-		Output("%-16s %-32s %-16s %-20s\n", "EnbID", "Cell ECGIs", "Service Models", "E2T Controllers")
+		Output("%-16s %-8s %-32s %-16s %-20s\n", "EnbID", "Status", "Cell ECGIs", "Service Models", "E2T Controllers")
 	}
 	for {
 		r, err := stream.Recv()
@@ -87,7 +107,7 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 			break
 		}
 		node := r.Node
-		Output("%-16d %-32s %-16s %-20s\n", node.EnbID, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+		Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
 	}
 	return nil
 }
@@ -128,6 +148,11 @@ func runCreateNodeCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func outputNode(node *types.Node) {
+	Output("EnbID: %-16d\nStatus: %s\nCell EGGIs: %s\nService Models: %s\nControllers: %s\n",
+		node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+}
+
 func runGetNodeCommand(cmd *cobra.Command, args []string) error {
 	enbid, err := strconv.ParseUint(args[0], 10, 64)
 	if err != nil {
@@ -144,9 +169,7 @@ func runGetNodeCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	node := res.Node
-	Output("EnbID: %-16d\nCell EGGIs: %s\nService Models: %s\nControllers: %s\n",
-		node.EnbID, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+	outputNode(res.Node)
 	return nil
 }
 
@@ -168,6 +191,35 @@ func runDeleteNodeCommand(cmd *cobra.Command, args []string) error {
 
 	Output("Node %d deleted\n", enbid)
 	return nil
+}
+
+func runControlCommand(command string, cmd *cobra.Command, args []string) error {
+	enbid, err := strconv.ParseUint(args[0], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	client, conn, err := getNodeClient(cmd)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	request := &modelapi.AgentControlRequest{EnbID: types.EnbID(enbid), Command: command}
+	res, err := client.AgentControl(context.Background(), request)
+	if err != nil {
+		return err
+	}
+	outputNode(res.Node)
+	return nil
+}
+
+func runStartNodeCommand(cmd *cobra.Command, args []string) error {
+	return runControlCommand("start", cmd, args)
+}
+
+func runStopNodeCommand(cmd *cobra.Command, args []string) error {
+	return runControlCommand("stop", cmd, args)
 }
 
 func toECGIs(ids []uint) []types.ECGI {

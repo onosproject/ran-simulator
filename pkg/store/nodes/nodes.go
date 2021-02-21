@@ -31,6 +31,9 @@ type NodeRegistry interface {
 	// WatchNodes watches the node inventory events using the supplied channel
 	WatchNodes(ch chan<- NodeEvent, options ...WatchOptions)
 
+	// SetsStatus changes the E2 node agent status value
+	SetStatus(enbID types.EnbID, status string) error
+
 	// Prune the node that has the specified cell
 	PruneCell(ecgi types.ECGI)
 }
@@ -133,6 +136,17 @@ func (r *nodeRegistry) PruneCell(ecgi types.ECGI) {
 			}
 		}
 	}
+}
+
+func (r *nodeRegistry) SetStatus(enbID types.EnbID, status string) error {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	if node, ok := r.nodes[enbID]; ok {
+		node.Status = status
+		r.notify(node, UPDATED)
+		return nil
+	}
+	return errors.New(errors.NotFound, "node not found")
 }
 
 func removeECGI(ecgis []types.ECGI, i int) []types.ECGI {
