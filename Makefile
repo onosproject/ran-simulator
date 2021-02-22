@@ -13,6 +13,7 @@ build:
 	export GOPRIVATE="github.com/onosproject/*"
 	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/ransim ./cmd/ransim
 	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/simcli ./cmd/simcli
+	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/csv2yaml ./cmd/csv2yaml
 
 debug: BUILD_FLAGS += -gcflags=all="-N -l"
 debug: build # @HELP build the Go binaries with debug symbols
