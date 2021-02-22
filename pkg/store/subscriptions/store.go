@@ -9,12 +9,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/onosproject/onos-e2t/pkg/protocols/e2"
+	"github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 )
 
 // ID is an alias for string subscription ID

@@ -64,16 +64,19 @@ type ResponseStatus int32
 const (
 	ResponseStatus_FAILED    ResponseStatus = 0
 	ResponseStatus_SUCCEEDED ResponseStatus = 1
+	ResponseStatus_REJECTED  ResponseStatus = 2
 )
 
 var ResponseStatus_name = map[int32]string{
 	0: "FAILED",
 	1: "SUCCEEDED",
+	2: "REJECTED",
 }
 
 var ResponseStatus_value = map[string]int32{
 	"FAILED":    0,
 	"SUCCEEDED": 1,
+	"REJECTED":  2,
 }
 
 func (x ResponseStatus) String() string {
@@ -84,23 +87,158 @@ func (ResponseStatus) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_706d69473e8d707d, []int{1}
 }
 
-// ServiceModelInfo E2 service model information
-type ServiceModelInfo struct {
-	ServiceModelId string `protobuf:"bytes,1,opt,name=service_model_id,json=serviceModelId,proto3" json:"service_model_id,omitempty"`
+// Cause is a failure cause
+type Cause int32
+
+const (
+	Cause_CAUSE_UNKNOWN                                                    Cause = 0
+	Cause_CAUSE_MISC_CONTROL_PROCESSING_OVERLOAD                           Cause = 1
+	Cause_CAUSE_MISC_HARDWARE_FAILURE                                      Cause = 2
+	Cause_CAUSE_MISC_OM_INTERVENTION                                       Cause = 3
+	Cause_CAUSE_MISC_UNSPECIFIED                                           Cause = 4
+	Cause_CAUSE_PROTOCOL_TRANSFER_SYNTAX_ERROR                             Cause = 5
+	Cause_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_REJECT                      Cause = 6
+	Cause_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_IGNORE_AND_NOTIFY           Cause = 7
+	Cause_CAUSE_PROTOCOL_MESSAGE_NOT_COMPATIBLE_WITH_RECEIVER_STATE        Cause = 8
+	Cause_CAUSE_PROTOCOL_SEMANTIC_ERROR                                    Cause = 9
+	Cause_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE Cause = 10
+	Cause_CAUSE_PROTOCOL_UNSPECIFIED                                       Cause = 11
+	Cause_CAUSE_RIC_RAN_FUNCTION_ID_INVALID                                Cause = 12
+	Cause_CAUSE_RIC_ACTION_NOT_SUPPORTED                                   Cause = 13
+	Cause_CAUSE_RIC_EXCESSIVE_ACTIONS                                      Cause = 14
+	Cause_CAUSE_RIC_DUPLICATE_ACTION                                       Cause = 15
+	Cause_CAUSE_RIC_DUPLICATE_EVENT                                        Cause = 16
+	Cause_CAUSE_RIC_FUNCTION_RESOURCE_LIMIT                                Cause = 17
+	Cause_CAUSE_RIC_REQUEST_ID_UNKNOWN                                     Cause = 18
+	Cause_CAUSE_RIC_INCONSISTENT_ACTION_SUBSEQUENT_ACTION_SEQUENCE         Cause = 19
+	Cause_CAUSE_RIC_CONTROL_MESSAGE_INVALID                                Cause = 20
+	Cause_CAUSE_RIC_CALL_PROCESS_ID_INVALID                                Cause = 21
+	Cause_CAUSE_RIC_UNSPECIFIED                                            Cause = 22
+	Cause_CAUSE_RICSERVICE_FUNCTION_NOT_REQUIRED                           Cause = 23
+	Cause_CAUSE_RICSERVICE_EXCESSIVE_FUNCTIONS                             Cause = 24
+	Cause_CAUSE_RICSERVICE_RIC_RESOURCE_LIMIT                              Cause = 25
+	Cause_CAUSE_TRANSPORT_UNSPECIFIED                                      Cause = 26
+	Cause_CAUSE_TRANSPORT_TRANSPORT_RESOURCE_UNAVAILABLE                   Cause = 27
+)
+
+var Cause_name = map[int32]string{
+	0:  "CAUSE_UNKNOWN",
+	1:  "CAUSE_MISC_CONTROL_PROCESSING_OVERLOAD",
+	2:  "CAUSE_MISC_HARDWARE_FAILURE",
+	3:  "CAUSE_MISC_OM_INTERVENTION",
+	4:  "CAUSE_MISC_UNSPECIFIED",
+	5:  "CAUSE_PROTOCOL_TRANSFER_SYNTAX_ERROR",
+	6:  "CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_REJECT",
+	7:  "CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_IGNORE_AND_NOTIFY",
+	8:  "CAUSE_PROTOCOL_MESSAGE_NOT_COMPATIBLE_WITH_RECEIVER_STATE",
+	9:  "CAUSE_PROTOCOL_SEMANTIC_ERROR",
+	10: "CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE",
+	11: "CAUSE_PROTOCOL_UNSPECIFIED",
+	12: "CAUSE_RIC_RAN_FUNCTION_ID_INVALID",
+	13: "CAUSE_RIC_ACTION_NOT_SUPPORTED",
+	14: "CAUSE_RIC_EXCESSIVE_ACTIONS",
+	15: "CAUSE_RIC_DUPLICATE_ACTION",
+	16: "CAUSE_RIC_DUPLICATE_EVENT",
+	17: "CAUSE_RIC_FUNCTION_RESOURCE_LIMIT",
+	18: "CAUSE_RIC_REQUEST_ID_UNKNOWN",
+	19: "CAUSE_RIC_INCONSISTENT_ACTION_SUBSEQUENT_ACTION_SEQUENCE",
+	20: "CAUSE_RIC_CONTROL_MESSAGE_INVALID",
+	21: "CAUSE_RIC_CALL_PROCESS_ID_INVALID",
+	22: "CAUSE_RIC_UNSPECIFIED",
+	23: "CAUSE_RICSERVICE_FUNCTION_NOT_REQUIRED",
+	24: "CAUSE_RICSERVICE_EXCESSIVE_FUNCTIONS",
+	25: "CAUSE_RICSERVICE_RIC_RESOURCE_LIMIT",
+	26: "CAUSE_TRANSPORT_UNSPECIFIED",
+	27: "CAUSE_TRANSPORT_TRANSPORT_RESOURCE_UNAVAILABLE",
 }
 
-func (m *ServiceModelInfo) Reset()         { *m = ServiceModelInfo{} }
-func (m *ServiceModelInfo) String() string { return proto.CompactTextString(m) }
-func (*ServiceModelInfo) ProtoMessage()    {}
-func (*ServiceModelInfo) Descriptor() ([]byte, []int) {
+var Cause_value = map[string]int32{
+	"CAUSE_UNKNOWN":                                                    0,
+	"CAUSE_MISC_CONTROL_PROCESSING_OVERLOAD":                           1,
+	"CAUSE_MISC_HARDWARE_FAILURE":                                      2,
+	"CAUSE_MISC_OM_INTERVENTION":                                       3,
+	"CAUSE_MISC_UNSPECIFIED":                                           4,
+	"CAUSE_PROTOCOL_TRANSFER_SYNTAX_ERROR":                             5,
+	"CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_REJECT":                      6,
+	"CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_IGNORE_AND_NOTIFY":           7,
+	"CAUSE_PROTOCOL_MESSAGE_NOT_COMPATIBLE_WITH_RECEIVER_STATE":        8,
+	"CAUSE_PROTOCOL_SEMANTIC_ERROR":                                    9,
+	"CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE": 10,
+	"CAUSE_PROTOCOL_UNSPECIFIED":                                       11,
+	"CAUSE_RIC_RAN_FUNCTION_ID_INVALID":                                12,
+	"CAUSE_RIC_ACTION_NOT_SUPPORTED":                                   13,
+	"CAUSE_RIC_EXCESSIVE_ACTIONS":                                      14,
+	"CAUSE_RIC_DUPLICATE_ACTION":                                       15,
+	"CAUSE_RIC_DUPLICATE_EVENT":                                        16,
+	"CAUSE_RIC_FUNCTION_RESOURCE_LIMIT":                                17,
+	"CAUSE_RIC_REQUEST_ID_UNKNOWN":                                     18,
+	"CAUSE_RIC_INCONSISTENT_ACTION_SUBSEQUENT_ACTION_SEQUENCE":         19,
+	"CAUSE_RIC_CONTROL_MESSAGE_INVALID":                                20,
+	"CAUSE_RIC_CALL_PROCESS_ID_INVALID":                                21,
+	"CAUSE_RIC_UNSPECIFIED":                                            22,
+	"CAUSE_RICSERVICE_FUNCTION_NOT_REQUIRED":                           23,
+	"CAUSE_RICSERVICE_EXCESSIVE_FUNCTIONS":                             24,
+	"CAUSE_RICSERVICE_RIC_RESOURCE_LIMIT":                              25,
+	"CAUSE_TRANSPORT_UNSPECIFIED":                                      26,
+	"CAUSE_TRANSPORT_TRANSPORT_RESOURCE_UNAVAILABLE":                   27,
+}
+
+func (x Cause) String() string {
+	return proto.EnumName(Cause_name, int32(x))
+}
+
+func (Cause) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_706d69473e8d707d, []int{2}
+}
+
+type ControlAckRequest int32
+
+const (
+	// Optional RIC Control Acknowledgement is required
+	ControlAckRequest_ACK ControlAckRequest = 0
+	// Optional RIC Control Acknowledgement is not required
+	ControlAckRequest_NO_ACK ControlAckRequest = 1
+	// Optional RIC Control Acknowledgement is only required to report failure
+	ControlAckRequest_NACK ControlAckRequest = 2
+)
+
+var ControlAckRequest_name = map[int32]string{
+	0: "ACK",
+	1: "NO_ACK",
+	2: "NACK",
+}
+
+var ControlAckRequest_value = map[string]int32{
+	"ACK":    0,
+	"NO_ACK": 1,
+	"NACK":   2,
+}
+
+func (x ControlAckRequest) String() string {
+	return proto.EnumName(ControlAckRequest_name, int32(x))
+}
+
+func (ControlAckRequest) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_706d69473e8d707d, []int{3}
+}
+
+// ServiceModelInfo E2 service model information
+type ServiceModel struct {
+	ID ServiceModelID `protobuf:"bytes,1,opt,name=id,proto3,casttype=ServiceModelID" json:"id,omitempty"`
+}
+
+func (m *ServiceModel) Reset()         { *m = ServiceModel{} }
+func (m *ServiceModel) String() string { return proto.CompactTextString(m) }
+func (*ServiceModel) ProtoMessage()    {}
+func (*ServiceModel) Descriptor() ([]byte, []int) {
 	return fileDescriptor_706d69473e8d707d, []int{0}
 }
-func (m *ServiceModelInfo) XXX_Unmarshal(b []byte) error {
+func (m *ServiceModel) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ServiceModelInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ServiceModel) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ServiceModelInfo.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ServiceModel.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -110,29 +248,29 @@ func (m *ServiceModelInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *ServiceModelInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ServiceModelInfo.Merge(m, src)
+func (m *ServiceModel) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ServiceModel.Merge(m, src)
 }
-func (m *ServiceModelInfo) XXX_Size() int {
+func (m *ServiceModel) XXX_Size() int {
 	return m.Size()
 }
-func (m *ServiceModelInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_ServiceModelInfo.DiscardUnknown(m)
+func (m *ServiceModel) XXX_DiscardUnknown() {
+	xxx_messageInfo_ServiceModel.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ServiceModelInfo proto.InternalMessageInfo
+var xxx_messageInfo_ServiceModel proto.InternalMessageInfo
 
-func (m *ServiceModelInfo) GetServiceModelId() string {
+func (m *ServiceModel) GetID() ServiceModelID {
 	if m != nil {
-		return m.ServiceModelId
+		return m.ID
 	}
 	return ""
 }
 
 // RequestHeader a common request header for all requests including encoding type, client/xApp/session info, ordering info, etc
 type RequestHeader struct {
-	EncodingType     EncodingType      `protobuf:"varint,1,opt,name=encoding_type,json=encodingType,proto3,enum=onos.e2t.e2.EncodingType" json:"encoding_type,omitempty"`
-	ServiceModelInfo *ServiceModelInfo `protobuf:"bytes,2,opt,name=service_model_info,json=serviceModelInfo,proto3" json:"service_model_info,omitempty"`
+	EncodingType EncodingType  `protobuf:"varint,1,opt,name=encoding_type,json=encodingType,proto3,enum=onos.e2t.e2.EncodingType" json:"encoding_type,omitempty"`
+	ServiceModel *ServiceModel `protobuf:"bytes,2,opt,name=service_model,json=serviceModel,proto3" json:"service_model,omitempty"`
 }
 
 func (m *RequestHeader) Reset()         { *m = RequestHeader{} }
@@ -175,19 +313,18 @@ func (m *RequestHeader) GetEncodingType() EncodingType {
 	return EncodingType_PROTO
 }
 
-func (m *RequestHeader) GetServiceModelInfo() *ServiceModelInfo {
+func (m *RequestHeader) GetServiceModel() *ServiceModel {
 	if m != nil {
-		return m.ServiceModelInfo
+		return m.ServiceModel
 	}
 	return nil
 }
 
 // ResponseHeader a common response header for all responses including encoding type, client/xApp/session info, ordering info, etc
 type ResponseHeader struct {
-	EncodingType     EncodingType      `protobuf:"varint,1,opt,name=encoding_type,json=encodingType,proto3,enum=onos.e2t.e2.EncodingType" json:"encoding_type,omitempty"`
-	ServiceModelInfo *ServiceModelInfo `protobuf:"bytes,2,opt,name=service_model_info,json=serviceModelInfo,proto3" json:"service_model_info,omitempty"`
-	ResponseStatus   ResponseStatus    `protobuf:"varint,3,opt,name=response_status,json=responseStatus,proto3,enum=onos.e2t.e2.ResponseStatus" json:"response_status,omitempty"`
-	IndicationHeader []byte            `protobuf:"bytes,4,opt,name=indication_header,json=indicationHeader,proto3" json:"indication_header,omitempty"`
+	EncodingType   EncodingType   `protobuf:"varint,1,opt,name=encoding_type,json=encodingType,proto3,enum=onos.e2t.e2.EncodingType" json:"encoding_type,omitempty"`
+	ServiceModel   *ServiceModel  `protobuf:"bytes,2,opt,name=service_model,json=serviceModel,proto3" json:"service_model,omitempty"`
+	ResponseStatus ResponseStatus `protobuf:"varint,3,opt,name=response_status,json=responseStatus,proto3,enum=onos.e2t.e2.ResponseStatus" json:"response_status,omitempty"`
 }
 
 func (m *ResponseHeader) Reset()         { *m = ResponseHeader{} }
@@ -230,9 +367,9 @@ func (m *ResponseHeader) GetEncodingType() EncodingType {
 	return EncodingType_PROTO
 }
 
-func (m *ResponseHeader) GetServiceModelInfo() *ServiceModelInfo {
+func (m *ResponseHeader) GetServiceModel() *ServiceModel {
 	if m != nil {
-		return m.ServiceModelInfo
+		return m.ServiceModel
 	}
 	return nil
 }
@@ -242,13 +379,6 @@ func (m *ResponseHeader) GetResponseStatus() ResponseStatus {
 		return m.ResponseStatus
 	}
 	return ResponseStatus_FAILED
-}
-
-func (m *ResponseHeader) GetIndicationHeader() []byte {
-	if m != nil {
-		return m.IndicationHeader
-	}
-	return nil
 }
 
 // StreamRequest
@@ -323,7 +453,8 @@ func (m *StreamRequest) GetSubscriptionID() SubscriptionID {
 // StreamResponse
 type StreamResponse struct {
 	Header            *ResponseHeader `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
-	IndicationMessage []byte          `protobuf:"bytes,2,opt,name=indication_message,json=indicationMessage,proto3" json:"indication_message,omitempty"`
+	IndicationHeader  []byte          `protobuf:"bytes,2,opt,name=indication_header,json=indicationHeader,proto3" json:"indication_header,omitempty"`
+	IndicationMessage []byte          `protobuf:"bytes,3,opt,name=indication_message,json=indicationMessage,proto3" json:"indication_message,omitempty"`
 }
 
 func (m *StreamResponse) Reset()         { *m = StreamResponse{} }
@@ -366,6 +497,13 @@ func (m *StreamResponse) GetHeader() *ResponseHeader {
 	return nil
 }
 
+func (m *StreamResponse) GetIndicationHeader() []byte {
+	if m != nil {
+		return m.IndicationHeader
+	}
+	return nil
+}
+
 func (m *StreamResponse) GetIndicationMessage() []byte {
 	if m != nil {
 		return m.IndicationMessage
@@ -373,55 +511,387 @@ func (m *StreamResponse) GetIndicationMessage() []byte {
 	return nil
 }
 
+// ControlRequest E2 control request
+type ControlRequest struct {
+	Header            *RequestHeader    `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
+	E2NodeID          E2NodeID          `protobuf:"bytes,2,opt,name=e2_node_id,json=e2NodeId,proto3,casttype=E2NodeID" json:"e2_node_id,omitempty"`
+	ControlHeader     []byte            `protobuf:"bytes,3,opt,name=control_header,json=controlHeader,proto3" json:"control_header,omitempty"`
+	ControlMessage    []byte            `protobuf:"bytes,4,opt,name=control_message,json=controlMessage,proto3" json:"control_message,omitempty"`
+	ControlAckRequest ControlAckRequest `protobuf:"varint,5,opt,name=control_ack_request,json=controlAckRequest,proto3,enum=onos.e2t.e2.ControlAckRequest" json:"control_ack_request,omitempty"`
+}
+
+func (m *ControlRequest) Reset()         { *m = ControlRequest{} }
+func (m *ControlRequest) String() string { return proto.CompactTextString(m) }
+func (*ControlRequest) ProtoMessage()    {}
+func (*ControlRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_706d69473e8d707d, []int{5}
+}
+func (m *ControlRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ControlRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ControlRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ControlRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ControlRequest.Merge(m, src)
+}
+func (m *ControlRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ControlRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ControlRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ControlRequest proto.InternalMessageInfo
+
+func (m *ControlRequest) GetHeader() *RequestHeader {
+	if m != nil {
+		return m.Header
+	}
+	return nil
+}
+
+func (m *ControlRequest) GetE2NodeID() E2NodeID {
+	if m != nil {
+		return m.E2NodeID
+	}
+	return ""
+}
+
+func (m *ControlRequest) GetControlHeader() []byte {
+	if m != nil {
+		return m.ControlHeader
+	}
+	return nil
+}
+
+func (m *ControlRequest) GetControlMessage() []byte {
+	if m != nil {
+		return m.ControlMessage
+	}
+	return nil
+}
+
+func (m *ControlRequest) GetControlAckRequest() ControlAckRequest {
+	if m != nil {
+		return m.ControlAckRequest
+	}
+	return ControlAckRequest_ACK
+}
+
+// ControlResponse E2 control response
+type ControlResponse struct {
+	Header *ResponseHeader `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
+	// Types that are valid to be assigned to Response:
+	//	*ControlResponse_ControlAcknowledge
+	//	*ControlResponse_ControlFailure
+	Response isControlResponse_Response `protobuf_oneof:"response"`
+}
+
+func (m *ControlResponse) Reset()         { *m = ControlResponse{} }
+func (m *ControlResponse) String() string { return proto.CompactTextString(m) }
+func (*ControlResponse) ProtoMessage()    {}
+func (*ControlResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_706d69473e8d707d, []int{6}
+}
+func (m *ControlResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ControlResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ControlResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ControlResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ControlResponse.Merge(m, src)
+}
+func (m *ControlResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *ControlResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ControlResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ControlResponse proto.InternalMessageInfo
+
+type isControlResponse_Response interface {
+	isControlResponse_Response()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type ControlResponse_ControlAcknowledge struct {
+	ControlAcknowledge *ControlAcknowledge `protobuf:"bytes,2,opt,name=control_acknowledge,json=controlAcknowledge,proto3,oneof" json:"control_acknowledge,omitempty"`
+}
+type ControlResponse_ControlFailure struct {
+	ControlFailure *ControlFailure `protobuf:"bytes,3,opt,name=control_failure,json=controlFailure,proto3,oneof" json:"control_failure,omitempty"`
+}
+
+func (*ControlResponse_ControlAcknowledge) isControlResponse_Response() {}
+func (*ControlResponse_ControlFailure) isControlResponse_Response()     {}
+
+func (m *ControlResponse) GetResponse() isControlResponse_Response {
+	if m != nil {
+		return m.Response
+	}
+	return nil
+}
+
+func (m *ControlResponse) GetHeader() *ResponseHeader {
+	if m != nil {
+		return m.Header
+	}
+	return nil
+}
+
+func (m *ControlResponse) GetControlAcknowledge() *ControlAcknowledge {
+	if x, ok := m.GetResponse().(*ControlResponse_ControlAcknowledge); ok {
+		return x.ControlAcknowledge
+	}
+	return nil
+}
+
+func (m *ControlResponse) GetControlFailure() *ControlFailure {
+	if x, ok := m.GetResponse().(*ControlResponse_ControlFailure); ok {
+		return x.ControlFailure
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ControlResponse) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ControlResponse_ControlAcknowledge)(nil),
+		(*ControlResponse_ControlFailure)(nil),
+	}
+}
+
+// ControlAcknowledge control acknowledgement
+type ControlAcknowledge struct {
+	ControlOutcome []byte `protobuf:"bytes,1,opt,name=control_outcome,json=controlOutcome,proto3" json:"control_outcome,omitempty"`
+}
+
+func (m *ControlAcknowledge) Reset()         { *m = ControlAcknowledge{} }
+func (m *ControlAcknowledge) String() string { return proto.CompactTextString(m) }
+func (*ControlAcknowledge) ProtoMessage()    {}
+func (*ControlAcknowledge) Descriptor() ([]byte, []int) {
+	return fileDescriptor_706d69473e8d707d, []int{7}
+}
+func (m *ControlAcknowledge) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ControlAcknowledge) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ControlAcknowledge.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ControlAcknowledge) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ControlAcknowledge.Merge(m, src)
+}
+func (m *ControlAcknowledge) XXX_Size() int {
+	return m.Size()
+}
+func (m *ControlAcknowledge) XXX_DiscardUnknown() {
+	xxx_messageInfo_ControlAcknowledge.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ControlAcknowledge proto.InternalMessageInfo
+
+func (m *ControlAcknowledge) GetControlOutcome() []byte {
+	if m != nil {
+		return m.ControlOutcome
+	}
+	return nil
+}
+
+// ControlFailure control failure message
+type ControlFailure struct {
+	Cause          Cause  `protobuf:"varint,1,opt,name=cause,proto3,enum=onos.e2t.e2.Cause" json:"cause,omitempty"`
+	ControlOutcome []byte `protobuf:"bytes,2,opt,name=control_outcome,json=controlOutcome,proto3" json:"control_outcome,omitempty"`
+	Message        string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (m *ControlFailure) Reset()         { *m = ControlFailure{} }
+func (m *ControlFailure) String() string { return proto.CompactTextString(m) }
+func (*ControlFailure) ProtoMessage()    {}
+func (*ControlFailure) Descriptor() ([]byte, []int) {
+	return fileDescriptor_706d69473e8d707d, []int{8}
+}
+func (m *ControlFailure) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ControlFailure) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ControlFailure.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ControlFailure) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ControlFailure.Merge(m, src)
+}
+func (m *ControlFailure) XXX_Size() int {
+	return m.Size()
+}
+func (m *ControlFailure) XXX_DiscardUnknown() {
+	xxx_messageInfo_ControlFailure.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ControlFailure proto.InternalMessageInfo
+
+func (m *ControlFailure) GetCause() Cause {
+	if m != nil {
+		return m.Cause
+	}
+	return Cause_CAUSE_UNKNOWN
+}
+
+func (m *ControlFailure) GetControlOutcome() []byte {
+	if m != nil {
+		return m.ControlOutcome
+	}
+	return nil
+}
+
+func (m *ControlFailure) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterEnum("onos.e2t.e2.EncodingType", EncodingType_name, EncodingType_value)
 	proto.RegisterEnum("onos.e2t.e2.ResponseStatus", ResponseStatus_name, ResponseStatus_value)
-	proto.RegisterType((*ServiceModelInfo)(nil), "onos.e2t.e2.ServiceModelInfo")
+	proto.RegisterEnum("onos.e2t.e2.Cause", Cause_name, Cause_value)
+	proto.RegisterEnum("onos.e2t.e2.ControlAckRequest", ControlAckRequest_name, ControlAckRequest_value)
+	proto.RegisterType((*ServiceModel)(nil), "onos.e2t.e2.ServiceModel")
 	proto.RegisterType((*RequestHeader)(nil), "onos.e2t.e2.RequestHeader")
 	proto.RegisterType((*ResponseHeader)(nil), "onos.e2t.e2.ResponseHeader")
 	proto.RegisterType((*StreamRequest)(nil), "onos.e2t.e2.StreamRequest")
 	proto.RegisterType((*StreamResponse)(nil), "onos.e2t.e2.StreamResponse")
+	proto.RegisterType((*ControlRequest)(nil), "onos.e2t.e2.ControlRequest")
+	proto.RegisterType((*ControlResponse)(nil), "onos.e2t.e2.ControlResponse")
+	proto.RegisterType((*ControlAcknowledge)(nil), "onos.e2t.e2.ControlAcknowledge")
+	proto.RegisterType((*ControlFailure)(nil), "onos.e2t.e2.ControlFailure")
 }
 
 func init() { proto.RegisterFile("onos/e2t/e2/e2.proto", fileDescriptor_706d69473e8d707d) }
 
 var fileDescriptor_706d69473e8d707d = []byte{
-	// 556 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x54, 0xc1, 0x6e, 0xd3, 0x4c,
-	0x10, 0xce, 0xa6, 0x7f, 0xa2, 0x3f, 0x93, 0xc4, 0x35, 0xab, 0x1e, 0x42, 0x0a, 0x4e, 0x14, 0x71,
-	0x08, 0xad, 0x48, 0xc0, 0x15, 0x37, 0x40, 0x4a, 0x1a, 0x23, 0x2c, 0x08, 0xad, 0xd6, 0x41, 0xe2,
-	0x66, 0xb9, 0xf1, 0x34, 0x58, 0x22, 0x5e, 0xe3, 0x75, 0x90, 0xfa, 0x16, 0x7d, 0x00, 0x1e, 0x88,
-	0x63, 0x8f, 0x9c, 0x22, 0xe4, 0xbc, 0x05, 0xe2, 0x80, 0xbc, 0x76, 0xa8, 0x63, 0xf5, 0x01, 0xb8,
-	0x79, 0xbe, 0xf9, 0x66, 0x67, 0xbe, 0xf9, 0x46, 0x86, 0x03, 0xee, 0x73, 0x31, 0x44, 0x3d, 0x1a,
-	0xa2, 0x3e, 0x44, 0x7d, 0x10, 0x84, 0x3c, 0xe2, 0xb4, 0x9e, 0xa0, 0x03, 0xd4, 0xa3, 0x01, 0xea,
-	0xed, 0x83, 0x05, 0x5f, 0x70, 0x89, 0x0f, 0x93, 0xaf, 0x94, 0xd2, 0x7b, 0x01, 0xaa, 0x85, 0xe1,
-	0x57, 0x6f, 0x8e, 0x53, 0xee, 0xe2, 0x67, 0xd3, 0xbf, 0xe4, 0xb4, 0x0f, 0xaa, 0x48, 0x31, 0x7b,
-	0x99, 0x80, 0xb6, 0xe7, 0xb6, 0x48, 0x97, 0xf4, 0x6b, 0x4c, 0x11, 0x79, 0xae, 0xdb, 0xfb, 0x46,
-	0xa0, 0xc9, 0xf0, 0xcb, 0x0a, 0x45, 0xf4, 0x06, 0x1d, 0x17, 0x43, 0xfa, 0x0a, 0x9a, 0xe8, 0xcf,
-	0xb9, 0xeb, 0xf9, 0x0b, 0x3b, 0xba, 0x0a, 0x50, 0x16, 0x2a, 0xfa, 0xfd, 0x41, 0x6e, 0x94, 0x81,
-	0x91, 0x31, 0x66, 0x57, 0x01, 0xb2, 0x06, 0xe6, 0x22, 0xfa, 0x16, 0x68, 0xa1, 0xb7, 0x7f, 0xc9,
-	0x5b, 0xe5, 0x2e, 0xe9, 0xd7, 0xf5, 0x87, 0x3b, 0x8f, 0x14, 0xc7, 0x66, 0xaa, 0x28, 0x20, 0xbd,
-	0xeb, 0x32, 0x28, 0x0c, 0x45, 0xc0, 0x7d, 0x81, 0xff, 0xe0, 0x7c, 0x74, 0x02, 0xfb, 0x61, 0x36,
-	0x9e, 0x2d, 0x22, 0x27, 0x5a, 0x89, 0xd6, 0x9e, 0x1c, 0xe7, 0x70, 0xe7, 0xa5, 0xad, 0x04, 0x4b,
-	0x52, 0x98, 0x12, 0xee, 0xc4, 0xf4, 0x18, 0xee, 0x79, 0xbe, 0xeb, 0xcd, 0x9d, 0xc8, 0xe3, 0xbe,
-	0xfd, 0x49, 0xea, 0x6c, 0xfd, 0xd7, 0x25, 0xfd, 0x06, 0x53, 0x6f, 0x13, 0xa9, 0xfe, 0xde, 0x6f,
-	0x02, 0x4d, 0x2b, 0x0a, 0xd1, 0x59, 0x66, 0xbe, 0x51, 0x1d, 0xaa, 0x59, 0x0d, 0x91, 0x2a, 0xda,
-	0x85, 0xde, 0x39, 0x77, 0x59, 0xc6, 0xa4, 0x8f, 0xa1, 0xea, 0x04, 0x41, 0x72, 0x17, 0x89, 0xf2,
-	0xda, 0x98, 0xc6, 0xeb, 0x4e, 0x65, 0x14, 0x04, 0xe6, 0xe4, 0xd7, 0xf6, 0x83, 0x55, 0x9c, 0x20,
-	0x30, 0x5d, 0xfa, 0x12, 0xea, 0x9e, 0x2f, 0x22, 0xc7, 0x9f, 0x63, 0xc2, 0xdf, 0x93, 0xfc, 0x07,
-	0xf1, 0xba, 0x03, 0x66, 0x06, 0xcb, 0xa2, 0x5c, 0xc4, 0x60, 0x5b, 0x60, 0xba, 0x74, 0x0a, 0xfb,
-	0x62, 0x75, 0x21, 0xe6, 0xa1, 0x17, 0x48, 0x79, 0x9e, 0x2b, 0xa5, 0xd5, 0xc6, 0x8f, 0xe2, 0x75,
-	0x47, 0xb1, 0x72, 0x29, 0xf9, 0x4c, 0x01, 0x61, 0x4a, 0xbe, 0xd8, 0x74, 0x7b, 0x11, 0x28, 0x5b,
-	0xf5, 0xe9, 0x0e, 0xe9, 0x49, 0x41, 0xfe, 0xdd, 0xab, 0x2f, 0xe8, 0x7f, 0x02, 0x34, 0xb7, 0xf2,
-	0x25, 0x0a, 0xe1, 0x2c, 0x50, 0xee, 0xa2, 0xc1, 0x72, 0x66, 0x4c, 0xd3, 0xc4, 0xd1, 0x73, 0x68,
-	0xe4, 0x4f, 0x8a, 0xd6, 0xa0, 0x72, 0xce, 0xce, 0x66, 0x67, 0x6a, 0x89, 0x36, 0xe0, 0xff, 0x91,
-	0xf5, 0xfe, 0x99, 0x7d, 0x6e, 0x30, 0x95, 0xfc, 0x8d, 0x3e, 0x1a, 0x4c, 0x2d, 0x1f, 0x1d, 0xdf,
-	0x5e, 0x6f, 0x66, 0x35, 0x40, 0xf5, 0xf5, 0xc8, 0x7c, 0x67, 0x4c, 0xd4, 0x12, 0x6d, 0x42, 0xcd,
-	0xfa, 0x70, 0x7a, 0x6a, 0x18, 0x13, 0x63, 0xa2, 0x12, 0xdd, 0x02, 0x30, 0xf4, 0x59, 0x76, 0x74,
-	0xd4, 0x80, 0x6a, 0xaa, 0x93, 0xee, 0xda, 0xb9, 0x63, 0x7d, 0xfb, 0xf0, 0xce, 0x5c, 0xda, 0xb1,
-	0x4f, 0x9e, 0x92, 0x71, 0xeb, 0x7b, 0xac, 0x91, 0x9b, 0x58, 0x23, 0x3f, 0x63, 0x8d, 0x5c, 0x6f,
-	0xb4, 0xd2, 0xcd, 0x46, 0x2b, 0xfd, 0xd8, 0x68, 0xa5, 0x8b, 0xaa, 0xfc, 0x7d, 0x9c, 0xfc, 0x09,
-	0x00, 0x00, 0xff, 0xff, 0xc4, 0xc7, 0x7f, 0xf6, 0x79, 0x04, 0x00, 0x00,
+	// 1330 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0xcf, 0x6f, 0xdb, 0xc6,
+	0x12, 0x16, 0x65, 0xcb, 0x96, 0xc7, 0x92, 0x4c, 0x6f, 0x7e, 0x3c, 0xd9, 0x4e, 0xe4, 0x44, 0x2f,
+	0x79, 0xf1, 0x73, 0x50, 0xbb, 0x65, 0xd0, 0x20, 0x29, 0x9a, 0xa2, 0x14, 0xb9, 0x8a, 0xb7, 0x91,
+	0x48, 0x75, 0x97, 0x52, 0x92, 0xd3, 0x42, 0x11, 0xb7, 0xae, 0x10, 0x5b, 0x54, 0x45, 0xb9, 0x45,
+	0x0e, 0xfd, 0x1b, 0xda, 0x6b, 0x81, 0x5e, 0xfa, 0xdf, 0xf4, 0x98, 0x53, 0xd1, 0x93, 0x51, 0x28,
+	0xf7, 0x02, 0xbd, 0x16, 0x3d, 0x14, 0xcb, 0x1f, 0x22, 0x25, 0xab, 0x40, 0x80, 0x5c, 0x7a, 0xdb,
+	0x9d, 0xf9, 0x66, 0xf6, 0x9b, 0x6f, 0x66, 0x97, 0x84, 0xcb, 0xde, 0xc0, 0xf3, 0x0f, 0x85, 0x36,
+	0x3e, 0x14, 0xda, 0xa1, 0xd0, 0x0e, 0x86, 0x23, 0x6f, 0xec, 0xa1, 0x75, 0x69, 0x3d, 0x10, 0xda,
+	0xf8, 0x40, 0x68, 0xdb, 0x97, 0x8f, 0xbd, 0x63, 0x2f, 0xb0, 0x1f, 0xca, 0x55, 0x08, 0xa9, 0x3e,
+	0x80, 0x02, 0x13, 0xa3, 0xaf, 0xfb, 0x3d, 0xd1, 0xf4, 0x5c, 0x71, 0x82, 0xf6, 0x20, 0xdb, 0x77,
+	0xcb, 0xca, 0x0d, 0x65, 0x6f, 0xad, 0x56, 0x9e, 0x9c, 0xef, 0x66, 0x89, 0xf9, 0xe7, 0xf9, 0x6e,
+	0x29, 0x8d, 0x21, 0x26, 0xcd, 0xf6, 0xdd, 0xea, 0x77, 0x0a, 0x14, 0xa9, 0xf8, 0xea, 0x4c, 0xf8,
+	0xe3, 0x23, 0xd1, 0x75, 0xc5, 0x08, 0x7d, 0x02, 0x45, 0x31, 0xe8, 0x79, 0x6e, 0x7f, 0x70, 0xcc,
+	0xc7, 0xaf, 0x86, 0x22, 0x48, 0x53, 0xd2, 0xb6, 0x0e, 0x52, 0x34, 0x0e, 0x70, 0x84, 0x70, 0x5e,
+	0x0d, 0x05, 0x2d, 0x88, 0xd4, 0x4e, 0xc6, 0xfb, 0xe1, 0x39, 0xfc, 0x54, 0x1e, 0x54, 0xce, 0xde,
+	0x50, 0xf6, 0xd6, 0xe7, 0xe2, 0xd3, 0x4c, 0x68, 0xc1, 0x4f, 0xed, 0xaa, 0xbf, 0x28, 0x50, 0xa2,
+	0xc2, 0x1f, 0x7a, 0x03, 0x5f, 0xfc, 0x3b, 0x28, 0x21, 0x13, 0x36, 0x46, 0x11, 0x23, 0xee, 0x8f,
+	0xbb, 0xe3, 0x33, 0xbf, 0xbc, 0x14, 0x30, 0xd8, 0x99, 0xc9, 0x10, 0xb3, 0x66, 0x01, 0x84, 0x96,
+	0x46, 0x33, 0xfb, 0xea, 0x5f, 0x0a, 0x14, 0xd9, 0x78, 0x24, 0xba, 0xa7, 0x91, 0xe0, 0x48, 0x83,
+	0x95, 0x2f, 0x83, 0x0a, 0x83, 0x82, 0xd6, 0xb5, 0xed, 0xb9, 0x74, 0xa9, 0xb6, 0xd0, 0x08, 0x89,
+	0xfe, 0x0f, 0x2b, 0xdd, 0xe1, 0x90, 0xf7, 0xdd, 0xa0, 0x88, 0xb5, 0x1a, 0x9a, 0x9c, 0xef, 0xe6,
+	0xf4, 0xe1, 0x30, 0xe8, 0x70, 0xb8, 0xa0, 0xb9, 0xee, 0x70, 0x48, 0x5c, 0xf4, 0x08, 0xd6, 0xfb,
+	0x03, 0x7f, 0xdc, 0x1d, 0xf4, 0x84, 0xc4, 0x2f, 0x05, 0xf8, 0x6b, 0x93, 0xf3, 0x5d, 0x20, 0x91,
+	0x39, 0x08, 0x4a, 0xed, 0x28, 0xc4, 0x01, 0xc4, 0x45, 0x4d, 0xd8, 0xf0, 0xcf, 0x5e, 0xf8, 0xbd,
+	0x51, 0x7f, 0x38, 0xee, 0x7b, 0x03, 0x99, 0x62, 0x39, 0x48, 0x71, 0x6b, 0x22, 0x67, 0x29, 0xe5,
+	0x8a, 0xa6, 0x6b, 0xc6, 0x42, 0x4b, 0xe9, 0x60, 0xe2, 0x56, 0x7f, 0x52, 0xa0, 0x14, 0x97, 0x1f,
+	0xea, 0x82, 0xee, 0xcd, 0xd5, 0xbf, 0x58, 0xce, 0x39, 0x01, 0xee, 0xc2, 0x66, 0x7f, 0xe0, 0xf6,
+	0x7b, 0xdd, 0x80, 0x54, 0x14, 0x2f, 0xb5, 0x28, 0x50, 0x35, 0x71, 0x44, 0x93, 0xf3, 0x1e, 0xa0,
+	0x14, 0xf8, 0x54, 0xf8, 0x7e, 0xf7, 0x58, 0x04, 0x4a, 0x14, 0x68, 0x2a, 0x4d, 0x33, 0x74, 0x54,
+	0x7f, 0xcc, 0x42, 0xc9, 0xf0, 0x06, 0xe3, 0x91, 0x77, 0xf2, 0x2e, 0x3d, 0xba, 0x0f, 0x20, 0x34,
+	0x3e, 0xf0, 0x5c, 0x91, 0xf4, 0x49, 0x5e, 0xc3, 0x3c, 0xd6, 0x2c, 0xcf, 0x0d, 0x55, 0x9f, 0xae,
+	0x69, 0x5e, 0x84, 0x2b, 0x17, 0xdd, 0x86, 0x52, 0x2f, 0x3c, 0x3d, 0xae, 0x2b, 0x64, 0x5a, 0x8c,
+	0xac, 0x51, 0x51, 0x77, 0x60, 0x23, 0x86, 0xc5, 0x15, 0x2d, 0x07, 0xb8, 0x38, 0x3a, 0x2a, 0x07,
+	0x59, 0x70, 0x29, 0x06, 0x76, 0x7b, 0x2f, 0xf9, 0x28, 0x24, 0x5b, 0xce, 0x05, 0xb3, 0x5b, 0x99,
+	0x29, 0x24, 0xaa, 0x5a, 0xef, 0xbd, 0x8c, 0x4a, 0xa2, 0x9b, 0xbd, 0x79, 0x53, 0xf5, 0x77, 0x05,
+	0x36, 0xa6, 0xf2, 0xbc, 0x4b, 0x0f, 0xe9, 0x0c, 0xb1, 0x81, 0xf7, 0xcd, 0x89, 0x70, 0x8f, 0x45,
+	0x74, 0x2d, 0x77, 0xff, 0x81, 0x58, 0x0c, 0x3b, 0xca, 0x50, 0xd4, 0xbb, 0x60, 0x45, 0xf5, 0x44,
+	0x95, 0x2f, 0xba, 0xfd, 0x93, 0xb3, 0x51, 0xd8, 0xe7, 0x79, 0x46, 0x51, 0xbe, 0x7a, 0x08, 0x39,
+	0xca, 0x4c, 0x45, 0x8b, 0x2c, 0x35, 0x80, 0x7c, 0x7c, 0x71, 0xab, 0x8f, 0x00, 0x5d, 0x3c, 0x3f,
+	0xad, 0xbf, 0x77, 0x36, 0xee, 0x79, 0xa7, 0xe1, 0x83, 0x94, 0xe8, 0x6f, 0x87, 0xd6, 0xea, 0xb7,
+	0xd3, 0x69, 0x8a, 0x92, 0xa3, 0x3d, 0xc8, 0xf5, 0xba, 0x67, 0x7e, 0xfc, 0x82, 0xa1, 0x59, 0x6a,
+	0xd2, 0x43, 0x43, 0xc0, 0xa2, 0x43, 0xb2, 0x8b, 0x0e, 0x41, 0x65, 0x58, 0x4d, 0xcf, 0xf5, 0x1a,
+	0x8d, 0xb7, 0xfb, 0x1f, 0x42, 0x21, 0xfd, 0x28, 0xa2, 0x35, 0xc8, 0xb5, 0xa8, 0xed, 0xd8, 0x6a,
+	0x06, 0x15, 0x20, 0xaf, 0x33, 0xeb, 0x03, 0xde, 0xc2, 0x54, 0x55, 0xa6, 0xbb, 0x67, 0x98, 0xaa,
+	0xd9, 0xfd, 0x87, 0xc9, 0xfb, 0x1b, 0xbe, 0x5c, 0x08, 0x60, 0xa5, 0xae, 0x93, 0x06, 0x36, 0xd5,
+	0x0c, 0x2a, 0xc2, 0x1a, 0x6b, 0x1b, 0x06, 0xc6, 0x26, 0x36, 0xc3, 0x50, 0x8a, 0x3f, 0xc3, 0x86,
+	0x83, 0x4d, 0x35, 0xbb, 0xff, 0x47, 0x1e, 0x72, 0x41, 0x15, 0x68, 0x13, 0x8a, 0x86, 0xde, 0x66,
+	0x98, 0xb7, 0xad, 0x27, 0x96, 0xfd, 0xd4, 0x52, 0x33, 0x68, 0x1f, 0xfe, 0x17, 0x9a, 0x9a, 0x84,
+	0x19, 0xdc, 0xb0, 0x2d, 0x87, 0xda, 0x0d, 0xde, 0xa2, 0xb6, 0x81, 0x19, 0x23, 0xd6, 0x63, 0x6e,
+	0x77, 0x30, 0x6d, 0xd8, 0xba, 0x4c, 0xbb, 0x0b, 0x3b, 0x29, 0xec, 0x91, 0x4e, 0xcd, 0xa7, 0x3a,
+	0xc5, 0x5c, 0xb2, 0x68, 0x53, 0xac, 0x66, 0x51, 0x05, 0xb6, 0x53, 0x00, 0xbb, 0xc9, 0x89, 0xe5,
+	0x60, 0xda, 0xc1, 0x96, 0x43, 0x6c, 0x4b, 0x5d, 0x42, 0xdb, 0x70, 0x35, 0xe5, 0x6f, 0x5b, 0xac,
+	0x85, 0x0d, 0x52, 0x27, 0xd8, 0x54, 0x97, 0xd1, 0x1e, 0xdc, 0x0a, 0x7d, 0x81, 0x1a, 0x86, 0xdd,
+	0xe0, 0x0e, 0xd5, 0x2d, 0x56, 0xc7, 0x94, 0xb3, 0xe7, 0x96, 0xa3, 0x3f, 0xe3, 0x98, 0x52, 0x9b,
+	0xaa, 0x39, 0x74, 0x08, 0x77, 0xe7, 0x90, 0x7a, 0x8d, 0x39, 0x54, 0x37, 0x9c, 0x19, 0x24, 0x0f,
+	0x25, 0x50, 0x57, 0xd0, 0x47, 0x70, 0xff, 0xad, 0x02, 0xc8, 0x63, 0xcb, 0xa6, 0x98, 0xeb, 0x96,
+	0xc9, 0x2d, 0xdb, 0x21, 0xf5, 0xe7, 0xea, 0x2a, 0x7a, 0x04, 0x0f, 0xe7, 0x62, 0x9b, 0x98, 0x31,
+	0xfd, 0x31, 0x96, 0x10, 0x6e, 0xd8, 0xcd, 0x96, 0xee, 0x90, 0x5a, 0x03, 0xf3, 0xa7, 0xc4, 0x39,
+	0xe2, 0x14, 0x1b, 0x98, 0x74, 0x24, 0x65, 0x47, 0x77, 0xb0, 0x9a, 0x47, 0x37, 0xe1, 0xfa, 0x5c,
+	0x38, 0xc3, 0x4d, 0xdd, 0x72, 0x88, 0x11, 0x95, 0xb3, 0x86, 0x4c, 0xf8, 0xf4, 0xad, 0xd8, 0xd5,
+	0xf5, 0x06, 0xc3, 0x8d, 0xe7, 0xb2, 0x47, 0xcc, 0xa1, 0x6d, 0xd9, 0xdc, 0x98, 0x8b, 0x0a, 0x89,
+	0xf4, 0xd3, 0x2c, 0x69, 0x79, 0xd7, 0xd1, 0x6d, 0xb8, 0x19, 0xfa, 0x29, 0x31, 0x38, 0xd5, 0x2d,
+	0x5e, 0x6f, 0x5b, 0x86, 0x6c, 0x0b, 0x27, 0x26, 0x27, 0x56, 0x47, 0x6f, 0x10, 0x53, 0x2d, 0xa0,
+	0x2a, 0x54, 0x12, 0x98, 0x1e, 0x02, 0x64, 0xa1, 0xac, 0xdd, 0x6a, 0xd9, 0x54, 0xce, 0x53, 0x31,
+	0x19, 0x03, 0x89, 0xc1, 0xcf, 0x82, 0x41, 0xe9, 0xe0, 0x08, 0xcd, 0xd4, 0x52, 0xc2, 0x45, 0x02,
+	0xcc, 0x76, 0xab, 0x41, 0x0c, 0xdd, 0x89, 0x01, 0xea, 0x06, 0xba, 0x0e, 0x5b, 0x8b, 0xfc, 0x58,
+	0x0e, 0x8a, 0xaa, 0xce, 0x52, 0x9d, 0xd2, 0xa4, 0x98, 0xd9, 0x6d, 0x6a, 0x60, 0xde, 0x20, 0x4d,
+	0xe2, 0xa8, 0x9b, 0xe8, 0x06, 0x5c, 0x4b, 0x55, 0x84, 0x3f, 0x6f, 0x63, 0xe6, 0xc8, 0x62, 0xe2,
+	0xd9, 0x46, 0xe8, 0x63, 0x78, 0x90, 0x20, 0x88, 0x25, 0x85, 0x23, 0xcc, 0xc1, 0x96, 0x13, 0x57,
+	0xc6, 0xda, 0x35, 0x26, 0x03, 0x53, 0x96, 0x60, 0x6b, 0x60, 0xf5, 0xd2, 0x2c, 0x8d, 0xf8, 0x62,
+	0xc4, 0xcd, 0x8f, 0x15, 0xbb, 0x3c, 0x07, 0xd3, 0x1b, 0xd3, 0xcb, 0x93, 0x16, 0xf6, 0x0a, 0xda,
+	0x82, 0x2b, 0x09, 0x2c, 0xdd, 0x9a, 0xab, 0xc9, 0x15, 0xa4, 0xc4, 0x60, 0x98, 0x76, 0x88, 0x81,
+	0x93, 0xb2, 0xa5, 0xf8, 0xb2, 0x38, 0x42, 0xb1, 0xa9, 0xfe, 0x27, 0xb9, 0x25, 0x29, 0x6c, 0xd2,
+	0x82, 0x38, 0x8a, 0xa9, 0x65, 0x74, 0x07, 0xfe, 0x7b, 0x01, 0x19, 0x2a, 0x35, 0xa3, 0xe3, 0x56,
+	0xd2, 0xce, 0xe0, 0xbe, 0xc9, 0x2e, 0xcf, 0xf0, 0xdb, 0x46, 0x1a, 0x1c, 0xcc, 0x03, 0x92, 0xd5,
+	0x34, 0x5d, 0xdb, 0xd2, 0x3b, 0x3a, 0x69, 0xe8, 0xb5, 0x06, 0x56, 0x77, 0xf6, 0x35, 0xd8, 0xbc,
+	0xf0, 0xf1, 0x42, 0xab, 0xb0, 0xa4, 0x1b, 0x4f, 0xd4, 0x8c, 0x7c, 0xba, 0x2c, 0x9b, 0xcb, 0xb5,
+	0x82, 0xf2, 0xb0, 0x6c, 0xc9, 0x55, 0x56, 0xfb, 0x41, 0x01, 0xc0, 0x9a, 0x13, 0xfd, 0xf2, 0x21,
+	0x0c, 0x2b, 0xe1, 0x9f, 0x09, 0x9a, 0xfd, 0xba, 0xcf, 0xfc, 0xad, 0x6d, 0xef, 0x2c, 0xf4, 0x85,
+	0x0f, 0xe5, 0x9e, 0xf2, 0xbe, 0x82, 0x4c, 0x58, 0x8d, 0x98, 0xa0, 0x85, 0xdf, 0x9c, 0x38, 0xd1,
+	0xb5, 0xc5, 0xce, 0x30, 0x53, 0xad, 0xfc, 0xf3, 0xa4, 0xa2, 0xbc, 0x9e, 0x54, 0x94, 0xdf, 0x26,
+	0x15, 0xe5, 0xfb, 0x37, 0x95, 0xcc, 0xeb, 0x37, 0x95, 0xcc, 0xaf, 0x6f, 0x2a, 0x99, 0x17, 0x2b,
+	0xc1, 0xcf, 0xfe, 0xbd, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0x92, 0x3a, 0x68, 0x7c, 0x27, 0x0c,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -438,6 +908,8 @@ const _ = grpc.SupportPackageIsVersion4
 type E2TServiceClient interface {
 	// Stream opens an indications stream
 	Stream(ctx context.Context, opts ...grpc.CallOption) (E2TService_StreamClient, error)
+	// Control sends a E2 control request
+	Control(ctx context.Context, in *ControlRequest, opts ...grpc.CallOption) (*ControlResponse, error)
 }
 
 type e2TServiceClient struct {
@@ -479,10 +951,21 @@ func (x *e2TServiceStreamClient) Recv() (*StreamResponse, error) {
 	return m, nil
 }
 
+func (c *e2TServiceClient) Control(ctx context.Context, in *ControlRequest, opts ...grpc.CallOption) (*ControlResponse, error) {
+	out := new(ControlResponse)
+	err := c.cc.Invoke(ctx, "/onos.e2t.e2.E2TService/Control", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // E2TServiceServer is the server API for E2TService service.
 type E2TServiceServer interface {
 	// Stream opens an indications stream
 	Stream(E2TService_StreamServer) error
+	// Control sends a E2 control request
+	Control(context.Context, *ControlRequest) (*ControlResponse, error)
 }
 
 // UnimplementedE2TServiceServer can be embedded to have forward compatible implementations.
@@ -491,6 +974,9 @@ type UnimplementedE2TServiceServer struct {
 
 func (*UnimplementedE2TServiceServer) Stream(srv E2TService_StreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method Stream not implemented")
+}
+func (*UnimplementedE2TServiceServer) Control(ctx context.Context, req *ControlRequest) (*ControlResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Control not implemented")
 }
 
 func RegisterE2TServiceServer(s *grpc.Server, srv E2TServiceServer) {
@@ -523,10 +1009,33 @@ func (x *e2TServiceStreamServer) Recv() (*StreamRequest, error) {
 	return m, nil
 }
 
+func _E2TService_Control_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ControlRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(E2TServiceServer).Control(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/onos.e2t.e2.E2TService/Control",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(E2TServiceServer).Control(ctx, req.(*ControlRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _E2TService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "onos.e2t.e2.E2TService",
 	HandlerType: (*E2TServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Control",
+			Handler:    _E2TService_Control_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Stream",
@@ -538,7 +1047,7 @@ var _E2TService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "onos/e2t/e2/e2.proto",
 }
 
-func (m *ServiceModelInfo) Marshal() (dAtA []byte, err error) {
+func (m *ServiceModel) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -548,20 +1057,20 @@ func (m *ServiceModelInfo) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ServiceModelInfo) MarshalTo(dAtA []byte) (int, error) {
+func (m *ServiceModel) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ServiceModelInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ServiceModel) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.ServiceModelId) > 0 {
-		i -= len(m.ServiceModelId)
-		copy(dAtA[i:], m.ServiceModelId)
-		i = encodeVarintE2(dAtA, i, uint64(len(m.ServiceModelId)))
+	if len(m.ID) > 0 {
+		i -= len(m.ID)
+		copy(dAtA[i:], m.ID)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.ID)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -588,9 +1097,9 @@ func (m *RequestHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.ServiceModelInfo != nil {
+	if m.ServiceModel != nil {
 		{
-			size, err := m.ServiceModelInfo.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.ServiceModel.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -628,21 +1137,14 @@ func (m *ResponseHeader) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.IndicationHeader) > 0 {
-		i -= len(m.IndicationHeader)
-		copy(dAtA[i:], m.IndicationHeader)
-		i = encodeVarintE2(dAtA, i, uint64(len(m.IndicationHeader)))
-		i--
-		dAtA[i] = 0x22
-	}
 	if m.ResponseStatus != 0 {
 		i = encodeVarintE2(dAtA, i, uint64(m.ResponseStatus))
 		i--
 		dAtA[i] = 0x18
 	}
-	if m.ServiceModelInfo != nil {
+	if m.ServiceModel != nil {
 		{
-			size, err := m.ServiceModelInfo.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.ServiceModel.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -741,6 +1243,13 @@ func (m *StreamResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.IndicationMessage)
 		i = encodeVarintE2(dAtA, i, uint64(len(m.IndicationMessage)))
 		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.IndicationHeader) > 0 {
+		i -= len(m.IndicationHeader)
+		copy(dAtA[i:], m.IndicationHeader)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.IndicationHeader)))
+		i--
 		dAtA[i] = 0x12
 	}
 	if m.Header != nil {
@@ -758,6 +1267,225 @@ func (m *StreamResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ControlRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ControlRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.ControlAckRequest != 0 {
+		i = encodeVarintE2(dAtA, i, uint64(m.ControlAckRequest))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.ControlMessage) > 0 {
+		i -= len(m.ControlMessage)
+		copy(dAtA[i:], m.ControlMessage)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.ControlMessage)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.ControlHeader) > 0 {
+		i -= len(m.ControlHeader)
+		copy(dAtA[i:], m.ControlHeader)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.ControlHeader)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.E2NodeID) > 0 {
+		i -= len(m.E2NodeID)
+		copy(dAtA[i:], m.E2NodeID)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.E2NodeID)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Header != nil {
+		{
+			size, err := m.Header.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ControlResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ControlResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Response != nil {
+		{
+			size := m.Response.Size()
+			i -= size
+			if _, err := m.Response.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if m.Header != nil {
+		{
+			size, err := m.Header.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ControlResponse_ControlAcknowledge) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_ControlAcknowledge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.ControlAcknowledge != nil {
+		{
+			size, err := m.ControlAcknowledge.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlResponse_ControlFailure) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlResponse_ControlFailure) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.ControlFailure != nil {
+		{
+			size, err := m.ControlFailure.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintE2(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *ControlAcknowledge) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ControlAcknowledge) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlAcknowledge) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ControlOutcome) > 0 {
+		i -= len(m.ControlOutcome)
+		copy(dAtA[i:], m.ControlOutcome)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.ControlOutcome)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ControlFailure) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ControlFailure) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ControlFailure) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ControlOutcome) > 0 {
+		i -= len(m.ControlOutcome)
+		copy(dAtA[i:], m.ControlOutcome)
+		i = encodeVarintE2(dAtA, i, uint64(len(m.ControlOutcome)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Cause != 0 {
+		i = encodeVarintE2(dAtA, i, uint64(m.Cause))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintE2(dAtA []byte, offset int, v uint64) int {
 	offset -= sovE2(v)
 	base := offset
@@ -769,13 +1497,13 @@ func encodeVarintE2(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *ServiceModelInfo) Size() (n int) {
+func (m *ServiceModel) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.ServiceModelId)
+	l = len(m.ID)
 	if l > 0 {
 		n += 1 + l + sovE2(uint64(l))
 	}
@@ -791,8 +1519,8 @@ func (m *RequestHeader) Size() (n int) {
 	if m.EncodingType != 0 {
 		n += 1 + sovE2(uint64(m.EncodingType))
 	}
-	if m.ServiceModelInfo != nil {
-		l = m.ServiceModelInfo.Size()
+	if m.ServiceModel != nil {
+		l = m.ServiceModel.Size()
 		n += 1 + l + sovE2(uint64(l))
 	}
 	return n
@@ -807,16 +1535,12 @@ func (m *ResponseHeader) Size() (n int) {
 	if m.EncodingType != 0 {
 		n += 1 + sovE2(uint64(m.EncodingType))
 	}
-	if m.ServiceModelInfo != nil {
-		l = m.ServiceModelInfo.Size()
+	if m.ServiceModel != nil {
+		l = m.ServiceModel.Size()
 		n += 1 + l + sovE2(uint64(l))
 	}
 	if m.ResponseStatus != 0 {
 		n += 1 + sovE2(uint64(m.ResponseStatus))
-	}
-	l = len(m.IndicationHeader)
-	if l > 0 {
-		n += 1 + l + sovE2(uint64(l))
 	}
 	return n
 }
@@ -856,7 +1580,112 @@ func (m *StreamResponse) Size() (n int) {
 		l = m.Header.Size()
 		n += 1 + l + sovE2(uint64(l))
 	}
+	l = len(m.IndicationHeader)
+	if l > 0 {
+		n += 1 + l + sovE2(uint64(l))
+	}
 	l = len(m.IndicationMessage)
+	if l > 0 {
+		n += 1 + l + sovE2(uint64(l))
+	}
+	return n
+}
+
+func (m *ControlRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Header != nil {
+		l = m.Header.Size()
+		n += 1 + l + sovE2(uint64(l))
+	}
+	l = len(m.E2NodeID)
+	if l > 0 {
+		n += 1 + l + sovE2(uint64(l))
+	}
+	l = len(m.ControlHeader)
+	if l > 0 {
+		n += 1 + l + sovE2(uint64(l))
+	}
+	l = len(m.ControlMessage)
+	if l > 0 {
+		n += 1 + l + sovE2(uint64(l))
+	}
+	if m.ControlAckRequest != 0 {
+		n += 1 + sovE2(uint64(m.ControlAckRequest))
+	}
+	return n
+}
+
+func (m *ControlResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Header != nil {
+		l = m.Header.Size()
+		n += 1 + l + sovE2(uint64(l))
+	}
+	if m.Response != nil {
+		n += m.Response.Size()
+	}
+	return n
+}
+
+func (m *ControlResponse_ControlAcknowledge) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ControlAcknowledge != nil {
+		l = m.ControlAcknowledge.Size()
+		n += 1 + l + sovE2(uint64(l))
+	}
+	return n
+}
+func (m *ControlResponse_ControlFailure) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ControlFailure != nil {
+		l = m.ControlFailure.Size()
+		n += 1 + l + sovE2(uint64(l))
+	}
+	return n
+}
+func (m *ControlAcknowledge) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ControlOutcome)
+	if l > 0 {
+		n += 1 + l + sovE2(uint64(l))
+	}
+	return n
+}
+
+func (m *ControlFailure) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Cause != 0 {
+		n += 1 + sovE2(uint64(m.Cause))
+	}
+	l = len(m.ControlOutcome)
+	if l > 0 {
+		n += 1 + l + sovE2(uint64(l))
+	}
+	l = len(m.Message)
 	if l > 0 {
 		n += 1 + l + sovE2(uint64(l))
 	}
@@ -869,7 +1698,7 @@ func sovE2(x uint64) (n int) {
 func sozE2(x uint64) (n int) {
 	return sovE2(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *ServiceModelInfo) Unmarshal(dAtA []byte) error {
+func (m *ServiceModel) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -892,15 +1721,15 @@ func (m *ServiceModelInfo) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ServiceModelInfo: wiretype end group for non-group")
+			return fmt.Errorf("proto: ServiceModel: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ServiceModelInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ServiceModel: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ServiceModelId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ID", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -928,7 +1757,7 @@ func (m *ServiceModelInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ServiceModelId = string(dAtA[iNdEx:postIndex])
+			m.ID = ServiceModelID(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1004,7 +1833,7 @@ func (m *RequestHeader) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ServiceModelInfo", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceModel", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1031,10 +1860,10 @@ func (m *RequestHeader) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.ServiceModelInfo == nil {
-				m.ServiceModelInfo = &ServiceModelInfo{}
+			if m.ServiceModel == nil {
+				m.ServiceModel = &ServiceModel{}
 			}
-			if err := m.ServiceModelInfo.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ServiceModel.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1112,7 +1941,7 @@ func (m *ResponseHeader) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ServiceModelInfo", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceModel", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1139,10 +1968,10 @@ func (m *ResponseHeader) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.ServiceModelInfo == nil {
-				m.ServiceModelInfo = &ServiceModelInfo{}
+			if m.ServiceModel == nil {
+				m.ServiceModel = &ServiceModel{}
 			}
-			if err := m.ServiceModelInfo.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ServiceModel.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1165,40 +1994,6 @@ func (m *ResponseHeader) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IndicationHeader", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowE2
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthE2
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthE2
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IndicationHeader = append(m.IndicationHeader[:0], dAtA[iNdEx:postIndex]...)
-			if m.IndicationHeader == nil {
-				m.IndicationHeader = []byte{}
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipE2(dAtA[iNdEx:])
@@ -1475,6 +2270,40 @@ func (m *StreamResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IndicationHeader", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IndicationHeader = append(m.IndicationHeader[:0], dAtA[iNdEx:postIndex]...)
+			if m.IndicationHeader == nil {
+				m.IndicationHeader = []byte{}
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field IndicationMessage", wireType)
 			}
 			var byteLen int
@@ -1506,6 +2335,598 @@ func (m *StreamResponse) Unmarshal(dAtA []byte) error {
 			if m.IndicationMessage == nil {
 				m.IndicationMessage = []byte{}
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipE2(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ControlRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowE2
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ControlRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ControlRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Header", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Header == nil {
+				m.Header = &RequestHeader{}
+			}
+			if err := m.Header.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field E2NodeID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.E2NodeID = E2NodeID(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControlHeader", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControlHeader = append(m.ControlHeader[:0], dAtA[iNdEx:postIndex]...)
+			if m.ControlHeader == nil {
+				m.ControlHeader = []byte{}
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControlMessage", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControlMessage = append(m.ControlMessage[:0], dAtA[iNdEx:postIndex]...)
+			if m.ControlMessage == nil {
+				m.ControlMessage = []byte{}
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControlAckRequest", wireType)
+			}
+			m.ControlAckRequest = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ControlAckRequest |= ControlAckRequest(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipE2(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ControlResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowE2
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ControlResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ControlResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Header", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Header == nil {
+				m.Header = &ResponseHeader{}
+			}
+			if err := m.Header.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControlAcknowledge", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ControlAcknowledge{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Response = &ControlResponse_ControlAcknowledge{v}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControlFailure", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &ControlFailure{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Response = &ControlResponse_ControlFailure{v}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipE2(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ControlAcknowledge) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowE2
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ControlAcknowledge: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ControlAcknowledge: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControlOutcome", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControlOutcome = append(m.ControlOutcome[:0], dAtA[iNdEx:postIndex]...)
+			if m.ControlOutcome == nil {
+				m.ControlOutcome = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipE2(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthE2
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ControlFailure) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowE2
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ControlFailure: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ControlFailure: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cause", wireType)
+			}
+			m.Cause = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Cause |= Cause(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControlOutcome", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControlOutcome = append(m.ControlOutcome[:0], dAtA[iNdEx:postIndex]...)
+			if m.ControlOutcome == nil {
+				m.ControlOutcome = []byte{}
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowE2
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthE2
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthE2
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -5,11 +5,11 @@
 package control
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 )
 
 // Control defines required fields for creating control acknowledge and failure responses
@@ -102,7 +102,7 @@ func WithRicControlOutcome(ricCtrlOut types.RicControlOutcome) func(control *Con
 func (control *Control) BuildControlAcknowledge() (response *e2appducontents.RiccontrolAcknowledge, err error) {
 
 	ricRequestID := e2appducontents.RiccontrolAcknowledgeIes_RiccontrolAcknowledgeIes29{
-		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
+		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: control.reqID,
@@ -112,7 +112,7 @@ func (control *Control) BuildControlAcknowledge() (response *e2appducontents.Ric
 	}
 
 	ranFunctionID := e2appducontents.RiccontrolAcknowledgeIes_RiccontrolAcknowledgeIes5{
-		Id:          int32(v1beta1.ProtocolIeIDRanfunctionID),
+		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: control.ranFuncID,
@@ -121,7 +121,7 @@ func (control *Control) BuildControlAcknowledge() (response *e2appducontents.Ric
 	}
 
 	ricCallProcessID := e2appducontents.RiccontrolAcknowledgeIes_RiccontrolAcknowledgeIes20{
-		Id:          int32(v1beta1.ProtocolIeIDRiccallProcessID),
+		Id:          int32(v1beta2.ProtocolIeIDRiccallProcessID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2ap_commondatatypes.RiccallProcessId{
 			Value: []byte(control.ricCallPrID),
@@ -130,14 +130,14 @@ func (control *Control) BuildControlAcknowledge() (response *e2appducontents.Ric
 	}
 
 	ricControlStatus := e2appducontents.RiccontrolAcknowledgeIes_RiccontrolAcknowledgeIes24{
-		Id:          int32(v1beta1.ProtocolIeIDRiccontrolStatus),
+		Id:          int32(v1beta2.ProtocolIeIDRiccontrolStatus),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value:       control.ricCtrlStatus,
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 
 	ricControlOutcome := e2appducontents.RiccontrolAcknowledgeIes_RiccontrolAcknowledgeIes32{
-		Id:          int32(v1beta1.ProtocolIeIDRiccontrolOutcome),
+		Id:          int32(v1beta2.ProtocolIeIDRiccontrolOutcome),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2ap_commondatatypes.RiccontrolOutcome{
 			Value: []byte(control.ricCtrlOut),
@@ -162,7 +162,7 @@ func (control *Control) BuildControlAcknowledge() (response *e2appducontents.Ric
 // BuildControlFailure builds e2ap control failure message
 func (control *Control) BuildControlFailure() (response *e2appducontents.RiccontrolFailure, err error) {
 	ricRequestID := e2appducontents.RiccontrolFailureIes_RiccontrolFailureIes29{
-		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
+		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: control.reqID,
@@ -172,7 +172,7 @@ func (control *Control) BuildControlFailure() (response *e2appducontents.Riccont
 	}
 
 	ranFunctionID := e2appducontents.RiccontrolFailureIes_RiccontrolFailureIes5{
-		Id:          int32(v1beta1.ProtocolIeIDRanfunctionID),
+		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: control.ranFuncID,
@@ -181,7 +181,7 @@ func (control *Control) BuildControlFailure() (response *e2appducontents.Riccont
 	}
 
 	ricCallProcessID := e2appducontents.RiccontrolFailureIes_RiccontrolFailureIes20{
-		Id:          int32(v1beta1.ProtocolIeIDRiccallProcessID),
+		Id:          int32(v1beta2.ProtocolIeIDRiccallProcessID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2ap_commondatatypes.RiccallProcessId{
 			Value: []byte(control.ricCallPrID),
@@ -190,14 +190,14 @@ func (control *Control) BuildControlFailure() (response *e2appducontents.Riccont
 	}
 
 	ricCause := e2appducontents.RiccontrolFailureIes_RiccontrolFailureIes1{
-		Id:          int32(v1beta1.ProtocolIeIDCause),
+		Id:          int32(v1beta2.ProtocolIeIDCause),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value:       &control.cause,
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 
 	ricControlOutcome := e2appducontents.RiccontrolFailureIes_RiccontrolFailureIes32{
-		Id:          int32(v1beta1.ProtocolIeIDRiccontrolOutcome),
+		Id:          int32(v1beta2.ProtocolIeIDRiccontrolOutcome),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2ap_commondatatypes.RiccontrolOutcome{
 			Value: []byte(control.ricCtrlOut),

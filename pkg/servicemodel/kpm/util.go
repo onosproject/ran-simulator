@@ -6,7 +6,7 @@ package kpm
 
 import (
 	e2sm_kpm_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"

@@ -657,6 +657,8 @@ github.com/onosproject/helmit v0.6.8 h1:f/DjOzQp/NFzbTClM7qn4WwQ5DgR/13OD1FWJ4Vx
 github.com/onosproject/helmit v0.6.8/go.mod h1:EorNGSNGWojXGxBEuiNmPScae+R2C5WYfg/13gKEPLw=
 github.com/onosproject/onos-api/go v0.7.0 h1:BjfN78bE/TXadUODrkYbaDsb1hyiV90dNiLoIkl5eV0=
 github.com/onosproject/onos-api/go v0.7.0/go.mod h1:HLfWE9aouIeOmi4soR6bxK2cZ33NbnFMvdyv9fmjaSg=
+github.com/onosproject/onos-api/go v0.7.5 h1:fCf5CEYVdfas79UraZP4oP8LrYctO2sLTz31PXEGsYU=
+github.com/onosproject/onos-api/go v0.7.5/go.mod h1:Has28v1hruZLUxY1E5cCZq76UHXJZLbh62h1W8KQztQ=
 github.com/onosproject/onos-e2-sm v0.0.0-20210205101813-aa827336fa4f h1:NtViv1CMpXO6aEVAwXZMQvyOfd5Zn4bQAvE0+1GCNzA=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0 h1:GiJ3qsCjPcbDTCGogKh1eIiS/y0t4xpQ+SnLtFJVYy0=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0/go.mod h1:XhAq30aC7880EVt5ru0/SZbFgPh3uf2Ty1+L+xUB+9E=
@@ -670,6 +672,8 @@ github.com/onosproject/onos-e2t v0.7.0 h1:yAHVQNkIeQWcgSRnProUsmEN7ZPFrMqSdH0E44
 github.com/onosproject/onos-e2t v0.7.0/go.mod h1:4q6MeDAVT63LPLR1N0o/a/OZ3y+QHYRNrkfBRG/Ixvs=
 github.com/onosproject/onos-e2t v0.7.2 h1:jL8+98aODLAlwminYnnqc4ZckBf+seWPX+gse3ybJtM=
 github.com/onosproject/onos-e2t v0.7.2/go.mod h1:tOh6wgoj9RSbBBi9kurPxIhHS7mU+yDBRq8IWYKuy9g=
+github.com/onosproject/onos-e2t v0.7.5 h1:ulvw11QPcF3biMtmmBHXd1GKoPg40fFkMzH9tf+cg88=
+github.com/onosproject/onos-e2t v0.7.5/go.mod h1:4fIbjkigK2Jn9MT646ue0OW1hbcF2UV+ZNA6Z3BoaM0=
 github.com/onosproject/onos-lib-go v0.7.0 h1:+BxQc0K4nej8qsciArvk6QC3Do6VKQevbIegpR3Kil8=
 github.com/onosproject/onos-lib-go v0.7.0/go.mod h1:ttkK+fV2CULZFHiq6FBZ69i7/Nymi1Wow1DNy0Ik/2o=
 github.com/onosproject/onos-ric-sdk-go v0.7.0 h1:z24x5pT13q1kt9FdMy8Nnpz4a3GMfSuiNZ4cf5CE1qc=
@@ -678,6 +682,8 @@ github.com/onosproject/onos-ric-sdk-go v0.7.0/go.mod h1:ep1Fe1OUcmKi4zzyFHhYr0dW
 github.com/onosproject/onos-ric-sdk-go v0.7.0/go.mod h1:ep1Fe1OUcmKi4zzyFHhYr0dWcE5aPD7nQJn8Q50b2VU=
 github.com/onosproject/onos-ric-sdk-go v0.7.6 h1:Xmbv20oy/BLPCmke7pW82Ccwz/PvdfMDbYMPK0dZgbA=
 github.com/onosproject/onos-ric-sdk-go v0.7.6/go.mod h1:ep1Fe1OUcmKi4zzyFHhYr0dWcE5aPD7nQJn8Q50b2VU=
+github.com/onosproject/onos-ric-sdk-go v0.7.9 h1:RcYP8tznGdApuTNSHH1ltoR3qwWobXFVpmmmqAiLfrI=
+github.com/onosproject/onos-ric-sdk-go v0.7.9/go.mod h1:DjxGBiS+K6qYmPIhv/Ti18uTYTW6fU8HNlVV7XvtAH8=
 github.com/onosproject/onos-test v0.6.4 h1:ocJhMv5mZ5RsojkhBUadE68Q6uSgBZpyDDjnwOPmu6g=
 github.com/onosproject/onos-test v0.6.4/go.mod h1:Ugb1OKR2bJhZjqpSMm9F5o6Ma2iwbtswhSlNyXXPgrg=
 github.com/onsi/ginkgo v0.0.0-20170829012221-11459a886d9c/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
@@ -853,6 +859,8 @@ github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81P
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
+github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/syndtr/gocapability v0.0.0-20170704070218-db04d3cc01c8/go.mod h1:hkRG7XYTFWNJGYcbNJQlaLq0fg1yr4J4t/NcTQtrfww=

@@ -5,11 +5,11 @@
 package indicationerror
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 )
 
 // ErrorIndication required fields for creating error indication error message
@@ -73,7 +73,7 @@ func WithCause(cause e2apies.Cause) func(*ErrorIndication) {
 // Build builds an error indication message
 func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 	ricRequestID := e2appducontents.ErrorIndicationIes_ErrorIndicationIes29{
-		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
+		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: e.reqID,
@@ -83,7 +83,7 @@ func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 	}
 
 	ranFunctionID := e2appducontents.ErrorIndicationIes_ErrorIndicationIes5{
-		Id:          int32(v1beta1.ProtocolIeIDRanfunctionID),
+		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: e.ranFuncID,
@@ -92,14 +92,14 @@ func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 	}
 
 	errorCause := e2appducontents.ErrorIndicationIes_ErrorIndicationIes1{
-		Id:          int32(v1beta1.ProtocolIeIDCause),
+		Id:          int32(v1beta2.ProtocolIeIDCause),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value:       &e.cause,
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 	}
 
 	criticalityDiagnostics := e2appducontents.ErrorIndicationIes_ErrorIndicationIes2{
-		Id:          int32(v1beta1.ProtocolIeIDCriticalityDiagnostics),
+		Id:          int32(v1beta2.ProtocolIeIDCriticalityDiagnostics),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value: &e2apies.CriticalityDiagnostics{
 			ProcedureCode: &e2ap_commondatatypes.ProcedureCode{

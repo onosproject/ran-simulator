@@ -6,7 +6,7 @@ package rc
 
 import (
 	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	"google.golang.org/protobuf/proto"
 )
 

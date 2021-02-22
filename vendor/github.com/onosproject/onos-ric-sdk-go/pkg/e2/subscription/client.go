@@ -24,6 +24,9 @@ type Context interface {
 
 	// ID returns the subscription identifier
 	ID() subapi.ID
+
+	// Err returns the subscription error channel
+	Err() <-chan error
 }
 
 // Client is an E2 subscription service client interface
