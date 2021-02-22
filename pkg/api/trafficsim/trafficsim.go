@@ -107,7 +107,6 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 // ListUes provides means to list (and optionally monitor) simulated UEs
 func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
 	ch := make(chan event.Event)
-	log.Infof("UE Store: %v", s.ueStore)
 	err := s.ueStore.Watch(stream.Context(), ch, ues.WatchOptions{Replay: !req.WithoutReplay, Monitor: req.Subscribe})
 	if err != nil {
 		return err

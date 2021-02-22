@@ -6,7 +6,6 @@ package ues
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"sync"
 
@@ -226,7 +225,6 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 		return err
 	}
 	go func() {
-		fmt.Println("context done")
 		<-ctx.Done()
 		err = s.watchers.RemoveWatcher(id)
 		if err != nil {
