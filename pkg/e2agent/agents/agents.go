@@ -2,31 +2,72 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package e2agent
+package agents
 
 import (
+	"context"
+
+	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/store/agents"
+	"github.com/onosproject/ran-simulator/pkg/store/event"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 )
 
+var log = logging.GetLogger("e2agent", "agents")
+
 // E2Agents represents a collection of E2 agents to allow centralized management
 type E2Agents struct {
-	agentStore agents.Store
+	agentStore          agents.Store
+	modelPluginRegistry *modelplugins.ModelPluginRegistry
+	nodeStore           nodes.Store
+	ueStore             ues.Store
+	model               *model.Model
+}
+
+// Agents agents interface
+type Agents interface {
+	Start() error
+
+	Stop() error
+}
+
+func (agents *E2Agents) processNodeEvents() {
+	ch := make(chan event.Event)
+	err := agents.nodeStore.Watch(context.Background(), ch)
+	if err != nil {
+		log.Error(err)
+	}
+	for nodeEvent := range ch {
+		switch nodeEvent.Type {
+		case nodes.Created:
+			log.Infof("New node is added: %v", nodeEvent.Key)
+		case nodes.Deleted:
+			log.Infof("Node %v is deleted: %v", nodeEvent.Key)
+		case nodes.Updated:
+			log.Infof("Node %v is updated: %v", nodeEvent.Key)
+
+		}
+	}
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
 func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	nodeStore nodes.NodeRegistry, ueStore ues.UERegistry) (*E2Agents, error) {
+	nodeStore nodes.Store, ueStore ues.Store) (*E2Agents, error) {
 	agentStore := agents.NewStore()
 	e2agents := &E2Agents{
-		agentStore: agentStore,
+		agentStore:          agentStore,
+		nodeStore:           nodeStore,
+		modelPluginRegistry: modelPluginRegistry,
+		model:               m,
+		ueStore:             ueStore,
 	}
 
 	for _, node := range m.Nodes {
-		e2Node, err := NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore)
+		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore)
 		if err != nil {
 			return nil, err
 		}
@@ -35,6 +76,7 @@ func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRe
 			log.Error(err)
 		}
 	}
+	go e2agents.processNodeEvents()
 	return e2agents, nil
 }
 
@@ -73,3 +115,5 @@ func (agents *E2Agents) Stop() error {
 	}
 	return nil
 }
+
+var _ Agents = &E2Agents{}

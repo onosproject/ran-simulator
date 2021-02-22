@@ -5,18 +5,19 @@
 package ues
 
 import (
-	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/store/cells"
-	"github.com/onosproject/ran-simulator/pkg/store/nodes"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"math/rand"
 	"testing"
 
+	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"gopkg.in/yaml.v2"
+
 	"github.com/stretchr/testify/assert"
 )
 
-func cellStore(t *testing.T) cells.CellRegistry {
+func cellStore(t *testing.T) cells.Store {
 	m := model.Model{}
 	bytes, err := ioutil.ReadFile("../../model/test.yaml")
 	assert.NoError(t, err)
@@ -42,14 +43,19 @@ func TestMoveUE(t *testing.T) {
 	cellStore := cellStore(t)
 	ues := NewUERegistry(18, cellStore)
 	assert.NotNil(t, ues, "unable to create UE registry")
-
 	// Get a cell ECGI
-	ecgi1 := cellStore.GetRandomCell().ECGI
+	cell1, err := cellStore.GetRandomCell()
+	assert.NoError(t, err)
+	ecgi1 := cell1.ECGI
 
 	// Get another cell ECGI; make sure it's different than the first.
-	ecgi2 := cellStore.GetRandomCell().ECGI
+	cell2, err := cellStore.GetRandomCell()
+	assert.NoError(t, err)
+	ecgi2 := cell2.ECGI
 	for ecgi1 == ecgi2 {
-		ecgi2 = cellStore.GetRandomCell().ECGI
+		cell2, err = cellStore.GetRandomCell()
+		assert.NoError(t, err)
+		ecgi2 = cell2.ECGI
 	}
 
 	for i, ue := range ues.ListAllUEs() {

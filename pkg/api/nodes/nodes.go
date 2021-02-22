@@ -7,6 +7,9 @@ package nodes
 
 import (
 	"context"
+
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	modelapi "github.com/onosproject/ran-simulator/api/model"
@@ -19,7 +22,7 @@ import (
 var log = liblog.GetLogger("api", "nodes")
 
 // NewService returns a new model Service
-func NewService(nodeStore nodes.NodeRegistry) service.Service {
+func NewService(nodeStore nodes.Store) service.Service {
 	return &Service{
 		nodeStore: nodeStore,
 	}
@@ -28,7 +31,7 @@ func NewService(nodeStore nodes.NodeRegistry) service.Service {
 // Service is a Service implementation for administration.
 type Service struct {
 	service.Service
-	nodeStore nodes.NodeRegistry
+	nodeStore nodes.Store
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
@@ -41,7 +44,7 @@ func (s *Service) Register(r *grpc.Server) {
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-	nodeStore nodes.NodeRegistry
+	nodeStore nodes.Store
 }
 
 func nodeToAPI(node *model.Node) *types.Node {
@@ -66,7 +69,7 @@ func nodeToModel(node *types.Node) *model.Node {
 
 // CreateNode creates a new simulated E2 node
 func (s *Server) CreateNode(ctx context.Context, request *modelapi.CreateNodeRequest) (*modelapi.CreateNodeResponse, error) {
-	err := s.nodeStore.AddNode(nodeToModel(request.Node))
+	err := s.nodeStore.Add(ctx, nodeToModel(request.Node))
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +78,7 @@ func (s *Server) CreateNode(ctx context.Context, request *modelapi.CreateNodeReq
 
 // GetNode retrieves the specified simulated E2 node
 func (s *Server) GetNode(ctx context.Context, request *modelapi.GetNodeRequest) (*modelapi.GetNodeResponse, error) {
-	node, err := s.nodeStore.GetNode(request.EnbID)
+	node, err := s.nodeStore.Get(ctx, request.EnbID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +87,7 @@ func (s *Server) GetNode(ctx context.Context, request *modelapi.GetNodeRequest) 
 
 // UpdateNode updates the specified simulated E2 node
 func (s *Server) UpdateNode(ctx context.Context, request *modelapi.UpdateNodeRequest) (*modelapi.UpdateNodeResponse, error) {
-	err := s.nodeStore.UpdateNode(nodeToModel(request.Node))
+	err := s.nodeStore.Update(ctx, nodeToModel(request.Node))
 	if err != nil {
 		return nil, err
 	}
@@ -93,19 +96,19 @@ func (s *Server) UpdateNode(ctx context.Context, request *modelapi.UpdateNodeReq
 
 // DeleteNode deletes the specified simulated E2 node
 func (s *Server) DeleteNode(ctx context.Context, request *modelapi.DeleteNodeRequest) (*modelapi.DeleteNodeResponse, error) {
-	_, err := s.nodeStore.DeleteNode(request.EnbID)
+	_, err := s.nodeStore.Delete(ctx, request.EnbID)
 	if err != nil {
 		return nil, err
 	}
 	return &modelapi.DeleteNodeResponse{}, nil
 }
 
-func eventType(t uint8) modelapi.EventType {
-	if t == nodes.ADDED {
+func eventType(nodeEvent nodes.NodeEvent) modelapi.EventType {
+	if nodeEvent == nodes.Created {
 		return modelapi.EventType_CREATED
-	} else if t == nodes.UPDATED {
+	} else if nodeEvent == nodes.Updated {
 		return modelapi.EventType_UPDATED
-	} else if t == nodes.DELETED {
+	} else if nodeEvent == nodes.Deleted {
 		return modelapi.EventType_DELETED
 	} else {
 		return modelapi.EventType_NONE
@@ -115,13 +118,17 @@ func eventType(t uint8) modelapi.EventType {
 // WatchNodes monitors changes to the inventory of E2 nodes
 func (s *Server) WatchNodes(request *modelapi.WatchNodesRequest, server modelapi.NodeModel_WatchNodesServer) error {
 	log.Infof("Watching nodes [%v]...", request)
-	ch := make(chan nodes.NodeEvent)
-	s.nodeStore.WatchNodes(ch, nodes.WatchOptions{Replay: !request.NoReplay, Monitor: !request.NoSubscribe})
+	ch := make(chan event.Event)
+	err := s.nodeStore.Watch(server.Context(), ch, nodes.WatchOptions{Replay: !request.NoReplay, Monitor: !request.NoSubscribe})
 
-	for event := range ch {
+	if err != nil {
+		return err
+	}
+
+	for nodeEvent := range ch {
 		response := &modelapi.WatchNodesResponse{
-			Node: nodeToAPI(event.Node),
-			Type: eventType(event.Type),
+			Node: nodeToAPI(nodeEvent.Value.(*model.Node)),
+			Type: eventType(nodeEvent.Type.(nodes.NodeEvent)),
 		}
 		err := server.Send(response)
 		if err != nil {
@@ -133,14 +140,14 @@ func (s *Server) WatchNodes(request *modelapi.WatchNodesRequest, server modelapi
 
 // AgentControl allows control over the lifecycle of the agent running on behalf of the simulated E2 node
 func (s *Server) AgentControl(ctx context.Context, request *modelapi.AgentControlRequest) (*modelapi.AgentControlResponse, error) {
-	node, err := s.nodeStore.GetNode(request.EnbID)
+	node, err := s.nodeStore.Get(ctx, request.EnbID)
 	if err != nil {
 		return nil, err
 	}
 	log.Infof("Requested '%s' of agent %d", request.Command, node.EnbID)
 	// TODO: implement agent stop|start, implement connection drop|reconnect, etc.
 	// For now, just put the command into the status
-	err = s.nodeStore.SetStatus(node.EnbID, request.Command)
+	err = s.nodeStore.SetStatus(ctx, node.EnbID, request.Command)
 	if err != nil {
 		return nil, err
 	}

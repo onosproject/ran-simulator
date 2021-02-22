@@ -7,6 +7,7 @@ package trafficsim
 
 import (
 	"context"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
@@ -21,7 +22,7 @@ import (
 var log = liblog.GetLogger("trafficsim")
 
 // NewService returns a new trafficsim Service
-func NewService(model *model.Model, cellStore cells.CellRegistry, ueStore ues.UERegistry) service.Service {
+func NewService(model *model.Model, cellStore cells.Store, ueStore ues.Store) service.Service {
 	return &Service{
 		model:     model,
 		cellStore: cellStore,
@@ -33,8 +34,8 @@ func NewService(model *model.Model, cellStore cells.CellRegistry, ueStore ues.UE
 type Service struct {
 	service.Service
 	model     *model.Model
-	cellStore cells.CellRegistry
-	ueStore   ues.UERegistry
+	cellStore cells.Store
+	ueStore   ues.Store
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
@@ -50,8 +51,8 @@ func (s *Service) Register(r *grpc.Server) {
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
 	model     *model.Model
-	cellStore cells.CellRegistry
-	ueStore   ues.UERegistry
+	cellStore cells.Store
+	ueStore   ues.Store
 }
 
 // GetMapLayout :

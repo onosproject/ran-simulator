@@ -5,13 +5,14 @@
 package ues
 
 import (
+	"math/rand"
+	"sync"
+
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
-	"math/rand"
-	"sync"
 )
 
 const (
@@ -21,8 +22,8 @@ const (
 
 var log = liblog.GetLogger("store", "ues")
 
-// UERegistry tracks inventory of user-equipment for the simulation
-type UERegistry interface {
+// Store tracks inventory of user-equipment for the simulation
+type Store interface {
 	// SetUECount updates the UE count and creates or deletes new UEs as needed
 	SetUECount(count uint)
 
@@ -81,12 +82,12 @@ type ueRegistry struct {
 	lock      sync.RWMutex
 	ues       map[types.IMSI]*model.UE
 	watchers  []ueWatcher
-	cellStore cells.CellRegistry
+	cellStore cells.Store
 }
 
 // NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start.
 // UEs will be semi-randomly distributed between the specified cells
-func NewUERegistry(count uint, cellStore cells.CellRegistry) UERegistry {
+func NewUERegistry(count uint, cellStore cells.Store) Store {
 	log.Infof("Creating registry from model with %d UEs", count)
 	reg := &ueRegistry{
 		lock:      sync.RWMutex{},
@@ -132,7 +133,11 @@ func (r *ueRegistry) CreateUEs(count uint) {
 			imsi = types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI)
 		}
 
-		ecgi := r.cellStore.GetRandomCell().ECGI
+		randomCell, err := r.cellStore.GetRandomCell()
+		if err != nil {
+			log.Error(err)
+		}
+		ecgi := randomCell.ECGI
 		ue := &model.UE{
 			IMSI:     imsi,
 			Type:     "phone",

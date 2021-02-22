@@ -8,12 +8,14 @@ package cli
 import (
 	"context"
 	"fmt"
+	"io"
+	"strconv"
+
 	"github.com/onosproject/onos-lib-go/pkg/cli"
 	modelapi "github.com/onosproject/ran-simulator/api/model"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	"strconv"
 )
 
 func getNodesCommand() *cobra.Command {
@@ -101,15 +103,23 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
 		Output("%-16s %-8s %-32s %-16s %-20s\n", "EnbID", "Status", "Cell ECGIs", "Service Models", "E2T Controllers")
 	}
-	for {
-		r, err := stream.Recv()
-		if err != nil {
-			break
+	errCh := make(chan error, 1)
+	go func() {
+		for {
+			r, err := stream.Recv()
+			if err == io.EOF {
+				errCh <- err
+			}
+
+			if err != nil {
+				errCh <- err
+			}
+			node := r.Node
+			Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
 		}
-		node := r.Node
-		Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
-	}
-	return nil
+	}()
+
+	return <-errCh
 }
 
 func optionsToNode(cmd *cobra.Command, node *types.Node) (*types.Node, error) {

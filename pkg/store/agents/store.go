@@ -5,6 +5,8 @@
 package agents
 
 import (
+	"github.com/onosproject/onos-lib-go/pkg/logging"
+
 	"sync"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
@@ -12,6 +14,8 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 )
+
+var log = logging.GetLogger("store", "agents")
 
 // E2Agents e2 agents
 type E2Agents struct {
@@ -29,11 +33,17 @@ func NewStore() *E2Agents {
 
 // Get gets an e2 agent
 func (e *E2Agents) Get(id types.EnbID) (e2agent.E2Agent, error) {
-	panic("implement me")
+	log.Debug("Getting e2 agent with ID:", id)
+	e.mu.RLock()
+	if val, ok := e.agents[id]; ok {
+		return val, nil
+	}
+	return nil, errors.New(errors.NotFound, "e2 agent has not been found")
 }
 
 // Add adds an e2 agent
 func (e *E2Agents) Add(id types.EnbID, agent e2agent.E2Agent) error {
+	log.Debug("Adding e2 agent with ID:", id)
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if id == 0 {
@@ -46,6 +56,7 @@ func (e *E2Agents) Add(id types.EnbID, agent e2agent.E2Agent) error {
 
 // Remove removes an e2 agent
 func (e *E2Agents) Remove(id types.EnbID) error {
+	log.Debug("Removing e2 agent with ID:", id)
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if id == 0 {
@@ -56,10 +67,11 @@ func (e *E2Agents) Remove(id types.EnbID) error {
 }
 
 // List list e2 agents
-func (e *E2Agents) List() ([]e2agent.E2Agent, error) {
-	return nil, nil
+func (e *E2Agents) List() (map[types.EnbID]e2agent.E2Agent, error) {
+	return e.agents, nil
 }
 
+// Store e2 agents store interface
 type Store interface {
 	// Add an e2 agent
 	Add(types.EnbID, e2agent.E2Agent) error
@@ -68,7 +80,7 @@ type Store interface {
 	Remove(types.EnbID) error
 
 	// List list all of the e2 agents
-	List() ([]e2agent.E2Agent, error)
+	List() (map[types.EnbID]e2agent.E2Agent, error)
 
 	// Get gets an e2 agent
 	Get(types.EnbID) (e2agent.E2Agent, error)

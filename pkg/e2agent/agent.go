@@ -7,9 +7,10 @@ package e2agent
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	"time"
 
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 
@@ -56,13 +57,13 @@ type e2Agent struct {
 	channel   e2.ClientChannel
 	registry  *registry.ServiceModelRegistry
 	subStore  *subscriptions.Subscriptions
-	nodeStore nodes.NodeRegistry
-	ueStore   ues.UERegistry
+	nodeStore nodes.Store
+	ueStore   ues.Store
 }
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	nodeStore nodes.NodeRegistry, ueStore ues.UERegistry) (E2Agent, error) {
+	nodeStore nodes.Store, ueStore ues.Store) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
 	reg := registry.NewServiceModelRegistry()
 
@@ -364,6 +365,7 @@ func (a *e2Agent) setup() error {
 }
 
 func (a *e2Agent) Stop() error {
+	log.Debugf("Stopping e2 agent with ID %v:", a.node.EnbID)
 	if a.channel != nil {
 		return a.channel.Close()
 	}
