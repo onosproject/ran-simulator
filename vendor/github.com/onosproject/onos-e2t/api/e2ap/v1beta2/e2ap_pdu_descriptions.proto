@@ -1,0 +1,178 @@
+/*
+SPDX-FileCopyrightText: 2021-present Open Networking Foundation <info@opennetworking.org>
+
+SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+*/
+
+////////////////////// e2ap_pdu_descriptions.proto //////////////////////
+// Protobuf generated from /e2ap-v01.01.00.asn1 by asn1c-0.9.29
+// E2AP-PDU-Descriptions { iso(1) identified-organization(3) dod(6) internet(1) private(4) enterprise(1) 53148 e2(1) version1(1) e2ap(1) e2ap-PDU-Descriptions(0) }
+
+syntax = "proto3";
+
+package e2ap.v1beta2;
+option go_package = "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-descriptions";
+
+import "e2ap/v1beta2/e2ap_commondatatypes.proto";
+import "e2ap/v1beta2/e2ap_pdu_contents.proto";
+import "e2ap/v1beta2/e2ap_constants.proto";
+import "validate/v1/validate.proto";
+
+// sequence from e2ap-v01.01.00.asn1:97
+message E2ApPdu {
+    // choice from e2ap-v01.01.00.asn1:97
+    oneof e2_ap_pdu {
+        InitiatingMessage initiating_message = 1;
+        SuccessfulOutcome successful_outcome = 2;
+        UnsuccessfulOutcome unsuccessful_outcome = 3;
+    }
+};
+
+// sequence from e2ap-v01.01.00.asn1:104
+message InitiatingMessage {
+    E2ApElementaryProcedures procedure_code = 1;
+//    @procedureCode criticality = 2;
+//    @procedureCode value = 3;
+};
+
+// sequence from e2ap-v01.01.00.asn1:110
+message SuccessfulOutcome {
+    E2ApElementaryProcedures procedure_code = 1;
+//    @procedureCode criticality = 2;
+//    @procedureCode value = 3;
+};
+
+// sequence from e2ap-v01.01.00.asn1:116
+message UnsuccessfulOutcome {
+    E2ApElementaryProcedures procedure_code = 1;
+//    @procedureCode criticality = 2;
+//    @procedureCode value = 3;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:127
+message E2ApElementaryProcedures {
+    RicSubscription ric_subscription = 1;
+    RicSubscriptionDelete ric_subscription_delete = 2;
+    RicServiceUpdate ric_service_update = 3;
+    RicControl ric_control = 4;
+    E2setup e2setup = 5;
+    E2nodeConfigurationUpdateEp e2node_configuration_update = 6;
+    E2connectionUpdateEp e2connection_update = 7;
+    Reset reset = 8;
+    RicIndication ric_indication = 9;
+    RicServiceQuery ric_service_query = 10;
+    ErrorIndicationEp error_indication = 11;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:133
+message E2ApElementaryProceduresClass1 {
+    RicSubscription ric_subscription = 1;
+    RicSubscriptionDelete ric_subscription_delete = 2;
+    RicServiceUpdate ric_service_update = 3;
+    RicControl ric_control = 4;
+    E2setup e2setup = 5;
+    E2nodeConfigurationUpdateEp e2node_configuration_update = 6;
+    E2connectionUpdateEp e2connection_update = 7;
+    Reset reset = 8;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:145
+message E2ApElementaryProceduresClass2 {
+    RicIndication ric_indication = 1;
+    RicServiceQuery ric_service_query = 2;
+    ErrorIndicationEp error_indication = 3;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:159
+message E2connectionUpdateEp {
+    E2connectionUpdate initiating_message = 1;
+    E2connectionUpdateAcknowledge successful_outcome = 2;
+    E2connectionUpdateFailure unsuccessful_outcome = 3;
+    IdE2connectionUpdate procedure_code = 4;
+    CriticalityReject criticality = 5;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:167
+message E2nodeConfigurationUpdateEp {
+    E2nodeConfigurationUpdate initiating_message = 1;
+    E2nodeConfigurationUpdateAcknowledge successful_outcome = 2;
+    E2nodeConfigurationUpdateFailure unsuccessful_outcome = 3;
+    IdE2nodeConfigurationUpdate procedure_code = 4;
+    CriticalityReject criticality = 5;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:175
+message E2setup {
+    E2setupRequest initiating_message = 1;
+    E2setupResponse successful_outcome = 2;
+    E2setupFailure unsuccessful_outcome = 3;
+    IdE2setup procedure_code = 4;
+    CriticalityReject criticality = 5;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:183
+message ErrorIndicationEp {
+    ErrorIndication initiating_message = 1;
+    IdErrorIndication procedure_code = 2;
+    CriticalityIgnore criticality = 3;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:189
+message Reset {
+    ResetRequest initiating_message = 1;
+    ResetResponse successful_outcome = 2;
+    IdReset procedure_code = 3;
+    CriticalityReject criticality = 4;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:196
+message RicControl {
+    RiccontrolRequest initiating_message = 1;
+    RiccontrolAcknowledge successful_outcome = 2;
+    RiccontrolFailure unsuccessful_outcome = 3;
+    IdRiccontrol procedure_code = 4;
+    CriticalityReject criticality = 5;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:204
+message RicIndication {
+    Ricindication initiating_message = 1;
+    IdRicindication procedure_code = 2;
+    CriticalityIgnore criticality = 3;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:210
+message RicServiceQuery {
+    RicserviceQuery initiating_message = 1;
+    IdRicserviceQuery procedure_code = 2;
+    CriticalityIgnore criticality = 3;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:216
+message RicServiceUpdate {
+    RicserviceUpdate initiating_message = 1;
+    RicserviceUpdateAcknowledge successful_outcome = 2;
+    RicserviceUpdateFailure unsuccessful_outcome = 3;
+    IdRicserviceUpdate procedure_code = 4;
+    CriticalityReject criticality = 5;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:224
+message RicSubscription {
+    RicsubscriptionRequest initiating_message = 1;
+    RicsubscriptionResponse successful_outcome = 2;
+    RicsubscriptionFailure unsuccessful_outcome = 3;
+    IdRicsubscription procedure_code = 4;
+    CriticalityReject criticality = 5;
+};
+
+// concrete instance(s) of class E2AP-ELEMENTARY-PROCEDURE from e2ap-v01.01.00.asn1:232
+message RicSubscriptionDelete {
+    RicsubscriptionDeleteRequest initiating_message = 1;
+    RicsubscriptionDeleteResponse successful_outcome = 2;
+    RicsubscriptionDeleteFailure unsuccessful_outcome = 3;
+    IdRicsubscriptionDelete procedure_code = 4;
+    CriticalityReject criticality = 5;
+};
+
+

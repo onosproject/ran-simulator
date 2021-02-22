@@ -5,6 +5,7 @@
 package termination
 
 import (
+	context2 "context"
 	"io"
 
 	e2tapi "github.com/onosproject/onos-api/go/onos/e2t/e2"
@@ -22,6 +23,8 @@ type Client interface {
 
 	// Stream opens a stream
 	Stream(ctx context.Context, ch chan<- e2tapi.StreamResponse) (chan<- e2tapi.StreamRequest, error)
+
+	Control(ctx context.Context, request *e2tapi.ControlRequest) (*e2tapi.ControlResponse, error)
 }
 
 // NewClient creates a new subscribe task service client
@@ -35,6 +38,15 @@ func NewClient(conn *grpc.ClientConn) Client {
 // terminationClient E2 termination client
 type terminationClient struct {
 	client e2tapi.E2TServiceClient
+}
+
+func (c *terminationClient) Control(ctx context2.Context, request *e2tapi.ControlRequest) (*e2tapi.ControlResponse, error) {
+	response, err := c.client.Control(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 func (c *terminationClient) Stream(ctx context.Context, responseCh chan<- e2tapi.StreamResponse) (chan<- e2tapi.StreamRequest, error) {

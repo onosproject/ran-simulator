@@ -5,10 +5,10 @@
 package subscriptiondelete
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2ap-commondatatypes"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2apies"
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta1/e2appducontents"
+	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 )
 
 // SubscriptionDelete required fields for creating subscription delete response and failure
@@ -76,7 +76,7 @@ func WithCause(cause *e2apies.Cause) func(subscriptionDelete *SubscriptionDelete
 // BuildSubscriptionDeleteFailure builds subscription delete failure
 func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteFailure() (response *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes29{
-		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
+		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: subscriptionDelete.reqID,         // sequence from e2ap-v01.00.asn1:1126
@@ -86,7 +86,7 @@ func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteFailure() (
 	}
 
 	ranFunctionID := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes5{
-		Id:          int32(v1beta1.ProtocolIeIDRanfunctionID),
+		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: subscriptionDelete.ranFuncID, // range of Integer from e2ap-v01.00.asn1:1050, value from line 1277
@@ -94,7 +94,7 @@ func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteFailure() (
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 	causeOfFailure := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes1{
-		Id:          int32(v1beta1.ProtocolIeIDCause),
+		Id:          int32(v1beta2.ProtocolIeIDCause),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value:       subscriptionDelete.cause,
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
@@ -114,7 +114,7 @@ func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteFailure() (
 // BuildSubscriptionDeleteResponse builds subscription delete response
 func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteResponse() (response *e2appducontents.RicsubscriptionDeleteResponse, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionDeleteResponseIes_RicsubscriptionDeleteResponseIes29{
-		Id:          int32(v1beta1.ProtocolIeIDRicrequestID),
+		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: subscriptionDelete.reqID,         // sequence from e2ap-v01.00.asn1:1126
@@ -124,7 +124,7 @@ func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteResponse() 
 	}
 
 	ranFunctionID := e2appducontents.RicsubscriptionDeleteResponseIes_RicsubscriptionDeleteResponseIes5{
-		Id:          int32(v1beta1.ProtocolIeIDRanfunctionID),
+		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: subscriptionDelete.ranFuncID, // range of Integer from e2ap-v01.00.asn1:1050, value from line 1277
