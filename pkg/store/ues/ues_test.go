@@ -5,6 +5,7 @@
 package ues
 
 import (
+	"context"
 	"io/ioutil"
 	"math/rand"
 	"testing"
@@ -28,18 +29,20 @@ func cellStore(t *testing.T) cells.Store {
 }
 
 func TestUERegistry(t *testing.T) {
+	ctx := context.Background()
 	ues := NewUERegistry(16, cellStore(t))
 	assert.NotNil(t, ues, "unable to create UE registry")
-	assert.Equal(t, 16, len(ues.ListAllUEs()))
+	assert.Equal(t, 16, ues.Len(ctx))
 
-	ues.SetUECount(10)
-	assert.Equal(t, 10, len(ues.ListAllUEs()))
+	ues.SetUECount(ctx, 10)
+	assert.Equal(t, 10, ues.Len(ctx))
 
-	ues.SetUECount(200)
-	assert.Equal(t, 200, len(ues.ListAllUEs()))
+	ues.SetUECount(ctx, 200)
+	assert.Equal(t, 200, ues.Len(ctx))
 }
 
 func TestMoveUE(t *testing.T) {
+	ctx := context.Background()
 	cellStore := cellStore(t)
 	ues := NewUERegistry(18, cellStore)
 	assert.NotNil(t, ues, "unable to create UE registry")
@@ -58,15 +61,15 @@ func TestMoveUE(t *testing.T) {
 		ecgi2 = cell2.ECGI
 	}
 
-	for i, ue := range ues.ListAllUEs() {
+	for i, ue := range ues.ListAllUEs(ctx) {
 		ecgi := ecgi1
 		if i%3 == 0 {
 			ecgi = ecgi2
 		}
-		err := ues.MoveUE(ue.IMSI, ecgi, rand.Float64())
+		err := ues.Move(ctx, ue.IMSI, ecgi, rand.Float64())
 		assert.NoError(t, err)
 	}
 
-	assert.Equal(t, 12, len(ues.ListUEs(ecgi1)))
-	assert.Equal(t, 6, len(ues.ListUEs(ecgi2)))
+	assert.Equal(t, 12, len(ues.ListUEs(ctx, ecgi1)))
+	assert.Equal(t, 6, len(ues.ListUEs(ctx, ecgi2)))
 }

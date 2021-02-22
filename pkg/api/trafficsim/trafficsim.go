@@ -8,6 +8,8 @@ package trafficsim
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
@@ -104,14 +106,17 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 
 // ListUes provides means to list (and optionally monitor) simulated UEs
 func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
-	ch := make(chan ues.UEEvent)
+	ch := make(chan event.Event)
 	log.Infof("UE Store: %v", s.ueStore)
-	s.ueStore.WatchUEs(ch, ues.WatchOptions{Replay: !req.WithoutReplay, Monitor: req.Subscribe})
+	err := s.ueStore.Watch(stream.Context(), ch, ues.WatchOptions{Replay: !req.WithoutReplay, Monitor: req.Subscribe})
+	if err != nil {
+		return err
+	}
 
-	for event := range ch {
+	for ueEvent := range ch {
 		resp := &simapi.ListUesResponse{
-			Ue:   ueToAPI(event.UE),
-			Type: eventType(event.Type),
+			Ue:   ueToAPI(ueEvent.Value.(*model.UE)),
+			Type: eventType(ueEvent.Type.(ues.UeEvent)),
 		}
 		err := stream.Send(resp)
 		if err != nil {
@@ -121,13 +126,13 @@ func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListU
 	return nil
 }
 
-func eventType(t uint8) simapi.Type {
-	if t == ues.ADDED {
+func eventType(ueEvent ues.UeEvent) simapi.Type {
+	if ueEvent == ues.Created {
 		return simapi.Type_ADDED
-	} else if t == ues.UPDATED {
-		return simapi.Type_ADDED
-	} else if t == ues.DELETED {
-		return simapi.Type_ADDED
+	} else if ueEvent == ues.Updated {
+		return simapi.Type_UPDATED
+	} else if ueEvent == ues.Deleted {
+		return simapi.Type_REMOVED
 	} else {
 		return simapi.Type_NONE
 	}
@@ -137,7 +142,7 @@ func eventType(t uint8) simapi.Type {
 func (s *Server) SetNumberUEs(ctx context.Context, req *simapi.SetNumberUEsRequest) (*simapi.SetNumberUEsResponse, error) {
 	ueCount := req.GetNumber()
 	log.Infof("Number of simulated UEs changed to %d", ueCount)
-	s.ueStore.SetUECount(uint(ueCount))
+	s.ueStore.SetUECount(ctx, uint(ueCount))
 	return &simapi.SetNumberUEsResponse{Number: ueCount}, nil
 }
 

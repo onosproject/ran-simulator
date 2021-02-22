@@ -193,6 +193,8 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 	err := s.watchers.AddWatcher(id, ch)
 	if err != nil {
 		log.Error(err)
+		close(ch)
+		return err
 	}
 	go func() {
 		<-ctx.Done()
