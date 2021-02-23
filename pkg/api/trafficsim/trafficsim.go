@@ -8,8 +8,6 @@ package trafficsim
 import (
 	"context"
 
-	"github.com/onosproject/ran-simulator/pkg/store/event"
-
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
@@ -106,35 +104,18 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 
 // ListUes provides means to list (and optionally monitor) simulated UEs
 func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
-	ch := make(chan event.Event)
-	err := s.ueStore.Watch(stream.Context(), ch, ues.WatchOptions{Replay: !req.WithoutReplay, Monitor: req.Subscribe})
-	if err != nil {
-		return err
-	}
-
-	for ueEvent := range ch {
+	ueList := s.ueStore.ListAllUEs(stream.Context())
+	for _, ue := range ueList {
 		resp := &simapi.ListUesResponse{
-			Ue:   ueToAPI(ueEvent.Value.(*model.UE)),
-			Type: eventType(ueEvent.Type.(ues.UeEvent)),
+			Ue: ueToAPI(ue),
 		}
 		err := stream.Send(resp)
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 	}
 	return nil
-}
-
-func eventType(ueEvent ues.UeEvent) simapi.Type {
-	if ueEvent == ues.Created {
-		return simapi.Type_ADDED
-	} else if ueEvent == ues.Updated {
-		return simapi.Type_UPDATED
-	} else if ueEvent == ues.Deleted {
-		return simapi.Type_REMOVED
-	} else {
-		return simapi.Type_NONE
-	}
 }
 
 // SetNumberUEs changes the number of UEs in the simulation

@@ -130,6 +130,24 @@ func eventType(cellEvent cells.CellEvent) modelapi.EventType {
 	}
 }
 
+// ListCells list all of the cells
+func (s *Server) ListCells(request *modelapi.ListCellsRequest, server modelapi.CellModel_ListCellsServer) error {
+	cellList, err := s.cellStore.List(server.Context())
+	if err != nil {
+		return err
+	}
+	for _, cell := range cellList {
+		resp := &modelapi.ListCellsResponse{
+			Cell: cellToAPI(cell),
+		}
+		err = server.Send(resp)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WatchCells monitors changes to the inventory of cells
 func (s *Server) WatchCells(request *modelapi.WatchCellsRequest, server modelapi.CellModel_WatchCellsServer) error {
 	log.Infof("Watching cells [%v]...", request)

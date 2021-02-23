@@ -6,10 +6,6 @@ package trafficsim
 
 import (
 	"context"
-<<<<<<< HEAD
-=======
-	"io/ioutil"
->>>>>>> improve ue store
 	"net"
 	"testing"
 
@@ -112,4 +108,3 @@ func countUEs(t *testing.T, stream simapi.Traffic_ListUesClient) int {
 	}
 	return count
 }
-

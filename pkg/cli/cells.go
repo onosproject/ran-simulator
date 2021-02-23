@@ -7,12 +7,13 @@ package cli
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/onosproject/onos-lib-go/pkg/cli"
 	modelapi "github.com/onosproject/ran-simulator/api/model"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	"strconv"
 )
 
 func getCellsCommand() *cobra.Command {
@@ -79,7 +80,7 @@ func runGetCellsCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer conn.Close()
 
-	stream, err := client.WatchCells(context.Background(), &modelapi.WatchCellsRequest{NoReplay: false, NoSubscribe: true})
+	stream, err := client.ListCells(context.Background(), &modelapi.ListCellsRequest{})
 	if err != nil {
 		return err
 	}

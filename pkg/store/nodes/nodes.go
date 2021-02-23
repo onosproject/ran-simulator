@@ -40,7 +40,7 @@ type Store interface {
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
 
 	// List list the nodes
-	List(ctx context.Context, ch chan<- *model.Node) error
+	List(ctx context.Context) ([]*model.Node, error)
 
 	// Len number of nodes
 	Len(ctx context.Context) (int, error)
@@ -59,7 +59,7 @@ type WatchOptions struct {
 }
 
 type store struct {
-	lock     sync.RWMutex
+	mu       sync.RWMutex
 	nodes    map[types.EnbID]*model.Node
 	watchers *watcher.Watchers
 }
@@ -69,7 +69,7 @@ func NewNodeRegistry(nodes map[string]model.Node) Store {
 	log.Infof("Creating registry from model with %d nodes", len(nodes))
 	watchers := watcher.NewWatchers()
 	reg := &store{
-		lock:     sync.RWMutex{},
+		mu:       sync.RWMutex{},
 		nodes:    make(map[types.EnbID]*model.Node),
 		watchers: watchers,
 	}
@@ -87,8 +87,8 @@ func NewNodeRegistry(nodes map[string]model.Node) Store {
 // Add adds a new node
 func (s *store) Add(ctx context.Context, node *model.Node) error {
 	log.Debugf("Adding node with ID: %d", node.EnbID)
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if _, ok := s.nodes[node.EnbID]; ok {
 		return errors.New(errors.NotFound, "node with EnbID already exists")
 	}
@@ -107,8 +107,8 @@ func (s *store) Add(ctx context.Context, node *model.Node) error {
 // Get gets a node based on a given ID
 func (s *store) Get(ctx context.Context, enbID types.EnbID) (*model.Node, error) {
 	log.Debugf("Getting node with ID: %d", enbID)
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	if node, ok := s.nodes[enbID]; ok {
 		return node, nil
 	}
@@ -119,8 +119,8 @@ func (s *store) Get(ctx context.Context, enbID types.EnbID) (*model.Node, error)
 // Update updates a node
 func (s *store) Update(ctx context.Context, node *model.Node) error {
 	log.Debugf("Updating node with ID:%d", node.EnbID)
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if _, ok := s.nodes[node.EnbID]; ok {
 		s.nodes[node.EnbID] = node
 		updateEvent := event.Event{
@@ -138,8 +138,8 @@ func (s *store) Update(ctx context.Context, node *model.Node) error {
 
 // PruneCell prunes a cell
 func (s *store) PruneCell(ctx context.Context, ecgi types.ECGI) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	for _, node := range s.nodes {
 		for i, e := range node.Cells {
 			if e == ecgi {
@@ -158,8 +158,8 @@ func (s *store) PruneCell(ctx context.Context, ecgi types.ECGI) error {
 }
 
 func (s *store) SetStatus(ctx context.Context, enbID types.EnbID, status string) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if node, ok := s.nodes[enbID]; ok {
 		node.Status = status
 		return nil
@@ -170,8 +170,8 @@ func (s *store) SetStatus(ctx context.Context, enbID types.EnbID, status string)
 // Delete deletes a node
 func (s *store) Delete(ctx context.Context, enbID types.EnbID) (*model.Node, error) {
 	log.Debugf("Deleting node %d:", enbID)
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if node, ok := s.nodes[enbID]; ok {
 		delete(s.nodes, enbID)
 		deleteEvent := event.Event{
@@ -225,22 +225,14 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 }
 
 // List list of nodes
-func (s *store) List(ctx context.Context, ch chan<- *model.Node) error {
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for _, node := range s.nodes {
-			ch <- node
-		}
-	}()
-	go func() {
-		<-ctx.Done()
-		close(ch)
-
-	}()
-
-	return nil
+func (s *store) List(ctx context.Context) ([]*model.Node, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	list := make([]*model.Node, 0, len(s.nodes))
+	for _, node := range s.nodes {
+		list = append(list, node)
+	}
+	return list, nil
 }
 
 // Len number of nodes

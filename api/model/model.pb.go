@@ -394,6 +394,86 @@ func (m *DeleteNodeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteNodeResponse proto.InternalMessageInfo
 
+type ListNodesRequest struct {
+}
+
+func (m *ListNodesRequest) Reset()         { *m = ListNodesRequest{} }
+func (m *ListNodesRequest) String() string { return proto.CompactTextString(m) }
+func (*ListNodesRequest) ProtoMessage()    {}
+func (*ListNodesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_81eaad4ae10285e6, []int{8}
+}
+func (m *ListNodesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListNodesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListNodesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListNodesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListNodesRequest.Merge(m, src)
+}
+func (m *ListNodesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListNodesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListNodesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListNodesRequest proto.InternalMessageInfo
+
+type ListNodesResponse struct {
+	Node *types.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
+}
+
+func (m *ListNodesResponse) Reset()         { *m = ListNodesResponse{} }
+func (m *ListNodesResponse) String() string { return proto.CompactTextString(m) }
+func (*ListNodesResponse) ProtoMessage()    {}
+func (*ListNodesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_81eaad4ae10285e6, []int{9}
+}
+func (m *ListNodesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListNodesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListNodesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListNodesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListNodesResponse.Merge(m, src)
+}
+func (m *ListNodesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListNodesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListNodesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListNodesResponse proto.InternalMessageInfo
+
+func (m *ListNodesResponse) GetNode() *types.Node {
+	if m != nil {
+		return m.Node
+	}
+	return nil
+}
+
 type WatchNodesRequest struct {
 	NoReplay    bool `protobuf:"varint,1,opt,name=no_replay,json=noReplay,proto3" json:"no_replay,omitempty"`
 	NoSubscribe bool `protobuf:"varint,2,opt,name=no_subscribe,json=noSubscribe,proto3" json:"no_subscribe,omitempty"`
@@ -403,7 +483,7 @@ func (m *WatchNodesRequest) Reset()         { *m = WatchNodesRequest{} }
 func (m *WatchNodesRequest) String() string { return proto.CompactTextString(m) }
 func (*WatchNodesRequest) ProtoMessage()    {}
 func (*WatchNodesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{8}
+	return fileDescriptor_81eaad4ae10285e6, []int{10}
 }
 func (m *WatchNodesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -455,7 +535,7 @@ func (m *WatchNodesResponse) Reset()         { *m = WatchNodesResponse{} }
 func (m *WatchNodesResponse) String() string { return proto.CompactTextString(m) }
 func (*WatchNodesResponse) ProtoMessage()    {}
 func (*WatchNodesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{9}
+	return fileDescriptor_81eaad4ae10285e6, []int{11}
 }
 func (m *WatchNodesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -508,7 +588,7 @@ func (m *AgentControlRequest) Reset()         { *m = AgentControlRequest{} }
 func (m *AgentControlRequest) String() string { return proto.CompactTextString(m) }
 func (*AgentControlRequest) ProtoMessage()    {}
 func (*AgentControlRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{10}
+	return fileDescriptor_81eaad4ae10285e6, []int{12}
 }
 func (m *AgentControlRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -566,7 +646,7 @@ func (m *AgentControlResponse) Reset()         { *m = AgentControlResponse{} }
 func (m *AgentControlResponse) String() string { return proto.CompactTextString(m) }
 func (*AgentControlResponse) ProtoMessage()    {}
 func (*AgentControlResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{11}
+	return fileDescriptor_81eaad4ae10285e6, []int{13}
 }
 func (m *AgentControlResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -610,7 +690,7 @@ func (m *CreateCellRequest) Reset()         { *m = CreateCellRequest{} }
 func (m *CreateCellRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateCellRequest) ProtoMessage()    {}
 func (*CreateCellRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{12}
+	return fileDescriptor_81eaad4ae10285e6, []int{14}
 }
 func (m *CreateCellRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -653,7 +733,7 @@ func (m *CreateCellResponse) Reset()         { *m = CreateCellResponse{} }
 func (m *CreateCellResponse) String() string { return proto.CompactTextString(m) }
 func (*CreateCellResponse) ProtoMessage()    {}
 func (*CreateCellResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{13}
+	return fileDescriptor_81eaad4ae10285e6, []int{15}
 }
 func (m *CreateCellResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -690,7 +770,7 @@ func (m *GetCellRequest) Reset()         { *m = GetCellRequest{} }
 func (m *GetCellRequest) String() string { return proto.CompactTextString(m) }
 func (*GetCellRequest) ProtoMessage()    {}
 func (*GetCellRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{14}
+	return fileDescriptor_81eaad4ae10285e6, []int{16}
 }
 func (m *GetCellRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -734,7 +814,7 @@ func (m *GetCellResponse) Reset()         { *m = GetCellResponse{} }
 func (m *GetCellResponse) String() string { return proto.CompactTextString(m) }
 func (*GetCellResponse) ProtoMessage()    {}
 func (*GetCellResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{15}
+	return fileDescriptor_81eaad4ae10285e6, []int{17}
 }
 func (m *GetCellResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -778,7 +858,7 @@ func (m *UpdateCellRequest) Reset()         { *m = UpdateCellRequest{} }
 func (m *UpdateCellRequest) String() string { return proto.CompactTextString(m) }
 func (*UpdateCellRequest) ProtoMessage()    {}
 func (*UpdateCellRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{16}
+	return fileDescriptor_81eaad4ae10285e6, []int{18}
 }
 func (m *UpdateCellRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -821,7 +901,7 @@ func (m *UpdateCellResponse) Reset()         { *m = UpdateCellResponse{} }
 func (m *UpdateCellResponse) String() string { return proto.CompactTextString(m) }
 func (*UpdateCellResponse) ProtoMessage()    {}
 func (*UpdateCellResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{17}
+	return fileDescriptor_81eaad4ae10285e6, []int{19}
 }
 func (m *UpdateCellResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -858,7 +938,7 @@ func (m *DeleteCellRequest) Reset()         { *m = DeleteCellRequest{} }
 func (m *DeleteCellRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteCellRequest) ProtoMessage()    {}
 func (*DeleteCellRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{18}
+	return fileDescriptor_81eaad4ae10285e6, []int{20}
 }
 func (m *DeleteCellRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -901,7 +981,7 @@ func (m *DeleteCellResponse) Reset()         { *m = DeleteCellResponse{} }
 func (m *DeleteCellResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteCellResponse) ProtoMessage()    {}
 func (*DeleteCellResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{19}
+	return fileDescriptor_81eaad4ae10285e6, []int{21}
 }
 func (m *DeleteCellResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -939,7 +1019,7 @@ func (m *WatchCellsRequest) Reset()         { *m = WatchCellsRequest{} }
 func (m *WatchCellsRequest) String() string { return proto.CompactTextString(m) }
 func (*WatchCellsRequest) ProtoMessage()    {}
 func (*WatchCellsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{20}
+	return fileDescriptor_81eaad4ae10285e6, []int{22}
 }
 func (m *WatchCellsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -991,7 +1071,7 @@ func (m *WatchCellsResponse) Reset()         { *m = WatchCellsResponse{} }
 func (m *WatchCellsResponse) String() string { return proto.CompactTextString(m) }
 func (*WatchCellsResponse) ProtoMessage()    {}
 func (*WatchCellsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_81eaad4ae10285e6, []int{21}
+	return fileDescriptor_81eaad4ae10285e6, []int{23}
 }
 func (m *WatchCellsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1034,6 +1114,86 @@ func (m *WatchCellsResponse) GetType() EventType {
 	return EventType_NONE
 }
 
+type ListCellsRequest struct {
+}
+
+func (m *ListCellsRequest) Reset()         { *m = ListCellsRequest{} }
+func (m *ListCellsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListCellsRequest) ProtoMessage()    {}
+func (*ListCellsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_81eaad4ae10285e6, []int{24}
+}
+func (m *ListCellsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListCellsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListCellsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListCellsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListCellsRequest.Merge(m, src)
+}
+func (m *ListCellsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListCellsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListCellsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListCellsRequest proto.InternalMessageInfo
+
+type ListCellsResponse struct {
+	Cell *types.Cell `protobuf:"bytes,1,opt,name=Cell,proto3" json:"Cell,omitempty"`
+}
+
+func (m *ListCellsResponse) Reset()         { *m = ListCellsResponse{} }
+func (m *ListCellsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListCellsResponse) ProtoMessage()    {}
+func (*ListCellsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_81eaad4ae10285e6, []int{25}
+}
+func (m *ListCellsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListCellsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListCellsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListCellsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListCellsResponse.Merge(m, src)
+}
+func (m *ListCellsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *ListCellsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListCellsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListCellsResponse proto.InternalMessageInfo
+
+func (m *ListCellsResponse) GetCell() *types.Cell {
+	if m != nil {
+		return m.Cell
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("ran.model.EventType", EventType_name, EventType_value)
 	proto.RegisterType((*CreateNodeRequest)(nil), "ran.model.CreateNodeRequest")
@@ -1044,6 +1204,8 @@ func init() {
 	proto.RegisterType((*UpdateNodeResponse)(nil), "ran.model.UpdateNodeResponse")
 	proto.RegisterType((*DeleteNodeRequest)(nil), "ran.model.DeleteNodeRequest")
 	proto.RegisterType((*DeleteNodeResponse)(nil), "ran.model.DeleteNodeResponse")
+	proto.RegisterType((*ListNodesRequest)(nil), "ran.model.ListNodesRequest")
+	proto.RegisterType((*ListNodesResponse)(nil), "ran.model.ListNodesResponse")
 	proto.RegisterType((*WatchNodesRequest)(nil), "ran.model.WatchNodesRequest")
 	proto.RegisterType((*WatchNodesResponse)(nil), "ran.model.WatchNodesResponse")
 	proto.RegisterType((*AgentControlRequest)(nil), "ran.model.AgentControlRequest")
@@ -1058,60 +1220,65 @@ func init() {
 	proto.RegisterType((*DeleteCellResponse)(nil), "ran.model.DeleteCellResponse")
 	proto.RegisterType((*WatchCellsRequest)(nil), "ran.model.WatchCellsRequest")
 	proto.RegisterType((*WatchCellsResponse)(nil), "ran.model.WatchCellsResponse")
+	proto.RegisterType((*ListCellsRequest)(nil), "ran.model.ListCellsRequest")
+	proto.RegisterType((*ListCellsResponse)(nil), "ran.model.ListCellsResponse")
 }
 
 func init() { proto.RegisterFile("api/model/model.proto", fileDescriptor_81eaad4ae10285e6) }
 
 var fileDescriptor_81eaad4ae10285e6 = []byte{
-	// 758 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x5f, 0x4f, 0xd3, 0x5e,
-	0x18, 0x5e, 0xd9, 0xf8, 0x41, 0x5f, 0xf8, 0x01, 0x3b, 0xce, 0x64, 0x56, 0xed, 0xb0, 0xde, 0x10,
-	0x13, 0x3b, 0x32, 0x8c, 0x21, 0x6a, 0xa2, 0xb0, 0x35, 0x64, 0x51, 0xc1, 0x14, 0x08, 0x97, 0xa4,
-	0xeb, 0x4e, 0x46, 0x49, 0x77, 0x4e, 0x6d, 0x3b, 0x13, 0xbe, 0x85, 0x1f, 0xc0, 0x0f, 0xe4, 0x85,
-	0x17, 0x5c, 0x7a, 0xb5, 0x98, 0xf1, 0x2d, 0xf0, 0xc6, 0x9c, 0xd3, 0x6e, 0x3b, 0x5d, 0x4b, 0xb2,
-	0xa1, 0xdc, 0x2c, 0x3b, 0xef, 0x7b, 0xde, 0xe7, 0xbc, 0xff, 0x9e, 0x67, 0x83, 0xfb, 0x96, 0xe7,
-	0x54, 0xbb, 0xb4, 0x8d, 0xdd, 0xe8, 0x53, 0xf7, 0x7c, 0x1a, 0x52, 0x24, 0xfb, 0x16, 0xd1, 0xb9,
-	0x41, 0x29, 0x75, 0x68, 0x87, 0x72, 0x6b, 0x95, 0x7d, 0x8b, 0x2e, 0x28, 0xaf, 0x3a, 0x4e, 0x78,
-	0xd6, 0x6b, 0xe9, 0x36, 0xed, 0x56, 0x29, 0xa1, 0x81, 0xe7, 0xd3, 0x73, 0x6c, 0x87, 0x55, 0xdf,
-	0x22, 0xcf, 0x03, 0xa7, 0xdb, 0x73, 0xad, 0x90, 0xfa, 0x55, 0x06, 0x1e, 0x5e, 0x78, 0x38, 0x88,
-	0x3e, 0xa3, 0x58, 0x6d, 0x1b, 0x8a, 0x75, 0x1f, 0x5b, 0x21, 0xde, 0xa7, 0x6d, 0x6c, 0xe2, 0xcf,
-	0x3d, 0x1c, 0x84, 0xe8, 0x29, 0x14, 0x08, 0x6d, 0xe3, 0xb2, 0xb4, 0x2e, 0x6d, 0x2c, 0xd5, 0x56,
-	0x75, 0x96, 0x40, 0x14, 0xc4, 0x6f, 0x71, 0xa7, 0x56, 0x02, 0x24, 0x46, 0x06, 0x1e, 0x25, 0x01,
-	0xd6, 0x1c, 0x58, 0xd9, 0xc3, 0xa1, 0x08, 0x76, 0x02, 0xf3, 0x98, 0xb4, 0x9c, 0x36, 0x47, 0xfb,
-	0x7f, 0x77, 0x67, 0xd0, 0xaf, 0xcc, 0x1b, 0xa4, 0xd5, 0x6c, 0x5c, 0xf7, 0x2b, 0x2f, 0x66, 0xcb,
-	0x5c, 0xe7, 0x71, 0x66, 0x84, 0xa7, 0xbd, 0x84, 0xd5, 0xd1, 0x53, 0xd1, 0xeb, 0xd3, 0x25, 0xbe,
-	0x0d, 0xc5, 0x63, 0xaf, 0x7d, 0xcb, 0x92, 0xc5, 0xc8, 0xb8, 0x64, 0x17, 0x8a, 0x0d, 0xec, 0xe2,
-	0x24, 0xde, 0x9d, 0x55, 0x5d, 0x02, 0x24, 0xbe, 0x16, 0xe7, 0x70, 0x08, 0xc5, 0x13, 0x2b, 0xb4,
-	0xcf, 0x98, 0x31, 0x18, 0xe6, 0xf0, 0x10, 0x64, 0x42, 0x4f, 0x7d, 0xec, 0xb9, 0xd6, 0x05, 0xcf,
-	0x63, 0xd1, 0x5c, 0x24, 0xd4, 0xe4, 0x67, 0xf4, 0x04, 0x96, 0x09, 0x3d, 0x0d, 0x7a, 0xad, 0xc0,
-	0xf6, 0x9d, 0x16, 0x2e, 0xcf, 0x71, 0xff, 0x12, 0xa1, 0x87, 0x43, 0x93, 0x66, 0x03, 0x12, 0x41,
-	0x67, 0xe8, 0x31, 0xda, 0x80, 0x02, 0xb3, 0x71, 0xd4, 0x95, 0x5a, 0x49, 0x1f, 0xad, 0xb0, 0x6e,
-	0x7c, 0xc1, 0x24, 0x3c, 0xba, 0xf0, 0xb0, 0xc9, 0x6f, 0x68, 0xdf, 0x24, 0xb8, 0xb7, 0xd3, 0xc1,
-	0x24, 0xac, 0x53, 0x12, 0xfa, 0xd4, 0xbd, 0xeb, 0x06, 0xa2, 0x32, 0x2c, 0xd8, 0xb4, 0xdb, 0xb5,
-	0x48, 0x9b, 0x67, 0x27, 0x9b, 0xc3, 0x23, 0x42, 0x50, 0xb0, 0xfc, 0x4e, 0x50, 0xce, 0xaf, 0xe7,
-	0x37, 0x64, 0x93, 0x7f, 0xd7, 0x5e, 0x43, 0x29, 0x99, 0xdd, 0x8c, 0x9b, 0x16, 0x51, 0xa4, 0x8e,
-	0x5d, 0x57, 0xd8, 0x34, 0x76, 0xcc, 0x88, 0xe4, 0xb7, 0xb8, 0x73, 0x4c, 0xae, 0x28, 0x32, 0x9e,
-	0x32, 0xe6, 0xe4, 0x12, 0xc1, 0x0e, 0xa1, 0x80, 0xed, 0x8e, 0x13, 0x37, 0xe9, 0xed, 0xa0, 0x5f,
-	0x29, 0x18, 0xf5, 0xbd, 0xe6, 0x75, 0xbf, 0xb2, 0x35, 0x6b, 0x8f, 0xea, 0x7b, 0x4d, 0x93, 0x83,
-	0xc5, 0xc4, 0x12, 0x5f, 0x9e, 0x2e, 0xe9, 0x11, 0xb1, 0x6e, 0x53, 0xae, 0x18, 0x19, 0x97, 0x7b,
-	0x3e, 0x24, 0x96, 0x88, 0x77, 0x9c, 0xdc, 0x8b, 0xbf, 0x2e, 0x79, 0x92, 0x56, 0x89, 0x0c, 0x86,
-	0xb4, 0x62, 0xc6, 0x7f, 0x4e, 0xab, 0x18, 0x74, 0x86, 0x0e, 0x4f, 0x4f, 0xab, 0x67, 0x6f, 0x40,
-	0x1e, 0x99, 0xd0, 0x22, 0x14, 0xf6, 0x0f, 0xf6, 0x8d, 0xb5, 0x1c, 0x5a, 0x82, 0x85, 0xba, 0x69,
-	0xec, 0x1c, 0x19, 0x8d, 0x35, 0x89, 0x1d, 0x8e, 0x3f, 0x35, 0xf8, 0x61, 0x8e, 0x1d, 0x1a, 0xc6,
-	0x07, 0x83, 0x1d, 0xf2, 0xb5, 0x1f, 0x79, 0x90, 0xd9, 0x1e, 0x7f, 0x64, 0xd8, 0xa8, 0x09, 0x30,
-	0x56, 0x7a, 0xf4, 0x48, 0x78, 0x35, 0xf5, 0xd3, 0xa1, 0x3c, 0xbe, 0xc1, 0x1b, 0x57, 0xf9, 0x0e,
-	0x16, 0x62, 0xcd, 0x46, 0x0f, 0x84, 0x9b, 0xc9, 0x9f, 0x0c, 0x45, 0xc9, 0x72, 0xc5, 0x08, 0x4d,
-	0x80, 0xb1, 0x06, 0x27, 0x92, 0x49, 0x89, 0x7a, 0x22, 0x99, 0xb4, 0x70, 0x33, 0xa8, 0xb1, 0x94,
-	0x26, 0xa0, 0x52, 0x7a, 0x9e, 0x80, 0x4a, 0xeb, 0x2f, 0x7a, 0x0f, 0x30, 0x96, 0xca, 0x04, 0x54,
-	0x4a, 0x96, 0x13, 0x50, 0x69, 0x7d, 0xdd, 0x94, 0xd0, 0x01, 0x2c, 0x8b, 0x9a, 0x83, 0x54, 0x21,
-	0x20, 0x43, 0x2a, 0x95, 0xca, 0x8d, 0xfe, 0x08, 0xb2, 0xf6, 0x7b, 0x0e, 0x64, 0xb6, 0x3f, 0x13,
-	0xe3, 0xe4, 0x2b, 0x95, 0x1e, 0xa7, 0xc0, 0xb6, 0x8c, 0x71, 0x26, 0x64, 0x61, 0xd4, 0xc1, 0x14,
-	0x54, 0x8a, 0xb8, 0x19, 0x1d, 0x9c, 0x84, 0x1a, 0x4b, 0x40, 0xc6, 0x5c, 0x6f, 0x82, 0x4a, 0xeb,
-	0x46, 0xbc, 0x64, 0x1c, 0x67, 0x62, 0xc9, 0x44, 0x10, 0x25, 0xcb, 0x35, 0x31, 0x4e, 0x4e, 0xd1,
-	0xf4, 0x38, 0x45, 0x39, 0x48, 0x8f, 0x33, 0xc1, 0xeb, 0x4d, 0x69, 0xb7, 0xfc, 0x7d, 0xa0, 0x4a,
-	0x97, 0x03, 0x55, 0xfa, 0x35, 0x50, 0xa5, 0xaf, 0x57, 0x6a, 0xee, 0xf2, 0x4a, 0xcd, 0xfd, 0xbc,
-	0x52, 0x73, 0xad, 0xff, 0xf8, 0x7f, 0xb0, 0xad, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x95, 0xe4,
-	0xf5, 0x10, 0xf9, 0x09, 0x00, 0x00,
+	// 811 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0xc1, 0x4e, 0xdb, 0x4a,
+	0x14, 0x8d, 0x49, 0x78, 0xe0, 0x0b, 0x0f, 0xc8, 0xbc, 0x3c, 0x29, 0x35, 0x34, 0xa1, 0xe9, 0x06,
+	0x55, 0x6a, 0x52, 0x85, 0xaa, 0x42, 0x6d, 0xa5, 0x16, 0x12, 0x8b, 0x46, 0xa5, 0x50, 0x19, 0x10,
+	0x4b, 0xe4, 0x24, 0xa3, 0x60, 0xe4, 0xcc, 0xb8, 0xb6, 0x53, 0x89, 0xbf, 0xe8, 0xaa, 0xab, 0xfe,
+	0x4e, 0xa5, 0x2e, 0x59, 0x76, 0x15, 0x55, 0xe1, 0x2f, 0x58, 0x55, 0x33, 0x76, 0x92, 0x19, 0xdb,
+	0x48, 0x98, 0x96, 0x0d, 0xca, 0xcc, 0x9d, 0x7b, 0xe6, 0xdc, 0xf1, 0x39, 0xf7, 0x02, 0xff, 0x9b,
+	0x8e, 0x55, 0xeb, 0xd3, 0x2e, 0xb6, 0x83, 0xbf, 0x55, 0xc7, 0xa5, 0x3e, 0x45, 0xaa, 0x6b, 0x92,
+	0x2a, 0xdf, 0xd0, 0x0a, 0x3d, 0xda, 0xa3, 0x7c, 0xb7, 0xc6, 0x7e, 0x05, 0x07, 0xb4, 0x97, 0x3d,
+	0xcb, 0x3f, 0x1b, 0xb4, 0xab, 0x1d, 0xda, 0xaf, 0x51, 0x42, 0x3d, 0xc7, 0xa5, 0xe7, 0xb8, 0xe3,
+	0xd7, 0x5c, 0x93, 0x3c, 0xf5, 0xac, 0xfe, 0xc0, 0x36, 0x7d, 0xea, 0xd6, 0x18, 0xb8, 0x7f, 0xe1,
+	0x60, 0x2f, 0xf8, 0x1b, 0xe4, 0x56, 0xb6, 0x20, 0xdf, 0x70, 0xb1, 0xe9, 0xe3, 0x7d, 0xda, 0xc5,
+	0x06, 0xfe, 0x34, 0xc0, 0x9e, 0x8f, 0x1e, 0x43, 0x8e, 0xd0, 0x2e, 0x2e, 0x2a, 0xeb, 0xca, 0xc6,
+	0x42, 0x7d, 0xb9, 0xca, 0x08, 0x04, 0x49, 0xfc, 0x14, 0x0f, 0x56, 0x0a, 0x80, 0xc4, 0x4c, 0xcf,
+	0xa1, 0xc4, 0xc3, 0x15, 0x0b, 0x96, 0x76, 0xb1, 0x2f, 0x82, 0x9d, 0xc0, 0x2c, 0x26, 0x6d, 0xab,
+	0xcb, 0xd1, 0xfe, 0xdd, 0xd9, 0x1e, 0x0d, 0xcb, 0xb3, 0x3a, 0x69, 0xb7, 0x9a, 0xd7, 0xc3, 0xf2,
+	0xf3, 0x74, 0xcc, 0xab, 0x3c, 0xcf, 0x08, 0xf0, 0x2a, 0x2f, 0x60, 0x79, 0x72, 0x55, 0x70, 0xfb,
+	0xed, 0x88, 0x6f, 0x41, 0xfe, 0xd8, 0xe9, 0xde, 0xb1, 0x64, 0x31, 0x33, 0x2c, 0xd9, 0x86, 0x7c,
+	0x13, 0xdb, 0x58, 0xc6, 0xbb, 0xb7, 0xaa, 0x0b, 0x80, 0xc4, 0xdb, 0x42, 0x0e, 0x08, 0x56, 0xf6,
+	0x2c, 0x8f, 0x3f, 0x86, 0x17, 0x52, 0x60, 0x75, 0x0a, 0x7b, 0x69, 0x5e, 0xe8, 0x10, 0xf2, 0x27,
+	0xa6, 0xdf, 0x39, 0x13, 0xe1, 0xd0, 0x2a, 0xa8, 0x84, 0x9e, 0xba, 0xd8, 0xb1, 0xcd, 0x0b, 0x9e,
+	0x3e, 0x6f, 0xcc, 0x13, 0x6a, 0xf0, 0x35, 0x7a, 0x04, 0x8b, 0x84, 0x9e, 0x7a, 0x83, 0xb6, 0xd7,
+	0x71, 0xad, 0x36, 0x2e, 0xce, 0xf0, 0xf8, 0x02, 0xa1, 0x87, 0xe3, 0xad, 0x4a, 0x07, 0x90, 0x08,
+	0x9a, 0x82, 0x0f, 0xda, 0x80, 0x1c, 0xdb, 0xe3, 0xa8, 0x4b, 0xf5, 0x42, 0x75, 0x62, 0x88, 0xaa,
+	0xfe, 0x19, 0x13, 0xff, 0xe8, 0xc2, 0xc1, 0x06, 0x3f, 0x51, 0xf9, 0xa6, 0xc0, 0x7f, 0xdb, 0x3d,
+	0x4c, 0xfc, 0x06, 0x25, 0xbe, 0x4b, 0xed, 0xfb, 0xfe, 0x1c, 0xa8, 0x08, 0x73, 0x1d, 0xda, 0xef,
+	0x9b, 0xa4, 0xcb, 0xd9, 0xa9, 0xc6, 0x78, 0x89, 0x10, 0xe4, 0x4c, 0xb7, 0xe7, 0x15, 0xb3, 0xeb,
+	0xd9, 0x0d, 0xd5, 0xe0, 0xbf, 0x2b, 0xaf, 0xa0, 0x20, 0xb3, 0x4b, 0xa9, 0xdb, 0xc0, 0x70, 0x0d,
+	0x6c, 0xdb, 0x82, 0x6e, 0xd9, 0x32, 0x21, 0x93, 0x9f, 0xe2, 0xc1, 0xa9, 0x55, 0x83, 0xcc, 0x50,
+	0x33, 0x98, 0x5b, 0x55, 0x04, 0x3b, 0x84, 0x1c, 0xee, 0xf4, 0xac, 0xf0, 0x91, 0xde, 0x8c, 0x86,
+	0xe5, 0x9c, 0xde, 0xd8, 0x6d, 0x5d, 0x0f, 0xcb, 0x9b, 0x69, 0xdf, 0xa8, 0xb1, 0xdb, 0x32, 0x38,
+	0x58, 0x68, 0x53, 0xf1, 0xe6, 0xdb, 0x91, 0x9e, 0xd8, 0xf4, 0x2e, 0xe5, 0x8a, 0x99, 0x61, 0xb9,
+	0xe7, 0x63, 0x9b, 0x8a, 0x78, 0xc7, 0xb2, 0x2e, 0xfe, 0xb8, 0xe4, 0xa8, 0x49, 0x25, 0x06, 0x63,
+	0x5b, 0xb1, 0xcd, 0xbf, 0x6e, 0xab, 0x10, 0x34, 0xc5, 0x0b, 0xa7, 0xb0, 0x55, 0xd8, 0x5e, 0x44,
+	0xe2, 0xe3, 0xf6, 0x92, 0xfe, 0xde, 0x27, 0xaf, 0x41, 0x9d, 0x5c, 0x80, 0xe6, 0x21, 0xb7, 0x7f,
+	0xb0, 0xaf, 0xaf, 0x64, 0xd0, 0x02, 0xcc, 0x35, 0x0c, 0x7d, 0xfb, 0x48, 0x6f, 0xae, 0x28, 0x6c,
+	0x71, 0xfc, 0xb1, 0xc9, 0x17, 0x33, 0x6c, 0xd1, 0xd4, 0xf7, 0x74, 0xb6, 0xc8, 0xd6, 0xbf, 0xe6,
+	0x40, 0x65, 0xae, 0xf8, 0xc0, 0x98, 0xa2, 0x16, 0xc0, 0x74, 0x0a, 0xa1, 0x35, 0xa1, 0x86, 0xd8,
+	0x58, 0xd3, 0x1e, 0xde, 0x10, 0x0d, 0xb9, 0xbf, 0x85, 0xb9, 0x70, 0x9e, 0xa0, 0x07, 0xc2, 0x49,
+	0x79, 0x9c, 0x69, 0x5a, 0x52, 0x28, 0x44, 0x68, 0x01, 0x4c, 0xe7, 0x83, 0x44, 0x26, 0x36, 0x70,
+	0x24, 0x32, 0xf1, 0xa1, 0xc2, 0xa0, 0xa6, 0x6d, 0x5e, 0x82, 0x8a, 0xcd, 0x1a, 0x09, 0x2a, 0x3e,
+	0x1b, 0xd0, 0x7b, 0x80, 0x69, 0xe3, 0x95, 0xa0, 0x62, 0x4d, 0x5e, 0x82, 0x8a, 0x77, 0xeb, 0x67,
+	0x0a, 0x7a, 0x07, 0xea, 0x64, 0xa8, 0xa0, 0x55, 0xe1, 0x74, 0x74, 0xfc, 0x68, 0x6b, 0xc9, 0xc1,
+	0x09, 0xd2, 0x01, 0x2c, 0x8a, 0xbd, 0x10, 0x95, 0x84, 0xf3, 0x09, 0x2d, 0x5c, 0x2b, 0xdf, 0x18,
+	0x0f, 0x20, 0xeb, 0xdf, 0xb3, 0xa0, 0x32, 0x7d, 0x45, 0x84, 0xc1, 0xa5, 0x1e, 0x17, 0x86, 0xd0,
+	0x05, 0x12, 0x84, 0x21, 0xb5, 0xab, 0xc9, 0xb7, 0x88, 0x41, 0xc5, 0x1a, 0x4a, 0xc2, 0xb7, 0x88,
+	0x42, 0x4d, 0x5b, 0x53, 0x82, 0x42, 0x6e, 0x82, 0x8a, 0xf7, 0xb3, 0x50, 0xae, 0x1c, 0x27, 0x22,
+	0x57, 0x11, 0x44, 0x4b, 0x0a, 0x45, 0x84, 0xc1, 0x2d, 0x1c, 0x17, 0x86, 0xe8, 0xf6, 0xb8, 0x30,
+	0x24, 0xdf, 0x4f, 0x85, 0x11, 0x60, 0x45, 0x85, 0x21, 0x41, 0xad, 0x25, 0x07, 0xc7, 0x48, 0x3b,
+	0xc5, 0x1f, 0xa3, 0x92, 0x72, 0x39, 0x2a, 0x29, 0xbf, 0x46, 0x25, 0xe5, 0xcb, 0x55, 0x29, 0x73,
+	0x79, 0x55, 0xca, 0xfc, 0xbc, 0x2a, 0x65, 0xda, 0xff, 0xf0, 0xff, 0x59, 0x37, 0x7f, 0x07, 0x00,
+	0x00, 0xff, 0xff, 0x68, 0x0b, 0xae, 0xf1, 0x29, 0x0b, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1131,6 +1298,7 @@ type NodeModelClient interface {
 	UpdateNode(ctx context.Context, in *UpdateNodeRequest, opts ...grpc.CallOption) (*UpdateNodeResponse, error)
 	DeleteNode(ctx context.Context, in *DeleteNodeRequest, opts ...grpc.CallOption) (*DeleteNodeResponse, error)
 	WatchNodes(ctx context.Context, in *WatchNodesRequest, opts ...grpc.CallOption) (NodeModel_WatchNodesClient, error)
+	ListNodes(ctx context.Context, in *ListNodesRequest, opts ...grpc.CallOption) (NodeModel_ListNodesClient, error)
 	AgentControl(ctx context.Context, in *AgentControlRequest, opts ...grpc.CallOption) (*AgentControlResponse, error)
 }
 
@@ -1210,6 +1378,38 @@ func (x *nodeModelWatchNodesClient) Recv() (*WatchNodesResponse, error) {
 	return m, nil
 }
 
+func (c *nodeModelClient) ListNodes(ctx context.Context, in *ListNodesRequest, opts ...grpc.CallOption) (NodeModel_ListNodesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_NodeModel_serviceDesc.Streams[1], "/ran.model.NodeModel/ListNodes", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &nodeModelListNodesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type NodeModel_ListNodesClient interface {
+	Recv() (*ListNodesResponse, error)
+	grpc.ClientStream
+}
+
+type nodeModelListNodesClient struct {
+	grpc.ClientStream
+}
+
+func (x *nodeModelListNodesClient) Recv() (*ListNodesResponse, error) {
+	m := new(ListNodesResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *nodeModelClient) AgentControl(ctx context.Context, in *AgentControlRequest, opts ...grpc.CallOption) (*AgentControlResponse, error) {
 	out := new(AgentControlResponse)
 	err := c.cc.Invoke(ctx, "/ran.model.NodeModel/AgentControl", in, out, opts...)
@@ -1226,6 +1426,7 @@ type NodeModelServer interface {
 	UpdateNode(context.Context, *UpdateNodeRequest) (*UpdateNodeResponse, error)
 	DeleteNode(context.Context, *DeleteNodeRequest) (*DeleteNodeResponse, error)
 	WatchNodes(*WatchNodesRequest, NodeModel_WatchNodesServer) error
+	ListNodes(*ListNodesRequest, NodeModel_ListNodesServer) error
 	AgentControl(context.Context, *AgentControlRequest) (*AgentControlResponse, error)
 }
 
@@ -1247,6 +1448,9 @@ func (*UnimplementedNodeModelServer) DeleteNode(ctx context.Context, req *Delete
 }
 func (*UnimplementedNodeModelServer) WatchNodes(req *WatchNodesRequest, srv NodeModel_WatchNodesServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchNodes not implemented")
+}
+func (*UnimplementedNodeModelServer) ListNodes(req *ListNodesRequest, srv NodeModel_ListNodesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListNodes not implemented")
 }
 func (*UnimplementedNodeModelServer) AgentControl(ctx context.Context, req *AgentControlRequest) (*AgentControlResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AgentControl not implemented")
@@ -1349,6 +1553,27 @@ func (x *nodeModelWatchNodesServer) Send(m *WatchNodesResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _NodeModel_ListNodes_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ListNodesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(NodeModelServer).ListNodes(m, &nodeModelListNodesServer{stream})
+}
+
+type NodeModel_ListNodesServer interface {
+	Send(*ListNodesResponse) error
+	grpc.ServerStream
+}
+
+type nodeModelListNodesServer struct {
+	grpc.ServerStream
+}
+
+func (x *nodeModelListNodesServer) Send(m *ListNodesResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _NodeModel_AgentControl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AgentControlRequest)
 	if err := dec(in); err != nil {
@@ -1398,6 +1623,11 @@ var _NodeModel_serviceDesc = grpc.ServiceDesc{
 			Handler:       _NodeModel_WatchNodes_Handler,
 			ServerStreams: true,
 		},
+		{
+			StreamName:    "ListNodes",
+			Handler:       _NodeModel_ListNodes_Handler,
+			ServerStreams: true,
+		},
 	},
 	Metadata: "api/model/model.proto",
 }
@@ -1411,6 +1641,7 @@ type CellModelClient interface {
 	UpdateCell(ctx context.Context, in *UpdateCellRequest, opts ...grpc.CallOption) (*UpdateCellResponse, error)
 	GetCell(ctx context.Context, in *GetCellRequest, opts ...grpc.CallOption) (*GetCellResponse, error)
 	WatchCells(ctx context.Context, in *WatchCellsRequest, opts ...grpc.CallOption) (CellModel_WatchCellsClient, error)
+	ListCells(ctx context.Context, in *ListCellsRequest, opts ...grpc.CallOption) (CellModel_ListCellsClient, error)
 }
 
 type cellModelClient struct {
@@ -1489,6 +1720,38 @@ func (x *cellModelWatchCellsClient) Recv() (*WatchCellsResponse, error) {
 	return m, nil
 }
 
+func (c *cellModelClient) ListCells(ctx context.Context, in *ListCellsRequest, opts ...grpc.CallOption) (CellModel_ListCellsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_CellModel_serviceDesc.Streams[1], "/ran.model.CellModel/ListCells", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &cellModelListCellsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type CellModel_ListCellsClient interface {
+	Recv() (*ListCellsResponse, error)
+	grpc.ClientStream
+}
+
+type cellModelListCellsClient struct {
+	grpc.ClientStream
+}
+
+func (x *cellModelListCellsClient) Recv() (*ListCellsResponse, error) {
+	m := new(ListCellsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // CellModelServer is the server API for CellModel service.
 type CellModelServer interface {
 	CreateCell(context.Context, *CreateCellRequest) (*CreateCellResponse, error)
@@ -1496,6 +1759,7 @@ type CellModelServer interface {
 	UpdateCell(context.Context, *UpdateCellRequest) (*UpdateCellResponse, error)
 	GetCell(context.Context, *GetCellRequest) (*GetCellResponse, error)
 	WatchCells(*WatchCellsRequest, CellModel_WatchCellsServer) error
+	ListCells(*ListCellsRequest, CellModel_ListCellsServer) error
 }
 
 // UnimplementedCellModelServer can be embedded to have forward compatible implementations.
@@ -1516,6 +1780,9 @@ func (*UnimplementedCellModelServer) GetCell(ctx context.Context, req *GetCellRe
 }
 func (*UnimplementedCellModelServer) WatchCells(req *WatchCellsRequest, srv CellModel_WatchCellsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WatchCells not implemented")
+}
+func (*UnimplementedCellModelServer) ListCells(req *ListCellsRequest, srv CellModel_ListCellsServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListCells not implemented")
 }
 
 func RegisterCellModelServer(s *grpc.Server, srv CellModelServer) {
@@ -1615,6 +1882,27 @@ func (x *cellModelWatchCellsServer) Send(m *WatchCellsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _CellModel_ListCells_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ListCellsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CellModelServer).ListCells(m, &cellModelListCellsServer{stream})
+}
+
+type CellModel_ListCellsServer interface {
+	Send(*ListCellsResponse) error
+	grpc.ServerStream
+}
+
+type cellModelListCellsServer struct {
+	grpc.ServerStream
+}
+
+func (x *cellModelListCellsServer) Send(m *ListCellsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 var _CellModel_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ran.model.CellModel",
 	HandlerType: (*CellModelServer)(nil),
@@ -1640,6 +1928,11 @@ var _CellModel_serviceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "WatchCells",
 			Handler:       _CellModel_WatchCells_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ListCells",
+			Handler:       _CellModel_ListCells_Handler,
 			ServerStreams: true,
 		},
 	},
@@ -1873,6 +2166,64 @@ func (m *DeleteNodeResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *ListNodesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListNodesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListNodesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *ListNodesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListNodesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListNodesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Node != nil {
+		{
+			size, err := m.Node.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintModel(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -2351,6 +2702,64 @@ func (m *WatchCellsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ListCellsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListCellsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListCellsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *ListCellsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListCellsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListCellsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Cell != nil {
+		{
+			size, err := m.Cell.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintModel(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintModel(dAtA []byte, offset int, v uint64) int {
 	offset -= sovModel(v)
 	base := offset
@@ -2449,6 +2858,28 @@ func (m *DeleteNodeResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	return n
+}
+
+func (m *ListNodesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *ListNodesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Node != nil {
+		l = m.Node.Size()
+		n += 1 + l + sovModel(uint64(l))
+	}
 	return n
 }
 
@@ -2635,6 +3066,28 @@ func (m *WatchCellsResponse) Size() (n int) {
 	}
 	if m.Type != 0 {
 		n += 1 + sovModel(uint64(m.Type))
+	}
+	return n
+}
+
+func (m *ListCellsRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *ListCellsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Cell != nil {
+		l = m.Cell.Size()
+		n += 1 + l + sovModel(uint64(l))
 	}
 	return n
 }
@@ -3191,6 +3644,148 @@ func (m *DeleteNodeResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: DeleteNodeResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipModel(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListNodesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowModel
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListNodesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListNodesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipModel(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListNodesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowModel
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListNodesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListNodesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowModel
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthModel
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthModel
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Node == nil {
+				m.Node = &types.Node{}
+			}
+			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipModel(dAtA[iNdEx:])
@@ -4388,6 +4983,148 @@ func (m *WatchCellsResponse) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipModel(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListCellsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowModel
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListCellsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListCellsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipModel(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthModel
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListCellsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowModel
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListCellsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListCellsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cell", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowModel
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthModel
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthModel
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Cell == nil {
+				m.Cell = &types.Cell{}
+			}
+			if err := m.Cell.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipModel(dAtA[iNdEx:])

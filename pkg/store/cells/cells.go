@@ -27,20 +27,23 @@ var log = liblog.GetLogger("store", "cells")
 
 // Store tracks inventory of simulated cells.
 type Store interface {
-	// AddCell adds the specified cell to the registry
+	// Add adds the specified cell to the registry
 	Add(ctx context.Context, cell *model.Cell) error
 
-	// GetCell retrieves the cell with the specified ECGI
+	// Get retrieves the cell with the specified ECGI
 	Get(ctx context.Context, ecgi types.ECGI) (*model.Cell, error)
 
-	// UpdateCell updates the cell
+	// Update updates the cell
 	Update(ctx context.Context, Cell *model.Cell) error
 
-	// DeleteCell deletes the cell with the specified ECGI
+	// Delete deletes the cell with the specified ECGI
 	Delete(ctx context.Context, ecgi types.ECGI) (*model.Cell, error)
 
-	// WatchCells watches the cell inventory events using the supplied channel
+	// Watch watches the cell inventory events using the supplied channel
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
+
+	// List list all of the cells
+	List(ctx context.Context) ([]*model.Cell, error)
 
 	// GetRandomCell retrieves a random cell from the registry
 	GetRandomCell() (*model.Cell, error)
@@ -53,7 +56,7 @@ type WatchOptions struct {
 }
 
 type store struct {
-	lock      sync.RWMutex
+	mu        sync.RWMutex
 	cells     map[types.ECGI]*model.Cell
 	nodeStore nodes.Store
 	watchers  *watcher.Watchers
@@ -64,7 +67,7 @@ func NewCellRegistry(cells map[string]model.Cell, nodeStore nodes.Store) Store {
 	log.Infof("Creating registry from model with %d cells", len(cells))
 	watchers := watcher.NewWatchers()
 	reg := &store{
-		lock:      sync.RWMutex{},
+		mu:        sync.RWMutex{},
 		cells:     make(map[types.ECGI]*model.Cell),
 		nodeStore: nodeStore,
 		watchers:  watchers,
@@ -82,8 +85,8 @@ func NewCellRegistry(cells map[string]model.Cell, nodeStore nodes.Store) Store {
 
 // Add adds a cell
 func (s *store) Add(ctx context.Context, cell *model.Cell) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if _, ok := s.cells[cell.ECGI]; ok {
 		return errors.New(errors.NotFound, "cell with EnbID already exists")
 	}
@@ -101,8 +104,8 @@ func (s *store) Add(ctx context.Context, cell *model.Cell) error {
 
 // Get gets a cell
 func (s *store) Get(ctx context.Context, ecgi types.ECGI) (*model.Cell, error) {
-	s.lock.RLock()
-	defer s.lock.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	if cell, ok := s.cells[ecgi]; ok {
 		return cell, nil
 	}
@@ -112,8 +115,8 @@ func (s *store) Get(ctx context.Context, ecgi types.ECGI) (*model.Cell, error) {
 
 // Update updates a cell
 func (s *store) Update(ctx context.Context, cell *model.Cell) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if _, ok := s.cells[cell.ECGI]; ok {
 		s.cells[cell.ECGI] = cell
 		cellEvent := event.Event{
@@ -130,8 +133,8 @@ func (s *store) Update(ctx context.Context, cell *model.Cell) error {
 
 // Delete deletes a cell
 func (s *store) Delete(ctx context.Context, ecgi types.ECGI) (*model.Cell, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if cell, ok := s.cells[ecgi]; ok {
 		delete(s.cells, ecgi)
 		deleteEvent := event.Event{
@@ -181,6 +184,17 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 
 	}
 	return nil
+}
+
+// List returns list of cells
+func (s *store) List(ctx context.Context) ([]*model.Cell, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	list := make([]*model.Cell, 0, len(s.cells))
+	for _, cell := range s.cells {
+		list = append(list, cell)
+	}
+	return list, nil
 }
 
 func (s *store) GetRandomCell() (*model.Cell, error) {

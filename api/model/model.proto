@@ -18,6 +18,7 @@ service NodeModel {
     rpc UpdateNode(UpdateNodeRequest) returns (UpdateNodeResponse);
     rpc DeleteNode(DeleteNodeRequest) returns (DeleteNodeResponse);
     rpc WatchNodes(WatchNodesRequest) returns (stream WatchNodesResponse);
+    rpc ListNodes(ListNodesRequest) returns (stream ListNodesResponse);
 
     rpc AgentControl(AgentControlRequest) returns (AgentControlResponse);
 }
@@ -52,6 +53,13 @@ message DeleteNodeRequest {
 message DeleteNodeResponse {
 }
 
+message ListNodesRequest {
+}
+
+message ListNodesResponse {
+    ran.types.Node node = 1;
+}
+
 message WatchNodesRequest {
     bool no_replay = 1;
     bool no_subscribe = 2;
@@ -82,7 +90,9 @@ service CellModel {
     rpc UpdateCell(UpdateCellRequest) returns (UpdateCellResponse);
     rpc GetCell(GetCellRequest) returns (GetCellResponse);
     rpc WatchCells(WatchCellsRequest) returns (stream WatchCellsResponse);
+    rpc ListCells(ListCellsRequest) returns (stream ListCellsResponse);
 }
+
 
 message CreateCellRequest {
     ran.types.Cell Cell = 1;
@@ -122,6 +132,14 @@ message WatchCellsResponse {
     ran.types.Cell Cell = 1;
     EventType type = 2;
 }
+
+message ListCellsRequest {
+}
+
+message ListCellsResponse {
+    ran.types.Cell Cell = 1;
+}
+
 
 
 // Change event type

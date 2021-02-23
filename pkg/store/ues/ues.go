@@ -249,5 +249,6 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 
 		}()
 	}
+
 	return nil
 }

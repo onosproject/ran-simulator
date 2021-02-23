@@ -7,6 +7,7 @@ package cli
 
 import (
 	"context"
+
 	"github.com/onosproject/onos-lib-go/pkg/cli"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
 
@@ -38,16 +39,15 @@ func runGetUEsCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	defer conn.Close()
-
+	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
+		Output("%-16s %-16s %-5s\n", "IMSI", "Serving Cell", "Admitted")
+	}
 	client := simapi.NewTrafficClient(conn)
 	stream, err := client.ListUes(context.Background(), &simapi.ListUesRequest{})
 	if err != nil {
 		return err
 	}
 
-	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
-		Output("%-16s %-16s %-5s\n", "IMSI", "Serving Cell", "Admitted")
-	}
 	for {
 		r, err := stream.Recv()
 		if err != nil {

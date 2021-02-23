@@ -103,6 +103,24 @@ func (s *Server) DeleteNode(ctx context.Context, request *modelapi.DeleteNodeReq
 	return &modelapi.DeleteNodeResponse{}, nil
 }
 
+// ListNodes list of e2 nodes
+func (s *Server) ListNodes(request *modelapi.ListNodesRequest, server modelapi.NodeModel_ListNodesServer) error {
+	nodeList, _ := s.nodeStore.List(server.Context())
+	log.Info("List of nodes:", nodeList)
+	for _, node := range nodeList {
+		log.Info("Node:", node)
+		resp := &modelapi.ListNodesResponse{
+			Node: nodeToAPI(node),
+		}
+		err := server.Send(resp)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+	}
+	return nil
+}
+
 func eventType(nodeEvent nodes.NodeEvent) modelapi.EventType {
 	if nodeEvent == nodes.Created {
 		return modelapi.EventType_CREATED
