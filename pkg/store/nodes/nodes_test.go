@@ -7,18 +7,14 @@ package nodes
 import (
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
 )
 
 func TestNodes(t *testing.T) {
-	m := model.Model{}
-	bytes, err := ioutil.ReadFile("../../model/test.yaml")
-	assert.NoError(t, err)
-	err = yaml.Unmarshal(bytes, &m)
+	m := &model.Model{}
+	err := model.LoadConfig(m, "../../model/test")
 	assert.NoError(t, err)
 	t.Log(m)
 

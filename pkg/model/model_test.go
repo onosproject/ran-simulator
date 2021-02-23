@@ -5,19 +5,16 @@
 package model
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
-	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
+
+	"github.com/onosproject/ran-simulator/api/types"
 )
 
 func TestModel(t *testing.T) {
-	model := Model{}
-	bytes, err := ioutil.ReadFile("test.yaml")
-	assert.NoError(t, err)
-	err = yaml.Unmarshal(bytes, &model)
+	model := &Model{}
+	err := LoadConfig(model, "test")
 	assert.NoError(t, err)
 	t.Log(model)
 	assert.Equal(t, 2, len(model.Controllers))
