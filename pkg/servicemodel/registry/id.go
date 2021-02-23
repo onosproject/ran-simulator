@@ -19,3 +19,10 @@ const (
 	// Rc
 	Rc
 )
+
+var StringToRanFunctionID = map[string]RanFunctionID {
+	"internal": Internal,
+	"kpm": Kpm,
+	"ni": Ni,
+	"rc": Rc,
+}

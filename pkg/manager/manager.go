@@ -156,6 +156,7 @@ func (m *Manager) Close() {
 	m.stopNorthboundServer()
 }
 
+
 func (m *Manager) stopNorthboundServer() {
 	// TODO implementation requires ability to actually stop the server
 }

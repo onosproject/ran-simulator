@@ -40,9 +40,10 @@ const (
 	version       = "v1"
 )
 
-// Client kpm service model client
+// Client rc service model client
 type Client struct {
 	ServiceModel *registry.ServiceModel
+	Store      *RcStore
 }
 
 // NewServiceModel creates a new service model
@@ -64,6 +65,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 
 	rcClient := &Client{
 		ServiceModel: &rcSm,
+		Store: &RcStore{},
 	}
 
 	rcSm.Client = rcClient
@@ -104,6 +106,9 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
+	LoadRC(node.EnbID, rcClient.Store)
+	log.Info(rcClient.Store)
+
 
 	rcSm.Description = ranFuncDescBytes
 	return rcSm, nil
