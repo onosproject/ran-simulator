@@ -21,22 +21,22 @@ var log = liblog.GetLogger("store", "metrics")
 // Store tracks arbitrary (named) scalar metrics on per entity (cell, node) basis.
 type Store interface {
 	// ListEntities retrieves all entities that presently have metrics associated with them
-	ListEntities(ctx context.Context) []uint64
+	ListEntities(ctx context.Context) ([]uint64, error)
 
 	// Set applies the specified metric value on the given entity
-	Set(ctx context.Context, entityID uint64, name string, value interface{})
+	Set(ctx context.Context, entityID uint64, name string, value interface{}) error
 
 	// Get retrieves the specified metric value on the given entity
 	Get(ctx context.Context, entityID uint64, name string) (interface{}, bool)
 
 	// Delete removes the specified metric
-	Delete(ctx context.Context, entityID uint64, name string)
+	Delete(ctx context.Context, entityID uint64, name string) error
 
 	// DeleteAll removes all metrics for the specified entity
-	DeleteAll(ctx context.Context, entityID uint64)
+	DeleteAll(ctx context.Context, entityID uint64) error
 
 	// Get retrieves all metrics of the specified entity as a map
-	List(ctx context.Context, entityID uint64) map[string]interface{}
+	List(ctx context.Context, entityID uint64) (map[string]interface{}, error)
 
 	// WatchMetrics monitors changes to the metrics
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
@@ -83,7 +83,7 @@ func MetricName(key string) string {
 }
 
 // ListEntities retrieves all entities that presently have metrics associated with them
-func (s *store) ListEntities(ctx context.Context) []uint64 {
+func (s *store) ListEntities(ctx context.Context) ([]uint64, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -98,7 +98,7 @@ func (s *store) ListEntities(ctx context.Context) []uint64 {
 		entities = append(entities, k)
 	}
 
-	return entities
+	return entities, nil
 }
 
 // Generate composite key from entity ID and metric name
@@ -125,12 +125,13 @@ func metricEvent(key string, value interface{}, eventType interface{}) event.Eve
 }
 
 // Set applies the specified metric value on the given entity
-func (s *store) Set(ctx context.Context, entityID uint64, name string, value interface{}) {
+func (s *store) Set(ctx context.Context, entityID uint64, name string, value interface{}) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	k := key(entityID, name)
 	s.metrics[k] = value
 	s.watchers.Send(metricEvent(k, value, Updated))
+	return nil
 }
 
 // Get retrieves the specified metric value on the given entity
@@ -144,15 +145,16 @@ func (s *store) Get(ctx context.Context, entityID uint64, name string) (interfac
 }
 
 // Delete removes the specified metric
-func (s *store) Delete(ctx context.Context, entityID uint64, name string) {
+func (s *store) Delete(ctx context.Context, entityID uint64, name string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	delete(s.metrics, key(entityID, name))
 	s.watchers.Send(metricEvent(name, nil, Deleted))
+	return nil
 }
 
 // DeleteAll removes all metrics for the specified entity
-func (s *store) DeleteAll(ctx context.Context, entityID uint64) {
+func (s *store) DeleteAll(ctx context.Context, entityID uint64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	prefix := entityPrefix(entityID)
@@ -162,10 +164,11 @@ func (s *store) DeleteAll(ctx context.Context, entityID uint64) {
 			s.watchers.Send(metricEvent(k, v, Deleted))
 		}
 	}
+	return nil
 }
 
 // Get retrieves all metrics of the specified entity as a map
-func (s *store) List(ctx context.Context, entityID uint64) map[string]interface{} {
+func (s *store) List(ctx context.Context, entityID uint64) (map[string]interface{}, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	prefix := entityPrefix(entityID)
@@ -175,7 +178,7 @@ func (s *store) List(ctx context.Context, entityID uint64) map[string]interface{
 			metrics[metricName(k, prefix)] = v
 		}
 	}
-	return metrics
+	return metrics, nil
 }
 
 // WatchMetrics monitors changes to the metrics

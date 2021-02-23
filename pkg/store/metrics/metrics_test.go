@@ -23,13 +23,15 @@ func TestMetrics(t *testing.T) {
 
 	_, ok := store.Get(ctx, 123, "foo")
 	assert.False(t, ok)
-	assert.Equal(t, 0, len(store.ListEntities(ctx)))
+	entities, err := store.ListEntities(ctx)
+	assert.Equal(t, 0, len(entities))
+	assert.NoError(t, err)
 
-	store.Set(ctx, 123, "foo", 6.28)
-	store.Set(ctx, 123, "bar", 3.14)
-	store.Set(ctx, 123, "bah", "42")
-	store.Set(ctx, 321, "foo", 2.718)
-	store.Set(ctx, 321, "goo", 1.618)
+	_ = store.Set(ctx, 123, "foo", 6.28)
+	_ = store.Set(ctx, 123, "bar", 3.14)
+	_ = store.Set(ctx, 123, "bah", "42")
+	_ = store.Set(ctx, 321, "foo", 2.718)
+	_ = store.Set(ctx, 321, "goo", 1.618)
 
 	metricEvent := <-ch
 	assert.Equal(t, Updated, metricEvent.Type)
@@ -45,11 +47,15 @@ func TestMetrics(t *testing.T) {
 	v, ok := store.Get(ctx, 123, "foo")
 	assert.True(t, ok)
 	assert.Equal(t, 6.28, v)
-	assert.Equal(t, 2, len(store.ListEntities(ctx)), "incorrect entity count")
-	assert.Equal(t, 3, len(store.List(ctx, 123)), "incorrect metric count")
 
-	store.Delete(ctx, 123, "bah")
-	assert.Equal(t, 2, len(store.List(ctx, 123)), "incorrect metric count")
+	entities, _ = store.ListEntities(ctx)
+	assert.Equal(t, 2, len(entities), "incorrect entity count")
+	metrics, _ := store.List(ctx, 123)
+	assert.Equal(t, 3, len(metrics), "incorrect metric count")
+
+	_ = store.Delete(ctx, 123, "bah")
+	metrics, _ = store.List(ctx, 123)
+	assert.Equal(t, 2, len(metrics), "incorrect metric count")
 
 	metricEvent = <-ch
 	assert.Equal(t, Deleted, metricEvent.Type)
@@ -57,9 +63,11 @@ func TestMetrics(t *testing.T) {
 	_, ok = store.Get(ctx, 123, "bah")
 	assert.False(t, ok)
 
-	store.DeleteAll(ctx, 123)
-	assert.Equal(t, 1, len(store.ListEntities(ctx)), "incorrect entity count")
-	assert.Equal(t, 0, len(store.List(ctx, 123)), "incorrect metric count")
+	_ = store.DeleteAll(ctx, 123)
+	entities, _ = store.ListEntities(ctx)
+	assert.Equal(t, 1, len(entities), "incorrect entity count")
+	metrics, _ = store.List(ctx, 123)
+	assert.Equal(t, 0, len(metrics), "incorrect metric count")
 
 	metricEvent = <-ch
 	assert.Equal(t, Deleted, metricEvent.Type)
