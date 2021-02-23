@@ -7,12 +7,10 @@ package metrics
 import (
 	"context"
 	"github.com/onosproject/ran-simulator/pkg/store/event"
-	"github.com/onosproject/ran-simulator/pkg/store/watcher"
-	"sync"
 )
 
-// MetricsStore tracks arbitrary (named) scalar metrics (as float64 values) on per entity (cell, node) basis.
-type MetricsStore interface {
+// Store tracks arbitrary (named) scalar metrics (as float64 values) on per entity (cell, node) basis.
+type Store interface {
 	// ListEntities retrieves all entities that presently have metrics associated with them
 	ListEntities(ctx context.Context) []uint64
 
@@ -42,6 +40,7 @@ type WatchOptions struct {
 	Entities []uint64
 }
 
+/*
 // Structure to track named metrics as floats for a single entity
 type metrics struct {
 	mu      sync.RWMutex
@@ -53,3 +52,4 @@ type store struct {
 	metrics  map[uint64]metrics
 	watchers *watcher.Watchers
 }
+*/
