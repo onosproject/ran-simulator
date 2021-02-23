@@ -7,19 +7,21 @@ package cells
 
 import (
 	"context"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	modelapi "github.com/onosproject/ran-simulator/api/model"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"github.com/onosproject/ran-simulator/pkg/store/event"
 	"google.golang.org/grpc"
 )
 
 var log = liblog.GetLogger("api", "cells")
 
 // NewService returns a new model Service
-func NewService(cellStore cells.CellRegistry) service.Service {
+func NewService(cellStore cells.Store) service.Service {
 	return &Service{
 		cellStore: cellStore,
 	}
@@ -28,7 +30,7 @@ func NewService(cellStore cells.CellRegistry) service.Service {
 // Service is a Service implementation for administration.
 type Service struct {
 	service.Service
-	cellStore cells.CellRegistry
+	cellStore cells.Store
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
@@ -41,7 +43,7 @@ func (s *Service) Register(r *grpc.Server) {
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
-	cellStore cells.CellRegistry
+	cellStore cells.Store
 }
 
 func cellToAPI(cell *model.Cell) *types.Cell {
@@ -82,7 +84,8 @@ func sectorToAPI(sector model.Sector) *types.Sector {
 
 // CreateCell creates a new simulated cell
 func (s *Server) CreateCell(ctx context.Context, request *modelapi.CreateCellRequest) (*modelapi.CreateCellResponse, error) {
-	err := s.cellStore.AddCell(cellToModel(request.Cell))
+	log.Debugf("Received create cell request: %v", request)
+	err := s.cellStore.Add(ctx, cellToModel(request.Cell))
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +94,8 @@ func (s *Server) CreateCell(ctx context.Context, request *modelapi.CreateCellReq
 
 // GetCell retrieves the specified simulated cell
 func (s *Server) GetCell(ctx context.Context, request *modelapi.GetCellRequest) (*modelapi.GetCellResponse, error) {
-	node, err := s.cellStore.GetCell(request.ECGI)
+	log.Debugf("Received get cell request: %v", request)
+	node, err := s.cellStore.Get(ctx, request.ECGI)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +104,8 @@ func (s *Server) GetCell(ctx context.Context, request *modelapi.GetCellRequest) 
 
 // UpdateCell updates the specified simulated cell
 func (s *Server) UpdateCell(ctx context.Context, request *modelapi.UpdateCellRequest) (*modelapi.UpdateCellResponse, error) {
-	err := s.cellStore.UpdateCell(cellToModel(request.Cell))
+	log.Debugf("Received update cell request: %v", request)
+	err := s.cellStore.Update(ctx, cellToModel(request.Cell))
 	if err != nil {
 		return nil, err
 	}
@@ -109,35 +114,58 @@ func (s *Server) UpdateCell(ctx context.Context, request *modelapi.UpdateCellReq
 
 // DeleteCell deletes the specified simulated cell
 func (s *Server) DeleteCell(ctx context.Context, request *modelapi.DeleteCellRequest) (*modelapi.DeleteCellResponse, error) {
-	_, err := s.cellStore.DeleteCell(request.ECGI)
+	log.Debugf("Received delete cell request: %v", request)
+	_, err := s.cellStore.Delete(ctx, request.ECGI)
 	if err != nil {
 		return nil, err
 	}
 	return &modelapi.DeleteCellResponse{}, nil
 }
 
-func eventType(t uint8) modelapi.EventType {
-	if t == cells.ADDED {
+func eventType(cellEvent cells.CellEvent) modelapi.EventType {
+	if cellEvent == cells.Created {
 		return modelapi.EventType_CREATED
-	} else if t == cells.UPDATED {
+	} else if cellEvent == cells.Updated {
 		return modelapi.EventType_UPDATED
-	} else if t == cells.DELETED {
+	} else if cellEvent == cells.Deleted {
 		return modelapi.EventType_DELETED
 	} else {
 		return modelapi.EventType_NONE
 	}
 }
 
+// ListCells list all of the cells
+func (s *Server) ListCells(request *modelapi.ListCellsRequest, server modelapi.CellModel_ListCellsServer) error {
+	log.Debugf("Received listing cells request: %v", request)
+	cellList, err := s.cellStore.List(server.Context())
+	if err != nil {
+		return err
+	}
+	for _, cell := range cellList {
+		resp := &modelapi.ListCellsResponse{
+			Cell: cellToAPI(cell),
+		}
+		err = server.Send(resp)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WatchCells monitors changes to the inventory of cells
 func (s *Server) WatchCells(request *modelapi.WatchCellsRequest, server modelapi.CellModel_WatchCellsServer) error {
-	log.Infof("Watching cells [%v]...", request)
-	ch := make(chan cells.CellEvent)
-	s.cellStore.WatchCells(ch, cells.WatchOptions{Replay: !request.NoReplay, Monitor: !request.NoSubscribe})
+	log.Debugf("Received watching cell changes request: %v", request)
+	ch := make(chan event.Event)
+	err := s.cellStore.Watch(server.Context(), ch, cells.WatchOptions{Replay: !request.NoReplay, Monitor: !request.NoSubscribe})
+	if err != nil {
+		return err
+	}
 
-	for event := range ch {
+	for cellEvent := range ch {
 		response := &modelapi.WatchCellsResponse{
-			Cell: cellToAPI(event.Cell),
-			Type: eventType(event.Type),
+			Cell: cellToAPI(cellEvent.Value.(*model.Cell)),
+			Type: eventType(cellEvent.Type.(cells.CellEvent)),
 		}
 		err := server.Send(response)
 		if err != nil {

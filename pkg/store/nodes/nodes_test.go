@@ -5,9 +5,12 @@
 package nodes
 
 import (
+	"context"
+	"testing"
+
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"testing"
+	"github.com/onosproject/ran-simulator/pkg/store/event"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -17,105 +20,49 @@ func TestNodes(t *testing.T) {
 	err := model.LoadConfig(m, "../../model/test")
 	assert.NoError(t, err)
 	t.Log(m)
+	ctx := context.Background()
 
-	reg := NewNodeRegistry(m.Nodes)
-	assert.Equal(t, 2, countNodes(reg))
+	nodeStore := NewNodeRegistry(m.Nodes)
+	node1EnbID := types.EnbID(144472)
+	node2EnbID := types.EnbID(144473)
+	numNodes, err := nodeStore.Len(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, 2, numNodes)
 
-	ch := make(chan NodeEvent)
-	reg.WatchNodes(ch, WatchOptions{Replay: true, Monitor: true})
-
-	event := <-ch
-	assert.Equal(t, NONE, event.Type)
-	event = <-ch
-	assert.Equal(t, NONE, event.Type)
-
-	_, err = reg.GetNode(144472)
-	assert.True(t, err != nil, "node should not exist")
-
-	go func() {
-		err := reg.AddNode(&model.Node{
-			EnbID:         144472,
-			Controllers:   []string{"controller1"},
-			ServiceModels: []string{"kpm"},
-			Cells:         []types.ECGI{1234, 4321},
-		})
-		assert.NoError(t, err, "node not added")
-	}()
-
-	event, ok := <-ch
-	assert.True(t, ok)
-	assert.Equal(t, ADDED, event.Type)
-	assert.Equal(t, 3, countNodes(reg))
-
-	node, err := reg.GetNode(144472)
-	assert.NoError(t, err, "node not found")
-	assert.Equal(t, types.EnbID(144472), node.EnbID)
-
-	go func() {
-		err := reg.UpdateNode(&model.Node{
-			EnbID:         144472,
-			Controllers:   []string{"controller2"},
-			ServiceModels: []string{"kpm"},
-			Cells:         []types.ECGI{1234, 4321},
-		})
-		assert.NoError(t, err, "node not updated")
-	}()
-
-	event, ok = <-ch
-	assert.True(t, ok)
-	assert.Equal(t, UPDATED, event.Type)
-
-	go func() {
-		err := reg.SetStatus(144472, "started")
-		assert.NoError(t, err, "node status not updated")
-	}()
-
-	event, ok = <-ch
-	assert.True(t, ok)
-	assert.Equal(t, UPDATED, event.Type)
-
-	go func() {
-		n, err := reg.DeleteNode(types.EnbID(144472))
-		assert.NoError(t, err, "node not deleted")
-		assert.Equal(t, types.EnbID(144472), n.EnbID, "incorrect node deleted")
-	}()
-
-	event, ok = <-ch
-	assert.True(t, ok)
-	assert.Equal(t, DELETED, event.Type)
-	assert.Equal(t, 2, countNodes(reg))
-
-	err = reg.AddNode(&model.Node{
-		EnbID:         144471,
+	ch := make(chan event.Event)
+	err = nodeStore.Watch(ctx, ch)
+	assert.NoError(t, err)
+	node1 := &model.Node{
+		EnbID:         node1EnbID,
 		Controllers:   []string{"controller1"},
 		ServiceModels: []string{"kpm"},
 		Cells:         []types.ECGI{1234, 4321},
-	})
-	assert.True(t, err != nil, "node should already exist")
-	assert.Equal(t, 2, countNodes(reg))
-
-	err = reg.UpdateNode(&model.Node{
-		EnbID:         144472,
-		Controllers:   []string{"controller1"},
-		ServiceModels: []string{"kpm"},
-		Cells:         []types.ECGI{1234, 4321},
-	})
-	assert.True(t, err != nil, "node does not exist")
-
-	_, err = reg.DeleteNode(144472)
-	assert.True(t, err != nil, "node does not exist")
-	assert.Equal(t, 2, countNodes(reg))
-
-	close(ch)
-}
-
-func countNodes(reg NodeRegistry) int {
-	c := 0
-	ch := make(chan NodeEvent)
-	reg.WatchNodes(ch, WatchOptions{Replay: true, Monitor: false})
-
-	for range ch {
-		c = c + 1
 	}
-	return c
+
+	node2 := &model.Node{
+		EnbID:         node2EnbID,
+		Controllers:   []string{"controller1"},
+		ServiceModels: []string{"kpm"},
+		Cells:         []types.ECGI{5678, 8765},
+	}
+	err = nodeStore.Add(ctx, node1)
+	assert.NoError(t, err)
+	err = nodeStore.Add(ctx, node2)
+	assert.NoError(t, err)
+
+	nodeEvent := <-ch
+	assert.Equal(t, Created, nodeEvent.Type.(NodeEvent))
+	nodeEvent = <-ch
+	assert.Equal(t, Created, nodeEvent.Type.(NodeEvent))
+
+	node1, err = nodeStore.Get(ctx, node1EnbID)
+	assert.NoError(t, err)
+	assert.Equal(t, node1.EnbID, node1EnbID)
+	_, err = nodeStore.Delete(ctx, node1EnbID)
+	assert.NoError(t, err)
+	nodeEvent = <-ch
+	assert.Equal(t, Deleted, nodeEvent.Type.(NodeEvent))
+
+	_, err = nodeStore.Get(ctx, node1EnbID)
+	assert.Error(t, err, "node not found")
 }

@@ -7,12 +7,13 @@ package cli
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/onosproject/onos-lib-go/pkg/cli"
 	modelapi "github.com/onosproject/ran-simulator/api/model"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	"strconv"
 )
 
 func getCellsCommand() *cobra.Command {
@@ -22,6 +23,8 @@ func getCellsCommand() *cobra.Command {
 		RunE:  runGetCellsCommand,
 	}
 	cmd.Flags().Bool("no-headers", false, "disables output headers")
+	cmd.Flags().BoolP("watch", "w", false, "watch cell changes")
+
 	return cmd
 }
 
@@ -73,31 +76,53 @@ func getCellClient(cmd *cobra.Command) (modelapi.CellModelClient, *grpc.ClientCo
 }
 
 func runGetCellsCommand(cmd *cobra.Command, args []string) error {
+	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
+		Output("%-16s %7s %7s %7s %9s %9s %7s %7s %-8s %s\n",
+			"ECGI", "#UEs", "Max UEs", "TxDB", "Lat", "Lng", "Azimuth", "Arc", "Color", "Neighbors")
+	}
+
 	client, conn, err := getCellClient(cmd)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
 
-	stream, err := client.WatchCells(context.Background(), &modelapi.WatchCellsRequest{NoReplay: false, NoSubscribe: true})
-	if err != nil {
-		return err
-	}
-
-	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
-		Output("%-16s %7s %7s %7s %9s %9s %7s %7s %-8s %s\n",
-			"ECGI", "#UEs", "Max UEs", "TxDB", "Lat", "Lng", "Azimuth", "Arc", "Color", "Neighbors")
-	}
-	for {
-		r, err := stream.Recv()
+	if watch, _ := cmd.Flags().GetBool("watch"); watch {
+		stream, err := client.WatchCells(context.Background(), &modelapi.WatchCellsRequest{NoReplay: false})
 		if err != nil {
-			break
+			return err
 		}
-		cell := r.Cell
-		Output("%-16d %7d %7d %7.2f %9.3f %9.3f %7d %7d %-8s %s\n",
-			cell.ECGI, len(cell.CrntiMap), cell.MaxUEs, cell.TxPowerdB,
-			cell.Location.Lat, cell.Location.Lng, cell.Sector.Azimuth, cell.Sector.Arc, cell.Color,
-			catECGIs(cell.Neighbors))
+
+		for {
+			r, err := stream.Recv()
+			if err != nil {
+				break
+			}
+			cell := r.Cell
+			Output("%-16d %7d %7d %7.2f %9.3f %9.3f %7d %7d %-8s %s\n",
+				cell.ECGI, len(cell.CrntiMap), cell.MaxUEs, cell.TxPowerdB,
+				cell.Location.Lat, cell.Location.Lng, cell.Sector.Azimuth, cell.Sector.Arc, cell.Color,
+				catECGIs(cell.Neighbors))
+		}
+
+	} else {
+
+		stream, err := client.ListCells(context.Background(), &modelapi.ListCellsRequest{})
+		if err != nil {
+			return err
+		}
+
+		for {
+			r, err := stream.Recv()
+			if err != nil {
+				break
+			}
+			cell := r.Cell
+			Output("%-16d %7d %7d %7.2f %9.3f %9.3f %7d %7d %-8s %s\n",
+				cell.ECGI, len(cell.CrntiMap), cell.MaxUEs, cell.TxPowerdB,
+				cell.Location.Lat, cell.Location.Lng, cell.Sector.Azimuth, cell.Sector.Arc, cell.Color,
+				catECGIs(cell.Neighbors))
+		}
 	}
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 	cellapi "github.com/onosproject/ran-simulator/pkg/api/cells"
 	nodeapi "github.com/onosproject/ran-simulator/pkg/api/nodes"
 	"github.com/onosproject/ran-simulator/pkg/api/trafficsim"
-	"github.com/onosproject/ran-simulator/pkg/e2agent"
+	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -55,13 +55,13 @@ func NewManager(config *Config) (*Manager, error) {
 // Manager is a manager for the E2T service
 type Manager struct {
 	config              Config
-	agents              *e2agent.E2Agents
+	agents              *agents.E2Agents
 	model               *model.Model
 	modelPluginRegistry *modelplugins.ModelPluginRegistry
 	server              *northbound.Server
-	nodeStore           nodes.NodeRegistry
-	cellStore           cells.CellRegistry
-	ueStore             ues.UERegistry
+	nodeStore           nodes.Store
+	cellStore           cells.Store
+	ueStore             ues.Store
 }
 
 // Run starts the manager and the associated services
@@ -135,7 +135,7 @@ func (m *Manager) startNorthboundServer() error {
 func (m *Manager) startE2Agents() error {
 	// Create the E2 agents for all simulated nodes and specified controllers
 	var err error
-	m.agents, err = e2agent.NewE2Agents(m.model, m.modelPluginRegistry, m.nodeStore, m.ueStore)
+	m.agents, err = agents.NewE2Agents(m.model, m.modelPluginRegistry, m.nodeStore, m.ueStore)
 	if err != nil {
 		log.Error(err)
 		return err

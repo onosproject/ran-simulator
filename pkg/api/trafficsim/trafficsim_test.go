@@ -6,14 +6,14 @@ package trafficsim
 
 import (
 	"context"
+	"net"
+	"testing"
+
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	"io"
-	"net"
-	"testing"
 
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	"github.com/stretchr/testify/assert"
@@ -80,29 +80,31 @@ func TestServiceBasics(t *testing.T) {
 	client := simapi.NewTrafficClient(createServerConnection(t))
 	assert.NotNil(t, client, "unable to create gRPC client")
 
-	stream, err := client.ListUes(context.TODO(), &simapi.ListUesRequest{WithoutReplay: false})
+	stream, err := client.ListUes(context.Background(), &simapi.ListUesRequest{})
 	assert.NoError(t, err, "unable to list UEs")
-
-	assert.Equal(t, 12, countItems(t, stream, &simapi.ListUesResponse{}), "incorrect UE count")
+	numUes := countUEs(t, stream)
+	assert.Equal(t, 12, numUes)
 	_, err = client.SetNumberUEs(context.TODO(), &simapi.SetNumberUEsRequest{
 		Number: 16,
 	})
 	assert.NoError(t, err, "unable to set UE count")
 
-	stream, err = client.ListUes(context.TODO(), &simapi.ListUesRequest{WithoutReplay: false})
+	stream, err = client.ListUes(context.TODO(), &simapi.ListUesRequest{})
 	assert.NoError(t, err, "unable to list UEs")
-	assert.Equal(t, 16, countItems(t, stream, &simapi.ListUesResponse{}), "incorrect revised UE count")
+	numUes = countUEs(t, stream)
+	assert.Equal(t, 16, numUes)
+
 }
 
-func countItems(t *testing.T, stream grpc.ClientStream, msg interface{}) int {
+func countUEs(t *testing.T, stream simapi.Traffic_ListUesClient) int {
 	count := 0
 	for {
-		err := stream.RecvMsg(msg)
-		if err == io.EOF {
+		_, err := stream.Recv()
+		if err != nil {
 			break
 		}
-		assert.NoError(t, err, "unable to read stream")
 		count = count + 1
+		t.Log(count)
 	}
 	return count
 }

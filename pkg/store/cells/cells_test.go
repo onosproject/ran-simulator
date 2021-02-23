@@ -5,12 +5,16 @@
 package cells
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"context"
 	"io/ioutil"
 	"testing"
 
+	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+
+	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
@@ -22,97 +26,35 @@ func TestCells(t *testing.T) {
 	err = yaml.Unmarshal(bytes, &m)
 	assert.NoError(t, err)
 	t.Log(m)
+	ctx := context.Background()
 
-	reg := NewCellRegistry(m.Cells, nodes.NewNodeRegistry(m.Nodes))
-	assert.Equal(t, 4, countCells(reg))
+	cellStore := NewCellRegistry(m.Cells, nodes.NewNodeRegistry(m.Nodes))
+	ch := make(chan event.Event)
+	err = cellStore.Watch(ctx, ch, WatchOptions{Replay: false, Monitor: false})
+	assert.NoError(t, err)
+	cell, err := cellStore.Get(ctx, 84325717505)
+	assert.NoError(t, err)
+	assert.Equal(t, types.ECGI(84325717505), cell.ECGI)
 
-	ch := make(chan CellEvent)
-	reg.WatchCells(ch, WatchOptions{Replay: true, Monitor: true})
+	ecgi1 := types.ECGI(84325717507)
+	cell1 := &model.Cell{
+		ECGI:   ecgi1,
+		Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 180},
+		Color:  "blue"}
 
-	event := <-ch
-	assert.Equal(t, NONE, event.Type)
-	event = <-ch
-	assert.Equal(t, NONE, event.Type)
+	err = cellStore.Add(ctx, cell1)
+	assert.NoError(t, err)
 
-	_, err = reg.GetCell(84325717507)
-	assert.True(t, err != nil, "cell should not exist")
+	cellEvent := <-ch
+	assert.Equal(t, Created, cellEvent.Type)
 
-	go func() {
-		err := reg.AddCell(&model.Cell{
-			ECGI:   84325717507,
-			Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 180},
-			Color:  "blue",
-		})
-		assert.NoError(t, err, "cell not added")
-	}()
+	cell1, err = cellStore.Get(ctx, ecgi1)
+	assert.NoError(t, err)
+	assert.Equal(t, ecgi1, cell1.ECGI)
 
-	// FIXME: find where the deadlock is...
-	if true {
-		return
-	}
+	_, err = cellStore.Delete(ctx, ecgi1)
+	assert.NoError(t, err)
+	cellEvent = <-ch
+	assert.Equal(t, Deleted, cellEvent.Type)
 
-	event, ok := <-ch
-	assert.True(t, ok)
-	assert.Equal(t, ADDED, event.Type)
-	assert.Equal(t, 5, countCells(reg))
-
-	cell, err := reg.GetCell(84325717507)
-	assert.NoError(t, err, "cell not found")
-	assert.Equal(t, types.ECGI(84325717507), cell.ECGI)
-
-	go func() {
-		err := reg.UpdateCell(&model.Cell{
-			ECGI:   84325717507,
-			Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 120},
-			Color:  "red",
-		})
-		assert.NoError(t, err, "cell not updated")
-	}()
-
-	event, ok = <-ch
-	assert.True(t, ok)
-	assert.Equal(t, UPDATED, event.Type)
-
-	go func() {
-		n, err := reg.DeleteCell(types.ECGI(84325717507))
-		assert.NoError(t, err, "cell not deleted")
-		assert.Equal(t, types.ECGI(84325717507), n.ECGI, "incorrect cell deleted")
-	}()
-
-	event, ok = <-ch
-	assert.True(t, ok)
-	assert.Equal(t, DELETED, event.Type)
-	assert.Equal(t, 4, countCells(reg))
-
-	err = reg.AddCell(&model.Cell{
-		ECGI:   84325717506,
-		Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 120},
-		Color:  "purple",
-	})
-	assert.True(t, err != nil, "cell should already exist")
-	assert.Equal(t, 4, countCells(reg))
-
-	err = reg.UpdateCell(&model.Cell{
-		ECGI:   84325717507,
-		Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 120},
-		Color:  "red",
-	})
-	assert.True(t, err != nil, "cell does not exist")
-
-	_, err = reg.DeleteCell(84325717507)
-	assert.True(t, err != nil, "cell does not exist")
-	assert.Equal(t, 4, countCells(reg))
-
-	close(ch)
-}
-
-func countCells(reg CellRegistry) int {
-	c := 0
-	ch := make(chan CellEvent)
-	reg.WatchCells(ch, WatchOptions{Replay: true, Monitor: false})
-
-	for range ch {
-		c = c + 1
-	}
-	return c
 }

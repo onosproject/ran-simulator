@@ -7,6 +7,9 @@ package trafficsim
 
 import (
 	"context"
+
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
@@ -21,7 +24,7 @@ import (
 var log = liblog.GetLogger("trafficsim")
 
 // NewService returns a new trafficsim Service
-func NewService(model *model.Model, cellStore cells.CellRegistry, ueStore ues.UERegistry) service.Service {
+func NewService(model *model.Model, cellStore cells.Store, ueStore ues.Store) service.Service {
 	return &Service{
 		model:     model,
 		cellStore: cellStore,
@@ -33,8 +36,8 @@ func NewService(model *model.Model, cellStore cells.CellRegistry, ueStore ues.UE
 type Service struct {
 	service.Service
 	model     *model.Model
-	cellStore cells.CellRegistry
-	ueStore   ues.UERegistry
+	cellStore cells.Store
+	ueStore   ues.Store
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
@@ -50,8 +53,8 @@ func (s *Service) Register(r *grpc.Server) {
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
 	model     *model.Model
-	cellStore cells.CellRegistry
-	ueStore   ues.UERegistry
+	cellStore cells.Store
+	ueStore   ues.Store
 }
 
 // GetMapLayout :
@@ -102,41 +105,48 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 }
 
 // ListUes provides means to list (and optionally monitor) simulated UEs
-func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
-	ch := make(chan ues.UEEvent)
-	log.Infof("UE Store: %v", s.ueStore)
-	s.ueStore.WatchUEs(ch, ues.WatchOptions{Replay: !req.WithoutReplay, Monitor: req.Subscribe})
-
-	for event := range ch {
+func (s *Server) ListUes(request *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
+	log.Debugf("Received listing ues request: %v", request)
+	ueList := s.ueStore.ListAllUEs(stream.Context())
+	for _, ue := range ueList {
 		resp := &simapi.ListUesResponse{
-			Ue:   ueToAPI(event.UE),
-			Type: eventType(event.Type),
+			Ue: ueToAPI(ue),
 		}
 		err := stream.Send(resp)
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 	}
 	return nil
 }
 
-func eventType(t uint8) simapi.Type {
-	if t == ues.ADDED {
-		return simapi.Type_ADDED
-	} else if t == ues.UPDATED {
-		return simapi.Type_ADDED
-	} else if t == ues.DELETED {
-		return simapi.Type_ADDED
-	} else {
-		return simapi.Type_NONE
+// WatchUes watch ue changes
+func (s *Server) WatchUes(request *simapi.WatchUesRequest, server simapi.Traffic_WatchUesServer) error {
+	log.Debugf("Received watching ue changes request: %v", request)
+	ch := make(chan event.Event)
+	err := s.ueStore.Watch(server.Context(), ch, ues.WatchOptions{Replay: !request.NoReplay})
+	if err != nil {
+		return err
 	}
+	for ueEvent := range ch {
+		response := &simapi.WatchUesResponse{
+			Ue: ueToAPI(ueEvent.Value.(*model.UE)),
+		}
+		err := server.Send(response)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // SetNumberUEs changes the number of UEs in the simulation
 func (s *Server) SetNumberUEs(ctx context.Context, req *simapi.SetNumberUEsRequest) (*simapi.SetNumberUEsResponse, error) {
 	ueCount := req.GetNumber()
 	log.Infof("Number of simulated UEs changed to %d", ueCount)
-	s.ueStore.SetUECount(uint(ueCount))
+	s.ueStore.SetUECount(ctx, uint(ueCount))
 	return &simapi.SetNumberUEsResponse{Number: ueCount}, nil
 }
 

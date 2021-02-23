@@ -5,13 +5,20 @@
 package ues
 
 import (
+	"context"
+	"math/rand"
+	"sync"
+
+	"github.com/google/uuid"
+	"github.com/onosproject/ran-simulator/pkg/store/watcher"
+
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
-	"math/rand"
-	"sync"
 )
 
 const (
@@ -21,118 +28,105 @@ const (
 
 var log = liblog.GetLogger("store", "ues")
 
-// UERegistry tracks inventory of user-equipment for the simulation
-type UERegistry interface {
+// Store tracks inventory of user-equipment for the simulation
+type Store interface {
 	// SetUECount updates the UE count and creates or deletes new UEs as needed
-	SetUECount(count uint)
+	SetUECount(ctx context.Context, count uint)
 
 	// GetUECount returns the number of active UEs
-	GetUECount() uint
+	Len(ctx context.Context) int
 
 	// CreateUEs creates the specified number of UEs
-	CreateUEs(count uint)
+	CreateUEs(ctx context.Context, count uint)
 
-	// GetUE retrieves the UE with the specified IMSI
-	GetUE(imsi types.IMSI) (*model.UE, error)
+	// Get retrieves the UE with the specified IMSI
+	Get(ctx context.Context, imsi types.IMSI) (*model.UE, error)
 
 	// DestroyUE destroy the specified UE
-	DestroyUE(imsi types.IMSI) (*model.UE, error)
+	Delete(ctx context.Context, imsi types.IMSI) (*model.UE, error)
 
-	// MoveUE update the cell affiliation of the specified UE
-	MoveUE(imsi types.IMSI, ecgi types.ECGI, strength float64) error
+	// Move update the cell affiliation of the specified UE
+	Move(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error
 
 	// ListAllUEs returns an array of all UEs
-	ListAllUEs() []*model.UE
+	ListAllUEs(ctx context.Context) []*model.UE
 
 	// ListUEs returns an array of all UEs associated with the specified cell
-	ListUEs(ecgi types.ECGI) []*model.UE
+	ListUEs(ctx context.Context, ecgi types.ECGI) []*model.UE
 
 	// WatchUEs watches the UE inventory events using the supplied channel
-	WatchUEs(ch chan<- UEEvent, options ...WatchOptions)
+	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
 }
 
-// UEEvent represents a change in the node inventory
-type UEEvent struct {
-	UE   *model.UE
-	Type uint8
-}
-
-// WatchOptions allows tailoring the WatchUEs behaviour
+// WatchOptions allows tailoring the WatchNodes behaviour
 type WatchOptions struct {
 	Replay  bool
 	Monitor bool
 }
 
-type ueWatcher struct {
-	ch chan<- UEEvent
-}
-
-func (r *ueRegistry) notify(ue *model.UE, eventType uint8) {
-	event := UEEvent{
-		UE:   ue,
-		Type: eventType,
-	}
-	for _, watcher := range r.watchers {
-		watcher.ch <- event
-	}
-}
-
-type ueRegistry struct {
-	lock      sync.RWMutex
+type store struct {
+	mu        sync.RWMutex
 	ues       map[types.IMSI]*model.UE
-	watchers  []ueWatcher
-	cellStore cells.CellRegistry
+	cellStore cells.Store
+	watchers  *watcher.Watchers
 }
 
 // NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start.
 // UEs will be semi-randomly distributed between the specified cells
-func NewUERegistry(count uint, cellStore cells.CellRegistry) UERegistry {
+func NewUERegistry(count uint, cellStore cells.Store) Store {
 	log.Infof("Creating registry from model with %d UEs", count)
-	reg := &ueRegistry{
-		lock:      sync.RWMutex{},
+	watchers := watcher.NewWatchers()
+	store := &store{
+		mu:        sync.RWMutex{},
 		ues:       make(map[types.IMSI]*model.UE),
 		cellStore: cellStore,
+		watchers:  watchers,
 	}
-	reg.CreateUEs(count)
-	log.Infof("Created registry primed with %d UEs", len(reg.ues))
-	return reg
+	ctx := context.Background()
+	store.CreateUEs(ctx, count)
+	log.Infof("Created registry primed with %d UEs", len(store.ues))
+	return store
 }
 
-func (r *ueRegistry) SetUECount(count uint) {
-	delta := len(r.ues) - int(count)
+func (s *store) SetUECount(ctx context.Context, count uint) {
+	delta := len(s.ues) - int(count)
 	if delta < 0 {
-		r.CreateUEs(uint(-delta))
+		s.CreateUEs(ctx, uint(-delta))
 	} else if delta > 0 {
-		r.removeSomeUEs(delta)
+		s.removeSomeUEs(ctx, delta)
 	}
 }
 
-func (r *ueRegistry) GetUECount() uint {
-	return uint(len(r.ues))
+func (s *store) Len(ctx context.Context) int {
+	return len(s.ues)
 }
 
-func (r *ueRegistry) removeSomeUEs(count int) {
+func (s *store) removeSomeUEs(ctx context.Context, count int) {
 	c := count
-	for imsi := range r.ues {
+	for imsi := range s.ues {
 		if c == 0 {
 			break
 		}
-		_, _ = r.DestroyUE(imsi)
+		_, _ = s.Delete(ctx, imsi)
 		c = c - 1
 	}
 }
 
-func (r *ueRegistry) CreateUEs(count uint) {
-	r.lock.Lock()
-	defer r.lock.Unlock()
+func (s *store) CreateUEs(ctx context.Context, count uint) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	for i := uint(0); i < count; i++ {
 		imsi := types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI)
-		if _, ok := r.ues[imsi]; ok {
+		if _, ok := s.ues[imsi]; ok {
 			// FIXME: more robust check for duplicates
 			imsi = types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI)
 		}
 
-		ecgi := r.cellStore.GetRandomCell().ECGI
+		randomCell, err := s.cellStore.GetRandomCell()
+		if err != nil {
+			log.Error(err)
+		}
+		ecgi := randomCell.ECGI
 		ue := &model.UE{
 			IMSI:     imsi,
 			Type:     "phone",
@@ -147,58 +141,70 @@ func (r *ueRegistry) CreateUEs(count uint) {
 			Cells:      nil,
 			IsAdmitted: false,
 		}
-		r.ues[ue.IMSI] = ue
+		s.ues[ue.IMSI] = ue
 	}
 }
 
-func (r *ueRegistry) GetUE(imsi types.IMSI) (*model.UE, error) {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
-	if node, ok := r.ues[imsi]; ok {
+// Get gets a UE based on a given imsi
+func (s *store) Get(ctx context.Context, imsi types.IMSI) (*model.UE, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if node, ok := s.ues[imsi]; ok {
 		return node, nil
 	}
 
 	return nil, errors.New(errors.NotFound, "UE not found")
 }
 
-func (r *ueRegistry) DestroyUE(imsi types.IMSI) (*model.UE, error) {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-	if ue, ok := r.ues[imsi]; ok {
-		delete(r.ues, imsi)
-		r.notify(ue, DELETED)
+// Delete deletes a UE based on a given imsi
+func (s *store) Delete(ctx context.Context, imsi types.IMSI) (*model.UE, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ue, ok := s.ues[imsi]; ok {
+		delete(s.ues, imsi)
+		deleteEvent := event.Event{
+			Key:   imsi,
+			Value: ue,
+			Type:  Deleted,
+		}
+		s.watchers.Send(deleteEvent)
 		return ue, nil
 	}
 	return nil, errors.New(errors.NotFound, "UE not found")
 }
 
-func (r *ueRegistry) ListAllUEs() []*model.UE {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
-	list := make([]*model.UE, 0, len(r.ues))
-	for _, ue := range r.ues {
+func (s *store) ListAllUEs(ctx context.Context) []*model.UE {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	list := make([]*model.UE, 0, len(s.ues))
+	for _, ue := range s.ues {
 		list = append(list, ue)
 	}
 	return list
 }
 
-func (r *ueRegistry) MoveUE(imsi types.IMSI, ecgi types.ECGI, strength float64) error {
-	r.lock.Lock()
-	defer r.lock.Unlock()
-	if ue, ok := r.ues[imsi]; ok {
+func (s *store) Move(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ue, ok := s.ues[imsi]; ok {
 		ue.Cell.ECGI = ecgi
 		ue.Cell.Strength = strength
-		r.notify(ue, UPDATED)
+		updateEvent := event.Event{
+			Key:   ue.IMSI,
+			Value: ue,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
 		return nil
 	}
 	return errors.New(errors.NotFound, "UE not found")
 }
 
-func (r *ueRegistry) ListUEs(ecgi types.ECGI) []*model.UE {
-	r.lock.RLock()
-	defer r.lock.RUnlock()
-	list := make([]*model.UE, 0, len(r.ues))
-	for _, ue := range r.ues {
+func (s *store) ListUEs(ctx context.Context, ecgi types.ECGI) []*model.UE {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	list := make([]*model.UE, 0, len(s.ues))
+	for _, ue := range s.ues {
 		if ue.Cell.ECGI == ecgi {
 			list = append(list, ue)
 		}
@@ -206,42 +212,42 @@ func (r *ueRegistry) ListUEs(ecgi types.ECGI) []*model.UE {
 	return list
 }
 
-const (
-	// NONE indicates no change event
-	NONE uint8 = 0
-
-	// ADDED indicates new node was added
-	ADDED uint8 = 1
-
-	// UPDATED indicates an existing node was updated
-	UPDATED uint8 = 2
-
-	// DELETED indicates a node was deleted
-	DELETED uint8 = 3
-)
-
-func (r *ueRegistry) WatchUEs(ch chan<- UEEvent, options ...WatchOptions) {
-	log.Infof("WatchUEs: %v (#%d)\n", options, len(r.ues))
-	monitor := len(options) == 0 || options[0].Monitor
+func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error {
+	log.Debug("Watching ue changes")
 	replay := len(options) > 0 && options[0].Replay
-	go func() {
-		watcher := ueWatcher{ch: ch}
-		if monitor {
-			r.lock.RLock()
-			r.watchers = append(r.watchers, watcher)
-			r.lock.RUnlock()
-		}
 
-		if replay {
-			r.lock.RLock()
-			defer r.lock.RUnlock()
-			for _, ue := range r.ues {
-				ch <- UEEvent{UE: ue, Type: NONE}
-			}
-			if !monitor {
-				close(ch)
-			}
+	id := uuid.New()
+	err := s.watchers.AddWatcher(id, ch)
+	if err != nil {
+		log.Error(err)
+		close(ch)
+		return err
+	}
+	go func() {
+		<-ctx.Done()
+		err = s.watchers.RemoveWatcher(id)
+		if err != nil {
+			log.Error(err)
 		}
+		close(ch)
+
 	}()
 
+	if replay {
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for _, ue := range s.ues {
+				ch <- event.Event{
+					Key:   ue,
+					Value: ue,
+					Type:  None,
+				}
+			}
+
+		}()
+	}
+
+	return nil
 }
