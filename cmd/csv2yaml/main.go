@@ -22,15 +22,36 @@ const (
 	maxUEs  = 99999
 	plmnID  = 62831
 	stopped = "stopped"
+	txPower = 11.0
 )
 
-func main() {
-	cellRecords := readCsvFile(os.Args[1])
-	neighborRecords := readCsvFile(os.Args[2])
-	yamlFile := os.Args[3]
+type importData struct {
+	model *model.Model
+	pci   *pciData
+}
 
-	m := loadModel(cellRecords, neighborRecords)
-	outputYAML(m, yamlFile)
+type pciData struct {
+	Pcis map[types.ECGI]int32 `yaml:"pcis"`
+}
+
+func main() {
+	// TODO: Add usage output and better argument validation
+	cellsInput := os.Args[1]
+	neighborsInput := os.Args[2]
+	modelOutput := os.Args[3]
+	pciOutput := os.Args[4]
+
+	cellRecords := readCsvFile(cellsInput)
+	neighborRecords := readCsvFile(neighborsInput)
+
+	data := &importData{
+		model: &model.Model{PlmnID: plmnID},
+		pci:   &pciData{Pcis: make(map[types.ECGI]int32)},
+	}
+
+	loadModel(data, cellRecords, neighborRecords)
+	outputModelYAML(data.model, modelOutput)
+	outputPciYAML(data.pci, pciOutput)
 }
 
 func readCsvFile(filePath string) [][]string {
@@ -49,25 +70,35 @@ func readCsvFile(filePath string) [][]string {
 	return records
 }
 
-func loadModel(cellRecords [][]string, neighborRecords [][]string) *model.Model {
-	m := &model.Model{PlmnID: plmnID}
-	processCellRecords(m, cellRecords)
-	processNeighborRecords(m, neighborRecords)
-	return m
+func loadModel(data *importData, cellRecords [][]string, neighborRecords [][]string) {
+	processCellRecords(data, cellRecords)
+	processNeighborRecords(data.model, neighborRecords)
 }
 
-func outputYAML(m *model.Model, yamlPath string) {
+func outputModelYAML(m *model.Model, path string) {
 	bytes, err := yaml.Marshal(m)
 	if err != nil {
 		log.Fatal("Unable to output model as YAML", err)
 	}
-	err = ioutil.WriteFile(yamlPath, bytes, os.FileMode(0644))
+	err = ioutil.WriteFile(path, bytes, os.FileMode(0644))
 	if err != nil {
 		log.Fatal("Unable to write YAML file", err)
 	}
 }
 
-func processCellRecords(m *model.Model, cellRecords [][]string) {
+func outputPciYAML(pci *pciData, path string) {
+	bytes, err := yaml.Marshal(pci)
+	if err != nil {
+		log.Fatal("Unable to output PCI as YAML", err)
+	}
+	err = ioutil.WriteFile(path, bytes, os.FileMode(0644))
+	if err != nil {
+		log.Fatal("Unable to write YAML file", err)
+	}
+}
+
+func processCellRecords(data *importData, cellRecords [][]string) {
+	m := data.model
 	m.Nodes = make(map[string]model.Node)
 	m.Cells = make(map[string]model.Cell)
 
@@ -122,10 +153,12 @@ func processCellRecords(m *model.Model, cellRecords [][]string) {
 			Sector:    model.Sector{Center: loc, Arc: arc, Azimuth: int32(azimuth)},
 			Color:     "none",
 			MaxUEs:    maxUEs,
-			Neighbors: nil,
-			TxPowerDB: float64(pci), // smuggle PCI as power... for now
+			TxPowerDB: txPower,
 		}
 		m.Cells[cellName(ci)] = cell
+
+		// Update the PCI structure
+		data.pci.Pcis[cell.ECGI] = int32(pci)
 
 		// Associate the new cell with the current node and update the node in the model Nodes
 		node.Cells = append(node.Cells, cell.ECGI)
