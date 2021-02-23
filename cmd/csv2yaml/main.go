@@ -103,7 +103,7 @@ func processCellRecords(data *importData, cellRecords [][]string) {
 	m.Cells = make(map[string]model.Cell)
 
 	controllers := []string{"controller1"}
-	serviceModels := []string{"kpm", "pci"}
+	serviceModels := []string{"kpm", "rc"}
 
 	lastLoc := model.Coordinate{Lat: 0, Lng: 0}
 
