@@ -187,7 +187,7 @@ func (s *store) Delete(ctx context.Context, enbID types.EnbID) (*model.Node, err
 
 // Watch
 func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error {
-	log.Infof("WatchNodes: %v (#%d)\n", options, len(s.nodes))
+	log.Debug("Watching node changes")
 	replay := len(options) > 0 && options[0].Replay
 	id := uuid.New()
 	err := s.watchers.AddWatcher(id, ch)

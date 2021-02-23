@@ -154,7 +154,7 @@ func (s *store) Delete(ctx context.Context, ecgi types.ECGI) (*model.Cell, error
 
 // Watch watch cell events
 func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error {
-	log.Infof("WatchCells: %v (#%d)\n", options, len(s.cells))
+	log.Debug("Watching cell changes")
 	replay := len(options) > 0 && options[0].Replay
 	id := uuid.New()
 	err := s.watchers.AddWatcher(id, ch)

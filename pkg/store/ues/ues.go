@@ -213,8 +213,7 @@ func (s *store) ListUEs(ctx context.Context, ecgi types.ECGI) []*model.UE {
 }
 
 func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error {
-	log.Infof("WatchUEs: %v (#%d)\n", options, len(s.ues))
-	//monitor := len(options) == 0 || options[0].Monitor
+	log.Debug("Watching ue changes")
 	replay := len(options) > 0 && options[0].Replay
 
 	id := uuid.New()
