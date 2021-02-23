@@ -9,16 +9,16 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 )
 
-// Store tracks arbitrary (named) scalar metrics (as float64 values) on per entity (cell, node) basis.
+// Store tracks arbitrary (named) scalar metrics on per entity (cell, node) basis.
 type Store interface {
 	// ListEntities retrieves all entities that presently have metrics associated with them
 	ListEntities(ctx context.Context) []uint64
 
 	// Set applies the specified metric value on the given entity
-	Set(ctx context.Context, entityID uint64, key string, value float64)
+	Set(ctx context.Context, entityID uint64, key string, value interface{})
 
 	// Get retrieves the specified metric value on the given entity
-	Get(ctx context.Context, entityID uint64, key string) (float64, error)
+	Get(ctx context.Context, entityID uint64, key string) (interface{}, error)
 
 	// Delete removes the specified metric
 	Delete(ctx context.Context, entityID uint64, key string) error
@@ -27,7 +27,7 @@ type Store interface {
 	DeleteAll(ctx context.Context, entityID uint64, key string) error
 
 	// Get retrieves all metrics of the specified entity as a map
-	List(ctx context.Context, entityID uint64, key string, value float64) (map[string]float64, error)
+	List(ctx context.Context, entityID uint64) (map[string]interface{}, error)
 
 	// WatchMetrics monitors changes to the metrics
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions)
@@ -41,10 +41,10 @@ type WatchOptions struct {
 }
 
 /*
-// Structure to track named metrics as floats for a single entity
+// Structure to track named metrics for a single entity
 type metrics struct {
 	mu      sync.RWMutex
-	metrics map[string]float64
+	metrics map[string]interface{}
 }
 
 type store struct {
