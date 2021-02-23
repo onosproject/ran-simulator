@@ -69,6 +69,7 @@ func nodeToModel(node *types.Node) *model.Node {
 
 // CreateNode creates a new simulated E2 node
 func (s *Server) CreateNode(ctx context.Context, request *modelapi.CreateNodeRequest) (*modelapi.CreateNodeResponse, error) {
+	log.Debugf("Received create node request: %+v", request)
 	err := s.nodeStore.Add(ctx, nodeToModel(request.Node))
 	if err != nil {
 		return nil, err
@@ -78,6 +79,7 @@ func (s *Server) CreateNode(ctx context.Context, request *modelapi.CreateNodeReq
 
 // GetNode retrieves the specified simulated E2 node
 func (s *Server) GetNode(ctx context.Context, request *modelapi.GetNodeRequest) (*modelapi.GetNodeResponse, error) {
+	log.Debugf("Received get node request: %+v", request)
 	node, err := s.nodeStore.Get(ctx, request.EnbID)
 	if err != nil {
 		return nil, err
@@ -87,6 +89,7 @@ func (s *Server) GetNode(ctx context.Context, request *modelapi.GetNodeRequest) 
 
 // UpdateNode updates the specified simulated E2 node
 func (s *Server) UpdateNode(ctx context.Context, request *modelapi.UpdateNodeRequest) (*modelapi.UpdateNodeResponse, error) {
+	log.Debugf("Received update node request: %+v", request)
 	err := s.nodeStore.Update(ctx, nodeToModel(request.Node))
 	if err != nil {
 		return nil, err
@@ -96,6 +99,7 @@ func (s *Server) UpdateNode(ctx context.Context, request *modelapi.UpdateNodeReq
 
 // DeleteNode deletes the specified simulated E2 node
 func (s *Server) DeleteNode(ctx context.Context, request *modelapi.DeleteNodeRequest) (*modelapi.DeleteNodeResponse, error) {
+	log.Debugf("Received delete node request: %v", request)
 	_, err := s.nodeStore.Delete(ctx, request.EnbID)
 	if err != nil {
 		return nil, err
@@ -105,8 +109,8 @@ func (s *Server) DeleteNode(ctx context.Context, request *modelapi.DeleteNodeReq
 
 // ListNodes list of e2 nodes
 func (s *Server) ListNodes(request *modelapi.ListNodesRequest, server modelapi.NodeModel_ListNodesServer) error {
+	log.Debugf("Received listing nodes request: %v", request)
 	nodeList, _ := s.nodeStore.List(server.Context())
-	log.Info("List of nodes:", nodeList)
 	for _, node := range nodeList {
 		log.Info("Node:", node)
 		resp := &modelapi.ListNodesResponse{
@@ -135,7 +139,7 @@ func eventType(nodeEvent nodes.NodeEvent) modelapi.EventType {
 
 // WatchNodes monitors changes to the inventory of E2 nodes
 func (s *Server) WatchNodes(request *modelapi.WatchNodesRequest, server modelapi.NodeModel_WatchNodesServer) error {
-	log.Infof("Watching nodes [%v]...", request)
+	log.Debugf("Received watching node changes Request: %v", request)
 	ch := make(chan event.Event)
 	err := s.nodeStore.Watch(server.Context(), ch, nodes.WatchOptions{Replay: !request.NoReplay, Monitor: !request.NoSubscribe})
 

@@ -105,7 +105,8 @@ func (s *Server) ListRoutes(req *simapi.ListRoutesRequest, stream simapi.Traffic
 }
 
 // ListUes provides means to list (and optionally monitor) simulated UEs
-func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
+func (s *Server) ListUes(request *simapi.ListUesRequest, stream simapi.Traffic_ListUesServer) error {
+	log.Debugf("Received listing ues request: %v", request)
 	ueList := s.ueStore.ListAllUEs(stream.Context())
 	for _, ue := range ueList {
 		resp := &simapi.ListUesResponse{
@@ -122,6 +123,7 @@ func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListU
 
 // WatchUes watch ue changes
 func (s *Server) WatchUes(request *simapi.WatchUesRequest, server simapi.Traffic_WatchUesServer) error {
+	log.Debugf("Received watching ue changes request: %v", request)
 	ch := make(chan event.Event)
 	err := s.ueStore.Watch(server.Context(), ch, ues.WatchOptions{Replay: !request.NoReplay})
 	if err != nil {

@@ -84,6 +84,7 @@ func sectorToAPI(sector model.Sector) *types.Sector {
 
 // CreateCell creates a new simulated cell
 func (s *Server) CreateCell(ctx context.Context, request *modelapi.CreateCellRequest) (*modelapi.CreateCellResponse, error) {
+	log.Debugf("Received create cell request: %v", request)
 	err := s.cellStore.Add(ctx, cellToModel(request.Cell))
 	if err != nil {
 		return nil, err
@@ -93,6 +94,7 @@ func (s *Server) CreateCell(ctx context.Context, request *modelapi.CreateCellReq
 
 // GetCell retrieves the specified simulated cell
 func (s *Server) GetCell(ctx context.Context, request *modelapi.GetCellRequest) (*modelapi.GetCellResponse, error) {
+	log.Debugf("Received get cell request: %v", request)
 	node, err := s.cellStore.Get(ctx, request.ECGI)
 	if err != nil {
 		return nil, err
@@ -102,6 +104,7 @@ func (s *Server) GetCell(ctx context.Context, request *modelapi.GetCellRequest) 
 
 // UpdateCell updates the specified simulated cell
 func (s *Server) UpdateCell(ctx context.Context, request *modelapi.UpdateCellRequest) (*modelapi.UpdateCellResponse, error) {
+	log.Debugf("Received update cell request: %v", request)
 	err := s.cellStore.Update(ctx, cellToModel(request.Cell))
 	if err != nil {
 		return nil, err
@@ -111,6 +114,7 @@ func (s *Server) UpdateCell(ctx context.Context, request *modelapi.UpdateCellReq
 
 // DeleteCell deletes the specified simulated cell
 func (s *Server) DeleteCell(ctx context.Context, request *modelapi.DeleteCellRequest) (*modelapi.DeleteCellResponse, error) {
+	log.Debugf("Received delete cell request: %v", request)
 	_, err := s.cellStore.Delete(ctx, request.ECGI)
 	if err != nil {
 		return nil, err
@@ -132,6 +136,7 @@ func eventType(cellEvent cells.CellEvent) modelapi.EventType {
 
 // ListCells list all of the cells
 func (s *Server) ListCells(request *modelapi.ListCellsRequest, server modelapi.CellModel_ListCellsServer) error {
+	log.Debugf("Received listing cells request: %v", request)
 	cellList, err := s.cellStore.List(server.Context())
 	if err != nil {
 		return err
@@ -150,7 +155,7 @@ func (s *Server) ListCells(request *modelapi.ListCellsRequest, server modelapi.C
 
 // WatchCells monitors changes to the inventory of cells
 func (s *Server) WatchCells(request *modelapi.WatchCellsRequest, server modelapi.CellModel_WatchCellsServer) error {
-	log.Infof("Watching cells [%v]...", request)
+	log.Debugf("Received watching cell changes request: %v", request)
 	ch := make(chan event.Event)
 	err := s.cellStore.Watch(server.Context(), ch, cells.WatchOptions{Replay: !request.NoReplay, Monitor: !request.NoSubscribe})
 	if err != nil {

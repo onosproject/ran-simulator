@@ -44,11 +44,13 @@ func (agents *E2Agents) processNodeEvents() {
 	for nodeEvent := range ch {
 		switch nodeEvent.Type {
 		case nodes.Created:
-			log.Infof("New node is added: %v", nodeEvent.Key)
+			// TODO start e2 agent
+			log.Debugf("New node is added: %v", nodeEvent.Key)
 		case nodes.Deleted:
-			log.Infof("Node %v is deleted: %v", nodeEvent.Key)
+			// TODO stop e2agent
+			log.Debugf("Node %v is deleted: %v", nodeEvent.Key)
 		case nodes.Updated:
-			log.Infof("Node %v is updated: %v", nodeEvent.Key)
+			log.Debugf("Node %v is updated: %v", nodeEvent.Key)
 
 		}
 	}
