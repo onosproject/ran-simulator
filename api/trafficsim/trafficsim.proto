@@ -10,16 +10,27 @@ package ran.trafficsim;
 
 import "github.com/onosproject/ran-simulator/api/types/types.proto";
 
+// Traffic - provides a stream of traffic data to GUI
+service Traffic {
+    rpc GetMapLayout(MapLayoutRequest) returns (ran.types.MapLayout);
+
+    rpc ListRoutes(ListRoutesRequest) returns (stream ListRoutesResponse);
+
+    rpc ListUes(ListUesRequest) returns (stream ListUesResponse);
+
+    rpc WatchUes(WatchUesRequest) returns (stream WatchUesResponse);
+
+    rpc SetNumberUEs(SetNumberUEsRequest) returns (SetNumberUEsResponse);
+
+    rpc ResetMetrics(ResetMetricsMsg) returns (ResetMetricsMsg);
+}
+
 message MapLayoutRequest {
 }
 
 message ListRoutesRequest {
-    // subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
-    // after all routes have been streamed to the client
-    bool subscribe = 1;
-
-    // option to request only changes that happen after the call
-    bool withoutReplay = 2;
+    bool no_replay = 1;
+    bool no_subscribe = 2;
 }
 
 message ListRoutesResponse {
@@ -31,15 +42,20 @@ message ListRoutesResponse {
 }
 
 message ListUesRequest {
-    // subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
-    // after all routes have been streamed to the client
-    bool subscribe = 1;
-
-    // option to request only changes that happen after the call
-    bool withoutReplay = 2;
 }
 
 message ListUesResponse {
+    // Ue is the UserEquipment change on which the event occurred
+    ran.types.Ue ue = 1;
+
+}
+
+message WatchUesRequest {
+    bool no_replay = 1;
+    bool no_subscribe = 2;
+}
+
+message WatchUesResponse {
     // Ue is the UserEquipment change on which the event occurred
     ran.types.Ue ue = 1;
 
@@ -49,6 +65,7 @@ message ListUesResponse {
     // update_type is a qualification of the type of UE change
     UpdateType update_type = 3;
 }
+
 
 message SetNumberUEsRequest {
     uint32 number = 1;
@@ -61,18 +78,7 @@ message SetNumberUEsResponse {
 message ResetMetricsMsg {
 }
 
-// Traffic - provides a stream of traffic data to GUI
-service Traffic {
-    rpc GetMapLayout(MapLayoutRequest) returns (ran.types.MapLayout);
 
-    rpc ListRoutes(ListRoutesRequest) returns (stream ListRoutesResponse);
-
-    rpc ListUes(ListUesRequest) returns (stream ListUesResponse);
-
-    rpc SetNumberUEs(SetNumberUEsRequest) returns (SetNumberUEsResponse);
-
-    rpc ResetMetrics(ResetMetricsMsg) returns (ResetMetricsMsg);
-}
 
 // Change event type
 enum Type {

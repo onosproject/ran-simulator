@@ -135,11 +135,8 @@ func (m *MapLayoutRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_MapLayoutRequest proto.InternalMessageInfo
 
 type ListRoutesRequest struct {
-	// subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
-	// after all routes have been streamed to the client
-	Subscribe bool `protobuf:"varint,1,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
-	// option to request only changes that happen after the call
-	WithoutReplay bool `protobuf:"varint,2,opt,name=withoutReplay,proto3" json:"withoutReplay,omitempty"`
+	NoReplay    bool `protobuf:"varint,1,opt,name=no_replay,json=noReplay,proto3" json:"no_replay,omitempty"`
+	NoSubscribe bool `protobuf:"varint,2,opt,name=no_subscribe,json=noSubscribe,proto3" json:"no_subscribe,omitempty"`
 }
 
 func (m *ListRoutesRequest) Reset()         { *m = ListRoutesRequest{} }
@@ -175,16 +172,16 @@ func (m *ListRoutesRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListRoutesRequest proto.InternalMessageInfo
 
-func (m *ListRoutesRequest) GetSubscribe() bool {
+func (m *ListRoutesRequest) GetNoReplay() bool {
 	if m != nil {
-		return m.Subscribe
+		return m.NoReplay
 	}
 	return false
 }
 
-func (m *ListRoutesRequest) GetWithoutReplay() bool {
+func (m *ListRoutesRequest) GetNoSubscribe() bool {
 	if m != nil {
-		return m.WithoutReplay
+		return m.NoSubscribe
 	}
 	return false
 }
@@ -244,11 +241,6 @@ func (m *ListRoutesResponse) GetType() Type {
 }
 
 type ListUesRequest struct {
-	// subscribe indicates whether to subscribe to events (e.g. ADD, UPDATE, and REMOVE) that occur
-	// after all routes have been streamed to the client
-	Subscribe bool `protobuf:"varint,1,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
-	// option to request only changes that happen after the call
-	WithoutReplay bool `protobuf:"varint,2,opt,name=withoutReplay,proto3" json:"withoutReplay,omitempty"`
 }
 
 func (m *ListUesRequest) Reset()         { *m = ListUesRequest{} }
@@ -284,27 +276,9 @@ func (m *ListUesRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListUesRequest proto.InternalMessageInfo
 
-func (m *ListUesRequest) GetSubscribe() bool {
-	if m != nil {
-		return m.Subscribe
-	}
-	return false
-}
-
-func (m *ListUesRequest) GetWithoutReplay() bool {
-	if m != nil {
-		return m.WithoutReplay
-	}
-	return false
-}
-
 type ListUesResponse struct {
 	// Ue is the UserEquipment change on which the event occurred
 	Ue *types.Ue `protobuf:"bytes,1,opt,name=ue,proto3" json:"ue,omitempty"`
-	// type is a qualification of the type of change being made
-	Type Type `protobuf:"varint,2,opt,name=type,proto3,enum=ran.trafficsim.Type" json:"type,omitempty"`
-	// update_type is a qualification of the type of UE change
-	UpdateType UpdateType `protobuf:"varint,3,opt,name=update_type,json=updateType,proto3,enum=ran.trafficsim.UpdateType" json:"update_type,omitempty"`
 }
 
 func (m *ListUesResponse) Reset()         { *m = ListUesResponse{} }
@@ -347,14 +321,115 @@ func (m *ListUesResponse) GetUe() *types.Ue {
 	return nil
 }
 
-func (m *ListUesResponse) GetType() Type {
+type WatchUesRequest struct {
+	NoReplay    bool `protobuf:"varint,1,opt,name=no_replay,json=noReplay,proto3" json:"no_replay,omitempty"`
+	NoSubscribe bool `protobuf:"varint,2,opt,name=no_subscribe,json=noSubscribe,proto3" json:"no_subscribe,omitempty"`
+}
+
+func (m *WatchUesRequest) Reset()         { *m = WatchUesRequest{} }
+func (m *WatchUesRequest) String() string { return proto.CompactTextString(m) }
+func (*WatchUesRequest) ProtoMessage()    {}
+func (*WatchUesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_47869854f8356ea4, []int{5}
+}
+func (m *WatchUesRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WatchUesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WatchUesRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WatchUesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WatchUesRequest.Merge(m, src)
+}
+func (m *WatchUesRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *WatchUesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_WatchUesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WatchUesRequest proto.InternalMessageInfo
+
+func (m *WatchUesRequest) GetNoReplay() bool {
+	if m != nil {
+		return m.NoReplay
+	}
+	return false
+}
+
+func (m *WatchUesRequest) GetNoSubscribe() bool {
+	if m != nil {
+		return m.NoSubscribe
+	}
+	return false
+}
+
+type WatchUesResponse struct {
+	// Ue is the UserEquipment change on which the event occurred
+	Ue *types.Ue `protobuf:"bytes,1,opt,name=ue,proto3" json:"ue,omitempty"`
+	// type is a qualification of the type of change being made
+	Type Type `protobuf:"varint,2,opt,name=type,proto3,enum=ran.trafficsim.Type" json:"type,omitempty"`
+	// update_type is a qualification of the type of UE change
+	UpdateType UpdateType `protobuf:"varint,3,opt,name=update_type,json=updateType,proto3,enum=ran.trafficsim.UpdateType" json:"update_type,omitempty"`
+}
+
+func (m *WatchUesResponse) Reset()         { *m = WatchUesResponse{} }
+func (m *WatchUesResponse) String() string { return proto.CompactTextString(m) }
+func (*WatchUesResponse) ProtoMessage()    {}
+func (*WatchUesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_47869854f8356ea4, []int{6}
+}
+func (m *WatchUesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WatchUesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WatchUesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WatchUesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WatchUesResponse.Merge(m, src)
+}
+func (m *WatchUesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *WatchUesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_WatchUesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WatchUesResponse proto.InternalMessageInfo
+
+func (m *WatchUesResponse) GetUe() *types.Ue {
+	if m != nil {
+		return m.Ue
+	}
+	return nil
+}
+
+func (m *WatchUesResponse) GetType() Type {
 	if m != nil {
 		return m.Type
 	}
 	return Type_NONE
 }
 
-func (m *ListUesResponse) GetUpdateType() UpdateType {
+func (m *WatchUesResponse) GetUpdateType() UpdateType {
 	if m != nil {
 		return m.UpdateType
 	}
@@ -369,7 +444,7 @@ func (m *SetNumberUEsRequest) Reset()         { *m = SetNumberUEsRequest{} }
 func (m *SetNumberUEsRequest) String() string { return proto.CompactTextString(m) }
 func (*SetNumberUEsRequest) ProtoMessage()    {}
 func (*SetNumberUEsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{5}
+	return fileDescriptor_47869854f8356ea4, []int{7}
 }
 func (m *SetNumberUEsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -413,7 +488,7 @@ func (m *SetNumberUEsResponse) Reset()         { *m = SetNumberUEsResponse{} }
 func (m *SetNumberUEsResponse) String() string { return proto.CompactTextString(m) }
 func (*SetNumberUEsResponse) ProtoMessage()    {}
 func (*SetNumberUEsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{6}
+	return fileDescriptor_47869854f8356ea4, []int{8}
 }
 func (m *SetNumberUEsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -456,7 +531,7 @@ func (m *ResetMetricsMsg) Reset()         { *m = ResetMetricsMsg{} }
 func (m *ResetMetricsMsg) String() string { return proto.CompactTextString(m) }
 func (*ResetMetricsMsg) ProtoMessage()    {}
 func (*ResetMetricsMsg) Descriptor() ([]byte, []int) {
-	return fileDescriptor_47869854f8356ea4, []int{7}
+	return fileDescriptor_47869854f8356ea4, []int{9}
 }
 func (m *ResetMetricsMsg) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -493,6 +568,8 @@ func init() {
 	proto.RegisterType((*ListRoutesResponse)(nil), "ran.trafficsim.ListRoutesResponse")
 	proto.RegisterType((*ListUesRequest)(nil), "ran.trafficsim.ListUesRequest")
 	proto.RegisterType((*ListUesResponse)(nil), "ran.trafficsim.ListUesResponse")
+	proto.RegisterType((*WatchUesRequest)(nil), "ran.trafficsim.WatchUesRequest")
+	proto.RegisterType((*WatchUesResponse)(nil), "ran.trafficsim.WatchUesResponse")
 	proto.RegisterType((*SetNumberUEsRequest)(nil), "ran.trafficsim.SetNumberUEsRequest")
 	proto.RegisterType((*SetNumberUEsResponse)(nil), "ran.trafficsim.SetNumberUEsResponse")
 	proto.RegisterType((*ResetMetricsMsg)(nil), "ran.trafficsim.ResetMetricsMsg")
@@ -501,43 +578,46 @@ func init() {
 func init() { proto.RegisterFile("api/trafficsim/trafficsim.proto", fileDescriptor_47869854f8356ea4) }
 
 var fileDescriptor_47869854f8356ea4 = []byte{
-	// 572 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcb, 0x6e, 0xd3, 0x40,
-	0x14, 0x8d, 0x93, 0xb4, 0x49, 0x6f, 0x1e, 0x75, 0x87, 0x08, 0x45, 0x16, 0xb8, 0xc5, 0x54, 0xa8,
-	0xaa, 0x54, 0x07, 0x05, 0xb1, 0x81, 0x55, 0x90, 0x0d, 0x54, 0x4a, 0xec, 0xc8, 0xb5, 0x5b, 0x75,
-	0x85, 0x9c, 0x30, 0x69, 0x8d, 0x9a, 0xd8, 0x78, 0x66, 0x84, 0xf2, 0x17, 0xec, 0xf8, 0x00, 0x7e,
-	0x86, 0x65, 0x97, 0x2c, 0x51, 0xf2, 0x23, 0xc8, 0x63, 0x13, 0x3b, 0xee, 0x03, 0x21, 0xb1, 0x89,
-	0xec, 0x3b, 0xe7, 0x9c, 0x39, 0xf7, 0xde, 0x13, 0xc3, 0xae, 0x1b, 0x78, 0x1d, 0x1a, 0xba, 0x93,
-	0x89, 0x37, 0x26, 0xde, 0x34, 0xf3, 0xa8, 0x06, 0xa1, 0x4f, 0x7d, 0xd4, 0x0c, 0xdd, 0x99, 0x9a,
-	0x56, 0xa5, 0x57, 0x17, 0x1e, 0xbd, 0x64, 0x23, 0x75, 0xec, 0x4f, 0x3b, 0xfe, 0xcc, 0x27, 0x41,
-	0xe8, 0x7f, 0xc2, 0x63, 0xda, 0x09, 0xdd, 0xd9, 0x11, 0xf1, 0xa6, 0xec, 0xca, 0xa5, 0x7e, 0xd8,
-	0xe1, 0xaa, 0xf3, 0x00, 0x93, 0xf8, 0x37, 0xd6, 0x52, 0x10, 0x88, 0x03, 0x37, 0xe8, 0xbb, 0x73,
-	0x9f, 0x51, 0x0b, 0x7f, 0x66, 0x98, 0x50, 0xe5, 0x0c, 0x76, 0xfa, 0x1e, 0xa1, 0x96, 0xcf, 0x28,
-	0x26, 0x49, 0x11, 0x3d, 0x82, 0x2d, 0xc2, 0x46, 0x64, 0x1c, 0x7a, 0x23, 0xdc, 0x16, 0xf6, 0x84,
-	0x83, 0xaa, 0x95, 0x16, 0xd0, 0x3e, 0x34, 0xbe, 0x78, 0xf4, 0x92, 0x8b, 0x04, 0x57, 0xee, 0xbc,
-	0x5d, 0xe4, 0x88, 0xf5, 0xa2, 0x32, 0x01, 0x94, 0x15, 0x26, 0x81, 0x3f, 0x23, 0x18, 0x3d, 0x83,
-	0x8d, 0x30, 0xaa, 0x70, 0xd5, 0x5a, 0x57, 0x54, 0x79, 0x7b, 0xdc, 0x23, 0x47, 0x5a, 0xf1, 0x31,
-	0x3a, 0x80, 0x72, 0x54, 0xe5, 0xd2, 0xcd, 0x6e, 0x4b, 0x5d, 0x9f, 0x82, 0x6a, 0xcf, 0x03, 0x6c,
-	0x71, 0x84, 0x62, 0x43, 0x33, 0xba, 0xc7, 0xf9, 0xbf, 0xee, 0xbf, 0x09, 0xb0, 0xbd, 0x92, 0x4d,
-	0xbc, 0x3f, 0x86, 0x22, 0xfb, 0x63, 0xbc, 0x91, 0x31, 0xee, 0x60, 0xab, 0xc8, 0xfe, 0xc1, 0x32,
-	0x7a, 0x0d, 0x35, 0x16, 0x7c, 0x74, 0x29, 0xfe, 0xc0, 0x09, 0x25, 0x4e, 0x90, 0xf2, 0x04, 0x87,
-	0x43, 0x38, 0x0d, 0xd8, 0xea, 0x59, 0x39, 0x82, 0x07, 0x27, 0x98, 0x1a, 0x6c, 0x3a, 0xc2, 0xa1,
-	0xa3, 0xaf, 0x9a, 0x7e, 0x08, 0x9b, 0x33, 0x5e, 0xe3, 0x06, 0x1b, 0x56, 0xf2, 0xa6, 0xa8, 0xd0,
-	0x5a, 0x87, 0x27, 0xcd, 0xdc, 0x85, 0xdf, 0x81, 0x6d, 0x0b, 0x13, 0x4c, 0x07, 0x98, 0x86, 0xde,
-	0x98, 0x0c, 0xc8, 0xc5, 0xe1, 0x4b, 0x28, 0x47, 0x37, 0xa3, 0x2a, 0x94, 0x0d, 0xd3, 0xd0, 0xc5,
-	0x02, 0xda, 0x82, 0x8d, 0x9e, 0xa6, 0xe9, 0x9a, 0x28, 0xa0, 0x1a, 0x54, 0x9c, 0xa1, 0xd6, 0xb3,
-	0x75, 0x4d, 0x2c, 0x46, 0x2f, 0x96, 0x3e, 0x30, 0x4f, 0x75, 0x4d, 0x2c, 0x1d, 0xea, 0x00, 0x69,
-	0x0b, 0x48, 0x84, 0xba, 0x61, 0xc6, 0x48, 0xfb, 0x7c, 0x18, 0x89, 0xd4, 0xa1, 0x3a, 0x34, 0x4f,
-	0x8e, 0xed, 0x63, 0xd3, 0x10, 0x85, 0x48, 0xd2, 0x36, 0xcf, 0x74, 0x4b, 0x2c, 0x46, 0x07, 0xef,
-	0x7b, 0x86, 0x66, 0x9e, 0xea, 0x96, 0x58, 0xea, 0x7e, 0x2f, 0x41, 0xc5, 0x8e, 0xa7, 0x82, 0xde,
-	0x42, 0xfd, 0x1d, 0xa6, 0xab, 0x0c, 0xa3, 0xbd, 0xfc, 0xcc, 0xf2, 0xf1, 0x96, 0x5a, 0x99, 0x3d,
-	0xa5, 0x3c, 0x07, 0x20, 0xcd, 0x26, 0x7a, 0x92, 0x57, 0xb9, 0xf1, 0x87, 0x90, 0x94, 0xfb, 0x20,
-	0xf1, 0x44, 0x9f, 0x0b, 0xa8, 0x0f, 0x95, 0x24, 0x33, 0x48, 0xbe, 0x8d, 0x90, 0x66, 0x54, 0xda,
-	0xbd, 0xf3, 0x7c, 0xa5, 0x76, 0x0e, 0xf5, 0xec, 0xe6, 0xd0, 0xd3, 0x3c, 0xe5, 0x96, 0x18, 0x48,
-	0xfb, 0xf7, 0x83, 0x92, 0xe5, 0x0f, 0xa1, 0x9e, 0x5d, 0x32, 0xba, 0xe1, 0x26, 0x17, 0x01, 0xe9,
-	0x6f, 0x80, 0x37, 0xed, 0x1f, 0x0b, 0x59, 0xb8, 0x5e, 0xc8, 0xc2, 0xaf, 0x85, 0x2c, 0x7c, 0x5d,
-	0xca, 0x85, 0xeb, 0xa5, 0x5c, 0xf8, 0xb9, 0x94, 0x0b, 0xa3, 0x4d, 0xfe, 0xed, 0x79, 0xf1, 0x3b,
-	0x00, 0x00, 0xff, 0xff, 0xa9, 0x26, 0xbf, 0x06, 0xea, 0x04, 0x00, 0x00,
+	// 611 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcb, 0x4e, 0xdb, 0x40,
+	0x14, 0x8d, 0x13, 0x1e, 0xe1, 0x26, 0xc0, 0x30, 0x45, 0x15, 0x72, 0x55, 0x03, 0x6e, 0x55, 0x21,
+	0x24, 0x1c, 0x44, 0xd5, 0x4d, 0xbb, 0xa2, 0xb2, 0xdb, 0x22, 0x91, 0x38, 0x9d, 0xc4, 0x20, 0x56,
+	0xc8, 0x71, 0x07, 0x70, 0x45, 0x3c, 0xae, 0x67, 0xbc, 0xc8, 0x5f, 0x74, 0xd9, 0x4f, 0xea, 0x92,
+	0x65, 0x97, 0x15, 0xfc, 0x42, 0x3f, 0xa0, 0xf2, 0xd8, 0xd8, 0xc6, 0x3c, 0xca, 0xa2, 0x9b, 0x68,
+	0xe6, 0xde, 0x73, 0xce, 0x7d, 0xe4, 0x8c, 0x61, 0xd5, 0x0d, 0xfd, 0x8e, 0x88, 0xdc, 0x93, 0x13,
+	0xdf, 0xe3, 0xfe, 0xb8, 0x74, 0x34, 0xc2, 0x88, 0x09, 0x86, 0x17, 0x22, 0x37, 0x30, 0x8a, 0xa8,
+	0xfa, 0xf6, 0xd4, 0x17, 0x67, 0xf1, 0xc8, 0xf0, 0xd8, 0xb8, 0xc3, 0x02, 0xc6, 0xc3, 0x88, 0x7d,
+	0xa5, 0x9e, 0xe8, 0x44, 0x6e, 0xb0, 0xc5, 0xfd, 0x71, 0x7c, 0xee, 0x0a, 0x16, 0x75, 0xa4, 0xea,
+	0x24, 0xa4, 0x3c, 0xfd, 0x4d, 0xb5, 0x74, 0x0c, 0xa8, 0xeb, 0x86, 0xfb, 0xee, 0x84, 0xc5, 0x82,
+	0xd0, 0x6f, 0x31, 0xe5, 0x42, 0x1f, 0xc0, 0xd2, 0xbe, 0xcf, 0x05, 0x61, 0xb1, 0xa0, 0x3c, 0x0b,
+	0xe2, 0x67, 0x30, 0x17, 0xb0, 0xe3, 0x88, 0x86, 0xe7, 0xee, 0x64, 0x45, 0x59, 0x53, 0x36, 0x9a,
+	0xa4, 0x19, 0x30, 0x22, 0xef, 0x78, 0x1d, 0xda, 0x01, 0x3b, 0xe6, 0xf1, 0x88, 0x7b, 0x91, 0x3f,
+	0xa2, 0x2b, 0x75, 0x99, 0x6f, 0x05, 0x6c, 0x70, 0x1d, 0xd2, 0x4f, 0x00, 0x97, 0x45, 0x79, 0xc8,
+	0x02, 0x4e, 0xf1, 0x2b, 0x98, 0x8e, 0x92, 0x88, 0x54, 0x6c, 0xed, 0x20, 0x43, 0x8e, 0x26, 0xfb,
+	0x93, 0x48, 0x92, 0xa6, 0xf1, 0x06, 0x4c, 0x25, 0x51, 0x29, 0xbc, 0xb0, 0xb3, 0x6c, 0xdc, 0xdc,
+	0x80, 0x31, 0x9c, 0x84, 0x94, 0x48, 0x84, 0x8e, 0x60, 0x21, 0xa9, 0xe3, 0xe4, 0x9d, 0xeb, 0xdb,
+	0xb0, 0x98, 0x47, 0xb2, 0xb2, 0xcf, 0xa1, 0x1e, 0x5f, 0xd7, 0x9c, 0x2f, 0xd5, 0x74, 0x28, 0xa9,
+	0xc7, 0x54, 0xff, 0x0c, 0x8b, 0x87, 0xae, 0xf0, 0xce, 0x9c, 0xff, 0x37, 0xfe, 0x0f, 0x05, 0x50,
+	0xa1, 0xf9, 0xa8, 0x36, 0x1e, 0x3f, 0x34, 0x7e, 0x07, 0xad, 0x38, 0xfc, 0xe2, 0x0a, 0x7a, 0x2c,
+	0x09, 0x0d, 0x49, 0x50, 0xab, 0x04, 0x47, 0x42, 0x24, 0x0d, 0xe2, 0xfc, 0xac, 0x6f, 0xc1, 0x93,
+	0x01, 0x15, 0xbd, 0x78, 0x3c, 0xa2, 0x91, 0x63, 0xe5, 0x13, 0x3f, 0x85, 0x99, 0x40, 0xc6, 0x64,
+	0x83, 0xf3, 0x24, 0xbb, 0xe9, 0x06, 0x2c, 0xdf, 0x84, 0x67, 0xc3, 0xdc, 0x87, 0x5f, 0x82, 0x45,
+	0x42, 0x39, 0x15, 0x5d, 0x2a, 0x22, 0xdf, 0xe3, 0x5d, 0x7e, 0xba, 0xf9, 0x06, 0xa6, 0x92, 0xca,
+	0xb8, 0x09, 0x53, 0x3d, 0xbb, 0x67, 0xa1, 0x1a, 0x9e, 0x83, 0xe9, 0x5d, 0xd3, 0xb4, 0x4c, 0xa4,
+	0xe0, 0x16, 0xcc, 0x3a, 0x7d, 0x73, 0x77, 0x68, 0x99, 0xa8, 0x9e, 0x5c, 0x88, 0xd5, 0xb5, 0x0f,
+	0x2c, 0x13, 0x35, 0x36, 0x2d, 0x80, 0x62, 0x04, 0x8c, 0xa0, 0xdd, 0xb3, 0x53, 0xe4, 0xf0, 0xa8,
+	0x9f, 0x88, 0xb4, 0xa1, 0xd9, 0xb7, 0x07, 0x7b, 0xc3, 0x3d, 0xbb, 0x87, 0x94, 0x44, 0x72, 0x68,
+	0x1f, 0x5a, 0x04, 0xd5, 0x93, 0xc4, 0xa7, 0xdd, 0x9e, 0x69, 0x1f, 0x58, 0x04, 0x35, 0x76, 0xfe,
+	0x34, 0x60, 0x76, 0x98, 0x6e, 0x05, 0x7f, 0x80, 0xf6, 0x47, 0x2a, 0xf2, 0x17, 0x80, 0xd7, 0xaa,
+	0x3b, 0xab, 0x3e, 0x0e, 0x75, 0xb9, 0xf4, 0x3f, 0x15, 0x3c, 0x07, 0xa0, 0x70, 0x37, 0x5e, 0xaf,
+	0xaa, 0xdc, 0x7a, 0x4e, 0xaa, 0xfe, 0x10, 0x24, 0xdd, 0xe8, 0xb6, 0x82, 0xf7, 0x61, 0x36, 0xb3,
+	0x2e, 0xd6, 0xee, 0x22, 0x14, 0x06, 0x55, 0x57, 0xef, 0xcd, 0xe7, 0x6a, 0x36, 0x34, 0xaf, 0x2d,
+	0x88, 0x6f, 0xc1, 0x2b, 0x86, 0x57, 0xd7, 0xee, 0x07, 0xe4, 0x82, 0x47, 0xd0, 0x2e, 0x5b, 0x01,
+	0xbf, 0xa8, 0x72, 0xee, 0xf0, 0x95, 0xfa, 0xf2, 0x61, 0x50, 0xe6, 0xa6, 0x3e, 0xb4, 0xcb, 0xae,
+	0xb9, 0xdd, 0x6f, 0xc5, 0x53, 0xea, 0xbf, 0x00, 0xef, 0x57, 0x7e, 0x5e, 0x6a, 0xca, 0xc5, 0xa5,
+	0xa6, 0xfc, 0xbe, 0xd4, 0x94, 0xef, 0x57, 0x5a, 0xed, 0xe2, 0x4a, 0xab, 0xfd, 0xba, 0xd2, 0x6a,
+	0xa3, 0x19, 0xf9, 0x29, 0x7c, 0xfd, 0x37, 0x00, 0x00, 0xff, 0xff, 0x6d, 0xd7, 0x18, 0xdc, 0x79,
+	0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -555,6 +635,7 @@ type TrafficClient interface {
 	GetMapLayout(ctx context.Context, in *MapLayoutRequest, opts ...grpc.CallOption) (*types.MapLayout, error)
 	ListRoutes(ctx context.Context, in *ListRoutesRequest, opts ...grpc.CallOption) (Traffic_ListRoutesClient, error)
 	ListUes(ctx context.Context, in *ListUesRequest, opts ...grpc.CallOption) (Traffic_ListUesClient, error)
+	WatchUes(ctx context.Context, in *WatchUesRequest, opts ...grpc.CallOption) (Traffic_WatchUesClient, error)
 	SetNumberUEs(ctx context.Context, in *SetNumberUEsRequest, opts ...grpc.CallOption) (*SetNumberUEsResponse, error)
 	ResetMetrics(ctx context.Context, in *ResetMetricsMsg, opts ...grpc.CallOption) (*ResetMetricsMsg, error)
 }
@@ -640,6 +721,38 @@ func (x *trafficListUesClient) Recv() (*ListUesResponse, error) {
 	return m, nil
 }
 
+func (c *trafficClient) WatchUes(ctx context.Context, in *WatchUesRequest, opts ...grpc.CallOption) (Traffic_WatchUesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Traffic_serviceDesc.Streams[2], "/ran.trafficsim.Traffic/WatchUes", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &trafficWatchUesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Traffic_WatchUesClient interface {
+	Recv() (*WatchUesResponse, error)
+	grpc.ClientStream
+}
+
+type trafficWatchUesClient struct {
+	grpc.ClientStream
+}
+
+func (x *trafficWatchUesClient) Recv() (*WatchUesResponse, error) {
+	m := new(WatchUesResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *trafficClient) SetNumberUEs(ctx context.Context, in *SetNumberUEsRequest, opts ...grpc.CallOption) (*SetNumberUEsResponse, error) {
 	out := new(SetNumberUEsResponse)
 	err := c.cc.Invoke(ctx, "/ran.trafficsim.Traffic/SetNumberUEs", in, out, opts...)
@@ -663,6 +776,7 @@ type TrafficServer interface {
 	GetMapLayout(context.Context, *MapLayoutRequest) (*types.MapLayout, error)
 	ListRoutes(*ListRoutesRequest, Traffic_ListRoutesServer) error
 	ListUes(*ListUesRequest, Traffic_ListUesServer) error
+	WatchUes(*WatchUesRequest, Traffic_WatchUesServer) error
 	SetNumberUEs(context.Context, *SetNumberUEsRequest) (*SetNumberUEsResponse, error)
 	ResetMetrics(context.Context, *ResetMetricsMsg) (*ResetMetricsMsg, error)
 }
@@ -679,6 +793,9 @@ func (*UnimplementedTrafficServer) ListRoutes(req *ListRoutesRequest, srv Traffi
 }
 func (*UnimplementedTrafficServer) ListUes(req *ListUesRequest, srv Traffic_ListUesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListUes not implemented")
+}
+func (*UnimplementedTrafficServer) WatchUes(req *WatchUesRequest, srv Traffic_WatchUesServer) error {
+	return status.Errorf(codes.Unimplemented, "method WatchUes not implemented")
 }
 func (*UnimplementedTrafficServer) SetNumberUEs(ctx context.Context, req *SetNumberUEsRequest) (*SetNumberUEsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetNumberUEs not implemented")
@@ -751,6 +868,27 @@ func (x *trafficListUesServer) Send(m *ListUesResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Traffic_WatchUes_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(WatchUesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(TrafficServer).WatchUes(m, &trafficWatchUesServer{stream})
+}
+
+type Traffic_WatchUesServer interface {
+	Send(*WatchUesResponse) error
+	grpc.ServerStream
+}
+
+type trafficWatchUesServer struct {
+	grpc.ServerStream
+}
+
+func (x *trafficWatchUesServer) Send(m *WatchUesResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _Traffic_SetNumberUEs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetNumberUEsRequest)
 	if err := dec(in); err != nil {
@@ -815,6 +953,11 @@ var _Traffic_serviceDesc = grpc.ServiceDesc{
 			Handler:       _Traffic_ListUes_Handler,
 			ServerStreams: true,
 		},
+		{
+			StreamName:    "WatchUes",
+			Handler:       _Traffic_WatchUes_Handler,
+			ServerStreams: true,
+		},
 	},
 	Metadata: "api/trafficsim/trafficsim.proto",
 }
@@ -862,9 +1005,9 @@ func (m *ListRoutesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.WithoutReplay {
+	if m.NoSubscribe {
 		i--
-		if m.WithoutReplay {
+		if m.NoSubscribe {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -872,9 +1015,9 @@ func (m *ListRoutesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x10
 	}
-	if m.Subscribe {
+	if m.NoReplay {
 		i--
-		if m.Subscribe {
+		if m.NoReplay {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -945,26 +1088,6 @@ func (m *ListUesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.WithoutReplay {
-		i--
-		if m.WithoutReplay {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Subscribe {
-		i--
-		if m.Subscribe {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -984,6 +1107,84 @@ func (m *ListUesResponse) MarshalTo(dAtA []byte) (int, error) {
 }
 
 func (m *ListUesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Ue != nil {
+		{
+			size, err := m.Ue.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTrafficsim(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *WatchUesRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WatchUesRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WatchUesRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.NoSubscribe {
+		i--
+		if m.NoSubscribe {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.NoReplay {
+		i--
+		if m.NoReplay {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *WatchUesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WatchUesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WatchUesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1118,10 +1319,10 @@ func (m *ListRoutesRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Subscribe {
+	if m.NoReplay {
 		n += 2
 	}
-	if m.WithoutReplay {
+	if m.NoSubscribe {
 		n += 2
 	}
 	return n
@@ -1149,16 +1350,38 @@ func (m *ListUesRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Subscribe {
+	return n
+}
+
+func (m *ListUesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Ue != nil {
+		l = m.Ue.Size()
+		n += 1 + l + sovTrafficsim(uint64(l))
+	}
+	return n
+}
+
+func (m *WatchUesRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.NoReplay {
 		n += 2
 	}
-	if m.WithoutReplay {
+	if m.NoSubscribe {
 		n += 2
 	}
 	return n
 }
 
-func (m *ListUesResponse) Size() (n int) {
+func (m *WatchUesResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1300,7 +1523,7 @@ func (m *ListRoutesRequest) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Subscribe", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NoReplay", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -1317,10 +1540,10 @@ func (m *ListRoutesRequest) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.Subscribe = bool(v != 0)
+			m.NoReplay = bool(v != 0)
 		case 2:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WithoutReplay", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NoSubscribe", wireType)
 			}
 			var v int
 			for shift := uint(0); ; shift += 7 {
@@ -1337,7 +1560,7 @@ func (m *ListRoutesRequest) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.WithoutReplay = bool(v != 0)
+			m.NoSubscribe = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTrafficsim(dAtA[iNdEx:])
@@ -1499,46 +1722,6 @@ func (m *ListUesRequest) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: ListUesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Subscribe", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTrafficsim
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Subscribe = bool(v != 0)
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WithoutReplay", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTrafficsim
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.WithoutReplay = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTrafficsim(dAtA[iNdEx:])
@@ -1590,6 +1773,188 @@ func (m *ListUesResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: ListUesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ue", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Ue == nil {
+				m.Ue = &types.Ue{}
+			}
+			if err := m.Ue.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTrafficsim(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WatchUesRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTrafficsim
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WatchUesRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WatchUesRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NoReplay", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.NoReplay = bool(v != 0)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NoSubscribe", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTrafficsim
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.NoSubscribe = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTrafficsim(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTrafficsim
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WatchUesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTrafficsim
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WatchUesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WatchUesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

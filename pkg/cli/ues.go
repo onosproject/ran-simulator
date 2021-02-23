@@ -21,6 +21,7 @@ func getUEsCommand() *cobra.Command {
 		RunE:  runGetUEsCommand,
 	}
 	cmd.Flags().Bool("no-headers", false, "disables output headers")
+	cmd.Flags().BoolP("watch", "w", false, "watch ue changes")
 	return cmd
 }
 
@@ -34,28 +35,34 @@ func getUECountCommand() *cobra.Command {
 }
 
 func runGetUEsCommand(cmd *cobra.Command, args []string) error {
+	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
+		Output("%-16s %-16s %-5s\n", "IMSI", "Serving Cell", "Admitted")
+	}
 	conn, err := cli.GetConnection(cmd)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
-	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
-		Output("%-16s %-16s %-5s\n", "IMSI", "Serving Cell", "Admitted")
-	}
 	client := simapi.NewTrafficClient(conn)
-	stream, err := client.ListUes(context.Background(), &simapi.ListUesRequest{})
-	if err != nil {
-		return err
+
+	if watch, _ := cmd.Flags().GetBool("watch"); watch {
+
+	} else {
+		stream, err := client.ListUes(context.Background(), &simapi.ListUesRequest{})
+		if err != nil {
+			return err
+		}
+
+		for {
+			r, err := stream.Recv()
+			if err != nil {
+				break
+			}
+			ue := r.Ue
+			Output("%-16d %-16d %-5t\n", ue.IMSI, ue.ServingTower, ue.Admitted)
+		}
 	}
 
-	for {
-		r, err := stream.Recv()
-		if err != nil {
-			break
-		}
-		ue := r.Ue
-		Output("%-16d %-16d %-5t\n", ue.IMSI, ue.ServingTower, ue.Admitted)
-	}
 	return nil
 }
 

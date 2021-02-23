@@ -80,7 +80,7 @@ func TestServiceBasics(t *testing.T) {
 	client := simapi.NewTrafficClient(createServerConnection(t))
 	assert.NotNil(t, client, "unable to create gRPC client")
 
-	stream, err := client.ListUes(context.Background(), &simapi.ListUesRequest{WithoutReplay: false})
+	stream, err := client.ListUes(context.Background(), &simapi.ListUesRequest{})
 	assert.NoError(t, err, "unable to list UEs")
 	numUes := countUEs(t, stream)
 	assert.Equal(t, 12, numUes)
@@ -89,7 +89,7 @@ func TestServiceBasics(t *testing.T) {
 	})
 	assert.NoError(t, err, "unable to set UE count")
 
-	stream, err = client.ListUes(context.TODO(), &simapi.ListUesRequest{WithoutReplay: true})
+	stream, err = client.ListUes(context.TODO(), &simapi.ListUesRequest{})
 	assert.NoError(t, err, "unable to list UEs")
 	numUes = countUEs(t, stream)
 	assert.Equal(t, 16, numUes)

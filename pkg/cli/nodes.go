@@ -24,6 +24,7 @@ func getNodesCommand() *cobra.Command {
 		RunE:  runGetNodesCommand,
 	}
 	cmd.Flags().Bool("no-headers", false, "disables output headers")
+	cmd.Flags().BoolP("watch", "w", false, "watch node changes")
 	return cmd
 }
 
@@ -94,21 +95,40 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	defer conn.Close()
-	stream, err := client.ListNodes(context.Background(), &modelapi.ListNodesRequest{})
-	if err != nil {
-		return err
-	}
 
 	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
 		Output("%-16s %-8s %-32s %-16s %-20s\n", "EnbID", "Status", "Cell ECGIs", "Service Models", "E2T Controllers")
 	}
-	for {
-		r, err := stream.Recv()
+
+	if watch, _ := cmd.Flags().GetBool("watch"); watch {
+		stream, err := client.WatchNodes(context.Background(), &modelapi.WatchNodesRequest{NoReplay: false})
 		if err != nil {
-			break
+			return err
 		}
-		node := r.Node
-		Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+		for {
+			r, err := stream.Recv()
+			if err != nil {
+				break
+			}
+			node := r.Node
+			Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+		}
+
+	} else {
+
+		stream, err := client.ListNodes(context.Background(), &modelapi.ListNodesRequest{})
+		if err != nil {
+			return err
+		}
+
+		for {
+			r, err := stream.Recv()
+			if err != nil {
+				break
+			}
+			node := r.Node
+			Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+		}
 	}
 
 	return nil

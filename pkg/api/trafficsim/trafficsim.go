@@ -8,6 +8,8 @@ package trafficsim
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
@@ -115,6 +117,26 @@ func (s *Server) ListUes(req *simapi.ListUesRequest, stream simapi.Traffic_ListU
 			return err
 		}
 	}
+	return nil
+}
+
+// WatchUes watch ue changes
+func (s *Server) WatchUes(request *simapi.WatchUesRequest, server simapi.Traffic_WatchUesServer) error {
+	ch := make(chan event.Event)
+	err := s.ueStore.Watch(server.Context(), ch, ues.WatchOptions{Replay: !request.NoReplay})
+	if err != nil {
+		return err
+	}
+	for ueEvent := range ch {
+		response := &simapi.WatchUesResponse{
+			Ue: ueToAPI(ueEvent.Value.(*model.UE)),
+		}
+		err := server.Send(response)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

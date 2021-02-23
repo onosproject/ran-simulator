@@ -52,4 +52,9 @@ func TestCells(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, ecgi1, cell1.ECGI)
 
+	_, err = cellStore.Delete(ctx, ecgi1)
+	assert.NoError(t, err)
+	cellEvent = <-ch
+	assert.Equal(t, Deleted, cellEvent.Type)
+
 }
