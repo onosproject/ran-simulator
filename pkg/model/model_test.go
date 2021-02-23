@@ -10,8 +10,6 @@ import (
 	"github.com/onosproject/ran-simulator/api/types"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/onosproject/ran-simulator/api/types"
 )
 
 func TestModel(t *testing.T) {

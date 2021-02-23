@@ -5,13 +5,7 @@
 package nodes
 
 import (
-<<<<<<< HEAD
-	"github.com/onosproject/ran-simulator/api/types"
-	"github.com/onosproject/ran-simulator/pkg/model"
-=======
 	"context"
-	"io/ioutil"
->>>>>>> Improve data stores
 	"testing"
 
 	"github.com/onosproject/ran-simulator/api/types"
