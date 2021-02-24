@@ -14,6 +14,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"github.com/onosproject/ran-simulator/pkg/pciload"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -95,6 +96,9 @@ func (m *Manager) Start() error {
 
 	// Create store for tracking arbitrary metrics and attributes for nodes, cells and UEs
 	m.metricsStore = metrics.NewMetricsStore()
+
+	// Load additional initial use-case data; ignore errors
+	_ = pciload.LoadPCIMetrics(m.metricsStore)
 
 	// Start gRPC server
 	err = m.startNorthboundServer()
