@@ -7,6 +7,8 @@ package rc
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
+
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 
 	rcindicationhdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/indication/header"
@@ -14,7 +16,6 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/pcirange"
 
-	"github.com/onosproject/ran-simulator/pkg/types"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/nrt"
 
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -66,12 +67,6 @@ func (sm *Client) reportIndicationPeiodic(ctx context.Context, interval int32, s
 	return nil
 }
 
-func (sm *Client) getPlmnID() types.Uint24 {
-	plmnIDUint24 := types.Uint24{}
-	plmnIDUint24.Set(uint32(sm.ServiceModel.Model.PlmnID))
-	return plmnIDUint24
-}
-
 func (sm *Client) createRicIndication(ctx context.Context, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
 	node := sm.ServiceModel.Node
 	plmnID := sm.getPlmnID()
@@ -81,13 +76,19 @@ func (sm *Client) createRicIndication(ctx context.Context, subscription *subutil
 	neighbourList = make([]*e2sm_rc_pre_ies.Nrt, 0)
 	for _, ecgi := range node.Cells {
 		cell, _ := sm.ServiceModel.CellStore.Get(ctx, ecgi)
-		for index, neighbour := range cell.Neighbors {
+		cellPci, _ := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "pci")
+		earfcn, _ := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "earfcn")
+		cellSize, _ := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "cellSize")
+		for index, neighbourEcgi := range cell.Neighbors {
+			neighbourCellPci, _ := sm.ServiceModel.MetricStore.Get(ctx, uint64(neighbourEcgi), "pci")
+			neighbourEarfcn, _ := sm.ServiceModel.MetricStore.Get(ctx, uint64(neighbourEcgi), "earfcn")
+			neighbourCellSize, _ := sm.ServiceModel.MetricStore.Get(ctx, uint64(neighbourEcgi), "cellSize")
 			neighbour, err := nrt.NewNeighbour(
 				nrt.WithNrIndex(int32(index)),
-				nrt.WithPci(10),
-				nrt.WithEutraCellIdentity(uint64(neighbour)),
-				nrt.WithEarfcn(40),
-				nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
+				nrt.WithPci(int32(neighbourCellPci.(uint32))),
+				nrt.WithEutraCellIdentity(uint64(neighbourEcgi)),
+				nrt.WithEarfcn(int32(neighbourEarfcn.(uint32))),
+				nrt.WithCellSize(sm.getCellSize(neighbourCellSize.(string))),
 				nrt.WithPlmnID(plmnID.Value())).Build()
 			if err == nil {
 				neighbourList = append(neighbourList, neighbour)
@@ -103,16 +104,16 @@ func (sm *Client) createRicIndication(ctx context.Context, subscription *subutil
 			rcindicationhdr.WithEutracellIdentity(uint64(cell.ECGI)))
 
 		message = rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
-			rcindicationmsg.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
-			rcindicationmsg.WithEarfcn(20),
+			rcindicationmsg.WithCellSize(sm.getCellSize(cellSize.(string))),
+			rcindicationmsg.WithEarfcn(int32(earfcn.(uint32))),
 			rcindicationmsg.WithEutraCellIdentity(uint64(cell.ECGI)),
-			rcindicationmsg.WithPci(10),
+			rcindicationmsg.WithPci(int32(cellPci.(uint32))),
 			rcindicationmsg.WithNeighbours(neighbourList),
 			rcindicationmsg.WithPciPool([]*e2smrcpreies.PciRange{pciRange1}))
 
 	}
 	testMessage, _ := message.Build()
-	log.Debug("Test message:", testMessage.GetIndicationMessageFormat1().Neighbors)
+	log.Debug("Test message:", testMessage.GetIndicationMessageFormat1().CellSize, testMessage.GetIndicationMessageFormat1().Pci)
 	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
 	if err != nil {
@@ -179,7 +180,6 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 
 	// Sends indication messages on cell changes
 	for cellEvent := range ch {
-		log.Debug("Cell event in rc:", cellEvent)
 		cell := cellEvent.Value.(*model.Cell)
 		for _, nodeCell := range nodeCells {
 			if nodeCell == cell.ECGI {
@@ -190,15 +190,16 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 				}
 			}
 		}
-
 	}
 
 	return nil
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model,
+	modelPluginRegistry *modelplugins.ModelPluginRegistry,
+	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
+	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	rcSm := registry.ServiceModel{
 		RanFunctionID:       registry.Rc,
@@ -212,6 +213,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		Nodes:               nodeStore,
 		UEs:                 ueStore,
 		CellStore:           cellStore,
+		MetricStore:         metricStore,
 	}
 
 	rcClient := &Client{

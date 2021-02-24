@@ -9,6 +9,7 @@ import (
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	"github.com/onosproject/ran-simulator/pkg/types"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -74,4 +75,25 @@ func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
 		return modelPlugin, nil
 	}
 	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
+}
+
+func (sm *Client) getPlmnID() types.Uint24 {
+	plmnIDUint24 := types.Uint24{}
+	plmnIDUint24.Set(uint32(sm.ServiceModel.Model.PlmnID))
+	return plmnIDUint24
+}
+
+func (sm *Client) getCellSize(cellSize string) e2sm_rc_pre_ies.CellSize {
+	switch cellSize {
+	case "ENTERPRISE":
+		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_ENTERPRISE
+	case "FEMTO":
+		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_FEMTO
+	case "MACRO":
+		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_MACRO
+	case "OUTDOOR_SMALL":
+		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_OUTDOOR_SMALL
+	default:
+		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_ENTERPRISE
+	}
 }

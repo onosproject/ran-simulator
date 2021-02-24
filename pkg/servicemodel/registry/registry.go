@@ -7,6 +7,8 @@ package registry
 import (
 	"sync"
 
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
+
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -48,6 +50,7 @@ type ServiceModel struct {
 	Nodes               nodes.Store
 	UEs                 ues.Store
 	CellStore           cells.Store
+	MetricStore         metrics.Store
 }
 
 // NewServiceModelRegistry creates a service model registry

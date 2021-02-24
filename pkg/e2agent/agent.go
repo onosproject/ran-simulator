@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
+
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -66,7 +68,7 @@ type e2Agent struct {
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store) (E2Agent, error) {
+	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
 	reg := registry.NewServiceModelRegistry()
 
@@ -92,7 +94,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 			}
 		case registry.Rc:
 			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry,
-				subStore, nodeStore, ueStore, cellStore)
+				subStore, nodeStore, ueStore, cellStore, metricStore)
 			if err != nil {
 				return nil, err
 			}

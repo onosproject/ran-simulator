@@ -7,8 +7,6 @@ package message
 import (
 	"fmt"
 
-	"github.com/onosproject/onos-lib-go/pkg/logging"
-
 	"github.com/onosproject/ran-simulator/pkg/types"
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
@@ -16,8 +14,6 @@ import (
 
 	"google.golang.org/protobuf/proto"
 )
-
-var log = logging.GetLogger("rc", "indication", "message")
 
 // Message indication message fields for rc service model
 type Message struct {
@@ -78,7 +74,6 @@ func WithPci(pci int32) func(message *Message) {
 
 // WithNeighbours sets neighbours
 func WithNeighbours(neighbours []*e2smrcpreies.Nrt) func(message *Message) {
-	log.Debug("With neighbours:", neighbours)
 	return func(message *Message) {
 		message.neighbours = neighbours
 	}
@@ -126,7 +121,6 @@ func (message *Message) Build() (*e2smrcpreies.E2SmRcPreIndicationMessage, error
 
 	e2SmIindicationMsg.IndicationMessageFormat1.PciPool = message.pciPool
 	e2SmIindicationMsg.IndicationMessageFormat1.Neighbors = message.neighbours
-	log.Debug("Message neighbours:", message.neighbours)
 
 	E2SmRcPrePdu := e2smrcpreies.E2SmRcPreIndicationMessage{
 		E2SmRcPreIndicationMessage: &e2SmIindicationMsg,
