@@ -8,12 +8,14 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	cellapi "github.com/onosproject/ran-simulator/pkg/api/cells"
+	metricsapi "github.com/onosproject/ran-simulator/pkg/api/metrics"
 	nodeapi "github.com/onosproject/ran-simulator/pkg/api/nodes"
 	"github.com/onosproject/ran-simulator/pkg/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 )
@@ -62,6 +64,7 @@ type Manager struct {
 	nodeStore           nodes.Store
 	cellStore           cells.Store
 	ueStore             ues.Store
+	metricsStore        metrics.Store
 }
 
 // Run starts the manager and the associated services
@@ -89,6 +92,9 @@ func (m *Manager) Start() error {
 
 	// Create the UE registry primed with the specified number of UEs
 	m.ueStore = ues.NewUERegistry(m.model.UECount, m.cellStore)
+
+	// Create store for tracking arbitrary metrics and attributes for nodes, cells and UEs
+	m.metricsStore = metrics.NewMetricsStore()
 
 	// Start gRPC server
 	err = m.startNorthboundServer()
@@ -118,6 +124,7 @@ func (m *Manager) startNorthboundServer() error {
 	m.server.AddService(nodeapi.NewService(m.nodeStore))
 	m.server.AddService(cellapi.NewService(m.cellStore))
 	m.server.AddService(trafficsim.NewService(m.model, m.cellStore, m.ueStore))
+	m.server.AddService(metricsapi.NewService(m.metricsStore))
 
 	doneCh := make(chan error)
 	go func() {

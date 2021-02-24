@@ -22,6 +22,12 @@ service MetricsService {
     // Get retrieves the named metric for the specified entity
     rpc Get(GetRequest) returns (GetResponse);
 
+    // Delete deletes the the named metric for the specified entity
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+
+    // DeleteAll deletes all metrics for the specified entity
+    rpc DeleteAll(DeleteAllRequest) returns (DeleteAllResponse);
+
     // Watch returns a stream of ongoing changes to the metrics
     rpc Watch(WatchRequest) returns (stream WatchResponse);
 }
@@ -56,6 +62,21 @@ message GetRequest {
 
 message GetResponse {
     Metric metric = 1;
+}
+
+message DeleteRequest {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+    string name = 2;
+}
+
+message DeleteResponse {
+}
+
+message DeleteAllRequest {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+}
+
+message DeleteAllResponse {
 }
 
 message WatchRequest {

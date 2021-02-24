@@ -136,6 +136,26 @@ func (s *Server) Get(ctx context.Context, request *metricsapi.GetRequest) (*metr
 	return nil, errors.New(errors.NotFound, "metric not found")
 }
 
+// Delete deletes the value of the specified metric
+func (s *Server) Delete(ctx context.Context, request *metricsapi.DeleteRequest) (*metricsapi.DeleteResponse, error) {
+	log.Debugf("Received delete metric request: %+v", request)
+	err := s.store.Delete(ctx, request.EntityID, request.Name)
+	if err != nil {
+		return nil, err
+	}
+	return &metricsapi.DeleteResponse{}, nil
+}
+
+// DeleteAll deletes all metrics of the specified entity
+func (s *Server) DeleteAll(ctx context.Context, request *metricsapi.DeleteAllRequest) (*metricsapi.DeleteAllResponse, error) {
+	log.Debugf("Received delete all metric request: %+v", request)
+	err := s.store.DeleteAll(ctx, request.EntityID)
+	if err != nil {
+		return nil, err
+	}
+	return &metricsapi.DeleteAllResponse{}, nil
+}
+
 func eventType(metricsEvent metrics.MetricEvent) metricsapi.EventType {
 	if metricsEvent == metrics.Deleted {
 		return metricsapi.EventType_DELETED

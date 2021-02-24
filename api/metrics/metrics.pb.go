@@ -399,6 +399,174 @@ func (m *GetResponse) GetMetric() *Metric {
 	return nil
 }
 
+type DeleteRequest struct {
+	EntityID uint64 `protobuf:"varint,1,opt,name=entityid,proto3" json:"entityid,omitempty"`
+	Name     string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *DeleteRequest) Reset()         { *m = DeleteRequest{} }
+func (m *DeleteRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteRequest) ProtoMessage()    {}
+func (*DeleteRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_48e16570f9ec44ef, []int{7}
+}
+func (m *DeleteRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DeleteRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DeleteRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DeleteRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteRequest.Merge(m, src)
+}
+func (m *DeleteRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DeleteRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteRequest proto.InternalMessageInfo
+
+func (m *DeleteRequest) GetEntityID() uint64 {
+	if m != nil {
+		return m.EntityID
+	}
+	return 0
+}
+
+func (m *DeleteRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type DeleteResponse struct {
+}
+
+func (m *DeleteResponse) Reset()         { *m = DeleteResponse{} }
+func (m *DeleteResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteResponse) ProtoMessage()    {}
+func (*DeleteResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_48e16570f9ec44ef, []int{8}
+}
+func (m *DeleteResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DeleteResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DeleteResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DeleteResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteResponse.Merge(m, src)
+}
+func (m *DeleteResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *DeleteResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteResponse proto.InternalMessageInfo
+
+type DeleteAllRequest struct {
+	EntityID uint64 `protobuf:"varint,1,opt,name=entityid,proto3" json:"entityid,omitempty"`
+}
+
+func (m *DeleteAllRequest) Reset()         { *m = DeleteAllRequest{} }
+func (m *DeleteAllRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteAllRequest) ProtoMessage()    {}
+func (*DeleteAllRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_48e16570f9ec44ef, []int{9}
+}
+func (m *DeleteAllRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DeleteAllRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DeleteAllRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DeleteAllRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteAllRequest.Merge(m, src)
+}
+func (m *DeleteAllRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *DeleteAllRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteAllRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteAllRequest proto.InternalMessageInfo
+
+func (m *DeleteAllRequest) GetEntityID() uint64 {
+	if m != nil {
+		return m.EntityID
+	}
+	return 0
+}
+
+type DeleteAllResponse struct {
+}
+
+func (m *DeleteAllResponse) Reset()         { *m = DeleteAllResponse{} }
+func (m *DeleteAllResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteAllResponse) ProtoMessage()    {}
+func (*DeleteAllResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_48e16570f9ec44ef, []int{10}
+}
+func (m *DeleteAllResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DeleteAllResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DeleteAllResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DeleteAllResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteAllResponse.Merge(m, src)
+}
+func (m *DeleteAllResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *DeleteAllResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteAllResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteAllResponse proto.InternalMessageInfo
+
 type WatchRequest struct {
 }
 
@@ -406,7 +574,7 @@ func (m *WatchRequest) Reset()         { *m = WatchRequest{} }
 func (m *WatchRequest) String() string { return proto.CompactTextString(m) }
 func (*WatchRequest) ProtoMessage()    {}
 func (*WatchRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_48e16570f9ec44ef, []int{7}
+	return fileDescriptor_48e16570f9ec44ef, []int{11}
 }
 func (m *WatchRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -444,7 +612,7 @@ func (m *WatchResponse) Reset()         { *m = WatchResponse{} }
 func (m *WatchResponse) String() string { return proto.CompactTextString(m) }
 func (*WatchResponse) ProtoMessage()    {}
 func (*WatchResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_48e16570f9ec44ef, []int{8}
+	return fileDescriptor_48e16570f9ec44ef, []int{12}
 }
 func (m *WatchResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -496,6 +664,10 @@ func init() {
 	proto.RegisterType((*SetResponse)(nil), "ran.metrics.SetResponse")
 	proto.RegisterType((*GetRequest)(nil), "ran.metrics.GetRequest")
 	proto.RegisterType((*GetResponse)(nil), "ran.metrics.GetResponse")
+	proto.RegisterType((*DeleteRequest)(nil), "ran.metrics.DeleteRequest")
+	proto.RegisterType((*DeleteResponse)(nil), "ran.metrics.DeleteResponse")
+	proto.RegisterType((*DeleteAllRequest)(nil), "ran.metrics.DeleteAllRequest")
+	proto.RegisterType((*DeleteAllResponse)(nil), "ran.metrics.DeleteAllResponse")
 	proto.RegisterType((*WatchRequest)(nil), "ran.metrics.WatchRequest")
 	proto.RegisterType((*WatchResponse)(nil), "ran.metrics.WatchResponse")
 }
@@ -503,35 +675,39 @@ func init() {
 func init() { proto.RegisterFile("api/metrics/metrics.proto", fileDescriptor_48e16570f9ec44ef) }
 
 var fileDescriptor_48e16570f9ec44ef = []byte{
-	// 445 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0x4d, 0x6f, 0xd3, 0x40,
-	0x10, 0xcd, 0x26, 0x6e, 0x9a, 0x8e, 0xd3, 0x28, 0x5a, 0x2a, 0xd8, 0xfa, 0x60, 0xa2, 0x3d, 0x45,
-	0x45, 0x24, 0x28, 0x1c, 0xf8, 0xba, 0x40, 0x65, 0xcb, 0x02, 0x95, 0x82, 0x9c, 0x22, 0xce, 0x26,
-	0x8c, 0x52, 0x0b, 0x6a, 0x1b, 0x7b, 0x1b, 0xc9, 0x67, 0xfe, 0x00, 0x3f, 0x8b, 0x63, 0x8f, 0x9c,
-	0x10, 0x72, 0xfe, 0x08, 0xf2, 0xee, 0x36, 0xb1, 0xd5, 0x46, 0x22, 0x9c, 0x32, 0x1f, 0xef, 0xed,
-	0xbc, 0x99, 0x17, 0xc3, 0x61, 0x90, 0x84, 0xe3, 0x0b, 0x14, 0x69, 0x38, 0xcb, 0xae, 0x7f, 0x47,
-	0x49, 0x1a, 0x8b, 0x98, 0x9a, 0x69, 0x10, 0x8d, 0x74, 0xc9, 0x3a, 0x98, 0xc7, 0xf3, 0x58, 0xd6,
-	0xc7, 0x65, 0xa4, 0x20, 0x3c, 0x82, 0xf6, 0x5b, 0x09, 0xa0, 0x43, 0xe8, 0x60, 0x24, 0x42, 0x91,
-	0x87, 0x9f, 0x19, 0x19, 0x90, 0xa1, 0x71, 0xdc, 0x2d, 0x7e, 0xdf, 0xef, 0xb8, 0xb2, 0xf6, 0xda,
-	0xf1, 0x57, 0x5d, 0xda, 0x87, 0xd6, 0x17, 0xcc, 0x59, 0x73, 0x40, 0x86, 0x7b, 0x7e, 0x19, 0xd2,
-	0x03, 0xd8, 0x59, 0x04, 0x5f, 0x2f, 0x91, 0xb5, 0x64, 0x4d, 0x25, 0x94, 0x82, 0x21, 0xf2, 0x04,
-	0x99, 0x21, 0x8b, 0x32, 0xe6, 0x4f, 0xc0, 0x3c, 0x09, 0x33, 0xe1, 0xe3, 0xb7, 0x4b, 0xcc, 0xc4,
-	0xbf, 0x0f, 0xe5, 0x73, 0xe8, 0x2a, 0x62, 0x96, 0xc4, 0x51, 0x86, 0x5b, 0xc8, 0x7d, 0x08, 0xbb,
-	0xfa, 0x06, 0xac, 0x39, 0x68, 0x0d, 0xcd, 0xc9, 0x9d, 0x51, 0xe5, 0x2e, 0x23, 0xb5, 0xbe, 0x7f,
-	0x8d, 0xe1, 0xcf, 0x00, 0xa6, 0xb8, 0x12, 0xf8, 0x00, 0xda, 0xaa, 0x21, 0x87, 0x6c, 0xe0, 0x6a,
-	0x08, 0xdf, 0x07, 0x53, 0x52, 0x95, 0x44, 0xfe, 0x06, 0xc0, 0xc3, 0xed, 0x57, 0x2d, 0xef, 0x16,
-	0x05, 0x17, 0xa8, 0x0f, 0x2c, 0x63, 0xfe, 0x1c, 0x4c, 0x6f, 0xfd, 0xf4, 0x76, 0xb2, 0x7a, 0xd0,
-	0xfd, 0x18, 0x88, 0xd9, 0xb9, 0x56, 0xc2, 0xcf, 0x61, 0x5f, 0xe7, 0xff, 0xf1, 0x1a, 0x3d, 0xd2,
-	0xae, 0x96, 0xea, 0x7a, 0x93, 0xbb, 0x35, 0xa8, 0xbb, 0xc0, 0x48, 0x9c, 0xe5, 0x09, 0x2a, 0xb7,
-	0x8f, 0xc6, 0xb0, 0xb7, 0x2a, 0xd1, 0x0e, 0x18, 0xa7, 0xef, 0x4e, 0xdd, 0x7e, 0x83, 0x9a, 0xb0,
-	0xfb, 0xe1, 0xbd, 0xf3, 0xea, 0xcc, 0x75, 0xfa, 0xa4, 0x4c, 0x1c, 0xf7, 0xc4, 0x2d, 0x93, 0xe6,
-	0xe4, 0x7b, 0x13, 0x7a, 0x6a, 0x5e, 0x36, 0xc5, 0x74, 0x11, 0xce, 0x90, 0xbe, 0x00, 0xa3, 0x34,
-	0x9e, 0xb2, 0xda, 0xa4, 0xca, 0x9f, 0xc8, 0x3a, 0xbc, 0xa5, 0xa3, 0x37, 0x7b, 0x0a, 0xad, 0x29,
-	0x0a, 0x7a, 0xaf, 0x86, 0x58, 0xdb, 0x6b, 0xb1, 0x9b, 0x8d, 0x35, 0xd3, 0xbb, 0xc1, 0xf4, 0x36,
-	0x31, 0xab, 0xde, 0xbc, 0x84, 0x1d, 0x79, 0x5e, 0x5a, 0xd7, 0x55, 0xb5, 0xc0, 0xb2, 0x6e, 0x6b,
-	0x29, 0xfe, 0x23, 0x72, 0xcc, 0x7e, 0x16, 0x36, 0xb9, 0x2a, 0x6c, 0xf2, 0xa7, 0xb0, 0xc9, 0x8f,
-	0xa5, 0xdd, 0xb8, 0x5a, 0xda, 0x8d, 0x5f, 0x4b, 0xbb, 0xf1, 0xa9, 0x2d, 0xbf, 0xda, 0xc7, 0x7f,
-	0x03, 0x00, 0x00, 0xff, 0xff, 0xa3, 0x99, 0x21, 0xcc, 0xf5, 0x03, 0x00, 0x00,
+	// 508 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x5f, 0x6f, 0xd2, 0x50,
+	0x14, 0xa7, 0xb4, 0x63, 0x70, 0x0a, 0xa4, 0xde, 0x2d, 0xda, 0xd5, 0x58, 0xc9, 0x7d, 0x22, 0x33,
+	0x82, 0xc1, 0x07, 0xff, 0x3e, 0xc8, 0xd2, 0x86, 0xb8, 0x6c, 0xd3, 0xc0, 0x8c, 0xcf, 0x15, 0x4f,
+	0x58, 0x23, 0x6b, 0x2b, 0xbd, 0x23, 0xe1, 0x5b, 0x18, 0x3f, 0x95, 0x8f, 0x7b, 0xf4, 0xc9, 0x18,
+	0xf8, 0x22, 0xa6, 0xf7, 0x5e, 0xa0, 0x0d, 0x90, 0x58, 0xe3, 0x53, 0xef, 0x39, 0xe7, 0xf7, 0x3b,
+	0x7f, 0x7f, 0x29, 0x1c, 0x79, 0x91, 0xdf, 0xbe, 0x46, 0x36, 0xf1, 0x87, 0xf1, 0xf2, 0xdb, 0x8a,
+	0x26, 0x21, 0x0b, 0x89, 0x3e, 0xf1, 0x82, 0x96, 0x74, 0x59, 0x87, 0xa3, 0x70, 0x14, 0x72, 0x7f,
+	0x3b, 0x79, 0x09, 0x08, 0x0d, 0xa0, 0x74, 0xce, 0x01, 0xa4, 0x09, 0x65, 0x0c, 0x98, 0xcf, 0x66,
+	0xfe, 0x67, 0x53, 0x69, 0x28, 0x4d, 0xed, 0xa4, 0x3a, 0xff, 0xf5, 0xb0, 0xec, 0x72, 0xdf, 0x5b,
+	0xa7, 0xbf, 0x8a, 0x12, 0x03, 0xd4, 0x2f, 0x38, 0x33, 0x8b, 0x0d, 0xa5, 0x59, 0xe9, 0x27, 0x4f,
+	0x72, 0x08, 0x7b, 0x53, 0x6f, 0x7c, 0x83, 0xa6, 0xca, 0x7d, 0xc2, 0x20, 0x04, 0x34, 0x36, 0x8b,
+	0xd0, 0xd4, 0xb8, 0x93, 0xbf, 0xe9, 0x33, 0xd0, 0xcf, 0xfc, 0x98, 0xf5, 0xf1, 0xeb, 0x0d, 0xc6,
+	0xec, 0xef, 0x8b, 0xd2, 0x11, 0x54, 0x05, 0x31, 0x8e, 0xc2, 0x20, 0xc6, 0x1c, 0xed, 0x3e, 0x86,
+	0x7d, 0xb9, 0x03, 0xb3, 0xd8, 0x50, 0x9b, 0x7a, 0xe7, 0xa0, 0x95, 0xda, 0x4b, 0x4b, 0x8c, 0xdf,
+	0x5f, 0x62, 0xe8, 0x0b, 0x80, 0x01, 0xae, 0x1a, 0x7c, 0x04, 0x25, 0x11, 0xe0, 0x45, 0x76, 0x70,
+	0x25, 0x84, 0xd6, 0x40, 0xe7, 0x54, 0xd1, 0x22, 0x3d, 0x05, 0xe8, 0x61, 0xfe, 0x51, 0x93, 0xbd,
+	0x05, 0xde, 0x35, 0xca, 0x05, 0xf3, 0x37, 0x7d, 0x09, 0x7a, 0x6f, 0x9d, 0x3a, 0x5f, 0x5b, 0xe7,
+	0x50, 0x73, 0x70, 0x8c, 0x0c, 0xff, 0x4f, 0x2b, 0x06, 0xd4, 0x97, 0xe9, 0xe4, 0xa0, 0xaf, 0xc1,
+	0x10, 0x9e, 0xee, 0x78, 0x9c, 0xff, 0xb2, 0x07, 0x70, 0x27, 0xc5, 0x96, 0x29, 0xeb, 0x50, 0xfd,
+	0xe8, 0xb1, 0xe1, 0x95, 0x4c, 0x47, 0xaf, 0xa0, 0x26, 0xed, 0x7f, 0xd8, 0x00, 0x39, 0x96, 0x4a,
+	0x4c, 0xc6, 0xa8, 0x77, 0xee, 0x66, 0xa0, 0xee, 0x14, 0x03, 0x76, 0x39, 0x8b, 0x50, 0x28, 0xf4,
+	0xb8, 0x0d, 0x95, 0x95, 0x8b, 0x94, 0x41, 0xbb, 0x78, 0x77, 0xe1, 0x1a, 0x05, 0xa2, 0xc3, 0xfe,
+	0x87, 0xf7, 0x4e, 0xf7, 0xd2, 0x75, 0x0c, 0x25, 0x31, 0x1c, 0xf7, 0xcc, 0x4d, 0x8c, 0x62, 0xe7,
+	0xbb, 0x0a, 0x75, 0x51, 0x2f, 0x1e, 0xe0, 0x64, 0xea, 0x0f, 0x91, 0xbc, 0x02, 0x2d, 0x11, 0x2b,
+	0x31, 0x33, 0x95, 0x52, 0xc2, 0xb7, 0x8e, 0xb6, 0x44, 0xe4, 0x64, 0xcf, 0x41, 0x1d, 0x20, 0x23,
+	0xf7, 0x32, 0x88, 0xb5, 0x24, 0x2d, 0x73, 0x33, 0xb0, 0x66, 0xf6, 0x36, 0x98, 0xbd, 0x5d, 0xcc,
+	0xb4, 0x9e, 0xba, 0x50, 0x12, 0x37, 0x20, 0x56, 0x06, 0x93, 0xd1, 0x8d, 0x75, 0x7f, 0x6b, 0x4c,
+	0xa6, 0x38, 0x85, 0xca, 0xea, 0x8c, 0xe4, 0xc1, 0x16, 0xe4, 0x5a, 0x1c, 0x96, 0xbd, 0x2b, 0x2c,
+	0x73, 0xbd, 0x81, 0x3d, 0x7e, 0x6d, 0x92, 0x5d, 0x53, 0x5a, 0x11, 0x96, 0xb5, 0x2d, 0x24, 0xf8,
+	0x4f, 0x94, 0x13, 0xf3, 0xc7, 0xdc, 0x56, 0x6e, 0xe7, 0xb6, 0xf2, 0x7b, 0x6e, 0x2b, 0xdf, 0x16,
+	0x76, 0xe1, 0x76, 0x61, 0x17, 0x7e, 0x2e, 0xec, 0xc2, 0xa7, 0x12, 0xff, 0xf1, 0x3d, 0xfd, 0x13,
+	0x00, 0x00, 0xff, 0xff, 0x7d, 0x56, 0x9d, 0xd8, 0x38, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -552,6 +728,10 @@ type MetricsServiceClient interface {
 	Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetResponse, error)
 	// Get retrieves the named metric for the specified entity
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	// Delete deletes the the named metric for the specified entity
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	// DeleteAll deletes all metrics for the specified entity
+	DeleteAll(ctx context.Context, in *DeleteAllRequest, opts ...grpc.CallOption) (*DeleteAllResponse, error)
 	// Watch returns a stream of ongoing changes to the metrics
 	Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (MetricsService_WatchClient, error)
 }
@@ -585,6 +765,24 @@ func (c *metricsServiceClient) Set(ctx context.Context, in *SetRequest, opts ...
 func (c *metricsServiceClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
 	err := c.cc.Invoke(ctx, "/ran.metrics.MetricsService/Get", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *metricsServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
+	err := c.cc.Invoke(ctx, "/ran.metrics.MetricsService/Delete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *metricsServiceClient) DeleteAll(ctx context.Context, in *DeleteAllRequest, opts ...grpc.CallOption) (*DeleteAllResponse, error) {
+	out := new(DeleteAllResponse)
+	err := c.cc.Invoke(ctx, "/ran.metrics.MetricsService/DeleteAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -631,6 +829,10 @@ type MetricsServiceServer interface {
 	Set(context.Context, *SetRequest) (*SetResponse, error)
 	// Get retrieves the named metric for the specified entity
 	Get(context.Context, *GetRequest) (*GetResponse, error)
+	// Delete deletes the the named metric for the specified entity
+	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	// DeleteAll deletes all metrics for the specified entity
+	DeleteAll(context.Context, *DeleteAllRequest) (*DeleteAllResponse, error)
 	// Watch returns a stream of ongoing changes to the metrics
 	Watch(*WatchRequest, MetricsService_WatchServer) error
 }
@@ -647,6 +849,12 @@ func (*UnimplementedMetricsServiceServer) Set(ctx context.Context, req *SetReque
 }
 func (*UnimplementedMetricsServiceServer) Get(ctx context.Context, req *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (*UnimplementedMetricsServiceServer) Delete(ctx context.Context, req *DeleteRequest) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (*UnimplementedMetricsServiceServer) DeleteAll(ctx context.Context, req *DeleteAllRequest) (*DeleteAllResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAll not implemented")
 }
 func (*UnimplementedMetricsServiceServer) Watch(req *WatchRequest, srv MetricsService_WatchServer) error {
 	return status.Errorf(codes.Unimplemented, "method Watch not implemented")
@@ -710,6 +918,42 @@ func _MetricsService_Get_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MetricsService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetricsServiceServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ran.metrics.MetricsService/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetricsServiceServer).Delete(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MetricsService_DeleteAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAllRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetricsServiceServer).DeleteAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ran.metrics.MetricsService/DeleteAll",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetricsServiceServer).DeleteAll(ctx, req.(*DeleteAllRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MetricsService_Watch_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(WatchRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -746,6 +990,14 @@ var _MetricsService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _MetricsService_Get_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _MetricsService_Delete_Handler,
+		},
+		{
+			MethodName: "DeleteAll",
+			Handler:    _MetricsService_DeleteAll_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -1005,6 +1257,115 @@ func (m *GetResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *DeleteRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DeleteRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DeleteRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintMetrics(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.EntityID != 0 {
+		i = encodeVarintMetrics(dAtA, i, uint64(m.EntityID))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DeleteResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DeleteResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DeleteResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *DeleteAllRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DeleteAllRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DeleteAllRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.EntityID != 0 {
+		i = encodeVarintMetrics(dAtA, i, uint64(m.EntityID))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DeleteAllResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DeleteAllResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DeleteAllResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func (m *WatchRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1181,6 +1542,52 @@ func (m *GetResponse) Size() (n int) {
 		l = m.Metric.Size()
 		n += 1 + l + sovMetrics(uint64(l))
 	}
+	return n
+}
+
+func (m *DeleteRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.EntityID != 0 {
+		n += 1 + sovMetrics(uint64(m.EntityID))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovMetrics(uint64(l))
+	}
+	return n
+}
+
+func (m *DeleteResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *DeleteAllRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.EntityID != 0 {
+		n += 1 + sovMetrics(uint64(m.EntityID))
+	}
+	return n
+}
+
+func (m *DeleteAllResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -1872,6 +2279,288 @@ func (m *GetResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetrics(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DeleteRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetrics
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeleteRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeleteRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityID", wireType)
+			}
+			m.EntityID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetrics
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EntityID |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetrics
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetrics(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DeleteResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetrics
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeleteResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeleteResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetrics(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DeleteAllRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetrics
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeleteAllRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeleteAllRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EntityID", wireType)
+			}
+			m.EntityID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetrics
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EntityID |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMetrics(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthMetrics
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DeleteAllResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMetrics
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeleteAllResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeleteAllResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipMetrics(dAtA[iNdEx:])

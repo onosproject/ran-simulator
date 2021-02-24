@@ -59,6 +59,7 @@ func GetRootCommand() *cobra.Command {
 	cmd.AddCommand(getCreateCommand())
 	cmd.AddCommand(getDeleteCommand())
 	cmd.AddCommand(getGetCommand())
+	cmd.AddCommand(getSetCommand())
 	//cmd.AddCommand(getUpdateCommand())
 
 	cmd.AddCommand(startNodeCommand())
@@ -87,6 +88,8 @@ func getDeleteCommand() *cobra.Command {
 	}
 	cmd.AddCommand(deleteNodeCommand())
 	cmd.AddCommand(deleteCellCommand())
+	cmd.AddCommand(deleteMetricCommand())
+	cmd.AddCommand(deleteMetricsCommand())
 	return cmd
 }
 
@@ -111,5 +114,18 @@ func getGetCommand() *cobra.Command {
 	//cmd.AddCommand(getUECommand())
 
 	cmd.AddCommand(getUECountCommand())
+
+	cmd.AddCommand(getMetricCommand())
+	cmd.AddCommand(getMetricsCommand())
+	return cmd
+}
+
+func getSetCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "set {metric} [args]",
+		Short: "Commands for setting RAN simulator model metrics and other information",
+	}
+
+	cmd.AddCommand(setMetricCommand())
 	return cmd
 }
