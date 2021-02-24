@@ -56,6 +56,24 @@ func getCellCommand() *cobra.Command {
 	return cmd
 }
 
+func updateCellCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cell <enbid> [field options]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Update a cell",
+		RunE:  runUpdateCellCommand,
+	}
+	cmd.Flags().Uint32("max-ues", 10000, "maximum number of UEs connected")
+	cmd.Flags().Float64("tx-power", 11.0, "transmit power (dB)")
+	cmd.Flags().Float64("lat", 11.0, "geo location latitude")
+	cmd.Flags().Float64("lng", 11.0, "geo location longitude")
+	cmd.Flags().Int32("azimuth", 0, "azimuth of the coverage arc")
+	cmd.Flags().Int32("arc", 120, "angle width of the coverage arc")
+	cmd.Flags().UintSlice("neighbors", []uint{}, "neighbor cell ECGIs")
+	cmd.Flags().String("color", "blue", "color label")
+	return cmd
+}
+
 func deleteCellCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cell <enbid>",
@@ -168,6 +186,37 @@ func runCreateCellCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	Output("Cell %d created\n", ecgi)
+	return nil
+}
+
+func runUpdateCellCommand(cmd *cobra.Command, args []string) error {
+	ecgi, err := strconv.ParseUint(args[0], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	client, conn, err := getCellClient(cmd)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	// Get the cell first to prime the update cell with existing values and allow sparse update
+	gres, err := client.GetCell(context.Background(), &modelapi.GetCellRequest{ECGI: types.ECGI(ecgi)})
+	if err != nil {
+		return err
+	}
+
+	cell, err := optionsToCell(cmd, gres.Cell)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.UpdateCell(context.Background(), &modelapi.UpdateCellRequest{Cell: cell})
+	if err != nil {
+		return err
+	}
+	Output("Cell %d updated\n", ecgi)
 	return nil
 }
 

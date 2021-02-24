@@ -77,7 +77,7 @@ func getMetricsClient(cmd *cobra.Command) (metricsapi.MetricsServiceClient, *grp
 	return metricsapi.NewMetricsServiceClient(conn), conn, nil
 }
 
-func output(m *metricsapi.Metric, verbose bool, uberVerbose bool) {
+func outputMetric(m *metricsapi.Metric, verbose bool, uberVerbose bool) {
 	if verbose {
 		if uberVerbose {
 			Output("%d/%s=%s (%s)\n", m.EntityID, m.Key, m.Value, m.Type)
@@ -110,7 +110,7 @@ func runGetMetricCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	verbose, _ := cmd.Flags().GetBool("verbose")
-	output(resp.Metric, verbose, false)
+	outputMetric(resp.Metric, verbose, false)
 	return nil
 }
 
@@ -150,7 +150,7 @@ func runGetMetricsCommand(cmd *cobra.Command, args []string) error {
 				r.Metric.Value = "<DELETED>"
 			}
 			if entityID == 0 || r.Metric.EntityID == entityID {
-				output(r.Metric, verbose, entityID == 0)
+				outputMetric(r.Metric, verbose, entityID == 0)
 			}
 		}
 
@@ -161,7 +161,7 @@ func runGetMetricsCommand(cmd *cobra.Command, args []string) error {
 		}
 
 		for _, m := range resp.Metrics {
-			output(m, verbose, false)
+			outputMetric(m, verbose, false)
 		}
 	}
 	return nil

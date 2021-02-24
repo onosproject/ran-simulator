@@ -51,6 +51,19 @@ func getNodeCommand() *cobra.Command {
 	return cmd
 }
 
+func updateNodeCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "node <enbid> [field options]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Update an E2 node",
+		RunE:  runUpdateNodeCommand,
+	}
+	cmd.Flags().UintSlice("cells", []uint{}, "cell ECGIs")
+	cmd.Flags().StringSlice("service-models", []string{}, "supported service models")
+	cmd.Flags().StringSlice("controllers", []string{}, "E2T controller")
+	return cmd
+}
+
 func deleteNodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "node <enbid>",
@@ -167,6 +180,37 @@ func runCreateNodeCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	Output("Node %d created\n", enbid)
+	return nil
+}
+
+func runUpdateNodeCommand(cmd *cobra.Command, args []string) error {
+	enbid, err := strconv.ParseUint(args[0], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	client, conn, err := getNodeClient(cmd)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	// Get the node first to prime the update node with existing values and allow sparse update
+	gres, err := client.GetNode(context.Background(), &modelapi.GetNodeRequest{EnbID: types.EnbID(enbid)})
+	if err != nil {
+		return err
+	}
+
+	node, err := optionsToNode(cmd, gres.Node)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.UpdateNode(context.Background(), &modelapi.UpdateNodeRequest{Node: node})
+	if err != nil {
+		return err
+	}
+	Output("Node %d updated\n", enbid)
 	return nil
 }
 
