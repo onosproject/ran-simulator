@@ -145,22 +145,54 @@ func runGetCellsCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func optionsToCell(cmd *cobra.Command, cell *types.Cell) (*types.Cell, error) {
+func optionsToCell(cmd *cobra.Command, cell *types.Cell, update bool) (*types.Cell, error) {
 	arc, _ := cmd.Flags().GetInt32("arc")
 	azimuth, _ := cmd.Flags().GetInt32("azimuth")
 	lat, _ := cmd.Flags().GetFloat64("lat")
 	lng, _ := cmd.Flags().GetFloat64("lng")
-	color, _ := cmd.Flags().GetString("color")
-	maxUEs, _ := cmd.Flags().GetUint32("max-ues")
-	txDb, _ := cmd.Flags().GetFloat64("tx-power")
-	neighbors, _ := cmd.Flags().GetUintSlice("neighbors")
 
-	cell.Location = &types.Point{Lat: lat, Lng: lng}
-	cell.Sector = &types.Sector{Centroid: cell.Location, Azimuth: azimuth, Arc: arc}
-	cell.Color = color
-	cell.MaxUEs = maxUEs
-	cell.TxPowerdB = txDb
-	cell.Neighbors = toECGIs(neighbors)
+	if cell.Location == nil {
+		cell.Location = &types.Point{Lat: lat, Lng: lng}
+	} else {
+		if !update || cmd.Flags().Changed("lat") {
+			cell.Location.Lng = lng
+		}
+		if !update || cmd.Flags().Changed("lng") {
+			cell.Location.Lng = lng
+		}
+	}
+
+	if cell.Sector == nil {
+		cell.Sector = &types.Sector{Centroid: cell.Location, Azimuth: azimuth, Arc: arc}
+	} else {
+		cell.Sector.Centroid = cell.Location
+		if !update || cmd.Flags().Changed("arc") {
+			cell.Sector.Arc = arc
+		}
+		if !update || cmd.Flags().Changed("azimuth") {
+			cell.Sector.Azimuth = azimuth
+		}
+	}
+
+	color, _ := cmd.Flags().GetString("color")
+	if !update || cmd.Flags().Changed("color") {
+		cell.Color = color
+	}
+
+	maxUEs, _ := cmd.Flags().GetUint32("max-ues")
+	if !update || cmd.Flags().Changed("max-ues") {
+		cell.MaxUEs = maxUEs
+	}
+
+	txDb, _ := cmd.Flags().GetFloat64("tx-power")
+	if !update || cmd.Flags().Changed("tx-power") {
+		cell.TxPowerdB = txDb
+	}
+
+	neighbors, _ := cmd.Flags().GetUintSlice("neighbors")
+	if !update || cmd.Flags().Changed("neighbors") {
+		cell.Neighbors = toECGIs(neighbors)
+	}
 	return cell, nil
 }
 
@@ -176,7 +208,7 @@ func runCreateCellCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer conn.Close()
 
-	cell, err := optionsToCell(cmd, &types.Cell{ECGI: types.ECGI(ecgi)})
+	cell, err := optionsToCell(cmd, &types.Cell{ECGI: types.ECGI(ecgi)}, false)
 	if err != nil {
 		return err
 	}
@@ -207,7 +239,7 @@ func runUpdateCellCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	cell, err := optionsToCell(cmd, gres.Cell)
+	cell, err := optionsToCell(cmd, gres.Cell, true)
 	if err != nil {
 		return err
 	}

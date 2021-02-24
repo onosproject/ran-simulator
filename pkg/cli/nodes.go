@@ -147,14 +147,21 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func optionsToNode(cmd *cobra.Command, node *types.Node) (*types.Node, error) {
+func optionsToNode(cmd *cobra.Command, node *types.Node, update bool) (*types.Node, error) {
 	cells, _ := cmd.Flags().GetUintSlice("cells")
-	models, _ := cmd.Flags().GetStringSlice("service-models")
-	controllers, _ := cmd.Flags().GetStringSlice("controllers")
+	if !update || cmd.Flags().Changed("cells") {
+		node.CellECGIs = toECGIs(cells)
+	}
 
-	node.CellECGIs = toECGIs(cells)
-	node.ServiceModels = models
-	node.Controllers = controllers
+	models, _ := cmd.Flags().GetStringSlice("service-models")
+	if !update || cmd.Flags().Changed("service-models") {
+		node.ServiceModels = models
+	}
+
+	controllers, _ := cmd.Flags().GetStringSlice("controllers")
+	if !update || cmd.Flags().Changed("controllers") {
+		node.Controllers = controllers
+	}
 	return node, nil
 }
 
@@ -170,7 +177,7 @@ func runCreateNodeCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer conn.Close()
 
-	node, err := optionsToNode(cmd, &types.Node{EnbID: types.EnbID(enbid)})
+	node, err := optionsToNode(cmd, &types.Node{EnbID: types.EnbID(enbid)}, false)
 	if err != nil {
 		return err
 	}
@@ -201,7 +208,7 @@ func runUpdateNodeCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	node, err := optionsToNode(cmd, gres.Node)
+	node, err := optionsToNode(cmd, gres.Node, true)
 	if err != nil {
 		return err
 	}
