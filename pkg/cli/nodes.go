@@ -51,6 +51,19 @@ func getNodeCommand() *cobra.Command {
 	return cmd
 }
 
+func updateNodeCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "node <enbid> [field options]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Update an E2 node",
+		RunE:  runUpdateNodeCommand,
+	}
+	cmd.Flags().UintSlice("cells", []uint{}, "cell ECGIs")
+	cmd.Flags().StringSlice("service-models", []string{}, "supported service models")
+	cmd.Flags().StringSlice("controllers", []string{}, "E2T controller")
+	return cmd
+}
+
 func deleteNodeCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "node <enbid>",
@@ -97,7 +110,7 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 	defer conn.Close()
 
 	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
-		Output("%-16s %-8s %-32s %-16s %-20s\n", "EnbID", "Status", "Cell ECGIs", "Service Models", "E2T Controllers")
+		Output("%-16s %-8s %-16s %-20s %s\n", "EnbID", "Status", "Service Models", "E2T Controllers", "Cell ECGIs")
 	}
 
 	if watch, _ := cmd.Flags().GetBool("watch"); watch {
@@ -111,7 +124,8 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 				break
 			}
 			node := r.Node
-			Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+			Output("%-16d %-8s %-16s %-20s %s\n", node.EnbID, node.Status,
+				catStrings(node.ServiceModels), catStrings(node.Controllers), catECGIs(node.CellECGIs))
 		}
 
 	} else {
@@ -127,21 +141,29 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 				break
 			}
 			node := r.Node
-			Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+			Output("%-16d %-8s %-16s %-20s %s\n", node.EnbID, node.Status,
+				catStrings(node.ServiceModels), catStrings(node.Controllers), catECGIs(node.CellECGIs))
 		}
 	}
 
 	return nil
 }
 
-func optionsToNode(cmd *cobra.Command, node *types.Node) (*types.Node, error) {
+func optionsToNode(cmd *cobra.Command, node *types.Node, update bool) (*types.Node, error) {
 	cells, _ := cmd.Flags().GetUintSlice("cells")
-	models, _ := cmd.Flags().GetStringSlice("service-models")
-	controllers, _ := cmd.Flags().GetStringSlice("controllers")
+	if !update || cmd.Flags().Changed("cells") {
+		node.CellECGIs = toECGIs(cells)
+	}
 
-	node.CellECGIs = toECGIs(cells)
-	node.ServiceModels = models
-	node.Controllers = controllers
+	models, _ := cmd.Flags().GetStringSlice("service-models")
+	if !update || cmd.Flags().Changed("service-models") {
+		node.ServiceModels = models
+	}
+
+	controllers, _ := cmd.Flags().GetStringSlice("controllers")
+	if !update || cmd.Flags().Changed("controllers") {
+		node.Controllers = controllers
+	}
 	return node, nil
 }
 
@@ -157,7 +179,7 @@ func runCreateNodeCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer conn.Close()
 
-	node, err := optionsToNode(cmd, &types.Node{EnbID: types.EnbID(enbid)})
+	node, err := optionsToNode(cmd, &types.Node{EnbID: types.EnbID(enbid)}, false)
 	if err != nil {
 		return err
 	}
@@ -170,9 +192,40 @@ func runCreateNodeCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func runUpdateNodeCommand(cmd *cobra.Command, args []string) error {
+	enbid, err := strconv.ParseUint(args[0], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	client, conn, err := getNodeClient(cmd)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	// Get the node first to prime the update node with existing values and allow sparse update
+	gres, err := client.GetNode(context.Background(), &modelapi.GetNodeRequest{EnbID: types.EnbID(enbid)})
+	if err != nil {
+		return err
+	}
+
+	node, err := optionsToNode(cmd, gres.Node, true)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.UpdateNode(context.Background(), &modelapi.UpdateNodeRequest{Node: node})
+	if err != nil {
+		return err
+	}
+	Output("Node %d updated\n", enbid)
+	return nil
+}
+
 func outputNode(node *types.Node) {
-	Output("EnbID: %-16d\nStatus: %s\nCell EGGIs: %s\nService Models: %s\nControllers: %s\n",
-		node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+	Output("EnbID: %-16d\nStatus: %s\nService Models: %s\nControllers: %s\nCell EGGIs: %s\n",
+		node.EnbID, node.Status, catStrings(node.ServiceModels), catStrings(node.Controllers), catECGIs(node.CellECGIs))
 }
 
 func runGetNodeCommand(cmd *cobra.Command, args []string) error {

@@ -126,6 +126,8 @@ func getSetCommand() *cobra.Command {
 		Short: "Commands for setting RAN simulator model metrics and other information",
 	}
 
+	cmd.AddCommand(updateNodeCommand())
+	cmd.AddCommand(updateCellCommand())
 	cmd.AddCommand(setMetricCommand())
 	return cmd
 }

@@ -56,6 +56,24 @@ func getCellCommand() *cobra.Command {
 	return cmd
 }
 
+func updateCellCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cell <enbid> [field options]",
+		Args:  cobra.ExactArgs(1),
+		Short: "Update a cell",
+		RunE:  runUpdateCellCommand,
+	}
+	cmd.Flags().Uint32("max-ues", 10000, "maximum number of UEs connected")
+	cmd.Flags().Float64("tx-power", 11.0, "transmit power (dB)")
+	cmd.Flags().Float64("lat", 11.0, "geo location latitude")
+	cmd.Flags().Float64("lng", 11.0, "geo location longitude")
+	cmd.Flags().Int32("azimuth", 0, "azimuth of the coverage arc")
+	cmd.Flags().Int32("arc", 120, "angle width of the coverage arc")
+	cmd.Flags().UintSlice("neighbors", []uint{}, "neighbor cell ECGIs")
+	cmd.Flags().String("color", "blue", "color label")
+	return cmd
+}
+
 func deleteCellCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cell <enbid>",
@@ -127,22 +145,54 @@ func runGetCellsCommand(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func optionsToCell(cmd *cobra.Command, cell *types.Cell) (*types.Cell, error) {
+func optionsToCell(cmd *cobra.Command, cell *types.Cell, update bool) (*types.Cell, error) {
 	arc, _ := cmd.Flags().GetInt32("arc")
 	azimuth, _ := cmd.Flags().GetInt32("azimuth")
 	lat, _ := cmd.Flags().GetFloat64("lat")
 	lng, _ := cmd.Flags().GetFloat64("lng")
-	color, _ := cmd.Flags().GetString("color")
-	maxUEs, _ := cmd.Flags().GetUint32("max-ues")
-	txDb, _ := cmd.Flags().GetFloat64("tx-power")
-	neighbors, _ := cmd.Flags().GetUintSlice("neighbors")
 
-	cell.Location = &types.Point{Lat: lat, Lng: lng}
-	cell.Sector = &types.Sector{Centroid: cell.Location, Azimuth: azimuth, Arc: arc}
-	cell.Color = color
-	cell.MaxUEs = maxUEs
-	cell.TxPowerdB = txDb
-	cell.Neighbors = toECGIs(neighbors)
+	if cell.Location == nil {
+		cell.Location = &types.Point{Lat: lat, Lng: lng}
+	} else {
+		if !update || cmd.Flags().Changed("lat") {
+			cell.Location.Lng = lng
+		}
+		if !update || cmd.Flags().Changed("lng") {
+			cell.Location.Lng = lng
+		}
+	}
+
+	if cell.Sector == nil {
+		cell.Sector = &types.Sector{Centroid: cell.Location, Azimuth: azimuth, Arc: arc}
+	} else {
+		cell.Sector.Centroid = cell.Location
+		if !update || cmd.Flags().Changed("arc") {
+			cell.Sector.Arc = arc
+		}
+		if !update || cmd.Flags().Changed("azimuth") {
+			cell.Sector.Azimuth = azimuth
+		}
+	}
+
+	color, _ := cmd.Flags().GetString("color")
+	if !update || cmd.Flags().Changed("color") {
+		cell.Color = color
+	}
+
+	maxUEs, _ := cmd.Flags().GetUint32("max-ues")
+	if !update || cmd.Flags().Changed("max-ues") {
+		cell.MaxUEs = maxUEs
+	}
+
+	txDb, _ := cmd.Flags().GetFloat64("tx-power")
+	if !update || cmd.Flags().Changed("tx-power") {
+		cell.TxPowerdB = txDb
+	}
+
+	neighbors, _ := cmd.Flags().GetUintSlice("neighbors")
+	if !update || cmd.Flags().Changed("neighbors") {
+		cell.Neighbors = toECGIs(neighbors)
+	}
 	return cell, nil
 }
 
@@ -158,7 +208,7 @@ func runCreateCellCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer conn.Close()
 
-	cell, err := optionsToCell(cmd, &types.Cell{ECGI: types.ECGI(ecgi)})
+	cell, err := optionsToCell(cmd, &types.Cell{ECGI: types.ECGI(ecgi)}, false)
 	if err != nil {
 		return err
 	}
@@ -168,6 +218,37 @@ func runCreateCellCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	Output("Cell %d created\n", ecgi)
+	return nil
+}
+
+func runUpdateCellCommand(cmd *cobra.Command, args []string) error {
+	ecgi, err := strconv.ParseUint(args[0], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	client, conn, err := getCellClient(cmd)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	// Get the cell first to prime the update cell with existing values and allow sparse update
+	gres, err := client.GetCell(context.Background(), &modelapi.GetCellRequest{ECGI: types.ECGI(ecgi)})
+	if err != nil {
+		return err
+	}
+
+	cell, err := optionsToCell(cmd, gres.Cell, true)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.UpdateCell(context.Background(), &modelapi.UpdateCellRequest{Cell: cell})
+	if err != nil {
+		return err
+	}
+	Output("Cell %d updated\n", ecgi)
 	return nil
 }
 
