@@ -8,6 +8,7 @@ package cli
 import (
 	"context"
 	"github.com/onosproject/onos-lib-go/pkg/cli"
+	"github.com/onosproject/onos-lib-go/pkg/errors"
 	metricsapi "github.com/onosproject/ran-simulator/api/metrics"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -25,9 +26,21 @@ func getMetricCommand() *cobra.Command {
 	return cmd
 }
 
+func getMetricsCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "metrics [<entity-id>]",
+		Short: "Get all metrics of an entity",
+		Args:  cobra.MaximumNArgs(1),
+		RunE:  runGetMetricsCommand,
+	}
+	cmd.Flags().BoolP("verbose", "v", false, "verbose output")
+	cmd.Flags().BoolP("watch", "w", false, "watch metrics changes")
+	return cmd
+}
+
 func setMetricCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "metric <entity-id> <metric-name> <value> --type {string|intX|uintX|floatX|bool; where X={8|16|32|64}}",
+		Use:   "metric <entity-id> <metric-name> <value>",
 		Short: "Set metric value",
 		Args:  cobra.ExactArgs(3),
 		RunE:  runSetMetricCommand,
@@ -46,20 +59,9 @@ func deleteMetricCommand() *cobra.Command {
 	return cmd
 }
 
-func getMetricsCommand() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "metrics <entity-id>",
-		Short: "Get all metrics of an entity",
-		Args:  cobra.ExactArgs(1),
-		RunE:  runGetMetricsCommand,
-	}
-	cmd.Flags().BoolP("verbose", "v", false, "verbose output")
-	return cmd
-}
-
 func deleteMetricsCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "metrica <entity-id>",
+		Use:   "metrics <entity-id>",
 		Short: "Delete all metrics of an entity",
 		Args:  cobra.ExactArgs(1),
 		RunE:  runDeleteMetricsCommand,
@@ -73,6 +75,20 @@ func getMetricsClient(cmd *cobra.Command) (metricsapi.MetricsServiceClient, *grp
 		return nil, nil, err
 	}
 	return metricsapi.NewMetricsServiceClient(conn), conn, nil
+}
+
+func output(m *metricsapi.Metric, verbose bool, uberVerbose bool) {
+	if verbose {
+		if uberVerbose {
+			Output("%d/%s=%s (%s)\n", m.EntityID, m.Key, m.Value, m.Type)
+		} else {
+			Output("%s=%s (%s)\n", m.Key, m.Value, m.Type)
+		}
+	} else if uberVerbose {
+		Output("%d/%s=%s\n", m.EntityID, m.Key, m.Value)
+	} else {
+		Output("%s=%s\n", m.Key, m.Value)
+	}
 }
 
 func runGetMetricCommand(cmd *cobra.Command, args []string) error {
@@ -93,20 +109,25 @@ func runGetMetricCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	m := resp.Metric
-
-	if verbose, _ := cmd.Flags().GetBool("verbose"); verbose {
-		Output("%s=%s (%s)\n", m.Key, m.Value, m.Type)
-	} else {
-		Output("%s\n", m.Value)
-	}
+	verbose, _ := cmd.Flags().GetBool("verbose")
+	output(resp.Metric, verbose, false)
 	return nil
 }
 
 func runGetMetricsCommand(cmd *cobra.Command, args []string) error {
-	entityID, err := strconv.ParseUint(args[0], 10, 64)
-	if err != nil {
-		return err
+	var err error
+	entityID := uint64(0)
+
+	verbose, _ := cmd.Flags().GetBool("verbose")
+	watch, _ := cmd.Flags().GetBool("watch")
+
+	if len(args) == 1 {
+		entityID, err = strconv.ParseUint(args[0], 10, 64)
+		if err != nil {
+			return err
+		}
+	} else if !watch {
+		return errors.NewInvalid("Either entityID must be given or --watch must be specified, or both")
 	}
 
 	client, conn, err := getMetricsClient(cmd)
@@ -115,17 +136,32 @@ func runGetMetricsCommand(cmd *cobra.Command, args []string) error {
 	}
 	defer conn.Close()
 
-	resp, err := client.List(context.Background(), &metricsapi.ListRequest{EntityID: entityID})
-	if err != nil {
-		return err
-	}
+	if watch {
+		stream, err := client.Watch(context.Background(), &metricsapi.WatchRequest{})
+		if err != nil {
+			return err
+		}
+		for {
+			r, err := stream.Recv()
+			if err != nil {
+				break
+			}
+			if r.Type == metricsapi.EventType_DELETED {
+				r.Metric.Value = "<DELETED>"
+			}
+			if entityID == 0 || r.Metric.EntityID == entityID {
+				output(r.Metric, verbose, entityID == 0)
+			}
+		}
 
-	verbose, _ := cmd.Flags().GetBool("verbose")
-	for _, m := range resp.Metrics {
-		if verbose {
-			Output("%s=%s (%s)\n", m.Key, m.Value, m.Type)
-		} else {
-			Output("%s=%s\n", m.Key, m.Value)
+	} else {
+		resp, err := client.List(context.Background(), &metricsapi.ListRequest{EntityID: entityID})
+		if err != nil {
+			return err
+		}
+
+		for _, m := range resp.Metrics {
+			output(m, verbose, false)
 		}
 	}
 	return nil

@@ -174,9 +174,11 @@ func (s *Server) Watch(request *metricsapi.WatchRequest, server metricsapi.Metri
 
 	for metricsEvent := range ch {
 		key := metricsEvent.Key.(string)
-		response := &metricsapi.WatchResponse{
-			Metric: metricToAPI(metrics.EntityID(key), metrics.MetricName(key), metricsEvent.Value),
-			Type:   eventType(metricsEvent.Type.(metrics.MetricEvent)),
+		response := &metricsapi.WatchResponse{Type: eventType(metricsEvent.Type.(metrics.MetricEvent))}
+		if metricsEvent.Type == metrics.Deleted {
+			response.Metric = metricToAPI(metrics.EntityID(key), metrics.MetricName(key), "")
+		} else {
+			response.Metric = metricToAPI(metrics.EntityID(key), metrics.MetricName(key), metricsEvent.Value)
 		}
 		err := server.Send(response)
 		if err != nil {
