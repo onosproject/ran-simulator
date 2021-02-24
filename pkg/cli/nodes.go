@@ -110,7 +110,7 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 	defer conn.Close()
 
 	if noHeaders, _ := cmd.Flags().GetBool("no-headers"); !noHeaders {
-		Output("%-16s %-8s %-32s %-16s %-20s\n", "EnbID", "Status", "Cell ECGIs", "Service Models", "E2T Controllers")
+		Output("%-16s %-8s %-16s %-20s %s\n", "EnbID", "Status", "Service Models", "E2T Controllers", "Cell ECGIs")
 	}
 
 	if watch, _ := cmd.Flags().GetBool("watch"); watch {
@@ -124,7 +124,8 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 				break
 			}
 			node := r.Node
-			Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+			Output("%-16d %-8s %-16s %-20s %s\n", node.EnbID, node.Status,
+				catStrings(node.ServiceModels), catStrings(node.Controllers), catECGIs(node.CellECGIs))
 		}
 
 	} else {
@@ -140,7 +141,8 @@ func runGetNodesCommand(cmd *cobra.Command, args []string) error {
 				break
 			}
 			node := r.Node
-			Output("%-16d %-8s %-32s %-16s %-20s\n", node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+			Output("%-16d %-8s %-16s %-20s %s\n", node.EnbID, node.Status,
+				catStrings(node.ServiceModels), catStrings(node.Controllers), catECGIs(node.CellECGIs))
 		}
 	}
 
@@ -222,8 +224,8 @@ func runUpdateNodeCommand(cmd *cobra.Command, args []string) error {
 }
 
 func outputNode(node *types.Node) {
-	Output("EnbID: %-16d\nStatus: %s\nCell EGGIs: %s\nService Models: %s\nControllers: %s\n",
-		node.EnbID, node.Status, catECGIs(node.CellECGIs), catStrings(node.ServiceModels), catStrings(node.Controllers))
+	Output("EnbID: %-16d\nStatus: %s\nService Models: %s\nControllers: %s\nCell EGGIs: %s\n",
+		node.EnbID, node.Status, catStrings(node.ServiceModels), catStrings(node.Controllers), catECGIs(node.CellECGIs))
 }
 
 func runGetNodeCommand(cmd *cobra.Command, args []string) error {
