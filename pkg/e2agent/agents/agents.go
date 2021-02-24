@@ -7,6 +7,8 @@ package agents
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
@@ -25,6 +27,7 @@ type E2Agents struct {
 	modelPluginRegistry *modelplugins.ModelPluginRegistry
 	nodeStore           nodes.Store
 	ueStore             ues.Store
+	cellStore           cells.Store
 	model               *model.Model
 }
 
@@ -58,7 +61,7 @@ func (agents *E2Agents) processNodeEvents() {
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
 func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	nodeStore nodes.Store, ueStore ues.Store) (*E2Agents, error) {
+	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store) (*E2Agents, error) {
 	agentStore := agents.NewStore()
 	e2agents := &E2Agents{
 		agentStore:          agentStore,
@@ -66,10 +69,11 @@ func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRe
 		modelPluginRegistry: modelPluginRegistry,
 		model:               m,
 		ueStore:             ueStore,
+		cellStore:           cellStore,
 	}
 
 	for _, node := range m.Nodes {
-		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore)
+		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore)
 		if err != nil {
 			return nil, err
 		}

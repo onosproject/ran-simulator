@@ -664,10 +664,14 @@ github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0 h1:GiJ3qsCjPcbDT
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.0/go.mod h1:XhAq30aC7880EVt5ru0/SZbFgPh3uf2Ty1+L+xUB+9E=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.6 h1:ZVqXAs9kSoWtnBzUPOawOt2DO2f6Jp71RsB4VQ7gEjY=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.6/go.mod h1:XhAq30aC7880EVt5ru0/SZbFgPh3uf2Ty1+L+xUB+9E=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.7 h1:yOcjEYsFPrBcNuGlYuqPuIehPj4KTTbUGevh4CI1ebA=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.7/go.mod h1:XhAq30aC7880EVt5ru0/SZbFgPh3uf2Ty1+L+xUB+9E=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.4 h1:HZowN8TrCeOtLZSHVimyR5xtT3gcTP2BN3FssAD2T3Q=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.4/go.mod h1:7L6EP4QiAwgtVXT1HbnEUslzpu5Nl+yz3MR/SYJd1nw=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.6 h1:WF7OlRb88FGIkNxFqe1H3qs2W2Zy3t4YejoXoQPfdyA=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.6/go.mod h1:7L6EP4QiAwgtVXT1HbnEUslzpu5Nl+yz3MR/SYJd1nw=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.7 h1:iWvLRcFtyhtqq7wMNHJYoPiEdbfvhsdkEGIiDC8cTTs=
+github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.7/go.mod h1:7L6EP4QiAwgtVXT1HbnEUslzpu5Nl+yz3MR/SYJd1nw=
 github.com/onosproject/onos-e2t v0.7.0 h1:yAHVQNkIeQWcgSRnProUsmEN7ZPFrMqSdH0E44GpxbQ=
 github.com/onosproject/onos-e2t v0.7.0/go.mod h1:4q6MeDAVT63LPLR1N0o/a/OZ3y+QHYRNrkfBRG/Ixvs=
 github.com/onosproject/onos-e2t v0.7.2 h1:jL8+98aODLAlwminYnnqc4ZckBf+seWPX+gse3ybJtM=

@@ -7,6 +7,8 @@ package rc
 import (
 	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -44,4 +46,32 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 	}
 
 	return controlHeader, nil
+}
+
+// getEventTriggerType extracts event trigger type
+func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_rc_pre_ies.RcPreTriggerType, error) {
+	modelPlugin, err := sm.getModelPlugin()
+	if err != nil {
+		log.Error(err)
+		return -1, err
+	}
+	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
+	eventTriggerProtoBytes, err := modelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+	if err != nil {
+		return -1, err
+	}
+	eventTriggerDefinition := &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition{}
+	err = proto.Unmarshal(eventTriggerProtoBytes, eventTriggerDefinition)
+	if err != nil {
+		return -1, err
+	}
+	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormat1().TriggerType
+	return eventTriggerType, nil
+}
+
+func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
+	if modelPlugin, ok := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[modelFullName]; ok {
+		return modelPlugin, nil
+	}
+	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
 }

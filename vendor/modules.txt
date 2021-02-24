@@ -220,6 +220,7 @@ github.com/google/go-cmp/cmp/internal/value
 # github.com/google/gofuzz v1.0.0
 github.com/google/gofuzz
 # github.com/google/uuid v1.1.2
+## explicit
 github.com/google/uuid
 # github.com/googleapis/gnostic v0.0.0-20170729233727-0c5108395e2d
 github.com/googleapis/gnostic/OpenAPIv2
@@ -346,11 +347,11 @@ github.com/onosproject/onos-api/go/onos/e2sub/task
 github.com/onosproject/onos-api/go/onos/e2t/admin
 github.com/onosproject/onos-api/go/onos/e2t/e2
 github.com/onosproject/onos-api/go/onos/e2t/e2sm
-# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.6
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.7
 ## explicit
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies
-# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.6
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.7
 ## explicit
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies

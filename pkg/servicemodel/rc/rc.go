@@ -7,6 +7,22 @@ package rc
 import (
 	"context"
 
+	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
+
+	rcindicationhdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/indication/header"
+	rcindicationmsg "github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/indication/message"
+
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/pcirange"
+
+	"github.com/onosproject/ran-simulator/pkg/types"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/nrt"
+
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
+
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
+	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
+
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 
@@ -23,6 +39,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -45,9 +62,143 @@ type Client struct {
 	ServiceModel *registry.ServiceModel
 }
 
+func (sm *Client) reportIndicationPeiodic(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+	return nil
+}
+
+func (sm *Client) getPlmnID() types.Uint24 {
+	plmnIDUint24 := types.Uint24{}
+	plmnIDUint24.Set(uint32(sm.ServiceModel.Model.PlmnID))
+	return plmnIDUint24
+}
+
+func (sm *Client) createRicIndication(ctx context.Context, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
+	node := sm.ServiceModel.Node
+	plmnID := sm.getPlmnID()
+	header := &rcindicationhdr.Header{}
+	message := &rcindicationmsg.Message{}
+	var neighbourList []*e2sm_rc_pre_ies.Nrt
+	neighbourList = make([]*e2sm_rc_pre_ies.Nrt, 0)
+	for _, ecgi := range node.Cells {
+		cell, _ := sm.ServiceModel.CellStore.Get(ctx, ecgi)
+		for index, neighbour := range cell.Neighbors {
+			neighbour, err := nrt.NewNeighbour(
+				nrt.WithNrIndex(int32(index)),
+				nrt.WithPci(10),
+				nrt.WithEutraCellIdentity(uint64(neighbour)),
+				nrt.WithEarfcn(40),
+				nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
+				nrt.WithPlmnID(plmnID.Value())).Build()
+			if err == nil {
+				neighbourList = append(neighbourList, neighbour)
+			}
+		}
+		pciRange1, err := pcirange.NewPciRange(pcirange.WithLowerPci(10),
+			pcirange.WithUpperPci(30)).Build()
+		if err != nil {
+			return nil, err
+		}
+		header = rcindicationhdr.NewIndicationHeader(
+			rcindicationhdr.WithPlmnID(plmnID.Value()),
+			rcindicationhdr.WithEutracellIdentity(uint64(cell.ECGI)))
+
+		message = rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
+			rcindicationmsg.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
+			rcindicationmsg.WithEarfcn(20),
+			rcindicationmsg.WithEutraCellIdentity(uint64(cell.ECGI)),
+			rcindicationmsg.WithPci(10),
+			rcindicationmsg.WithNeighbours(neighbourList),
+			rcindicationmsg.WithPciPool([]*e2smrcpreies.PciRange{pciRange1}))
+
+	}
+	testMessage, _ := message.Build()
+	log.Debug("Test message:", testMessage.GetIndicationMessageFormat1().Neighbors)
+	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	indicationMessageAsn1Bytes, err := message.ToAsn1Bytes(rcModelPlugin)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	indication := indicationutils.NewIndication(
+		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
+		indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
+		indicationutils.WithRequestID(subscription.GetReqID()),
+		indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
+		indicationutils.WithIndicationMessage(indicationMessageAsn1Bytes))
+
+	ricIndication, err := indication.Build()
+	if err != nil {
+		log.Error("creating indication message is failed", err)
+		return nil, err
+	}
+
+	return ricIndication, nil
+
+}
+
+func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
+	ricIndication, err := sm.createRicIndication(ctx, subscription)
+	if err != nil {
+		return err
+	}
+
+	err = sub.E2Channel.RICIndication(ctx, ricIndication)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	return nil
+}
+
+func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *subutils.Subscription) error {
+	log.Debugf("Sending report indication on change for subscription:%v", subscription)
+	ch := make(chan event.Event)
+	nodeCells := sm.ServiceModel.Node.Cells
+	err := sm.ServiceModel.CellStore.Watch(context.Background(), ch)
+	if err != nil {
+		return err
+	}
+
+	// Sends the first indication message
+	err = sm.sendRicIndication(ctx, subscription)
+	if err != nil {
+		return err
+	}
+
+	// Sends indication messages on cell changes
+	for cellEvent := range ch {
+		log.Debug("Cell event in rc:", cellEvent)
+		cell := cellEvent.Value.(*model.Cell)
+		for _, nodeCell := range nodeCells {
+			if nodeCell == cell.ECGI {
+				log.Debug("Test Cell change for ECGI:", cell.ECGI)
+				err = sm.sendRicIndication(ctx, subscription)
+				if err != nil {
+					log.Error()
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
+	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	rcSm := registry.ServiceModel{
 		RanFunctionID:       registry.Rc,
@@ -60,6 +211,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		Subscriptions:       subStore,
 		Nodes:               nodeStore,
 		UEs:                 ueStore,
+		CellStore:           cellStore,
 	}
 
 	rcClient := &Client{
@@ -191,7 +343,32 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, nil, err
 	}
 
-	// TODO handler event triggers for RC service model
+	eventTriggerType, err := sm.getEventTriggerType(request)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	switch eventTriggerType {
+	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
+		log.Debugf("Event trigger is on change")
+		go func() {
+			err = sm.reportIndicationOnChange(context.Background(), subscription)
+			if err != nil {
+				return
+			}
+		}()
+	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
+		go func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			err := sm.reportIndicationPeiodic(ctx, 10, subscription)
+			if err != nil {
+				return
+			}
+		}()
+
+	}
+
 	return response, nil, nil
 }
 
@@ -218,12 +395,6 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	}
 
 	// TODO stop the event triggers
-	return response, nil, nil
-}
 
-func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
-	if modelPlugin, ok := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[modelFullName]; ok {
-		return modelPlugin, nil
-	}
-	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
+	return response, nil, nil
 }
