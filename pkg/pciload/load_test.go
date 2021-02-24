@@ -22,7 +22,15 @@ func TestPCILoad(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, uint32(42), v)
 
-	v, ok = store.Get(ctx, 321, "pci")
+	v, ok = store.Get(ctx, 123, "pci2Max")
+	assert.True(t, ok)
+	assert.Equal(t, uint32(90), v)
+
+	v, ok = store.Get(ctx, 213, "pci")
 	assert.True(t, ok)
 	assert.Equal(t, uint32(69), v)
+
+	v, ok = store.Get(ctx, 213, "earfcn")
+	assert.True(t, ok)
+	assert.Equal(t, uint32(7213), v)
 }
