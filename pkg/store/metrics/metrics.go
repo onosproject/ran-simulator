@@ -76,7 +76,7 @@ func EntityID(key string) uint64 {
 // MetricName extracts metric name from the composite metric key
 func MetricName(key string) string {
 	f := strings.SplitN(key, "/", 2)
-	if len(f) < 1 {
+	if len(f) < 2 {
 		return ""
 	}
 	return f[1]
@@ -148,8 +148,9 @@ func (s *store) Get(ctx context.Context, entityID uint64, name string) (interfac
 func (s *store) Delete(ctx context.Context, entityID uint64, name string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	delete(s.metrics, key(entityID, name))
-	s.watchers.Send(metricEvent(name, nil, Deleted))
+	k := key(entityID, name)
+	delete(s.metrics, k)
+	s.watchers.Send(metricEvent(k, nil, Deleted))
 	return nil
 }
 

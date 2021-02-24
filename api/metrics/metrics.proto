@@ -1,0 +1,101 @@
+/*
+SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+
+SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+*/
+
+syntax = "proto3";
+
+package ran.metrics;
+
+import "gogoproto/gogo.proto";
+//import "github.com/onosproject/ran-simulator/api/types/types.proto";
+
+// Model provides means to create, delete and read RAN simulation model.
+service MetricsService {
+    // List returns an array of all metrics for the specified entity (Node, Cell or UE)
+    rpc List(ListRequest) returns (ListResponse);
+
+    // Set sets value of the named metric for the specified entity
+    rpc Set(SetRequest) returns (SetResponse);
+
+    // Get retrieves the named metric for the specified entity
+    rpc Get(GetRequest) returns (GetResponse);
+
+    // Delete deletes the the named metric for the specified entity
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+
+    // DeleteAll deletes all metrics for the specified entity
+    rpc DeleteAll(DeleteAllRequest) returns (DeleteAllResponse);
+
+    // Watch returns a stream of ongoing changes to the metrics
+    rpc Watch(WatchRequest) returns (stream WatchResponse);
+}
+
+message Metric {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+    string key = 2;
+    string value = 3;
+    string type = 4; // intX, uintX, floatX, string; X := {8|16|32|64}
+}
+
+message ListRequest {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+}
+
+message ListResponse {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+    repeated Metric metrics = 2;
+}
+
+message SetRequest {
+    Metric metric = 1;
+}
+
+message SetResponse {
+}
+
+message GetRequest {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+    string name = 2;
+}
+
+message GetResponse {
+    Metric metric = 1;
+}
+
+message DeleteRequest {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+    string name = 2;
+}
+
+message DeleteResponse {
+}
+
+message DeleteAllRequest {
+    uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
+}
+
+message DeleteAllResponse {
+}
+
+message WatchRequest {
+}
+
+message WatchResponse {
+    Metric metric = 1;
+    EventType type = 2;
+}
+
+
+// Change event type
+enum EventType {
+    // NONE indicates unknown event type
+    NONE = 0;
+
+    // UPDATED indicates a metric value was set (updated)
+    UPDATED = 1;
+
+    // DELETED indicates a metric was deleted
+    DELETED = 2;
+}
