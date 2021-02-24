@@ -4,7 +4,7 @@
 
 cells:
   123:
-    cellSize: 1
+    cellSize: ENTERPRISE
     earfcn: 7123
     pci: 42
     pciPool:
@@ -13,14 +13,14 @@ cells:
       - min: 80
         max: 90
   132:
-    cellSize: 1
+    cellSize: FEMTO
     earfcn: 7132
     pci: 27
     pciPool:
       - min: 20
         max: 30
   213:
-    cellSize: 1
+    cellSize: ENTERPRISE
     earfcn: 7213
     pci: 69
     pciPool:

@@ -22,7 +22,7 @@ type PciMetrics struct {
 
 // PciCell is an auxiliary structure for inport PCI data from YAML configuration
 type PciCell struct {
-	CellSize uint32     `mapstructure:"cellSize"`
+	CellSize string     `mapstructure:"cellSize"`
 	Earfcn   uint32     `mapstructure:"earfcn"`
 	Pci      uint32     `mapstructure:"pci"`
 	PciPool  []PciRange `mapstructure:"pciPool"`
