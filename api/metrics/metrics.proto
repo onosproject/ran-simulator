@@ -14,13 +14,13 @@ import "gogoproto/gogo.proto";
 // Model provides means to create, delete and read RAN simulation model.
 service MetricsService {
     // List returns an array of all metrics for the specified entity (Node, Cell or UE)
-    rpc List(ListRequest) returns (ListRequest);
+    rpc List(ListRequest) returns (ListResponse);
 
     // Set sets value of the named metric for the specified entity
     rpc Set(SetRequest) returns (SetResponse);
 
     // Get retrieves the named metric for the specified entity
-    rpc Get(SetRequest) returns (GetResponse);
+    rpc Get(GetRequest) returns (GetResponse);
 
     // Watch returns a stream of ongoing changes to the metrics
     rpc Watch(WatchRequest) returns (stream WatchResponse);
@@ -30,6 +30,7 @@ message Metric {
     uint64 entityid = 1 [(gogoproto.customname) = "EntityID"];
     string key = 2;
     string value = 3;
+    string type = 4; // intX, uintX, floatX, string; X := {8|16|32|64}
 }
 
 message ListRequest {
