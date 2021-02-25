@@ -9,6 +9,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
+
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
+
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 
@@ -33,7 +37,7 @@ import (
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
-	"github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
@@ -59,11 +63,12 @@ type e2Agent struct {
 	subStore  *subscriptions.Subscriptions
 	nodeStore nodes.Store
 	ueStore   ues.Store
+	cellStore cells.Store
 }
 
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	nodeStore nodes.Store, ueStore ues.Store) (E2Agent, error) {
+	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
 	reg := registry.NewServiceModelRegistry()
 
@@ -77,7 +82,8 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
 		case registry.Kpm:
-			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore)
+			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry,
+				subStore, nodeStore, ueStore)
 			if err != nil {
 				return nil, err
 			}
@@ -87,7 +93,8 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 				return nil, err
 			}
 		case registry.Rc:
-			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore)
+			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry,
+				subStore, nodeStore, ueStore, cellStore, metricStore)
 			if err != nil {
 				return nil, err
 			}
@@ -106,6 +113,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 		subStore:  subStore,
 		nodeStore: nodeStore,
 		ueStore:   ueStore,
+		cellStore: cellStore,
 	}, nil
 }
 

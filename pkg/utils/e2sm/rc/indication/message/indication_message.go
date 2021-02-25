@@ -11,6 +11,7 @@ import (
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+
 	"google.golang.org/protobuf/proto"
 )
 

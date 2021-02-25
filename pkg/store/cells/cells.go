@@ -117,8 +117,19 @@ func (s *store) Get(ctx context.Context, ecgi types.ECGI) (*model.Cell, error) {
 func (s *store) Update(ctx context.Context, cell *model.Cell) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, ok := s.cells[cell.ECGI]; ok {
+	if prevCell, ok := s.cells[cell.ECGI]; ok {
 		s.cells[cell.ECGI] = cell
+		prevNeighbors := prevCell.Neighbors
+		equalNeighborsResult := equalNeighbors(prevNeighbors, cell.Neighbors)
+		if !equalNeighborsResult {
+			cellEvent := event.Event{
+				Key:   cell.ECGI,
+				Value: cell,
+				Type:  UpdatedNeighbors,
+			}
+			s.watchers.Send(cellEvent)
+		}
+
 		cellEvent := event.Event{
 			Key:   cell.ECGI,
 			Value: cell,

@@ -6,8 +6,9 @@ package pciload
 
 import (
 	"context"
-	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"testing"
+
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,9 +23,10 @@ func TestPCILoad(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, uint32(42), v)
 
-	v, ok = store.Get(ctx, 123, "pci2Max")
+	v, ok = store.Get(ctx, 123, "pcipool")
 	assert.True(t, ok)
-	assert.Equal(t, uint32(90), v)
+	pciPool := v.([]PciRange)
+	assert.Equal(t, uint32(90), pciPool[1].Max)
 
 	v, ok = store.Get(ctx, 213, "pci")
 	assert.True(t, ok)

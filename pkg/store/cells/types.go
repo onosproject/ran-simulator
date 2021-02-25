@@ -14,6 +14,8 @@ const (
 	Created
 	// Updated updated cell event
 	Updated
+	// UpdatedNeighbors updated cell neighbors event
+	UpdatedNeighbors
 	// Deleted deleted cell event
 	Deleted
 )

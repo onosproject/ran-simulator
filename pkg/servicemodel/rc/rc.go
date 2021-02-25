@@ -6,6 +6,15 @@ package rc
 
 import (
 	"context"
+	"time"
+
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
+
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
+
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+
+	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
@@ -45,9 +54,84 @@ type Client struct {
 	ServiceModel *registry.ServiceModel
 }
 
+func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+	log.Debugf("Starting periodic report with interval %d ms", interval)
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	intervalDuration := time.Duration(interval)
+	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
+	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
+	for range sub.Ticker.C {
+		_ = sm.sendRicIndication(ctx, subscription)
+	}
+	return nil
+}
+
+func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
+
+	node := sm.ServiceModel.Node
+	// Creates and sends an indication message for each cell in the node
+	for _, ecgi := range node.Cells {
+		ricIndication, err := sm.createRicIndication(ctx, ecgi, subscription)
+		if err != nil {
+			return err
+		}
+
+		err = sub.E2Channel.RICIndication(ctx, ricIndication)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+	}
+	return nil
+}
+
+func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *subutils.Subscription) error {
+	log.Debugf("Sending report indication on change from node: %d", sm.ServiceModel.Node.EnbID)
+	ch := make(chan event.Event)
+	nodeCells := sm.ServiceModel.Node.Cells
+	err := sm.ServiceModel.CellStore.Watch(context.Background(), ch)
+	if err != nil {
+		return err
+	}
+
+	// Sends the first indication message
+	err = sm.sendRicIndication(ctx, subscription)
+	if err != nil {
+		return err
+	}
+
+	// Sends indication messages on cell changes
+	for cellEvent := range ch {
+		cell := cellEvent.Value.(*model.Cell)
+		cellEventType := cellEvent.Type.(cells.CellEvent)
+		if cellEventType == cells.UpdatedNeighbors {
+			for _, nodeCell := range nodeCells {
+				if nodeCell == cell.ECGI {
+					err = sm.sendRicIndication(ctx, subscription)
+					if err != nil {
+						log.Error(err)
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
-	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
+func NewServiceModel(node model.Node, model *model.Model,
+	modelPluginRegistry *modelplugins.ModelPluginRegistry,
+	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
+	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	rcSm := registry.ServiceModel{
 		RanFunctionID:       registry.Rc,
@@ -60,6 +144,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		Subscriptions:       subStore,
 		Nodes:               nodeStore,
 		UEs:                 ueStore,
+		CellStore:           cellStore,
+		MetricStore:         metricStore,
 	}
 
 	rcClient := &Client{
@@ -73,7 +159,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 	var ranFunctionDescription = "RC PRE"
 	var ranFunctionInstance int32 = 3
 	var ricEventStyleType int32 = 1
-	var ricEventStyleName = "PeriodicReport"
+	var ricEventStyleName = "Periodic and On Change Report"
 	var ricEventFormatType int32 = 1
 	var ricReportStyleType int32 = 1
 	var ricReportStyleName = "PCI and NRT update for eNB"
@@ -111,7 +197,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 
 // RICControl implements control handler for RC service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	log.Info("Control Request is received for service model:", sm.ServiceModel.ModelFullName)
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
 	reqID := controlutils.GetRequesterID(request)
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
@@ -142,7 +228,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for RC service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("Ric Subscription Request is received for service model:", sm.ServiceModel.ModelFullName)
+	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -191,23 +277,63 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, nil, err
 	}
 
-	// TODO handler event triggers for RC service model
+	eventTriggerType, err := sm.getEventTriggerType(request)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	switch eventTriggerType {
+	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
+		log.Debugf("Event trigger is on change")
+		go func() {
+			err = sm.reportIndicationOnChange(context.Background(), subscription)
+			if err != nil {
+				return
+			}
+		}()
+	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
+		go func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			interval, err := sm.getReportPeriod(request)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			err = sm.reportPeriodicIndication(ctx, interval, subscription)
+			if err != nil {
+				return
+			}
+		}()
+
+	}
+
 	return response, nil, nil
 }
 
 // RICSubscriptionDelete implements subscription delete handler for RC service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Info("Ric subscription delete request is received for service model:", sm.ServiceModel.ModelFullName)
+	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
 	subID := subscriptions.NewID(ricInstanceID, reqID, ranFuncID)
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
-
 	if err != nil {
 		return nil, nil, err
 	}
-	log.Debug("Deleting subscription with ID:", sub.ID)
+	eventTriggerAsnBytes := sub.Details.RicEventTriggerDefinition.Value
+	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	eventTriggerProtoBytes, err := rcModelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+	if err != nil {
+		return nil, nil, err
+	}
+	eventTriggerDefinition := &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition{}
+	err = proto.Unmarshal(eventTriggerProtoBytes, eventTriggerDefinition)
+	if err != nil {
+		return nil, nil, err
+	}
+	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormat1().TriggerType
 	subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
 		subdeleteutils.WithRequestID(reqID),
 		subdeleteutils.WithRanFuncID(ranFuncID),
@@ -217,13 +343,12 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		return nil, nil, err
 	}
 
-	// TODO stop the event triggers
-	return response, nil, nil
-}
-
-func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
-	if modelPlugin, ok := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[modelFullName]; ok {
-		return modelPlugin, nil
+	switch eventTriggerType {
+	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
+		sub.Ticker.Stop()
+	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
+		// TODO stop on change event trigger
 	}
-	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
+
+	return response, nil, nil
 }
