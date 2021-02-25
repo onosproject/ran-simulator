@@ -166,86 +166,85 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	return reportPeriod, nil
 }
 
-func (sm *Client) createRicIndication(ctx context.Context, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
-	node := sm.ServiceModel.Node
+func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
 	plmnID := sm.getPlmnID()
 	header := &rcindicationhdr.Header{}
 	message := &rcindicationmsg.Message{}
 	var neighbourList []*e2sm_rc_pre_ies.Nrt
 	neighbourList = make([]*e2sm_rc_pre_ies.Nrt, 0)
-	for _, ecgi := range node.Cells {
-		cell, err := sm.ServiceModel.CellStore.Get(ctx, ecgi)
-		if err != nil {
-			return nil, err
-		}
-		cellPci, err := sm.getCellPci(ctx, ecgi)
-		if err != nil {
-			return nil, err
-		}
-		earfcn, err := sm.getEarfcn(ctx, ecgi)
-		if err != nil {
-			return nil, err
-		}
-
-		cellSize, err := sm.getCellSize(ctx, ecgi)
-		if err != nil {
-			return nil, err
-		}
-		for index, neighbourEcgi := range cell.Neighbors {
-			neighbourCellPci, err := sm.getCellPci(ctx, neighbourEcgi)
-			if err != nil {
-				return nil, err
-			}
-			neighbourEarfcn, err := sm.getEarfcn(ctx, ecgi)
-			if err != nil {
-				return nil, err
-			}
-			neighbourCellSize, err := sm.getCellSize(ctx, ecgi)
-			if err != nil {
-				return nil, err
-			}
-			neighbour, err := nrt.NewNeighbour(
-				nrt.WithNrIndex(int32(index)),
-				nrt.WithPci(neighbourCellPci),
-				nrt.WithEutraCellIdentity(uint64(neighbourEcgi)),
-				nrt.WithEarfcn(neighbourEarfcn),
-				nrt.WithCellSize(sm.toCellSizeEnum(neighbourCellSize)),
-				nrt.WithPlmnID(plmnID.Value())).Build()
-			if err == nil {
-				neighbourList = append(neighbourList, neighbour)
-			}
-		}
-
-		pciRanges, err := sm.getPciPool(ctx, ecgi)
-		if err != nil {
-			return nil, err
-		}
-
-		var pciPool []*e2smrcpreies.PciRange
-		for _, pciRangeValue := range pciRanges {
-			pciRange, err := pcirange.NewPciRange(pcirange.WithLowerPci(int32(pciRangeValue.Min)),
-				pcirange.WithUpperPci(int32(pciRangeValue.Max))).Build()
-			if err != nil {
-				return nil, err
-			}
-			pciPool = append(pciPool, pciRange)
-		}
-
-		// Creates RC indication header
-		header = rcindicationhdr.NewIndicationHeader(
-			rcindicationhdr.WithPlmnID(plmnID.Value()),
-			rcindicationhdr.WithEutracellIdentity(uint64(cell.ECGI)))
-
-		// Creates RC indication message
-		message = rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
-			rcindicationmsg.WithCellSize(sm.toCellSizeEnum(cellSize)),
-			rcindicationmsg.WithEarfcn(earfcn),
-			rcindicationmsg.WithEutraCellIdentity(uint64(cell.ECGI)),
-			rcindicationmsg.WithPci(cellPci),
-			rcindicationmsg.WithNeighbours(neighbourList),
-			rcindicationmsg.WithPciPool(pciPool))
-
+	//for _, ecgi := range node.Cells {
+	cell, err := sm.ServiceModel.CellStore.Get(ctx, ecgi)
+	if err != nil {
+		return nil, err
 	}
+	cellPci, err := sm.getCellPci(ctx, ecgi)
+	if err != nil {
+		return nil, err
+	}
+	earfcn, err := sm.getEarfcn(ctx, ecgi)
+	if err != nil {
+		return nil, err
+	}
+
+	cellSize, err := sm.getCellSize(ctx, ecgi)
+	if err != nil {
+		return nil, err
+	}
+	for index, neighbourEcgi := range cell.Neighbors {
+		neighbourCellPci, err := sm.getCellPci(ctx, neighbourEcgi)
+		if err != nil {
+			return nil, err
+		}
+		neighbourEarfcn, err := sm.getEarfcn(ctx, ecgi)
+		if err != nil {
+			return nil, err
+		}
+		neighbourCellSize, err := sm.getCellSize(ctx, ecgi)
+		if err != nil {
+			return nil, err
+		}
+		neighbour, err := nrt.NewNeighbour(
+			nrt.WithNrIndex(int32(index)),
+			nrt.WithPci(neighbourCellPci),
+			nrt.WithEutraCellIdentity(uint64(neighbourEcgi)),
+			nrt.WithEarfcn(neighbourEarfcn),
+			nrt.WithCellSize(sm.toCellSizeEnum(neighbourCellSize)),
+			nrt.WithPlmnID(plmnID.Value())).Build()
+		if err == nil {
+			neighbourList = append(neighbourList, neighbour)
+		}
+	}
+
+	pciRanges, err := sm.getPciPool(ctx, ecgi)
+	if err != nil {
+		return nil, err
+	}
+
+	var pciPool []*e2smrcpreies.PciRange
+	for _, pciRangeValue := range pciRanges {
+		pciRange, err := pcirange.NewPciRange(pcirange.WithLowerPci(int32(pciRangeValue.Min)),
+			pcirange.WithUpperPci(int32(pciRangeValue.Max))).Build()
+		if err != nil {
+			return nil, err
+		}
+		pciPool = append(pciPool, pciRange)
+	}
+
+	// Creates RC indication header
+	header = rcindicationhdr.NewIndicationHeader(
+		rcindicationhdr.WithPlmnID(plmnID.Value()),
+		rcindicationhdr.WithEutracellIdentity(uint64(cell.ECGI)))
+
+	// Creates RC indication message
+	message = rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
+		rcindicationmsg.WithCellSize(sm.toCellSizeEnum(cellSize)),
+		rcindicationmsg.WithEarfcn(earfcn),
+		rcindicationmsg.WithEutraCellIdentity(uint64(cell.ECGI)),
+		rcindicationmsg.WithPci(cellPci),
+		rcindicationmsg.WithNeighbours(neighbourList),
+		rcindicationmsg.WithPciPool(pciPool))
+
+	//}
 	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
 	if err != nil {

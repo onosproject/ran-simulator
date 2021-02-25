@@ -64,15 +64,7 @@ func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, 
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
 	for range sub.Ticker.C {
-		ricIndication, err := sm.createRicIndication(ctx, subscription)
-		if err != nil {
-			return err
-		}
-		err = sub.E2Channel.RICIndication(ctx, ricIndication)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
+		_ = sm.sendRicIndication(ctx, subscription)
 	}
 	return nil
 }
@@ -83,21 +75,25 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	if err != nil {
 		return err
 	}
-	ricIndication, err := sm.createRicIndication(ctx, subscription)
-	if err != nil {
-		return err
-	}
 
-	err = sub.E2Channel.RICIndication(ctx, ricIndication)
-	if err != nil {
-		log.Error(err)
-		return err
+	node := sm.ServiceModel.Node
+	for _, ecgi := range node.Cells {
+		ricIndication, err := sm.createRicIndication(ctx, ecgi, subscription)
+		if err != nil {
+			return err
+		}
+
+		err = sub.E2Channel.RICIndication(ctx, ricIndication)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
 	}
 	return nil
 }
 
 func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *subutils.Subscription) error {
-	log.Debugf("Sending report indication on change for node: %d", sm.ServiceModel.Node.EnbID)
+	log.Debugf("Sending report indication on change from node: %d", sm.ServiceModel.Node.EnbID)
 	ch := make(chan event.Event)
 	nodeCells := sm.ServiceModel.Node.Cells
 	err := sm.ServiceModel.CellStore.Watch(context.Background(), ch)
@@ -200,7 +196,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 // RICControl implements control handler for RC service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	log.Info("Control Request is received for service model and e2 node ID:", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
 	reqID := controlutils.GetRequesterID(request)
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
@@ -231,7 +227,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for RC service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("Ric Subscription Request is received for service model and e2 node with ID:", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -316,7 +312,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for RC service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Info("Ric subscription delete request is received for service model and e2 node with ID:", sm.ServiceModel.ModelFullName)
+	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
