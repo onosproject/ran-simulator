@@ -166,13 +166,11 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	return reportPeriod, nil
 }
 
+// createRicIndication creates ric indication  for each cell in the node
 func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
 	plmnID := sm.getPlmnID()
-	header := &rcindicationhdr.Header{}
-	message := &rcindicationmsg.Message{}
 	var neighbourList []*e2sm_rc_pre_ies.Nrt
 	neighbourList = make([]*e2sm_rc_pre_ies.Nrt, 0)
-	//for _, ecgi := range node.Cells {
 	cell, err := sm.ServiceModel.CellStore.Get(ctx, ecgi)
 	if err != nil {
 		return nil, err
@@ -231,12 +229,12 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 	}
 
 	// Creates RC indication header
-	header = rcindicationhdr.NewIndicationHeader(
+	header := rcindicationhdr.NewIndicationHeader(
 		rcindicationhdr.WithPlmnID(plmnID.Value()),
 		rcindicationhdr.WithEutracellIdentity(uint64(cell.ECGI)))
 
 	// Creates RC indication message
-	message = rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
+	message := rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
 		rcindicationmsg.WithCellSize(sm.toCellSizeEnum(cellSize)),
 		rcindicationmsg.WithEarfcn(earfcn),
 		rcindicationmsg.WithEutraCellIdentity(uint64(cell.ECGI)),
@@ -244,7 +242,6 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 		rcindicationmsg.WithNeighbours(neighbourList),
 		rcindicationmsg.WithPciPool(pciPool))
 
-	//}
 	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
 	if err != nil {

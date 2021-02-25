@@ -77,6 +77,7 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	}
 
 	node := sm.ServiceModel.Node
+	// Creates and sends an indication message for each cell in the node
 	for _, ecgi := range node.Cells {
 		ricIndication, err := sm.createRicIndication(ctx, ecgi, subscription)
 		if err != nil {
