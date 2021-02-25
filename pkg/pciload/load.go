@@ -6,7 +6,7 @@ package pciload
 
 import (
 	"context"
-	"fmt"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
@@ -59,11 +59,7 @@ func LoadPCIMetrics(store metrics.Store) error {
 		_ = store.Set(ctx, id, "cellSize", m.CellSize)
 		_ = store.Set(ctx, id, "earfcn", m.Earfcn)
 		_ = store.Set(ctx, id, "pci", m.Pci)
-
-		for i, p := range m.PciPool {
-			_ = store.Set(ctx, id, fmt.Sprintf("pci%dMin", i+1), p.Min)
-			_ = store.Set(ctx, id, fmt.Sprintf("pci%dMax", i+1), p.Max)
-		}
+		_ = store.Set(ctx, id, "pcipool", m.PciPool)
 	}
 
 	return err
