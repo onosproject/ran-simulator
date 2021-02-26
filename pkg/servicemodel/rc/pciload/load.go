@@ -34,20 +34,25 @@ type PciRange struct {
 	Max uint32 `mapstructure:"max"`
 }
 
-// LoadPCIMetrics Loads model with data in "pcis" yaml file
+// LoadPCIMetrics Loads model with data in "metrics" yaml file
 func LoadPCIMetrics(store metrics.Store) error {
 	log.Infof("Loading initial PCI metrics...")
 	var err error
 
-	model.ViperConfigure("pci")
+	model.ViperConfigure("metrics")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Errorf("Unable to read metrics config: %v", err)
 		return err
 	}
 
+	const key string = "rc.pci"
+	if !viper.IsSet(key) {
+		log.Infof("PCI metrics not found. skipping...")
+	}
+
 	pcis := &PciMetrics{}
-	err = viper.Unmarshal(pcis)
+	err = viper.UnmarshalKey(key, pcis)
 	if err != nil {
 		return err
 	}
