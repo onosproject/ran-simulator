@@ -49,7 +49,7 @@ const (
 	version       = "v1"
 )
 
-// Client kpm service model client
+// Client rc service model client
 type Client struct {
 	ServiceModel *registry.ServiceModel
 }

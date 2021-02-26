@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/spf13/viper"
@@ -17,7 +18,7 @@ var log = logging.GetLogger("pci", "load")
 
 // PciMetrics is an auxiliary structure for importing PCI data from YAML configuration
 type PciMetrics struct {
-	Cells map[uint64]PciCell `mapstructure:"cells"`
+	Cells map[types.ECGI]PciCell `mapstructure:"cells"`
 }
 
 // PciCell is an auxiliary structure for inport PCI data from YAML configuration
@@ -60,7 +61,8 @@ func LoadPCIMetrics(store metrics.Store) error {
 	log.Infof("Storing initial PCI metrics for %d cells...", len(pcis.Cells))
 
 	ctx := context.Background()
-	for id, m := range pcis.Cells {
+	for ecgi, m := range pcis.Cells {
+		id := uint64(ecgi)
 		_ = store.Set(ctx, id, "cellSize", m.CellSize)
 		_ = store.Set(ctx, id, "earfcn", m.Earfcn)
 		_ = store.Set(ctx, id, "pci", m.Pci)
