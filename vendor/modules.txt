@@ -12,6 +12,7 @@ github.com/Masterminds/semver/v3
 # github.com/Masterminds/sprig/v3 v3.0.2
 github.com/Masterminds/sprig/v3
 # github.com/Microsoft/go-winio v0.4.15
+## explicit
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
 # github.com/Microsoft/hcsshim v0.8.7
@@ -171,6 +172,8 @@ github.com/exponent-io/jsonpath
 github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.4.9
 github.com/fsnotify/fsnotify
+# github.com/garyburd/redigo v1.1.1-0.20170914051019-70e1b1943d4f
+## explicit
 # github.com/ghodss/yaml v1.0.0
 github.com/ghodss/yaml
 # github.com/go-openapi/jsonpointer v0.19.3
@@ -191,7 +194,6 @@ github.com/gobwas/glob/syntax/lexer
 github.com/gobwas/glob/util/runes
 github.com/gobwas/glob/util/strings
 # github.com/gogo/protobuf v1.3.1
-## explicit
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
 github.com/gogo/protobuf/protoc-gen-gogo/descriptor
@@ -209,8 +211,6 @@ github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/snappy
 # github.com/google/btree v1.0.0
 github.com/google/btree
-# github.com/google/gnxi v0.0.0-20201130113533-3b2d93b83a53
-## explicit
 # github.com/google/go-cmp v0.5.3
 github.com/google/go-cmp/cmp
 github.com/google/go-cmp/cmp/internal/diff
@@ -227,6 +227,7 @@ github.com/googleapis/gnostic/OpenAPIv2
 github.com/googleapis/gnostic/compiler
 github.com/googleapis/gnostic/extensions
 # github.com/gorilla/mux v1.8.0
+## explicit
 github.com/gorilla/mux
 # github.com/gosuri/uitable v0.0.4
 github.com/gosuri/uitable
@@ -297,7 +298,6 @@ github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/mitchellh/copystructure v1.0.0
 github.com/mitchellh/copystructure
 # github.com/mitchellh/go-homedir v1.1.0
-## explicit
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/go-wordwrap v1.0.0
 github.com/mitchellh/go-wordwrap
@@ -311,8 +311,6 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/morikuni/aec v1.0.0
 github.com/morikuni/aec
-# github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b
-## explicit
 # github.com/onosproject/helmit v0.6.8
 ## explicit
 github.com/onosproject/helmit/pkg/helm
@@ -339,8 +337,6 @@ github.com/onosproject/helmit/pkg/test
 github.com/onosproject/helmit/pkg/util/files
 github.com/onosproject/helmit/pkg/util/logging
 github.com/onosproject/helmit/pkg/util/random
-# github.com/onosproject/onos-api v0.7.9
-## explicit
 # github.com/onosproject/onos-api/go v0.7.7
 ## explicit
 github.com/onosproject/onos-api/go/onos/e2sub/endpoint
@@ -405,6 +401,7 @@ github.com/onosproject/onos-ric-sdk-go/pkg/e2/termination
 ## explicit
 github.com/onosproject/onos-test/pkg/onostest
 # github.com/opencontainers/go-digest v1.0.0
+## explicit
 github.com/opencontainers/go-digest
 # github.com/opencontainers/image-spec v1.0.1
 github.com/opencontainers/image-spec/specs-go
@@ -427,7 +424,6 @@ github.com/pmezard/go-difflib/difflib
 github.com/pquerna/cachecontrol
 github.com/pquerna/cachecontrol/cacheobject
 # github.com/prometheus/client_golang v1.4.1
-## explicit
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/internal
 github.com/prometheus/client_golang/prometheus/promhttp
