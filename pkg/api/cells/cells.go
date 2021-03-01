@@ -8,10 +8,10 @@ package cells
 import (
 	"context"
 
+	modelapi "github.com/onosproject/onos-api/go/onos/ransim/model"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
-	modelapi "github.com/onosproject/ran-simulator/api/model"
-	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/event"

@@ -9,7 +9,7 @@ import (
 	"net"
 	"testing"
 
-	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
+	simapi "github.com/onosproject/onos-api/go/onos/ransim/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"

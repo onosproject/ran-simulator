@@ -7,12 +7,13 @@ package cli
 
 import (
 	"context"
+	"strconv"
+
+	metricsapi "github.com/onosproject/onos-api/go/onos/ransim/metrics"
 	"github.com/onosproject/onos-lib-go/pkg/cli"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
-	metricsapi "github.com/onosproject/ran-simulator/api/metrics"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
-	"strconv"
 )
 
 func getMetricCommand() *cobra.Command {

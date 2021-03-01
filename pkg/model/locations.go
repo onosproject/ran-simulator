@@ -11,7 +11,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
-	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 )
 
 // LocationID type - an alias for string

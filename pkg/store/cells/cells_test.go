@@ -9,7 +9,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"

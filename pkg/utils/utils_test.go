@@ -6,10 +6,11 @@
 package utils
 
 import (
-	"github.com/onosproject/ran-simulator/api/types"
-	"gotest.tools/assert"
 	"math"
 	"testing"
+
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
+	"gotest.tools/assert"
 )
 
 const (

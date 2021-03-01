@@ -7,9 +7,10 @@ package e2agent
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/onosproject/ran-simulator/api/types"
 	"hash/fnv"
 	"time"
+
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/cenkalti/backoff"
 )

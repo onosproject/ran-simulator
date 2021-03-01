@@ -4,7 +4,9 @@
 
 package cells
 
-import "github.com/onosproject/ran-simulator/api/types"
+import (
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
+)
 
 func equalNeighbors(a, b []types.ECGI) bool {
 

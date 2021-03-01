@@ -3,24 +3,32 @@ module github.com/onosproject/ran-simulator
 go 1.15
 
 require (
+	github.com/Microsoft/go-winio v0.4.15 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/gogo/protobuf v1.3.1
-	github.com/google/gnxi v0.0.0-20201130113533-3b2d93b83a53 // indirect
+	github.com/docker/docker v1.13.1 // indirect
+	github.com/garyburd/redigo v1.1.1-0.20170914051019-70e1b1943d4f // indirect
 	github.com/google/uuid v1.1.2
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/onosproject/config-models/modelplugin/ric-1.0.0 v0.0.0-20201206002829-0f3b7ebb025b // indirect
+	github.com/googleapis/gnostic v0.3.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
+	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
+	github.com/mattn/go-colorable v0.1.4 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/onosproject/helmit v0.6.8
-	github.com/onosproject/onos-api/go v0.7.5
+	github.com/onosproject/onos-api/go v0.7.9
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.7
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.7
 	github.com/onosproject/onos-e2t v0.7.5
 	github.com/onosproject/onos-lib-go v0.7.0
 	github.com/onosproject/onos-ric-sdk-go v0.7.9
 	github.com/onosproject/onos-test v0.6.4
+	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.4.1 // indirect
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
+	go.uber.org/multierr v1.4.0 // indirect
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	google.golang.org/grpc v1.33.2
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v2 v2.3.0

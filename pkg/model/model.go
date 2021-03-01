@@ -5,8 +5,8 @@
 package model
 
 import (
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/api/types"
 )
 
 // Model simulation model

@@ -9,9 +9,9 @@ import (
 	"context"
 	"strconv"
 
+	modelapi "github.com/onosproject/onos-api/go/onos/ransim/model"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/cli"
-	modelapi "github.com/onosproject/ran-simulator/api/model"
-	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 )
