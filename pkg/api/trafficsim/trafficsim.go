@@ -11,7 +11,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 
 	simapi "github.com/onosproject/onos-api/go/onos/ransim/trafficsim"
-	"github.com/onosproject/onos-api/go/onos/ransim/types"
+
 	simtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
@@ -58,9 +58,9 @@ type Server struct {
 }
 
 // GetMapLayout :
-func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest) (*types.MapLayout, error) {
-	return &types.MapLayout{
-		Center:         &types.Point{Lat: s.model.MapLayout.Center.Lat, Lng: s.model.MapLayout.Center.Lng},
+func (s *Server) GetMapLayout(ctx context.Context, req *simapi.MapLayoutRequest) (*simtypes.MapLayout, error) {
+	return &simtypes.MapLayout{
+		Center:         &simtypes.Point{Lat: s.model.MapLayout.Center.Lat, Lng: s.model.MapLayout.Center.Lng},
 		Zoom:           s.model.MapLayout.Zoom,
 		Fade:           s.model.MapLayout.FadeMap,
 		ShowRoutes:     s.model.MapLayout.ShowRoutes,
