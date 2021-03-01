@@ -35,6 +35,7 @@ func NewStore() *E2Agents {
 func (e *E2Agents) Get(id types.EnbID) (e2agent.E2Agent, error) {
 	log.Debug("Getting e2 agent with ID:", id)
 	e.mu.RLock()
+	defer e.mu.RUnlock()
 	if val, ok := e.agents[id]; ok {
 		return val, nil
 	}

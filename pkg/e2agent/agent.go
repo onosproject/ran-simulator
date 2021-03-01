@@ -373,7 +373,8 @@ func (a *e2Agent) setup() error {
 }
 
 func (a *e2Agent) Stop() error {
-	log.Debugf("Stopping e2 agent with ID %v:", a.node.EnbID)
+	log.Debugf("Stopping e2 agent with ID %d:", a.node.EnbID)
+
 	if a.channel != nil {
 		return a.channel.Close()
 	}
