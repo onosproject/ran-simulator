@@ -8,16 +8,17 @@ package nodes
 import (
 	"context"
 	"fmt"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/store/event"
-	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"reflect"
 	"strconv"
 	"strings"
 
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+	"github.com/onosproject/ran-simulator/pkg/store/metrics"
+
+	metricsapi "github.com/onosproject/onos-api/go/onos/ransim/metrics"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
-	metricsapi "github.com/onosproject/ran-simulator/api/metrics"
 	"google.golang.org/grpc"
 )
 

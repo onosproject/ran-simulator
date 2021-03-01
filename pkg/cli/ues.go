@@ -8,8 +8,8 @@ package cli
 import (
 	"context"
 
+	simapi "github.com/onosproject/onos-api/go/onos/ransim/trafficsim"
 	"github.com/onosproject/onos-lib-go/pkg/cli"
-	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
 
 	"github.com/spf13/cobra"
 )

@@ -8,7 +8,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 

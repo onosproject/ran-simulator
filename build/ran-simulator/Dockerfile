@@ -6,7 +6,6 @@ ENV GO111MODULE=on
 ARG ONOS_MAKE_TARGET=build
 
 COPY Makefile go.mod go.sum /go/src/github.com/onosproject/ran-simulator/
-COPY api/ /go/src/github.com/onosproject/ran-simulator/api/
 COPY cmd/ /go/src/github.com/onosproject/ran-simulator/cmd/
 COPY pkg/ /go/src/github.com/onosproject/ran-simulator/pkg/
 COPY vendor/ /go/src/github.com/onosproject/ran-simulator/vendor/

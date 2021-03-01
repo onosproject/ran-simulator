@@ -10,11 +10,11 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 
+	simapi "github.com/onosproject/onos-api/go/onos/ransim/trafficsim"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
+	simtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
-	simapi "github.com/onosproject/ran-simulator/api/trafficsim"
-	"github.com/onosproject/ran-simulator/api/types"
-	simtypes "github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"

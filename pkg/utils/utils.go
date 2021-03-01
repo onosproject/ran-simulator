@@ -9,7 +9,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/onosproject/ran-simulator/api/types"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 )
 
 // ServerParams - params to start a new server
