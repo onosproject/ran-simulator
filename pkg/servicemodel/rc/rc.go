@@ -134,7 +134,7 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 				}
 			}
 		case <-sub.E2Channel.Context().Done():
-			log.Info("context done in rc")
+			log.Debug("E2 channel context is done")
 			return nil
 		}
 	}

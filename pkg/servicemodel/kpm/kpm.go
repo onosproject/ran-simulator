@@ -177,7 +177,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 			}
 
 		case <-sub.E2Channel.Context().Done():
-			log.Info("Context done for kpm channel")
+			log.Debug("E2 channel context is done")
 			sub.Ticker.Stop()
 			return nil
 

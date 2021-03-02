@@ -52,11 +52,11 @@ func (agents *E2Agents) processNodeEvents() {
 		log.Error(err)
 	}
 	for nodeEvent := range ch {
-		log.Info("Node event", nodeEvent)
+		log.Debug("Received Node event:", nodeEvent)
 		switch nodeEvent.Type {
 		case nodes.Created:
 			node := nodeEvent.Value.(*model.Node)
-			log.Debugf("Starting e2 agent: %d", nodeEvent.Key.(types.EnbID), node)
+			log.Debugf("Starting e2 agent %d", nodeEvent.Key.(types.EnbID))
 			e2Node, err := e2agent.NewE2Agent(*node, agents.model,
 				agents.modelPluginRegistry, agents.nodeStore, agents.ueStore,
 				agents.cellStore, agents.metricStore)
@@ -86,7 +86,6 @@ func (agents *E2Agents) processNodeEvents() {
 				log.Error(err)
 				continue
 			}
-			log.Debugf("Node in delete:", e2Node)
 			err = e2Node.Stop()
 			if err != nil {
 				log.Error(err)
@@ -100,8 +99,6 @@ func (agents *E2Agents) processNodeEvents() {
 
 		}
 	}
-
-	log.Debugf("Terminating node events")
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
