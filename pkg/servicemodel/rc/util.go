@@ -193,11 +193,11 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 		if err != nil {
 			return nil, err
 		}
-		neighbourEarfcn, err := sm.getEarfcn(ctx, ecgi)
+		neighbourEarfcn, err := sm.getEarfcn(ctx, neighbourEcgi)
 		if err != nil {
 			return nil, err
 		}
-		neighbourCellSize, err := sm.getCellSize(ctx, ecgi)
+		neighbourCellSize, err := sm.getCellSize(ctx, neighbourEcgi)
 		if err != nil {
 			return nil, err
 		}
