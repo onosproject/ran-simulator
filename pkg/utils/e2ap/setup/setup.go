@@ -85,8 +85,6 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 						Value: int32(ranFunctionID.Revision),
 					},
 					RanFunctionOid: &e2ap_commondatatypes.RanfunctionOid{
-						// TODO - Remove hardcoded OID
-						//Value: []byte("1.3.6.1.4.1.1.1.2.2"),
 						Value: []byte(ranFunctionID.OID),
 					},
 				},
