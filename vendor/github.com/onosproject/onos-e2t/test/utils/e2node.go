@@ -22,6 +22,8 @@ const (
 // TODO this function should be replaced with topology API
 func GetNodeIDs() ([]string, error) {
 	tlsConfig, err := creds.GetClientCredentials()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	var nodeIDs []string
 	if err != nil {
 		return []string{}, err
@@ -30,12 +32,12 @@ func GetNodeIDs() ([]string, error) {
 		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
 	}
 
-	conn, err := grpc.DialContext(context.Background(), OnosE2TAddress, opts...)
+	conn, err := grpc.DialContext(ctx, OnosE2TAddress, opts...)
 	if err != nil {
 		return []string{}, err
 	}
 	adminClient := admin.NewE2TAdminServiceClient(conn)
-	connections, err := adminClient.ListE2NodeConnections(context.Background(), &admin.ListE2NodeConnectionsRequest{})
+	connections, err := adminClient.ListE2NodeConnections(ctx, &admin.ListE2NodeConnectionsRequest{})
 
 	if err != nil {
 		return []string{}, err
@@ -45,16 +47,13 @@ func GetNodeIDs() ([]string, error) {
 		connection, err := connections.Recv()
 		if err == io.EOF {
 			break
-		}
-		if err != nil {
+		} else if err != nil {
 			return []string{}, err
 		}
 		if connection != nil {
 			nodeID := connection.Id
 			nodeIDs = append(nodeIDs, nodeID)
 		}
-
 	}
-
 	return nodeIDs, nil
 }

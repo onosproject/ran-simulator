@@ -84,6 +84,9 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 					RanFunctionRevision: &e2apies.RanfunctionRevision{
 						Value: int32(ranFunctionID.Revision),
 					},
+					RanFunctionOid: &e2ap_commondatatypes.RanfunctionOid{
+						Value: []byte(ranFunctionID.OID),
+					},
 				},
 			},
 		}

@@ -22,8 +22,9 @@ import (
 func newRanFunctionItem(rfItem *e2appducontents.RanfunctionItem) *C.RANfunction_Item_t {
 	rfItemC := C.RANfunction_Item_t{
 		ranFunctionID:         newRanFunctionID(rfItem.GetRanFunctionId()),
-		ranFunctionRevision:   newRanFunctionRevision(rfItem.GetRanFunctionRevision()),
+		ranFunctionRevision:   *newRanFunctionRevision(rfItem.GetRanFunctionRevision()),
 		ranFunctionDefinition: *newOctetString(string(rfItem.GetRanFunctionDefinition().GetValue())),
+		ranFunctionOID:        newRanFunctionOID(rfItem.GetRanFunctionOid()),
 	}
 	return &rfItemC
 }
@@ -38,7 +39,8 @@ func decodeRanFunctionItemBytes(bytes [88]byte) (*e2appducontents.RanfunctionIte
 			buf:  (*C.uchar)(C.CBytes(gobytes)),
 			size: C.ulong(size),
 		},
-		ranFunctionRevision: C.long(binary.LittleEndian.Uint64(bytes[24:32])),
+		ranFunctionRevision: C.long(binary.LittleEndian.Uint64(bytes[48:56])),
+		ranFunctionOID: (*C.PrintableString_t)(unsafe.Pointer(uintptr(binary.LittleEndian.Uint64(bytes[56:64])))),
 	}
 
 	return decodeRanFunctionItem(&rfiC)
@@ -54,6 +56,9 @@ func decodeRanFunctionItem(rfiC *C.RANfunction_Item_t) (*e2appducontents.Ranfunc
 		},
 		RanFunctionDefinition: &e2ap_commondatatypes.RanfunctionDefinition{
 			Value: []byte(decodeOctetString(&rfiC.ranFunctionDefinition)),
+		},
+		RanFunctionOid: &e2ap_commondatatypes.RanfunctionOid{
+			Value: decodeRanFunctionOID(rfiC.ranFunctionOID).Value,
 		},
 	}
 

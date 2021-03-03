@@ -14,8 +14,11 @@ const (
 	KpmServiceModelID       = "e2sm_kpm-v1beta1"
 	E2TServiceHost          = "onos-e2t"
 	E2TServicePort          = 5150
+	RansimServiceHost       = "ran-simulator"
+	RansimServicePort       = 5150
 )
 
 var (
 	SubscriptionServiceAddress = SubscriptionServiceHost + ":" + strconv.Itoa(SubscriptionServicePort)
+	RansimServiceAddress       = RansimServiceHost + ":" + strconv.Itoa(RansimServicePort)
 )

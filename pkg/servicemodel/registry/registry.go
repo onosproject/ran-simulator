@@ -42,6 +42,7 @@ type ServiceModel struct {
 	Version             string
 	Description         []byte // ASN1 bytes from Service Model
 	Revision            int
+	OID                 string
 	Client              servicemodel.Client
 	ModelPluginRegistry *modelplugins.ModelPluginRegistry
 	Node                model.Node
@@ -74,6 +75,7 @@ func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
 	s.ranFunctions[ranFuncID] = e2aptypes.RanFunctionItem{
 		Description: sm.Description,
 		Revision:    e2aptypes.RanFunctionRevision(sm.Revision),
+		OID:         e2aptypes.RanFunctionOID(sm.OID),
 	}
 	s.serviceModels[sm.RanFunctionID] = sm
 

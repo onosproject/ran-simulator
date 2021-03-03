@@ -47,6 +47,7 @@ var log = logging.GetLogger("sm", "kpm")
 const (
 	modelFullName = "e2sm_kpm-v1beta1"
 	version       = "v1beta1"
+	modelOID      = "1.3.6.1.4.1.1.1.2.2"
 )
 
 // Client kpm service model client
@@ -62,6 +63,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		RanFunctionID:       registry.Kpm,
 		ModelFullName:       modelFullName,
 		Revision:            1,
+		OID:                 modelOID,
 		Version:             version,
 		ModelPluginRegistry: modelPluginRegistry,
 		Node:                node,
