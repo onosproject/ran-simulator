@@ -47,6 +47,8 @@ var log = logging.GetLogger("sm", "rc")
 const (
 	modelFullName = "e2sm_rc_pre-v1"
 	version       = "v1"
+	// TODO - Replace with OID for rc-pre service model
+	modelOID      = "1.3.6.1.4.1.1.1.2.99"
 )
 
 // Client rc service model client
@@ -150,6 +152,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 		RanFunctionID:       registry.Rc,
 		ModelFullName:       modelFullName,
 		Revision:            1,
+		OID:                 modelOID,
 		Version:             version,
 		ModelPluginRegistry: modelPluginRegistry,
 		Node:                node,

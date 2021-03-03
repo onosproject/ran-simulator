@@ -8,11 +8,13 @@ import e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
 
 type RanFunctionDescription []byte
 type RanFunctionRevision int
+type RanFunctionOID []byte
 type RanFunctionID uint8
 
 type RanFunctionItem struct {
 	Description RanFunctionDescription
 	Revision    RanFunctionRevision
+	OID         RanFunctionOID
 }
 
 type RanFunctions map[RanFunctionID]RanFunctionItem

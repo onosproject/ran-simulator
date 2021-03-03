@@ -1617,7 +1617,9 @@ func newRANfunctionItemIEs(rfItemIes *e2appducontents.RanfunctionItemIes) (*C.RA
 	binary.LittleEndian.PutUint64(choiceC[0:], uint64(rfItemC.ranFunctionID))
 	binary.LittleEndian.PutUint64(choiceC[8:], uint64(uintptr(unsafe.Pointer(rfItemC.ranFunctionDefinition.buf))))
 	binary.LittleEndian.PutUint64(choiceC[16:], uint64(rfItemC.ranFunctionDefinition.size))
-	binary.LittleEndian.PutUint64(choiceC[24:], uint64(rfItemC.ranFunctionRevision))
+	// Gap of 24 for the asn_struct_ctx_t belonging to OCTET STRING
+	binary.LittleEndian.PutUint64(choiceC[48:], uint64(rfItemC.ranFunctionRevision))
+	binary.LittleEndian.PutUint64(choiceC[56:], uint64(uintptr(unsafe.Pointer(rfItemC.ranFunctionOID))))
 
 	rfItemIesC := C.RANfunction_ItemIEs_t{
 		id:          idC,

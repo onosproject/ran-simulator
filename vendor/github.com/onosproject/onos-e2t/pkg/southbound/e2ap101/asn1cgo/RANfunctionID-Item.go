@@ -20,7 +20,7 @@ import (
 func newRanFunctionIDItem(rfIDi *e2appducontents.RanfunctionIdItem) *C.RANfunctionID_Item_t {
 	rfIDiC := C.RANfunctionID_Item_t{
 		ranFunctionID:       newRanFunctionID(rfIDi.GetRanFunctionId()),
-		ranFunctionRevision: newRanFunctionRevision(rfIDi.GetRanFunctionRevision()),
+		ranFunctionRevision: *newRanFunctionRevision(rfIDi.GetRanFunctionRevision()),
 	}
 
 	return &rfIDiC
