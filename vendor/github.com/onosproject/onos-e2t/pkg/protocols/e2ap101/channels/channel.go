@@ -163,6 +163,11 @@ func (c *threadSafeChannel) processRecv(bytes []byte) error {
 }
 
 func (c *threadSafeChannel) Close() error {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Debug("recovering from panic:", err)
+		}
+	}()
 	close(c.sendCh)
 	close(c.recvCh)
 	c.cancel()

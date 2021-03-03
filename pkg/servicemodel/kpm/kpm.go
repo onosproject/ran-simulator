@@ -122,7 +122,6 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		return err
 	}
 	// Creates an indication header
-
 	plmnID := types.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 
 	header := kpmutils.NewIndicationHeader(
@@ -154,27 +153,36 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		return err
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
-	for range sub.Ticker.C {
-		log.Debug("Sending Indication Report for subscription:", sub.ID)
-		indication := indicationutils.NewIndication(
-			indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
-			indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
-			indicationutils.WithRequestID(subscription.GetReqID()),
-			indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
-			indicationutils.WithIndicationMessage(indicationMessageBytes))
+	for {
+		select {
+		case <-sub.Ticker.C:
+			log.Debug("Sending Indication Report for subscription:", sub.ID)
+			indication := indicationutils.NewIndication(
+				indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
+				indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
+				indicationutils.WithRequestID(subscription.GetReqID()),
+				indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
+				indicationutils.WithIndicationMessage(indicationMessageBytes))
 
-		ricIndication, err := indication.Build()
-		if err != nil {
-			log.Error("creating indication message is failed", err)
-			return err
-		}
-		err = sub.E2Channel.RICIndication(ctx, ricIndication)
-		if err != nil {
-			log.Error("Sending indication report is failed:", err)
-			return err
+			ricIndication, err := indication.Build()
+			if err != nil {
+				log.Error("creating indication message is failed", err)
+				return err
+			}
+
+			err = sub.E2Channel.RICIndication(ctx, ricIndication)
+			if err != nil {
+				log.Error("Sending indication report is failed:", err)
+				return err
+			}
+
+		case <-sub.E2Channel.Context().Done():
+			log.Debug("E2 channel context is done")
+			sub.Ticker.Stop()
+			return nil
+
 		}
 	}
-	return nil
 }
 
 // RICControl implements control handler for kpm service model
@@ -184,7 +192,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Info("RIC Subscription request received for service model:", sm.ServiceModel.ModelFullName)
+	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelFullName)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -256,7 +264,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Info("RIC subscription delete request is received for service model:", sm.ServiceModel.ModelFullName)
+	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelFullName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)

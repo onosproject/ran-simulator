@@ -63,10 +63,16 @@ func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, 
 		return err
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
-	for range sub.Ticker.C {
-		_ = sm.sendRicIndication(ctx, subscription)
+	for {
+		select {
+		case <-sub.Ticker.C:
+			_ = sm.sendRicIndication(ctx, subscription)
+
+		case <-sub.E2Channel.Context().Done():
+			sub.Ticker.Stop()
+			return nil
+		}
 	}
-	return nil
 }
 
 func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
@@ -83,7 +89,6 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 		if err != nil {
 			return err
 		}
-
 		err = sub.E2Channel.RICIndication(ctx, ricIndication)
 		if err != nil {
 			log.Error(err)
@@ -95,9 +100,14 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 
 func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *subutils.Subscription) error {
 	log.Debugf("Sending report indication on change from node: %d", sm.ServiceModel.Node.EnbID)
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
 	ch := make(chan event.Event)
 	nodeCells := sm.ServiceModel.Node.Cells
-	err := sm.ServiceModel.CellStore.Watch(context.Background(), ch)
+	err = sm.ServiceModel.CellStore.Watch(context.Background(), ch)
 	if err != nil {
 		return err
 	}
@@ -108,23 +118,26 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 		return err
 	}
 
-	// Sends indication messages on cell changes
-	for cellEvent := range ch {
-		cell := cellEvent.Value.(*model.Cell)
-		cellEventType := cellEvent.Type.(cells.CellEvent)
-		if cellEventType == cells.UpdatedNeighbors {
-			for _, nodeCell := range nodeCells {
-				if nodeCell == cell.ECGI {
-					err = sm.sendRicIndication(ctx, subscription)
-					if err != nil {
-						log.Error(err)
+	for {
+		select {
+		case cellEvent := <-ch:
+			cellEventType := cellEvent.Type.(cells.CellEvent)
+			if cellEventType == cells.UpdatedNeighbors {
+				cell := cellEvent.Value.(*model.Cell)
+				for _, nodeCell := range nodeCells {
+					if nodeCell == cell.ECGI {
+						err = sm.sendRicIndication(ctx, subscription)
+						if err != nil {
+							log.Error(err)
+						}
 					}
 				}
 			}
+		case <-sub.E2Channel.Context().Done():
+			log.Debug("E2 channel context is done")
+			return nil
 		}
 	}
-
-	return nil
 }
 
 // NewServiceModel creates a new service model
@@ -286,7 +299,9 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
 		log.Debugf("Event trigger is on change")
 		go func() {
-			err = sm.reportIndicationOnChange(context.Background(), subscription)
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			err = sm.reportIndicationOnChange(ctx, subscription)
 			if err != nil {
 				return
 			}

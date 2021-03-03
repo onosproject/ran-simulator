@@ -7,6 +7,8 @@ package agents
 import (
 	"context"
 
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
+
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -43,20 +45,57 @@ type Agents interface {
 
 func (agents *E2Agents) processNodeEvents() {
 	ch := make(chan event.Event)
-	err := agents.nodeStore.Watch(context.Background(), ch)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	err := agents.nodeStore.Watch(ctx, ch)
 	if err != nil {
 		log.Error(err)
 	}
 	for nodeEvent := range ch {
+		log.Debug("Received Node event:", nodeEvent)
 		switch nodeEvent.Type {
 		case nodes.Created:
-			// TODO start e2 agent
-			log.Debugf("New node is added: %v", nodeEvent.Key)
+			node := nodeEvent.Value.(*model.Node)
+			log.Debugf("Starting e2 agent %d", nodeEvent.Key.(types.EnbID))
+			e2Node, err := e2agent.NewE2Agent(*node, agents.model,
+				agents.modelPluginRegistry, agents.nodeStore, agents.ueStore,
+				agents.cellStore, agents.metricStore)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			err = agents.agentStore.Add(node.EnbID, e2Node)
+			if err != nil {
+				log.Error(err)
+			}
+
+			err = e2Node.Start()
+			if err != nil {
+				log.Error(err)
+				err = agents.agentStore.Remove(node.EnbID)
+				if err != nil {
+					log.Error(err)
+				}
+			}
+
 		case nodes.Deleted:
-			// TODO stop e2agent
-			log.Debugf("Node %v is deleted: %v", nodeEvent.Key)
-		case nodes.Updated:
-			log.Debugf("Node %v is updated: %v", nodeEvent.Key)
+			log.Debugf("Stopping e2 agent %d", nodeEvent.Key.(types.EnbID))
+			node := nodeEvent.Value.(*model.Node)
+			e2Node, err := agents.agentStore.Get(node.EnbID)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+			err = e2Node.Stop()
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+
+			err = agents.agentStore.Remove(node.EnbID)
+			if err != nil {
+				log.Error(err)
+			}
 
 		}
 	}

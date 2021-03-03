@@ -6,6 +6,7 @@ package procedures
 
 import (
 	"context"
+
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	e2appdudescriptions "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-descriptions"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
@@ -85,6 +86,11 @@ func (p *E2SetupInitiator) Handle(pdu *e2appdudescriptions.E2ApPdu) {
 }
 
 func (p *E2SetupInitiator) Close() error {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Debug("recovering from panic", err)
+		}
+	}()
 	close(p.responseCh)
 	return nil
 }
