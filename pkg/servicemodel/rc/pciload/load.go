@@ -8,6 +8,7 @@ import (
 	"context"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/spf13/viper"
@@ -17,7 +18,7 @@ var log = logging.GetLogger("pci", "load")
 
 // PciMetrics is an auxiliary structure for importing PCI data from YAML configuration
 type PciMetrics struct {
-	Cells map[uint64]PciCell `mapstructure:"cells"`
+	Cells map[types.ECGI]PciCell `mapstructure:"cells"`
 }
 
 // PciCell is an auxiliary structure for inport PCI data from YAML configuration
@@ -34,20 +35,25 @@ type PciRange struct {
 	Max uint32 `mapstructure:"max"`
 }
 
-// LoadPCIMetrics Loads model with data in "pcis" yaml file
+// LoadPCIMetrics Loads model with data in "metrics" yaml file
 func LoadPCIMetrics(store metrics.Store) error {
 	log.Infof("Loading initial PCI metrics...")
 	var err error
 
-	model.ViperConfigure("pci")
+	model.ViperConfigure("metrics")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Errorf("Unable to read metrics config: %v", err)
 		return err
 	}
 
+	const key string = "rc.pci"
+	if !viper.IsSet(key) {
+		log.Infof("PCI metrics not found. skipping...")
+	}
+
 	pcis := &PciMetrics{}
-	err = viper.Unmarshal(pcis)
+	err = viper.UnmarshalKey(key, pcis)
 	if err != nil {
 		return err
 	}
@@ -55,7 +61,8 @@ func LoadPCIMetrics(store metrics.Store) error {
 	log.Infof("Storing initial PCI metrics for %d cells...", len(pcis.Cells))
 
 	ctx := context.Background()
-	for id, m := range pcis.Cells {
+	for ecgi, m := range pcis.Cells {
+		id := uint64(ecgi)
 		_ = store.Set(ctx, id, "cellSize", m.CellSize)
 		_ = store.Set(ctx, id, "earfcn", m.Earfcn)
 		_ = store.Set(ctx, id, "pci", m.Pci)

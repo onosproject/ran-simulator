@@ -14,7 +14,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/nrt"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/pcirange"
 
-	"github.com/onosproject/ran-simulator/pkg/pciload"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc/pciload"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 

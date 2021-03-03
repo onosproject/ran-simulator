@@ -14,7 +14,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-	"github.com/onosproject/ran-simulator/pkg/pciload"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc/pciload"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
