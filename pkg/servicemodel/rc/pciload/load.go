@@ -7,8 +7,8 @@ package pciload
 import (
 	"context"
 
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/ran-simulator/api/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/spf13/viper"
