@@ -362,7 +362,7 @@ github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies
 ## explicit
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies
-# github.com/onosproject/onos-e2t v0.7.5
+# github.com/onosproject/onos-e2t v0.7.6
 ## explicit
 github.com/onosproject/onos-e2t/api/e2ap/v1beta2
 github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes

@@ -54,6 +54,13 @@ func CreateRanSimulator(t *testing.T) *helm.HelmRelease {
 	return CreateRanSimulatorWithName(t, random.NewPetName(2))
 }
 
+// CreateRanSimulatorWithNameOrDie creates a simulator and fails the test if the creation returned an error
+func CreateRanSimulatorWithNameOrDie(t *testing.T, simName string) *helm.HelmRelease {
+	sim := CreateRanSimulatorWithName(t, simName)
+	assert.NotNil(t, sim)
+	return sim
+}
+
 // CreateRanSimulatorWithName creates a ran simulator
 func CreateRanSimulatorWithName(t *testing.T, name string) *helm.HelmRelease {
 	username, password, err := getCredentials()
