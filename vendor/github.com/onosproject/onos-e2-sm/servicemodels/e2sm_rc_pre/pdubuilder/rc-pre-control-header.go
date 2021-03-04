@@ -8,12 +8,24 @@ import (
 	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 )
 
-func CreateE2SmRcPreControlHeader() (*e2sm_rc_pre_ies.E2SmRcPreControlHeader, error) {
+func CreateE2SmRcPreControlHeader(controlMessagePriority int32, plmnIDBytes []byte, cellID *e2sm_rc_pre_ies.BitString) (*e2sm_rc_pre_ies.E2SmRcPreControlHeader, error) {
 
 	e2smRcPreFormat1 := e2sm_rc_pre_ies.E2SmRcPreControlHeaderFormat1{
+		Cgi: &e2sm_rc_pre_ies.CellGlobalId{
+			CellGlobalId: &e2sm_rc_pre_ies.CellGlobalId_EUtraCgi{
+				EUtraCgi: &e2sm_rc_pre_ies.Eutracgi{
+					PLmnIdentity: &e2sm_rc_pre_ies.PlmnIdentity{
+						Value: plmnIDBytes,
+					},
+					EUtracellIdentity: &e2sm_rc_pre_ies.EutracellIdentity{
+						Value: cellID,
+					},
+				},
+			},
+		},
 		RcCommand: e2sm_rc_pre_ies.RcPreCommand_RC_PRE_COMMAND_SET_PARAMETERS,
 		RicControlMessagePriority: &e2sm_rc_pre_ies.RicControlMessagePriority{
-			Value: 1,
+			Value: controlMessagePriority,
 		},
 	}
 	e2smRcPrePdu := e2sm_rc_pre_ies.E2SmRcPreControlHeader{

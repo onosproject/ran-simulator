@@ -6,6 +6,7 @@ package rc
 
 import (
 	"context"
+	"strconv"
 
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
@@ -269,4 +270,12 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 		return nil, err
 	}
 	return ricIndication, nil
+}
+
+func toEcgi(plmnIDByteArray []byte, eci uint64) string {
+	plmnID := uint24.Uint24ToUint32(plmnIDByteArray)
+	plmnIDString := strconv.FormatUint(uint64(plmnID), 10)
+	eciString := strconv.FormatUint(eci, 10)
+	ecgi := plmnIDString + eciString
+	return ecgi
 }
