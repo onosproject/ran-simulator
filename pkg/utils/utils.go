@@ -138,6 +138,6 @@ func DegreesToRads(degrees float64) float64 {
 }
 
 // AspectRatio - Compensate for the narrowing of meridians at higher latitudes
-func AspectRatio(point *types.Point) float64 {
-	return math.Cos(DegreesToRads(point.Lat))
+func AspectRatio(latitude float64) float64 {
+	return math.Cos(DegreesToRads(latitude))
 }
