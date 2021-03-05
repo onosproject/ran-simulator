@@ -340,7 +340,7 @@ github.com/onosproject/helmit/pkg/test
 github.com/onosproject/helmit/pkg/util/files
 github.com/onosproject/helmit/pkg/util/logging
 github.com/onosproject/helmit/pkg/util/random
-# github.com/onosproject/onos-api/go v0.7.10
+# github.com/onosproject/onos-api/go v0.7.12
 ## explicit
 github.com/onosproject/onos-api/go/onos/e2sub/endpoint
 github.com/onosproject/onos-api/go/onos/e2sub/subscription

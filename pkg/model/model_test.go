@@ -26,7 +26,8 @@ func TestModel(t *testing.T) {
 	assert.Equal(t, 3, model.ServiceModels["rc"].ID)
 	assert.Equal(t, 2, model.ServiceModels["ni"].ID)
 	assert.Equal(t, uint(12), model.UECount)
-	assert.Equal(t, types.PlmnID(314), model.PlmnID)
+	assert.Equal(t, "314628", model.Plmn)
+	assert.Equal(t, types.PlmnID(0x138426), model.PlmnID)
 
 	assert.Equal(t, types.ECGI(84325717761), model.Cells["cell3"].ECGI)
 	assert.Equal(t, 2, len(model.Nodes["node1"].Cells))

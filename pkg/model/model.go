@@ -11,13 +11,14 @@ import (
 
 // Model simulation model
 type Model struct {
-	MapLayout     MapLayout               `mapstructure:"layout"`
-	Nodes         map[string]Node         `mapstructure:"nodes"`
-	Cells         map[string]Cell         `mapstructure:"cells"`
-	Controllers   map[string]Controller   `mapstructure:"controllers"`
-	ServiceModels map[string]ServiceModel `mapstructure:"servicemodels"`
-	UECount       uint                    `mapstructure:"ueCount"`
-	PlmnID        types.PlmnID            `mapstructure:"plmnID"`
+	MapLayout     MapLayout               `mapstructure:"layout" yaml:"layout"`
+	Nodes         map[string]Node         `mapstructure:"nodes" yaml:"nodes"`
+	Cells         map[string]Cell         `mapstructure:"cells" yaml:"cells"`
+	Controllers   map[string]Controller   `mapstructure:"controllers" yaml:"controllers"`
+	ServiceModels map[string]ServiceModel `mapstructure:"servicemodels" yaml:"servicemodels"`
+	UECount       uint                    `mapstructure:"ueCount" yaml:"ueCount"`
+	Plmn          string                  `mapstructure:"plmnID" yaml:"plmnID"`
+	PlmnID        types.PlmnID            `mapstructure:"plmnNumber" yaml:"plmnNumber"` // overridden and derived post-load from "Plmn" field
 }
 
 // Coordinate represents a geographical location
@@ -64,9 +65,6 @@ type Cell struct {
 	MaxUEs    uint32       `mapstructure:"maxUEs"`
 	Neighbors []types.ECGI `mapstructure:"neighbors"`
 	TxPowerDB float64      `mapstructure:"txPower"`
-	//Crntis map
-	//CrntiIndex uint32     `mapstructure:"crntiIndex"`
-	//Port       uint32     `mapstructure:"port"`
 }
 
 // UEType represents type of user-equipment

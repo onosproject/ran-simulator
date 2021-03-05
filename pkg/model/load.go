@@ -5,6 +5,7 @@
 package model
 
 import (
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/spf13/viper"
 )
@@ -40,6 +41,9 @@ func LoadConfig(model *Model, configname string) error {
 	}
 
 	err = viper.Unmarshal(model)
+
+	// Convert the MCC-MNC format into numeric PLMNID
+	model.PlmnID = types.PlmnIDFromString(model.Plmn)
 
 	return err
 }
