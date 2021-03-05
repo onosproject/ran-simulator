@@ -125,7 +125,7 @@ func (m *Manager) startNorthboundServer() error {
 		northbound.SecurityConfig{}))
 
 	m.server.AddService(logging.Service{})
-	m.server.AddService(nodeapi.NewService(m.nodeStore))
+	m.server.AddService(nodeapi.NewService(m.nodeStore, m.model.PlmnID))
 	m.server.AddService(cellapi.NewService(m.cellStore))
 	m.server.AddService(trafficsim.NewService(m.model, m.cellStore, m.ueStore))
 	m.server.AddService(metricsapi.NewService(m.metricsStore))
