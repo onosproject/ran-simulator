@@ -6,6 +6,7 @@ package rc
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -249,17 +250,15 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value
 	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetEUtraCgi().EUtracellIdentity.Value.Value
-	//ecgi := toEcgi(plmnIDBytes, eci)
 	plmnID := uint24.Uint24ToUint32(plmnIDBytes)
+	plmnIDString := strconv.FormatUint(uint64(plmnID), 10)
 
-	ecgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
-	log.Debug("New ecgi:", ecgi)
-
+	ecgi := ransimtypes.ToECGI(ransimtypes.PlmnIDFromString(plmnIDString), ransimtypes.GetECI(eci))
 	parameterName := controlMessage.GetControlMessage().ParameterType.RanParameterName.Value
 	parameterID := controlMessage.GetControlMessage().ParameterType.RanParameterId.Value
 
 	oldValue, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), parameterName)
-	log.Debugf("Current value for entity %s is %v", ecgi, oldValue)
+	log.Debugf("Current value for ecgi %d is %v", ecgi, oldValue)
 	if !found {
 		log.Debugf("Ran parameter for entity %d not found", ecgi)
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(

@@ -6,6 +6,7 @@
 package types
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -87,6 +88,13 @@ func PlmnIDFromHexString(plmnID string) PlmnID {
 // PlmnIDFromString converts string form of PLMNID given as a simple MCC-MCN catenation into a numeric one suitable for APIs
 func PlmnIDFromString(plmnID string) PlmnID {
 	return ToPlmnID(plmnID[0:3], plmnID[3:])
+}
+
+// PlmnIDToString generates the MCC-MCN catenation format from the specified numeric PLMNID
+func PlmnIDToString(plmnID PlmnID) string {
+	hexString := fmt.Sprintf("%x", plmnID)
+	mcc, mnc := DecodePlmnID(hexString)
+	return mcc + mnc
 }
 
 // ToECI produces ECI from the specified components
