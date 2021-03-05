@@ -8,6 +8,9 @@ import (
 	"context"
 	"time"
 
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	uint24 "github.com/onosproject/ran-simulator/pkg/types"
+
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/controloutcome"
 
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
@@ -242,6 +245,10 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value
 	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetEUtraCgi().EUtracellIdentity.Value.Value
 	ecgi := toEcgi(plmnIDBytes, eci)
+	plmnID := uint24.Uint24ToUint32(plmnIDBytes)
+
+	ecgiNew := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
+	log.Debug("New ecgi:", ecgiNew)
 
 	parameterName := controlMessage.GetControlMessage().ParameterType.RanParameterName.Value
 	parameterID := controlMessage.GetControlMessage().ParameterType.RanParameterId.Value
