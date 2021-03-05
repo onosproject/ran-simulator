@@ -22,8 +22,9 @@ import (
 var log = liblog.GetLogger("api", "nodes")
 
 // NewService returns a new model Service
-func NewService(nodeStore nodes.Store) service.Service {
+func NewService(nodeStore nodes.Store, plmnID types.PlmnID) service.Service {
 	return &Service{
+		plmnID:    plmnID,
 		nodeStore: nodeStore,
 	}
 }
@@ -31,19 +32,22 @@ func NewService(nodeStore nodes.Store) service.Service {
 // Service is a Service implementation for administration.
 type Service struct {
 	service.Service
+	plmnID    types.PlmnID
 	nodeStore nodes.Store
 }
 
 // Register registers the TrafficSim Service with the gRPC server.
 func (s *Service) Register(r *grpc.Server) {
 	server := &Server{
-		s.nodeStore,
+		plmnID:    s.plmnID,
+		nodeStore: s.nodeStore,
 	}
 	modelapi.RegisterNodeModelServer(r, server)
 }
 
 // Server implements the TrafficSim gRPC service for administrative facilities.
 type Server struct {
+	plmnID    types.PlmnID
 	nodeStore nodes.Store
 }
 
@@ -65,6 +69,11 @@ func nodeToModel(node *types.Node) *model.Node {
 		Cells:         node.CellECGIs,
 		Status:        node.Status,
 	}
+}
+
+// GetPlmnID returns the PLMNID used by the RAN simulator for all simulated entities
+func (s *Server) GetPlmnID(ctx context.Context, request *modelapi.PlmnIDRequest) (*modelapi.PlmnIDResponse, error) {
+	return &modelapi.PlmnIDResponse{PlmnID: s.plmnID}, nil
 }
 
 // CreateNode creates a new simulated E2 node
