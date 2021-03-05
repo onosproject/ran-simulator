@@ -22,6 +22,7 @@ require (
 	github.com/onosproject/onos-ric-sdk-go v0.7.9
 	github.com/onosproject/onos-test v0.6.4
 	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab
 	github.com/prometheus/client_golang v1.4.1 // indirect
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
@@ -37,3 +38,5 @@ require (
 )
 
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200229013735-71373c6105e3
+
+replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18

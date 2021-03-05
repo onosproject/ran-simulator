@@ -62,7 +62,7 @@ func newLocations(cells map[types.ECGI]*types.Cell, maxUEs int, locationsScale f
 	}
 	centre := types.Point{Lat: minLat + (maxLat-minLat)/2, Lng: minLng + (maxLng-minLng)/2}
 	radius := float64(locationsScale) * math.Hypot(maxLat-minLat, maxLng-minLng) / 2
-	aspectRatio := utils.AspectRatio(&centre)
+	aspectRatio := utils.AspectRatio(centre.Lat)
 	for l := 0; l < (maxUEs * 2); l++ {
 		pos := utils.RandomLatLng(centre.GetLat(), centre.GetLng(),
 			radius, aspectRatio)
