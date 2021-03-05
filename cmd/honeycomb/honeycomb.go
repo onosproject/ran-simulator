@@ -48,6 +48,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().UintP("sectors-per-tower", "s", 3, "sectors per tower (3 or 6)")
 	cmd.Flags().Float64P("latitude", "a", 52.5200, "Map centre latitude in degrees")
 	cmd.Flags().Float64P("longitude", "g", 13.4050, "Map centre longitude in degrees")
+	cmd.Flags().Float64P("max-neighbor-distance", "d", 3860.0, "Maximum distance between neighbor cells")
 	cmd.Flags().Int32("plmnid", 315010, "PlmnID")
 	cmd.Flags().Uint32P("enbidstart", "e", 5152, "EnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
@@ -65,12 +66,13 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	plmnid, _ := cmd.Flags().GetUint32("plmnid")
 	enbidStart, _ := cmd.Flags().GetUint32("enbidstart")
 	pitch, _ := cmd.Flags().GetFloat32("pitch")
+	maxDistance, _ := cmd.Flags().GetFloat64("max-neighbor-distance")
 
 	fmt.Printf("Creating honeycomb array of towers. Towers %d. Sectors: %d\n", numTowers, sectorsPerTower)
 
 	mapCenter := model.Coordinate{Lat: latitude, Lng: longitude}
 
-	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower, types.PlmnID(plmnid), enbidStart, pitch)
+	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower, types.PlmnID(plmnid), enbidStart, pitch, maxDistance)
 	if err != nil {
 		return err
 	}

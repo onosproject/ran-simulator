@@ -17,7 +17,7 @@ import (
 // GenerateHoneycombTopology generates a set of simulated nodes and cells organized in a honeycomb
 // outward from the specified center.
 func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint,
-	plmnID types.PlmnID, enbStart uint32, pitch float32) (*model.Model, error) {
+	plmnID types.PlmnID, enbStart uint32, pitch float32, maxDistance float64) (*model.Model, error) {
 
 	m := &model.Model{
 		PlmnID:    plmnID,
@@ -82,7 +82,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	// Add cells neighbors
 	for cellName, cell := range m.Cells {
 		for _, other := range m.Cells {
-			if isNeighbor(cell, other) {
+			if isNeighbor(cell, other, maxDistance) {
 				cell.Neighbors = append(cell.Neighbors, other.ECGI)
 			}
 		}
@@ -92,9 +92,28 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	return m, nil
 }
 
-func isNeighbor(cell model.Cell, other model.Cell) bool {
-	// TODO: add distance criteria
-	return cell.Sector.Center.Lat == other.Sector.Center.Lat && cell.Sector.Center.Lng == other.Sector.Center.Lng
+func isNeighbor(cell model.Cell, other model.Cell, maxDistance float64) bool {
+	return (cell.Sector.Center.Lat == other.Sector.Center.Lat && cell.Sector.Center.Lng == other.Sector.Center.Lng) ||
+		distance(cell.Sector.Center, other.Sector.Center) <= maxDistance
+}
+
+// http://en.wikipedia.org/wiki/Haversine_formula
+func distance(c1 model.Coordinate, c2 model.Coordinate) float64 {
+	var la1, lo1, la2, lo2, r float64
+	la1 = c1.Lat * math.Pi / 180
+	lo1 = c1.Lng * math.Pi / 180
+	la2 = c2.Lat * math.Pi / 180
+	lo2 = c2.Lng * math.Pi / 180
+
+	r = 6378100 // Earth radius in meters
+
+	h := hsin(la2-la1) + math.Cos(la1)*math.Cos(la2)*hsin(lo2-lo1)
+
+	return 2 * r * math.Asin(math.Sqrt(h))
+}
+
+func hsin(theta float64) float64 {
+	return math.Pow(math.Sin(theta/2), 2)
 }
 
 func hexMesh(pitch float64, numTowers uint) []*model.Coordinate {
