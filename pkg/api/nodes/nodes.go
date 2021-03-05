@@ -71,6 +71,7 @@ func nodeToModel(node *types.Node) *model.Node {
 	}
 }
 
+// GetPlmnID returns the PLMNID used by the RAN simulator for all simulated entities
 func (s *Server) GetPlmnID(ctx context.Context, request *modelapi.PlmnIDRequest) (*modelapi.PlmnIDResponse, error) {
 	return &modelapi.PlmnIDResponse{PlmnID: s.plmnID}, nil
 }
