@@ -8,12 +8,12 @@ import (
 	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 )
 
-func CreateE2SmRcPreControlMessage(RANparameterName string, RANparameterValue int32) (*e2sm_rc_pre_ies.E2SmRcPreControlMessage, error) {
+func CreateE2SmRcPreControlMessage(RANparameterID int32, RANparameterName string, RANparameterValue int32) (*e2sm_rc_pre_ies.E2SmRcPreControlMessage, error) {
 
 	e2smRcPreMsgFormat1 := e2sm_rc_pre_ies.E2SmRcPreControlMessageFormat1{
 		ParameterType: &e2sm_rc_pre_ies.RanparameterDefItem{
 			RanParameterId: &e2sm_rc_pre_ies.RanparameterId{
-				Value: 20,
+				Value: RANparameterID,
 			},
 			RanParameterName: &e2sm_rc_pre_ies.RanparameterName{
 				Value: RANparameterName,

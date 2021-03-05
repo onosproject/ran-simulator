@@ -2468,6 +2468,16 @@ func (m *E2SmRcPreControlHeaderFormat1) Validate() error {
 		return nil
 	}
 
+	if v, ok := interface{}(m.GetCgi()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return E2SmRcPreControlHeaderFormat1ValidationError{
+				field:  "Cgi",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for RcCommand
 
 	if v, ok := interface{}(m.GetRicControlMessagePriority()).(interface{ Validate() error }); ok {

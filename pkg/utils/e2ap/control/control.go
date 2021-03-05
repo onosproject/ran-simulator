@@ -19,7 +19,7 @@ type Control struct {
 	ranFuncID     int32
 	ricCallPrID   types.RicCallProcessID
 	ricCtrlStatus e2apies.RiccontrolStatus
-	ricCtrlOut    types.RicControlOutcome
+	ricCtrlOut    []byte
 	cause         e2apies.Cause
 }
 
@@ -92,7 +92,7 @@ func WithRicControlStatus(ricCtrlStatus e2apies.RiccontrolStatus) func(control *
 }
 
 // WithRicControlOutcome sets ric control outcome
-func WithRicControlOutcome(ricCtrlOut types.RicControlOutcome) func(control *Control) {
+func WithRicControlOutcome(ricCtrlOut []byte) func(control *Control) {
 	return func(control *Control) {
 		control.ricCtrlOut = ricCtrlOut
 	}
@@ -140,7 +140,7 @@ func (control *Control) BuildControlAcknowledge() (response *e2appducontents.Ric
 		Id:          int32(v1beta2.ProtocolIeIDRiccontrolOutcome),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2ap_commondatatypes.RiccontrolOutcome{
-			Value: []byte(control.ricCtrlOut),
+			Value: control.ricCtrlOut,
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 	}
@@ -200,7 +200,7 @@ func (control *Control) BuildControlFailure() (response *e2appducontents.Riccont
 		Id:          int32(v1beta2.ProtocolIeIDRiccontrolOutcome),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2ap_commondatatypes.RiccontrolOutcome{
-			Value: []byte(control.ricCtrlOut),
+			Value: control.ricCtrlOut,
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 	}

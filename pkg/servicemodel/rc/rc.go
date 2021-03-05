@@ -8,6 +8,11 @@ import (
 	"context"
 	"time"
 
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	uint24 "github.com/onosproject/ran-simulator/pkg/types"
+
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/controloutcome"
+
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -217,13 +222,16 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	reqID := controlutils.GetRequesterID(request)
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
-
+	modelPlugin, err := sm.getModelPlugin()
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
 	controlMessage, err := sm.getControlMessage(request)
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
 	}
-	log.Debugf("Control Message Proto: %+v", controlMessage)
 
 	controlHeader, err := sm.getControlHeader(request)
 	if err != nil {
@@ -231,15 +239,88 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		return nil, nil, err
 	}
 
-	log.Debugf("Control Header Proto: %+v", controlHeader)
-	// TODO implement RC control logic
+	log.Debugf("RC control header: %v", controlHeader)
+	log.Debugf("RC control message: %v", controlMessage)
 
-	response, _ = controlutils.NewControl(
+	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value
+	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetEUtraCgi().EUtracellIdentity.Value.Value
+	ecgi := toEcgi(plmnIDBytes, eci)
+	plmnID := uint24.Uint24ToUint32(plmnIDBytes)
+
+	ecgiNew := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
+	log.Debug("New ecgi:", ecgiNew)
+
+	parameterName := controlMessage.GetControlMessage().ParameterType.RanParameterName.Value
+	parameterID := controlMessage.GetControlMessage().ParameterType.RanParameterId.Value
+
+	oldValue, found := sm.ServiceModel.MetricStore.Get(ctx, metrics.EntityID(ecgi), parameterName)
+	log.Debugf("Current value for entity %s is %v", ecgi, oldValue)
+	if !found {
+		log.Debugf("Ran parameter for entity %s not found", ecgi)
+		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
+			controloutcome.WithRanParameterID(parameterID),
+			controloutcome.WithRanParameterValue(oldValue.(int32))).
+			ToAsn1Bytes(modelPlugin)
+		if err != nil {
+			return nil, nil, err
+		}
+		failure, err = controlutils.NewControl(
+			controlutils.WithRanFuncID(ranFuncID),
+			controlutils.WithRequestID(reqID),
+			controlutils.WithRicInstanceID(ricInstanceID),
+			controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
+	}
+	var parameterValue interface{}
+	switch controlMessage.GetControlMessage().ParameterType.RanParameterType {
+	case e2sm_rc_pre_ies.RanparameterType_RANPARAMETER_TYPE_INTEGER:
+		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValueInt()
+	case e2sm_rc_pre_ies.RanparameterType_RANPARAMETER_TYPE_ENUMERATED:
+		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValueEnum()
+	case e2sm_rc_pre_ies.RanparameterType_RANPARAMETER_TYPE_PRINTABLE_STRING:
+		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValuePrtS()
+	}
+
+	err = sm.ServiceModel.MetricStore.Set(ctx, metrics.EntityID(ecgi), parameterName, parameterValue)
+	if err != nil {
+		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
+			controloutcome.WithRanParameterID(parameterID),
+			controloutcome.WithRanParameterValue(oldValue.(int32))).
+			ToAsn1Bytes(modelPlugin)
+		if err != nil {
+			return nil, nil, err
+		}
+		failure, err = controlutils.NewControl(
+			controlutils.WithRanFuncID(ranFuncID),
+			controlutils.WithRequestID(reqID),
+			controlutils.WithRicInstanceID(ricInstanceID),
+			controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
+	}
+
+	outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
+		controloutcome.WithRanParameterID(parameterID),
+		controloutcome.WithRanParameterValue(parameterValue.(int32))).
+		ToAsn1Bytes(modelPlugin)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	response, err = controlutils.NewControl(
 		controlutils.WithRanFuncID(ranFuncID),
 		controlutils.WithRequestID(reqID),
 		controlutils.WithRicInstanceID(ricInstanceID),
-		controlutils.WithRicControlOutcome(e2aptypes.RicControlOutcome("OK"))).BuildControlAcknowledge()
-	return response, nil, err
+		controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlAcknowledge()
+	if err != nil {
+		return nil, nil, err
+	}
+	return response, nil, nil
 }
 
 // RICSubscription implements subscription handler for RC service model
