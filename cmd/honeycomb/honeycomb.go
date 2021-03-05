@@ -49,7 +49,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().Float64P("latitude", "a", 52.5200, "Map centre latitude in degrees")
 	cmd.Flags().Float64P("longitude", "g", 13.4050, "Map centre longitude in degrees")
 	cmd.Flags().Float64P("max-neighbor-distance", "d", 3860.0, "Maximum distance between neighbor cells")
-	cmd.Flags().Int32("plmnid", 315010, "PlmnID")
+	cmd.Flags().String("plmnid", "315010", "PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN")
 	cmd.Flags().Uint32P("enbidstart", "e", 5152, "EnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
 	return cmd
@@ -63,7 +63,7 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	}
 	latitude, _ := cmd.Flags().GetFloat64("latitude")
 	longitude, _ := cmd.Flags().GetFloat64("longitude")
-	plmnid, _ := cmd.Flags().GetUint32("plmnid")
+	plmnid, _ := cmd.Flags().GetString("plmnid")
 	enbidStart, _ := cmd.Flags().GetUint32("enbidstart")
 	pitch, _ := cmd.Flags().GetFloat32("pitch")
 	maxDistance, _ := cmd.Flags().GetFloat64("max-neighbor-distance")
@@ -72,10 +72,13 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 
 	mapCenter := model.Coordinate{Lat: latitude, Lng: longitude}
 
-	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower, types.PlmnID(plmnid), enbidStart, pitch, maxDistance)
+	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower,
+		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance)
 	if err != nil {
 		return err
 	}
+
+	m.Plmn = plmnid // we want the MCC-MNC format in our YAML
 
 	d, err := yaml.Marshal(&m)
 	if err != nil {
