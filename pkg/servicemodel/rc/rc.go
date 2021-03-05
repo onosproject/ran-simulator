@@ -73,7 +73,12 @@ func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, 
 	for {
 		select {
 		case <-sub.Ticker.C:
-			_ = sm.sendRicIndication(ctx, subscription)
+			log.Debug("Sending periodic indication report for subscription:", sub.ID)
+			err = sm.sendRicIndication(ctx, subscription)
+			if err != nil {
+				log.Error("creating indication message is failed", err)
+				return err
+			}
 
 		case <-sub.E2Channel.Context().Done():
 			sub.Ticker.Stop()
@@ -381,7 +386,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	switch eventTriggerType {
 	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
-		log.Debugf("Event trigger is on change")
+		log.Debug("Received on change report subscription request")
 		go func() {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -391,6 +396,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			}
 		}()
 	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
+		log.Debug("Received periodic report subscription request")
 		go func() {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
@@ -444,6 +450,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 	switch eventTriggerType {
 	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
+		log.Debug("Stopping the periodic report subscription")
 		sub.Ticker.Stop()
 	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
 		// TODO stop on change event trigger
