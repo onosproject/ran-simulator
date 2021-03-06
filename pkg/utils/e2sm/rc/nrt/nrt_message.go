@@ -7,15 +7,14 @@ package nrt
 import (
 	"fmt"
 
-	"github.com/onosproject/ran-simulator/pkg/types"
-
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 )
 
 // Neighbour neighbour fields for nrt message
 type Neighbour struct {
 	nrIndex           int32
-	plmnID            types.Uint24
+	plmnID            ransimtypes.Uint24
 	eutraCellIdentity uint64
 	earfcn            int32
 	pci               int32
@@ -40,7 +39,7 @@ func WithNrIndex(nrIndex int32) func(neighbour *Neighbour) {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID types.Uint24) func(neighbour *Neighbour) {
+func WithPlmnID(plmnID ransimtypes.Uint24) func(neighbour *Neighbour) {
 	return func(neighbour *Neighbour) {
 		neighbour.plmnID = plmnID
 	}

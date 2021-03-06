@@ -23,7 +23,6 @@ import (
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-	uint24 "github.com/onosproject/ran-simulator/pkg/types"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -91,8 +90,8 @@ func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
 	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
 }
 
-func (sm *Client) getPlmnID() uint24.Uint24 {
-	plmnIDUint24 := uint24.Uint24{}
+func (sm *Client) getPlmnID() types.Uint24 {
+	plmnIDUint24 := types.Uint24{}
 	plmnIDUint24.Set(uint32(sm.ServiceModel.Model.PlmnID))
 	return plmnIDUint24
 }

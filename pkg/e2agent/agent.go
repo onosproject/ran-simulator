@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -17,8 +19,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
-
-	"github.com/onosproject/ran-simulator/pkg/types"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
 
@@ -345,7 +345,7 @@ func (a *e2Agent) connect() error {
 
 func (a *e2Agent) setup() error {
 	e2GlobalID, err := nodeID(a.model.PlmnID, a.node.EnbID)
-	plmnID := types.NewUint24(uint32(a.model.PlmnID))
+	plmnID := ransimtypes.NewUint24(uint32(a.model.PlmnID))
 	if err != nil {
 		return err
 	}

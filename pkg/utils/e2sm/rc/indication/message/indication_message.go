@@ -7,7 +7,7 @@ package message
 import (
 	"fmt"
 
-	"github.com/onosproject/ran-simulator/pkg/types"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
@@ -17,7 +17,7 @@ import (
 
 // Message indication message fields for rc service model
 type Message struct {
-	plmnID            types.Uint24
+	plmnID            ransimtypes.Uint24
 	eutraCellIdentity uint64
 	earfcn            int32
 	cellSize          e2smrcpreies.CellSize
@@ -37,7 +37,7 @@ func NewIndicationMessage(options ...func(msg *Message)) *Message {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID types.Uint24) func(message *Message) {
+func WithPlmnID(plmnID ransimtypes.Uint24) func(message *Message) {
 	return func(message *Message) {
 		message.plmnID = plmnID
 

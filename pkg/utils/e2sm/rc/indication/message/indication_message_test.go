@@ -7,7 +7,7 @@ package message
 import (
 	"testing"
 
-	"github.com/onosproject/ran-simulator/pkg/types"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/pcirange"
 
@@ -19,7 +19,7 @@ import (
 
 func TestCreateIndicationMessage(t *testing.T) {
 
-	plmnID := types.NewUint24(12345)
+	plmnID := ransimtypes.NewUint24(12345)
 	nrt1, err := nrt.NewNeighbour(
 		nrt.WithNrIndex(1),
 		nrt.WithPci(10),

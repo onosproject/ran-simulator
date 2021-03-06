@@ -10,10 +10,10 @@ import (
 	"strconv"
 	"time"
 
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
-
-	"github.com/onosproject/ran-simulator/pkg/types"
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
@@ -124,7 +124,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		return err
 	}
 	// Creates an indication header
-	plmnID := types.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
+	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 
 	header := kpmutils.NewIndicationHeader(
 		kpmutils.WithPlmnID(plmnID.Value()),

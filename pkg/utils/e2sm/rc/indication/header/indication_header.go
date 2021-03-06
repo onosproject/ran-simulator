@@ -7,7 +7,7 @@ package header
 import (
 	"fmt"
 
-	"github.com/onosproject/ran-simulator/pkg/types"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
@@ -17,7 +17,7 @@ import (
 
 // Header indication header for rc service model
 type Header struct {
-	plmnID            types.Uint24
+	plmnID            ransimtypes.Uint24
 	eutraCellIdentity uint64
 }
 
@@ -32,7 +32,7 @@ func NewIndicationHeader(options ...func(header *Header)) *Header {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID types.Uint24) func(header *Header) {
+func WithPlmnID(plmnID ransimtypes.Uint24) func(header *Header) {
 	return func(header *Header) {
 		header.plmnID = plmnID
 
