@@ -7,13 +7,13 @@ package header
 import (
 	"testing"
 
-	"github.com/onosproject/ran-simulator/pkg/types"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateIndicationHeader(t *testing.T) {
-	plmnID := types.NewUint24(12345)
+	plmnID := ransimtypes.NewUint24(12345)
 	indicationHeader, err := NewIndicationHeader(WithPlmnID(plmnID.Value()),
 		WithEutracellIdentity(32)).Build()
 	assert.NoError(t, err)

@@ -5,13 +5,13 @@
 package setup
 
 import (
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
 	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	"github.com/onosproject/ran-simulator/pkg/types"
 )
 
 var log = logging.GetLogger("servicemodel", "utils", "setup")
@@ -19,7 +19,7 @@ var log = logging.GetLogger("servicemodel", "utils", "setup")
 // Setup setup request
 type Setup struct {
 	ranFunctions e2aptypes.RanFunctions
-	plmnID       types.Uint24
+	plmnID       ransimtypes.Uint24
 	e2NodeID     uint64
 }
 
@@ -42,7 +42,7 @@ func WithRanFunctions(ranFunctions e2aptypes.RanFunctions) func(*Setup) {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID types.Uint24) func(*Setup) {
+func WithPlmnID(plmnID ransimtypes.Uint24) func(*Setup) {
 	return func(request *Setup) {
 		request.plmnID = plmnID
 

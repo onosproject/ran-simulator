@@ -7,7 +7,7 @@ package indication
 import (
 	"fmt"
 
-	"github.com/onosproject/ran-simulator/pkg/types"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
@@ -17,10 +17,10 @@ import (
 
 // Header indication header for kpm service model
 type Header struct {
-	plmnID      types.Uint24
+	plmnID      ransimtypes.Uint24
 	gNbCuUpID   int64
 	gNbDuID     int64
-	plmnIDnrcgi types.Uint24
+	plmnIDnrcgi ransimtypes.Uint24
 	sst         string
 	sd          string
 	fiveQi      int32
@@ -39,7 +39,7 @@ func NewIndicationHeader(options ...func(header *Header)) *Header {
 }
 
 // WithPlmnID sets plmnID
-func WithPlmnID(plmnID types.Uint24) func(header *Header) {
+func WithPlmnID(plmnID ransimtypes.Uint24) func(header *Header) {
 	return func(header *Header) {
 		header.plmnID = plmnID
 
@@ -62,7 +62,7 @@ func WithGnbDuID(gNbDuID int64) func(header *Header) {
 }
 
 // WithPlmnIDnrcgi sets plmnIDnrcgi
-func WithPlmnIDnrcgi(plmnIDnrcgi types.Uint24) func(header *Header) {
+func WithPlmnIDnrcgi(plmnIDnrcgi ransimtypes.Uint24) func(header *Header) {
 	return func(header *Header) {
 		header.plmnIDnrcgi = plmnIDnrcgi
 	}
