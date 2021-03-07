@@ -16,7 +16,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc/pciload"
 
-	"github.com/onosproject/onos-api/go/onos/ransim/types"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
@@ -90,8 +90,8 @@ func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
 	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
 }
 
-func (sm *Client) getPlmnID() types.Uint24 {
-	plmnIDUint24 := types.Uint24{}
+func (sm *Client) getPlmnID() ransimtypes.Uint24 {
+	plmnIDUint24 := ransimtypes.Uint24{}
 	plmnIDUint24.Set(uint32(sm.ServiceModel.Model.PlmnID))
 	return plmnIDUint24
 }
@@ -111,7 +111,7 @@ func (sm *Client) toCellSizeEnum(cellSize string) e2sm_rc_pre_ies.CellSize {
 	}
 }
 
-func (sm *Client) getCellPci(ctx context.Context, ecgi types.ECGI) (int32, error) {
+func (sm *Client) getCellPci(ctx context.Context, ecgi ransimtypes.ECGI) (int32, error) {
 	cellPci, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "pci")
 	if !found {
 		return 0, errors.New(errors.NotFound, "pci value is not found for cell:", ecgi)
@@ -119,7 +119,7 @@ func (sm *Client) getCellPci(ctx context.Context, ecgi types.ECGI) (int32, error
 	return int32(cellPci.(uint32)), nil
 }
 
-func (sm *Client) getEarfcn(ctx context.Context, ecgi types.ECGI) (int32, error) {
+func (sm *Client) getEarfcn(ctx context.Context, ecgi ransimtypes.ECGI) (int32, error) {
 	earfcn, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "earfcn")
 	if !found {
 		return 0, errors.New(errors.NotFound, "earfc value is not found for cell:", ecgi)
@@ -128,7 +128,7 @@ func (sm *Client) getEarfcn(ctx context.Context, ecgi types.ECGI) (int32, error)
 	return int32(earfcn.(uint32)), nil
 }
 
-func (sm *Client) getCellSize(ctx context.Context, ecgi types.ECGI) (string, error) {
+func (sm *Client) getCellSize(ctx context.Context, ecgi ransimtypes.ECGI) (string, error) {
 	cellSize, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "cellSize")
 	if !found {
 		return "", errors.New(errors.NotFound, "cell size value is not found for  neighbour  cell:", ecgi)
@@ -136,7 +136,7 @@ func (sm *Client) getCellSize(ctx context.Context, ecgi types.ECGI) (string, err
 	return cellSize.(string), nil
 }
 
-func (sm *Client) getPciPool(ctx context.Context, ecgi types.ECGI) ([]pciload.PciRange, error) {
+func (sm *Client) getPciPool(ctx context.Context, ecgi ransimtypes.ECGI) ([]pciload.PciRange, error) {
 	pciPool, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "pcipool")
 	if !found {
 		return nil, errors.New(errors.NotFound, "cell size value is not found for  neighbour  cell:", ecgi)
@@ -166,7 +166,7 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 }
 
 // createRicIndication creates ric indication  for each cell in the node
-func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
+func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
 	plmnID := sm.getPlmnID()
 	var neighbourList []*e2sm_rc_pre_ies.Nrt
 	neighbourList = make([]*e2sm_rc_pre_ies.Nrt, 0)
@@ -176,6 +176,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 	}
 	cellPci, err := sm.getCellPci(ctx, ecgi)
 	if err != nil {
+		log.Error(err)
 		return nil, err
 	}
 	earfcn, err := sm.getEarfcn(ctx, ecgi)
@@ -190,6 +191,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 	for index, neighbourEcgi := range cell.Neighbors {
 		neighbourCellPci, err := sm.getCellPci(ctx, neighbourEcgi)
 		if err != nil {
+			log.Error(err)
 			return nil, err
 		}
 		neighbourEarfcn, err := sm.getEarfcn(ctx, neighbourEcgi)
@@ -200,10 +202,11 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 		if err != nil {
 			return nil, err
 		}
+		neighbourEci := ransimtypes.GetECI(uint64(neighbourEcgi))
 		neighbour, err := nrt.NewNeighbour(
 			nrt.WithNrIndex(int32(index)),
 			nrt.WithPci(neighbourCellPci),
-			nrt.WithEutraCellIdentity(uint64(neighbourEcgi)),
+			nrt.WithEutraCellIdentity(uint64(neighbourEci)),
 			nrt.WithEarfcn(neighbourEarfcn),
 			nrt.WithCellSize(sm.toCellSizeEnum(neighbourCellSize)),
 			nrt.WithPlmnID(plmnID.Value())).Build()
@@ -227,16 +230,18 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi types.ECGI, subs
 		pciPool = append(pciPool, pciRange)
 	}
 
+	cellEci := ransimtypes.GetECI(uint64(cell.ECGI))
 	// Creates RC indication header
 	header := rcindicationhdr.NewIndicationHeader(
 		rcindicationhdr.WithPlmnID(plmnID.Value()),
-		rcindicationhdr.WithEutracellIdentity(uint64(cell.ECGI)))
+		rcindicationhdr.WithEutracellIdentity(uint64(cellEci)))
 
 	// Creates RC indication message
+
 	message := rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
 		rcindicationmsg.WithCellSize(sm.toCellSizeEnum(cellSize)),
 		rcindicationmsg.WithEarfcn(earfcn),
-		rcindicationmsg.WithEutraCellIdentity(uint64(cell.ECGI)),
+		rcindicationmsg.WithEutraCellIdentity(uint64(cellEci)),
 		rcindicationmsg.WithPci(cellPci),
 		rcindicationmsg.WithNeighbours(neighbourList),
 		rcindicationmsg.WithPciPool(pciPool))
