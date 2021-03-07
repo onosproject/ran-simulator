@@ -99,6 +99,7 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	for _, ecgi := range node.Cells {
 		ricIndication, err := sm.createRicIndication(ctx, ecgi, subscription)
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 		err = sub.E2Channel.RICIndication(ctx, ricIndication)
