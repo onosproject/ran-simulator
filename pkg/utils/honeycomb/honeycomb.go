@@ -16,19 +16,27 @@ import (
 
 // GenerateHoneycombTopology generates a set of simulated nodes and cells organized in a honeycomb
 // outward from the specified center.
-func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint,
-	plmnID types.PlmnID, enbStart uint32, pitch float32, maxDistance float64) (*model.Model, error) {
+func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint, plmnID types.PlmnID,
+	enbStart uint32, pitch float32, maxDistance float64, neighbors int,
+	controllerAddresses []string, serviceModels []string) (*model.Model, error) {
 
 	m := &model.Model{
-		PlmnID:    plmnID,
-		MapLayout: model.MapLayout{Center: mapCenter},
-		Cells:     make(map[string]model.Cell),
-		Nodes:     make(map[string]model.Node),
+		PlmnID:        plmnID,
+		MapLayout:     model.MapLayout{Center: mapCenter, LocationsScale: 1.25},
+		Cells:         make(map[string]model.Cell),
+		Nodes:         make(map[string]model.Node),
+		Controllers:   generateControllers(controllerAddresses),
+		ServiceModels: generateServiceModels(serviceModels),
 	}
 
 	aspectRatio := utils.AspectRatio(mapCenter.Lat)
 	points := hexMesh(float64(pitch), numTowers)
 	arc := int32(360.0 / sectorsPerTower)
+
+	controllers := make([]string, 0, len(controllerAddresses))
+	for name := range m.Controllers {
+		controllers = append(controllers, name)
+	}
 
 	var t, s uint
 	for t = 0; t < numTowers; t++ {
@@ -42,13 +50,11 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 
 		node := model.Node{
 			EnbID:         enbID,
-			Controllers:   []string{"e2t-1"},
-			ServiceModels: []string{"kpm", "rc"},
+			Controllers:   controllers,
+			ServiceModels: serviceModels,
 			Cells:         make([]types.ECGI, 0, sectorsPerTower),
 			Status:        "stopped",
 		}
-
-		m.Nodes[nodeName] = node
 
 		for s = 0; s < sectorsPerTower; s++ {
 			cellID := types.CellID(s + 1)
@@ -77,12 +83,13 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 			node.Cells = append(node.Cells, cell.ECGI)
 		}
 
+		m.Nodes[nodeName] = node
 	}
 
 	// Add cells neighbors
 	for cellName, cell := range m.Cells {
 		for _, other := range m.Cells {
-			if isNeighbor(cell, other, maxDistance) {
+			if isNeighbor(cell, other, maxDistance) && len(cell.Neighbors) < neighbors {
 				cell.Neighbors = append(cell.Neighbors, other.ECGI)
 			}
 		}
@@ -90,6 +97,23 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	}
 
 	return m, nil
+}
+
+func generateControllers(addresses []string) map[string]model.Controller {
+	controllers := make(map[string]model.Controller)
+	for i, address := range addresses {
+		name := fmt.Sprintf("e2t-%d", i+1)
+		controllers[name] = model.Controller{ID: name, Address: address, Port: 36421}
+	}
+	return controllers
+}
+
+func generateServiceModels(names []string) map[string]model.ServiceModel {
+	models := make(map[string]model.ServiceModel)
+	for i, name := range names {
+		models[name] = model.ServiceModel{ID: i + 1, Version: "1.0.0", Description: name + " service model"}
+	}
+	return models
 }
 
 func isNeighbor(cell model.Cell, other model.Cell, maxDistance float64) bool {
