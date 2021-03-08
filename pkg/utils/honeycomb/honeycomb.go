@@ -12,6 +12,8 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"github.com/pmcxs/hexgrid"
 	"math"
+	"strconv"
+	"strings"
 )
 
 // GenerateHoneycombTopology generates a set of simulated nodes and cells organized in a honeycomb
@@ -38,6 +40,11 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		controllers = append(controllers, name)
 	}
 
+	models := make([]string, 0, len(serviceModels))
+	for name := range m.ServiceModels {
+		models = append(models, name)
+	}
+
 	var t, s uint
 	for t = 0; t < numTowers; t++ {
 		var azOffset int32 = 0
@@ -51,7 +58,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		node := model.Node{
 			EnbID:         enbID,
 			Controllers:   controllers,
-			ServiceModels: serviceModels,
+			ServiceModels: models,
 			Cells:         make([]types.ECGI, 0, sectorsPerTower),
 			Status:        "stopped",
 		}
@@ -108,10 +115,15 @@ func generateControllers(addresses []string) map[string]model.Controller {
 	return controllers
 }
 
-func generateServiceModels(names []string) map[string]model.ServiceModel {
+func generateServiceModels(namesAndIDs []string) map[string]model.ServiceModel {
 	models := make(map[string]model.ServiceModel)
-	for i, name := range names {
-		models[name] = model.ServiceModel{ID: i + 1, Version: "1.0.0", Description: name + " service model"}
+	for i, nameAndID := range namesAndIDs {
+		fields := strings.Split(nameAndID, "/")
+		id := int64(i)
+		if len(fields) > 1 {
+			id, _ = strconv.ParseInt(fields[1], 10, 32)
+		}
+		models[fields[0]] = model.ServiceModel{ID: int(id), Version: "1.0.0", Description: fields[0] + " service model"}
 	}
 	return models
 }
