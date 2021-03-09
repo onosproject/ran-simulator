@@ -49,6 +49,9 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().Float64P("latitude", "a", 52.5200, "Map centre latitude in degrees")
 	cmd.Flags().Float64P("longitude", "g", 13.4050, "Map centre longitude in degrees")
 	cmd.Flags().Float64P("max-neighbor-distance", "d", 3860.0, "Maximum distance between neighbor cells")
+	cmd.Flags().Int("max-neighbors", 5, "Maximum number of neighbors a cell will have; -1 no limit")
+	cmd.Flags().StringSlice("service-models", []string{"kpm/1", "ni/2", "rc/3"}, "List of service models supported by the nodes")
+	cmd.Flags().StringSlice("controller-addresses", []string{"onos-e2t"}, "List of E2T controller addresses or service names")
 	cmd.Flags().String("plmnid", "315010", "PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN")
 	cmd.Flags().Uint32P("enbidstart", "e", 5152, "EnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
@@ -67,13 +70,16 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	enbidStart, _ := cmd.Flags().GetUint32("enbidstart")
 	pitch, _ := cmd.Flags().GetFloat32("pitch")
 	maxDistance, _ := cmd.Flags().GetFloat64("max-neighbor-distance")
+	maxNeighbors, _ := cmd.Flags().GetInt("max-neighbors")
+	controllerAddresses, _ := cmd.Flags().GetStringSlice("controller-addresses")
+	serviceModels, _ := cmd.Flags().GetStringSlice("service-models")
 
 	fmt.Printf("Creating honeycomb array of towers. Towers %d. Sectors: %d\n", numTowers, sectorsPerTower)
 
 	mapCenter := model.Coordinate{Lat: latitude, Lng: longitude}
 
 	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower,
-		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance)
+		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance, maxNeighbors, controllerAddresses, serviceModels)
 	if err != nil {
 		return err
 	}

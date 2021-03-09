@@ -18,29 +18,34 @@ var log = logging.GetLogger("pci", "load")
 
 // PciMetrics is an auxiliary structure for importing PCI data from YAML configuration
 type PciMetrics struct {
-	Cells map[types.ECGI]PciCell `mapstructure:"cells"`
+	Cells map[types.ECGI]PciCell `mapstructure:"cells" yaml:"cells"`
 }
 
 // PciCell is an auxiliary structure for inport PCI data from YAML configuration
 type PciCell struct {
-	CellSize string     `mapstructure:"cellSize"`
-	Earfcn   uint32     `mapstructure:"earfcn"`
-	Pci      uint32     `mapstructure:"pci"`
-	PciPool  []PciRange `mapstructure:"pciPool"`
+	CellSize string     `mapstructure:"cellSize" yaml:"cellSize"`
+	Earfcn   uint32     `mapstructure:"earfcn" yaml:"earfcn"`
+	Pci      uint32     `mapstructure:"pci" yaml:"pci"`
+	PciPool  []PciRange `mapstructure:"pciPool" yaml:"pciPool"`
 }
 
 // PciRange is an auxiliary structure for inport PCI data from YAML configuration
 type PciRange struct {
-	Min uint32 `mapstructure:"min"`
-	Max uint32 `mapstructure:"max"`
+	Min uint32 `mapstructure:"min" yaml:"min"`
+	Max uint32 `mapstructure:"max" yaml:"max"`
 }
 
-// LoadPCIMetrics Loads model with data in "metrics" yaml file
+// LoadPCIMetrics loads model with data in "metrics" yaml file
 func LoadPCIMetrics(store metrics.Store) error {
-	log.Infof("Loading initial PCI metrics...")
+	return LoadPCIMetricsConfig(store, "metrics")
+}
+
+// LoadPCIMetricsConfig loads model with data in the named configuration
+func LoadPCIMetricsConfig(store metrics.Store, configName string) error {
+	log.Infof("Loading initial PCI metrics from %s...", configName)
 	var err error
 
-	model.ViperConfigure("metrics")
+	model.ViperConfigure(configName)
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Errorf("Unable to read metrics config: %v", err)
