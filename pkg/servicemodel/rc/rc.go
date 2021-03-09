@@ -6,7 +6,6 @@ package rc
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -251,9 +250,9 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value
 	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetEUtraCgi().EUtracellIdentity.Value.Value
 	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
-	plmnIDString := strconv.FormatUint(uint64(plmnID), 10)
+	log.Debugf("ECI is %d and PLMN ID is %d", eci, plmnID)
 
-	ecgi := ransimtypes.ToECGI(ransimtypes.PlmnIDFromString(plmnIDString), ransimtypes.GetECI(eci))
+	ecgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
 	parameterName := controlMessage.GetControlMessage().ParameterType.RanParameterName.Value
 	parameterID := controlMessage.GetControlMessage().ParameterType.RanParameterId.Value
 
