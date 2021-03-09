@@ -263,7 +263,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		log.Debugf("Ran parameter for entity %d not found", ecgi)
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 			controloutcome.WithRanParameterID(parameterID),
-			controloutcome.WithRanParameterValue(oldValue.(int32))).
+			controloutcome.WithRanParameterValue(0)).
 			ToAsn1Bytes(modelPlugin)
 		if err != nil {
 			return nil, nil, err
