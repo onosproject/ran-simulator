@@ -18,21 +18,21 @@ var log = logging.GetLogger("pci", "load")
 
 // PciMetrics is an auxiliary structure for importing PCI data from YAML configuration
 type PciMetrics struct {
-	Cells map[types.ECGI]PciCell `mapstructure:"cells"`
+	Cells map[types.ECGI]PciCell `mapstructure:"cells" yaml:"cells"`
 }
 
 // PciCell is an auxiliary structure for inport PCI data from YAML configuration
 type PciCell struct {
-	CellSize string     `mapstructure:"cellSize"`
-	Earfcn   uint32     `mapstructure:"earfcn"`
-	Pci      uint32     `mapstructure:"pci"`
-	PciPool  []PciRange `mapstructure:"pciPool"`
+	CellSize string     `mapstructure:"cellSize" yaml:"cellSize"`
+	Earfcn   uint32     `mapstructure:"earfcn" yaml:"earfcn"`
+	Pci      uint32     `mapstructure:"pci" yaml:"pci"`
+	PciPool  []PciRange `mapstructure:"pciPool" yaml:"pciPool"`
 }
 
 // PciRange is an auxiliary structure for inport PCI data from YAML configuration
 type PciRange struct {
-	Min uint32 `mapstructure:"min"`
-	Max uint32 `mapstructure:"max"`
+	Min uint32 `mapstructure:"min" yaml:"min"`
+	Max uint32 `mapstructure:"max" yaml:"max"`
 }
 
 // LoadPCIMetrics Loads model with data in "metrics" yaml file

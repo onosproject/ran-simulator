@@ -1,0 +1,252 @@
+# SPDX-FileCopyrightText: 2021-present Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
+
+pcis:
+  cells:
+    21458294227473:
+      cellSize: ENTERPRISE
+      earfcn: 68
+      pci: 392
+      pciPool:
+      - min: 392
+        max: 408
+    21458294227474:
+      cellSize: FEMTO
+      earfcn: 48
+      pci: 310
+      pciPool:
+      - min: 698
+        max: 714
+      - min: 307
+        max: 323
+    21458294227475:
+      cellSize: ENTERPRISE
+      earfcn: 58
+      pci: 678
+      pciPool:
+      - min: 664
+        max: 680
+    21458294227489:
+      cellSize: ENTERPRISE
+      earfcn: 70
+      pci: 551
+      pciPool:
+      - min: 545
+        max: 561
+      - min: 885
+        max: 901
+    21458294227490:
+      cellSize: ENTERPRISE
+      earfcn: 67
+      pci: 916
+      pciPool:
+      - min: 902
+        max: 918
+      - min: 919
+        max: 935
+    21458294227491:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 44
+      pci: 808
+      pciPool:
+      - min: 834
+        max: 850
+      - min: 800
+        max: 816
+    21458294227505:
+      cellSize: ENTERPRISE
+      earfcn: 42
+      pci: 81
+      pciPool:
+      - min: 358
+        max: 374
+      - min: 69
+        max: 85
+    21458294227506:
+      cellSize: ENTERPRISE
+      earfcn: 71
+      pci: 186
+      pciPool:
+      - min: 494
+        max: 510
+      - min: 171
+        max: 187
+    21458294227507:
+      cellSize: FEMTO
+      earfcn: 69
+      pci: 15
+      pciPool:
+      - min: 1
+        max: 17
+      - min: 681
+        max: 697
+    21458294227521:
+      cellSize: ENTERPRISE
+      earfcn: 59
+      pci: 654
+      pciPool:
+      - min: 647
+        max: 663
+      - min: 749
+        max: 765
+    21458294227522:
+      cellSize: FEMTO
+      earfcn: 65
+      pci: 985
+      pciPool:
+      - min: 970
+        max: 986
+    21458294227523:
+      cellSize: FEMTO
+      earfcn: 50
+      pci: 110
+      pciPool:
+      - min: 103
+        max: 119
+    21458294227537:
+      cellSize: FEMTO
+      earfcn: 57
+      pci: 951
+      pciPool:
+      - min: 936
+        max: 952
+    21458294227538:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 53
+      pci: 654
+      pciPool:
+      - min: 749
+        max: 765
+      - min: 52
+        max: 68
+    21458294227539:
+      cellSize: FEMTO
+      earfcn: 52
+      pci: 951
+      pciPool:
+      - min: 936
+        max: 952
+      - min: 341
+        max: 357
+    21458294227553:
+      cellSize: ENTERPRISE
+      earfcn: 51
+      pci: 916
+      pciPool:
+      - min: 902
+        max: 918
+    21458294227554:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 63
+      pci: 478
+      pciPool:
+      - min: 477
+        max: 493
+    21458294227555:
+      cellSize: ENTERPRISE
+      earfcn: 47
+      pci: 643
+      pciPool:
+      - min: 596
+        max: 612
+      - min: 630
+        max: 646
+    21458294227569:
+      cellSize: FEMTO
+      earfcn: 54
+      pci: 469
+      pciPool:
+      - min: 460
+        max: 476
+    21458294227570:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 60
+      pci: 985
+      pciPool:
+      - min: 970
+        max: 986
+      - min: 137
+        max: 153
+    21458294227571:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 43
+      pci: 37
+      pciPool:
+      - min: 35
+        max: 51
+    21458294227585:
+      cellSize: FEMTO
+      earfcn: 56
+      pci: 619
+      pciPool:
+      - min: 613
+        max: 629
+      - min: 613
+        max: 629
+    21458294227586:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 61
+      pci: 220
+      pciPool:
+      - min: 205
+        max: 221
+    21458294227587:
+      cellSize: ENTERPRISE
+      earfcn: 66
+      pci: 328
+      pciPool:
+      - min: 766
+        max: 782
+      - min: 562
+        max: 578
+    21458294227601:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 45
+      pci: 551
+      pciPool:
+      - min: 545
+        max: 561
+    21458294227602:
+      cellSize: FEMTO
+      earfcn: 49
+      pci: 162
+      pciPool:
+      - min: 154
+        max: 170
+      - min: 817
+        max: 833
+    21458294227603:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 55
+      pci: 478
+      pciPool:
+      - min: 477
+        max: 493
+      - min: 409
+        max: 425
+    21458294227617:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 62
+      pci: 727
+      pciPool:
+      - min: 715
+        max: 731
+    21458294227618:
+      cellSize: OUTDOOR_SMALL
+      earfcn: 64
+      pci: 535
+      pciPool:
+      - min: 528
+        max: 544
+      - min: 1004
+        max: 1020
+    21458294227619:
+      cellSize: FEMTO
+      earfcn: 46
+      pci: 328
+      pciPool:
+      - min: 324
+        max: 340
+      - min: 766
+        max: 782
