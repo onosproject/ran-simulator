@@ -44,8 +44,8 @@ func getPCIMetricsCommand() *cobra.Command {
 	}
 	cmd.Flags().String("model", "model.yaml", "path of the model.yaml file")
 	_ = cmd.MarkFlagRequired("towers")
-	cmd.Flags().Uint("min-pci", 1, "minimum PCI value")
-	cmd.Flags().Uint("max-pci", 1024, "maximum PCI value")
+	cmd.Flags().Uint("min-pci", 0, "minimum PCI value")
+	cmd.Flags().Uint("max-pci", 503, "maximum PCI value")
 	cmd.Flags().Uint("max-collisions", 8, "maximum number of collisions")
 	cmd.Flags().Uint32("earfcn-start", 42, "start point for EARFCN generation")
 	cmd.Flags().StringSlice("cell-types", []string{"ENTERPRISE", "FEMTO", "OUTDOOR_SMALL"}, "List of cell size types")
