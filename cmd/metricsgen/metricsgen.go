@@ -53,7 +53,11 @@ func getPCIMetricsCommand() *cobra.Command {
 }
 
 type auxTop struct {
-	Pcis *pciload.PciMetrics `yaml:"pcis"`
+	Rc *auxRc `yaml:"rc"`
+}
+
+type auxRc struct {
+	Pci *pciload.PciMetrics `yaml:"pci"`
 }
 
 func runPCIMetricsCommand(cmd *cobra.Command, args []string) error {
@@ -73,7 +77,7 @@ func runPCIMetricsCommand(cmd *cobra.Command, args []string) error {
 
 	pciMetrics := pciload.GeneratePCIMetrics(m, minPCI, maxPCI, maxCollisions, earfcnStart, cellSizeTypes)
 
-	d, err := yaml.Marshal(&auxTop{Pcis: pciMetrics})
+	d, err := yaml.Marshal(&auxTop{Rc: &auxRc{Pci: pciMetrics}})
 	if err != nil {
 		fmt.Printf("Unable to marshal PCI metrics: %v", err)
 		return err

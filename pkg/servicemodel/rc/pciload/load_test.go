@@ -36,3 +36,14 @@ func TestPCILoad(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, uint32(7213), v)
 }
+
+func TestPCISampleLoad(t *testing.T) {
+	ctx := context.TODO()
+	store := metrics.NewMetricsStore()
+	err := LoadPCIMetricsConfig(store, "sample")
+	assert.NoError(t, err)
+
+	v, ok := store.Get(ctx, 21458294227474, "pci")
+	assert.True(t, ok)
+	assert.Equal(t, uint32(459), v)
+}
