@@ -146,12 +146,14 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 
 	intervalDuration := time.Duration(interval)
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)

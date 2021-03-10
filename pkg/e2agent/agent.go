@@ -122,6 +122,7 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	log.Debugf("Received Control Request %+v for ran function %d", request, ranFuncID)
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
+		log.Warn(err)
 		// TODO If the target E2 Node receives a RIC CONTROL REQUEST message
 		//  which contains a RAN Function ID IE that was not previously announced as a s
 		//  supported RAN function in the E2 Setup procedure or the RIC Service Update procedure,
@@ -154,6 +155,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		subutils.GetRanFunctionID(request))
 
 	if err != nil {
+		log.Warn(err)
 		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
 		//  message which contains a RAN Function ID IE that was not previously
 		//  announced as a supported RAN function in the E2 Setup procedure or
@@ -221,7 +223,7 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		subdeleteutils.GetRanFunctionID(request))
 	_, err = a.subStore.Get(subID)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		//  If the target E2 Node receives a RIC SUBSCRIPTION DELETE REQUEST
 		//  message containing RIC Request ID IE that is not known, the target
 		//  E2 Node shall send the RIC SUBSCRIPTION DELETE FAILURE message
@@ -246,7 +248,7 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		//  If the target E2 Node receives a RIC SUBSCRIPTION DELETE REQUEST message contains a
 		//  RAN Function ID IE that was not previously announced as a supported RAN function
 		//  in the E2 Setup procedure or the RIC Service Update procedure, the target E2 Node
@@ -280,6 +282,7 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	}
 	// Ric subscription delete procedure is failed so we are not going to update subscriptions store
 	if err != nil {
+		log.Warn(err)
 		return response, failure, err
 	}
 
