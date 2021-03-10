@@ -1,2 +1,1 @@
-# Ran Simulator
-
+# RAN Simulator

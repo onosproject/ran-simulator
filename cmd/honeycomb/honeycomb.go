@@ -45,7 +45,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	}
 	cmd.Flags().UintP("towers", "t", 0, "number of towers")
 	_ = cmd.MarkFlagRequired("towers")
-	cmd.Flags().UintP("sectors-per-tower", "s", 3, "sectors per tower (3 or 6)")
+	cmd.Flags().UintP("sectors-per-tower", "s", 3, "sectors per tower")
 	cmd.Flags().Float64P("latitude", "a", 52.5200, "Map centre latitude in degrees")
 	cmd.Flags().Float64P("longitude", "g", 13.4050, "Map centre longitude in degrees")
 	cmd.Flags().Float64P("max-neighbor-distance", "d", 3860.0, "Maximum distance between neighbor cells")
