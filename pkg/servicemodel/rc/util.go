@@ -116,7 +116,15 @@ func (sm *Client) getCellPci(ctx context.Context, ecgi ransimtypes.ECGI) (int32,
 	if !found {
 		return 0, errors.New(errors.NotFound, "pci value is not found for cell:", ecgi)
 	}
-	return int32(cellPci.(uint32)), nil
+	switch cellPci := cellPci.(type) {
+	case uint32:
+		return int32(cellPci), nil
+	case int32:
+		return cellPci, nil
+	default:
+		return cellPci.(int32), nil
+	}
+
 }
 
 func (sm *Client) getEarfcn(ctx context.Context, ecgi ransimtypes.ECGI) (int32, error) {
