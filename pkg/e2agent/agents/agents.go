@@ -118,6 +118,7 @@ func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRe
 	for _, node := range m.Nodes {
 		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore, metricStore)
 		if err != nil {
+			log.Error(err)
 			return nil, err
 		}
 		err = agentStore.Add(node.EnbID, e2Node)
