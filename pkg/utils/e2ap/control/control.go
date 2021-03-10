@@ -49,6 +49,13 @@ func (control *Control) GetReqID() int32 {
 	return control.reqID
 }
 
+// WithCtrlStatus sets control status
+func WithCtrlStatus(ricCtrlStatus e2apies.RiccontrolStatus) func(control *Control) {
+	return func(control *Control) {
+		control.ricCtrlStatus = ricCtrlStatus
+	}
+}
+
 // WithRequestID sets request ID
 func WithRequestID(reqID int32) func(control *Control) {
 	return func(control *Control) {

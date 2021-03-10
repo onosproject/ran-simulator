@@ -300,6 +300,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 			controlutils.WithRanFuncID(ranFuncID),
 			controlutils.WithRequestID(reqID),
 			controlutils.WithRicInstanceID(ricInstanceID),
+			controlutils.WithRicControlStatus(e2apies.RiccontrolStatus_RICCONTROL_STATUS_FAILED),
 			controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlFailure()
 		if err != nil {
 			return nil, nil, err
@@ -319,6 +320,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		controlutils.WithRanFuncID(ranFuncID),
 		controlutils.WithRequestID(reqID),
 		controlutils.WithRicInstanceID(ricInstanceID),
+		controlutils.WithRicControlStatus(e2apies.RiccontrolStatus_RICCONTROL_STATUS_SUCCESS),
 		controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlAcknowledge()
 	if err != nil {
 		return nil, nil, err
