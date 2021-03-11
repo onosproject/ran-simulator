@@ -43,7 +43,7 @@ func getPCIMetricsCommand() *cobra.Command {
 		RunE:          runPCIMetricsCommand,
 	}
 	cmd.Flags().String("model", "model.yaml", "path of the model.yaml file")
-	_ = cmd.MarkFlagRequired("towers")
+	_ = cmd.MarkFlagRequired("model")
 	cmd.Flags().Uint("min-pci", 0, "minimum PCI value")
 	cmd.Flags().Uint("max-pci", 503, "maximum PCI value")
 	cmd.Flags().Uint("max-collisions", 8, "maximum number of collisions")
