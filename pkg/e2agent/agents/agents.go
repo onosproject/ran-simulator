@@ -77,6 +77,10 @@ func (agents *E2Agents) processNodeEvents() {
 					log.Error(err)
 				}
 			}
+			err = agents.nodeStore.SetStatus(context.Background(), node.EnbID, "Running")
+			if err != nil {
+				log.Error(err)
+			}
 
 		case nodes.Deleted:
 			log.Debugf("Stopping e2 agent %d", nodeEvent.Key.(types.EnbID))
@@ -93,6 +97,10 @@ func (agents *E2Agents) processNodeEvents() {
 			}
 
 			err = agents.agentStore.Remove(node.EnbID)
+			if err != nil {
+				log.Error(err)
+			}
+			err = agents.nodeStore.SetStatus(context.Background(), node.EnbID, "Stopped")
 			if err != nil {
 				log.Error(err)
 			}
@@ -121,9 +129,16 @@ func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRe
 			log.Error(err)
 			return nil, err
 		}
+
 		err = agentStore.Add(node.EnbID, e2Node)
 		if err != nil {
 			log.Error(err)
+			return nil, err
+		}
+		err = nodeStore.SetStatus(context.Background(), node.EnbID, "Running")
+		if err != nil {
+			log.Error(err)
+			return nil, err
 		}
 	}
 	go e2agents.processNodeEvents()
