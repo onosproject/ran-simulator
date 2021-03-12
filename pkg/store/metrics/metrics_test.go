@@ -73,9 +73,9 @@ func TestMetrics(t *testing.T) {
 	assert.Equal(t, Deleted, metricEvent.Type)
 	metricEvent = <-ch
 	assert.Equal(t, Deleted, metricEvent.Type)
-	assert.Equal(t, uint64(123), EntityID(metricEvent.Key.(string)))
+	assert.Equal(t, uint64(123), metricEvent.Key.(Key).EntityID)
 
-	name := MetricName(metricEvent.Key.(string))
+	name := metricEvent.Key.(Key).Name
 	assert.True(t, name == "bar" || name == "foo")
 
 	ctx.Done()

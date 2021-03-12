@@ -19,3 +19,9 @@ const (
 func (e MetricEvent) String() string {
 	return [...]string{"None", "Updated", "Deleted"}[e]
 }
+
+// Key key for storing a metric
+type Key struct {
+	EntityID uint64
+	Name     string
+}

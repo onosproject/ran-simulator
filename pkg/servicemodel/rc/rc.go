@@ -117,9 +117,14 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 	if err != nil {
 		return err
 	}
-	ch := make(chan event.Event)
+	cellEventCh := make(chan event.Event)
+	metricEventCh := make(chan event.Event)
 	nodeCells := sm.ServiceModel.Node.Cells
-	err = sm.ServiceModel.CellStore.Watch(context.Background(), ch)
+	err = sm.ServiceModel.CellStore.Watch(context.Background(), cellEventCh)
+	if err != nil {
+		return err
+	}
+	err = sm.ServiceModel.MetricStore.Watch(context.Background(), metricEventCh)
 	if err != nil {
 		return err
 	}
@@ -132,7 +137,8 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 
 	for {
 		select {
-		case cellEvent := <-ch:
+		case cellEvent := <-cellEventCh:
+			log.Debug("Received cell event:", cellEvent)
 			cellEventType := cellEvent.Type.(cells.CellEvent)
 			if cellEventType == cells.UpdatedNeighbors {
 				cell := cellEvent.Value.(*model.Cell)
@@ -145,6 +151,18 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 					}
 				}
 			}
+		case metricEvent := <-metricEventCh:
+			log.Debug("Received metric event:", metricEvent)
+			metricKey := metricEvent.Key.(metrics.Key)
+			for _, nodeCell := range nodeCells {
+				if uint64(nodeCell) == metricKey.EntityID && metricKey.Name == "pci" {
+					err = sm.sendRicIndication(ctx, subscription)
+					if err != nil {
+						log.Error(err)
+					}
+				}
+			}
+
 		case <-sub.E2Channel.Context().Done():
 			log.Debug("E2 channel context is done")
 			return nil
