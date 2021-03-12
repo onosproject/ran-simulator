@@ -46,11 +46,11 @@ var _ servicemodel.Client = &Client{}
 
 var log = logging.GetLogger("sm", "kpm2")
 
-const (
-	modelFullName = "e2sm_kpm-v2"
-	version       = "v2"
-	modelOID      = "1.3.6.1.4.1.1.1.2.2"
-)
+//const (
+//	modelFullName = "e2sm_kpm-v2"
+//	version       = "v2"
+//	modelOID      = "1.3.6.1.4.1.1.1.2.2"
+//)
 
 // Client kpm service model client
 type Client struct {

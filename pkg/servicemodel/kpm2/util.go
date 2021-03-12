@@ -5,11 +5,11 @@
 package kpm2
 
 import (
-    // "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-ies"
+	//"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-	// "google.golang.org/protobuf/proto"
+	//"github.com/onosproject/onos-lib-go/pkg/errors"
+	//"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	//"google.golang.org/protobuf/proto"
 )
 
 func getReportPeriods() map[string]int32 {
@@ -60,9 +60,9 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	return interval, nil
 }
 
-func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
-	if modelPlugin, ok := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[modelFullName]; ok {
-		return modelPlugin, nil
-	}
-	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
-}
+//func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
+//	if modelPlugin, ok := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[modelFullName]; ok {
+//		return modelPlugin, nil
+//	}
+//	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
+//}
