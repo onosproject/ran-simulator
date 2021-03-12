@@ -6,14 +6,12 @@ package metrics
 
 import (
 	"context"
-	"fmt"
+	"sync"
+
 	"github.com/google/uuid"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 	"github.com/onosproject/ran-simulator/pkg/store/watcher"
-	"strconv"
-	"strings"
-	"sync"
 )
 
 var log = liblog.GetLogger("store", "metrics")
@@ -48,7 +46,7 @@ type WatchOptions struct {
 
 type store struct {
 	mu       sync.RWMutex
-	metrics  map[string]interface{}
+	metrics  map[Key]interface{}
 	watchers *watcher.Watchers
 }
 
@@ -58,28 +56,9 @@ func NewMetricsStore() Store {
 	watchers := watcher.NewWatchers()
 	return &store{
 		mu:       sync.RWMutex{},
-		metrics:  make(map[string]interface{}),
+		metrics:  make(map[Key]interface{}),
 		watchers: watchers,
 	}
-}
-
-// EntityID extracts entity ID as uint64 from the composite metric key
-func EntityID(key string) uint64 {
-	f := strings.SplitN(key, "/", 2)
-	id, err := strconv.ParseUint(f[0], 10, 64)
-	if err != nil {
-		return 0
-	}
-	return id
-}
-
-// MetricName extracts metric name from the composite metric key
-func MetricName(key string) string {
-	f := strings.SplitN(key, "/", 2)
-	if len(f) < 2 {
-		return ""
-	}
-	return f[1]
 }
 
 // ListEntities retrieves all entities that presently have metrics associated with them
@@ -89,7 +68,7 @@ func (s *store) ListEntities(ctx context.Context) ([]uint64, error) {
 
 	idmap := make(map[uint64]uint64)
 	for k := range s.metrics {
-		id := EntityID(k)
+		id := k.EntityID
 		idmap[id] = id
 	}
 
@@ -102,21 +81,14 @@ func (s *store) ListEntities(ctx context.Context) ([]uint64, error) {
 }
 
 // Generate composite key from entity ID and metric name
-func key(entityID uint64, name string) string {
-	return fmt.Sprintf("%d/%s", entityID, name)
+func key(entityID uint64, name string) Key {
+	return Key{
+		EntityID: entityID,
+		Name:     name,
+	}
 }
 
-// Extract metric name from the composite key
-func metricName(key string, prefix string) string {
-	return key[len(prefix):]
-}
-
-// Generate composite key prefix from the given entity ID
-func entityPrefix(id uint64) string {
-	return fmt.Sprintf("%d/", id)
-}
-
-func metricEvent(key string, value interface{}, eventType interface{}) event.Event {
+func metricEvent(key Key, value interface{}, eventType interface{}) event.Event {
 	return event.Event{
 		Key:   key,
 		Value: value,
@@ -158,9 +130,8 @@ func (s *store) Delete(ctx context.Context, entityID uint64, name string) error 
 func (s *store) DeleteAll(ctx context.Context, entityID uint64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	prefix := entityPrefix(entityID)
 	for k, v := range s.metrics {
-		if strings.HasPrefix(k, prefix) {
+		if k.EntityID == entityID {
 			delete(s.metrics, k)
 			s.watchers.Send(metricEvent(k, v, Deleted))
 		}
@@ -172,11 +143,10 @@ func (s *store) DeleteAll(ctx context.Context, entityID uint64) error {
 func (s *store) List(ctx context.Context, entityID uint64) (map[string]interface{}, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	prefix := entityPrefix(entityID)
 	metrics := make(map[string]interface{})
 	for k, v := range s.metrics {
-		if strings.HasPrefix(k, prefix) {
-			metrics[metricName(k, prefix)] = v
+		if k.EntityID == entityID {
+			metrics[k.Name] = v
 		}
 	}
 	return metrics, nil
