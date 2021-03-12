@@ -103,7 +103,18 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 				log.Error(err)
 				return nil, err
 			}
-
+		case registry.Kpm2:
+			log.Info("Kpm2 service model ignored for node with eNbID:", node.EnbID)
+			// kpm2Sm, err := kpm2.NewServiceModel(node, model, modelPluginRegistry,
+			// 	subStore, nodeStore, ueStore)
+			// if err != nil {
+			// 	return nil, err
+			// }
+			// err = reg.RegisterServiceModel(kpm2Sm)
+			// if err != nil {
+			// 	log.Error(err)
+			// 	return nil, err
+			// }
 		}
 	}
 	return &e2Agent{
