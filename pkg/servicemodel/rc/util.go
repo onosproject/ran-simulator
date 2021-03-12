@@ -116,11 +116,25 @@ func (sm *Client) getCellPci(ctx context.Context, ecgi ransimtypes.ECGI) (int32,
 	if !found {
 		return 0, errors.New(errors.NotFound, "pci value is not found for cell:", ecgi)
 	}
+	// TODO we should handle this properly in metric store
 	switch cellPci := cellPci.(type) {
 	case uint32:
 		return int32(cellPci), nil
 	case int32:
 		return cellPci, nil
+	case int64:
+		return int32(cellPci), nil
+	case uint64:
+		return int32(cellPci), nil
+	case uint8:
+		return int32(cellPci), nil
+	case int8:
+		return int32(cellPci), nil
+	case int16:
+		return int32(cellPci), nil
+	case uint16:
+		return int32(cellPci), nil
+
 	default:
 		return cellPci.(int32), nil
 	}
