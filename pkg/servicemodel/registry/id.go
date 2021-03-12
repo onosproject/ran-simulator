@@ -18,4 +18,6 @@ const (
 	Ni
 	// Rc
 	Rc
+	// Kpm2
+	Kpm2
 )
