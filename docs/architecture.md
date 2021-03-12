@@ -16,6 +16,7 @@ You can find more details about Ransim APIs here: [Ransim APIs](api.md)
 * **Ransim CLI**: Ransim is equipped with a command line interface which is integrated with 
  [onos-cli](https://github.com/onosproject/onos-cli) that allows to interact with Ransim to retrieve required information from data stores, 
   monitor RAN environment changes, create/remove/update RAN entities, metrics, etc.
+The list of ransim commands is documented here [ransim-cli](https://github.com/onosproject/onos-cli/blob/master/docs/cli/onos_ransim.md)  
   
 
 ![Ransim Architecture](images/ransim_architecture.jpg)
