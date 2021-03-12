@@ -70,6 +70,25 @@ ran-simulator-6d9c89cdc7-6t6tl   1/1     Running   0          99s
 After deploying ran-simulator, it loads the models, create E2 nodes and make connections using SCTP
 to onos-e2t endpoint which is specified in the model. 
 
+To verify simulated e2 nodes are connected to the E2T endpoint successfully, 
+you can use onos-cli to check list of E2 connections using the following command:
+
+```bash
+> onos e2t list connections
+Global ID            PLNM ID   IP Addr        Port    Conn Type
+0000000000340422:0   1279014   10.244.0.247   39772   G_NB
+00000000003020f9:0   1279014   10.244.0.247   53406   G_NB
+```
+
+or use ransim CLI to check status of E2 nodes:
+```bash
+> onos ransim get nodes
+EnbID            Status   Service Models   E2T Controllers      Cell ECGIs
+5153             Running  kpm,rc           e2t-1                21458294227473,21458294227474,21458294227475
+5154             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227475
+```
+
+
 [Helm]: https://helm.sh/
 [Kubernetes]: https://kubernetes.io/
 [kind]: https://kind.sigs.k8s.io
