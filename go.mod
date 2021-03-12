@@ -17,7 +17,7 @@ require (
 	github.com/onosproject/onos-api v0.7.14 // indirect
 	github.com/onosproject/onos-api/go v0.7.14
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.10
-	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.10 // indirect
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.10
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.10
 	github.com/onosproject/onos-e2t v0.7.7
 	github.com/onosproject/onos-lib-go v0.7.0
