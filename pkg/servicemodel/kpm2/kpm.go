@@ -7,23 +7,25 @@ package kpm2
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"strconv"
 	"time"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
-	"github.com/onosproject/ran-simulator/pkg/store/nodes"
-	"github.com/onosproject/ran-simulator/pkg/store/ues"
+	// "github.com/onosproject/ran-simulator/pkg/store/nodes"
+	// "github.com/onosproject/ran-simulator/pkg/store/ues"
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
-	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm/indication"
+	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
-	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder"
+	// "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
@@ -37,7 +39,7 @@ import (
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
-	"google.golang.org/protobuf/proto"
+	// "google.golang.org/protobuf/proto"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -58,62 +60,64 @@ type Client struct {
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
-	modelFullName := modelplugins.ModelFullName(modelFullName)
-	kpmSm := registry.ServiceModel{
-		RanFunctionID:       registry.Kpm,
-		ModelFullName:       modelFullName,
-		Revision:            1,
-		OID:                 modelOID,
-		Version:             version,
-		ModelPluginRegistry: modelPluginRegistry,
-		Node:                node,
-		Model:               model,
-		Subscriptions:       subStore,
-		Nodes:               nodeStore,
-		UEs:                 ueStore,
-	}
-	kpmClient := &Client{
-		ServiceModel: &kpmSm,
-	}
+	// modelFullName := modelplugins.ModelFullName(modelFullName)
+	// kpmSm := registry.ServiceModel{
+	// 	RanFunctionID:       registry.Kpm,
+	// 	ModelFullName:       modelFullName,
+	// 	Revision:            1,
+	// 	OID:                 modelOID,
+	// 	Version:             version,
+	// 	ModelPluginRegistry: modelPluginRegistry,
+	// 	Node:                node,
+	// 	Model:               model,
+	// 	Subscriptions:       subStore,
+	// 	Nodes:               nodeStore,
+	// 	UEs:                 ueStore,
+	// }
+	// kpmClient := &Client{
+	// 	ServiceModel: &kpmSm,
+	// }
 
-	kpmSm.Client = kpmClient
+	// kpmSm.Client = kpmClient
 
-	var ranFunctionShortName = string(modelFullName)
-	var ranFunctionE2SmOid = "OID123"
-	var ranFunctionDescription = "KPM Monitor"
-	var ranFunctionInstance int32 = 1
-	var ricEventStyleType int32 = 1
-	var ricEventStyleName = "Periodic report"
-	var ricEventFormatType int32 = 5
-	var ricReportStyleType int32 = 1
-	var ricReportStyleName = "O-CU-CP Measurement Container for the 5GC connected deployment"
-	var ricIndicationHeaderFormatType int32 = 1
-	var ricIndicationMessageFormatType int32 = 1
-	ranFuncDescPdu, err := pdubuilder.CreateE2SmKpmRanfunctionDescriptionMsg(ranFunctionShortName, ranFunctionE2SmOid, ranFunctionDescription,
-		ranFunctionInstance, ricEventStyleType, ricEventStyleName, ricEventFormatType, ricReportStyleType, ricReportStyleName,
-		ricIndicationHeaderFormatType, ricIndicationMessageFormatType)
-	if err != nil {
-		log.Error(err)
-		return registry.ServiceModel{}, err
-	}
+	// var ranFunctionShortName = string(modelFullName)
+	// var ranFunctionE2SmOid = "OID123"
+	// var ranFunctionDescription = "KPM Monitor"
+	// var ranFunctionInstance int32 = 1
+	// var ricEventStyleType int32 = 1
+	// var ricEventStyleName = "Periodic report"
+	// var ricEventFormatType int32 = 5
+	// var ricReportStyleType int32 = 1
+	// var ricReportStyleName = "O-CU-CP Measurement Container for the 5GC connected deployment"
+	// var ricIndicationHeaderFormatType int32 = 1
+	// var ricIndicationMessageFormatType int32 = 1
+	// ranFuncDescPdu, err := pdubuilder.CreateE2SmKpmRanfunctionDescriptionMsg(ranFunctionShortName, ranFunctionE2SmOid, ranFunctionDescription,
+	// 	ranFunctionInstance, ricEventStyleType, ricEventStyleName, ricEventFormatType, ricReportStyleType, ricReportStyleName,
+	// 	ricIndicationHeaderFormatType, ricIndicationMessageFormatType)
+	// if err != nil {
+	// 	log.Error(err)
+	// 	return registry.ServiceModel{}, err
+	// }
 
-	protoBytes, err := proto.Marshal(ranFuncDescPdu)
-	if err != nil {
-		log.Error(err)
-		return registry.ServiceModel{}, err
-	}
-	kpmModelPlugin := modelPluginRegistry.ModelPlugins[modelFullName]
-	if kpmModelPlugin == nil {
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
-	}
-	ranFuncDescBytes, err := kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
-	if err != nil {
-		log.Error(err)
-		return registry.ServiceModel{}, err
-	}
+	// protoBytes, err := proto.Marshal(ranFuncDescPdu)
+	// if err != nil {
+	// 	log.Error(err)
+	// 	return registry.ServiceModel{}, err
+	// }
+	// kpmModelPlugin := modelPluginRegistry.ModelPlugins[modelFullName]
+	// if kpmModelPlugin == nil {
+	// 	return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
+	// }
+	// ranFuncDescBytes, err := kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
+	// if err != nil {
+	// 	log.Error(err)
+	// 	return registry.ServiceModel{}, err
+	// }
 
-	kpmSm.Description = ranFuncDescBytes
-	return kpmSm, nil
+	// kpmSm.Description = ranFuncDescBytes
+	// return kpmSm, nil
+
+	return registry.ServiceModel{}, nil
 }
 
 func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
