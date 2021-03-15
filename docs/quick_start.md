@@ -52,7 +52,7 @@ deploy ran-simulator using the following command:
 helm install ran-simulator ran-simulator -n sd-ran
 ```
 
-if you deploy ran-simulator successfully, you should be able to see it
+if you deploy RAN simulator successfully, you should be able to see it
 in the list of deployments:
 
 ```bash
@@ -80,7 +80,7 @@ Global ID            PLNM ID   IP Addr        Port    Conn Type
 00000000003020f9:0   1279014   10.244.0.247   53406   G_NB
 ```
 
-or use ransim CLI to check status of E2 nodes:
+or use RAN simulator CLI to check status of E2 nodes:
 ```bash
 > onos ransim get nodes
 EnbID            Status   Service Models   E2T Controllers      Cell ECGIs

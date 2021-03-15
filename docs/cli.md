@@ -1,6 +1,6 @@
-# Ransim CLI
+# RAN simulator CLI
 
-Ransim is equipped with a command line interface which is integrated with
+RAN simulator is equipped with a command line interface which is integrated with
 [onos-cli](https://github.com/onosproject/onos-cli) that allows to interact with Ransim to retrieve required information from data stores,
 monitor RAN environment changes, create/remove/update RAN entities, metrics, etc.
 The list of ransim commands is documented here [ransim-cli](https://github.com/onosproject/onos-cli/blob/master/docs/cli/onos_ransim.md) 
@@ -8,7 +8,7 @@ The list of ransim commands is documented here [ransim-cli](https://github.com/o
 ## Usage 
 
 1) Follow the instructions in [Quick Start](quick_start.md) to deploy 
-sd-ran subsystems and Ransim. 
+sd-ran subsystems and RAN simulator. 
    
 2) Use the following command to access to onos-cli that you can run onos ransim 
 commands:

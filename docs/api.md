@@ -1,6 +1,6 @@
-# Ransim APIs
+# RAN simulator APIs
 
-Ransim gRPC APIs are defined in [onos-api][onos-api] that are listed as follows:
+RAN simulator gRPC APIs are defined in [onos-api][onos-api] that are listed as follows:
 
 * **Model API**: provides means to create, delete and read RAN simulation model
   such as E2 nodes and cells.  
