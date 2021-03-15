@@ -1,0 +1,14 @@
+# RAN simulator APIs
+
+RAN simulator gRPC APIs are defined in [onos-api][onos-api] that are listed as follows:
+
+* **Model API**: provides means to create, delete and read RAN simulation model
+  such as E2 nodes and cells.  
+  
+* **Traffic Sim API**: provides means to create, list, and monitor UEs. 
+
+* **Metrics API**: provides means to create, delete, and read metrics for the specified entity
+  ( e.g. A node, a cell, or a UE)
+
+  
+[onos-api]: https://github.com/onosproject/onos-api/ 
