@@ -6,6 +6,7 @@ package rc
 
 import (
 	"context"
+	"strconv"
 
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
@@ -134,9 +135,14 @@ func (sm *Client) getCellPci(ctx context.Context, ecgi ransimtypes.ECGI) (int32,
 		return int32(cellPci), nil
 	case uint16:
 		return int32(cellPci), nil
-
+	case string:
+		val, err := strconv.Atoi(cellPci)
+		if err != nil {
+			return 0, err
+		}
+		return int32(val), nil
 	default:
-		return cellPci.(int32), nil
+		return 0, nil
 	}
 
 }
