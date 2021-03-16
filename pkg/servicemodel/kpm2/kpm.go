@@ -48,18 +48,18 @@ var _ servicemodel.Client = &Client{}
 var log = logging.GetLogger("sm", "kpm2")
 
 const (
-	modelName    = "e2sm_kpm_v2"
-	modelVersion = "v2"
-	modelOID     = "1.3.6.1.4.1.1.1.2.2.2"
-	ricStyleType = 1
-	ricStyleName = "Periodic Report"
-	ricFormatType = 5
-	ricIndMsgFormat = 1
-	ricIndHdrFormat = 1
+	modelName              = "e2sm_kpm_v2"
+	modelVersion           = "v2"
+	modelOID               = "1.3.6.1.4.1.1.1.2.2.2"
+	ricStyleType           = 1
+	ricStyleName           = "Periodic Report"
+	ricFormatType          = 5
+	ricIndMsgFormat        = 1
+	ricIndHdrFormat        = 1
 	ranFunctionDescription = "KPM 2.0 Monitor"
-	ranFunctionShortName = modelName + "-" + modelVersion
-	ranFunctionE2SmOid = "OID123"
-	ranFunctionInstance = 1
+	ranFunctionShortName   = modelName + "-" + modelVersion
+	ranFunctionE2SmOid     = "OID123"
+	ranFunctionInstance    = 1
 )
 
 // Client kpm service model client
