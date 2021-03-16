@@ -94,8 +94,6 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 				TxPowerDB: 11,
 			}
 
-			fmt.Printf("%v\n", cell)
-
 			m.Cells[cellName] = cell
 			node.Cells = append(node.Cells, cell.ECGI)
 		}
@@ -107,7 +105,6 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	for cellName, cell := range m.Cells {
 		for _, other := range m.Cells {
 			if cell.ECGI != other.ECGI && isNeighbor(cell, other, maxDistance, sectorsPerTower == 1) && len(cell.Neighbors) < maxNeighbors {
-				fmt.Printf("%d n %d\n", cell.ECGI, other.ECGI)
 				cell.Neighbors = append(cell.Neighbors, other.ECGI)
 			}
 		}
@@ -142,8 +139,8 @@ func generateServiceModels(namesAndIDs []string) map[string]model.ServiceModel {
 // Cells are neighbors if their sectors have the same coordinates or if their center arc vectors fall within a distance/2
 func isNeighbor(cell model.Cell, other model.Cell, maxDistance float64, onlyDistance bool) bool {
 	return (cell.Sector.Center.Lat == other.Sector.Center.Lat && cell.Sector.Center.Lng == other.Sector.Center.Lng) ||
-				(onlyDistance && distance(cell.Sector.Center, other.Sector.Center) <= maxDistance) ||
-				distance(reachPoint(cell.Sector, maxDistance), reachPoint(other.Sector, maxDistance)) <= maxDistance/2
+		(onlyDistance && distance(cell.Sector.Center, other.Sector.Center) <= maxDistance) ||
+		distance(reachPoint(cell.Sector, maxDistance), reachPoint(other.Sector, maxDistance)) <= maxDistance/2
 }
 
 // Calculate the end-point of the center arc vector a distance from the sector center
