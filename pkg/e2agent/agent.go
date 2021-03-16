@@ -7,6 +7,7 @@ package e2agent
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 	"time"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -104,17 +105,19 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelp
 				return nil, err
 			}
 		case registry.Kpm2:
-			log.Info("Kpm2 service model ignored for node with eNbID:", node.EnbID)
-			// kpm2Sm, err := kpm2.NewServiceModel(node, model, modelPluginRegistry,
-			// 	subStore, nodeStore, ueStore)
-			// if err != nil {
-			// 	return nil, err
-			// }
-			// err = reg.RegisterServiceModel(kpm2Sm)
-			// if err != nil {
-			// 	log.Error(err)
-			// 	return nil, err
-			// }
+			log.Info("KPM2 service model for node with eNbID:", node.EnbID)
+			kpm2Sm, err := kpm2.NewServiceModel(node, model, modelPluginRegistry,
+				subStore, nodeStore, ueStore)
+			if err != nil {
+				log.Info("Failure creating KPM2 service model for eNbID:", node.EnbID)
+				return nil, err
+			}
+			err = reg.RegisterServiceModel(kpm2Sm)
+			if err != nil {
+				log.Info("Failure registering KPM2 service model for eNbID:", node.EnbID)
+				log.Error(err)
+				return nil, err
+			}
 		}
 	}
 	return &e2Agent{

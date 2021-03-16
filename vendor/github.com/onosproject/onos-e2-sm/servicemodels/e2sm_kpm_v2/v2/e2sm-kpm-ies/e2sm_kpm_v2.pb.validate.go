@@ -926,12 +926,7 @@ func (m *MeasurementLabel) Validate() error {
 		}
 	}
 
-	if val := m.GetSUm(); val < 0 || val >= 1 {
-		return MeasurementLabelValidationError{
-			field:  "SUm",
-			reason: "value must be inside range [0, 1)",
-		}
-	}
+	// no validation rules for SUm
 
 	if val := m.GetDistBinX(); val < 1 || val > 65536 {
 		return MeasurementLabelValidationError{
@@ -954,19 +949,9 @@ func (m *MeasurementLabel) Validate() error {
 		}
 	}
 
-	if val := m.GetPreLabelOverride(); val < 0 || val >= 1 {
-		return MeasurementLabelValidationError{
-			field:  "PreLabelOverride",
-			reason: "value must be inside range [0, 1)",
-		}
-	}
+	// no validation rules for PreLabelOverride
 
-	if val := m.GetStartEndInd(); val < 0 || val > 1 {
-		return MeasurementLabelValidationError{
-			field:  "StartEndInd",
-			reason: "value must be inside range [0, 1]",
-		}
-	}
+	// no validation rules for StartEndInd
 
 	return nil
 }
