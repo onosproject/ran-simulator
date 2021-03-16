@@ -55,6 +55,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().String("plmnid", "315010", "PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN")
 	cmd.Flags().Uint32P("enbidstart", "e", 5152, "EnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
+	cmd.Flags().Bool("single-node", false, "generate a single node for all cells")
 	return cmd
 }
 
@@ -73,13 +74,14 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	maxNeighbors, _ := cmd.Flags().GetInt("max-neighbors")
 	controllerAddresses, _ := cmd.Flags().GetStringSlice("controller-addresses")
 	serviceModels, _ := cmd.Flags().GetStringSlice("service-models")
+	singleNode, _ := cmd.Flags().GetBool("single-node")
 
 	fmt.Printf("Creating honeycomb array of %d towers with %d cells each.\n", numTowers, sectorsPerTower)
 
 	mapCenter := model.Coordinate{Lat: latitude, Lng: longitude}
 
 	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower,
-		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance, maxNeighbors, controllerAddresses, serviceModels)
+		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance, maxNeighbors, controllerAddresses, serviceModels, singleNode)
 	if err != nil {
 		return err
 	}

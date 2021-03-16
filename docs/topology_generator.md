@@ -22,6 +22,7 @@ Flags:
       --plmnid string                  PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN (default "315010")
   -s, --sectors-per-tower uint         sectors per tower (default 3)
       --service-models strings         List of service models supported by the nodes (default [kpm/1,ni/2,rc/3])
+      --single-node                    generate a single node for all cells
   -t, --towers uint                    number of towers
 ```
 
