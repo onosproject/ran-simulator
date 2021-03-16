@@ -132,15 +132,45 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		Value: make([]*e2sm_kpm_v2.MeasurementInfoActionItem, 0),
 	}
 
-	var measTypeName1 = "foo"
-	var measTypeID1 int32 = 24
+	var measTypeName1 = "RRC.ConnEstabAtt.Tot"
+	var measTypeID1 int32 = 1
 	measInfoActionItem1 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName1, measTypeID1)
 	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem1)
 
-	var measTypeName2 = "bar"
-	var measTypeID2 int32 = 24
+	var measTypeName2 = "RRC.ConnEstabSucc.Tot"
+	var measTypeID2 int32 = 2
 	measInfoActionItem2 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName2, measTypeID2)
 	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem2)
+
+	var measTypeName3 = "RRC.ConnReEstabAtt.Tot"
+	var measTypeID3 int32 = 3
+	measInfoActionItem3 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName3, measTypeID3)
+	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem3)
+
+	var measTypeName4 = "RRC.ConnReEstabAtt.reconfigFail"
+	var measTypeID4 int32 = 4
+	measInfoActionItem4 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName4, measTypeID4)
+	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem4)
+
+	var measTypeName5 = "RRC.ConnReEstabAtt.HOFail"
+	var measTypeID5 int32 = 5
+	measInfoActionItem5 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName5, measTypeID5)
+	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem5)
+
+	var measTypeName6 = "RRC.ConnReEstabAtt.Other"
+	var measTypeID6 int32 = 6
+	measInfoActionItem6 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName6, measTypeID6)
+	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem6)
+
+	var measTypeName7 = "RRC.Conn.Avg"
+	var measTypeID7 int32 = 7
+	measInfoActionItem7 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName7, measTypeID7)
+	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem7)
+
+	var measTypeName8 = "RRC.Conn.Max"
+	var measTypeID8 int32 = 8
+	measInfoActionItem8 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName8, measTypeID8)
+	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem8)
 
 	rrsi := pdubuilder.CreateRicReportStyleItem(ricStyleType, ricStyleName, ricFormatType, &measInfoActionList, ricIndHdrFormat, ricIndMsgFormat)
 
