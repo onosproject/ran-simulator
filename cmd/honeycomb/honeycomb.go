@@ -62,9 +62,6 @@ func getHoneycombTopoCommand() *cobra.Command {
 func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	numTowers, _ := cmd.Flags().GetUint("towers")
 	sectorsPerTower, _ := cmd.Flags().GetUint("sectors-per-tower")
-	if sectorsPerTower != 3 && sectorsPerTower != 6 {
-		return fmt.Errorf("only 3 or 6 are allowed for 'sectors-per-tower'")
-	}
 	latitude, _ := cmd.Flags().GetFloat64("latitude")
 	longitude, _ := cmd.Flags().GetFloat64("longitude")
 	plmnid, _ := cmd.Flags().GetString("plmnid")
