@@ -20,7 +20,7 @@ import (
 // outward from the specified center.
 func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint, plmnID types.PlmnID,
 	enbStart uint32, pitch float32, maxDistance float64, neighbors int,
-	controllerAddresses []string, serviceModels []string) (*model.Model, error) {
+	controllerAddresses []string, serviceModels []string, singleNode bool) (*model.Model, error) {
 
 	m := &model.Model{
 		PlmnID:        plmnID,
@@ -46,21 +46,26 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	}
 
 	var t, s uint
+	var enbID types.EnbID
+	var nodeName string
+	var node model.Node
 	for t = 0; t < numTowers; t++ {
 		var azOffset int32 = 0
 		if sectorsPerTower == 6 {
 			azOffset = int32(math.Mod(float64(t), 2) * 30)
 		}
 
-		enbID := types.EnbID(enbStart + uint32(t+1))
-		nodeName := fmt.Sprintf("node%d", t+1)
+		if !singleNode || t == 0 {
+			enbID = types.EnbID(enbStart + uint32(t+1))
+			nodeName = fmt.Sprintf("node%d", t+1)
 
-		node := model.Node{
-			EnbID:         enbID,
-			Controllers:   controllers,
-			ServiceModels: models,
-			Cells:         make([]types.ECGI, 0, sectorsPerTower),
-			Status:        "stopped",
+			node = model.Node{
+				EnbID:         enbID,
+				Controllers:   controllers,
+				ServiceModels: models,
+				Cells:         make([]types.ECGI, 0, sectorsPerTower),
+				Status:        "stopped",
+			}
 		}
 
 		for s = 0; s < sectorsPerTower; s++ {
