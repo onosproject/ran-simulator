@@ -19,7 +19,7 @@ import (
 // GenerateHoneycombTopology generates a set of simulated nodes and cells organized in a honeycomb
 // outward from the specified center.
 func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint, plmnID types.PlmnID,
-	enbStart uint32, pitch float32, maxDistance float64, neighbors int,
+	enbStart uint32, pitch float32, maxDistance float64, maxNeighbors int,
 	controllerAddresses []string, serviceModels []string, singleNode bool) (*model.Model, error) {
 
 	m := &model.Model{
@@ -70,6 +70,9 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 
 		for s = 0; s < sectorsPerTower; s++ {
 			cellID := types.CellID(s + 1)
+			if singleNode && sectorsPerTower == 1 {
+				cellID = types.CellID(t + 1)
+			}
 			cellName := fmt.Sprintf("cell%d", (t*sectorsPerTower)+s+1)
 
 			azimuth := azOffset
@@ -78,7 +81,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 			}
 
 			cell := model.Cell{
-				ECGI: types.ToECGI(plmnID, types.ToECI(node.EnbID, cellID)),
+				ECGI: types.ToECGI(plmnID, types.ToECI(enbID, cellID)),
 				Sector: model.Sector{
 					Center: model.Coordinate{
 						Lat: mapCenter.Lat + points[t].Lat,
@@ -87,7 +90,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 					Arc:     arc},
 				Color:     "green",
 				MaxUEs:    99999,
-				Neighbors: nil,
+				Neighbors: make([]types.ECGI, 0, sectorsPerTower),
 				TxPowerDB: 11,
 			}
 
@@ -101,7 +104,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	// Add cells neighbors
 	for cellName, cell := range m.Cells {
 		for _, other := range m.Cells {
-			if isNeighbor(cell, other, maxDistance) && len(cell.Neighbors) < neighbors {
+			if cell.ECGI != other.ECGI && isNeighbor(cell, other, maxDistance, sectorsPerTower == 1) && len(cell.Neighbors) < maxNeighbors {
 				cell.Neighbors = append(cell.Neighbors, other.ECGI)
 			}
 		}
@@ -134,10 +137,10 @@ func generateServiceModels(namesAndIDs []string) map[string]model.ServiceModel {
 }
 
 // Cells are neighbors if their sectors have the same coordinates or if their center arc vectors fall within a distance/2
-func isNeighbor(cell model.Cell, other model.Cell, maxDistance float64) bool {
-	return (cell.ECGI != other.ECGI) &&
-		((cell.Sector.Center.Lat == other.Sector.Center.Lat && cell.Sector.Center.Lng == other.Sector.Center.Lng) ||
-			distance(reachPoint(cell.Sector, maxDistance), reachPoint(other.Sector, maxDistance)) <= maxDistance/2)
+func isNeighbor(cell model.Cell, other model.Cell, maxDistance float64, onlyDistance bool) bool {
+	return (cell.Sector.Center.Lat == other.Sector.Center.Lat && cell.Sector.Center.Lng == other.Sector.Center.Lng) ||
+		(onlyDistance && distance(cell.Sector.Center, other.Sector.Center) <= maxDistance) ||
+		distance(reachPoint(cell.Sector, maxDistance), reachPoint(other.Sector, maxDistance)) <= maxDistance/2
 }
 
 // Calculate the end-point of the center arc vector a distance from the sector center
