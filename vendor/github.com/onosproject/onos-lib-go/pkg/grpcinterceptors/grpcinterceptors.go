@@ -16,10 +16,10 @@ package grpcinterceptors
 
 import (
 	"context"
-
+	"fmt"
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/onosproject/onos-lib-go/pkg/auth"
-
-	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"strings"
 
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 )
@@ -29,12 +29,8 @@ const (
 	ContextMetadataTokenKey = "bearer"
 )
 
-var log = logging.GetLogger("interceptors")
-
 // AuthenticationInterceptor an interceptor for authentication
 func AuthenticationInterceptor(ctx context.Context) (context.Context, error) {
-	log.Info("Authenticating the user")
-
 	// Extract token from metadata in the context
 	tokenString, err := grpc_auth.AuthFromMD(ctx, ContextMetadataTokenKey)
 	if err != nil {
@@ -43,11 +39,45 @@ func AuthenticationInterceptor(ctx context.Context) (context.Context, error) {
 
 	// Authenticate the jwt token
 	jwtAuth := new(auth.JwtAuthenticator)
-	_, err = jwtAuth.ParseAndValidate(tokenString)
+	authClaims, err := jwtAuth.ParseAndValidate(tokenString)
 	if err != nil {
 		return ctx, err
 	}
 
-	return ctx, nil
+	niceMd := metautils.ExtractIncoming(ctx)
+	niceMd.Del("authorization")
+	if name, ok := authClaims["name"]; ok {
+		niceMd.Set("name", name.(string))
+	}
+	if email, ok := authClaims["email"]; ok {
+		niceMd.Set("email", email.(string))
+	}
+	if aud, ok := authClaims["aud"]; ok {
+		niceMd.Set("aud", aud.(string))
+	}
+	if exp, ok := authClaims["exp"]; ok {
+		niceMd.Set("exp", fmt.Sprintf("%s", exp))
+	}
+	if iat, ok := authClaims["iat"]; ok {
+		niceMd.Set("iat", fmt.Sprintf("%s", iat))
+	}
+	if iss, ok := authClaims["iss"]; ok {
+		niceMd.Set("iss", iss.(string))
+	}
+	if sub, ok := authClaims["sub"]; ok {
+		niceMd.Set("sub", sub.(string))
+	}
+	if atHash, ok := authClaims["at_hash"]; ok {
+		niceMd.Set("at_hash", atHash.(string))
+	}
 
+	groupsIf, ok := authClaims["groups"].([]interface{})
+	if ok {
+		groups := make([]string, 0)
+		for _, g := range groupsIf {
+			groups = append(groups, g.(string))
+		}
+		niceMd.Set("groups", strings.Join(groups, ";"))
+	}
+	return niceMd.ToIncoming(ctx), nil
 }

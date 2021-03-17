@@ -67,7 +67,7 @@ func (j *JwtAuthenticator) parseToken(tokenString string) (*jwt.Token, jwt.MapCl
 		} else if strings.HasPrefix(token.Method.Alg(), RS) {
 			keyID, ok := token.Header["kid"]
 			if !ok {
-				return nil, fmt.Errorf("header not found 'kid' (key ID)")
+				return nil, status.Errorf(codes.Unauthenticated, "token header not found 'kid' (key ID)")
 			}
 			keyIDStr := keyID.(string)
 			publicKey, ok := j.publicKeys[keyIDStr]
@@ -75,20 +75,20 @@ func (j *JwtAuthenticator) parseToken(tokenString string) (*jwt.Token, jwt.MapCl
 				// Keys may have been refreshed on the server
 				// Fetch them again and try once more before failing
 				if err := j.refreshJwksKeys(); err != nil {
-					return nil, fmt.Errorf("unable to refresh keys from ID provider %s", err)
+					return nil, status.Errorf(codes.Unauthenticated, "unable to refresh keys from ID provider %s", err)
 				}
 				// try again after refresh
 				if publicKey, ok = j.publicKeys[keyIDStr]; !ok {
-					return nil, fmt.Errorf("key ID %s not found in keys", keyID)
+					return nil, status.Errorf(codes.Unauthenticated, "token has obsolete key ID %s", keyID)
 				}
 			}
 			rsaPublicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKey)
 			if err != nil {
-				return nil, err
+				return nil, status.Errorf(codes.Unauthenticated, err.Error())
 			}
 			return rsaPublicKey, nil
 		}
-		return nil, fmt.Errorf("unknown signining algorithm: %s", token.Method.Alg())
+		return nil, status.Errorf(codes.Unauthenticated, "unknown signing algorithm: %s", token.Method.Alg())
 	})
 
 	return token, claims, err
@@ -106,7 +106,7 @@ func (j *JwtAuthenticator) ParseAndValidate(tokenString string) (jwt.MapClaims, 
 
 	// Check the token is valid
 	if !token.Valid {
-		return nil, status.Error(codes.Unauthenticated, "token is not valid")
+		return nil, status.Errorf(codes.Unauthenticated, "token is not valid %v", token)
 	}
 
 	return claims, nil

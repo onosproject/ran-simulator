@@ -57,4 +57,7 @@ func TestCells(t *testing.T) {
 	cellEvent = <-ch
 	assert.Equal(t, Deleted, cellEvent.Type)
 
+	cellStore.Clear(ctx)
+	ids, _ := cellStore.List(ctx)
+	assert.Equal(t, 0, len(ids), "should be empty")
 }

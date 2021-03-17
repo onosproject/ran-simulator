@@ -43,6 +43,7 @@ type Service interface {
 type Server struct {
 	cfg      *ServerConfig
 	services []Service
+	server   *grpc.Server
 }
 
 // SecurityConfig security configuration
@@ -155,12 +156,22 @@ func (s *Server) Serve(started func(string)) error {
 
 	}
 
-	server := grpc.NewServer(opts...)
+	s.server = grpc.NewServer(opts...)
 	for i := range s.services {
-		s.services[i].Register(server)
+		s.services[i].Register(s.server)
 	}
 	started(lis.Addr().String())
 
 	log.Infof("Starting RPC server on address: %s", lis.Addr().String())
-	return server.Serve(lis)
+	return s.server.Serve(lis)
+}
+
+// Stop stops the server.
+func (s *Server) Stop() {
+	s.server.Stop()
+}
+
+// GracefulStop stops the server gracefully.
+func (s *Server) GracefulStop() {
+	s.server.GracefulStop()
 }
