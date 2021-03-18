@@ -12,7 +12,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	// "google.golang.org/protobuf/proto"
 
-	e2smkpmies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-ies"
+	e2smkpmies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 )
 
 // Header indication header for kpm service model
