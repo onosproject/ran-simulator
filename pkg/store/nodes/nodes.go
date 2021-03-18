@@ -88,6 +88,8 @@ func NewNodeRegistry(nodes map[string]model.Node) Store {
 
 // Load add all nodes from the specified node map; no events will be generated
 func (s *store) Load(ctx context.Context, nodes map[string]model.Node) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	// Copy the nodes into our own map
 	for _, n := range nodes {
 		node := n // avoids scopelint issue

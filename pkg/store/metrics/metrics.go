@@ -66,6 +66,8 @@ func NewMetricsStore() Store {
 
 // Clear clears all metrics; no events will be generated
 func (s *store) Clear(ctx context.Context) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	for key := range s.metrics {
 		delete(s.metrics, key)
 	}

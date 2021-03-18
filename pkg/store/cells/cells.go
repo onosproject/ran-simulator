@@ -87,6 +87,8 @@ func NewCellRegistry(cells map[string]model.Cell, nodeStore nodes.Store) Store {
 
 // Load add all cells from the specified cell map; no events will be generated
 func (s *store) Load(ctx context.Context, cells map[string]model.Cell) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	// Copy the Cells into our own map
 	for _, c := range cells {
 		cell := c // avoids scopelint issue
@@ -96,6 +98,8 @@ func (s *store) Load(ctx context.Context, cells map[string]model.Cell) {
 
 // Clear removes all cells; no events will be generated
 func (s *store) Clear(ctx context.Context) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	for id := range s.cells {
 		delete(s.cells, id)
 	}
