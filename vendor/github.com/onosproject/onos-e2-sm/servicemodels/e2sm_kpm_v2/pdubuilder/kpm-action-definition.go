@@ -5,10 +5,10 @@ package pdubuilder
 
 import (
 	"fmt"
-	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-ies"
+	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 )
 
-func CreateE2SmKpmActionDefinition(ricStyleType int32,
+func CreateE2SmKpmActionDefinitionFormat1(ricStyleType int32,
 	actionDefinition *e2sm_kpm_v2.E2SmKpmActionDefinitionFormat1) (*e2sm_kpm_v2.E2SmKpmActionDefinition, error) {
 
 	e2SmKpmPdu := e2sm_kpm_v2.E2SmKpmActionDefinition{
@@ -17,6 +17,42 @@ func CreateE2SmKpmActionDefinition(ricStyleType int32,
 		},
 		E2SmKpmActionDefinition: &e2sm_kpm_v2.E2SmKpmActionDefinition_ActionDefinitionFormat1{
 			ActionDefinitionFormat1: actionDefinition,
+		},
+	}
+
+	if err := e2SmKpmPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmKpmActionDefinition %s", err.Error())
+	}
+	return &e2SmKpmPdu, nil
+}
+
+func CreateE2SmKpmActionDefinitionFormat2(ricStyleType int32,
+	actionDefinitionFormat2 *e2sm_kpm_v2.E2SmKpmActionDefinitionFormat2) (*e2sm_kpm_v2.E2SmKpmActionDefinition, error) {
+
+	e2SmKpmPdu := e2sm_kpm_v2.E2SmKpmActionDefinition{
+		RicStyleType: &e2sm_kpm_v2.RicStyleType{
+			Value: ricStyleType,
+		},
+		E2SmKpmActionDefinition: &e2sm_kpm_v2.E2SmKpmActionDefinition_ActionDefinitionFormat2{
+			ActionDefinitionFormat2: actionDefinitionFormat2,
+		},
+	}
+
+	if err := e2SmKpmPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmKpmActionDefinition %s", err.Error())
+	}
+	return &e2SmKpmPdu, nil
+}
+
+func CreateE2SmKpmActionDefinitionFormat3(ricStyleType int32,
+	actionDefinitionFormat3 *e2sm_kpm_v2.E2SmKpmActionDefinitionFormat3) (*e2sm_kpm_v2.E2SmKpmActionDefinition, error) {
+
+	e2SmKpmPdu := e2sm_kpm_v2.E2SmKpmActionDefinition{
+		RicStyleType: &e2sm_kpm_v2.RicStyleType{
+			Value: ricStyleType,
+		},
+		E2SmKpmActionDefinition: &e2sm_kpm_v2.E2SmKpmActionDefinition_ActionDefinitionFormat3{
+			ActionDefinitionFormat3: actionDefinitionFormat3,
 		},
 	}
 
@@ -47,6 +83,45 @@ func CreateActionDefinitionFormat1(cellObjID string, measInfoList *e2sm_kpm_v2.M
 	}
 
 	return &actionDefinitionFormat1, nil
+}
+
+func CreateActionDefinitionFormat2(ueID string, actionDefinitionFormat1 *e2sm_kpm_v2.E2SmKpmActionDefinitionFormat1) (*e2sm_kpm_v2.E2SmKpmActionDefinitionFormat2, error) {
+
+	actionDefinitionFormat2 := e2sm_kpm_v2.E2SmKpmActionDefinitionFormat2{
+		UeId: &e2sm_kpm_v2.UeIdentity{
+			Value: ueID,
+		},
+		SubscriptInfo: actionDefinitionFormat1,
+	}
+
+	if err := actionDefinitionFormat2.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmKpmActionDefinitionFormat2 %s", err.Error())
+	}
+
+	return &actionDefinitionFormat2, nil
+}
+
+func CreateActionDefinitionFormat3(cellObjID string, measCondList *e2sm_kpm_v2.MeasurementCondList,
+	granularity int32, subID int64) (*e2sm_kpm_v2.E2SmKpmActionDefinitionFormat3, error) {
+
+	actionDefinitionFormat3 := e2sm_kpm_v2.E2SmKpmActionDefinitionFormat3{
+		CellObjId: &e2sm_kpm_v2.CellObjectId{
+			Value: cellObjID,
+		},
+		MeasCondList: measCondList,
+		GranulPeriod: &e2sm_kpm_v2.GranularityPeriod{
+			Value: granularity,
+		},
+		SubscriptId: &e2sm_kpm_v2.SubscriptionId{
+			Value: subID,
+		},
+	}
+
+	if err := actionDefinitionFormat3.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmKpmActionDefinitionFormat3 %s", err.Error())
+	}
+
+	return &actionDefinitionFormat3, nil
 }
 
 func CreateMeasurementInfoItem(measType *e2sm_kpm_v2.MeasurementType, labelInfoList *e2sm_kpm_v2.LabelInfoList) (*e2sm_kpm_v2.MeasurementInfoItem, error) {
@@ -95,7 +170,7 @@ func CreateMeasurementTypeMeasName(measName string) (*e2sm_kpm_v2.MeasurementTyp
 	return &measType, nil
 }
 
-func CreateLabelInfoItem(plmnID []byte, sst []byte, sd []byte, fiveQI int32, qci int32, qciMax int32, qciMin int32,
+func CreateLabelInfoItem(plmnID []byte, sst []byte, sd []byte, fiveQI int32, qfi int32, qci int32, qciMax int32, qciMin int32,
 	arpMax int32, arpMin int32, bitrateRange int32, layerMuMimo int32, distX int32, distY int32, distZ int32,
 	startEndIndication e2sm_kpm_v2.StartEndInd) (*e2sm_kpm_v2.LabelInfoItem, error) {
 
@@ -114,6 +189,27 @@ func CreateLabelInfoItem(plmnID []byte, sst []byte, sd []byte, fiveQI int32, qci
 	if arpMin < 1 && arpMin > 15 {
 		return nil, fmt.Errorf("error: ARP values must be in rang [1, 15]")
 	}
+	if arpMin > arpMax {
+		return nil, fmt.Errorf("error: ARPmin should be less than ARPmax")
+	}
+	if qfi < 0 && qfi > 63 {
+		return nil, fmt.Errorf("error: QFI values must be in rang [1, 63]")
+	}
+	if qci < 0 && qci > 255 {
+		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
+	}
+	if qciMax < 0 && qciMax > 255 {
+		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
+	}
+	if qciMin < 0 && qciMin > 255 {
+		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
+	}
+	if fiveQI < 0 && fiveQI > 255 {
+		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
+	}
+	if qciMin > qciMax {
+		return nil, fmt.Errorf("error: QCImin should be less than QCImax")
+	}
 
 	labelInfoItem := e2sm_kpm_v2.LabelInfoItem{
 		MeasLabel: &e2sm_kpm_v2.MeasurementLabel{
@@ -126,6 +222,9 @@ func CreateLabelInfoItem(plmnID []byte, sst []byte, sd []byte, fiveQI int32, qci
 			},
 			FiveQi: &e2sm_kpm_v2.FiveQi{
 				Value: fiveQI,
+			},
+			QFi: &e2sm_kpm_v2.Qfi{
+				Value: qfi,
 			},
 			QCi: &e2sm_kpm_v2.Qci{
 				Value: qci,
@@ -158,4 +257,166 @@ func CreateLabelInfoItem(plmnID []byte, sst []byte, sd []byte, fiveQI int32, qci
 	}
 
 	return &labelInfoItem, nil
+}
+func CreateMeasurementCondItem(measType *e2sm_kpm_v2.MeasurementType, measCondList *e2sm_kpm_v2.MatchingCondList) (*e2sm_kpm_v2.MeasurementCondItem, error) {
+
+	measCondItem := e2sm_kpm_v2.MeasurementCondItem{
+		MeasType:     measType,
+		MatchingCond: measCondList,
+	}
+
+	if err := measCondItem.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating MeasurementCondItem %s", err.Error())
+	}
+	return &measCondItem, nil
+}
+
+func CreateMatchingCondItemMeasLabel(measLabel *e2sm_kpm_v2.MeasurementLabel) (*e2sm_kpm_v2.MatchingCondItem, error) {
+
+	res := e2sm_kpm_v2.MatchingCondItem{
+		MatchingCondItem: &e2sm_kpm_v2.MatchingCondItem_MeasLabel{
+			MeasLabel: measLabel,
+		},
+	}
+
+	if err := res.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating MatchingCondItem (MeasLabel) %s", err.Error())
+	}
+	return &res, nil
+}
+
+func CreateMatchingCondItemTestCondInfo(testCondInfo *e2sm_kpm_v2.TestCondInfo) (*e2sm_kpm_v2.MatchingCondItem, error) {
+
+	res := e2sm_kpm_v2.MatchingCondItem{
+		MatchingCondItem: &e2sm_kpm_v2.MatchingCondItem_TestCondInfo{
+			TestCondInfo: testCondInfo,
+		},
+	}
+
+	if err := res.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating MatchingCondItem (TestCondInfo) %s", err.Error())
+	}
+	return &res, nil
+}
+
+func CreateTestCondInfo(tct *e2sm_kpm_v2.TestCondType, tce e2sm_kpm_v2.TestCondExpression, tcv *e2sm_kpm_v2.TestCondValue) (*e2sm_kpm_v2.TestCondInfo, error) {
+
+	tci := e2sm_kpm_v2.TestCondInfo{
+		TestValue: tcv,
+		TestExpr:  tce,
+		TestType:  tct,
+	}
+
+	if err := tci.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating TestCondInfo (TestCondInfo) %s", err.Error())
+	}
+	return &tci, nil
+}
+
+func CreateTestCondTypeGBR() *e2sm_kpm_v2.TestCondType {
+
+	return &e2sm_kpm_v2.TestCondType{
+		TestCondType: &e2sm_kpm_v2.TestCondType_GBr{
+			GBr: e2sm_kpm_v2.GBR_GBR_TRUE,
+		},
+	}
+}
+
+func CreateTestCondTypeAMBR() *e2sm_kpm_v2.TestCondType {
+
+	return &e2sm_kpm_v2.TestCondType{
+		TestCondType: &e2sm_kpm_v2.TestCondType_AMbr{
+			AMbr: e2sm_kpm_v2.AMBR_AMBR_TRUE,
+		},
+	}
+}
+
+func CreateTestCondTypeIsStat() *e2sm_kpm_v2.TestCondType {
+
+	return &e2sm_kpm_v2.TestCondType{
+		TestCondType: &e2sm_kpm_v2.TestCondType_IsStat{
+			IsStat: e2sm_kpm_v2.ISSTAT_ISSTAT_TRUE,
+		},
+	}
+}
+
+func CreateTestCondTypeIsCatM() *e2sm_kpm_v2.TestCondType {
+
+	return &e2sm_kpm_v2.TestCondType{
+		TestCondType: &e2sm_kpm_v2.TestCondType_IsCatM{
+			IsCatM: e2sm_kpm_v2.ISCATM_ISCATM_TRUE,
+		},
+	}
+}
+
+func CreateTestCondTypeRSRP() *e2sm_kpm_v2.TestCondType {
+
+	return &e2sm_kpm_v2.TestCondType{
+		TestCondType: &e2sm_kpm_v2.TestCondType_RSrp{
+			RSrp: e2sm_kpm_v2.RSRP_RSRP_TRUE,
+		},
+	}
+}
+
+func CreateTestCondTypeRSRQ() *e2sm_kpm_v2.TestCondType {
+
+	return &e2sm_kpm_v2.TestCondType{
+		TestCondType: &e2sm_kpm_v2.TestCondType_RSrq{
+			RSrq: e2sm_kpm_v2.RSRQ_RSRQ_TRUE,
+		},
+	}
+}
+
+func CreateTestCondValueInt(val int64) *e2sm_kpm_v2.TestCondValue {
+
+	return &e2sm_kpm_v2.TestCondValue{
+		TestCondValue: &e2sm_kpm_v2.TestCondValue_ValueInt{
+			ValueInt: val,
+		},
+	}
+}
+
+func CreateTestCondValueEnum(val int64) *e2sm_kpm_v2.TestCondValue {
+
+	return &e2sm_kpm_v2.TestCondValue{
+		TestCondValue: &e2sm_kpm_v2.TestCondValue_ValueEnum{
+			ValueEnum: val,
+		},
+	}
+}
+
+func CreateTestCondValueBool(val bool) *e2sm_kpm_v2.TestCondValue {
+
+	return &e2sm_kpm_v2.TestCondValue{
+		TestCondValue: &e2sm_kpm_v2.TestCondValue_ValueBool{
+			ValueBool: val,
+		},
+	}
+}
+
+func CreateTestCondValueBitS(val *e2sm_kpm_v2.BitString) *e2sm_kpm_v2.TestCondValue {
+
+	return &e2sm_kpm_v2.TestCondValue{
+		TestCondValue: &e2sm_kpm_v2.TestCondValue_ValueBitS{
+			ValueBitS: val,
+		},
+	}
+}
+
+func CreateTestCondValueOctS(val string) *e2sm_kpm_v2.TestCondValue {
+
+	return &e2sm_kpm_v2.TestCondValue{
+		TestCondValue: &e2sm_kpm_v2.TestCondValue_ValueOctS{
+			ValueOctS: val,
+		},
+	}
+}
+
+func CreateTestCondValuePrtS(val string) *e2sm_kpm_v2.TestCondValue {
+
+	return &e2sm_kpm_v2.TestCondValue{
+		TestCondValue: &e2sm_kpm_v2.TestCondValue_ValuePrtS{
+			ValuePrtS: val,
+		},
+	}
 }
