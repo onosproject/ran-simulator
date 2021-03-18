@@ -342,7 +342,7 @@ github.com/onosproject/helmit/pkg/util/logging
 github.com/onosproject/helmit/pkg/util/random
 # github.com/onosproject/onos-api v0.7.14
 ## explicit
-# github.com/onosproject/onos-api/go v0.7.14
+# github.com/onosproject/onos-api/go v0.7.17
 ## explicit
 github.com/onosproject/onos-api/go/onos/e2sub/endpoint
 github.com/onosproject/onos-api/go/onos/e2sub/subscription
@@ -383,7 +383,7 @@ github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/asn1cgo
 github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types
 github.com/onosproject/onos-e2t/pkg/utils/async
 github.com/onosproject/onos-e2t/test/utils
-# github.com/onosproject/onos-lib-go v0.7.0
+# github.com/onosproject/onos-lib-go v0.7.7
 ## explicit
 github.com/onosproject/onos-lib-go/api/logging
 github.com/onosproject/onos-lib-go/pkg/auth

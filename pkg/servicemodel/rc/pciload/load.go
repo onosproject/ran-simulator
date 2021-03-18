@@ -5,6 +5,7 @@
 package pciload
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -35,15 +36,14 @@ type PciRange struct {
 	Max uint32 `mapstructure:"max" yaml:"max"`
 }
 
-// LoadPCIMetrics loads model with data in "metrics" yaml file
+// LoadPCIMetrics loads metrics with data in "metrics" yaml file
 func LoadPCIMetrics(store metrics.Store) error {
 	return LoadPCIMetricsConfig(store, "metrics")
 }
 
-// LoadPCIMetricsConfig loads model with data in the named configuration
+// LoadPCIMetricsConfig loads metrics with data in the named configuration
 func LoadPCIMetricsConfig(store metrics.Store, configName string) error {
-	log.Infof("Loading initial PCI metrics from %s...", configName)
-	var err error
+	log.Infof("Loading PCI metrics from %s...", configName)
 
 	model.ViperConfigure(configName)
 
@@ -52,18 +52,36 @@ func LoadPCIMetricsConfig(store metrics.Store, configName string) error {
 		return err
 	}
 
+	return unmarshal(store)
+}
+
+// LoadPCIMetricsData loads metrics with data in the specified bytes
+func LoadPCIMetricsData(store metrics.Store, metricsData []byte) error {
+	log.Infof("Loading PCI metrics from bytes...")
+
+	// Set the file type of the configurations file
+	viper.SetConfigType("yaml")
+
+	if err := viper.ReadConfig(bytes.NewBuffer(metricsData)); err != nil {
+		log.Errorf("Unable to read metrics config: %v", err)
+		return err
+	}
+
+	return unmarshal(store)
+}
+
+func unmarshal(store metrics.Store) error {
 	const key string = "rc.pci"
 	if !viper.IsSet(key) {
 		log.Infof("PCI metrics not found. skipping...")
 	}
 
 	pcis := &PciMetrics{}
-	err = viper.UnmarshalKey(key, pcis)
-	if err != nil {
+	if err := viper.UnmarshalKey(key, pcis); err != nil {
 		return err
 	}
 
-	log.Infof("Storing initial PCI metrics for %d cells...", len(pcis.Cells))
+	log.Infof("Storing PCI metrics for %d cells...", len(pcis.Cells))
 
 	ctx := context.Background()
 	for ecgi, m := range pcis.Cells {
@@ -74,5 +92,5 @@ func LoadPCIMetricsConfig(store metrics.Store, configName string) error {
 		_ = store.Set(ctx, id, "pcipool", m.PciPool)
 	}
 
-	return err
+	return nil
 }

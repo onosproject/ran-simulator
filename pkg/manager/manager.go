@@ -5,10 +5,12 @@
 package manager
 
 import (
+	"context"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	cellapi "github.com/onosproject/ran-simulator/pkg/api/cells"
 	metricsapi "github.com/onosproject/ran-simulator/pkg/api/metrics"
+	modelapi "github.com/onosproject/ran-simulator/pkg/api/model"
 	nodeapi "github.com/onosproject/ran-simulator/pkg/api/nodes"
 	"github.com/onosproject/ran-simulator/pkg/api/trafficsim"
 	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
@@ -57,6 +59,7 @@ func NewManager(config *Config) (*Manager, error) {
 
 // Manager is a manager for the E2T service
 type Manager struct {
+	modelapi.ManagementDelegate
 	config              Config
 	agents              *agents.E2Agents
 	model               *model.Model
@@ -85,20 +88,8 @@ func (m *Manager) Start() error {
 		return err
 	}
 
-	// Create the node registry primed with the pre-loaded nodes
-	m.nodeStore = nodes.NewNodeRegistry(m.model.Nodes)
-
-	// Create the cell registry primed with the pre-loaded cells
-	m.cellStore = cells.NewCellRegistry(m.model.Cells, m.nodeStore)
-
-	// Create the UE registry primed with the specified number of UEs
-	m.ueStore = ues.NewUERegistry(m.model.UECount, m.cellStore)
-
-	// Create store for tracking arbitrary metrics and attributes for nodes, cells and UEs
-	m.metricsStore = metrics.NewMetricsStore()
-
-	// Load additional initial use-case data; ignore errors
-	_ = pciload.LoadPCIMetrics(m.metricsStore)
+	m.initModelStores()
+	m.initMetricStore()
 
 	// Start gRPC server
 	err = m.startNorthboundServer()
@@ -112,6 +103,32 @@ func (m *Manager) Start() error {
 	}
 
 	return nil
+}
+
+// Close kills the channels and manager related objects
+func (m *Manager) Close() {
+	log.Info("Closing Manager")
+	m.stopE2Agents()
+	m.stopNorthboundServer()
+}
+
+func (m *Manager) initModelStores() {
+	// Create the node registry primed with the pre-loaded nodes
+	m.nodeStore = nodes.NewNodeRegistry(m.model.Nodes)
+
+	// Create the cell registry primed with the pre-loaded cells
+	m.cellStore = cells.NewCellRegistry(m.model.Cells, m.nodeStore)
+
+	// Create the UE registry primed with the specified number of UEs
+	m.ueStore = ues.NewUERegistry(m.model.UECount, m.cellStore)
+}
+
+func (m *Manager) initMetricStore() {
+	// Create store for tracking arbitrary metrics and attributes for nodes, cells and UEs
+	m.metricsStore = metrics.NewMetricsStore()
+
+	// Load additional initial use-case data; ignore errors
+	_ = pciload.LoadPCIMetrics(m.metricsStore)
 }
 
 // startSouthboundServer starts the northbound gRPC server
@@ -129,6 +146,7 @@ func (m *Manager) startNorthboundServer() error {
 	m.server.AddService(cellapi.NewService(m.cellStore))
 	m.server.AddService(trafficsim.NewService(m.model, m.cellStore, m.ueStore))
 	m.server.AddService(metricsapi.NewService(m.metricsStore))
+	m.server.AddService(modelapi.NewService(m))
 
 	doneCh := make(chan error)
 	go func() {
@@ -161,13 +179,43 @@ func (m *Manager) startE2Agents() error {
 	return nil
 }
 
-// Close kills the channels and manager related objects
-func (m *Manager) Close() {
-	log.Info("Closing Manager")
+func (m *Manager) stopE2Agents() {
 	_ = m.agents.Stop()
-	m.stopNorthboundServer()
 }
 
 func (m *Manager) stopNorthboundServer() {
-	// TODO implementation requires ability to actually stop the server
+	m.server.Stop()
+}
+
+// PauseAndClear pauses simulation and clears the model
+func (m *Manager) PauseAndClear(ctx context.Context) {
+	m.stopE2Agents()
+	m.nodeStore.Clear(ctx)
+	m.cellStore.Clear(ctx)
+	m.metricsStore.Clear(ctx)
+}
+
+// LoadModel loads the new model into the simulator
+func (m *Manager) LoadModel(ctx context.Context, data []byte) error {
+	m.model = &model.Model{}
+	if err := model.LoadConfigFromBytes(m.model, data); err != nil {
+		return err
+	}
+	m.initModelStores()
+	return nil
+}
+
+// LoadMetrics loads new metrics into the simulator
+func (m *Manager) LoadMetrics(ctx context.Context, name string, data []byte) error {
+	if name == "rc.pci" {
+		if err := pciload.LoadPCIMetricsData(m.metricsStore, data); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Resume resume the simulation
+func (m *Manager) Resume(ctx context.Context) {
+	_ = m.startE2Agents()
 }

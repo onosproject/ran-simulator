@@ -38,6 +38,9 @@ type Store interface {
 
 	// WatchMetrics monitors changes to the metrics
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
+
+	// Clear clears all metrics; no events will be generated
+	Clear(ctx context.Context)
 }
 
 // WatchOptions allows tailoring the WatchNodes behaviour
@@ -58,6 +61,15 @@ func NewMetricsStore() Store {
 		mu:       sync.RWMutex{},
 		metrics:  make(map[Key]interface{}),
 		watchers: watchers,
+	}
+}
+
+// Clear clears all metrics; no events will be generated
+func (s *store) Clear(ctx context.Context) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for key := range s.metrics {
+		delete(s.metrics, key)
 	}
 }
 

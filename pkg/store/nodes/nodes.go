@@ -39,17 +39,23 @@ type Store interface {
 	// Watch watches the node inventory events using the supplied channel
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
 
-	// List list the nodes
+	// List lists the nodes
 	List(ctx context.Context) ([]*model.Node, error)
 
-	// Len number of nodes
+	// Len returns number of nodes
 	Len(ctx context.Context) (int, error)
 
 	// SetsStatus changes the E2 node agent status value
 	SetStatus(ctx context.Context, enbID types.EnbID, status string) error
 
-	// Prune the node that has the specified cell
+	// PruneCell  the node that has the specified cell
 	PruneCell(ctx context.Context, ecgi types.ECGI) error
+
+	// Load add all nodes from the specified node map; no events will be generated
+	Load(ctx context.Context, nodes map[string]model.Node)
+
+	// Clear removes all nodes; no events will be generated
+	Clear(ctx context.Context)
 }
 
 // WatchOptions allows tailoring the WatchNodes behaviour
@@ -74,14 +80,30 @@ func NewNodeRegistry(nodes map[string]model.Node) Store {
 		watchers: watchers,
 	}
 
-	// Copy the nodes into our own map
-	for _, n := range nodes {
-		node := n // avoids scopelint issue
-		reg.nodes[node.EnbID] = &node
-	}
+	reg.Load(context.Background(), nodes)
 
 	log.Infof("Created registry primed with %d nodes", len(reg.nodes))
 	return reg
+}
+
+// Load add all nodes from the specified node map; no events will be generated
+func (s *store) Load(ctx context.Context, nodes map[string]model.Node) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Copy the nodes into our own map
+	for _, n := range nodes {
+		node := n // avoids scopelint issue
+		s.nodes[node.EnbID] = &node
+	}
+}
+
+// Clear removes all nodes; no events will be generated
+func (s *store) Clear(ctx context.Context) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for id := range s.nodes {
+		delete(s.nodes, id)
+	}
 }
 
 // Add adds a new node

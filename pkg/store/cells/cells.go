@@ -47,6 +47,12 @@ type Store interface {
 
 	// GetRandomCell retrieves a random cell from the registry
 	GetRandomCell() (*model.Cell, error)
+
+	// Load add all cells from the specified cell map; no events will be generated
+	Load(ctx context.Context, nodes map[string]model.Cell)
+
+	// Clear removes all cells; no events will be generated
+	Clear(ctx context.Context)
 }
 
 // WatchOptions allows tailoring the WatchCells behaviour
@@ -73,14 +79,30 @@ func NewCellRegistry(cells map[string]model.Cell, nodeStore nodes.Store) Store {
 		watchers:  watchers,
 	}
 
-	// Copy the Cells into our own map
-	for _, c := range cells {
-		cell := c // avoids scopelint issue
-		reg.cells[cell.ECGI] = &cell
-	}
+	reg.Load(context.Background(), cells)
 
 	log.Infof("Created registry primed with %d cells", len(reg.cells))
 	return reg
+}
+
+// Load add all cells from the specified cell map; no events will be generated
+func (s *store) Load(ctx context.Context, cells map[string]model.Cell) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Copy the Cells into our own map
+	for _, c := range cells {
+		cell := c // avoids scopelint issue
+		s.cells[cell.ECGI] = &cell
+	}
+}
+
+// Clear removes all cells; no events will be generated
+func (s *store) Clear(ctx context.Context) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for id := range s.cells {
+		delete(s.cells, id)
+	}
 }
 
 // Add adds a cell

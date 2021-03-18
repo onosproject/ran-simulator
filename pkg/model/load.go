@@ -5,6 +5,7 @@
 package model
 
 import (
+	"bytes"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/spf13/viper"
@@ -51,4 +52,22 @@ func LoadConfig(model *Model, configname string) error {
 // Load the model configuration.
 func Load(model *Model) error {
 	return LoadConfig(model, "model")
+}
+
+// LoadConfigFromBytes Loads model with data in configuration yaml file
+func LoadConfigFromBytes(model *Model, modelData []byte) error {
+	var err error
+	viper.SetConfigType("yaml")
+
+	if err := viper.ReadConfig(bytes.NewBuffer(modelData)); err != nil {
+		log.Errorf("Unable to read %s config: %v", modelData, err)
+		return err
+	}
+
+	err = viper.Unmarshal(model)
+
+	// Convert the MCC-MNC format into numeric PLMNID
+	model.PlmnID = types.PlmnIDFromString(model.Plmn)
+
+	return err
 }

@@ -78,5 +78,9 @@ func TestMetrics(t *testing.T) {
 	name := metricEvent.Key.(Key).Name
 	assert.True(t, name == "bar" || name == "foo")
 
+	store.Clear(ctx)
+	ids, _ := store.ListEntities(ctx)
+	assert.Equal(t, 0, len(ids), "should be empty")
+
 	ctx.Done()
 }
