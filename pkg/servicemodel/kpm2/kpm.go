@@ -7,40 +7,28 @@ package kpm2
 import (
 	"context"
 	"fmt"
-	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-ies"
-	"github.com/onosproject/ran-simulator/pkg/store/nodes"
-	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	"strconv"
-	"time"
-
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-
-	// "github.com/onosproject/ran-simulator/pkg/store/nodes"
-	// "github.com/onosproject/ran-simulator/pkg/store/ues"
-
-	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
-
-	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
-
-	"github.com/onosproject/ran-simulator/pkg/model"
-
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
-	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
-	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
-	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
-
-	"github.com/onosproject/onos-lib-go/pkg/logging"
-
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
-
+	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"github.com/onosproject/ran-simulator/pkg/store/nodes"
+	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
+	"github.com/onosproject/ran-simulator/pkg/store/ues"
+	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
+	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
+	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
 	"google.golang.org/protobuf/proto"
+	"strconv"
+	"time"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -50,7 +38,7 @@ var log = logging.GetLogger("sm", "kpm2")
 const (
 	modelName              = "e2sm_kpm_v2"
 	modelVersion           = "v2"
-	modelOID               = "1.3.6.1.4.1.1.1.2.2.2"
+	modelOID               = "1.3.6.1.4.1.1.1.2.2.98"
 	ricStyleType           = 1
 	ricStyleName           = "Periodic Report"
 	ricFormatType          = 5
