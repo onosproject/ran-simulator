@@ -5,7 +5,7 @@ package pdubuilder
 
 import (
 	"fmt"
-	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-ies"
+	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 )
 
 func CreateE2SmKpmRanfunctionDescription(rfSn string, rfE2SMoid string, rfd string, rfi int32, rknl []*e2sm_kpm_v2.RicKpmnodeItem,
