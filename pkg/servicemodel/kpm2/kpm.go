@@ -38,14 +38,14 @@ var log = logging.GetLogger("sm", "kpm2")
 const (
 	modelName              = "e2sm_kpm_v2"
 	modelVersion           = "v2"
-	modelOID               = "1.3.6.1.4.1.1.1.2.2.98"
+	modelOID               = "1.3.6.1.4.1.53148.1.2.2.2"
 	ricStyleType           = 1
 	ricStyleName           = "Periodic Report"
 	ricFormatType          = 5
 	ricIndMsgFormat        = 1
 	ricIndHdrFormat        = 1
-	ranFunctionDescription = "KPM 2.0 Monitor"
-	ranFunctionShortName   = modelName + "-" + modelVersion
+	ranFunctionDescription = "KPM Monitor"
+	ranFunctionShortName   = "ORAN-E2SM-KPM"
 	ranFunctionE2SmOid     = "OID123"
 	ranFunctionInstance    = 1
 )
