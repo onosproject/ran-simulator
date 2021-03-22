@@ -7,6 +7,9 @@ package registry
 // RanFunctionID Ran function ID
 type RanFunctionID int32
 
+// ModelOid service model OID
+type ModelOid string
+
 // TODO define them using standard Ran function IDs
 const (
 

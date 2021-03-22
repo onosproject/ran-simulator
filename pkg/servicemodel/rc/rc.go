@@ -49,10 +49,9 @@ var _ servicemodel.Client = &Client{}
 var log = logging.GetLogger("sm", "rc")
 
 const (
-	modelFullName = "e2sm_rc_pre-v1"
+	modelFullName = "ORAN-E2SM-RC-PRE"
 	version       = "v1"
-	// TODO - Replace with OID for rc-pre service model
-	modelOID = "1.3.6.1.4.1.1.1.2.99"
+	modelOID      = "1.3.6.1.4.1.53148.1.1.2.100"
 )
 
 // Client rc service model client
@@ -172,7 +171,7 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model,
-	modelPluginRegistry *modelplugins.ModelPluginRegistry,
+	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
@@ -199,7 +198,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	rcSm.Client = rcClient
 
 	var ranFunctionShortName = string(modelFullName)
-	var ranFunctionE2SmOid = "OID124"
+	var ranFunctionE2SmOid = modelOID
 	var ranFunctionDescription = "RC PRE"
 	var ranFunctionInstance int32 = 3
 	var ricEventStyleType int32 = 1
@@ -224,9 +223,9 @@ func NewServiceModel(node model.Node, model *model.Model,
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	rcModelPlugin := modelPluginRegistry.ModelPlugins[modelFullName]
+	rcModelPlugin, _ := modelPluginRegistry.GetPlugin(modelOID)
 	if rcModelPlugin == nil {
-		log.Debug("model plugin names:", modelPluginRegistry.ModelPlugins)
+		log.Debug("model plugin names:", modelPluginRegistry.GetPlugins())
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}
 	ranFuncDescBytes, err := rcModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
@@ -444,7 +443,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		return nil, nil, err
 	}
 	eventTriggerAsnBytes := sub.Details.RicEventTriggerDefinition.Value
-	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelplugins.ModelOid(sm.ServiceModel.OID))
 	eventTriggerProtoBytes, err := rcModelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return nil, nil, err

@@ -42,9 +42,9 @@ type ServiceModel struct {
 	Version             string
 	Description         []byte // ASN1 bytes from Service Model
 	Revision            int
-	OID                 string
+	OID                 ModelOid
 	Client              servicemodel.Client
-	ModelPluginRegistry *modelplugins.ModelPluginRegistry
+	ModelPluginRegistry modelplugins.ModelRegistry
 	Node                model.Node
 	Model               *model.Model
 	Subscriptions       *subscriptions.Subscriptions

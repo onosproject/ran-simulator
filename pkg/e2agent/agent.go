@@ -7,8 +7,9 @@ package e2agent
 import (
 	"context"
 	"fmt"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 	"time"
+
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
@@ -68,7 +69,7 @@ type e2Agent struct {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
+func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
 	reg := registry.NewServiceModelRegistry()

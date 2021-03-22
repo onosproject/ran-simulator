@@ -73,7 +73,7 @@ func (co *ControlOutcome) Build() (*e2sm_rc_pre_ies.E2SmRcPreControlOutcome, err
 }
 
 // ToAsn1Bytes converts to Asn1 bytes
-func (co *ControlOutcome) ToAsn1Bytes(modelPlugin modelplugins.ModelPlugin) ([]byte, error) {
+func (co *ControlOutcome) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
 	outcomeRcMessage, err := co.Build()
 	if err != nil {
 		return nil, err

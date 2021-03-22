@@ -45,9 +45,9 @@ var _ servicemodel.Client = &Client{}
 var log = logging.GetLogger("sm", "kpm")
 
 const (
-	modelFullName = "e2sm_kpm-v1beta1"
-	version       = "v1beta1"
-	modelOID      = "1.3.6.1.4.1.1.1.2.2"
+	modelFullName = "ORAN-E2SM-KPM"
+	version       = "v1"
+	modelOID      = "1.3.6.1.4.1.53148.1.1.2.2"
 )
 
 // Client kpm service model client
@@ -56,7 +56,7 @@ type Client struct {
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
 	modelFullName := modelplugins.ModelFullName(modelFullName)
 	kpmSm := registry.ServiceModel{
@@ -79,7 +79,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 	kpmSm.Client = kpmClient
 
 	var ranFunctionShortName = string(modelFullName)
-	var ranFunctionE2SmOid = "OID123"
+	var ranFunctionE2SmOid = modelOID
 	var ranFunctionDescription = "KPM Monitor"
 	var ranFunctionInstance int32 = 1
 	var ricEventStyleType int32 = 1
@@ -102,7 +102,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	kpmModelPlugin := modelPluginRegistry.ModelPlugins[modelFullName]
+
+	kpmModelPlugin, _ := modelPluginRegistry.GetPlugin(modelOID)
 	if kpmModelPlugin == nil {
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}
@@ -133,7 +134,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		kpmutils.WithSd("SD1"),
 		kpmutils.WithPlmnIDnrcgi(plmnID.Value()))
 
-	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelplugins.ModelOid(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		log.Error(err)
