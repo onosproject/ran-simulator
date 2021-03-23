@@ -62,7 +62,7 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
 	modelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
 	if err != nil {
-		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
+		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelName)
 	}
 
 	return modelPlugin, nil

@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
 	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
@@ -59,7 +61,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
 	kpmSm := registry.ServiceModel{
 		RanFunctionID:       registry.Kpm2,
-		ModelFullName:       ranFunctionShortName,
+		ModelName:           ranFunctionShortName,
 		Revision:            1,
 		OID:                 ranFunctionE2SmOid,
 		Version:             modelVersion,
@@ -211,7 +213,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		kpmutils.WithSd("SD1"),
 		kpmutils.WithPlmnIDnrcgi(plmnID.Value()))
 
-	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelplugins.ModelOid(sm.ServiceModel.OID))
+	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		log.Error(err)
@@ -274,7 +276,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelFullName)
+	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -346,7 +348,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelFullName)
+	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)

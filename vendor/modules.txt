@@ -341,6 +341,9 @@ github.com/onosproject/helmit/pkg/util/files
 github.com/onosproject/helmit/pkg/util/logging
 github.com/onosproject/helmit/pkg/util/random
 # github.com/onosproject/onos-api/go v0.7.17
+# github.com/onosproject/onos-api v0.7.14
+## explicit
+# github.com/onosproject/onos-api/go v0.7.19 => /Users/adibrastegarnia/go/src/github.com/onosproject/onos-api/go
 ## explicit
 github.com/onosproject/onos-api/go/onos/e2sub/endpoint
 github.com/onosproject/onos-api/go/onos/e2sub/subscription
@@ -1039,3 +1042,4 @@ sigs.k8s.io/kustomize/pkg/types
 # sigs.k8s.io/yaml v1.1.0
 sigs.k8s.io/yaml
 # github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200229013735-71373c6105e3
+# github.com/onosproject/onos-api/go => /Users/adibrastegarnia/go/src/github.com/onosproject/onos-api/go

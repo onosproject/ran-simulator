@@ -8,6 +8,8 @@ import (
 	"context"
 	"strconv"
 
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	rcindicationhdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/indication/header"
@@ -276,7 +278,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		rcindicationmsg.WithNeighbours(neighbourList),
 		rcindicationmsg.WithPciPool(pciPool))
 
-	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelplugins.ModelOid(sm.ServiceModel.OID))
+	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
 	if err != nil {
 		log.Error(err)
