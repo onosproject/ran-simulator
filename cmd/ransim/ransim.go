@@ -60,8 +60,8 @@ func main() {
 		CertPath:            *certPath,
 		GRPCPort:            *grpcPort,
 		ServiceModelPlugins: serviceModelPlugins,
-		ModelName: 			 *modelName,
-		MetricName:   		 *metricName,
+		ModelName:           *modelName,
+		MetricName:          *metricName,
 	}
 
 	mgr, err := manager.NewManager(cfg)

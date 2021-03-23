@@ -32,8 +32,8 @@ type Config struct {
 	CertPath            string
 	GRPCPort            int
 	ServiceModelPlugins []string
-	ModelName			string
-	MetricName			string
+	ModelName           string
+	MetricName          string
 }
 
 // NewManager creates a new manager
