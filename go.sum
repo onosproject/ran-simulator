@@ -635,6 +635,17 @@ github.com/onosproject/helmit v0.6.8 h1:f/DjOzQp/NFzbTClM7qn4WwQ5DgR/13OD1FWJ4Vx
 github.com/onosproject/helmit v0.6.8/go.mod h1:EorNGSNGWojXGxBEuiNmPScae+R2C5WYfg/13gKEPLw=
 github.com/onosproject/onos-api v0.7.9 h1:rqk/ymQAZgZET4JuRYSNFi3QFKEu/9wDXd3ZdNuuH+k=
 github.com/onosproject/onos-api v0.7.9/go.mod h1:dZshiDmSU6bt1Pd/yTw6WIx6qHaoz+MVwm+2gVH/BNI=
+<<<<<<< HEAD
+=======
+github.com/onosproject/onos-api v0.7.12 h1:4Wjs+RY9hGoiwo+eAccdAGav+CB4WWwz98eVEIsyqGc=
+github.com/onosproject/onos-api v0.7.12/go.mod h1:dZshiDmSU6bt1Pd/yTw6WIx6qHaoz+MVwm+2gVH/BNI=
+github.com/onosproject/onos-api v0.7.13 h1:v7boxmZ353Nv3VQvUfXFzflrLhoAeIw8N2jAYxox9nw=
+github.com/onosproject/onos-api v0.7.13/go.mod h1:dZshiDmSU6bt1Pd/yTw6WIx6qHaoz+MVwm+2gVH/BNI=
+github.com/onosproject/onos-api v0.7.14 h1:HgK4/VaczbGJ7wA/cxR86wMS64R2ousJmi8jiJ/Cq8g=
+github.com/onosproject/onos-api v0.7.14/go.mod h1:dZshiDmSU6bt1Pd/yTw6WIx6qHaoz+MVwm+2gVH/BNI=
+github.com/onosproject/onos-api v0.7.20 h1:/0tsF0FeBJt3WK5LJQ8evjN5ERwWcDtKEfR4O4dLeDQ=
+github.com/onosproject/onos-api v0.7.20/go.mod h1:dZshiDmSU6bt1Pd/yTw6WIx6qHaoz+MVwm+2gVH/BNI=
+>>>>>>> update api
 github.com/onosproject/onos-api/go v0.7.0 h1:BjfN78bE/TXadUODrkYbaDsb1hyiV90dNiLoIkl5eV0=
 github.com/onosproject/onos-api/go v0.7.0/go.mod h1:HLfWE9aouIeOmi4soR6bxK2cZ33NbnFMvdyv9fmjaSg=
 github.com/onosproject/onos-api/go v0.7.5 h1:fCf5CEYVdfas79UraZP4oP8LrYctO2sLTz31PXEGsYU=
