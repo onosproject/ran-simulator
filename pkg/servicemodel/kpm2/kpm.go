@@ -37,17 +37,15 @@ var _ servicemodel.Client = &Client{}
 var log = logging.GetLogger("sm", "kpm2")
 
 const (
-	modelName              = "ORAN-E2SM-KPM"
 	modelVersion           = "v2"
-	modelOID               = "1.3.6.1.4.1.53148.1.2.2.2"
 	ricStyleType           = 1
 	ricStyleName           = "Periodic Report"
 	ricFormatType          = 5
 	ricIndMsgFormat        = 1
 	ricIndHdrFormat        = 1
 	ranFunctionDescription = "KPM 2.0 Monitor"
-	ranFunctionShortName   = modelName
-	ranFunctionE2SmOid     = modelOID
+	ranFunctionShortName   = "ORAN-E2SM-KPM"
+	ranFunctionE2SmOid     = "1.3.6.1.4.1.53148.1.2.2.2"
 	ranFunctionInstance    = 1
 )
 
@@ -61,7 +59,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
 	kpmSm := registry.ServiceModel{
 		RanFunctionID:       registry.Kpm2,
-		ModelFullName:       modelName,
+		ModelFullName:       ranFunctionShortName,
 		Revision:            1,
 		OID:                 ranFunctionE2SmOid,
 		Version:             modelVersion,
@@ -183,7 +181,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	kpmModelPlugin, _ := modelPluginRegistry.GetPlugin(modelOID)
+	kpmModelPlugin, _ := modelPluginRegistry.GetPlugin(ranFunctionE2SmOid)
 	if kpmModelPlugin == nil {
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}

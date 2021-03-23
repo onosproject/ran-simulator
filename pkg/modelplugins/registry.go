@@ -11,7 +11,7 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 
-	types "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
@@ -59,7 +59,7 @@ type ServiceModel interface {
 	EventTriggerDefinitionProtoToASN1(protoBytes []byte) ([]byte, error)
 	ActionDefinitionASN1toProto(asn1Bytes []byte) ([]byte, error)
 	ActionDefinitionProtoToASN1(protoBytes []byte) ([]byte, error)
-	DecodeRanFunctionDescription(asn1bytes []byte) (*types.RanfunctionNameDef, *types.RicEventTriggerList, *types.RicReportList, error)
+	DecodeRanFunctionDescription(asn1bytes []byte) (*e2smtypes.RanfunctionNameDef, *e2smtypes.RicEventTriggerList, *e2smtypes.RicReportList, error)
 	ControlHeaderASN1toProto(asn1Bytes []byte) ([]byte, error)
 	ControlHeaderProtoToASN1(protoBytes []byte) ([]byte, error)
 	ControlMessageASN1toProto(asn1Bytes []byte) ([]byte, error)
