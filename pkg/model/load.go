@@ -50,8 +50,8 @@ func LoadConfig(model *Model, configname string) error {
 }
 
 // Load the model configuration.
-func Load(model *Model) error {
-	return LoadConfig(model, "model")
+func Load(model *Model, modelName string) error {
+	return LoadConfig(model, modelName)
 }
 
 // LoadConfigFromBytes Loads model with data in configuration yaml file

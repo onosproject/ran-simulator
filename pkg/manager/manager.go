@@ -32,6 +32,8 @@ type Config struct {
 	CertPath            string
 	GRPCPort            int
 	ServiceModelPlugins []string
+	ModelName           string
+	MetricName          string
 }
 
 // NewManager creates a new manager
@@ -82,7 +84,7 @@ func (m *Manager) Run() {
 // Start starts the manager
 func (m *Manager) Start() error {
 	// Load the model data
-	err := model.Load(m.model)
+	err := model.Load(m.model, m.config.ModelName)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -128,7 +130,7 @@ func (m *Manager) initMetricStore() {
 	m.metricsStore = metrics.NewMetricsStore()
 
 	// Load additional initial use-case data; ignore errors
-	_ = pciload.LoadPCIMetrics(m.metricsStore)
+	_ = pciload.LoadPCIMetrics(m.metricsStore, m.config.MetricName)
 }
 
 // startSouthboundServer starts the northbound gRPC server

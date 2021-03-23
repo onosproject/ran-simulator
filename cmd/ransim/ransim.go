@@ -50,6 +50,8 @@ func main() {
 	keyPath := flag.String("keyPath", "", "path to client private key")
 	certPath := flag.String("certPath", "", "path to client certificate")
 	grpcPort := flag.Int("grpcPort", 5150, "GRPC port for e2T server")
+	modelName := flag.String("modelName", "model", "RANSim model name")
+	metricName := flag.String("metricName", "metric", "RANSim metric name")
 	flag.Parse()
 
 	cfg := &manager.Config{
@@ -58,6 +60,8 @@ func main() {
 		CertPath:            *certPath,
 		GRPCPort:            *grpcPort,
 		ServiceModelPlugins: serviceModelPlugins,
+		ModelName:           *modelName,
+		MetricName:          *metricName,
 	}
 
 	mgr, err := manager.NewManager(cfg)
