@@ -37,8 +37,8 @@ type PciRange struct {
 }
 
 // LoadPCIMetrics loads metrics with data in "metrics" yaml file
-func LoadPCIMetrics(store metrics.Store) error {
-	return LoadPCIMetricsConfig(store, "metrics")
+func LoadPCIMetrics(store metrics.Store, metricName string) error {
+	return LoadPCIMetricsConfig(store, metricName)
 }
 
 // LoadPCIMetricsConfig loads metrics with data in the named configuration
