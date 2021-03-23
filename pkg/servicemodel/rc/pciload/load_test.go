@@ -16,7 +16,7 @@ import (
 func TestPCILoad(t *testing.T) {
 	ctx := context.TODO()
 	store := metrics.NewMetricsStore()
-	err := LoadPCIMetrics(store, "metric")
+	err := LoadPCIMetrics(store, "metrics")
 	assert.NoError(t, err)
 
 	v, ok := store.Get(ctx, 123, "pci")
