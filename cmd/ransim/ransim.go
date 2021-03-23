@@ -51,7 +51,7 @@ func main() {
 	certPath := flag.String("certPath", "", "path to client certificate")
 	grpcPort := flag.Int("grpcPort", 5150, "GRPC port for e2T server")
 	modelName := flag.String("modelName", "model", "RANSim model name")
-	metricName := flag.String("flagName", "metric", "RANSim metric name")
+	metricName := flag.String("metricName", "metric", "RANSim metric name")
 	flag.Parse()
 
 	cfg := &manager.Config{
