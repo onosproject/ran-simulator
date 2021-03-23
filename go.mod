@@ -14,7 +14,6 @@ require (
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/onosproject/helmit v0.6.8
-	github.com/onosproject/onos-api v0.7.14 // indirect
 	github.com/onosproject/onos-api/go v0.7.17
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.15
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.15
