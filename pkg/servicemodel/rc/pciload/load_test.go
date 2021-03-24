@@ -43,7 +43,7 @@ func TestPCISampleLoad(t *testing.T) {
 	err := LoadPCIMetricsConfig(store, "sample")
 	assert.NoError(t, err)
 
-	v, ok := store.Get(ctx, 21458294227474, "pci")
+	v, ok := store.Get(ctx, 343332707639553, "pci")
 	assert.True(t, ok)
-	assert.Equal(t, uint32(40), v)
+	assert.Equal(t, uint32(35), v)
 }
