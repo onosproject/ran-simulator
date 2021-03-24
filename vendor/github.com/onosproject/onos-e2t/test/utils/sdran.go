@@ -67,11 +67,12 @@ func CreateRanSimulatorWithName(t *testing.T, name string) *helm.HelmRelease {
 	assert.NoError(t, err)
 
 	simulator := helm.
-		Chart(name, onostest.SdranChartRepo).
+		Chart("ran-simulator", onostest.SdranChartRepo).
 		Release(name).
 		SetUsername(username).
 		SetPassword(password).
-		Set("image.tag", "latest")
+		Set("image.tag", "latest").
+		Set("fullnameOverride", "")
 	err = simulator.Install(true)
 	assert.NoError(t, err, "could not install device simulator %v", err)
 

@@ -9,6 +9,7 @@ import (
 
 	subapi "github.com/onosproject/onos-api/go/onos/e2sub/subscription"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder"
+	rcpdubuilder "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder"
 	"github.com/onosproject/onos-ric-sdk-go/pkg/e2/creds"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -18,7 +19,8 @@ import (
 // Subscription subscription request for subscription SDK api
 type Subscription struct {
 	NodeID               string
-	ServiceModelID       string
+	ServiceModelName     subapi.ServiceModelName
+	ServiceModelVersion  subapi.ServiceModelVersion
 	ActionType           subapi.ActionType
 	ActionID             int32
 	EncodingType         subapi.Encoding
@@ -27,7 +29,24 @@ type Subscription struct {
 	EventTrigger         []byte
 }
 
-// CreateKpmEventTrigger creates a kpm event trigger
+// CreateRcEventTrigger creates a rc service model event trigger
+func CreateRcEventTrigger() ([]byte, error) {
+	e2SmKpmEventTriggerDefinition, err := rcpdubuilder.CreateE2SmRcPreEventTriggerDefinitionUponChange()
+	if err != nil {
+		return []byte{}, err
+	}
+	err = e2SmKpmEventTriggerDefinition.Validate()
+	if err != nil {
+		return []byte{}, err
+	}
+	protoBytes, err := proto.Marshal(e2SmKpmEventTriggerDefinition)
+	if err != nil {
+		return []byte{}, err
+	}
+	return protoBytes, nil
+}
+
+// CreateKpmEventTrigger creates a kpm service model event trigger
 func CreateKpmEventTrigger(rtPeriod int32) ([]byte, error) {
 	e2SmKpmEventTriggerDefinition, err := pdubuilder.CreateE2SmKpmEventTriggerDefinition(rtPeriod)
 	if err != nil {
@@ -49,7 +68,8 @@ func (subRequest *Subscription) Create() (subapi.SubscriptionDetails, error) {
 	subReq := subapi.SubscriptionDetails{
 		E2NodeID: subapi.E2NodeID(subRequest.NodeID),
 		ServiceModel: subapi.ServiceModel{
-			ID: subapi.ServiceModelID(subRequest.ServiceModelID),
+			Name:    subRequest.ServiceModelName,
+			Version: subRequest.ServiceModelVersion,
 		},
 		EventTrigger: subapi.EventTrigger{
 			Payload: subapi.Payload{

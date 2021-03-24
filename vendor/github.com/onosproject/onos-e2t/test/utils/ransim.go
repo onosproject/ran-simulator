@@ -9,6 +9,9 @@ import (
 	"io"
 	"testing"
 
+	"github.com/onosproject/helmit/pkg/kubernetes"
+
+	"github.com/onosproject/helmit/pkg/helm"
 	modelapi "github.com/onosproject/onos-api/go/onos/ransim/model"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +22,12 @@ import (
 )
 
 // ConnectRansimServiceHost connects to ransim service
-func ConnectRansimServiceHost() (*grpc.ClientConn, error) {
+func ConnectRansimServiceHost(release *helm.HelmRelease) (*grpc.ClientConn, error) {
+	client := kubernetes.NewForReleaseOrDie(release)
+	services, err := client.CoreV1().Services().List()
+	if err != nil {
+		return nil, err
+	}
 	tlsConfig, err := creds.GetClientCredentials()
 	if err != nil {
 		return nil, err
@@ -28,7 +36,8 @@ func ConnectRansimServiceHost() (*grpc.ClientConn, error) {
 		grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)),
 	}
 
-	return grpc.DialContext(context.Background(), RansimServiceAddress, opts...)
+	ransimServiceAddress := getRansimServiceAddress(services[0].Name)
+	return grpc.DialContext(context.Background(), ransimServiceAddress, opts...)
 }
 
 func GetNodes(t *testing.T, nodeClient modelapi.NodeModelClient) []*ransimtypes.Node {
@@ -105,15 +114,15 @@ func GetNumNodes(t *testing.T, nodeClient modelapi.NodeModelClient) int {
 	return numNodes
 }
 
-func GetRansimCellClient(t *testing.T) modelapi.CellModelClient {
-	conn, err := ConnectRansimServiceHost()
+func GetRansimCellClient(t *testing.T, release *helm.HelmRelease) modelapi.CellModelClient {
+	conn, err := ConnectRansimServiceHost(release)
 	assert.NoError(t, err)
 	assert.NotNil(t, conn)
 	return modelapi.NewCellModelClient(conn)
 }
 
-func GetRansimNodeClient(t *testing.T) modelapi.NodeModelClient {
-	conn, err := ConnectRansimServiceHost()
+func GetRansimNodeClient(t *testing.T, release *helm.HelmRelease) modelapi.NodeModelClient {
+	conn, err := ConnectRansimServiceHost(release)
 	assert.NoError(t, err)
 	assert.NotNil(t, conn)
 	return modelapi.NewNodeModelClient(conn)
