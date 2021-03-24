@@ -11,7 +11,8 @@ import (
 	"time"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
-	kpm2IndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
+	kpm2IndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
+	kpm2MessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication/messageformat1"
 	kpm2NodeIDutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/nodeid"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -215,8 +216,8 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		return err
 	}
 
-	header := kpm2IndicationUtils.NewIndicationHeader(
-		kpm2IndicationUtils.WithGlobalKpmNodeID(kpmNodeID))
+	header := kpm2IndicationHeader.NewIndicationHeader(
+		kpm2IndicationHeader.WithGlobalKpmNodeID(kpmNodeID))
 
 	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
@@ -225,8 +226,8 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		return err
 	}
 
-	// Creating an indication message
-	indicationMessage := kpm2IndicationUtils.NewIndicationMessage()
+	// Creating an indication message format 1
+	indicationMessage := kpm2MessageFormat1.NewIndicationMessage()
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		log.Warn(err)
