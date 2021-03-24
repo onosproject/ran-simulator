@@ -7,30 +7,38 @@ package modelplugins
 import (
 	"fmt"
 	"plugin"
+	"sync"
+
+	"github.com/onosproject/onos-lib-go/pkg/errors"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
-var log = logging.GetLogger("modelplugin", "registry")
+var log = logging.GetLogger("modelregistry")
 
-// ModelType service model plugin type
-type ModelType string
-
-// ModelVersion service model plugin version
-type ModelVersion string
-
-// ModelFullName service model plugin name
-type ModelFullName string
-
-// ModelPluginRegistry is the object for the saving information about device models
-type ModelPluginRegistry struct {
-	ModelPlugins map[ModelFullName]ModelPlugin
+// ModelRegistry is the object for the saving information about device models
+type ModelRegistry interface {
+	GetPlugins() map[e2smtypes.OID]ServiceModel
+	GetPlugin(oid e2smtypes.OID) (ServiceModel, error)
+	RegisterModelPlugin(moduleName string) (e2smtypes.ShortName, e2smtypes.Version, error)
 }
 
-// ModelPlugin is a set of methods that each model plugin should implement
-type ModelPlugin interface {
-	ServiceModelData() (string, string, string)
+type modelRegistry struct {
+	plugins map[e2smtypes.OID]ServiceModel
+	mu      sync.RWMutex
+}
+
+// NewModelRegistry create an instance of model registry
+func NewModelRegistry() ModelRegistry {
+	return &modelRegistry{
+		plugins: make(map[e2smtypes.OID]ServiceModel),
+	}
+}
+
+// ServiceModel is a set of methods that each model plugin should implement
+type ServiceModel interface {
+	ServiceModelData() (smData e2smtypes.ServiceModelData)
 	IndicationHeaderASN1toProto(asn1Bytes []byte) ([]byte, error)
 	IndicationHeaderProtoToASN1(protoBytes []byte) ([]byte, error)
 	IndicationMessageASN1toProto(asn1Bytes []byte) ([]byte, error)
@@ -50,9 +58,33 @@ type ModelPlugin interface {
 	ControlOutcomeProtoToASN1(protoBytes []byte) ([]byte, error)
 }
 
+// GetModelPlugins get model plugins
+func (r *modelRegistry) GetPlugins() map[e2smtypes.OID]ServiceModel {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	plugins := make(map[e2smtypes.OID]ServiceModel, len(r.plugins))
+	for id, plugin := range r.plugins {
+		plugins[id] = plugin
+	}
+	return plugins
+}
+
+// GetPlugin returns the model plugin interface
+func (r *modelRegistry) GetPlugin(oid e2smtypes.OID) (ServiceModel, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	serviceModel, ok := r.plugins[oid]
+	if !ok {
+		err := errors.NewNotFound("Model plugin '%s' not found", oid)
+		return nil, err
+	}
+	return serviceModel, nil
+
+}
+
 // RegisterModelPlugin adds an external model plugin to the model registry at startup
 // or through the 'admin' gRPC interface. Once plugins are loaded they cannot be unloaded
-func (m *ModelPluginRegistry) RegisterModelPlugin(moduleName string) (ModelType, ModelVersion, error) {
+func (r *modelRegistry) RegisterModelPlugin(moduleName string) (e2smtypes.ShortName, e2smtypes.Version, error) {
 	log.Info("Loading module ", moduleName)
 	modelPluginModule, err := plugin.Open(moduleName)
 	if err != nil {
@@ -64,21 +96,18 @@ func (m *ModelPluginRegistry) RegisterModelPlugin(moduleName string) (ModelType,
 		log.Warn("Unable to find ServiceModel in module ", moduleName, err)
 		return "", "", err
 	}
-	serviceModelPlugin, ok := symbolMP.(ModelPlugin)
+	serviceModelPlugin, ok := symbolMP.(ServiceModel)
 	if !ok {
 		log.Warnf("Unable to use ServiceModelPlugin in %s", moduleName)
 		return "", "", fmt.Errorf("symbol loaded from module %s is not a ServiceModel",
 			moduleName)
 	}
-	name, version, _ := serviceModelPlugin.ServiceModelData()
-	log.Infof("Loaded %s %s from %s", name, version, moduleName)
-	fullName := ToModelName(ModelType(name), ModelVersion(version))
-	m.ModelPlugins[fullName] = serviceModelPlugin
+	smData := serviceModelPlugin.ServiceModelData()
+	modelOid := smData.OID
+	log.Infof("Loaded %s %s %s from %s", smData.Name, smData.Version, smData.OID, moduleName)
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.plugins[modelOid] = serviceModelPlugin
 
-	return ModelType(name), ModelVersion(version), nil
-}
-
-// ToModelName simply joins together model type and version in a consistent way
-func ToModelName(name ModelType, version ModelVersion) ModelFullName {
-	return ModelFullName(fmt.Sprintf("%s-%s", name, version))
+	return smData.Name, smData.Version, nil
 }

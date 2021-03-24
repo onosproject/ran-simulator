@@ -7,6 +7,8 @@ package registry
 import (
 	"sync"
 
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -38,13 +40,13 @@ type ServiceModelRegistry struct {
 // ServiceModel service model
 type ServiceModel struct {
 	RanFunctionID       RanFunctionID
-	ModelFullName       modelplugins.ModelFullName
+	ModelName           e2smtypes.ShortName
 	Version             string
 	Description         []byte // ASN1 bytes from Service Model
 	Revision            int
-	OID                 string
+	OID                 ModelOid
 	Client              servicemodel.Client
-	ModelPluginRegistry *modelplugins.ModelPluginRegistry
+	ModelPluginRegistry modelplugins.ModelRegistry
 	Node                model.Node
 	Model               *model.Model
 	Subscriptions       *subscriptions.Subscriptions
@@ -64,7 +66,7 @@ func NewServiceModelRegistry() *ServiceModelRegistry {
 
 // RegisterServiceModel registers a service model
 func (s *ServiceModelRegistry) RegisterServiceModel(sm ServiceModel) error {
-	log.Info("Register Service Model:", sm.ModelFullName, ":", sm.RanFunctionID)
+	log.Info("Register Service Model:", sm.ModelName, ":", sm.RanFunctionID)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, exists := s.serviceModels[sm.RanFunctionID]; exists {

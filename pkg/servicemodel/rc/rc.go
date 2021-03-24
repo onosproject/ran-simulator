@@ -8,6 +8,8 @@ import (
 	"context"
 	"time"
 
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/controloutcome"
@@ -49,10 +51,9 @@ var _ servicemodel.Client = &Client{}
 var log = logging.GetLogger("sm", "rc")
 
 const (
-	modelFullName = "e2sm_rc_pre-v1"
+	modelFullName = "ORAN-E2SM-RC-PRE"
 	version       = "v1"
-	// TODO - Replace with OID for rc-pre service model
-	modelOID = "1.3.6.1.4.1.1.1.2.99"
+	modelOID      = "1.3.6.1.4.1.53148.1.1.2.100"
 )
 
 // Client rc service model client
@@ -172,13 +173,13 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model,
-	modelPluginRegistry *modelplugins.ModelPluginRegistry,
+	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
-	modelFullName := modelplugins.ModelFullName(modelFullName)
+	modelName := e2smtypes.ShortName(modelFullName)
 	rcSm := registry.ServiceModel{
 		RanFunctionID:       registry.Rc,
-		ModelFullName:       modelFullName,
+		ModelName:           modelName,
 		Revision:            1,
 		OID:                 modelOID,
 		Version:             version,
@@ -199,7 +200,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	rcSm.Client = rcClient
 
 	var ranFunctionShortName = string(modelFullName)
-	var ranFunctionE2SmOid = "OID124"
+	var ranFunctionE2SmOid = modelOID
 	var ranFunctionDescription = "RC PRE"
 	var ranFunctionInstance int32 = 3
 	var ricEventStyleType int32 = 1
@@ -224,9 +225,9 @@ func NewServiceModel(node model.Node, model *model.Model,
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	rcModelPlugin := modelPluginRegistry.ModelPlugins[modelFullName]
+	rcModelPlugin, _ := modelPluginRegistry.GetPlugin(modelOID)
 	if rcModelPlugin == nil {
-		log.Debug("model plugin names:", modelPluginRegistry.ModelPlugins)
+		log.Debug("model plugin names:", modelPluginRegistry.GetPlugins())
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}
 	ranFuncDescBytes, err := rcModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
@@ -241,7 +242,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 // RICControl implements control handler for RC service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
 	reqID := controlutils.GetRequesterID(request)
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
@@ -346,7 +347,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for RC service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -434,7 +435,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for RC service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelFullName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
@@ -444,7 +445,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		return nil, nil, err
 	}
 	eventTriggerAsnBytes := sub.Details.RicEventTriggerDefinition.Value
-	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	eventTriggerProtoBytes, err := rcModelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return nil, nil, err

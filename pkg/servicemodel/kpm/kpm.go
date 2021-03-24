@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -45,9 +47,9 @@ var _ servicemodel.Client = &Client{}
 var log = logging.GetLogger("sm", "kpm")
 
 const (
-	modelFullName = "e2sm_kpm-v1beta1"
-	version       = "v1beta1"
-	modelOID      = "1.3.6.1.4.1.1.1.2.2"
+	modelName = "ORAN-E2SM-KPM"
+	version   = "v1"
+	modelOID  = "1.3.6.1.4.1.53148.1.1.2.2"
 )
 
 // Client kpm service model client
@@ -56,12 +58,12 @@ type Client struct {
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
+func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
-	modelFullName := modelplugins.ModelFullName(modelFullName)
+	modelName := e2smtypes.ShortName(modelName)
 	kpmSm := registry.ServiceModel{
 		RanFunctionID:       registry.Kpm,
-		ModelFullName:       modelFullName,
+		ModelName:           modelName,
 		Revision:            1,
 		OID:                 modelOID,
 		Version:             version,
@@ -78,8 +80,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 
 	kpmSm.Client = kpmClient
 
-	var ranFunctionShortName = string(modelFullName)
-	var ranFunctionE2SmOid = "OID123"
+	var ranFunctionShortName = string(modelName)
+	var ranFunctionE2SmOid = modelOID
 	var ranFunctionDescription = "KPM Monitor"
 	var ranFunctionInstance int32 = 1
 	var ricEventStyleType int32 = 1
@@ -102,7 +104,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry *m
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	kpmModelPlugin := modelPluginRegistry.ModelPlugins[modelFullName]
+
+	kpmModelPlugin, _ := modelPluginRegistry.GetPlugin(modelOID)
 	if kpmModelPlugin == nil {
 		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
 	}
@@ -133,7 +136,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		kpmutils.WithSd("SD1"),
 		kpmutils.WithPlmnIDnrcgi(plmnID.Value()))
 
-	kpmModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		log.Error(err)
@@ -196,7 +199,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelFullName)
+	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -268,7 +271,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelFullName)
+	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)

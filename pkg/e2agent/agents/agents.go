@@ -28,7 +28,7 @@ var log = logging.GetLogger("e2agent", "agents")
 // E2Agents represents a collection of E2 agents to allow centralized management
 type E2Agents struct {
 	agentStore          agents.Store
-	modelPluginRegistry *modelplugins.ModelPluginRegistry
+	modelPluginRegistry modelplugins.ModelRegistry
 	nodeStore           nodes.Store
 	ueStore             ues.Store
 	cellStore           cells.Store
@@ -110,7 +110,7 @@ func (agents *E2Agents) processNodeEvents() {
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
-func NewE2Agents(m *model.Model, modelPluginRegistry *modelplugins.ModelPluginRegistry,
+func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (*E2Agents, error) {
 	agentStore := agents.NewStore()
 	e2agents := &E2Agents{

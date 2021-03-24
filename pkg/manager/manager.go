@@ -6,6 +6,7 @@ package manager
 
 import (
 	"context"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
 	cellapi "github.com/onosproject/ran-simulator/pkg/api/cells"
@@ -40,9 +41,7 @@ type Config struct {
 func NewManager(config *Config) (*Manager, error) {
 	log.Info("Creating Manager")
 
-	modelPluginRegistry := modelplugins.ModelPluginRegistry{
-		ModelPlugins: make(map[modelplugins.ModelFullName]modelplugins.ModelPlugin),
-	}
+	modelPluginRegistry := modelplugins.NewModelRegistry()
 	for _, smp := range config.ServiceModelPlugins {
 		if _, _, err := modelPluginRegistry.RegisterModelPlugin(smp); err != nil {
 			log.Error(err)
@@ -53,7 +52,7 @@ func NewManager(config *Config) (*Manager, error) {
 		config:              *config,
 		agents:              nil,
 		model:               &model.Model{},
-		modelPluginRegistry: &modelPluginRegistry,
+		modelPluginRegistry: modelPluginRegistry,
 	}
 
 	return mgr, nil
@@ -65,7 +64,7 @@ type Manager struct {
 	config              Config
 	agents              *agents.E2Agents
 	model               *model.Model
-	modelPluginRegistry *modelplugins.ModelPluginRegistry
+	modelPluginRegistry modelplugins.ModelRegistry
 	server              *northbound.Server
 	nodeStore           nodes.Store
 	cellStore           cells.Store

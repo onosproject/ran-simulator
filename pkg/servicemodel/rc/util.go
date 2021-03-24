@@ -8,6 +8,8 @@ import (
 	"context"
 	"strconv"
 
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	rcindicationhdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/indication/header"
@@ -84,11 +86,13 @@ func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRe
 	return eventTriggerType, nil
 }
 
-func (sm *Client) getModelPlugin() (modelplugins.ModelPlugin, error) {
-	if modelPlugin, ok := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[modelFullName]; ok {
-		return modelPlugin, nil
+func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
+	modelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
+	if err != nil {
+		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
 	}
-	return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
+
+	return modelPlugin, nil
 }
 
 func (sm *Client) getPlmnID() ransimtypes.Uint24 {
@@ -274,7 +278,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		rcindicationmsg.WithNeighbours(neighbourList),
 		rcindicationmsg.WithPciPool(pciPool))
 
-	rcModelPlugin := sm.ServiceModel.ModelPluginRegistry.ModelPlugins[sm.ServiceModel.ModelFullName]
+	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
 	if err != nil {
 		log.Error(err)

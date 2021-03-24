@@ -12,22 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package e2
+package types
 
-// AppID is an application identifier
-type AppID string
-
-// InstanceID is an application instance identifier
-type InstanceID string
-
-// SubscriptionID is a subscription identifier
-type SubscriptionID string
-
-// ServiceModelName is a service model name
-type ServiceModelName string
-
-// ServiceModelVersion is a service model version
-type ServiceModelVersion string
-
-// E2NodeID is an E2 node identifier
-type E2NodeID string
+// ServiceModelData service model related information
+type ServiceModelData struct {
+	Name       ShortName
+	Version    Version
+	ModuleName ModuleName
+	OID        OID
+}

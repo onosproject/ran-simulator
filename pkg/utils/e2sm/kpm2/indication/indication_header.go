@@ -104,7 +104,7 @@ func WithGnbID(gnbID uint64) func(header *Header) {
 }
 
 // ToAsn1Bytes converts header to asn1 bytes
-func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ModelPlugin) ([]byte, error) {
+func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
 	// // Creating an indication header
 	// indicationHeader, err := header.Build()
 	// if err != nil {

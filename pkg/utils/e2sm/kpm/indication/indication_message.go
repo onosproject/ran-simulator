@@ -34,7 +34,7 @@ func WithNumberOfActiveUes(numOfActiveUes int32) func(msg *Message) {
 }
 
 // ToAsn1Bytes converts to Asn1 bytes
-func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ModelPlugin) ([]byte, error) {
+func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
 	indicationMessage, err := message.Build()
 	if err != nil {
 		return nil, err

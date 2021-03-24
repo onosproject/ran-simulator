@@ -137,17 +137,14 @@ func (c *threadSafeChannel) processRecvs() {
 	buf := make([]byte, c.options.RecvBufferSize)
 	for {
 		n, err := c.conn.Read(buf)
-		if err == io.EOF {
+		if err != nil {
 			c.Close()
 			return
 		}
+
+		err = c.processRecv(buf[:n])
 		if err != nil {
 			log.Error(err)
-		} else {
-			err := c.processRecv(buf[:n])
-			if err != nil {
-				log.Error(err)
-			}
 		}
 	}
 }

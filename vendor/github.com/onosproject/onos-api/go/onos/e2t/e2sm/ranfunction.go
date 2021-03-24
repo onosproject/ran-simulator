@@ -16,7 +16,7 @@ package types
 
 type ShortName string
 
-type Oid string
+type OID string
 
 type Description string
 
@@ -28,9 +28,13 @@ type StyleName string
 
 type FormatType int32
 
+type Version string
+
+type ModuleName string
+
 type RanfunctionNameDef struct {
 	RanFunctionShortName   ShortName
-	RanFunctionE2SmOid     Oid
+	RanFunctionE2SmOid     OID
 	RanFunctionDescription Description
 	RanFunctionInstance    Instance
 }

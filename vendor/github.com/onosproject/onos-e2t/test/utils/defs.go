@@ -11,14 +11,19 @@ import (
 const (
 	SubscriptionServiceHost = "onos-e2sub"
 	SubscriptionServicePort = 5150
-	KpmServiceModelID       = "e2sm_kpm-v1beta1"
+	KpmServiceModelName     = "oran-e2sm-kpm"
+	KpmServiceModelVersion1 = "v1"
+	RcServiceModelName      = "oran-e2sm-rc-pre"
+	RcServiceModelVersion1  = "v1"
 	E2TServiceHost          = "onos-e2t"
 	E2TServicePort          = 5150
-	RansimServiceHost       = "ran-simulator"
 	RansimServicePort       = 5150
 )
 
 var (
 	SubscriptionServiceAddress = SubscriptionServiceHost + ":" + strconv.Itoa(SubscriptionServicePort)
-	RansimServiceAddress       = RansimServiceHost + ":" + strconv.Itoa(RansimServicePort)
 )
+
+func getRansimServiceAddress(ransimServiceHost string) string {
+	return ransimServiceHost + ":" + strconv.Itoa(RansimServicePort)
+}
