@@ -11,10 +11,12 @@ import (
 	"time"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	kpm2IndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
+	kpm2NodeIDutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/nodeid"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
-	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
@@ -27,10 +29,9 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
+	e2apIndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
-	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -79,7 +80,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	kpmSm.Client = kpmClient
 
 	plmnID := ransimtypes.NewUint24(uint32(kpmSm.Model.PlmnID)).ToBytes()
-	bs := e2sm_kpm_v2.BitString{
+	bs := e2smkpmv2.BitString{
 		Value: 0x9bcd4,
 		Len:   22,
 	}
@@ -103,21 +104,21 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		return registry.ServiceModel{}, err
 	}
 
-	cmol := make([]*e2sm_kpm_v2.CellMeasurementObjectItem, 0)
+	cmol := make([]*e2smkpmv2.CellMeasurementObjectItem, 0)
 	cmol = append(cmol, cellMeasObjItem)
 
 	kpmNodeItem := pdubuilder.CreateRicKpmnodeItem(globalKpmnodeID, cmol)
 
-	rknl := make([]*e2sm_kpm_v2.RicKpmnodeItem, 0)
+	rknl := make([]*e2smkpmv2.RicKpmnodeItem, 0)
 	rknl = append(rknl, kpmNodeItem)
 
 	retsi := pdubuilder.CreateRicEventTriggerStyleItem(ricStyleType, ricStyleName, ricFormatType)
 
-	retsl := make([]*e2sm_kpm_v2.RicEventTriggerStyleItem, 0)
+	retsl := make([]*e2smkpmv2.RicEventTriggerStyleItem, 0)
 	retsl = append(retsl, retsi)
 
-	measInfoActionList := e2sm_kpm_v2.MeasurementInfoActionList{
-		Value: make([]*e2sm_kpm_v2.MeasurementInfoActionItem, 0),
+	measInfoActionList := e2smkpmv2.MeasurementInfoActionList{
+		Value: make([]*e2smkpmv2.MeasurementInfoActionItem, 0),
 	}
 
 	var measTypeName1 = "RRC.ConnEstabAtt.Tot"
@@ -162,7 +163,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	rrsi := pdubuilder.CreateRicReportStyleItem(ricStyleType, ricStyleName, ricFormatType, &measInfoActionList, ricIndHdrFormat, ricIndMsgFormat)
 
-	rrsl := make([]*e2sm_kpm_v2.RicReportStyleItem, 0)
+	rrsl := make([]*e2smkpmv2.RicReportStyleItem, 0)
 	rrsl = append(rrsl, rrsi)
 
 	ranFuncDescPdu, err := pdubuilder.CreateE2SmKpmRanfunctionDescription(
@@ -200,40 +201,42 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	gNbID, err := strconv.ParseUint(fmt.Sprintf("%d", sm.ServiceModel.Node.EnbID), 10, 64)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		return err
 	}
 	// Creates an indication header
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 
-	header := kpmutils.NewIndicationHeader(
-		kpmutils.WithPlmnID(plmnID.Value()),
-		kpmutils.WithGnbID(gNbID),
-		kpmutils.WithSst("1"),
-		kpmutils.WithSd("SD1"),
-		kpmutils.WithPlmnIDnrcgi(plmnID.Value()))
+	kpmNodeID, err := kpm2NodeIDutils.NewGlobalGNBID(kpm2NodeIDutils.WithPlmnID(plmnID.Value()),
+		kpm2NodeIDutils.WithGNBCuUpID(int64(gNbID))).Build()
+
+	if err != nil {
+		log.Warn(err)
+		return err
+	}
+
+	header := kpm2IndicationUtils.NewIndicationHeader(
+		kpm2IndicationUtils.WithGlobalKpmNodeID(kpmNodeID))
 
 	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		return err
 	}
 
 	// Creating an indication message
-	indicationMessage := kpmutils.NewIndicationMessage(
-		kpmutils.WithNumberOfActiveUes(int32(sm.ServiceModel.UEs.Len(ctx))))
-
+	indicationMessage := kpm2IndicationUtils.NewIndicationMessage()
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		return err
 	}
 
 	intervalDuration := time.Duration(interval)
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		return err
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
@@ -241,12 +244,12 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending Indication Report for subscription:", sub.ID)
-			indication := indicationutils.NewIndication(
-				indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
-				indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
-				indicationutils.WithRequestID(subscription.GetReqID()),
-				indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
-				indicationutils.WithIndicationMessage(indicationMessageBytes))
+			indication := e2apIndicationUtils.NewIndication(
+				e2apIndicationUtils.WithRicInstanceID(subscription.GetRicInstanceID()),
+				e2apIndicationUtils.WithRanFuncID(subscription.GetRanFuncID()),
+				e2apIndicationUtils.WithRequestID(subscription.GetReqID()),
+				e2apIndicationUtils.WithIndicationHeader(indicationHeaderAsn1Bytes),
+				e2apIndicationUtils.WithIndicationMessage(indicationMessageBytes))
 
 			ricIndication, err := indication.Build()
 			if err != nil {
