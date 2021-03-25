@@ -7,14 +7,13 @@ package kpm2
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2/payloads"
 	"strconv"
 	"time"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
-	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
@@ -31,7 +30,6 @@ import (
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 	kpmutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
-	"google.golang.org/protobuf/proto"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -39,16 +37,9 @@ var _ servicemodel.Client = &Client{}
 var log = logging.GetLogger("sm", "kpm2")
 
 const (
-	modelVersion           = "v2"
-	ricStyleType           = 1
-	ricStyleName           = "Periodic Report"
-	ricFormatType          = 5
-	ricIndMsgFormat        = 1
-	ricIndHdrFormat        = 1
-	ranFunctionDescription = "KPM 2.0 Monitor"
-	ranFunctionShortName   = "ORAN-E2SM-KPM"
-	ranFunctionE2SmOid     = "1.3.6.1.4.1.53148.1.2.2.2"
-	ranFunctionInstance    = 1
+	modelVersion         = "v2"
+	ranFunctionShortName = "ORAN-E2SM-KPM"
+	ranFunctionE2SmOid   = "1.3.6.1.4.1.53148.1.2.2.2"
 )
 
 // Client kpm service model client
@@ -77,122 +68,11 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	}
 
 	kpmSm.Client = kpmClient
-
-	plmnID := ransimtypes.NewUint24(uint32(kpmSm.Model.PlmnID)).ToBytes()
-	bs := e2sm_kpm_v2.BitString{
-		Value: 0x9bcd4,
-		Len:   22,
-	}
-	// TODO - Fix hardcoded cellID
-	cellGlobalID, err := pdubuilder.CreateCellGlobalIDNRCGI(plmnID, 0xabcdef012<<28) // 36 bit
+	var err error
+	kpmSm.Description, err = payloads.RanFunctionDescriptionBytes(kpmSm.Model.PlmnID, modelPluginRegistry)
 	if err != nil {
-		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-
-	// TODO - Fix hardcoded cellObjID
-	var cellObjID = "ONF"
-	cellMeasObjItem := pdubuilder.CreateCellMeasurementObjectItem(cellObjID, cellGlobalID)
-
-	// TODO - Fix hardcoded IDs
-	var gnbCuUpID int64 = 12345
-	var gnbDuID int64 = 6789
-	globalKpmnodeID, err := pdubuilder.CreateGlobalKpmnodeIDgNBID(&bs, plmnID, gnbCuUpID, gnbDuID)
-	if err != nil {
-		log.Error(err)
-		return registry.ServiceModel{}, err
-	}
-
-	cmol := make([]*e2sm_kpm_v2.CellMeasurementObjectItem, 0)
-	cmol = append(cmol, cellMeasObjItem)
-
-	kpmNodeItem := pdubuilder.CreateRicKpmnodeItem(globalKpmnodeID, cmol)
-
-	rknl := make([]*e2sm_kpm_v2.RicKpmnodeItem, 0)
-	rknl = append(rknl, kpmNodeItem)
-
-	retsi := pdubuilder.CreateRicEventTriggerStyleItem(ricStyleType, ricStyleName, ricFormatType)
-
-	retsl := make([]*e2sm_kpm_v2.RicEventTriggerStyleItem, 0)
-	retsl = append(retsl, retsi)
-
-	measInfoActionList := e2sm_kpm_v2.MeasurementInfoActionList{
-		Value: make([]*e2sm_kpm_v2.MeasurementInfoActionItem, 0),
-	}
-
-	var measTypeName1 = "RRC.ConnEstabAtt.Tot"
-	var measTypeID1 int32 = 1
-	measInfoActionItem1 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName1, measTypeID1)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem1)
-
-	var measTypeName2 = "RRC.ConnEstabSucc.Tot"
-	var measTypeID2 int32 = 2
-	measInfoActionItem2 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName2, measTypeID2)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem2)
-
-	var measTypeName3 = "RRC.ConnReEstabAtt.Tot"
-	var measTypeID3 int32 = 3
-	measInfoActionItem3 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName3, measTypeID3)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem3)
-
-	var measTypeName4 = "RRC.ConnReEstabAtt.reconfigFail"
-	var measTypeID4 int32 = 4
-	measInfoActionItem4 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName4, measTypeID4)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem4)
-
-	var measTypeName5 = "RRC.ConnReEstabAtt.HOFail"
-	var measTypeID5 int32 = 5
-	measInfoActionItem5 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName5, measTypeID5)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem5)
-
-	var measTypeName6 = "RRC.ConnReEstabAtt.Other"
-	var measTypeID6 int32 = 6
-	measInfoActionItem6 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName6, measTypeID6)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem6)
-
-	var measTypeName7 = "RRC.Conn.Avg"
-	var measTypeID7 int32 = 7
-	measInfoActionItem7 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName7, measTypeID7)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem7)
-
-	var measTypeName8 = "RRC.Conn.Max"
-	var measTypeID8 int32 = 8
-	measInfoActionItem8 := pdubuilder.CreateMeasurementInfoActionItem(measTypeName8, measTypeID8)
-	measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem8)
-
-	rrsi := pdubuilder.CreateRicReportStyleItem(ricStyleType, ricStyleName, ricFormatType, &measInfoActionList, ricIndHdrFormat, ricIndMsgFormat)
-
-	rrsl := make([]*e2sm_kpm_v2.RicReportStyleItem, 0)
-	rrsl = append(rrsl, rrsi)
-
-	ranFuncDescPdu, err := pdubuilder.CreateE2SmKpmRanfunctionDescription(
-		ranFunctionShortName,
-		ranFunctionE2SmOid,
-		ranFunctionDescription,
-		ranFunctionInstance,
-		rknl,
-		retsl,
-		rrsl)
-	if err != nil {
-		log.Error(err)
-		return registry.ServiceModel{}, err
-	}
-
-	protoBytes, err := proto.Marshal(ranFuncDescPdu)
-	if err != nil {
-		log.Error(err)
-		return registry.ServiceModel{}, err
-	}
-	kpmModelPlugin, _ := modelPluginRegistry.GetPlugin(ranFunctionE2SmOid)
-	if kpmModelPlugin == nil {
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
-	}
-	ranFuncDescBytes, err := kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
-	if err != nil {
-		log.Error(err)
-		return registry.ServiceModel{}, err
-	}
-	kpmSm.Description = ranFuncDescBytes
 	return kpmSm, nil
 }
 

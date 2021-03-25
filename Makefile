@@ -21,6 +21,7 @@ debug: build # @HELP build the Go binaries with debug symbols
 test: # @HELP run the unit tests and source code validation producing a golang style report
 test: build deps linters license_check
 	go test -race github.com/onosproject/ran-simulator/...
+	cd plugintests/e2sm_kpm_v2 && go test -race github.com/onosproject/ran-simulator/plugintests/e2sm_kpm_v2/...
 
 jenkins-test:  # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
 jenkins-test: build-tools build deps license_check linters
