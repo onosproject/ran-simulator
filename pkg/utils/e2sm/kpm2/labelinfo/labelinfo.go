@@ -31,7 +31,7 @@ type LabelInfo struct {
 }
 
 // NewLabelInfo creates a new label info
-func NewLabelInfo(options ...func(info *LabelInfo) error) (*LabelInfo, error) {
+func NewLabelInfo(options ...func(*LabelInfo) error) (*LabelInfo, error) {
 	labelInfo := &LabelInfo{}
 	for _, option := range options {
 		err := option(labelInfo)
@@ -130,6 +130,77 @@ func WithQCIMin(qciMin int32) func(info *LabelInfo) error {
 		return nil
 	}
 
+}
+
+// WithArpMax sets arp max
+func WithArpMax(arpMax int32) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		if arpMax < 0 || arpMax > 15 {
+			return errors.NewInvalid("Arp Max values must be in rang [0, 15]")
+		}
+
+		info.arpMax = arpMax
+		return nil
+	}
+}
+
+// WithArpMin sets arp min
+func WithArpMin(arpMin int32) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		if arpMin < 0 || arpMin > 15 {
+			return errors.NewInvalid("Arp Max values must be in rang [0, 15]")
+		}
+		info.arpMin = arpMin
+		return nil
+	}
+}
+
+// WithBitRateRange sets bit rate range
+func WithBitRateRange(bitrateRange int32) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		info.bitrateRange = bitrateRange
+		return nil
+	}
+}
+
+// WithLayerMuMimo sets layer muMimo
+func WithLayerMuMimo(layerMuMimo int32) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		info.layerMuMimo = layerMuMimo
+		return nil
+	}
+}
+
+// WithDistX sets distX
+func WithDistX(distX int32) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		info.distX = distX
+		return nil
+	}
+}
+
+// WithDistY sets distY
+func WithDistY(distY int32) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		info.distY = distY
+		return nil
+	}
+}
+
+// WithDistZ sets distZ
+func WithDistZ(distZ int32) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		info.distZ = distZ
+		return nil
+	}
+}
+
+// WithStartEndIndication sets start
+func WithStartEndIndication(startEndIndication e2smkpmv2.StartEndInd) func(info *LabelInfo) error {
+	return func(info *LabelInfo) error {
+		info.startEndIndication = startEndIndication
+		return nil
+	}
 }
 
 // Build builds label information item

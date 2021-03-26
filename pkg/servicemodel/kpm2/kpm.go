@@ -10,6 +10,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/measurments"
+
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/labelinfo"
+
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	kpm2IndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
 	kpm2MessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication/messageformat1"
@@ -51,6 +55,15 @@ const (
 	ranFunctionShortName   = "ORAN-E2SM-KPM"
 	ranFunctionE2SmOid     = "1.3.6.1.4.1.53148.1.2.2.2"
 	ranFunctionInstance    = 1
+)
+
+// TODO hard coded values for indication messages and should be replaced by
+// real values
+const (
+	fileFormatVersion string = "txt"
+	senderName        string = "ONF"
+	senderType        string = "test-type"
+	vendorName        string = "ONF"
 )
 
 // Client kpm service model client
@@ -217,7 +230,12 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	}
 
 	header := kpm2IndicationHeader.NewIndicationHeader(
-		kpm2IndicationHeader.WithGlobalKpmNodeID(kpmNodeID))
+		kpm2IndicationHeader.WithGlobalKpmNodeID(kpmNodeID),
+		kpm2IndicationHeader.WithFileFormatVersion(fileFormatVersion),
+		kpm2IndicationHeader.WithSenderName(senderName),
+		kpm2IndicationHeader.WithSenderType(senderType),
+		kpm2IndicationHeader.WithVendorName(vendorName),
+		kpm2IndicationHeader.WithTimeStamp([]byte{0x21, 0x22, 0x23, 0x24}))
 
 	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
@@ -226,8 +244,122 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		return err
 	}
 
+	var integerValue int64 = 12345
+	var realValue float64 = 6789
+	var cellObjID = "onf"
+	var granularity int32 = 21
+	var fiveQI int32 = 10
+	var qfi int32 = 62
+	var qci int32 = 15
+	var qciMin int32 = 1
+	var qciMax int32 = 15
+	var arpMax int32 = 15
+	var arpMin int32 = 10
+	var bitrateRange int32 = 251
+	var layerMuMimo int32 = 5
+	var distX int32 = 123
+	var distY int32 = 456
+	var distZ int32 = 789
+	startEndIndication := e2smkpmv2.StartEndInd_START_END_IND_START
+	sst := []byte{0x01}
+	sd := []byte{0x01, 0x02, 0x03}
+
+	// Creates label information
+	labelInfo, err := labelinfo.NewLabelInfo(labelinfo.WithFiveQI(fiveQI),
+		labelinfo.WithPlmnID(plmnID.Value()),
+		labelinfo.WithArpMin(arpMin),
+		labelinfo.WithArpMax(arpMax),
+		labelinfo.WithBitRateRange(bitrateRange),
+		labelinfo.WithDistX(distX),
+		labelinfo.WithDistY(distY),
+		labelinfo.WithDistZ(distZ),
+		labelinfo.WithLayerMuMimo(layerMuMimo),
+		labelinfo.WithQCI(qci),
+		labelinfo.WithQCIMin(qciMin),
+		labelinfo.WithQCIMax(qciMax),
+		labelinfo.WithQFI(qfi),
+		labelinfo.WithStartEndIndication(startEndIndication),
+		labelinfo.WithSD(sd),
+		labelinfo.WithSST(sst))
+
+	if err != nil {
+		log.Warn(err)
+		return err
+	}
+	labelInfoItem, err := labelInfo.Build()
+	if err != nil {
+		log.Warn(err)
+		return err
+	}
+
+	labelInfoList := e2smkpmv2.LabelInfoList{
+		Value: make([]*e2smkpmv2.LabelInfoItem, 0),
+	}
+	labelInfoList.Value = append(labelInfoList.Value, labelInfoItem)
+
+	// Creates measurement type name
+	measTypeName, err := measurments.NewMeasurementTypeMeasName(
+		measurments.WithMeasurementName("test")).
+		Build()
+	if err != nil {
+		log.Warn(err)
+		return err
+	}
+
+	if err != nil {
+		log.Warn(err)
+		return err
+	}
+
+	// Creates measurement info item
+	measInfoItem, err := measurments.NewMeasurementInfoItem(
+		measurments.WithMeasType(measTypeName),
+		measurments.WithLabelInfoList(&labelInfoList)).Build()
+	if err != nil {
+		log.Warn(err)
+		return err
+	}
+
+	// Creates measurement info list
+	measInfoList := e2smkpmv2.MeasurementInfoList{
+		Value: make([]*e2smkpmv2.MeasurementInfoItem, 0),
+	}
+	measInfoList.Value = append(measInfoList.Value, measInfoItem)
+
+	// Creates meas record
+	measRecord := e2smkpmv2.MeasurementRecord{
+		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
+	}
+
+	measRecordInteger := measurments.NewMeasurementRecordItemInteger(measurments.WithIntegerValue(integerValue)).Build()
+	measRecordReal := measurments.NewMeasurementRecordItemReal(measurments.WithRealValue(realValue)).Build()
+	measRecordNoValue := measurments.NewMeasurementRecordItemNoValue()
+
+	measRecord.Value = append(measRecord.Value, measRecordInteger)
+	measRecord.Value = append(measRecord.Value, measRecordReal)
+	measRecord.Value = append(measRecord.Value, measRecordNoValue)
+
+	measDataItem, err := measurments.NewMeasurementDataItem(
+		measurments.WithMeasurementRecord(&measRecord),
+		measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).Build()
+	if err != nil {
+		log.Warn(err)
+		return err
+	}
+
+	measData := e2smkpmv2.MeasurementData{
+		Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
+	}
+	measData.Value = append(measData.Value, measDataItem)
+
 	// Creating an indication message format 1
-	indicationMessage := kpm2MessageFormat1.NewIndicationMessage()
+	indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
+		kpm2MessageFormat1.WithCellObjID(cellObjID),
+		kpm2MessageFormat1.WithGranularity(granularity),
+		kpm2MessageFormat1.WithSubscriptionID(123456),
+		kpm2MessageFormat1.WithMeasData(&measData),
+		kpm2MessageFormat1.WithMeasInfoList(&measInfoList))
+
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		log.Warn(err)
