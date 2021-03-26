@@ -221,8 +221,16 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 	// Creates an indication header
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 
-	kpmNodeID, err := kpm2NodeIDutils.NewGlobalGNBID(kpm2NodeIDutils.WithPlmnID(plmnID.Value()),
-		kpm2NodeIDutils.WithGNBCuUpID(int64(gNbID))).Build()
+	bs := e2smkpmv2.BitString{
+		Value: 0x9bcd4,
+		Len:   22,
+	}
+
+	kpmNodeID, err := kpm2NodeIDutils.NewGlobalGNBID(
+		kpm2NodeIDutils.WithPlmnID(plmnID.Value()),
+		kpm2NodeIDutils.WithGNBCuUpID(int64(gNbID)),
+		kpm2NodeIDutils.WithGNBIDChoice(&bs),
+		kpm2NodeIDutils.WithGNBDuID(int64(gNbID))).Build()
 
 	if err != nil {
 		log.Warn(err)
