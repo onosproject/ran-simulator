@@ -211,47 +211,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	return kpmSm, nil
 }
 
-func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
-	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
-	gNbID, err := strconv.ParseUint(fmt.Sprintf("%d", sm.ServiceModel.Node.EnbID), 10, 64)
-	if err != nil {
-		log.Warn(err)
-		return err
-	}
-	// Creates an indication header
+func (sm *Client) createIndicationMessageFormat1() ([]byte, error) {
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-
-	bs := e2smkpmv2.BitString{
-		Value: 0x9bcd4,
-		Len:   22,
-	}
-
-	kpmNodeID, err := kpm2NodeIDutils.NewGlobalGNBID(
-		kpm2NodeIDutils.WithPlmnID(plmnID.Value()),
-		kpm2NodeIDutils.WithGNBCuUpID(int64(gNbID)),
-		kpm2NodeIDutils.WithGNBIDChoice(&bs),
-		kpm2NodeIDutils.WithGNBDuID(int64(gNbID))).Build()
-
-	if err != nil {
-		log.Warn(err)
-		return err
-	}
-
-	header := kpm2IndicationHeader.NewIndicationHeader(
-		kpm2IndicationHeader.WithGlobalKpmNodeID(kpmNodeID),
-		kpm2IndicationHeader.WithFileFormatVersion(fileFormatVersion),
-		kpm2IndicationHeader.WithSenderName(senderName),
-		kpm2IndicationHeader.WithSenderType(senderType),
-		kpm2IndicationHeader.WithVendorName(vendorName),
-		kpm2IndicationHeader.WithTimeStamp([]byte{0x21, 0x22, 0x23, 0x24}))
-
-	kpmModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
-	if err != nil {
-		log.Warn(err)
-		return err
-	}
-
 	var integerValue int64 = 12345
 	var realValue float64 = 6789
 	var cellObjID = "onf"
@@ -292,12 +253,12 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 
 	if err != nil {
 		log.Warn(err)
-		return err
+		return nil, err
 	}
 	labelInfoItem, err := labelInfo.Build()
 	if err != nil {
 		log.Warn(err)
-		return err
+		return nil, err
 	}
 
 	labelInfoList := e2smkpmv2.LabelInfoList{
@@ -311,12 +272,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		Build()
 	if err != nil {
 		log.Warn(err)
-		return err
-	}
-
-	if err != nil {
-		log.Warn(err)
-		return err
+		return nil, err
 	}
 
 	// Creates measurement info item
@@ -325,7 +281,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		measurments.WithLabelInfoList(&labelInfoList)).Build()
 	if err != nil {
 		log.Warn(err)
-		return err
+		return nil, err
 	}
 
 	// Creates measurement info list
@@ -349,10 +305,11 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 
 	measDataItem, err := measurments.NewMeasurementDataItem(
 		measurments.WithMeasurementRecord(&measRecord),
-		measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).Build()
+		measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
+		Build()
 	if err != nil {
 		log.Warn(err)
-		return err
+		return nil, err
 	}
 
 	measData := e2smkpmv2.MeasurementData{
@@ -368,11 +325,69 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		kpm2MessageFormat1.WithMeasData(&measData),
 		kpm2MessageFormat1.WithMeasInfoList(&measInfoList))
 
+	kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
+	if err != nil {
+		return nil, err
+	}
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
 	if err != nil {
 		log.Warn(err)
-		return err
+		return nil, err
 	}
+
+	return indicationMessageBytes, nil
+}
+
+func (sm *Client) createIndicationHeaderBytes() ([]byte, error) {
+	gNbID, err := strconv.ParseUint(fmt.Sprintf("%d", sm.ServiceModel.Node.EnbID), 10, 64)
+	if err != nil {
+		log.Warn(err)
+		return nil, err
+	}
+	// Creates an indication header
+	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
+
+	bs := e2smkpmv2.BitString{
+		Value: 0x9bcd4,
+		Len:   22,
+	}
+
+	kpmNodeID, err := kpm2NodeIDutils.NewGlobalGNBID(
+		kpm2NodeIDutils.WithPlmnID(plmnID.Value()),
+		kpm2NodeIDutils.WithGNBCuUpID(int64(gNbID)),
+		kpm2NodeIDutils.WithGNBIDChoice(&bs),
+		kpm2NodeIDutils.WithGNBDuID(int64(gNbID))).Build()
+
+	if err != nil {
+		log.Warn(err)
+		return nil, err
+	}
+
+	header := kpm2IndicationHeader.NewIndicationHeader(
+		kpm2IndicationHeader.WithGlobalKpmNodeID(kpmNodeID),
+		kpm2IndicationHeader.WithFileFormatVersion(fileFormatVersion),
+		kpm2IndicationHeader.WithSenderName(senderName),
+		kpm2IndicationHeader.WithSenderType(senderType),
+		kpm2IndicationHeader.WithVendorName(vendorName),
+		kpm2IndicationHeader.WithTimeStamp([]byte{0x21, 0x22, 0x23, 0x24}))
+
+	kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
+	if err != nil {
+		return nil, err
+	}
+	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
+	if err != nil {
+		log.Warn(err)
+		return nil, err
+	}
+
+	return indicationHeaderAsn1Bytes, nil
+
+}
+
+func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	// Creates an indication header
 
 	intervalDuration := time.Duration(interval)
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -385,6 +400,16 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending Indication Report for subscription:", sub.ID)
+			indicationHeaderAsn1Bytes, err := sm.createIndicationHeaderBytes()
+			if err != nil {
+				log.Warn(err)
+				return err
+			}
+			indicationMessageBytes, err := sm.createIndicationMessageFormat1()
+			if err != nil {
+				log.Warn(err)
+				return err
+			}
 			indication := e2apIndicationUtils.NewIndication(
 				e2apIndicationUtils.WithRicInstanceID(subscription.GetRicInstanceID()),
 				e2apIndicationUtils.WithRanFuncID(subscription.GetRanFuncID()),
