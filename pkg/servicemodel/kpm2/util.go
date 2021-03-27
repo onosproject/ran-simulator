@@ -8,11 +8,45 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/labelinfo"
 	"google.golang.org/protobuf/proto"
 )
+
+func (sm *Client) getActionDefinition(actionList []*e2appducontents.RicactionToBeSetupItemIes, ricActionsAccepted []*e2aptypes.RicActionID) ([]*e2smkpmv2.E2SmKpmActionDefinition, error) {
+	modelPlugin, err := sm.getModelPlugin()
+	if err != nil {
+		log.Warn(err)
+		return nil, err
+	}
+
+	var actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition
+	for _, action := range actionList {
+		for _, acceptedActionID := range ricActionsAccepted {
+			if action.Value.RicActionId.Value == int32(*acceptedActionID) {
+				actionDefinitionBytes := action.Value.RicActionDefinition.Value
+				actionDefinitionProtoBytes, err := modelPlugin.ActionDefinitionASN1toProto(actionDefinitionBytes)
+				if err != nil {
+					log.Warn(err)
+					return nil, err
+				}
+
+				actionDefinition := &e2smkpmv2.E2SmKpmActionDefinition{}
+				err = proto.Unmarshal(actionDefinitionProtoBytes, actionDefinition)
+				if err != nil {
+					log.Warn(err)
+					return nil, err
+				}
+
+				actionDefinitions = append(actionDefinitions, actionDefinition)
+
+			}
+		}
+	}
+	return actionDefinitions, nil
+}
 
 // getReportPeriod extracts report period
 func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {

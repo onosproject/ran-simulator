@@ -7,7 +7,6 @@ package kpm2
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"strconv"
 	"time"
 
@@ -56,19 +55,8 @@ const (
 	ranFunctionInstance    = 1
 )
 
-var measTypes = map[string]int32{
-	"RRC.ConnEstabAtt.Tot":            1,
-	"RRC.ConnEstabSucc.Tot":           2,
-	"RRC.ConnReEstabAtt.Tot":          3,
-	"RRC.ConnReEstabAtt.reconfigFail": 4,
-	"RRC.ConnReEstabAtt.HOFail":       5,
-	"RRC.ConnReEstabAtt.Other":        6,
-	"RRC.Conn.Avg":                    7,
-	"RRC.Conn.Max":                    8,
-}
-
 // TODO hard coded values for indication messages and should be replaced by
-// real values
+//  real values
 const (
 	fileFormatVersion string = "txt"
 	senderName        string = "ONF"
@@ -145,9 +133,9 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		Value: make([]*e2smkpmv2.MeasurementInfoActionItem, 0),
 	}
 
-	for measTypeName, measTypeID := range measTypes {
-		log.Debug("Measurement Name and ID:", measTypeName, measTypeID)
-		measInfoActionItem := pdubuilder.CreateMeasurementInfoActionItem(measTypeName, measTypeID)
+	for _, measType := range measTypes {
+		log.Debug("Measurement Name and ID:", measType.measTypeName, measType.measTypeID)
+		measInfoActionItem := pdubuilder.CreateMeasurementInfoActionItem(measType.measTypeName.String(), measType.measTypeID)
 		measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem)
 
 	}
@@ -188,7 +176,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	return kpmSm, nil
 }
 
-func (sm *Client) createMeasurementInfoList() (*e2smkpmv2.MeasurementInfoList, error) {
+func (sm *Client) createDefaultMeasInfoList() (*e2smkpmv2.MeasurementInfoList, error) {
 	// Creates measurement info list
 	measInfoList := e2smkpmv2.MeasurementInfoList{
 		Value: make([]*e2smkpmv2.MeasurementInfoItem, 0),
@@ -197,9 +185,10 @@ func (sm *Client) createMeasurementInfoList() (*e2smkpmv2.MeasurementInfoList, e
 	if err != nil {
 		return nil, err
 	}
-	for measTypeName := range measTypes {
+
+	for _, measType := range measTypes {
 		measTypeName, _ := measurments.NewMeasurementTypeMeasName(
-			measurments.WithMeasurementName(measTypeName)).
+			measurments.WithMeasurementName(measType.measTypeName.String())).
 			Build()
 		measInfoItem, _ := measurments.NewMeasurementInfoItem(
 			measurments.WithMeasType(measTypeName),
@@ -212,26 +201,36 @@ func (sm *Client) createMeasurementInfoList() (*e2smkpmv2.MeasurementInfoList, e
 
 }
 
-func (sm *Client) createMeasurementData() (*e2smkpmv2.MeasurementData, error) {
-
+func (sm *Client) createMeasDefaultData(ctx context.Context) (*e2smkpmv2.MeasurementData, error) {
 	measData := e2smkpmv2.MeasurementData{
 		Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
 	}
 
-	for measTypeName := range measTypes {
-		log.Debug("Creating measurement data for:", measTypeName)
+	for _, measType := range measTypes {
+		log.Debug("Creating measurement data for:", measType.measTypeName.String())
 
-		var integerValue = rand.Int63()
 		// Creates meas record
 		measRecord := e2smkpmv2.MeasurementRecord{
 			Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
 		}
+		switch measType.measTypeName {
+		case RRCConnMax:
+			log.Debug("Number of UEs set for RRC Con Max:", sm.ServiceModel.UEs.Len(ctx))
+			measRecordInteger := measurments.NewMeasurementRecordItemInteger(
+				measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
+				Build()
+			measRecord.Value = append(measRecord.Value, measRecordInteger)
+		case RRCConnAvg:
+			log.Debug("Number of UEs set for RRC Con Avg:", sm.ServiceModel.UEs.Len(ctx))
+			measRecordInteger := measurments.NewMeasurementRecordItemInteger(
+				measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
+				Build()
+			measRecord.Value = append(measRecord.Value, measRecordInteger)
+		default:
+			measRecordNoValue := measurments.NewMeasurementRecordItemNoValue()
+			measRecord.Value = append(measRecord.Value, measRecordNoValue)
 
-		measRecordInteger := measurments.NewMeasurementRecordItemInteger(
-			measurments.WithIntegerValue(integerValue)).
-			Build()
-
-		measRecord.Value = append(measRecord.Value, measRecordInteger)
+		}
 
 		measDataItem, err := measurments.NewMeasurementDataItem(
 			measurments.WithMeasurementRecord(&measRecord),
@@ -248,14 +247,13 @@ func (sm *Client) createMeasurementData() (*e2smkpmv2.MeasurementData, error) {
 
 }
 
-func (sm *Client) createIndicationMessageFormat1(cellECGI ransimtypes.ECGI) ([]byte, error) {
-
-	measInfoList, err := sm.createMeasurementInfoList()
+func (sm *Client) createDefaultIndicationMsgFormat1(ctx context.Context, cellECGI ransimtypes.ECGI) ([]byte, error) {
+	measInfoList, err := sm.createDefaultMeasInfoList()
 	if err != nil {
 		return nil, err
 	}
 
-	measData, err := sm.createMeasurementData()
+	measData, err := sm.createMeasDefaultData(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -280,6 +278,22 @@ func (sm *Client) createIndicationMessageFormat1(cellECGI ransimtypes.ECGI) ([]b
 	}
 
 	return indicationMessageBytes, nil
+
+}
+
+func (sm *Client) createIndicationMessageFormat1(ctx context.Context, cellECGI ransimtypes.ECGI, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) ([]byte, error) {
+	// If there is no action definition then reports all of the stats
+	if actionDefinitions == nil {
+		log.Debug("No action definitions, reporting all of the stats")
+		indicationMessageASNBytes, err := sm.createDefaultIndicationMsgFormat1(ctx, cellECGI)
+		if err != nil {
+			return nil, err
+		}
+		return indicationMessageASNBytes, nil
+	}
+
+	return nil, nil
+
 }
 
 func (sm *Client) createIndicationHeaderBytes() ([]byte, error) {
@@ -329,8 +343,8 @@ func (sm *Client) createIndicationHeaderBytes() ([]byte, error) {
 
 }
 
-func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
-	indicationMessageBytes, err := sm.createIndicationMessageFormat1(ecgi)
+func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) (*e2appducontents.Ricindication, error) {
+	indicationMessageBytes, err := sm.createIndicationMessageFormat1(ctx, ecgi, actionDefinitions)
 	if err != nil {
 		log.Warn(err)
 		return nil, err
@@ -356,7 +370,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 	return ricIndication, nil
 }
 
-func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
+func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
@@ -366,7 +380,7 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node
 	for _, ecgi := range node.Cells {
-		ricIndication, err := sm.createRicIndication(ctx, ecgi, subscription)
+		ricIndication, err := sm.createRicIndication(ctx, ecgi, subscription, actionDefinitions)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -380,7 +394,7 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	return nil
 }
 
-func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	// Creates an indication header
 
@@ -395,7 +409,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending Indication Report for subscription:", sub.ID)
-			err = sm.sendRicIndication(ctx, subscription)
+			err = sm.sendRicIndication(ctx, subscription, actionDefinitions)
 			if err != nil {
 				log.Error("creating indication message is failed", err)
 				return err
@@ -445,6 +459,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
+
 	subscription := subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
 		subutils.WithRanFuncID(ranFuncID),
@@ -454,7 +469,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
-		log.Debug("no action is accepted")
+		log.Warn("no action is accepted")
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
 			return nil, nil, err
@@ -471,6 +486,11 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, subscriptionFailure, nil
 	}
 
+	actionDefinitions, err := sm.getActionDefinition(actionList, ricActionsAccepted)
+	if err != nil {
+		log.Warn(err)
+	}
+
 	subscriptionResponse, err := subscription.BuildSubscriptionResponse()
 	if err != nil {
 		return nil, nil, err
@@ -478,7 +498,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	go func() {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		err := sm.reportIndication(ctx, reportInterval, subscription)
+		err := sm.reportIndication(ctx, reportInterval, subscription, actionDefinitions)
 		if err != nil {
 			return
 		}
