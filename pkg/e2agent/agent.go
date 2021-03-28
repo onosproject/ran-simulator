@@ -220,6 +220,9 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	case registry.Rc:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
+	case registry.Kpm2:
+		client := sm.Client.(*kpm2.Client)
+		response, failure, err = client.RICSubscription(ctx, request)
 
 	}
 	// Ric subscription is failed
@@ -292,6 +295,9 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	case registry.Rc:
 		client := sm.Client.(*rc.Client)
+		response, failure, err = client.RICSubscriptionDelete(ctx, request)
+	case registry.Kpm2:
+		client := sm.Client.(*kpm2.Client)
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 
 	}
