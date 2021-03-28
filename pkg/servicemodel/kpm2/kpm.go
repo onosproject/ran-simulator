@@ -6,16 +6,21 @@ package kpm2
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/reportstyle"
+
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/ranfuncdescription"
+
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/nodeitem"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/measurments"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	kpm2gNBID "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/id/gnbid"
 	kpm2IndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
 	kpm2MessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication/messageformat1"
-	kpm2NodeIDutils "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/nodeid"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
@@ -46,7 +51,7 @@ const (
 	modelVersion           = "v2"
 	ricStyleType           = 1
 	ricStyleName           = "Periodic Report"
-	ricFormatType          = 5
+	ricFormatType          = 1
 	ricIndMsgFormat        = 1
 	ricIndHdrFormat        = 1
 	ranFunctionDescription = "KPM 2.0 Monitor"
@@ -91,43 +96,53 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	kpmSm.Client = kpmClient
 
-	plmnID := ransimtypes.NewUint24(uint32(kpmSm.Model.PlmnID)).ToBytes()
-	bs := e2smkpmv2.BitString{
-		Value: 0x9bcd4,
-		Len:   22,
-	}
+	plmnID := ransimtypes.NewUint24(uint32(kpmSm.Model.PlmnID))
 
 	cells := node.Cells
-	cmol := make([]*e2smkpmv2.CellMeasurementObjectItem, 0)
+	cellMeasObjectItems := make([]*e2smkpmv2.CellMeasurementObjectItem, 0)
 	for _, cellEcgi := range cells {
-		cellGlobalID, err := pdubuilder.CreateCellGlobalIDNRCGI(plmnID, uint64(cellEcgi)<<28)
+		eci := ransimtypes.GetECI(uint64(cellEcgi))
+		eciBitString := &e2smkpmv2.BitString{
+			Value: uint64(eci),
+			Len:   28,
+		}
+
+		cellGlobalID, err := pdubuilder.CreateCellGlobalIDEUTRACGI(plmnID.ToBytes(), eciBitString)
 		if err != nil {
 			log.Error(err)
 			return registry.ServiceModel{}, err
 		}
 
 		cellMeasObjItem := pdubuilder.CreateCellMeasurementObjectItem(strconv.FormatUint(uint64(cellEcgi), 10), cellGlobalID)
-		cmol = append(cmol, cellMeasObjItem)
+		cellMeasObjectItems = append(cellMeasObjectItems, cellMeasObjItem)
 	}
 
-	// TODO - Fix hardcoded IDs
-	var gnbCuUpID int64 = 12345
-	var gnbDuID int64 = 6789
-	globalKpmnodeID, err := pdubuilder.CreateGlobalKpmnodeIDgNBID(&bs, plmnID, gnbCuUpID, gnbDuID)
+	// Creates an indication header
+	gNBID := &e2smkpmv2.BitString{
+		Value: uint64(node.EnbID),
+		Len:   22,
+	}
+
+	globalKPMNodeID, err := kpm2gNBID.NewGlobalGNBID(
+		kpm2gNBID.WithPlmnID(plmnID.Value()),
+		kpm2gNBID.WithGNBIDChoice(gNBID)).Build()
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
 
-	kpmNodeItem := pdubuilder.CreateRicKpmnodeItem(globalKpmnodeID, cmol)
+	kpmNodeItem := nodeitem.NewNodeItem(
+		nodeitem.WithGlobalKpmNodeID(globalKPMNodeID),
+		nodeitem.WithCellMeasurementObjectItems(cellMeasObjectItems)).
+		Build()
 
-	rknl := make([]*e2smkpmv2.RicKpmnodeItem, 0)
-	rknl = append(rknl, kpmNodeItem)
+	reportKpmNodeList := make([]*e2smkpmv2.RicKpmnodeItem, 0)
+	reportKpmNodeList = append(reportKpmNodeList, kpmNodeItem)
 
-	retsi := pdubuilder.CreateRicEventTriggerStyleItem(ricStyleType, ricStyleName, ricFormatType)
+	ricEventTriggerStyleItem := pdubuilder.CreateRicEventTriggerStyleItem(ricStyleType, ricStyleName, ricFormatType)
 
-	retsl := make([]*e2smkpmv2.RicEventTriggerStyleItem, 0)
-	retsl = append(retsl, retsi)
+	ricEventTriggerStyleList := make([]*e2smkpmv2.RicEventTriggerStyleItem, 0)
+	ricEventTriggerStyleList = append(ricEventTriggerStyleList, ricEventTriggerStyleItem)
 
 	measInfoActionList := e2smkpmv2.MeasurementInfoActionList{
 		Value: make([]*e2smkpmv2.MeasurementInfoActionItem, 0),
@@ -140,19 +155,28 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	}
 
-	rrsi := pdubuilder.CreateRicReportStyleItem(ricStyleType, ricStyleName, ricFormatType, &measInfoActionList, ricIndHdrFormat, ricIndMsgFormat)
+	reportStyleItem := reportstyle.NewReportStyleItem(
+		reportstyle.WithRICStyleType(ricStyleType),
+		reportstyle.WithRICStyleName(ricStyleName),
+		reportstyle.WithRICFormatType(ricFormatType),
+		reportstyle.WithMeasInfoActionList(&measInfoActionList),
+		reportstyle.WithIndicationHdrFormatType(ricIndHdrFormat),
+		reportstyle.WithIndicationMsgFormatType(ricIndMsgFormat)).
+		Build()
 
-	rrsl := make([]*e2smkpmv2.RicReportStyleItem, 0)
-	rrsl = append(rrsl, rrsi)
+	ricReportStyleList := make([]*e2smkpmv2.RicReportStyleItem, 0)
+	ricReportStyleList = append(ricReportStyleList, reportStyleItem)
 
-	ranFuncDescPdu, err := pdubuilder.CreateE2SmKpmRanfunctionDescription(
-		ranFunctionShortName,
-		ranFunctionE2SmOid,
-		ranFunctionDescription,
-		ranFunctionInstance,
-		rknl,
-		retsl,
-		rrsl)
+	ranFuncDescPdu, err := ranfuncdescription.NewRANFunctionDescription(
+		ranfuncdescription.WithRANFunctionShortName(ranFunctionShortName),
+		ranfuncdescription.WithRANFunctionE2SmOID(ranFunctionE2SmOid),
+		ranfuncdescription.WithRANFunctionDescription(ranFunctionDescription),
+		ranfuncdescription.WithRANFunctionInstance(ranFunctionInstance),
+		ranfuncdescription.WithRICKPMNodeList(reportKpmNodeList),
+		ranfuncdescription.WithRICEventTriggerStyleList(ricEventTriggerStyleList),
+		ranfuncdescription.WithRICReportStyleList(ricReportStyleList)).
+		Build()
+
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
@@ -208,7 +232,6 @@ func (sm *Client) createMeasDefaultData(ctx context.Context) (*e2smkpmv2.Measure
 
 	for _, measType := range measTypes {
 		log.Debug("Creating measurement data for:", measType.measTypeName.String())
-
 		// Creates meas record
 		measRecord := e2smkpmv2.MeasurementRecord{
 			Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
@@ -297,24 +320,16 @@ func (sm *Client) createIndicationMessageFormat1(ctx context.Context, cellECGI r
 }
 
 func (sm *Client) createIndicationHeaderBytes() ([]byte, error) {
-	gNbID, err := strconv.ParseUint(fmt.Sprintf("%d", sm.ServiceModel.Node.EnbID), 10, 64)
-	if err != nil {
-		log.Warn(err)
-		return nil, err
-	}
 	// Creates an indication header
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-
-	bs := e2smkpmv2.BitString{
-		Value: 0x9bcd4,
+	gNBID := &e2smkpmv2.BitString{
+		Value: uint64(sm.ServiceModel.Node.EnbID),
 		Len:   22,
 	}
 
-	kpmNodeID, err := kpm2NodeIDutils.NewGlobalGNBID(
-		kpm2NodeIDutils.WithPlmnID(plmnID.Value()),
-		kpm2NodeIDutils.WithGNBCuUpID(int64(gNbID)),
-		kpm2NodeIDutils.WithGNBIDChoice(&bs),
-		kpm2NodeIDutils.WithGNBDuID(int64(gNbID))).Build()
+	kpmNodeID, err := kpm2gNBID.NewGlobalGNBID(
+		kpm2gNBID.WithPlmnID(plmnID.Value()),
+		kpm2gNBID.WithGNBIDChoice(gNBID)).Build()
 
 	if err != nil {
 		log.Warn(err)

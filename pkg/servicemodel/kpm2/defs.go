@@ -4,16 +4,25 @@
 
 package kpm2
 
+// MeasTypeName name of measurement type
 type MeasTypeName int
 
 const (
+	// RRCConnEstabAttTot total number of RRC connection establishment attempts
 	RRCConnEstabAttTot MeasTypeName = iota
+	// RRCConnEstabSuccTot  total number of successful RRC Connection establishments
 	RRCConnEstabSuccTot
+	// RRCConnReEstabAttTot total number of RRC connection re-establishment attempts
 	RRCConnReEstabAttTot
+	// RRCConnReEstabAttreconfigFail  total number of RRC connection re-establishment attempts due to reconfiguration failure
 	RRCConnReEstabAttreconfigFail
+	// RRCConnReEstabAttHOFail total number of RRC connection re-establishment attempts due to Handover failure
 	RRCConnReEstabAttHOFail
+	// RRCConnReEstabAttOther total number of RRC connection re-establishment attempts due to Other reasons
 	RRCConnReEstabAttOther
+	// RRCConnAvg the mean number of users in RRC connected mode during each granularity period.
 	RRCConnAvg
+	// RRCConnMax  the max number of users in RRC connected mode during each granularity period.
 	RRCConnMax
 )
 

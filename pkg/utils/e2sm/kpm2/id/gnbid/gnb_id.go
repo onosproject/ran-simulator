@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package nodeid
+package gnbid
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -18,7 +18,7 @@ type GlobalGNBID struct {
 }
 
 // NewGlobalGNBID creates new global gnb ID
-func NewGlobalGNBID(options ...func(header *GlobalGNBID)) *GlobalGNBID {
+func NewGlobalGNBID(options ...func(*GlobalGNBID)) *GlobalGNBID {
 	gNBID := &GlobalGNBID{}
 	for _, option := range options {
 		option(gNBID)
