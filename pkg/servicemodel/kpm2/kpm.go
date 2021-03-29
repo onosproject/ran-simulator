@@ -156,7 +156,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	for _, measType := range measTypes {
 		log.Debug("Measurement Name and ID:", measType.measTypeName, measType.measTypeID)
-		measInfoActionItem := pdubuilder.CreateMeasurementInfoActionItem(measType.measTypeName.String(), measType.measTypeID)
+		measInfoActionItem := pdubuilder.CreateMeasurementInfoActionItem(measType.measTypeName.String())
 		measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem)
 
 	}

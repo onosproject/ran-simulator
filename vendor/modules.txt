@@ -352,15 +352,15 @@ github.com/onosproject/onos-api/go/onos/ransim/metrics
 github.com/onosproject/onos-api/go/onos/ransim/model
 github.com/onosproject/onos-api/go/onos/ransim/trafficsim
 github.com/onosproject/onos-api/go/onos/ransim/types
-# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.18
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.19
 ## explicit
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/pdubuilder
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm/v1beta1/e2sm-kpm-ies
-# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.18
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.19
 ## explicit
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2
-# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.18
+# github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.19
 ## explicit
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies
