@@ -6230,10 +6230,10 @@ func (m *E2SmKpmRanfunctionDescription) Validate() error {
 		}
 	}
 
-	if l := len(m.GetRicKpmNodeList()); l < 1 || l > 1024 {
+	if len(m.GetRicKpmNodeList()) > 1024 {
 		return E2SmKpmRanfunctionDescriptionValidationError{
 			field:  "RicKpmNodeList",
-			reason: "value must contain between 1 and 1024 items, inclusive",
+			reason: "value must contain no more than 1024 item(s)",
 		}
 	}
 
@@ -6252,10 +6252,10 @@ func (m *E2SmKpmRanfunctionDescription) Validate() error {
 
 	}
 
-	if l := len(m.GetRicEventTriggerStyleList()); l < 1 || l > 63 {
+	if len(m.GetRicEventTriggerStyleList()) > 63 {
 		return E2SmKpmRanfunctionDescriptionValidationError{
 			field:  "RicEventTriggerStyleList",
-			reason: "value must contain between 1 and 63 items, inclusive",
+			reason: "value must contain no more than 63 item(s)",
 		}
 	}
 
@@ -6274,10 +6274,10 @@ func (m *E2SmKpmRanfunctionDescription) Validate() error {
 
 	}
 
-	if l := len(m.GetRicReportStyleList()); l < 1 || l > 63 {
+	if len(m.GetRicReportStyleList()) > 63 {
 		return E2SmKpmRanfunctionDescriptionValidationError{
 			field:  "RicReportStyleList",
-			reason: "value must contain between 1 and 63 items, inclusive",
+			reason: "value must contain no more than 63 item(s)",
 		}
 	}
 
@@ -6374,10 +6374,10 @@ func (m *RicKpmnodeItem) Validate() error {
 		}
 	}
 
-	if l := len(m.GetCellMeasurementObjectList()); l < 1 || l > 16384 {
+	if len(m.GetCellMeasurementObjectList()) > 16384 {
 		return RicKpmnodeItemValidationError{
 			field:  "CellMeasurementObjectList",
-			reason: "value must contain between 1 and 16384 items, inclusive",
+			reason: "value must contain no more than 16384 item(s)",
 		}
 	}
 

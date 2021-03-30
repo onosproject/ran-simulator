@@ -8,8 +8,8 @@ import (
 	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 )
 
-func CreateE2SmKpmIndicationMessageFormat1(subscriptionID int64, cellObjID string, granularity int32,
-	measInfoList *e2sm_kpm_v2.MeasurementInfoList, measData *e2sm_kpm_v2.MeasurementData) (*e2sm_kpm_v2.E2SmKpmIndicationMessage, error) {
+func CreateE2SmKpmIndicationMessageFormat1(subscriptionID int64, cellObjID string, measInfoList *e2sm_kpm_v2.MeasurementInfoList,
+	measData *e2sm_kpm_v2.MeasurementData) (*e2sm_kpm_v2.E2SmKpmIndicationMessage, error) {
 
 	e2SmKpmPdu := e2sm_kpm_v2.E2SmKpmIndicationMessage{
 		E2SmKpmIndicationMessage: &e2sm_kpm_v2.E2SmKpmIndicationMessage_IndicationMessageFormat1{
@@ -17,16 +17,23 @@ func CreateE2SmKpmIndicationMessageFormat1(subscriptionID int64, cellObjID strin
 				SubscriptId: &e2sm_kpm_v2.SubscriptionId{
 					Value: subscriptionID,
 				},
-				CellObjId: &e2sm_kpm_v2.CellObjectId{
-					Value: cellObjID,
-				},
 				GranulPeriod: &e2sm_kpm_v2.GranularityPeriod{
-					Value: granularity,
+					Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
 				},
-				MeasInfoList: measInfoList,
-				MeasData:     measData,
+				MeasData: measData,
 			},
 		},
+	}
+
+	// optional instance
+	if cellObjID != "" {
+		e2SmKpmPdu.GetIndicationMessageFormat1().CellObjId = &e2sm_kpm_v2.CellObjectId{
+			Value: cellObjID,
+		}
+	}
+	// optional instance
+	if measInfoList != nil {
+		e2SmKpmPdu.GetIndicationMessageFormat1().MeasInfoList = measInfoList
 	}
 
 	if err := e2SmKpmPdu.Validate(); err != nil {
@@ -35,8 +42,8 @@ func CreateE2SmKpmIndicationMessageFormat1(subscriptionID int64, cellObjID strin
 	return &e2SmKpmPdu, nil
 }
 
-func CreateE2SmKpmIndicationMessageFormat2(subscriptionID int64, cellObjID string, granularity int32,
-	measCondUEList *e2sm_kpm_v2.MeasurementCondUeidList, measData *e2sm_kpm_v2.MeasurementData) (*e2sm_kpm_v2.E2SmKpmIndicationMessage, error) {
+func CreateE2SmKpmIndicationMessageFormat2(subscriptionID int64, cellObjID string, measCondUEList *e2sm_kpm_v2.MeasurementCondUeidList,
+	measData *e2sm_kpm_v2.MeasurementData) (*e2sm_kpm_v2.E2SmKpmIndicationMessage, error) {
 
 	e2SmKpmPdu := e2sm_kpm_v2.E2SmKpmIndicationMessage{
 		E2SmKpmIndicationMessage: &e2sm_kpm_v2.E2SmKpmIndicationMessage_IndicationMessageFormat2{
@@ -44,16 +51,20 @@ func CreateE2SmKpmIndicationMessageFormat2(subscriptionID int64, cellObjID strin
 				SubscriptId: &e2sm_kpm_v2.SubscriptionId{
 					Value: subscriptionID,
 				},
-				CellObjId: &e2sm_kpm_v2.CellObjectId{
-					Value: cellObjID,
-				},
 				GranulPeriod: &e2sm_kpm_v2.GranularityPeriod{
-					Value: granularity,
+					Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
 				},
 				MeasCondUeidList: measCondUEList,
 				MeasData:         measData,
 			},
 		},
+	}
+
+	// optional instance
+	if cellObjID != "" {
+		e2SmKpmPdu.GetIndicationMessageFormat2().CellObjId = &e2sm_kpm_v2.CellObjectId{
+			Value: cellObjID,
+		}
 	}
 
 	if err := e2SmKpmPdu.Validate(); err != nil {
@@ -93,9 +104,13 @@ func CreateMeasurementCondUEIDItem(measType *e2sm_kpm_v2.MeasurementType, mc *e2
 	mcUEIDlist *e2sm_kpm_v2.MatchingUeidList) (*e2sm_kpm_v2.MeasurementCondUeidItem, error) {
 
 	measCondUEIDItem := e2sm_kpm_v2.MeasurementCondUeidItem{
-		MeasType:         measType,
-		MatchingCond:     mc,
-		MatchingUeidList: mcUEIDlist,
+		MeasType:     measType,
+		MatchingCond: mc,
+	}
+
+	// optional instance
+	if mcUEIDlist != nil {
+		measCondUEIDItem.MatchingUeidList = mcUEIDlist
 	}
 
 	if err := measCondUEIDItem.Validate(); err != nil {
@@ -122,7 +137,7 @@ func CreateMeasurementDataItem(mr *e2sm_kpm_v2.MeasurementRecord) (*e2sm_kpm_v2.
 
 	mdi := e2sm_kpm_v2.MeasurementDataItem{
 		MeasRecord:     mr,
-		IncompleteFlag: e2sm_kpm_v2.IncompleteFlag_INCOMPLETE_FLAG_TRUE,
+		IncompleteFlag: -1, // optional instance
 	}
 
 	if err := mdi.Validate(); err != nil {

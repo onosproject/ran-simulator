@@ -127,8 +127,12 @@ func CreateActionDefinitionFormat3(cellObjID string, measCondList *e2sm_kpm_v2.M
 func CreateMeasurementInfoItem(measType *e2sm_kpm_v2.MeasurementType, labelInfoList *e2sm_kpm_v2.LabelInfoList) (*e2sm_kpm_v2.MeasurementInfoItem, error) {
 
 	item := e2sm_kpm_v2.MeasurementInfoItem{
-		MeasType:      measType,
-		LabelInfoList: labelInfoList,
+		MeasType: measType,
+	}
+
+	// optional instance
+	if labelInfoList != nil {
+		item.LabelInfoList = labelInfoList
 	}
 
 	if err := item.Validate(); err != nil {
@@ -170,91 +174,65 @@ func CreateMeasurementTypeMeasName(measName string) (*e2sm_kpm_v2.MeasurementTyp
 	return &measType, nil
 }
 
-func CreateLabelInfoItem(plmnID []byte, sst []byte, sd []byte, fiveQI int32, qfi int32, qci int32, qciMax int32, qciMin int32,
-	arpMax int32, arpMin int32, bitrateRange int32, layerMuMimo int32, distX int32, distY int32, distZ int32,
-	startEndIndication e2sm_kpm_v2.StartEndInd) (*e2sm_kpm_v2.LabelInfoItem, error) {
-
-	if len(sst) != 1 {
-		return nil, fmt.Errorf("error: SST should be 1 chars")
-	}
-	if len(sd) != 3 {
-		return nil, fmt.Errorf("error: SD should be 3 chars")
-	}
-	if len(plmnID) != 3 {
-		return nil, fmt.Errorf("error: Plmn ID should be 3 chars")
-	}
-	if arpMax < 1 && arpMax > 15 {
-		return nil, fmt.Errorf("error: ARP values must be in rang [1, 15]")
-	}
-	if arpMin < 1 && arpMin > 15 {
-		return nil, fmt.Errorf("error: ARP values must be in rang [1, 15]")
-	}
-	if arpMin > arpMax {
-		return nil, fmt.Errorf("error: ARPmin should be less than ARPmax")
-	}
-	if qfi < 0 && qfi > 63 {
-		return nil, fmt.Errorf("error: QFI values must be in rang [1, 63]")
-	}
-	if qci < 0 && qci > 255 {
-		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
-	}
-	if qciMax < 0 && qciMax > 255 {
-		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
-	}
-	if qciMin < 0 && qciMin > 255 {
-		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
-	}
-	if fiveQI < 0 && fiveQI > 255 {
-		return nil, fmt.Errorf("error: QCI values must be in rang [0, 255]")
-	}
-	if qciMin > qciMax {
-		return nil, fmt.Errorf("error: QCImin should be less than QCImax")
-	}
+func CreateLabelInfoItem(plmnID []byte, sst []byte, sd []byte) (*e2sm_kpm_v2.LabelInfoItem, error) {
 
 	labelInfoItem := e2sm_kpm_v2.LabelInfoItem{
-		MeasLabel: &e2sm_kpm_v2.MeasurementLabel{
-			PlmnId: &e2sm_kpm_v2.PlmnIdentity{
-				Value: plmnID,
-			},
-			SliceId: &e2sm_kpm_v2.Snssai{
-				SD:  sd,
-				SSt: sst,
-			},
-			FiveQi: &e2sm_kpm_v2.FiveQi{
-				Value: fiveQI,
-			},
-			QFi: &e2sm_kpm_v2.Qfi{
-				Value: qfi,
-			},
-			QCi: &e2sm_kpm_v2.Qci{
-				Value: qci,
-			},
-			QCimax: &e2sm_kpm_v2.Qci{
-				Value: qciMax,
-			},
-			QCimin: &e2sm_kpm_v2.Qci{
-				Value: qciMin,
-			},
-			ARpmax: &e2sm_kpm_v2.Arp{
-				Value: arpMax,
-			},
-			ARpmin: &e2sm_kpm_v2.Arp{
-				Value: arpMin,
-			},
-			BitrateRange:     bitrateRange,
-			LayerMuMimo:      layerMuMimo,
-			SUm:              e2sm_kpm_v2.SUM_SUM_TRUE,
-			DistBinX:         distX,
-			DistBinY:         distY,
-			DistBinZ:         distZ,
-			PreLabelOverride: e2sm_kpm_v2.PreLabelOverride_PRE_LABEL_OVERRIDE_TRUE,
-			StartEndInd:      startEndIndication,
-		},
+		MeasLabel: &e2sm_kpm_v2.MeasurementLabel{},
 	}
 
-	if err := labelInfoItem.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating LabelInfoItem %s", err.Error())
+	if plmnID != nil {
+		if len(plmnID) != 3 {
+			return nil, fmt.Errorf("error: Plmn ID should be 3 chars")
+		}
+		labelInfoItem.MeasLabel.PlmnId = &e2sm_kpm_v2.PlmnIdentity{
+			Value: plmnID,
+		}
 	}
+	if sst != nil {
+		if len(sst) != 1 {
+			return nil, fmt.Errorf("error: SST should be 1 chars")
+		}
+		labelInfoItem.MeasLabel.SliceId = &e2sm_kpm_v2.Snssai{
+			SSt: sst,
+		}
+		if sd != nil {
+			if len(sd) != 3 {
+				return nil, fmt.Errorf("error: SD should be 3 chars")
+			}
+			labelInfoItem.MeasLabel.SliceId.SD = sd
+		}
+	}
+
+	labelInfoItem.MeasLabel.FiveQi = &e2sm_kpm_v2.FiveQi{
+		Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	}
+	labelInfoItem.MeasLabel.QCi = &e2sm_kpm_v2.Qci{
+		Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	}
+	labelInfoItem.MeasLabel.QCimax = &e2sm_kpm_v2.Qci{
+		Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	}
+	labelInfoItem.MeasLabel.QCimin = &e2sm_kpm_v2.Qci{
+		Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	}
+	labelInfoItem.MeasLabel.ARpmin = &e2sm_kpm_v2.Arp{
+		Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	}
+	labelInfoItem.MeasLabel.ARpmax = &e2sm_kpm_v2.Arp{
+		Value: -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	}
+	labelInfoItem.MeasLabel.BitrateRange = -1     // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	labelInfoItem.MeasLabel.LayerMuMimo = -1      // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	labelInfoItem.MeasLabel.SUm = -1              // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	labelInfoItem.MeasLabel.DistBinX = -1         // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	labelInfoItem.MeasLabel.DistBinY = -1         // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	labelInfoItem.MeasLabel.DistBinZ = -1         // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	labelInfoItem.MeasLabel.PreLabelOverride = -1 // Not valid value, indicates this item not present in message - handled later in CGo encoding
+	labelInfoItem.MeasLabel.StartEndInd = -1      // Not valid value, indicates this item not present in message - handled later in CGo encoding
+
+	//if err := labelInfoItem.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating LabelInfoItem %s", err.Error())
+	//}
 
 	return &labelInfoItem, nil
 }

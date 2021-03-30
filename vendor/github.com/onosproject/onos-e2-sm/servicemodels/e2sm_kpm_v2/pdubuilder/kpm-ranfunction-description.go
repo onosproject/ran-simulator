@@ -8,7 +8,7 @@ import (
 	e2sm_kpm_v2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
 )
 
-func CreateE2SmKpmRanfunctionDescription(rfSn string, rfE2SMoid string, rfd string, rfi int32, rknl []*e2sm_kpm_v2.RicKpmnodeItem,
+func CreateE2SmKpmRanfunctionDescription(rfSn string, rfE2SMoid string, rfd string, rknl []*e2sm_kpm_v2.RicKpmnodeItem,
 	retsl []*e2sm_kpm_v2.RicEventTriggerStyleItem, rrsl []*e2sm_kpm_v2.RicReportStyleItem) (*e2sm_kpm_v2.E2SmKpmRanfunctionDescription, error) {
 
 	e2SmKpmPdu := e2sm_kpm_v2.E2SmKpmRanfunctionDescription{
@@ -16,11 +16,21 @@ func CreateE2SmKpmRanfunctionDescription(rfSn string, rfE2SMoid string, rfd stri
 			RanFunctionShortName:   rfSn,
 			RanFunctionE2SmOid:     rfE2SMoid,
 			RanFunctionDescription: rfd,
-			RanFunctionInstance:    rfi,
+			RanFunctionInstance:    -1, // Not valid value, indicates this item not present in message - handled later in CGo encoding
 		},
-		RicKpmNodeList:           rknl,
-		RicEventTriggerStyleList: retsl,
-		RicReportStyleList:       rrsl,
+	}
+
+	// optional instance
+	if rknl != nil {
+		e2SmKpmPdu.RicKpmNodeList = rknl
+	}
+	// optional instance
+	if retsl != nil {
+		e2SmKpmPdu.RicEventTriggerStyleList = retsl
+	}
+	// optional instance
+	if rrsl != nil {
+		e2SmKpmPdu.RicReportStyleList = rrsl
 	}
 
 	if err := e2SmKpmPdu.Validate(); err != nil {
@@ -31,10 +41,16 @@ func CreateE2SmKpmRanfunctionDescription(rfSn string, rfE2SMoid string, rfd stri
 
 func CreateRicKpmnodeItem(globalKpmnodeID *e2sm_kpm_v2.GlobalKpmnodeId, cmol []*e2sm_kpm_v2.CellMeasurementObjectItem) *e2sm_kpm_v2.RicKpmnodeItem {
 
-	return &e2sm_kpm_v2.RicKpmnodeItem{
-		RicKpmnodeType:            globalKpmnodeID,
-		CellMeasurementObjectList: cmol,
+	res := e2sm_kpm_v2.RicKpmnodeItem{
+		RicKpmnodeType: globalKpmnodeID,
 	}
+
+	// optional instance
+	if cmol != nil {
+		res.CellMeasurementObjectList = cmol
+	}
+
+	return &res
 }
 
 func CreateCellMeasurementObjectItem(cellObjID string, cellGlobalID *e2sm_kpm_v2.CellGlobalId) *e2sm_kpm_v2.CellMeasurementObjectItem {
@@ -134,14 +150,11 @@ func CreateRicReportStyleItem(ricStyleType int32, ricStyleName string, ricFormat
 	}
 }
 
-func CreateMeasurementInfoActionItem(measTypeName string, measTypeID int32) *e2sm_kpm_v2.MeasurementInfoActionItem {
+func CreateMeasurementInfoActionItem(measTypeName string) *e2sm_kpm_v2.MeasurementInfoActionItem {
 
 	return &e2sm_kpm_v2.MeasurementInfoActionItem{
 		MeasName: &e2sm_kpm_v2.MeasurementTypeName{
 			Value: measTypeName,
-		},
-		MeasId: &e2sm_kpm_v2.MeasurementTypeId{
-			Value: measTypeID,
 		},
 	}
 }
