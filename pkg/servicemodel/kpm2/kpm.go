@@ -235,13 +235,12 @@ func (sm *Client) createMeasDefaultData(ctx context.Context) (*e2smkpmv2.Measure
 	measData := e2smkpmv2.MeasurementData{
 		Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
 	}
-
+	measRecord := e2smkpmv2.MeasurementRecord{
+		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
+	}
 	for _, measType := range measTypes {
 		log.Debug("Creating measurement data for:", measType.measTypeName.String())
 		// Creates meas record
-		measRecord := e2smkpmv2.MeasurementRecord{
-			Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
-		}
 		switch measType.measTypeName {
 		case RRCConnMax:
 			log.Debug("Max number of UEs set for RRC Con Max:", sm.ServiceModel.UEs.Len(ctx))
@@ -261,17 +260,17 @@ func (sm *Client) createMeasDefaultData(ctx context.Context) (*e2smkpmv2.Measure
 
 		}
 
-		measDataItem, err := measurments.NewMeasurementDataItem(
-			measurments.WithMeasurementRecord(&measRecord),
-			measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
-			Build()
-		if err != nil {
-			log.Warn(err)
-			return nil, err
-		}
-
-		measData.Value = append(measData.Value, measDataItem)
 	}
+	measDataItem, err := measurments.NewMeasurementDataItem(
+		measurments.WithMeasurementRecord(&measRecord),
+		measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
+		Build()
+	if err != nil {
+		log.Warn(err)
+		return nil, err
+	}
+
+	measData.Value = append(measData.Value, measDataItem)
 	return &measData, nil
 
 }
