@@ -6,6 +6,7 @@ package manager
 
 import (
 	"context"
+	"time"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
@@ -190,6 +191,7 @@ func (m *Manager) stopNorthboundServer() {
 
 // PauseAndClear pauses simulation and clears the model
 func (m *Manager) PauseAndClear(ctx context.Context) {
+	log.Info("Pausing RAN simulator...")
 	m.stopE2Agents()
 	m.nodeStore.Clear(ctx)
 	m.cellStore.Clear(ctx)
@@ -218,5 +220,12 @@ func (m *Manager) LoadMetrics(ctx context.Context, name string, data []byte) err
 
 // Resume resume the simulation
 func (m *Manager) Resume(ctx context.Context) {
+	log.Info("Resuming RAN simulator...")
+	go func() {
+		time.Sleep(1 * time.Second)
+		log.Info("Restarting NBI...")
+		m.stopNorthboundServer()
+		_ = m.startNorthboundServer()
+	}()
 	_ = m.startE2Agents()
 }
