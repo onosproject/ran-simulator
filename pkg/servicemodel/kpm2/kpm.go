@@ -315,6 +315,7 @@ func (sm *Client) createRequestedIndMsgFormat1(ctx context.Context, cellECGI ran
 	var granularity int32 = 21
 
 	log.Debug("Create Indication message format 1 based on action defs")
+	//nodeCells := sm.ServiceModel.Node.Cells
 	for _, action := range actionDefinitions {
 		if action.GetActionDefinitionFormat1() != nil {
 			measInfoList := action.GetActionDefinitionFormat1().GetMeasInfoList()
@@ -345,20 +346,23 @@ func (sm *Client) createRequestedIndMsgFormat1(ctx context.Context, cellECGI ran
 							measRecord.Value = append(measRecord.Value, measRecordNoValue)
 
 						}
-						measDataItem, err := measurments.NewMeasurementDataItem(
-							measurments.WithMeasurementRecord(&measRecord),
-							measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
-							Build()
-						if err != nil {
-							log.Warn(err)
-							return nil, err
-						}
 
-						measData.Value = append(measData.Value, measDataItem)
 					}
 				}
 
 			}
+			measDataItem, err := measurments.NewMeasurementDataItem(
+				measurments.WithMeasurementRecord(&measRecord),
+				measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
+				Build()
+			if err != nil {
+				log.Warn(err)
+				return nil, err
+			}
+
+			measData.Value = append(measData.Value, measDataItem)
+			subID := action.GetActionDefinitionFormat1().SubscriptId.GetValue()
+			log.Info("Sub ID:", subID)
 			// TODO remove hard coded subscription ID
 			// Creating an indication message format 1
 			indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
