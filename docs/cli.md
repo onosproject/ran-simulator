@@ -10,8 +10,7 @@ The list of ransim commands is documented here [ransim-cli](https://github.com/o
 1) Follow the instructions in [Quick Start](quick_start.md) to deploy 
 sd-ran subsystems and RAN simulator. 
    
-2) Use the following command to access to onos-cli that you can run onos ransim 
-commands:
+2) Use the following command to access to `onos-cli` that you can run the [RAN simulator commands][ransim-cli]:
 
 ```bash
 kubectl exec -it -n sd-ran onos-cli-5d8b489f69-nvfcm -- /bin/bash
@@ -25,10 +24,12 @@ Usage:
   onos ransim [command]
 
 Available Commands:
+  clear       Clear the simulated nodes, cells and metrics
   config      Manage the CLI configuration
   create      Commands for creating simulated entities
   delete      Commands for deleting simulated entities
   get         Commands for retrieving RAN simulator model and other information
+  load        Load model and/or metric data
   log         logging api commands
   set         Commands for setting RAN simulator model metrics and other information
   start       Start E2 node agent
@@ -68,3 +69,6 @@ EnbID            Status   Service Models   E2T Controllers      Cell ECGIs
 5154             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227475
 5155             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227491
 ```
+
+
+[ransim-cli]: https://github.com/onosproject/onos-cli/blob/master/docs/cli/onos_ransim.md
