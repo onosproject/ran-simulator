@@ -10,7 +10,7 @@ The list of ransim commands is documented here [ransim-cli](https://github.com/o
 1) Follow the instructions in [Quick Start](quick_start.md) to deploy 
 sd-ran subsystems and RAN simulator. 
    
-2) Use the following command to access to `onos-cli` that you can run onos ransim 
+2) Use the following command to access to [onos-cli][onos-cli] that you can run onos ransim 
 commands:
 
 ```bash
@@ -70,3 +70,6 @@ EnbID            Status   Service Models   E2T Controllers      Cell ECGIs
 5154             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227475
 5155             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227491
 ```
+
+
+[onos-cli]: https://github.com/onosproject/onos-cli/blob/master/docs/cli/onos_ransim.md
