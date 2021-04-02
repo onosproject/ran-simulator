@@ -16,7 +16,7 @@ Flags:
   -h, --help                           help for topo
   -a, --latitude float                 Map centre latitude in degrees (default 52.52)
   -g, --longitude float                Map centre longitude in degrees (default 13.405)
-  -d, --max-neighbor-distance float    Maximum 'distance' between neighbor cells (default 3600); see docs
+  -d, --max-neighbor-distance float    Maximum 'distance' between neighbor cells; see docs (default 3600)
       --max-neighbors int              Maximum number of neighbors a cell will have; -1 no limit (default 5)
   -i, --pitch float32                  pitch between cells in degrees (default 0.02)
       --plmnid string                  PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN (default "315010")

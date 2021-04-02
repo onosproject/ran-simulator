@@ -10,7 +10,7 @@ The list of ransim commands is documented here [ransim-cli](https://github.com/o
 1) Follow the instructions in [Quick Start](quick_start.md) to deploy 
 sd-ran subsystems and RAN simulator. 
    
-2) Use the following command to access to onos-cli that you can run onos ransim 
+2) Use the following command to access to `onos-cli` that you can run onos ransim 
 commands:
 
 ```bash
@@ -25,10 +25,12 @@ Usage:
   onos ransim [command]
 
 Available Commands:
+  clear       Clear the simulated nodes, cells and metrics
   config      Manage the CLI configuration
   create      Commands for creating simulated entities
   delete      Commands for deleting simulated entities
   get         Commands for retrieving RAN simulator model and other information
+  load        Load model and/or metric data
   log         logging api commands
   set         Commands for setting RAN simulator model metrics and other information
   start       Start E2 node agent
