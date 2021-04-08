@@ -317,7 +317,6 @@ func (sm *Client) createRequestedIndMsgFormat1(ctx context.Context, cellECGI ran
 		if action.GetActionDefinitionFormat1() != nil {
 			cellObjectID := action.GetActionDefinitionFormat1().GetCellObjId().Value
 			if cellObjectID == strconv.FormatUint(uint64(cellECGI), 10) {
-				log.Info("Test CELL ECGI and CELL Object ID:", cellECGI, "----", cellObjectID)
 				measInfoList := action.GetActionDefinitionFormat1().GetMeasInfoList()
 				measRecord := e2smkpmv2.MeasurementRecord{
 					Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
