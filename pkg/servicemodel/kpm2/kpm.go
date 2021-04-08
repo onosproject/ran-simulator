@@ -382,8 +382,6 @@ func (sm *Client) createRequestedIndMsgFormat1(ctx context.Context, cellECGI ran
 				}
 
 				return indicationMessageBytes, nil
-			} else {
-				return nil, nil
 			}
 		}
 	}
