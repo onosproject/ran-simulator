@@ -74,7 +74,7 @@ func ueToAPI(ue *model.UE) *simtypes.Ue {
 		IMSI:     ue.IMSI,
 		Type:     string(ue.Type),
 		Position: nil,
-		Rotation: ue.Rotation,
+		Rotation: ue.Heading,
 		CRNTI:    ue.CRNTI,
 		Admitted: ue.IsAdmitted,
 	}

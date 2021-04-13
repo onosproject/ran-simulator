@@ -225,7 +225,6 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 			log.Error(err)
 		}
 		close(ch)
-
 	}()
 
 	if replay {
@@ -240,7 +239,6 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 					Type:  None,
 				}
 			}
-
 		}()
 	}
 	return nil

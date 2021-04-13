@@ -6,6 +6,7 @@ package manager
 
 import (
 	"context"
+	"github.com/onosproject/ran-simulator/pkg/store/routes"
 	"time"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -70,6 +71,7 @@ type Manager struct {
 	nodeStore           nodes.Store
 	cellStore           cells.Store
 	ueStore             ues.Store
+	routeStore          routes.Store
 	metricsStore        metrics.Store
 }
 
@@ -123,6 +125,9 @@ func (m *Manager) initModelStores() {
 
 	// Create the UE registry primed with the specified number of UEs
 	m.ueStore = ues.NewUERegistry(m.model.UECount, m.cellStore)
+
+	// Create an empty route registry
+	m.routeStore = routes.NewRouteRegistry()
 }
 
 func (m *Manager) initMetricStore() {
