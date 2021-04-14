@@ -1,4 +1,5 @@
 **/_output
+vendor/*
 *.DS_Store
 coverage.txt
 *.coverprofile*

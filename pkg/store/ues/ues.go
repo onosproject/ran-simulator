@@ -33,7 +33,7 @@ type Store interface {
 	// SetUECount updates the UE count and creates or deletes new UEs as needed
 	SetUECount(ctx context.Context, count uint)
 
-	// GetUECount returns the number of active UEs
+	// Len returns the number of active UEs
 	Len(ctx context.Context) int
 
 	// CreateUEs creates the specified number of UEs
@@ -42,11 +42,14 @@ type Store interface {
 	// Get retrieves the UE with the specified IMSI
 	Get(ctx context.Context, imsi types.IMSI) (*model.UE, error)
 
-	// DestroyUE destroy the specified UE
+	// Delete destroy the specified UE
 	Delete(ctx context.Context, imsi types.IMSI) (*model.UE, error)
 
-	// Move update the cell affiliation of the specified UE
-	Move(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error
+	// MoveToCell update the cell affiliation of the specified UE
+	MoveToCell(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error
+
+	// MoveToCoordinate updates the UEs geo location and compass heading
+	MoveToCoordinate(ctx context.Context, imsi types.IMSI, location model.Coordinate, heading uint32) error
 
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs(ctx context.Context) []*model.UE
@@ -54,7 +57,7 @@ type Store interface {
 	// ListUEs returns an array of all UEs associated with the specified cell
 	ListUEs(ctx context.Context, ecgi types.ECGI) []*model.UE
 
-	// WatchUEs watches the UE inventory events using the supplied channel
+	// Watch watches the UE inventory events using the supplied channel
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
 }
 
@@ -131,7 +134,7 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			IMSI:     imsi,
 			Type:     "phone",
 			Location: model.Coordinate{Lat: 0, Lng: 0},
-			Rotation: 0,
+			Heading:  0,
 			Cell: &model.UECell{
 				ID:       types.GEnbID(ecgi), // placeholder
 				ECGI:     ecgi,
@@ -183,12 +186,29 @@ func (s *store) ListAllUEs(ctx context.Context) []*model.UE {
 	return list
 }
 
-func (s *store) Move(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error {
+func (s *store) MoveToCell(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if ue, ok := s.ues[imsi]; ok {
 		ue.Cell.ECGI = ecgi
 		ue.Cell.Strength = strength
+		updateEvent := event.Event{
+			Key:   ue.IMSI,
+			Value: ue,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
+		return nil
+	}
+	return errors.New(errors.NotFound, "UE not found")
+}
+
+func (s *store) MoveToCoordinate(ctx context.Context, imsi types.IMSI, location model.Coordinate, heading uint32) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ue, ok := s.ues[imsi]; ok {
+		ue.Location = location
+		ue.Heading = heading
 		updateEvent := event.Event{
 			Key:   ue.IMSI,
 			Value: ue,
@@ -230,7 +250,6 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 			log.Error(err)
 		}
 		close(ch)
-
 	}()
 
 	if replay {
@@ -240,12 +259,11 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 			defer wg.Done()
 			for _, ue := range s.ues {
 				ch <- event.Event{
-					Key:   ue,
+					Key:   ue.IMSI,
 					Value: ue,
 					Type:  None,
 				}
 			}
-
 		}()
 	}
 

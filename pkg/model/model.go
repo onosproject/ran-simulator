@@ -34,9 +34,9 @@ type Sector struct {
 	Arc     int32      `mapstructure:"arc"`
 }
 
-// Route represents a named series of points for tracking movement of user-equipment
+// Route represents a series of points for tracking movement of user-equipment
 type Route struct {
-	Name   string
+	IMSI   types.IMSI
 	Points []*Coordinate
 	Color  string
 }
@@ -82,14 +82,13 @@ type UE struct {
 	IMSI     types.IMSI
 	Type     UEType
 	Location Coordinate
-	Rotation uint32
+	Heading  uint32
 
 	Cell  *UECell
 	CRNTI types.CRNTI
 	Cells []*UECell
 
 	IsAdmitted bool
-	// Metrics
 }
 
 // ServiceModel service model information

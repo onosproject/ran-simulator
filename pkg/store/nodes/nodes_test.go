@@ -64,7 +64,7 @@ func TestNodes(t *testing.T) {
 	assert.Equal(t, Deleted, nodeEvent.Type.(NodeEvent))
 
 	_, err = nodeStore.Get(ctx, node1EnbID)
-	assert.Error(t, err, "node not found")
+	assert.Error(t, err, "node found")
 
 	nodeStore.Clear(ctx)
 	ids, _ := nodeStore.List(ctx)

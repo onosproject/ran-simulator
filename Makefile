@@ -10,7 +10,6 @@ OUTPUT_DIR=./build/_output
 
 build: # @HELP build the Go binaries and run all validations (default)
 build:
-	export GOPRIVATE="github.com/onosproject/*"
 	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/ransim ./cmd/ransim
 	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/honeycomb ./cmd/honeycomb
 	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/metricsgen ./cmd/metricsgen
@@ -24,12 +23,10 @@ test: build deps linters license_check
 
 jenkins-test:  # @HELP run the unit tests and source code validation producing a junit style report for Jenkins
 jenkins-test: build-tools build deps license_check linters
-	export GOPRIVATE="github.com/onosproject/*"
 	TEST_PACKAGES=github.com/onosproject/ran-simulator/pkg/... ./../build-tools/build/jenkins/make-unit
 
 coverage: # @HELP generate unit test coverage data
 coverage: build deps linters license_check
-	export GOPRIVATE="github.com/onosproject/*"
 	go test -covermode=count -coverprofile=onos.coverprofile github.com/onosproject/ran-simulator/pkg/...
 	cd .. && go get github.com/mattn/goveralls && cd ran-simulator
 	grep -v .pb.go onos.coverprofile >onos-nogrpc.coverprofile
@@ -67,6 +64,7 @@ protos: # @HELP compile the protobuf files (using protoc-go Docker)
 		onosproject/protoc-go:${ONOS_PROTOC_VERSION}
 
 ran-simulator-docker: # @HELP build ran-simulator Docker image
+	@go mod vendor
 	docker build . -f build/ran-simulator/Dockerfile \
 		-t onosproject/ran-simulator:${RAN_SIMULATOR_VERSION}
 
