@@ -16,6 +16,8 @@ sd-ran subsystems and RAN simulator.
 kubectl exec -it -n sd-ran onos-cli-5d8b489f69-nvfcm -- /bin/bash
 ```
 
+_TODO: Update CLI usage to include routes and UEs!_
+
 3) Run onos ransim --help to see the list of ransim commands:
 ```bash
 ONOS RAN simulator commands
