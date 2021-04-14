@@ -156,7 +156,10 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	for _, measType := range measTypes {
 		log.Debug("Measurement Name and ID:", measType.measTypeName, measType.measTypeID)
-		measInfoActionItem := pdubuilder.CreateMeasurementInfoActionItem(measType.measTypeName.String())
+		measInfoActionItem, _ := measurments.NewMeasurementInfoActionItem(
+			measurments.WithMeasTypeName(measType.measTypeName.String()),
+			measurments.WithMeasTypeID(measType.measTypeID)).Build()
+
 		measInfoActionList.Value = append(measInfoActionList.Value, measInfoActionItem)
 
 	}
@@ -312,73 +315,76 @@ func (sm *Client) createDefaultIndicationMsgFormat1(ctx context.Context, cellECG
 }
 
 func (sm *Client) createRequestedIndMsgFormat1(ctx context.Context, cellECGI ransimtypes.ECGI, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) ([]byte, error) {
-	var granularity int32 = 21
-
 	log.Debug("Create Indication message format 1 based on action defs")
 	for _, action := range actionDefinitions {
 		if action.GetActionDefinitionFormat1() != nil {
-			measInfoList := action.GetActionDefinitionFormat1().GetMeasInfoList()
-			measRecord := e2smkpmv2.MeasurementRecord{
-				Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
-			}
-			measData := &e2smkpmv2.MeasurementData{
-				Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
-			}
-			for _, measInfo := range measInfoList.Value {
-				for _, measType := range measTypes {
-					if measType.measTypeName.String() == measInfo.MeasType.GetMeasName().Value {
-						switch measType.measTypeName {
-						case RRCConnMax:
-							log.Debug("Max number of UEs set for RRC Con Max:", sm.ServiceModel.UEs.Len(ctx))
-							measRecordInteger := measurments.NewMeasurementRecordItemInteger(
-								measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
-								Build()
-							measRecord.Value = append(measRecord.Value, measRecordInteger)
-						case RRCConnAvg:
-							log.Debug("Avg number of UEs set for RRC Con Avg:", sm.ServiceModel.UEs.Len(ctx))
-							measRecordInteger := measurments.NewMeasurementRecordItemInteger(
-								measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
-								Build()
-							measRecord.Value = append(measRecord.Value, measRecordInteger)
-						default:
-							measRecordNoValue := measurments.NewMeasurementRecordItemNoValue()
-							measRecord.Value = append(measRecord.Value, measRecordNoValue)
+			cellObjectID := action.GetActionDefinitionFormat1().GetCellObjId().Value
+			if cellObjectID == strconv.FormatUint(uint64(cellECGI), 10) {
+				measInfoList := action.GetActionDefinitionFormat1().GetMeasInfoList()
+				measRecord := e2smkpmv2.MeasurementRecord{
+					Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
+				}
+				measData := &e2smkpmv2.MeasurementData{
+					Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
+				}
+				for _, measInfo := range measInfoList.Value {
+					for _, measType := range measTypes {
+						if measType.measTypeName.String() == measInfo.MeasType.GetMeasName().Value {
+							switch measType.measTypeName {
+							case RRCConnMax:
+								log.Debug("Max number of UEs set for RRC Con Max:", sm.ServiceModel.UEs.Len(ctx))
+								measRecordInteger := measurments.NewMeasurementRecordItemInteger(
+									measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
+									Build()
+								measRecord.Value = append(measRecord.Value, measRecordInteger)
+							case RRCConnAvg:
+								log.Debug("Avg number of UEs set for RRC Con Avg:", sm.ServiceModel.UEs.Len(ctx))
+								measRecordInteger := measurments.NewMeasurementRecordItemInteger(
+									measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
+									Build()
+								measRecord.Value = append(measRecord.Value, measRecordInteger)
+							default:
+								measRecordNoValue := measurments.NewMeasurementRecordItemNoValue()
+								measRecord.Value = append(measRecord.Value, measRecordNoValue)
+
+							}
 
 						}
-						measDataItem, err := measurments.NewMeasurementDataItem(
-							measurments.WithMeasurementRecord(&measRecord),
-							measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
-							Build()
-						if err != nil {
-							log.Warn(err)
-							return nil, err
-						}
-
-						measData.Value = append(measData.Value, measDataItem)
 					}
+
+				}
+				measDataItem, err := measurments.NewMeasurementDataItem(
+					measurments.WithMeasurementRecord(&measRecord),
+					measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
+					Build()
+				if err != nil {
+					log.Warn(err)
+					return nil, err
 				}
 
-			}
-			// TODO remove hard coded subscription ID
-			// Creating an indication message format 1
-			indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
-				kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellECGI), 10)),
-				kpm2MessageFormat1.WithGranularity(granularity),
-				kpm2MessageFormat1.WithSubscriptionID(123456),
-				kpm2MessageFormat1.WithMeasData(measData),
-				kpm2MessageFormat1.WithMeasInfoList(measInfoList))
+				measData.Value = append(measData.Value, measDataItem)
+				subID := action.GetActionDefinitionFormat1().SubscriptId.GetValue()
+				granularity := action.GetActionDefinitionFormat1().GetGranulPeriod().Value
+				// Creating an indication message format 1
+				indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
+					kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellECGI), 10)),
+					kpm2MessageFormat1.WithGranularity(granularity),
+					kpm2MessageFormat1.WithSubscriptionID(subID),
+					kpm2MessageFormat1.WithMeasData(measData),
+					kpm2MessageFormat1.WithMeasInfoList(measInfoList))
 
-			kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-			if err != nil {
-				return nil, err
-			}
-			indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
-			if err != nil {
-				log.Warn(err)
-				return nil, err
-			}
+				kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
+				if err != nil {
+					return nil, err
+				}
+				indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
+				if err != nil {
+					log.Warn(err)
+					return nil, err
+				}
 
-			return indicationMessageBytes, nil
+				return indicationMessageBytes, nil
+			}
 		}
 	}
 	return nil, nil
@@ -395,7 +401,6 @@ func (sm *Client) createIndicationMessageFormat1(ctx context.Context, cellECGI r
 		return indicationMessageASNBytes, nil
 	}
 
-	// TODO sending indication based on action definitions is a WIP and needs to be tested
 	indicationMessageASNBytes, err := sm.createRequestedIndMsgFormat1(ctx, cellECGI, actionDefinitions)
 	if err != nil {
 		return nil, err
@@ -450,6 +455,11 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		log.Warn(err)
 		return nil, err
 	}
+
+	if indicationMessageBytes == nil {
+		return nil, nil
+	}
+
 	indicationHeaderAsn1Bytes, err := sm.createIndicationHeaderBytes()
 	if err != nil {
 		log.Warn(err)
@@ -486,10 +496,13 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 			log.Error(err)
 			return err
 		}
-		err = sub.E2Channel.RICIndication(ctx, ricIndication)
-		if err != nil {
-			log.Error(err)
-			return err
+
+		if ricIndication != nil {
+			err = sub.E2Channel.RICIndication(ctx, ricIndication)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
 		}
 	}
 	return nil
