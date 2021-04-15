@@ -6,6 +6,7 @@ package kpm2
 
 import (
 	"context"
+	"encoding/binary"
 	"strconv"
 	"time"
 
@@ -425,6 +426,10 @@ func (sm *Client) createIndicationHeaderBytes() ([]byte, error) {
 		log.Warn(err)
 		return nil, err
 	}
+	timestamp := make([]byte, 4)
+
+	binary.LittleEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
+	log.Info("Timestamp:", timestamp, string(timestamp))
 
 	header := kpm2IndicationHeader.NewIndicationHeader(
 		kpm2IndicationHeader.WithGlobalKpmNodeID(kpmNodeID),
@@ -432,7 +437,7 @@ func (sm *Client) createIndicationHeaderBytes() ([]byte, error) {
 		kpm2IndicationHeader.WithSenderName(senderName),
 		kpm2IndicationHeader.WithSenderType(senderType),
 		kpm2IndicationHeader.WithVendorName(vendorName),
-		kpm2IndicationHeader.WithTimeStamp([]byte{0x21, 0x22, 0x23, 0x24}))
+		kpm2IndicationHeader.WithTimeStamp(timestamp))
 
 	kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	if err != nil {
