@@ -427,10 +427,7 @@ func (sm *Client) createIndicationHeaderBytes() ([]byte, error) {
 		return nil, err
 	}
 	timestamp := make([]byte, 4)
-
-	binary.LittleEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
-	log.Info("Timestamp:", timestamp, string(timestamp))
-
+	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
 	header := kpm2IndicationHeader.NewIndicationHeader(
 		kpm2IndicationHeader.WithGlobalKpmNodeID(kpmNodeID),
 		kpm2IndicationHeader.WithFileFormatVersion(fileFormatVersion),
