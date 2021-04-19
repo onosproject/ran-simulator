@@ -63,11 +63,9 @@ const (
 	ranFunctionInstance    = 1
 )
 
-// TODO hard coded values for indication messages and should be replaced by
-//  real values
 const (
 	fileFormatVersion1 string = "version1"
-	senderName         string = "ONF"
+	senderName         string = "RAN Simulator"
 	senderType         string = ""
 	vendorName         string = "ONF"
 )
@@ -335,7 +333,6 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 	for _, actionDefinition := range actionDefinitions {
 		if actionDefinition.GetActionDefinitionFormat1() != nil {
 			cellObjectID := actionDefinition.GetActionDefinitionFormat1().GetCellObjId().Value
-
 			if cellObjectID == strconv.FormatUint(uint64(ecgi), 10) {
 				log.Debug("Sending indication message for Cell with ID:", cellObjectID)
 				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ecgi, actionDefinition)
@@ -465,6 +462,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	reportInterval, err := sm.getReportPeriod(request)
 	if err != nil {
+		// TODO ric action not admitted should be updated to reflect the correct cause
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
 			return nil, nil, err
