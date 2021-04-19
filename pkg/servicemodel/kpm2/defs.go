@@ -77,7 +77,3 @@ var measTypes = []MeasType{
 		measTypeID:   8,
 	},
 }
-
-type ActionDefinitionInfo struct {
-	cellObjectID string
-}
