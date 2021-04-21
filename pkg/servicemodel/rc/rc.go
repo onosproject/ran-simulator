@@ -286,15 +286,16 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		if err != nil {
 			return nil, nil, err
 		}
-		failure, err = controlutils.NewControl(
+		response, err = controlutils.NewControl(
 			controlutils.WithRanFuncID(ranFuncID),
 			controlutils.WithRequestID(reqID),
 			controlutils.WithRicInstanceID(ricInstanceID),
-			controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlFailure()
+			controlutils.WithRicControlStatus(e2apies.RiccontrolStatus_RICCONTROL_STATUS_FAILED),
+			controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlAcknowledge()
 		if err != nil {
 			return nil, nil, err
 		}
-		return nil, failure, nil
+		return response, nil, nil
 	}
 	var parameterValue interface{}
 	switch controlMessage.GetControlMessage().ParameterType.RanParameterType {
@@ -315,15 +316,16 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		if err != nil {
 			return nil, nil, err
 		}
-		failure, err = controlutils.NewControl(
+		response, err := controlutils.NewControl(
 			controlutils.WithRanFuncID(ranFuncID),
 			controlutils.WithRequestID(reqID),
 			controlutils.WithRicInstanceID(ricInstanceID),
-			controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlFailure()
+			controlutils.WithRicControlStatus(e2apies.RiccontrolStatus_RICCONTROL_STATUS_FAILED),
+			controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlAcknowledge()
 		if err != nil {
 			return nil, nil, err
 		}
-		return nil, failure, nil
+		return response, nil, nil
 	}
 
 	outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
@@ -338,6 +340,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		controlutils.WithRanFuncID(ranFuncID),
 		controlutils.WithRequestID(reqID),
 		controlutils.WithRicInstanceID(ricInstanceID),
+		controlutils.WithRicControlStatus(e2apies.RiccontrolStatus_RICCONTROL_STATUS_SUCCESS),
 		controlutils.WithRicControlOutcome(outcomeAsn1Bytes)).BuildControlAcknowledge()
 	if err != nil {
 		return nil, nil, err

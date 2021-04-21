@@ -138,13 +138,25 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	sm, err := a.registry.GetServiceModel(ranFuncID)
 	if err != nil {
 		log.Warn(err)
-		// TODO If the target E2 Node receives a RIC CONTROL REQUEST message
+		//  If the target E2 Node receives a RIC CONTROL REQUEST message
 		//  which contains a RAN Function ID IE that was not previously announced as a s
 		//  supported RAN function in the E2 Setup procedure or the RIC Service Update procedure,
 		//  or the E2 Node does not support the specific RIC Control procedure action, then
 		//  the target E2 Node shall ignore message and send an ERROR INDICATION message to the Near-RT RIC.
+		failure, err := controlutils.NewControl(
+			controlutils.WithRanFuncID(controlutils.GetRanFunctionID(request)),
+			controlutils.WithRequestID(controlutils.GetRequesterID(request)),
+			controlutils.WithRicInstanceID(controlutils.GetRicInstanceID(request)),
+			controlutils.WithCause(e2apies.Cause{
+				Cause: &e2apies.Cause_RicRequest{
+					RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
+				},
+			})).BuildControlFailure()
+		if err != nil {
+			return nil, nil, err
+		}
 
-		return nil, nil, err
+		return nil, failure, err
 	}
 	switch sm.RanFunctionID {
 	case registry.Kpm:
@@ -165,10 +177,6 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
 	log.Debugf("Received Subscription Request %v for ran function %d", request, ranFuncID)
 	sm, err := a.registry.GetServiceModel(ranFuncID)
-	id := subscriptions.NewID(subutils.GetRicInstanceID(request),
-		subutils.GetRequesterID(request),
-		subutils.GetRanFunctionID(request))
-
 	if err != nil {
 		log.Warn(err)
 		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
@@ -204,6 +212,10 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		}
 		return nil, failure, nil
 	}
+
+	id := subscriptions.NewID(subutils.GetRicInstanceID(request),
+		subutils.GetRequesterID(request),
+		subutils.GetRanFunctionID(request))
 	subscription, err := subscriptions.NewSubscription(id, request, a.channel)
 	if err != nil {
 		return response, failure, err
