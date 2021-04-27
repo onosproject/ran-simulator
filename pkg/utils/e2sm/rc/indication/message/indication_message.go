@@ -9,7 +9,7 @@ import (
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
 	"google.golang.org/protobuf/proto"
@@ -23,7 +23,6 @@ type Message struct {
 	cellSize          e2smrcpreies.CellSize
 	pci               int32
 	neighbours        []*e2smrcpreies.Nrt
-	pciPool           []*e2smrcpreies.PciRange
 }
 
 // NewIndicationMessage creates a new indication message
@@ -79,39 +78,20 @@ func WithNeighbours(neighbours []*e2smrcpreies.Nrt) func(message *Message) {
 	}
 }
 
-// WithPciPool sets pciPool
-func WithPciPool(pciPool []*e2smrcpreies.PciRange) func(message *Message) {
-	return func(message *Message) {
-		message.pciPool = pciPool
-	}
-}
-
 // Build builds indication message for RC service model
 func (message *Message) Build() (*e2smrcpreies.E2SmRcPreIndicationMessage, error) {
 	e2SmIindicationMsg := e2smrcpreies.E2SmRcPreIndicationMessage_IndicationMessageFormat1{
 		IndicationMessageFormat1: &e2smrcpreies.E2SmRcPreIndicationMessageFormat1{
 			Neighbors: make([]*e2smrcpreies.Nrt, 0),
-			PciPool:   make([]*e2smrcpreies.PciRange, 0),
 		},
 	}
 
-	e2SmIindicationMsg.IndicationMessageFormat1.Cgi = &e2smrcpreies.CellGlobalId{
-		CellGlobalId: &e2smrcpreies.CellGlobalId_EUtraCgi{
-			EUtraCgi: &e2smrcpreies.Eutracgi{
-				PLmnIdentity: &e2smrcpreies.PlmnIdentity{
-					Value: message.plmnID.ToBytes(),
-				},
-				EUtracellIdentity: &e2smrcpreies.EutracellIdentity{
-					Value: &e2smrcpreies.BitString{
-						Value: message.eutraCellIdentity, //uint64
-						Len:   28,                        //uint32
-					},
-				},
+	e2SmIindicationMsg.IndicationMessageFormat1.DlArfcn = &e2smrcpreies.Arfcn{
+		Arfcn: &e2smrcpreies.Arfcn_EArfcn{
+			EArfcn: &e2smrcpreies.Earfcn{
+				Value: message.earfcn,
 			},
 		},
-	}
-	e2SmIindicationMsg.IndicationMessageFormat1.DlEarfcn = &e2smrcpreies.Earfcn{
-		Value: message.earfcn,
 	}
 
 	e2SmIindicationMsg.IndicationMessageFormat1.CellSize = message.cellSize
@@ -119,7 +99,6 @@ func (message *Message) Build() (*e2smrcpreies.E2SmRcPreIndicationMessage, error
 		Value: message.pci,
 	}
 
-	e2SmIindicationMsg.IndicationMessageFormat1.PciPool = message.pciPool
 	e2SmIindicationMsg.IndicationMessageFormat1.Neighbors = message.neighbours
 
 	E2SmRcPrePdu := e2smrcpreies.E2SmRcPreIndicationMessage{
