@@ -32,6 +32,12 @@ type Store interface {
 	// Get retrieves the route for the specified IMSI
 	Get(ctx context.Context, imsi types.IMSI) (*model.Route, error)
 
+	// Start sets the route to its start condition
+	Start(ctx context.Context, imsi types.IMSI, speedAvg uint32, speedStdDev uint32) error
+
+	// Advance advances to the next waypoint in the specified direction, reversing at route end-points
+	Advance(ctx context.Context, imsi types.IMSI) error
+
 	// Delete destroy the specified UE route
 	Delete(ctx context.Context, imsi types.IMSI) (*model.Route, error)
 
@@ -84,6 +90,10 @@ func (s *store) Len(ctx context.Context) int {
 }
 
 func (s *store) Add(ctx context.Context, route *model.Route) error {
+	if len(route.Points) < 2 {
+		return errors.New(errors.NotFound, "route must have at least two points")
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, ok := s.routes[route.IMSI]; ok {
@@ -109,6 +119,51 @@ func (s *store) Get(ctx context.Context, imsi types.IMSI) (*model.Route, error) 
 	}
 
 	return nil, errors.New(errors.NotFound, "route not found")
+}
+
+func (s *store) Start(ctx context.Context, imsi types.IMSI, speedAvg uint32, speedStdDev uint32) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if route, ok := s.routes[imsi]; ok {
+		route.NextPoint = 1
+		route.Reverse = false
+		route.SpeedAvg = speedAvg
+		route.SpeedStdDev = speedStdDev
+		updateEvent := event.Event{
+			Key:   imsi,
+			Value: route,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
+		return nil
+	}
+	return errors.New(errors.NotFound, "route not found")
+}
+
+func (s *store) Advance(ctx context.Context, imsi types.IMSI) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if route, ok := s.routes[imsi]; ok {
+		if !route.Reverse && route.NextPoint == len(route.Points)-1 {
+			route.Reverse = true
+		} else if route.Reverse && route.NextPoint == 0 {
+			route.Reverse = false
+		}
+
+		if !route.Reverse {
+			route.NextPoint = route.NextPoint + 1
+		} else {
+			route.NextPoint = route.NextPoint - 1
+		}
+		updateEvent := event.Event{
+			Key:   imsi,
+			Value: route,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
+		return nil
+	}
+	return errors.New(errors.NotFound, "route not found")
 }
 
 // Delete deletes a UE based on a given imsi
