@@ -53,9 +53,13 @@ func routeToAPI(route *model.Route) *types.Route {
 		points = append(points, &types.Point{Lat: p.Lat, Lng: p.Lng})
 	}
 	return &types.Route{
-		RouteID:   route.IMSI,
-		Waypoints: points,
-		Color:     route.Color,
+		RouteID:    route.IMSI,
+		Waypoints:  points,
+		Color:      route.Color,
+		SpeedAvg:   route.SpeedAvg,
+		SpeedStdev: route.SpeedStdDev,
+		NextPoint:  route.NextPoint,
+		Reverse:    route.Reverse,
 	}
 }
 
@@ -65,9 +69,13 @@ func routeToModel(route *types.Route) *model.Route {
 		points = append(points, &model.Coordinate{Lat: p.Lat, Lng: p.Lng})
 	}
 	return &model.Route{
-		IMSI:   route.RouteID,
-		Points: points,
-		Color:  route.Color,
+		IMSI:        route.RouteID,
+		Points:      points,
+		Color:       route.Color,
+		SpeedAvg:    route.SpeedAvg,
+		SpeedStdDev: route.SpeedStdev,
+		NextPoint:   route.NextPoint,
+		Reverse:     route.Reverse,
 	}
 }
 

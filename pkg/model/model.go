@@ -42,7 +42,7 @@ type Route struct {
 	SpeedAvg    uint32
 	SpeedStdDev uint32
 	Reverse     bool
-	NextPoint   int
+	NextPoint   uint32
 }
 
 // Node e2 node

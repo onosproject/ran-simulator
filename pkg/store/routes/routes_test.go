@@ -91,7 +91,7 @@ func TestRouteAdvance(t *testing.T) {
 
 	r1, err := routes.Get(ctx, r.IMSI)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, r1.NextPoint)
+	assert.Equal(t, uint32(1), r1.NextPoint)
 	assert.Equal(t, false, r1.Reverse)
 	assert.Equal(t, uint32(100), r1.SpeedAvg)
 	assert.Equal(t, uint32(0), r1.SpeedStdDev)
@@ -113,7 +113,7 @@ func TestRouteAdvance(t *testing.T) {
 	validate(t, routes, r.IMSI, 1, false)
 }
 
-func validate(t *testing.T, store Store, imsi types.IMSI, n int, rev bool) {
+func validate(t *testing.T, store Store, imsi types.IMSI, n uint32, rev bool) {
 	r, err := store.Get(context.Background(), imsi)
 	assert.NoError(t, err)
 	assert.Equal(t, n, r.NextPoint)
