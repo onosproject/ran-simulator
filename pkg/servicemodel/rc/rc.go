@@ -52,12 +52,6 @@ var _ servicemodel.Client = &Client{}
 
 var log = logging.GetLogger("sm", "rc")
 
-const (
-	modelFullName = "ORAN-E2SM-RC-PRE"
-	version       = "v2"
-	modelOID      = "1.3.6.1.4.1.53148.1.2.2.100"
-)
-
 // Client rc service model client
 type Client struct {
 	ServiceModel *registry.ServiceModel
