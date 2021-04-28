@@ -164,21 +164,17 @@ func distance(c1 model.Coordinate, c2 model.Coordinate) float64 {
 	return 2 * earthRadius * math.Asin(math.Sqrt(h))
 }
 
-func targetPoint(c model.Coordinate, azimuth float64, dist float64) model.Coordinate {
-	var la1, lo1, la2, lo2, d float64
+func targetPoint(c model.Coordinate, bearing float64, dist float64) model.Coordinate {
+	var la1, lo1, la2, lo2, azimuth, d float64
 	la1 = c.Lat * math.Pi / 180
 	lo1 = c.Lng * math.Pi / 180
+	azimuth = bearing * math.Pi / 180
 	d = dist / earthRadius
 
 	la2 = math.Asin(math.Sin(la1)*math.Cos(d) + math.Cos(la1)*math.Sin(d)*math.Cos(azimuth))
 	lo2 = lo1 + math.Atan2(math.Sin(azimuth)*math.Sin(d)*math.Cos(la1), math.Cos(d)-math.Sin(la1)*math.Sin(la2))
 
-	tp := model.Coordinate{Lat: la2 * 180 / math.Pi, Lng: lo2 * 180 / math.Pi}
-
-	//fmt.Printf("s: %.4f,%.4f\tt: %.4f,%.4f\ta: %.2f\td: %.2f\tcd: %.2f\n",
-	//	c.Lng, c.Lat, tp.Lng, tp.Lat, azimuth, dist, distance(c, tp))
-
-	return tp
+	return model.Coordinate{Lat: la2 * 180 / math.Pi, Lng: lo2 * 180 / math.Pi}
 }
 
 func hsin(theta float64) float64 {

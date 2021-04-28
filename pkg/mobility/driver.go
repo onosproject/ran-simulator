@@ -41,6 +41,8 @@ func NewMobilityDriver(routeStore routes.Store, ueStore ues.Store) Driver {
 	}
 }
 
+var tickUnit = time.Second
+
 const tickFrequency = 1
 
 func (d *driver) Start() {
@@ -48,9 +50,11 @@ func (d *driver) Start() {
 	ctx := context.Background()
 
 	// Iterate over all routes and position the UEs at the start of their routes
-	d.initializeUEPositions(ctx)
+	for _, route := range d.routeStore.List(ctx) {
+		d.initializeUEPosition(ctx, route)
+	}
 
-	d.ticker = time.NewTicker(tickFrequency * time.Second)
+	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)
 
 	go d.drive(ctx)
@@ -66,16 +70,27 @@ func (d *driver) drive(ctx context.Context) {
 	for {
 		select {
 		case <-d.done:
+			ctx.Done()
+			close(d.done)
 			return
-		case t := <-d.ticker.C:
+		case <-d.ticker.C:
 			for _, route := range d.routeStore.List(ctx) {
-				d.driveStep(ctx, t, route)
+				if route.NextPoint == 0 && !route.Reverse {
+					d.initializeUEPosition(ctx, route)
+				}
+				d.updateUEPosition(ctx, route)
 			}
 		}
 	}
 }
 
-func (d *driver) driveStep(ctx context.Context, t time.Time, route *model.Route) {
+// Initializes UE positions to the start of its routes.
+func (d *driver) initializeUEPosition(ctx context.Context, route *model.Route) {
+	_ = d.ueStore.MoveToCoordinate(ctx, route.IMSI, *route.Points[0], uint32(math.Round(initialBearing(*route.Points[0], *route.Points[1]))))
+	_ = d.routeStore.Start(ctx, route.IMSI, route.SpeedAvg, route.SpeedStdDev)
+}
+
+func (d *driver) updateUEPosition(ctx context.Context, route *model.Route) {
 	// Get the UE
 	ue, err := d.ueStore.Get(ctx, route.IMSI)
 	if err != nil {
@@ -96,23 +111,15 @@ func (d *driver) driveStep(ctx context.Context, t time.Time, route *model.Route)
 	newPoint := *route.Points[route.NextPoint]
 	reachedWaypoint := remainingDistance <= distanceDriven
 	if !reachedWaypoint {
-		newPoint = targetPoint(ue.Location, float64(bearing), distanceDriven)
+		newPoint = targetPoint(ue.Location, bearing, distanceDriven)
 	}
 
 	// Move the UE to the determined coordinate; update heading if necessary
-	_ = d.ueStore.MoveToCoordinate(ctx, route.IMSI, newPoint, bearing)
+	_ = d.ueStore.MoveToCoordinate(ctx, route.IMSI, newPoint, uint32(math.Round(bearing)))
 
 	// Update the route if necessary
 	if reachedWaypoint {
 		_ = d.routeStore.Advance(ctx, route.IMSI)
-	}
-}
-
-// Initializes UE positions to the start of their routes.
-func (d *driver) initializeUEPositions(ctx context.Context) {
-	for _, route := range d.routeStore.List(ctx) {
-		_ = d.ueStore.MoveToCoordinate(ctx, route.IMSI, *route.Points[0], initialBearing(*route.Points[0], *route.Points[1]))
-		_ = d.routeStore.Start(ctx, route.IMSI, route.SpeedAvg, route.SpeedStdDev)
 	}
 }
 
@@ -133,25 +140,25 @@ func distance(c1 model.Coordinate, c2 model.Coordinate) float64 {
 }
 
 // Returns initial bearing from c1 to c2
-func initialBearing(c1 model.Coordinate, c2 model.Coordinate) uint32 {
+func initialBearing(c1 model.Coordinate, c2 model.Coordinate) float64 {
 	y := math.Sin(c2.Lng-c1.Lng) * math.Cos(c2.Lat)
 	x := math.Cos(c1.Lat)*math.Sin(c2.Lat) - math.Sin(c1.Lat)*math.Cos(c2.Lat)*math.Cos(c2.Lng-c1.Lng)
 	theta := math.Atan2(y, x)
-	return uint32(theta*180/math.Pi+360) % 360.0 // in degrees
+	return math.Mod(theta*180/math.Pi+360, 360.0) // in degrees
 }
 
 // Returns destination point given starting point and distance along heading.
-func targetPoint(c model.Coordinate, azimuth float64, dist float64) model.Coordinate {
-	var la1, lo1, la2, lo2, d float64
+func targetPoint(c model.Coordinate, bearing float64, dist float64) model.Coordinate {
+	var la1, lo1, la2, lo2, azimuth, d float64
 	la1 = c.Lat * math.Pi / 180
 	lo1 = c.Lng * math.Pi / 180
+	azimuth = bearing * math.Pi / 180
 	d = dist / earthRadius
 
 	la2 = math.Asin(math.Sin(la1)*math.Cos(d) + math.Cos(la1)*math.Sin(d)*math.Cos(azimuth))
 	lo2 = lo1 + math.Atan2(math.Sin(azimuth)*math.Sin(d)*math.Cos(la1), math.Cos(d)-math.Sin(la1)*math.Sin(la2))
 
-	tp := model.Coordinate{Lat: la2 * 180 / math.Pi, Lng: lo2 * 180 / math.Pi}
-	return tp
+	return model.Coordinate{Lat: la2 * 180 / math.Pi, Lng: lo2 * 180 / math.Pi}
 }
 
 func hsin(theta float64) float64 {
