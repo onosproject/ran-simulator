@@ -36,9 +36,13 @@ type Sector struct {
 
 // Route represents a series of points for tracking movement of user-equipment
 type Route struct {
-	IMSI   types.IMSI
-	Points []*Coordinate
-	Color  string
+	IMSI        types.IMSI
+	Points      []*Coordinate
+	Color       string
+	SpeedAvg    uint32
+	SpeedStdDev uint32
+	Reverse     bool
+	NextPoint   int
 }
 
 // Node e2 node

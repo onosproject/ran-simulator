@@ -6,6 +6,7 @@ package manager
 
 import (
 	"context"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/store/routes"
 	"time"
 
@@ -73,6 +74,7 @@ type Manager struct {
 	ueStore             ues.Store
 	routeStore          routes.Store
 	metricsStore        metrics.Store
+	mobilityDriver      mobility.Driver
 }
 
 // Run starts the manager and the associated services
@@ -106,6 +108,9 @@ func (m *Manager) Start() error {
 		return err
 	}
 
+	m.mobilityDriver = mobility.NewMobilityDriver(m.routeStore, m.ueStore)
+	m.mobilityDriver.Start()
+
 	return nil
 }
 
@@ -114,6 +119,7 @@ func (m *Manager) Close() {
 	log.Info("Closing Manager")
 	m.stopE2Agents()
 	m.stopNorthboundServer()
+	m.mobilityDriver.Stop()
 }
 
 func (m *Manager) initModelStores() {
