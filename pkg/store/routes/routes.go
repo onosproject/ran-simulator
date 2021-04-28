@@ -144,7 +144,7 @@ func (s *store) Advance(ctx context.Context, imsi types.IMSI) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if route, ok := s.routes[imsi]; ok {
-		if !route.Reverse && route.NextPoint == len(route.Points)-1 {
+		if !route.Reverse && route.NextPoint+1 >= uint32(len(route.Points)) {
 			route.Reverse = true
 		} else if route.Reverse && route.NextPoint == 0 {
 			route.Reverse = false
