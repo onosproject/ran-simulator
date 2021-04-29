@@ -8,6 +8,7 @@ import (
 	"context"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/routes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"github.com/onosproject/ran-simulator/pkg/utils"
@@ -31,16 +32,20 @@ type Driver interface {
 }
 
 type driver struct {
+	cellStore  cells.Store
 	routeStore routes.Store
 	ueStore    ues.Store
 	apiKey     string
 	ticker     *time.Ticker
 	done       chan bool
+	min        *model.Coordinate
+	max        *model.Coordinate
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
-func NewMobilityDriver(routeStore routes.Store, ueStore ues.Store, apiKey string) Driver {
+func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string) Driver {
 	return &driver{
+		cellStore:  cellStore,
 		routeStore: routeStore,
 		ueStore:    ueStore,
 	}

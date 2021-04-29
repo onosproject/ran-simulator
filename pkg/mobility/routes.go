@@ -21,14 +21,41 @@ import (
 const googleAPIKeyMinLen = 38
 const stepsPerDecimalDegree = 500
 
+const latMargin = 0.04 // ~ 4.4km at equator; ~3.1km at 45
+const lngMargin = 0.01 // ~ 4.4km
+
 func (d *driver) GenerateRoutes(ctx context.Context, minSpeed uint32, maxSpeed uint32, speedStdDev uint32) {
-	// TODO: Determine the area for choosing random end-point locations
+	d.establishArea(ctx)
 	for _, ue := range d.ueStore.ListAllUEs(ctx) {
 		_, err := d.routeStore.Get(ctx, ue.IMSI)
 		if err != nil {
 			_ = d.generateRoute(ctx, ue.IMSI, uint32(rand.Intn(int(maxSpeed-minSpeed))), speedStdDev)
 		}
 	}
+}
+
+// Determines the area for choosing random end-point locations
+func (d *driver) establishArea(ctx context.Context) {
+	cells, err := d.cellStore.List(ctx)
+	if err != nil {
+		return
+	}
+
+	d.min = &model.Coordinate{Lat: -90.0, Lng: -180.0}
+	d.max = &model.Coordinate{Lat: 90.0, Lng: 180.0}
+	for _, cell := range cells {
+		d.min.Lat = math.Min(cell.Sector.Center.Lat, d.min.Lat)
+		d.min.Lng = math.Min(cell.Sector.Center.Lng, d.min.Lng)
+		d.min.Lat = math.Max(cell.Sector.Center.Lat, d.min.Lat)
+		d.min.Lng = math.Max(cell.Sector.Center.Lng, d.min.Lng)
+	}
+
+	// Widen the area slightly to allow UEs to move at the edges of the RAN topology
+	// No, this does not account for Earth curvature, but should be good enough
+	d.min.Lat = d.min.Lat - latMargin
+	d.min.Lng = d.min.Lng - lngMargin
+	d.max.Lat = d.min.Lat + latMargin
+	d.max.Lng = d.min.Lng + lngMargin
 }
 
 func (d *driver) generateRoute(ctx context.Context, imsi types.IMSI, speedAvg uint32, speedStdDev uint32) error {
@@ -39,10 +66,10 @@ func (d *driver) generateRoute(ctx context.Context, imsi types.IMSI, speedAvg ui
 	var points []*model.Coordinate
 	if len(d.apiKey) >= googleAPIKeyMinLen {
 		points, err = googleRoute(start, end, d.apiKey)
-		log.Infof("Generated new Route %d with %d points using Google Directions", imsi, len(points))
+		log.Infof("Generated route for UE %d with %d points using Google Directions", imsi, len(points))
 	} else {
 		points, err = randomRoute(start, end)
-		log.Infof("Generated new Route %d with %d points using Random Directions", imsi, len(points))
+		log.Infof("Generated route for UE %d with %d points using Random Directions", imsi, len(points))
 	}
 	if err != nil {
 		return err
@@ -60,8 +87,8 @@ func (d *driver) generateRoute(ctx context.Context, imsi types.IMSI, speedAvg ui
 
 func (d *driver) randomCoordinate() *model.Coordinate {
 	return &model.Coordinate{
-		Lat: 0,
-		Lng: 0,
+		Lat: rand.Float64()*(d.max.Lat-d.min.Lat) + d.min.Lat,
+		Lng: rand.Float64()*(d.max.Lng-d.min.Lng) + d.min.Lng,
 	}
 }
 
@@ -104,9 +131,6 @@ func googleRoute(startLoc *model.Coordinate, endLoc *model.Coordinate, apiKey st
 	return points, nil
 }
 
-// If the no google API Key is given, we cannot access the Directions API and so
-// generate a route randomly - it will not follow the streets
-// Warning - this is a simple calculator that expect points to be on the same hemisphere
 func randomRoute(startLoc *model.Coordinate, endLoc *model.Coordinate) ([]*model.Coordinate, error) {
 	routeWidth := endLoc.Lng - startLoc.Lng
 	routeHeight := endLoc.Lat - startLoc.Lat

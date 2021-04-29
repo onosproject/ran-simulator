@@ -108,7 +108,9 @@ func (m *Manager) Start() error {
 		return err
 	}
 
-	m.mobilityDriver = mobility.NewMobilityDriver(m.routeStore, m.ueStore, m.model.APIKey)
+	m.mobilityDriver = mobility.NewMobilityDriver(m.cellStore, m.routeStore, m.ueStore, m.model.APIKey)
+	// TODO: Make initial speeds configurable
+	m.mobilityDriver.GenerateRoutes(context.Background(), 30000, 160000, 20000)
 	m.mobilityDriver.Start(context.Background())
 
 	return nil

@@ -46,7 +46,7 @@ func TestDriver(t *testing.T) {
 	err = rs.Add(ctx, route)
 	assert.NoError(t, err)
 
-	driver := NewMobilityDriver(rs, us, "")
+	driver := NewMobilityDriver(cs, rs, us, "")
 	tickUnit = time.Millisecond // For testing
 	driver.Start(ctx)
 
