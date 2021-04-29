@@ -26,10 +26,14 @@ const lngMargin = 0.01 // ~ 4.4km
 
 func (d *driver) GenerateRoutes(ctx context.Context, minSpeed uint32, maxSpeed uint32, speedStdDev uint32) {
 	d.establishArea(ctx)
+	log.Infof("Generating routes in area min=%v; max=%v\n", d.min, d.max)
 	for _, ue := range d.ueStore.ListAllUEs(ctx) {
 		_, err := d.routeStore.Get(ctx, ue.IMSI)
 		if err != nil {
-			_ = d.generateRoute(ctx, ue.IMSI, uint32(rand.Intn(int(maxSpeed-minSpeed))), speedStdDev)
+			err = d.generateRoute(ctx, ue.IMSI, uint32(rand.Intn(int(maxSpeed-minSpeed))), speedStdDev)
+			if err != nil {
+				log.Warn("Unable to generate route for %d", ue.IMSI)
+			}
 		}
 	}
 }
@@ -41,21 +45,21 @@ func (d *driver) establishArea(ctx context.Context) {
 		return
 	}
 
-	d.min = &model.Coordinate{Lat: -90.0, Lng: -180.0}
-	d.max = &model.Coordinate{Lat: 90.0, Lng: 180.0}
+	d.min = &model.Coordinate{Lat: 90.0, Lng: 180.0}
+	d.max = &model.Coordinate{Lat: -90.0, Lng: -180.0}
 	for _, cell := range cells {
 		d.min.Lat = math.Min(cell.Sector.Center.Lat, d.min.Lat)
 		d.min.Lng = math.Min(cell.Sector.Center.Lng, d.min.Lng)
-		d.min.Lat = math.Max(cell.Sector.Center.Lat, d.min.Lat)
-		d.min.Lng = math.Max(cell.Sector.Center.Lng, d.min.Lng)
+		d.max.Lat = math.Max(cell.Sector.Center.Lat, d.max.Lat)
+		d.max.Lng = math.Max(cell.Sector.Center.Lng, d.max.Lng)
 	}
 
 	// Widen the area slightly to allow UEs to move at the edges of the RAN topology
 	// No, this does not account for Earth curvature, but should be good enough
 	d.min.Lat = d.min.Lat - latMargin
 	d.min.Lng = d.min.Lng - lngMargin
-	d.max.Lat = d.min.Lat + latMargin
-	d.max.Lng = d.min.Lng + lngMargin
+	d.max.Lat = d.max.Lat + latMargin
+	d.max.Lng = d.max.Lng + lngMargin
 }
 
 func (d *driver) generateRoute(ctx context.Context, imsi types.IMSI, speedAvg uint32, speedStdDev uint32) error {
