@@ -108,7 +108,7 @@ func (m *Manager) Start() error {
 		return err
 	}
 
-	m.mobilityDriver = mobility.NewMobilityDriver(m.routeStore, m.ueStore, "")
+	m.mobilityDriver = mobility.NewMobilityDriver(m.routeStore, m.ueStore, m.model.APIKey)
 	m.mobilityDriver.Start(context.Background())
 
 	return nil
