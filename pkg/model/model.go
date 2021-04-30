@@ -19,6 +19,7 @@ type Model struct {
 	UECount       uint                    `mapstructure:"ueCount" yaml:"ueCount"`
 	Plmn          string                  `mapstructure:"plmnID" yaml:"plmnID"`
 	PlmnID        types.PlmnID            `mapstructure:"plmnNumber" yaml:"plmnNumber"` // overridden and derived post-load from "Plmn" field
+	APIKey        string                  `mapstructure:"apiKey" yaml:"apiKey"`         // Google Maps API key (optional)
 }
 
 // Coordinate represents a geographical location

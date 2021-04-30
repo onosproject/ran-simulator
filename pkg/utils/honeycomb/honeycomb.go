@@ -139,46 +139,13 @@ func generateServiceModels(namesAndIDs []string) map[string]model.ServiceModel {
 // Cells are neighbors if their sectors have the same coordinates or if their center arc vectors fall within a distance/2
 func isNeighbor(cell model.Cell, other model.Cell, maxDistance float64, onlyDistance bool) bool {
 	return (cell.Sector.Center.Lat == other.Sector.Center.Lat && cell.Sector.Center.Lng == other.Sector.Center.Lng) ||
-		(onlyDistance && distance(cell.Sector.Center, other.Sector.Center) <= maxDistance) ||
-		distance(reachPoint(cell.Sector, maxDistance), reachPoint(other.Sector, maxDistance)) <= maxDistance/2
+		(onlyDistance && utils.Distance(cell.Sector.Center, other.Sector.Center) <= maxDistance) ||
+		utils.Distance(reachPoint(cell.Sector, maxDistance), reachPoint(other.Sector, maxDistance)) <= maxDistance/2
 }
 
 // Calculate the end-point of the center arc vector a distance from the sector center
 func reachPoint(sector model.Sector, distance float64) model.Coordinate {
-	return targetPoint(sector.Center, float64((sector.Azimuth+sector.Arc/2)%360), distance)
-}
-
-// Earth radius in meters
-const earthRadius = 6378100
-
-// http://en.wikipedia.org/wiki/Haversine_formula
-func distance(c1 model.Coordinate, c2 model.Coordinate) float64 {
-	var la1, lo1, la2, lo2 float64
-	la1 = c1.Lat * math.Pi / 180
-	lo1 = c1.Lng * math.Pi / 180
-	la2 = c2.Lat * math.Pi / 180
-	lo2 = c2.Lng * math.Pi / 180
-
-	h := hsin(la2-la1) + math.Cos(la1)*math.Cos(la2)*hsin(lo2-lo1)
-
-	return 2 * earthRadius * math.Asin(math.Sqrt(h))
-}
-
-func targetPoint(c model.Coordinate, bearing float64, dist float64) model.Coordinate {
-	var la1, lo1, la2, lo2, azimuth, d float64
-	la1 = c.Lat * math.Pi / 180
-	lo1 = c.Lng * math.Pi / 180
-	azimuth = bearing * math.Pi / 180
-	d = dist / earthRadius
-
-	la2 = math.Asin(math.Sin(la1)*math.Cos(d) + math.Cos(la1)*math.Sin(d)*math.Cos(azimuth))
-	lo2 = lo1 + math.Atan2(math.Sin(azimuth)*math.Sin(d)*math.Cos(la1), math.Cos(d)-math.Sin(la1)*math.Sin(la2))
-
-	return model.Coordinate{Lat: la2 * 180 / math.Pi, Lng: lo2 * 180 / math.Pi}
-}
-
-func hsin(theta float64) float64 {
-	return math.Pow(math.Sin(theta/2), 2)
+	return utils.TargetPoint(sector.Center, float64((sector.Azimuth+sector.Arc/2)%360), distance)
 }
 
 func hexMesh(pitch float64, numTowers uint) []*model.Coordinate {

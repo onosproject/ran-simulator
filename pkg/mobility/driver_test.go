@@ -46,9 +46,9 @@ func TestDriver(t *testing.T) {
 	err = rs.Add(ctx, route)
 	assert.NoError(t, err)
 
-	driver := NewMobilityDriver(rs, us)
+	driver := NewMobilityDriver(cs, rs, us, "")
 	tickUnit = time.Millisecond // For testing
-	driver.Start()
+	driver.Start(ctx)
 
 	c := 0
 	for e = range ch {
@@ -65,6 +65,45 @@ func TestDriver(t *testing.T) {
 		}
 	}
 
-	close(ch)
+	driver.Stop()
+}
+
+func TestRouteGeneration(t *testing.T) {
+	m := &model.Model{}
+	err := model.LoadConfig(m, "../utils/honeycomb/sample")
+	assert.NoError(t, err)
+
+	ns := nodes.NewNodeRegistry(m.Nodes)
+	cs := cells.NewCellRegistry(m.Cells, ns)
+	us := ues.NewUERegistry(1, cs)
+	rs := routes.NewRouteRegistry()
+
+	ctx := context.TODO()
+	us.SetUECount(ctx, 100)
+	assert.Equal(t, 100, us.Len(ctx))
+
+	driver := NewMobilityDriver(cs, rs, us, "")
+	driver.GenerateRoutes(ctx, 30000, 160000, 20000)
+	assert.Equal(t, 100, rs.Len(ctx))
+
+	ch := make(chan event.Event)
+	err = us.Watch(ctx, ch, ues.WatchOptions{Replay: true})
+	assert.NoError(t, err)
+
+	tickUnit = time.Millisecond
+	driver.Start(ctx)
+
+	c := 0
+	for e := range ch {
+		ue := e.Value.(*model.UE)
+		//fmt.Printf("%v: %v\n", ue.Location, ue.Heading)
+		assert.True(t, 52.41 < ue.Location.Lat && ue.Location.Lat < 52.57, "UE latitude is out of range")
+		assert.True(t, 13.29 < ue.Location.Lng && ue.Location.Lng < 13.52, "UE longitude is out of range")
+		c = c + 1
+		if c > 500 {
+			break
+		}
+	}
+
 	driver.Stop()
 }
