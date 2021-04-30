@@ -51,6 +51,9 @@ type Store interface {
 	// MoveToCoordinate updates the UEs geo location and compass heading
 	MoveToCoordinate(ctx context.Context, imsi types.IMSI, location model.Coordinate, heading uint32) error
 
+	// UpdateCells updates the visible cells and their signal strength
+	UpdateCells(ctx context.Context, imsi types.IMSI, cells []*model.UECell) error
+
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs(ctx context.Context) []*model.UE
 
@@ -209,6 +212,22 @@ func (s *store) MoveToCoordinate(ctx context.Context, imsi types.IMSI, location 
 	if ue, ok := s.ues[imsi]; ok {
 		ue.Location = location
 		ue.Heading = heading
+		updateEvent := event.Event{
+			Key:   ue.IMSI,
+			Value: ue,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
+		return nil
+	}
+	return errors.New(errors.NotFound, "UE not found")
+}
+
+func (s *store) UpdateCells(ctx context.Context, imsi types.IMSI, cells []*model.UECell) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ue, ok := s.ues[imsi]; ok {
+		ue.Cells = cells
 		updateEvent := event.Event{
 			Key:   ue.IMSI,
 			Value: ue,

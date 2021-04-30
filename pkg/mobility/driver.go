@@ -6,6 +6,7 @@ package mobility
 
 import (
 	"context"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -88,6 +89,7 @@ func (d *driver) drive(ctx context.Context) {
 					d.initializeUEPosition(ctx, route)
 				}
 				d.updateUEPosition(ctx, route)
+				d.updateUESignalStrength(ctx, route.IMSI)
 			}
 		}
 	}
@@ -125,10 +127,34 @@ func (d *driver) updateUEPosition(ctx context.Context, route *model.Route) {
 	}
 
 	// Move the UE to the determined coordinate; update heading if necessary
-	_ = d.ueStore.MoveToCoordinate(ctx, route.IMSI, newPoint, uint32(math.Round(bearing)))
+	err = d.ueStore.MoveToCoordinate(ctx, route.IMSI, newPoint, uint32(math.Round(bearing)))
+	if err != nil {
+		log.Warn("Unable to update UE %d coordinates", route.IMSI)
+	}
 
 	// Update the route if necessary
 	if reachedWaypoint {
 		_ = d.routeStore.Advance(ctx, route.IMSI)
+	}
+}
+
+func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
+	ue, err := d.ueStore.Get(ctx, imsi)
+	if err != nil {
+		log.Warn("Unable to find UE %d", imsi)
+		return
+	}
+
+	for _, uecell := range ue.Cells {
+		cell, err := d.cellStore.Get(ctx, uecell.ECGI)
+		if err != nil {
+			log.Warn("Unable to find cell %d", uecell.ECGI)
+			continue
+		}
+		uecell.Strength = StrengthAtLocation(ue.Location, *cell)
+	}
+	err = d.ueStore.UpdateCells(ctx, imsi, ue.Cells)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", imsi)
 	}
 }

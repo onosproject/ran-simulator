@@ -90,3 +90,20 @@ func TestMoveUEToCoord(t *testing.T) {
 	assert.Equal(t, 14.4378, ue1.Location.Lng)
 	assert.Equal(t, uint32(182), ue1.Heading)
 }
+
+func TestUpdateCells(t *testing.T) {
+	ctx := context.Background()
+	cellStore := cellStore(t)
+	ues := NewUERegistry(18, cellStore)
+	assert.NotNil(t, ues, "unable to create UE registry")
+
+	ue := ues.ListAllUEs(ctx)[0]
+	uecells := []*model.UECell{{ECGI: 123001, Strength: 42.0}, {ECGI: 123002, Strength: 6.28}}
+	err := ues.UpdateCells(ctx, ue.IMSI, uecells)
+	assert.NoError(t, err)
+
+	ue1, _ := ues.Get(ctx, ue.IMSI)
+	assert.NoError(t, err)
+	assert.Equal(t, 42.0, ue1.Cells[0].Strength)
+	assert.Equal(t, 6.28, ue1.Cells[1].Strength)
+}
