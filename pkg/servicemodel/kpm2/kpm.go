@@ -208,15 +208,13 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	return kpmSm, nil
 }
 
-func (sm *Client) createIndicationMsgFormat1(ctx context.Context, cellECGI ransimtypes.ECGI, actionDefintion *e2smkpmv2.E2SmKpmActionDefinition) ([]byte, error) {
-	log.Debug("Create Indication message format 1 based on action defs for cell:", cellECGI)
-	measInfoList := actionDefintion.GetActionDefinitionFormat1().GetMeasInfoList()
+func (sm *Client) collect(ctx context.Context,
+	actionDefinition *e2smkpmv2.E2SmKpmActionDefinition) (*e2smkpmv2.MeasurementDataItem, error) {
+	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
 	measRecord := e2smkpmv2.MeasurementRecord{
 		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
 	}
-	measData := &e2smkpmv2.MeasurementData{
-		Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
-	}
+
 	for _, measInfo := range measInfoList.Value {
 		for _, measType := range measTypes {
 			if measType.measTypeName.String() == measInfo.MeasType.GetMeasName().Value {
@@ -247,14 +245,30 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, cellECGI ransi
 		measurments.WithMeasurementRecord(&measRecord),
 		measurments.WithIncompleteFlag(e2smkpmv2.IncompleteFlag_INCOMPLETE_FLAG_TRUE)).
 		Build()
-	if err != nil {
-		log.Warn(err)
-		return nil, err
-	}
+	return measDataItem, err
+}
 
-	measData.Value = append(measData.Value, measDataItem)
-	subID := actionDefintion.GetActionDefinitionFormat1().SubscriptId.GetValue()
-	granularity := actionDefintion.GetActionDefinitionFormat1().GetGranulPeriod().Value
+func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
+	cellECGI ransimtypes.ECGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval int32) ([]byte, error) {
+	log.Debug("Create Indication message format 1 based on action defs for cell:", cellECGI)
+	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
+	measData := &e2smkpmv2.MeasurementData{
+		Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
+	}
+	granularity := actionDefinition.GetActionDefinitionFormat1().GetGranulPeriod().Value
+	numDataItems := int(interval / granularity)
+
+	for i := 0; i < numDataItems; i++ {
+		measDataItem, err := sm.collect(ctx, actionDefinition)
+		if err != nil {
+			log.Warn(err)
+			return nil, err
+		}
+
+		measData.Value = append(measData.Value, measDataItem)
+	}
+	subID := actionDefinition.GetActionDefinitionFormat1().SubscriptId.GetValue()
+
 	// Creating an indication message format 1
 	indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
 		kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellECGI), 10)),
@@ -316,7 +330,10 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 
 }
 
-func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes.ECGI, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
+func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes.ECGI,
+	subscription *subutils.Subscription,
+	actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition,
+	interval int32) error {
 	// Creates and sends indication message format 1
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -335,7 +352,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 			cellObjectID := actionDefinition.GetActionDefinitionFormat1().GetCellObjId().Value
 			if cellObjectID == strconv.FormatUint(uint64(ecgi), 10) {
 				log.Debug("Sending indication message for Cell with ID:", cellObjectID)
-				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ecgi, actionDefinition)
+				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ecgi, actionDefinition, interval)
 				if err != nil {
 					return err
 				}
@@ -364,11 +381,12 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 	return nil
 }
 
-func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
+func (sm *Client) sendRicIndication(ctx context.Context,
+	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int32) error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
 	for _, ecgi := range node.Cells {
-		err := sm.sendRicIndicationFormat1(ctx, ecgi, subscription, actionDefinitions)
+		err := sm.sendRicIndicationFormat1(ctx, ecgi, subscription, actionDefinitions, interval)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -392,7 +410,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int32, subscrip
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending Indication Report for subscription:", sub.ID)
-			err = sm.sendRicIndication(ctx, subscription, actionDefinitions)
+			err = sm.sendRicIndication(ctx, subscription, actionDefinitions, interval)
 			if err != nil {
 				log.Error("creating indication message is failed", err)
 				return err
