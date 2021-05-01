@@ -13,7 +13,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
-	github.com/onosproject/helmit v0.6.11
+	github.com/onosproject/helmit v0.6.12
 	github.com/onosproject/onos-api/go v0.7.25
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.19
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.19

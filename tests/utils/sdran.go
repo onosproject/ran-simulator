@@ -5,6 +5,7 @@ package utils
 
 import (
 	"github.com/onosproject/helmit/pkg/helm"
+	"github.com/onosproject/helmit/pkg/input"
 	"github.com/onosproject/helmit/pkg/kubernetes"
 	"github.com/onosproject/helmit/pkg/util/random"
 	"github.com/onosproject/onos-test/pkg/onostest"
@@ -26,8 +27,9 @@ func getCredentials() (string, string, error) {
 }
 
 // CreateSdranRelease creates a helm release for an sd-ran instance
-func CreateSdranRelease() (*helm.HelmRelease, error) {
+func CreateSdranRelease(c *input.Context) (*helm.HelmRelease, error) {
 	username, password, err := getCredentials()
+	registry := c.GetArg("registry").String("")
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +38,7 @@ func CreateSdranRelease() (*helm.HelmRelease, error) {
 		Release("sd-ran").
 		SetUsername(username).
 		SetPassword(password).
+		Set("global.image.registry", registry).
 		Set("import.onos-config.enabled", false).
 		Set("import.onos-topo.enabled", false).
 		Set("onos-e2t.image.tag", "latest").
@@ -45,19 +48,21 @@ func CreateSdranRelease() (*helm.HelmRelease, error) {
 }
 
 // CreateRanSimulator creates a ran simulator
-func CreateRanSimulator() *helm.HelmRelease {
-	return CreateRanSimulatorWithName(random.NewPetName(2))
+func CreateRanSimulator(c *input.Context) *helm.HelmRelease {
+	return CreateRanSimulatorWithName(c, random.NewPetName(2))
 }
 
 // CreateRanSimulatorWithName creates a ran simulator
-func CreateRanSimulatorWithName(name string) *helm.HelmRelease {
+func CreateRanSimulatorWithName(c *input.Context, name string) *helm.HelmRelease {
 	username, password, _ := getCredentials()
+	registry := c.GetArg("registry").String("")
 
 	simulator := helm.
 		Chart(name, onostest.SdranChartRepo).
 		Release(name).
 		SetUsername(username).
 		SetPassword(password).
+		Set("global.image.registry", registry).
 		Set("image.tag", "latest")
 	return simulator
 }
