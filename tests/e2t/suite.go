@@ -5,6 +5,7 @@
 package e2t
 
 import (
+	"github.com/onosproject/helmit/pkg/input"
 	"github.com/onosproject/helmit/pkg/test"
 	"github.com/onosproject/ran-simulator/tests/utils"
 )
@@ -15,8 +16,8 @@ type TestSuite struct {
 }
 
 // SetupTestSuite sets up the ran-simulator test suite
-func (s *TestSuite) SetupTestSuite() error {
-	sdran, err := utils.CreateSdranRelease()
+func (s *TestSuite) SetupTestSuite(c *input.Context) error {
+	sdran, err := utils.CreateSdranRelease(c)
 	if err != nil {
 		return err
 	}
@@ -26,6 +27,6 @@ func (s *TestSuite) SetupTestSuite() error {
 	}
 
 	// Create an instance of the simulator
-	simulator := utils.CreateRanSimulatorWithName("ran-simulator")
+	simulator := utils.CreateRanSimulatorWithName(c, "ran-simulator")
 	return simulator.Install(true)
 }
