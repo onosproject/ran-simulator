@@ -8,12 +8,11 @@ import (
 	"fmt"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
 )
 
 // Neighbour neighbour fields for nrt message
 type Neighbour struct {
-	nrIndex           int32
 	plmnID            ransimtypes.Uint24
 	eutraCellIdentity uint64
 	earfcn            int32
@@ -29,13 +28,6 @@ func NewNeighbour(options ...func(nrb *Neighbour)) *Neighbour {
 	}
 
 	return nrb
-}
-
-// WithNrIndex sets nrIndex
-func WithNrIndex(nrIndex int32) func(neighbour *Neighbour) {
-	return func(neighbour *Neighbour) {
-		neighbour.nrIndex = nrIndex
-	}
 }
 
 // WithPlmnID sets plmnID
@@ -76,7 +68,6 @@ func WithCellSize(cellSize e2smrcpreies.CellSize) func(neighbour *Neighbour) {
 // Build builds Nrt message for RC service model
 func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 	nrtMsg := &e2smrcpreies.Nrt{
-		NrIndex: neighbour.nrIndex,
 		Cgi: &e2smrcpreies.CellGlobalId{
 			CellGlobalId: &e2smrcpreies.CellGlobalId_EUtraCgi{
 				EUtraCgi: &e2smrcpreies.Eutracgi{
@@ -96,8 +87,12 @@ func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 			Value: neighbour.pci,
 		},
 		CellSize: neighbour.cellSize,
-		DlEarfcn: &e2smrcpreies.Earfcn{
-			Value: neighbour.earfcn,
+		DlArfcn: &e2smrcpreies.Arfcn{
+			Arfcn: &e2smrcpreies.Arfcn_EArfcn{
+				EArfcn: &e2smrcpreies.Earfcn{
+					Value: neighbour.earfcn,
+				},
+			},
 		},
 	}
 	if err := nrtMsg.Validate(); err != nil {

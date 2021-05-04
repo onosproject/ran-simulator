@@ -10,13 +10,12 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
 )
 
 // ControlOutcome required fields for control outcome
 type ControlOutcome struct {
-	ranParameterID    int32
-	ranParameterValue int32
+	ranParameterID int32
 }
 
 // NewControlOutcome creates a new control outcome
@@ -36,31 +35,19 @@ func WithRanParameterID(ranParameterID int32) func(co *ControlOutcome) {
 	}
 }
 
-// WithRanParameterValue sets ran parameter value
-func WithRanParameterValue(ranParameterValue int32) func(co *ControlOutcome) {
-	return func(co *ControlOutcome) {
-		co.ranParameterValue = ranParameterValue
-	}
-}
-
 // Build builds rc control outcome message
-func (co *ControlOutcome) Build() (*e2sm_rc_pre_ies.E2SmRcPreControlOutcome, error) {
-	e2smRcPreOutcomeFormat1 := e2sm_rc_pre_ies.E2SmRcPreControlOutcomeFormat1{
-		OutcomeElementList: make([]*e2sm_rc_pre_ies.RanparameterItem, 0),
+func (co *ControlOutcome) Build() (*e2smrcpreies.E2SmRcPreControlOutcome, error) {
+	e2smRcPreOutcomeFormat1 := e2smrcpreies.E2SmRcPreControlOutcomeFormat1{
+		OutcomeElementList: make([]*e2smrcpreies.RanparameterItem, 0),
 	}
-	outcomeElementList := &e2sm_rc_pre_ies.RanparameterItem{
-		RanParameterId: &e2sm_rc_pre_ies.RanparameterId{
+	outcomeElementList := &e2smrcpreies.RanparameterItem{
+		RanParameterId: &e2smrcpreies.RanparameterId{
 			Value: co.ranParameterID,
-		},
-		RanParameterValue: &e2sm_rc_pre_ies.RanparameterValue{
-			RanparameterValue: &e2sm_rc_pre_ies.RanparameterValue_ValueInt{
-				ValueInt: co.ranParameterValue,
-			},
 		},
 	}
 	e2smRcPreOutcomeFormat1.OutcomeElementList = append(e2smRcPreOutcomeFormat1.OutcomeElementList, outcomeElementList)
-	e2smRcPrePdu := e2sm_rc_pre_ies.E2SmRcPreControlOutcome{
-		E2SmRcPreControlOutcome: &e2sm_rc_pre_ies.E2SmRcPreControlOutcome_ControlOutcomeFormat1{
+	e2smRcPrePdu := e2smrcpreies.E2SmRcPreControlOutcome{
+		E2SmRcPreControlOutcome: &e2smrcpreies.E2SmRcPreControlOutcome_ControlOutcomeFormat1{
 			ControlOutcomeFormat1: &e2smRcPreOutcomeFormat1,
 		},
 	}

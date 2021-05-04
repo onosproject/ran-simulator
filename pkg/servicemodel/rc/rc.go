@@ -8,6 +8,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/ranfundesc"
+
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -20,7 +22,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 
-	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
@@ -49,12 +51,6 @@ import (
 var _ servicemodel.Client = &Client{}
 
 var log = logging.GetLogger("sm", "rc")
-
-const (
-	modelFullName = "ORAN-E2SM-RC-PRE"
-	version       = "v1"
-	modelOID      = "1.3.6.1.4.1.53148.1.1.2.100"
-)
 
 // Client rc service model client
 type Client struct {
@@ -199,7 +195,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	rcSm.Client = rcClient
 
-	var ranFunctionShortName = string(modelFullName)
+	var ranFunctionShortName = modelFullName
 	var ranFunctionE2SmOid = modelOID
 	var ranFunctionDescription = "RC PRE"
 	var ranFunctionInstance int32 = 3
@@ -210,9 +206,24 @@ func NewServiceModel(node model.Node, model *model.Model,
 	var ricReportStyleName = "PCI and NRT update for eNB"
 	var ricIndicationHeaderFormatType int32 = 1
 	var ricIndicationMessageFormatType int32 = 1
-	ranFuncDescPdu, err := pdubuilder.CreateE2SmRcPreRanfunctionDescriptionMsg(ranFunctionShortName, ranFunctionE2SmOid, ranFunctionDescription,
-		ranFunctionInstance, ricEventStyleType, ricEventStyleName, ricEventFormatType, ricReportStyleType, ricReportStyleName,
-		ricIndicationHeaderFormatType, ricIndicationMessageFormatType)
+
+	ricEventTriggerStyleList := make([]*e2smrcpreies.RicEventTriggerStyleList, 0)
+	ricEventTriggerItem1 := pdubuilder.CreateRicEventTriggerStyleItem(ricEventStyleType, ricEventStyleName, ricEventFormatType)
+	ricEventTriggerStyleList = append(ricEventTriggerStyleList, ricEventTriggerItem1)
+
+	ricReportStyleList := make([]*e2smrcpreies.RicReportStyleList, 0)
+	ricReportStyleItem1 := pdubuilder.CreateRicReportStyleItem(ricReportStyleType, ricReportStyleName, ricIndicationHeaderFormatType,
+		ricIndicationMessageFormatType)
+	ricReportStyleList = append(ricReportStyleList, ricReportStyleItem1)
+
+	ranFuncDescPdu, err := ranfundesc.NewRANFunctionDescription(
+		ranfundesc.WithRANFunctionDescription(ranFunctionDescription),
+		ranfundesc.WithRANFunctionInstance(ranFunctionInstance),
+		ranfundesc.WithRANFunctionShortName(ranFunctionShortName),
+		ranfundesc.WithRANFunctionE2SmOID(ranFunctionE2SmOid),
+		ranfundesc.WithRICEventTriggerStyleList(ricEventTriggerStyleList),
+		ranfundesc.WithRICReportStyleList(ricReportStyleList)).
+		Build()
 
 	if err != nil {
 		log.Error(err)
@@ -266,8 +277,8 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	log.Debugf("RC control header: %v", controlHeader)
 	log.Debugf("RC control message: %v", controlMessage)
 
-	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value
-	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetEUtraCgi().EUtracellIdentity.Value.Value
+	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value
+	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetNrCgi().NRcellIdentity.Value.Value
 	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
 	log.Debugf("ECI is %d and PLMN ID is %d", eci, plmnID)
 
@@ -280,8 +291,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	if !found {
 		log.Debugf("Ran parameter for entity %d not found", ecgi)
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
-			controloutcome.WithRanParameterID(parameterID),
-			controloutcome.WithRanParameterValue(0)).
+			controloutcome.WithRanParameterID(parameterID)).
 			ToAsn1Bytes(modelPlugin)
 		if err != nil {
 			return nil, nil, err
@@ -298,19 +308,18 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	}
 	var parameterValue interface{}
 	switch controlMessage.GetControlMessage().ParameterType.RanParameterType {
-	case e2sm_rc_pre_ies.RanparameterType_RANPARAMETER_TYPE_INTEGER:
+	case e2smrcpreies.RanparameterType_RANPARAMETER_TYPE_INTEGER:
 		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValueInt()
-	case e2sm_rc_pre_ies.RanparameterType_RANPARAMETER_TYPE_ENUMERATED:
+	case e2smrcpreies.RanparameterType_RANPARAMETER_TYPE_ENUMERATED:
 		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValueEnum()
-	case e2sm_rc_pre_ies.RanparameterType_RANPARAMETER_TYPE_PRINTABLE_STRING:
+	case e2smrcpreies.RanparameterType_RANPARAMETER_TYPE_PRINTABLE_STRING:
 		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValuePrtS()
 	}
 
 	err = sm.ServiceModel.MetricStore.Set(ctx, uint64(ecgi), parameterName, parameterValue)
 	if err != nil {
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
-			controloutcome.WithRanParameterID(parameterID),
-			controloutcome.WithRanParameterValue(oldValue.(int32))).
+			controloutcome.WithRanParameterID(parameterID)).
 			ToAsn1Bytes(modelPlugin)
 		if err != nil {
 			return nil, nil, err
@@ -327,8 +336,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	}
 
 	outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
-		controloutcome.WithRanParameterID(parameterID),
-		controloutcome.WithRanParameterValue(parameterValue.(int32))).
+		controloutcome.WithRanParameterID(parameterID)).
 		ToAsn1Bytes(modelPlugin)
 	if err != nil {
 		return nil, nil, err
@@ -402,7 +410,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	}
 
 	switch eventTriggerType {
-	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
+	case e2smrcpreies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
 		log.Debug("Received on change report subscription request")
 		go func() {
 			ctx, cancel := context.WithCancel(context.Background())
@@ -412,7 +420,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 				return
 			}
 		}()
-	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
+	case e2smrcpreies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
 		log.Debug("Received periodic report subscription request")
 		go func() {
 			ctx, cancel := context.WithCancel(context.Background())
@@ -450,7 +458,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	if err != nil {
 		return nil, nil, err
 	}
-	eventTriggerDefinition := &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition{}
+	eventTriggerDefinition := &e2smrcpreies.E2SmRcPreEventTriggerDefinition{}
 	err = proto.Unmarshal(eventTriggerProtoBytes, eventTriggerDefinition)
 	if err != nil {
 		return nil, nil, err
@@ -466,10 +474,10 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	}
 
 	switch eventTriggerType {
-	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
+	case e2smrcpreies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_PERIODIC:
 		log.Debug("Stopping the periodic report subscription")
 		sub.Ticker.Stop()
-	case e2sm_rc_pre_ies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
+	case e2smrcpreies.RcPreTriggerType_RC_PRE_TRIGGER_TYPE_UPON_CHANGE:
 		// TODO stop on change event trigger
 	}
 

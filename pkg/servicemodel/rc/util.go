@@ -15,21 +15,17 @@ import (
 	rcindicationhdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/indication/header"
 	rcindicationmsg "github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/indication/message"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/nrt"
-	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/pcirange"
-
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc/pciload"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
-	e2sm_rc_pre_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v1/e2sm-rc-pre-ies"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 )
 
-func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_rc_pre_ies.E2SmRcPreControlMessage, error) {
+func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlMessage, error) {
 	modelPlugin, err := sm.getModelPlugin()
 	if err != nil {
 		return nil, err
@@ -38,7 +34,7 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 	if err != nil {
 		return nil, err
 	}
-	controlMessage := &e2sm_rc_pre_ies.E2SmRcPreControlMessage{}
+	controlMessage := &e2smrcpreies.E2SmRcPreControlMessage{}
 	err = proto.Unmarshal(controlMessageProtoBytes, controlMessage)
 
 	if err != nil {
@@ -47,7 +43,7 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 	return controlMessage, nil
 }
 
-func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_rc_pre_ies.E2SmRcPreControlHeader, error) {
+func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlHeader, error) {
 	modelPlugin, err := sm.getModelPlugin()
 	if err != nil {
 		return nil, err
@@ -56,7 +52,7 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 	if err != nil {
 		return nil, err
 	}
-	controlHeader := &e2sm_rc_pre_ies.E2SmRcPreControlHeader{}
+	controlHeader := &e2smrcpreies.E2SmRcPreControlHeader{}
 	err = proto.Unmarshal(controlHeaderProtoBytes, controlHeader)
 	if err != nil {
 		return nil, err
@@ -66,7 +62,7 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 }
 
 // getEventTriggerType extracts event trigger type
-func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_rc_pre_ies.RcPreTriggerType, error) {
+func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2smrcpreies.RcPreTriggerType, error) {
 	modelPlugin, err := sm.getModelPlugin()
 	if err != nil {
 		log.Error(err)
@@ -77,7 +73,7 @@ func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRe
 	if err != nil {
 		return -1, err
 	}
-	eventTriggerDefinition := &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition{}
+	eventTriggerDefinition := &e2smrcpreies.E2SmRcPreEventTriggerDefinition{}
 	err = proto.Unmarshal(eventTriggerProtoBytes, eventTriggerDefinition)
 	if err != nil {
 		return -1, err
@@ -101,18 +97,18 @@ func (sm *Client) getPlmnID() ransimtypes.Uint24 {
 	return plmnIDUint24
 }
 
-func (sm *Client) toCellSizeEnum(cellSize string) e2sm_rc_pre_ies.CellSize {
+func (sm *Client) toCellSizeEnum(cellSize string) e2smrcpreies.CellSize {
 	switch cellSize {
 	case "ENTERPRISE":
-		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_ENTERPRISE
+		return e2smrcpreies.CellSize_CELL_SIZE_ENTERPRISE
 	case "FEMTO":
-		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_FEMTO
+		return e2smrcpreies.CellSize_CELL_SIZE_FEMTO
 	case "MACRO":
-		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_MACRO
+		return e2smrcpreies.CellSize_CELL_SIZE_MACRO
 	case "OUTDOOR_SMALL":
-		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_OUTDOOR_SMALL
+		return e2smrcpreies.CellSize_CELL_SIZE_OUTDOOR_SMALL
 	default:
-		return e2sm_rc_pre_ies.CellSize_CELL_SIZE_ENTERPRISE
+		return e2smrcpreies.CellSize_CELL_SIZE_ENTERPRISE
 	}
 }
 
@@ -168,14 +164,6 @@ func (sm *Client) getCellSize(ctx context.Context, ecgi ransimtypes.ECGI) (strin
 	return cellSize.(string), nil
 }
 
-func (sm *Client) getPciPool(ctx context.Context, ecgi ransimtypes.ECGI) ([]pciload.PciRange, error) {
-	pciPool, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "pcipool")
-	if !found {
-		return nil, errors.New(errors.NotFound, "cell size value is not found for  neighbour  cell:", ecgi)
-	}
-	return pciPool.([]pciload.PciRange), nil
-}
-
 // getReportPeriod extracts report period
 func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {
 	modelPlugin, err := sm.getModelPlugin()
@@ -188,7 +176,7 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	if err != nil {
 		return 0, err
 	}
-	eventTriggerDefinition := &e2sm_rc_pre_ies.E2SmRcPreEventTriggerDefinition{}
+	eventTriggerDefinition := &e2smrcpreies.E2SmRcPreEventTriggerDefinition{}
 	err = proto.Unmarshal(eventTriggerProtoBytes, eventTriggerDefinition)
 	if err != nil {
 		return 0, err
@@ -200,8 +188,8 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 // createRicIndication creates ric indication  for each cell in the node
 func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
 	plmnID := sm.getPlmnID()
-	var neighbourList []*e2sm_rc_pre_ies.Nrt
-	neighbourList = make([]*e2sm_rc_pre_ies.Nrt, 0)
+	var neighbourList []*e2smrcpreies.Nrt
+	neighbourList = make([]*e2smrcpreies.Nrt, 0)
 	cell, err := sm.ServiceModel.CellStore.Get(ctx, ecgi)
 	if err != nil {
 		return nil, err
@@ -220,7 +208,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 	if err != nil {
 		return nil, err
 	}
-	for index, neighbourEcgi := range cell.Neighbors {
+	for _, neighbourEcgi := range cell.Neighbors {
 		neighbourCellPci, err := sm.getCellPci(ctx, neighbourEcgi)
 		if err != nil {
 			log.Error(err)
@@ -236,7 +224,6 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		}
 		neighbourEci := ransimtypes.GetECI(uint64(neighbourEcgi))
 		neighbour, err := nrt.NewNeighbour(
-			nrt.WithNrIndex(int32(index)),
 			nrt.WithPci(neighbourCellPci),
 			nrt.WithEutraCellIdentity(uint64(neighbourEci)),
 			nrt.WithEarfcn(neighbourEarfcn),
@@ -245,21 +232,6 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		if err == nil {
 			neighbourList = append(neighbourList, neighbour)
 		}
-	}
-
-	pciRanges, err := sm.getPciPool(ctx, ecgi)
-	if err != nil {
-		return nil, err
-	}
-
-	var pciPool []*e2smrcpreies.PciRange
-	for _, pciRangeValue := range pciRanges {
-		pciRange, err := pcirange.NewPciRange(pcirange.WithLowerPci(int32(pciRangeValue.Min)),
-			pcirange.WithUpperPci(int32(pciRangeValue.Max))).Build()
-		if err != nil {
-			return nil, err
-		}
-		pciPool = append(pciPool, pciRange)
 	}
 
 	cellEci := ransimtypes.GetECI(uint64(cell.ECGI))
@@ -275,8 +247,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		rcindicationmsg.WithEarfcn(earfcn),
 		rcindicationmsg.WithEutraCellIdentity(uint64(cellEci)),
 		rcindicationmsg.WithPci(cellPci),
-		rcindicationmsg.WithNeighbours(neighbourList),
-		rcindicationmsg.WithPciPool(pciPool))
+		rcindicationmsg.WithNeighbours(neighbourList))
 
 	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
