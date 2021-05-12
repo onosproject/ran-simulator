@@ -15,7 +15,7 @@ import (
 type Message struct {
 	subscriptionID int64
 	cellObjID      string
-	granularity    int32
+	granularity    uint32
 	measInfoList   *e2smkpmv2.MeasurementInfoList
 	measData       *e2smkpmv2.MeasurementData
 }
@@ -45,7 +45,7 @@ func WithCellObjID(cellObjID string) func(msg *Message) {
 }
 
 // WithGranularity sets granularity
-func WithGranularity(granularity int32) func(msg *Message) {
+func WithGranularity(granularity uint32) func(msg *Message) {
 	return func(msg *Message) {
 		msg.granularity = granularity
 	}

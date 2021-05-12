@@ -249,7 +249,7 @@ func (sm *Client) collect(ctx context.Context,
 }
 
 func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
-	cellECGI ransimtypes.ECGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval int32) ([]byte, error) {
+	cellECGI ransimtypes.ECGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval uint32) ([]byte, error) {
 	log.Debug("Create Indication message format 1 based on action defs for cell:", cellECGI)
 	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
 	measData := &e2smkpmv2.MeasurementData{
@@ -333,7 +333,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes.ECGI,
 	subscription *subutils.Subscription,
 	actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition,
-	interval int32) error {
+	interval uint32) error {
 	// Creates and sends indication message format 1
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -382,7 +382,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 }
 
 func (sm *Client) sendRicIndication(ctx context.Context,
-	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int32) error {
+	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval uint32) error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
 	for _, ecgi := range node.Cells {
@@ -395,7 +395,7 @@ func (sm *Client) sendRicIndication(ctx context.Context,
 	return nil
 }
 
-func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
+func (sm *Client) reportIndication(ctx context.Context, interval uint32, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 
 	intervalDuration := time.Duration(interval)
