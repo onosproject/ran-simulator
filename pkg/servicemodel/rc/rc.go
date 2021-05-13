@@ -277,8 +277,8 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	log.Debugf("RC control header: %v", controlHeader)
 	log.Debugf("RC control message: %v", controlMessage)
 
-	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value
-	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetEUtraCgi().EUtracellIdentity.Value.Value
+	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value
+	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetNrCgi().NRcellIdentity.Value.Value
 	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
 	log.Debugf("ECI is %d and PLMN ID is %d", eci, plmnID)
 

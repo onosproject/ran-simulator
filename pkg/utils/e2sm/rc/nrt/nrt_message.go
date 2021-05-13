@@ -37,10 +37,10 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(neighbour *Neighbour) {
 	}
 }
 
-// WithEutraCellIdentity sets eutraCellIdentity
-func WithEutraCellIdentity(eutraCellIdentity uint64) func(neighbour *Neighbour) {
+// WithNrcellIdentity sets NrcellIdentity
+func WithNrcellIdentity(nRcellIdentity uint64) func(neighbour *Neighbour) {
 	return func(neighbour *Neighbour) {
-		neighbour.eutraCellIdentity = eutraCellIdentity
+		neighbour.eutraCellIdentity = nRcellIdentity
 	}
 }
 
@@ -69,15 +69,15 @@ func WithCellSize(cellSize e2smrcpreies.CellSize) func(neighbour *Neighbour) {
 func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 	nrtMsg := &e2smrcpreies.Nrt{
 		Cgi: &e2smrcpreies.CellGlobalId{
-			CellGlobalId: &e2smrcpreies.CellGlobalId_EUtraCgi{
-				EUtraCgi: &e2smrcpreies.Eutracgi{
+			CellGlobalId: &e2smrcpreies.CellGlobalId_NrCgi{
+				NrCgi: &e2smrcpreies.Nrcgi{
 					PLmnIdentity: &e2smrcpreies.PlmnIdentity{
 						Value: neighbour.plmnID.ToBytes(),
 					},
-					EUtracellIdentity: &e2smrcpreies.EutracellIdentity{
+					NRcellIdentity: &e2smrcpreies.NrcellIdentity{
 						Value: &e2smrcpreies.BitString{
 							Value: neighbour.eutraCellIdentity, //uint64
-							Len:   28,                          //uint32
+							Len:   36,                          //uint32
 						},
 					},
 				},

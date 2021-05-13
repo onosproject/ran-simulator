@@ -15,10 +15,10 @@ import (
 func TestCreateIndicationHeader(t *testing.T) {
 	plmnID := ransimtypes.NewUint24(12345)
 	indicationHeader, err := NewIndicationHeader(WithPlmnID(plmnID.Value()),
-		WithEutracellIdentity(32)).Build()
+		WithNRcellIdentity(32)).Build()
 	assert.NoError(t, err)
 
-	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetEUtraCgi().PLmnIdentity.Value, plmnID.ToBytes())
-	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetEUtraCgi().EUtracellIdentity.Value.Value, uint64(32))
+	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value, plmnID.ToBytes())
+	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().NRcellIdentity.Value.Value, uint64(32))
 
 }

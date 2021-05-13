@@ -43,13 +43,6 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(message *Message) {
 	}
 }
 
-// WithEutraCellIdentity sets eutraCellIdentity
-func WithEutraCellIdentity(eutraCellIdentity uint64) func(message *Message) {
-	return func(message *Message) {
-		message.eutraCellIdentity = eutraCellIdentity
-	}
-}
-
 // WithEarfcn sets 	earfcn
 func WithEarfcn(earfcn int32) func(message *Message) {
 	return func(message *Message) {
