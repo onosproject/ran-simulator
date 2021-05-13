@@ -13,11 +13,11 @@ import (
 
 // Neighbour neighbour fields for nrt message
 type Neighbour struct {
-	plmnID            ransimtypes.Uint24
-	eutraCellIdentity uint64
-	earfcn            int32
-	pci               int32
-	cellSize          e2smrcpreies.CellSize
+	plmnID         ransimtypes.Uint24
+	nRCellIdentity uint64
+	earfcn         int32
+	pci            int32
+	cellSize       e2smrcpreies.CellSize
 }
 
 // NewNeighbour creates a new neighbour message
@@ -40,7 +40,7 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(neighbour *Neighbour) {
 // WithNrcellIdentity sets NrcellIdentity
 func WithNrcellIdentity(nRcellIdentity uint64) func(neighbour *Neighbour) {
 	return func(neighbour *Neighbour) {
-		neighbour.eutraCellIdentity = nRcellIdentity
+		neighbour.nRCellIdentity = nRcellIdentity
 	}
 }
 
@@ -76,8 +76,8 @@ func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 					},
 					NRcellIdentity: &e2smrcpreies.NrcellIdentity{
 						Value: &e2smrcpreies.BitString{
-							Value: neighbour.eutraCellIdentity, //uint64
-							Len:   36,                          //uint32
+							Value: neighbour.nRCellIdentity, //uint64
+							Len:   36,                       //uint32
 						},
 					},
 				},
