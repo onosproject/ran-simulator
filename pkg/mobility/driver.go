@@ -188,8 +188,8 @@ func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *mo
 			continue
 		}
 		ueCell := &model.UECell{
-			ID: types.GEnbID(cell.ECGI),
-			ECGI: cell.ECGI,
+			ID:       types.GEnbID(cell.ECGI),
+			ECGI:     cell.ECGI,
 			Strength: rsrp,
 		}
 		csCellList = d.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
@@ -200,8 +200,8 @@ func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *mo
 
 func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.UECell {
 	// bubble sort
-	for i:=0; i<len(ueCells)-1; i++ {
-		for j:=0; j<len(ueCells)-i-1; j++ {
+	for i := 0; i < len(ueCells)-1; i++ {
+		for j := 0; j < len(ueCells)-i-1; j++ {
 			if ueCells[j].Strength < ueCells[j+1].Strength {
 				ueCells[j], ueCells[j+1] = ueCells[j+1], ueCells[j]
 			}
