@@ -118,7 +118,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 			if err != nil {
 				log.Info("Failure registering KPM2 service model for eNbID:", node.EnbID)
 				log.Error(err)
-			return nil, err
+				return nil, err
 			}
 		case registry.Mho:
 			log.Info("MHO service model for node with eNbID:", node.EnbID)

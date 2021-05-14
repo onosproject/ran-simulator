@@ -18,8 +18,6 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 
-	"github.com/onosproject/ran-simulator/pkg/store/event"
-
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -105,65 +103,65 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	return nil
 }
 
-func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *subutils.Subscription) error {
-	log.Debugf("Sending report indication on change from node: %d", sm.ServiceModel.Node.EnbID)
-	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
-	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
-	if err != nil {
-		return err
-	}
-	cellEventCh := make(chan event.Event)
-	metricEventCh := make(chan event.Event)
-	nodeCells := sm.ServiceModel.Node.Cells
-	err = sm.ServiceModel.CellStore.Watch(context.Background(), cellEventCh)
-	if err != nil {
-		return err
-	}
-	err = sm.ServiceModel.MetricStore.Watch(context.Background(), metricEventCh)
-	if err != nil {
-		return err
-	}
-
-	// Sends the first indication message
-	err = sm.sendRicIndication(ctx, subscription)
-	if err != nil {
-		return err
-	}
-
-	for {
-		select {
-		case cellEvent := <-cellEventCh:
-			log.Debug("Received cell event:", cellEvent)
-			cellEventType := cellEvent.Type.(cells.CellEvent)
-			if cellEventType == cells.UpdatedNeighbors {
-				cell := cellEvent.Value.(*model.Cell)
-				for _, nodeCell := range nodeCells {
-					if nodeCell == cell.ECGI {
-						err = sm.sendRicIndication(ctx, subscription)
-						if err != nil {
-							log.Error(err)
-						}
-					}
-				}
-			}
-		case metricEvent := <-metricEventCh:
-			log.Debug("Received metric event:", metricEvent)
-			metricKey := metricEvent.Key.(metrics.Key)
-			for _, nodeCell := range nodeCells {
-				if uint64(nodeCell) == metricKey.EntityID && metricKey.Name == "pci" {
-					err = sm.sendRicIndication(ctx, subscription)
-					if err != nil {
-						log.Error(err)
-					}
-				}
-			}
-
-		case <-sub.E2Channel.Context().Done():
-			log.Debug("E2 channel context is done")
-			return nil
-		}
-	}
-}
+//func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *subutils.Subscription) error {
+//	log.Debugf("Sending report indication on change from node: %d", sm.ServiceModel.Node.EnbID)
+//	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+//	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
+//	if err != nil {
+//		return err
+//	}
+//	cellEventCh := make(chan event.Event)
+//	metricEventCh := make(chan event.Event)
+//	nodeCells := sm.ServiceModel.Node.Cells
+//	err = sm.ServiceModel.CellStore.Watch(context.Background(), cellEventCh)
+//	if err != nil {
+//		return err
+//	}
+//	err = sm.ServiceModel.MetricStore.Watch(context.Background(), metricEventCh)
+//	if err != nil {
+//		return err
+//	}
+//
+//	// Sends the first indication message
+//	err = sm.sendRicIndication(ctx, subscription)
+//	if err != nil {
+//		return err
+//	}
+//
+//	for {
+//		select {
+//		case cellEvent := <-cellEventCh:
+//			log.Debug("Received cell event:", cellEvent)
+//			cellEventType := cellEvent.Type.(cells.CellEvent)
+//			if cellEventType == cells.UpdatedNeighbors {
+//				cell := cellEvent.Value.(*model.Cell)
+//				for _, nodeCell := range nodeCells {
+//					if nodeCell == cell.ECGI {
+//						err = sm.sendRicIndication(ctx, subscription)
+//						if err != nil {
+//							log.Error(err)
+//						}
+//					}
+//				}
+//			}
+//		case metricEvent := <-metricEventCh:
+//			log.Debug("Received metric event:", metricEvent)
+//			metricKey := metricEvent.Key.(metrics.Key)
+//			for _, nodeCell := range nodeCells {
+//				if uint64(nodeCell) == metricKey.EntityID && metricKey.Name == "pci" {
+//					err = sm.sendRicIndication(ctx, subscription)
+//					if err != nil {
+//						log.Error(err)
+//					}
+//				}
+//			}
+//
+//		case <-sub.E2Channel.Context().Done():
+//			log.Debug("E2 channel context is done")
+//			return nil
+//		}
+//	}
+//}
 
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model,

@@ -6,8 +6,6 @@ package mho
 
 import (
 	"context"
-	"strconv"
-
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 
@@ -18,41 +16,41 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		return nil, err
-	}
-	controlMessageProtoBytes, err := modelPlugin.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
-	if err != nil {
-		return nil, err
-	}
-	controlMessage := &e2sm_mho.E2SmMhoControlMessage{}
-	err = proto.Unmarshal(controlMessageProtoBytes, controlMessage)
+//func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
+//	modelPlugin, err := sm.getModelPlugin()
+//	if err != nil {
+//		return nil, err
+//	}
+//	controlMessageProtoBytes, err := modelPlugin.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
+//	if err != nil {
+//		return nil, err
+//	}
+//	controlMessage := &e2sm_mho.E2SmMhoControlMessage{}
+//	err = proto.Unmarshal(controlMessageProtoBytes, controlMessage)
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//	return controlMessage, nil
+//}
 
-	if err != nil {
-		return nil, err
-	}
-	return controlMessage, nil
-}
-
-func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		return nil, err
-	}
-	controlHeaderProtoBytes, err := modelPlugin.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
-	if err != nil {
-		return nil, err
-	}
-	controlHeader := &e2sm_mho.E2SmMhoControlHeader{}
-	err = proto.Unmarshal(controlHeaderProtoBytes, controlHeader)
-	if err != nil {
-		return nil, err
-	}
-
-	return controlHeader, nil
-}
+//func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
+//	modelPlugin, err := sm.getModelPlugin()
+//	if err != nil {
+//		return nil, err
+//	}
+//	controlHeaderProtoBytes, err := modelPlugin.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
+//	if err != nil {
+//		return nil, err
+//	}
+//	controlHeader := &e2sm_mho.E2SmMhoControlHeader{}
+//	err = proto.Unmarshal(controlHeaderProtoBytes, controlHeader)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return controlHeader, nil
+//}
 
 // getEventTriggerType extracts event trigger type
 func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_mho.MhoTriggerType, error) {
@@ -84,63 +82,11 @@ func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
 	return modelPlugin, nil
 }
 
-func (sm *Client) getPlmnID() ransimtypes.Uint24 {
-	plmnIDUint24 := ransimtypes.Uint24{}
-	plmnIDUint24.Set(uint32(sm.ServiceModel.Model.PlmnID))
-	return plmnIDUint24
-}
-
-func (sm *Client) getCellPci(ctx context.Context, ecgi ransimtypes.ECGI) (int32, error) {
-	cellPci, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "pci")
-	if !found {
-		return 0, errors.New(errors.NotFound, "pci value is not found for cell:", ecgi)
-	}
-	// TODO we should handle this properly in metric store
-	switch cellPci := cellPci.(type) {
-	case uint32:
-		return int32(cellPci), nil
-	case int32:
-		return cellPci, nil
-	case int64:
-		return int32(cellPci), nil
-	case uint64:
-		return int32(cellPci), nil
-	case uint8:
-		return int32(cellPci), nil
-	case int8:
-		return int32(cellPci), nil
-	case int16:
-		return int32(cellPci), nil
-	case uint16:
-		return int32(cellPci), nil
-	case string:
-		val, err := strconv.Atoi(cellPci)
-		if err != nil {
-			return 0, err
-		}
-		return int32(val), nil
-	default:
-		return 0, nil
-	}
-
-}
-
-func (sm *Client) getEarfcn(ctx context.Context, ecgi ransimtypes.ECGI) (int32, error) {
-	earfcn, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "earfcn")
-	if !found {
-		return 0, errors.New(errors.NotFound, "earfc value is not found for cell:", ecgi)
-	}
-
-	return int32(earfcn.(uint32)), nil
-}
-
-func (sm *Client) getCellSize(ctx context.Context, ecgi ransimtypes.ECGI) (string, error) {
-	cellSize, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "cellSize")
-	if !found {
-		return "", errors.New(errors.NotFound, "cell size value is not found for  neighbour  cell:", ecgi)
-	}
-	return cellSize.(string), nil
-}
+//func (sm *Client) getPlmnID() ransimtypes.Uint24 {
+//	plmnIDUint24 := ransimtypes.Uint24{}
+//	plmnIDUint24.Set(uint32(sm.ServiceModel.Model.PlmnID))
+//	return plmnIDUint24
+//}
 
 // getReportPeriod extracts report period
 func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {

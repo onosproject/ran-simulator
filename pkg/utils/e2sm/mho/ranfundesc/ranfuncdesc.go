@@ -86,7 +86,7 @@ func (desc *RANFunctionDescription) Build() (*e2sm_mho.E2SmMhoRanfunctionDescrip
 			RanFunctionInstance:    desc.ranFunctionInstance,
 		},
 		RicEventTriggerStyleList: desc.ricEventTriggerStyleList,
-		RicReportStyleList: desc.ricReportStyleList,
+		RicReportStyleList:       desc.ricReportStyleList,
 	}
 
 	if err := e2smMhoPdu.Validate(); err != nil {
