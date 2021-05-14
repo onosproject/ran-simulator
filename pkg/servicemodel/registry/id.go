@@ -23,4 +23,6 @@ const (
 	Rc
 	// Kpm2
 	Kpm2
+	// MHO
+	Mho
 )

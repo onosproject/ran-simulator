@@ -7,6 +7,7 @@ package e2agent
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"time"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
@@ -116,6 +117,19 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 			err = reg.RegisterServiceModel(kpm2Sm)
 			if err != nil {
 				log.Info("Failure registering KPM2 service model for eNbID:", node.EnbID)
+				log.Error(err)
+				return nil, err
+			}
+		case registry.Mho:
+			log.Info("MHO service model for node with eNbID:", node.EnbID)
+			mhoSm, err := mho.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore, cellStore, metricStore)
+			if err != nil {
+				log.Info("Failure creating MHO service model for eNbID:", node.EnbID)
+				return nil, err
+			}
+			err = reg.RegisterServiceModel(mhoSm)
+			if err != nil {
+				log.Info("Failure registering MHO service model for eNbID:", node.EnbID)
 				log.Error(err)
 				return nil, err
 			}
