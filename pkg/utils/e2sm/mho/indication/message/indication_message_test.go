@@ -19,14 +19,12 @@ func TestCreateIndicationMessage(t *testing.T) {
 	plmnID := ransimtypes.NewUint24(12345)
 	nrt1, err := nrt.NewNeighbour(
 		nrt.WithPci(10),
-		nrt.WithEutraCellIdentity(15),
 		nrt.WithEarfcn(40),
 		nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_MACRO),
 		nrt.WithPlmnID(plmnID.Value())).Build()
 	assert.NoError(t, err)
 	nrt2, err := nrt.NewNeighbour(
 		nrt.WithPci(20),
-		nrt.WithEutraCellIdentity(25),
 		nrt.WithEarfcn(50),
 		nrt.WithCellSize(e2smrcpreies.CellSize_CELL_SIZE_FEMTO),
 		nrt.WithPlmnID(plmnID.Value())).Build()

@@ -39,10 +39,10 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(header *Header) {
 	}
 }
 
-// WithEutracellIdentity sets eutraCellIdentity
-func WithEutracellIdentity(eutraCellIdentity uint64) func(header *Header) {
+// WithNRcellIdentity sets NRcellIdentity
+func WithNRcellIdentity(nRcellIdentity uint64) func(header *Header) {
 	return func(header *Header) {
-		header.eutraCellIdentity = eutraCellIdentity
+		header.eutraCellIdentity = nRcellIdentity
 	}
 }
 
@@ -52,15 +52,15 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 		E2SmRcPreIndicationHeader: &e2smrcpreies.E2SmRcPreIndicationHeader_IndicationHeaderFormat1{
 			IndicationHeaderFormat1: &e2smrcpreies.E2SmRcPreIndicationHeaderFormat1{
 				Cgi: &e2smrcpreies.CellGlobalId{
-					CellGlobalId: &e2smrcpreies.CellGlobalId_EUtraCgi{
-						EUtraCgi: &e2smrcpreies.Eutracgi{
+					CellGlobalId: &e2smrcpreies.CellGlobalId_NrCgi{
+						NrCgi: &e2smrcpreies.Nrcgi{
 							PLmnIdentity: &e2smrcpreies.PlmnIdentity{
 								Value: header.plmnID.ToBytes(),
 							},
-							EUtracellIdentity: &e2smrcpreies.EutracellIdentity{
+							NRcellIdentity: &e2smrcpreies.NrcellIdentity{
 								Value: &e2smrcpreies.BitString{
 									Value: header.eutraCellIdentity, //uint64
-									Len:   28,                       //uint32
+									Len:   36,                       //uint32
 								},
 							},
 						},

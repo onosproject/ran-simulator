@@ -17,12 +17,11 @@ import (
 
 // Message indication message fields for rc service model
 type Message struct {
-	plmnID            ransimtypes.Uint24
-	eutraCellIdentity uint64
-	earfcn            int32
-	cellSize          e2smrcpreies.CellSize
-	pci               int32
-	neighbours        []*e2smrcpreies.Nrt
+	plmnID     ransimtypes.Uint24
+	earfcn     int32
+	cellSize   e2smrcpreies.CellSize
+	pci        int32
+	neighbours []*e2smrcpreies.Nrt
 }
 
 // NewIndicationMessage creates a new indication message
@@ -40,13 +39,6 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(message *Message) {
 	return func(message *Message) {
 		message.plmnID = plmnID
 
-	}
-}
-
-// WithEutraCellIdentity sets eutraCellIdentity
-func WithEutraCellIdentity(eutraCellIdentity uint64) func(message *Message) {
-	return func(message *Message) {
-		message.eutraCellIdentity = eutraCellIdentity
 	}
 }
 

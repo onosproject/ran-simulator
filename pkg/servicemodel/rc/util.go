@@ -225,7 +225,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		neighbourEci := ransimtypes.GetECI(uint64(neighbourEcgi))
 		neighbour, err := nrt.NewNeighbour(
 			nrt.WithPci(neighbourCellPci),
-			nrt.WithEutraCellIdentity(uint64(neighbourEci)),
+			nrt.WithNrcellIdentity(uint64(neighbourEci)),
 			nrt.WithEarfcn(neighbourEarfcn),
 			nrt.WithCellSize(sm.toCellSizeEnum(neighbourCellSize)),
 			nrt.WithPlmnID(plmnID.Value())).Build()
@@ -238,14 +238,12 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 	// Creates RC indication header
 	header := rcindicationhdr.NewIndicationHeader(
 		rcindicationhdr.WithPlmnID(plmnID.Value()),
-		rcindicationhdr.WithEutracellIdentity(uint64(cellEci)))
-
+		rcindicationhdr.WithNRcellIdentity(uint64(cellEci)))
 	// Creates RC indication message
 
 	message := rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
 		rcindicationmsg.WithCellSize(sm.toCellSizeEnum(cellSize)),
 		rcindicationmsg.WithEarfcn(earfcn),
-		rcindicationmsg.WithEutraCellIdentity(uint64(cellEci)),
 		rcindicationmsg.WithPci(cellPci),
 		rcindicationmsg.WithNeighbours(neighbourList))
 
