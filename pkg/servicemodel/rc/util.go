@@ -239,8 +239,6 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 	header := rcindicationhdr.NewIndicationHeader(
 		rcindicationhdr.WithPlmnID(plmnID.Value()),
 		rcindicationhdr.WithNRcellIdentity(uint64(cellEci)))
-
-	log.Info("HEADER:", header)
 	// Creates RC indication message
 
 	message := rcindicationmsg.NewIndicationMessage(rcindicationmsg.WithPlmnID(plmnID.Value()),
