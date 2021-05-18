@@ -17,7 +17,8 @@ const powerFactor = 0.001
 func StrengthAtLocation(coord model.Coordinate, cell model.Cell) float64 {
 	distAtt := distanceAttenuation(coord, cell)
 	angleAtt := angleAttenuation(coord, cell)
-	return cell.TxPowerDB + distAtt + angleAtt
+	pathLoss := getPathLoss(coord, cell)
+	return cell.TxPowerDB + distAtt + angleAtt - pathLoss
 }
 
 // distanceAttenuation is the antenna Gain as a function of the dist
@@ -48,5 +49,28 @@ func angleAttenuation(coord model.Coordinate, cell model.Cell) float64 {
 	// We just use a simple linear formula 0 => no loss
 	// 33° => -3dB for a 120° sector according to [2]
 	// assume this is 1:1 rads:attenuation e.g. 0.50 rads = 0.5 = -3dB attenuation
-	return 10 * math.Log10(1-(angularOffset/math.Pi/angleScaling))
+	//return 10 * math.Log10(1-(angularOffset/math.Pi/angleScaling))
+	return -math.Min(12*math.Pow((angularOffset/(math.Pi*2/3)/angleScaling), 2), 30)
+}
+
+func getPathLoss(coord model.Coordinate, cell model.Cell) float64 {
+	return getFreeSpacePathLoss(coord, cell)
+}
+
+func getFreeSpacePathLoss(coord model.Coordinate, cell model.Cell) float64 {
+	distanceKM := getEuclianDistanceFromGPS(coord, cell)
+	// Assuming we're using CBRS frequency 3.6 GHz
+	// 92.45 is the constant value of 20 * log10(4*pi / c) in Kilometer scale
+	pathLoss := 20*math.Log10(distanceKM) + 20*math.Log10(3.6) + 92.45
+	return pathLoss
+}
+
+func getEuclianDistanceFromGPS(coord model.Coordinate, cell model.Cell) float64 {
+	earthRadius := 6378.137
+	dLat := coord.Lat*math.Pi/180 - cell.Sector.Center.Lat*math.Pi/180
+	dLng := coord.Lng*math.Pi/180 - cell.Sector.Center.Lng*math.Pi/180
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) + math.Cos(coord.Lat*math.Pi/180)*math.Cos(cell.Sector.Center.Lat*math.Pi/180)*
+		math.Sin(dLng/2)*math.Sin(dLng/2)
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	return earthRadius * c
 }

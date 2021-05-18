@@ -6,6 +6,7 @@ package mobility
 
 import (
 	"context"
+	"fmt"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
@@ -145,16 +146,69 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 		return
 	}
 
-	for _, uecell := range ue.Cells {
-		cell, err := d.cellStore.Get(ctx, uecell.ECGI)
-		if err != nil {
-			log.Warn("Unable to find cell %d", uecell.ECGI)
-			continue
-		}
-		uecell.Strength = StrengthAtLocation(ue.Location, *cell)
+	// update RSRP from serving cell
+	err = d.updateUESignalStrengthServCell(ctx, ue)
+	if err != nil {
+		log.Warnf("%v", err)
+		return
 	}
+
+	// update RSRP from candidate serving cells
+	err = d.updateUESignalStrengthCandServCells(ctx, ue)
+	if err != nil {
+		log.Warnf("%v", err)
+		return
+	}
+
+	// update cells on ueStore
 	err = d.ueStore.UpdateCells(ctx, imsi, ue.Cells)
 	if err != nil {
 		log.Warn("Unable to update UE %d cell info", imsi)
 	}
+}
+
+func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
+	sCell, err := d.cellStore.Get(ctx, ue.Cell.ECGI)
+	if err != nil {
+		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
+	}
+	ue.Cell.Strength = StrengthAtLocation(ue.Location, *sCell)
+	return nil
+}
+
+func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE) error {
+	cellList, err := d.cellStore.List(ctx)
+	if err != nil {
+		return fmt.Errorf("Unable to get all cells")
+	}
+	var csCellList []*model.UECell
+	for _, cell := range cellList {
+		rsrp := StrengthAtLocation(ue.Location, *cell)
+		if math.IsNaN(rsrp) {
+			continue
+		}
+		ueCell := &model.UECell{
+			ID:       types.GEnbID(cell.ECGI),
+			ECGI:     cell.ECGI,
+			Strength: rsrp,
+		}
+		csCellList = d.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
+	}
+	ue.Cells = csCellList
+	return nil
+}
+
+func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.UECell {
+	// bubble sort
+	for i := 0; i < len(ueCells)-1; i++ {
+		for j := 0; j < len(ueCells)-i-1; j++ {
+			if ueCells[j].Strength < ueCells[j+1].Strength {
+				ueCells[j], ueCells[j+1] = ueCells[j+1], ueCells[j]
+			}
+		}
+	}
+	if len(ueCells) >= numAdjCells {
+		return ueCells[0:numAdjCells]
+	}
+	return ueCells
 }
