@@ -7,5 +7,5 @@ package mho
 const (
 	modelFullName = "ORAN-E2SM-MHO"
 	version       = "v1"
-	modelOID      = "1.3.6.1.4.1.53148.1.2.2.101"
+	modelOID      = "1.3.6.1.4.1.53148.1.1.2.101"
 )
