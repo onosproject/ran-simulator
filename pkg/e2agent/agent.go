@@ -237,6 +237,9 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	case registry.Kpm2:
 		client := sm.Client.(*kpm2.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
+	case registry.Mho:
+		client := sm.Client.(*mho.Client)
+		response, failure, err = client.RICSubscription(ctx, request)
 
 	}
 	// Ric subscription is failed
