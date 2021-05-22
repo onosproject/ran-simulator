@@ -57,7 +57,7 @@ type Client struct {
 	ServiceModel *registry.ServiceModel
 }
 
-func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+func (sm *Client) reportPeriodicIndication(ctx context.Context, interval uint32, subscription *subutils.Subscription) error {
 	log.Debugf("Starting periodic report with interval %d ms", interval)
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	intervalDuration := time.Duration(interval)
