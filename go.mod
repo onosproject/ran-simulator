@@ -43,5 +43,3 @@ require (
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200229013735-71373c6105e3
 
 replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
-
-replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre => /Users/adibrastegarnia/go/src/github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre
