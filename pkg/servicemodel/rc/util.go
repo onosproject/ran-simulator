@@ -165,7 +165,7 @@ func (sm *Client) getCellSize(ctx context.Context, ecgi ransimtypes.ECGI) (strin
 }
 
 // getReportPeriod extracts report period
-func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {
+func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (uint32, error) {
 	modelPlugin, err := sm.getModelPlugin()
 	if err != nil {
 		log.Error(err)
