@@ -182,7 +182,7 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 		return 0, err
 	}
 	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormat1().ReportingPeriodMs
-	return reportPeriod, nil
+	return int32(reportPeriod), nil
 }
 
 // createRicIndication creates ric indication  for each cell in the node
