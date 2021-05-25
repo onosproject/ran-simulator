@@ -13,10 +13,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// Message indication message fields for rc service model
+// Message indication message fields for MHO service model
 type Message struct {
-	ueId              string
-	MeasReport	      []*e2sm_mho.E2SmMhoMeasurementReportItem
+	ueID       string
+	MeasReport []*e2sm_mho.E2SmMhoMeasurementReportItem
 }
 
 // NewIndicationMessage creates a new indication message
@@ -29,26 +29,26 @@ func NewIndicationMessage(options ...func(msg *Message)) *Message {
 	return msg
 }
 
-// WithUeId sets pci
-func WithUeId(ueId string) func(message *Message) {
+// WithUeID sets ueID
+func WithUeID(ueID string) func(message *Message) {
 	return func(message *Message) {
-		message.ueId = ueId
+		message.ueID = ueID
 	}
 }
 
-// WithUeId sets pci
+// WithMeasReport sets measReport
 func WithMeasReport(measReport []*e2sm_mho.E2SmMhoMeasurementReportItem) func(message *Message) {
 	return func(message *Message) {
 		message.MeasReport = measReport
 	}
 }
 
-// Build builds indication message for RC service model
+// Build builds indication message for MHO service model
 func (message *Message) Build() (*e2sm_mho.E2SmMhoIndicationMessage, error) {
 	e2SmIndicationMsg := e2sm_mho.E2SmMhoIndicationMessage_IndicationMessageFormat1{
 		IndicationMessageFormat1: &e2sm_mho.E2SmMhoIndicationMessageFormat1{
 			UeId: &e2sm_mho.UeIdentity{
-				Value: message.ueId,
+				Value: message.ueID,
 			},
 			MeasReport: message.MeasReport,
 		},

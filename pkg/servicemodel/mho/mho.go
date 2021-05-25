@@ -41,9 +41,9 @@ var log = logging.GetLogger("sm", "mho")
 
 const (
 	fileFormatVersion1 string = "version1"
-	senderName         string = "RAN Simulator"
-	senderType         string = ""
-	vendorName         string = "ONF"
+	//senderName         string = "RAN Simulator"
+	//senderType         string = ""
+	//vendorName         string = "ONF"
 )
 
 // Client mho service model client
@@ -363,7 +363,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 }
 func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimtypes.ECGI, fileFormatVersion string) ([]byte, error) {
 
-	cell, err := sm.ServiceModel.CellStore.Get(ctx, ecgi)
+	cell, _ := sm.ServiceModel.CellStore.Get(ctx, ecgi)
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	cellEci := ransimtypes.GetECI(uint64(cell.ECGI))
 
@@ -374,7 +374,7 @@ func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimty
 		mhoIndicationHeader.WithNrcellIdentity(uint64(cellEci)))
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	log.Debugf( "Create indication header bytes, oid:%v, name:%v, version:%v", mhoModelPlugin.ServiceModelData().OID, mhoModelPlugin.ServiceModelData().Name, mhoModelPlugin.ServiceModelData().Version)
+	log.Debugf("Create indication header bytes, oid:%v, name:%v, version:%v", mhoModelPlugin.ServiceModelData().OID, mhoModelPlugin.ServiceModelData().Name, mhoModelPlugin.ServiceModelData().Version)
 	if err != nil {
 		return nil, err
 	}
@@ -404,7 +404,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, cellECGI ransi
 					NRcellIdentity: &e2sm_mho.NrcellIdentity{
 						Value: &e2sm_mho.BitString{
 							Value: uint64(eci),
-							Len: 36,
+							Len:   36,
 						},
 					},
 				},
@@ -416,7 +416,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, cellECGI ransi
 	})
 
 	indicationMessage := mhoMessageFormat1.NewIndicationMessage(
-		mhoMessageFormat1.WithUeId(ueID),
+		mhoMessageFormat1.WithUeID(ueID),
 		mhoMessageFormat1.WithMeasReport(measReport))
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))

@@ -20,7 +20,7 @@ var log = logging.GetLogger("sm", "mho")
 
 // Header indication header for mho service model
 type Header struct {
-	plmnID            ransimtypes.Uint24
+	plmnID         ransimtypes.Uint24
 	nrCellIdentity uint64
 }
 
