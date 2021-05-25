@@ -48,14 +48,16 @@ type Server struct {
 
 func cellToAPI(cell *model.Cell) *types.Cell {
 	sector := sectorToAPI(cell.Sector)
+	eventA3Param := eventA3ParamsToAPI(cell.EventA3Params)
 	return &types.Cell{
-		ECGI:      cell.ECGI,
-		Location:  sector.Centroid,
-		Sector:    sector,
-		Color:     cell.Color,
-		MaxUEs:    cell.MaxUEs,
-		Neighbors: cell.Neighbors,
-		TxPowerdB: cell.TxPowerDB,
+		ECGI:          cell.ECGI,
+		Location:      sector.Centroid,
+		Sector:        sector,
+		Color:         cell.Color,
+		MaxUEs:        cell.MaxUEs,
+		Neighbors:     cell.Neighbors,
+		TxPowerdB:     cell.TxPowerDB,
+		EventA3Params: eventA3Param,
 	}
 }
 
@@ -71,6 +73,13 @@ func cellToModel(cell *types.Cell) *model.Cell {
 		MaxUEs:    cell.MaxUEs,
 		Neighbors: cell.Neighbors,
 		TxPowerDB: cell.TxPowerdB,
+		EventA3Params: model.EventA3Params{
+			A3Offset:          cell.EventA3Params.A3Offset,
+			A3TimeToTrigger:   cell.EventA3Params.A3TimeToTrigger,
+			A3Hysteresis:      cell.EventA3Params.A3Hysteresis,
+			A3CellOffset:      cell.EventA3Params.A3CellOffset,
+			A3FrequencyOffset: cell.EventA3Params.A3FrequencyOffset,
+		},
 	}
 }
 
@@ -79,6 +88,16 @@ func sectorToAPI(sector model.Sector) *types.Sector {
 		Azimuth:  sector.Azimuth,
 		Arc:      sector.Arc,
 		Centroid: &types.Point{Lat: sector.Center.Lat, Lng: sector.Center.Lng},
+	}
+}
+
+func eventA3ParamsToAPI(params model.EventA3Params) *types.EventA3Params {
+	return &types.EventA3Params{
+		A3Offset:          params.A3Offset,
+		A3TimeToTrigger:   params.A3TimeToTrigger,
+		A3Hysteresis:      params.A3Hysteresis,
+		A3CellOffset:      params.A3CellOffset,
+		A3FrequencyOffset: params.A3FrequencyOffset,
 	}
 }
 

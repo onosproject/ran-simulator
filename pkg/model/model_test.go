@@ -5,9 +5,8 @@
 package model
 
 import (
-	"testing"
-
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
