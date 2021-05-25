@@ -13,12 +13,15 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
+
+var log = logging.GetLogger("sm", "mho")
 
 // Header indication header for mho service model
 type Header struct {
-	plmnID            ransimtypes.Uint24
-	eutraCellIdentity uint64
+	plmnID         ransimtypes.Uint24
+	nrCellIdentity uint64
 }
 
 // NewIndicationHeader creates a new indication header
@@ -39,10 +42,10 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(header *Header) {
 	}
 }
 
-// WithEutracellIdentity sets eutraCellIdentity
-func WithEutracellIdentity(eutraCellIdentity uint64) func(header *Header) {
+// WithNrcellIdentity sets nrCellIdentity
+func WithNrcellIdentity(nrCellIdentity uint64) func(header *Header) {
 	return func(header *Header) {
-		header.eutraCellIdentity = eutraCellIdentity
+		header.nrCellIdentity = nrCellIdentity
 	}
 }
 
@@ -52,15 +55,15 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 		E2SmMhoIndicationHeader: &e2sm_mho.E2SmMhoIndicationHeader_IndicationHeaderFormat1{
 			IndicationHeaderFormat1: &e2sm_mho.E2SmMhoIndicationHeaderFormat1{
 				Cgi: &e2sm_mho.CellGlobalId{
-					CellGlobalId: &e2sm_mho.CellGlobalId_EUtraCgi{
-						EUtraCgi: &e2sm_mho.Eutracgi{
+					CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
+						NrCgi: &e2sm_mho.Nrcgi{
 							PLmnIdentity: &e2sm_mho.PlmnIdentity{
 								Value: header.plmnID.ToBytes(),
 							},
-							EUtracellIdentity: &e2sm_mho.EutracellIdentity{
+							NRcellIdentity: &e2sm_mho.NrcellIdentity{
 								Value: &e2sm_mho.BitString{
-									Value: header.eutraCellIdentity, //uint64
-									Len:   28,                       //uint32
+									Value: header.nrCellIdentity, //uint64
+									Len:   36,                    //uint32
 								},
 							},
 						},
@@ -77,8 +80,9 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 
 }
 
-// ToAsn1Bytes converts header to asn1 bytes
-func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+// MhoToAsn1Bytes converts header to asn1 bytes
+func (header *Header) MhoToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+	log.Debug("MhoToAsn1Bytes")
 	// Creating an indication header
 	indicationHeader, err := header.Build()
 	if err != nil {
