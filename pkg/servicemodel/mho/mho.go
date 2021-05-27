@@ -7,6 +7,7 @@ package mho
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/pdubuilder"
@@ -32,6 +33,7 @@ import (
 	mhoMessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
 	"google.golang.org/protobuf/proto"
+	"strconv"
 	"time"
 )
 
@@ -308,12 +310,12 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node
 	for _, ecgi := range node.Cells {
-		// TODO - for all UEs in this cell
-		{
-			ueID := "1234"
-			err := sm.sendRicIndicationFormat1(ctx, ecgi, ueID, subscription)
+		log.Debugf("Send MHO indications for cell ecgi:%d", ecgi)
+		for _, ue := range sm.ServiceModel.UEs.ListUEs(ctx, ecgi) {
+			log.Debugf("Send MHO indications for cell ecgi:%d, IMSI:%d", ecgi, ue.IMSI)
+			err := sm.sendRicIndicationFormat1(ctx, ecgi, ue, subscription)
 			if err != nil {
-				log.Error(err)
+				log.Warn(err)
 				continue
 			}
 		}
@@ -321,7 +323,7 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	return nil
 }
 
-func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes.ECGI, ueID string, subscription *subutils.Subscription) error {
+func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes.ECGI, ue *model.UE, subscription *subutils.Subscription) error {
 
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -331,13 +333,11 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 
 	indicationHeaderBytes, err := sm.createIndicationHeaderBytes(ctx, ecgi, fileFormatVersion1)
 	if err != nil {
-		log.Error(err)
 		return err
 	}
 
-	indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ecgi, ueID)
+	indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ue)
 	if err != nil {
-		log.Error(err)
 		return err
 	}
 
@@ -350,7 +350,6 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 
 	ricIndication, err := indication.Build()
 	if err != nil {
-		log.Error("creating indication message is failed for Cell with ID", ecgi, err)
 		return err
 	}
 
@@ -361,6 +360,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 
 	return nil
 }
+
 func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimtypes.ECGI, fileFormatVersion string) ([]byte, error) {
 
 	cell, _ := sm.ServiceModel.CellStore.Get(ctx, ecgi)
@@ -374,50 +374,62 @@ func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimty
 		mhoIndicationHeader.WithNrcellIdentity(uint64(cellEci)))
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	log.Debugf("Create indication header bytes, oid:%v, name:%v, version:%v", mhoModelPlugin.ServiceModelData().OID, mhoModelPlugin.ServiceModelData().Name, mhoModelPlugin.ServiceModelData().Version)
 	if err != nil {
 		return nil, err
 	}
+
 	indicationHeaderAsn1Bytes, err := header.MhoToAsn1Bytes(mhoModelPlugin)
 	if err != nil {
-		log.Warn(err)
 		return nil, err
 	}
 
 	return indicationHeaderAsn1Bytes, nil
 }
 
-func (sm *Client) createIndicationMsgFormat1(ctx context.Context, cellECGI ransimtypes.ECGI, ueID string) ([]byte, error) {
-	log.Debug("Create Indication message format 1 for cell:", cellECGI)
+func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) ([]byte, error) {
+	log.Debugf("Create MHO Indication message ueID: %d", ue.IMSI)
 
-	// TODO - replace dummy measReport with real values from store
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-	eci := ransimtypes.GetECI(uint64(cellECGI))
 	measReport := make([]*e2sm_mho.E2SmMhoMeasurementReportItem, 0)
-	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
-		Cgi: &e2sm_mho.CellGlobalId{
-			CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
-				NrCgi: &e2sm_mho.Nrcgi{
-					PLmnIdentity: &e2sm_mho.PlmnIdentity{
-						Value: plmnID.ToBytes(),
-					},
-					NRcellIdentity: &e2sm_mho.NrcellIdentity{
-						Value: &e2sm_mho.BitString{
-							Value: uint64(eci),
-							Len:   36,
+
+	if len(ue.Cells) == 0 {
+		err := fmt.Errorf("no cells found for ueID:%d", ue.IMSI)
+		return nil, err
+	}
+
+	for i, cell := range ue.Cells {
+		log.Debugf("Add MHO measurement report #%d: ecgi:%d, rsrp:%d", i, cell.ECGI, int32(cell.Strength))
+		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
+			Cgi: &e2sm_mho.CellGlobalId{
+				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
+					NrCgi: &e2sm_mho.Nrcgi{
+						PLmnIdentity: &e2sm_mho.PlmnIdentity{
+							Value: plmnID.ToBytes(),
+						},
+						NRcellIdentity: &e2sm_mho.NrcellIdentity{
+							Value: &e2sm_mho.BitString{
+								Value: uint64(cell.ECGI),
+								Len:   36,
+							},
 						},
 					},
 				},
 			},
-		},
-		Rsrp: &e2sm_mho.Rsrp{
-			Value: 1234,
-		},
-	})
+			Rsrp: &e2sm_mho.Rsrp{
+				Value: int32(cell.Strength),
+			},
+		})
+	}
+
+	ueID := strconv.Itoa(int(ue.IMSI))
+
+	log.Debugf("MHO measurement report for ueID %s: %v", ueID, measReport)
 
 	indicationMessage := mhoMessageFormat1.NewIndicationMessage(
 		mhoMessageFormat1.WithUeID(ueID),
 		mhoMessageFormat1.WithMeasReport(measReport))
+
+	log.Debugf("MHO indication message for ueID %s: %v", ueID, indicationMessage)
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	if err != nil {

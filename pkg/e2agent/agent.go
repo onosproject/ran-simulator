@@ -227,6 +227,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		return response, failure, err
 	}
 
+	// TODO - Assumes ono-to-one mapping between ran function and server model
 	switch sm.RanFunctionID {
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
