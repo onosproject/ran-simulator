@@ -421,7 +421,6 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 		})
 	}
 
-
 	ueID := strconv.Itoa(int(ue.IMSI))
 
 	log.Debugf("MHO measurement report for ueID %s: %v", ueID, measReport)
