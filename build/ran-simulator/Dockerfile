@@ -5,18 +5,21 @@ FROM onosproject/golang-build:v0.6.7 as build
 ENV GO111MODULE=on
 ARG ONOS_MAKE_TARGET=build
 
-COPY Makefile go.mod go.sum /go/src/github.com/onosproject/ran-simulator/
-COPY cmd/ /go/src/github.com/onosproject/ran-simulator/cmd/
-COPY pkg/ /go/src/github.com/onosproject/ran-simulator/pkg/
-COPY vendor/ /go/src/github.com/onosproject/ran-simulator/vendor/
+COPY Makefile go.mod go.sum /build/
+COPY cmd/ /build/cmd/
+COPY pkg/ /build/pkg/
+COPY vendor/ /build/vendor/
 
-RUN cd /go/src/github.com/onosproject/ran-simulator && GOFLAGS=-mod=vendor make ${ONOS_MAKE_TARGET}
+WORKDIR /build
+
+RUN GOFLAGS=-mod=vendor make ${ONOS_MAKE_TARGET}
+
 
 FROM frolvlad/alpine-glibc:alpine-3.12
 
 USER nobody
 
-COPY --from=build /go/src/github.com/onosproject/ran-simulator/build/_output/ransim /usr/local/bin/ransim
+COPY --from=build /build/build/_output/ransim /usr/local/bin/ransim
 # COPY pkg/config/*.yaml /etc/onos/config/
 
 ENTRYPOINT ["ransim"]
