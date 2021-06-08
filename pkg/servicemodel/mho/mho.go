@@ -365,13 +365,11 @@ func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimty
 
 	cell, _ := sm.ServiceModel.CellStore.Get(ctx, ecgi)
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-	cellEci := ransimtypes.GetECI(uint64(cell.ECGI))
-
 	timestamp := make([]byte, 4)
 	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
 	header := mhoIndicationHeader.NewIndicationHeader(
 		mhoIndicationHeader.WithPlmnID(*plmnID),
-		mhoIndicationHeader.WithNrcellIdentity(uint64(cellEci)))
+		mhoIndicationHeader.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.ECGI)))))
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	if err != nil {
@@ -397,8 +395,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 		return nil, err
 	}
 
-	for i, cell := range ue.Cells {
-		log.Debugf("Add MHO measurement report #%d: ecgi:%d, rsrp:%d", i, cell.ECGI, int32(cell.Strength))
+	for _, cell := range ue.Cells {
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 			Cgi: &e2sm_mho.CellGlobalId{
 				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
@@ -408,7 +405,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 						},
 						NRcellIdentity: &e2sm_mho.NrcellIdentity{
 							Value: &e2sm_mho.BitString{
-								Value: uint64(cell.ECGI),
+								Value: uint64(ransimtypes.GetECI(uint64(cell.ECGI))),
 								Len:   36,
 							},
 						},
