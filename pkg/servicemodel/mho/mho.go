@@ -395,7 +395,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 		return nil, err
 	}
 
-	for i, cell := range ue.Cells {
+	for _, cell := range ue.Cells {
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 			Cgi: &e2sm_mho.CellGlobalId{
 				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
