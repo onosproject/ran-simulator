@@ -114,8 +114,6 @@ func (d *driver) drive(ctx context.Context) {
 				}
 				d.updateUEPosition(ctx, route)
 				d.updateUESignalStrength(ctx, route.IMSI)
-				// report measurement
-				d.reportMeasurement(ctx, route.IMSI)
 			}
 		}
 	}
@@ -190,6 +188,9 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 	if err != nil {
 		log.Warn("Unable to update UE %d cell info", imsi)
 	}
+
+	// report measurement
+	d.reportMeasurement(ue)
 }
 
 func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
@@ -241,12 +242,7 @@ func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.
 	return ueCells
 }
 
-func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
-	ue, err := d.ueStore.Get(ctx, imsi)
-	if err != nil {
-		log.Warn("Unable to find UE %d", imsi)
-		return
-	}
+func (d *driver) reportMeasurement(ue *model.UE) {
 	d.measCtrl.GetInputChan() <- ue
 }
 
