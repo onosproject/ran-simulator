@@ -15,15 +15,17 @@ import (
 
 var logHoCtrl = logging.GetLogger("handover", "controller")
 
-func NewHOController (hoType HOType, cellStore cells.Store, ueStore ues.Store) HOController {
+// NewHOController returns the hanover controller
+func NewHOController(hoType HOType, cellStore cells.Store, ueStore ues.Store) HOController {
 	return &hoController{
-		hoType: hoType,
+		hoType:    hoType,
 		cellStore: cellStore,
-		ueStore: ueStore,
+		ueStore:   ueStore,
 		inputChan: make(chan device.UE),
 	}
 }
 
+// HOController is an abstraction of the handover controller
 type HOController interface {
 	// Start starts handover controller
 	Start(ctx context.Context)
@@ -35,15 +37,15 @@ type HOController interface {
 	GetOutputChan() chan handover.A3HandoverDecision
 }
 
-// handover type - currently it is string
+// HOType is the type of hanover - currently it is string
 // ToDo: define enumerated handover type into rrm-son-lib
 type HOType string
 
 type hoController struct {
-	cellStore cells.Store
-	ueStore ues.Store
-	hoType HOType
-	inputChan chan device.UE
+	cellStore  cells.Store
+	ueStore    ues.Store
+	hoType     HOType
+	inputChan  chan device.UE
 	outputChan chan handover.A3HandoverDecision
 }
 
@@ -89,6 +91,6 @@ func (h *hoController) GetInputChan() chan device.UE {
 	return h.inputChan
 }
 
-func (h * hoController) GetOutputChan() chan handover.A3HandoverDecision {
+func (h *hoController) GetOutputChan() chan handover.A3HandoverDecision {
 	return h.outputChan
 }

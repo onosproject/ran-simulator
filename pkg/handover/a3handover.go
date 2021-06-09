@@ -12,9 +12,10 @@ import (
 
 var logA3ho = logging.GetLogger("handover", "a3")
 
+// A3Handover is an abstraction of A3 handover
 type A3Handover interface {
 	// Start starts the A3 handover module
-	Start ()
+	Start()
 
 	// GetInputChan returns the channel to push measurement
 	GetInputChan() chan device.UE
@@ -30,6 +31,7 @@ type a3Handover struct {
 	a3HandoverHandler *handover.A3HandoverHandler
 }
 
+// NewA3Handover returns an A3 handover object
 func NewA3Handover() A3Handover {
 	return &a3Handover{
 		a3HandoverHandler: handover.NewA3HandoverHandler(),

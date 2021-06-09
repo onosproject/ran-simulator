@@ -15,16 +15,18 @@ import (
 
 var logMeasCtrl = logging.GetLogger("measurement", "controller")
 
-func NewMeasController (measType MeasEventType, cellStore cells.Store, ueStore ues.Store) MeasController{
+// NewMeasController returns the measurement controller object
+func NewMeasController(measType MeasEventType, cellStore cells.Store, ueStore ues.Store) MeasController {
 	return &measController{
-		measType: measType,
-		cellStore: cellStore,
-		ueStore: ueStore,
-		inputChan: make(chan *model.UE),
+		measType:   measType,
+		cellStore:  cellStore,
+		ueStore:    ueStore,
+		inputChan:  make(chan *model.UE),
 		outputChan: make(chan device.UE),
 	}
 }
 
+// MeasController is an abstraction of the measurement controller
 type MeasController interface {
 	// Start starts measurement controller
 	Start(ctx context.Context)
@@ -36,15 +38,15 @@ type MeasController interface {
 	GetOutputChan() chan device.UE
 }
 
-// measurement type - currently it is string
+// MeasEventType is the type for measurement event - currently it is string
 // ToDo: define enumerated measurement type into rrm-son-lib
 type MeasEventType string
 
 type measController struct {
-	cellStore cells.Store
-	ueStore ues.Store
-	measType MeasEventType
-	inputChan chan *model.UE
+	cellStore  cells.Store
+	ueStore    ues.Store
+	measType   MeasEventType
+	inputChan  chan *model.UE
 	outputChan chan device.UE
 }
 

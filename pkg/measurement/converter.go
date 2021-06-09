@@ -10,14 +10,70 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
+	utils "github.com/onosproject/ran-simulator/pkg/utils/measurement"
 	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 	"github.com/onosproject/rrm-son-lib/pkg/model/measurement"
 	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
+	"math"
 )
 
 var logConverter = logging.GetLogger("measurement", "converter")
 
+var qoffsetRanges = utils.QOffsetRanges{
+	{Min: math.MinInt32, Max: -24, Value: meastype.QOffsetMinus24dB},
+	{Min: -24, Max: -22, Value: meastype.QOffsetMinus22dB},
+	{Min: -22, Max: -22, Value: meastype.QOffsetMinus20dB},
+	{Min: -20, Max: -20, Value: meastype.QOffsetMinus18dB},
+	{Min: -18, Max: -18, Value: meastype.QOffsetMinus16dB},
+	{Min: -16, Max: -16, Value: meastype.QOffsetMinus14dB},
+	{Min: -14, Max: -14, Value: meastype.QOffsetMinus12dB},
+	{Min: -12, Max: -12, Value: meastype.QOffsetMinus10dB},
+	{Min: -10, Max: -10, Value: meastype.QOffsetMinus8dB},
+	{Min: -8, Max: -6, Value: meastype.QOffsetMinus6dB},
+	{Min: -6, Max: -5, Value: meastype.QOffsetMinus5dB},
+	{Min: -5, Max: -4, Value: meastype.QOffsetMinus4dB},
+	{Min: -4, Max: -3, Value: meastype.QOffsetMinus3dB},
+	{Min: -3, Max: -2, Value: meastype.QOffsetMinus2dB},
+	{Min: -2, Max: -1, Value: meastype.QOffsetMinus1dB},
+	{Min: -1, Max: 0, Value: meastype.QOffset0dB},
+	{Min: 0, Max: 1, Value: meastype.QOffset1dB},
+	{Min: 1, Max: 2, Value: meastype.QOffset2dB},
+	{Min: 2, Max: 3, Value: meastype.QOffset3dB},
+	{Min: 3, Max: 4, Value: meastype.QOffset4dB},
+	{Min: 4, Max: 5, Value: meastype.QOffset5dB},
+	{Min: 5, Max: 6, Value: meastype.QOffset6dB},
+	{Min: 6, Max: 8, Value: meastype.QOffset8dB},
+	{Min: 8, Max: 10, Value: meastype.QOffset10dB},
+	{Min: 10, Max: 12, Value: meastype.QOffset12dB},
+	{Min: 12, Max: 14, Value: meastype.QOffset14dB},
+	{Min: 14, Max: 16, Value: meastype.QOffset16dB},
+	{Min: 16, Max: 18, Value: meastype.QOffset18dB},
+	{Min: 18, Max: 20, Value: meastype.QOffset20dB},
+	{Min: 20, Max: 22, Value: meastype.QOffset22dB},
+	{Min: 22, Max: math.MaxInt32, Value: meastype.QOffset24dB},
+}
+
+var tttRanges = utils.TimeToTriggerRanges{
+	{Min: math.MinInt32, Max: 0, Value: meastype.TTT0ms},
+	{Min: 40, Max: 64, Value: meastype.TTT40ms},
+	{Min: 64, Max: 80, Value: meastype.TTT64ms},
+	{Min: 80, Max: 100, Value: meastype.TTT80ms},
+	{Min: 100, Max: 128, Value: meastype.TTT100ms},
+	{Min: 128, Max: 160, Value: meastype.TTT128ms},
+	{Min: 160, Max: 256, Value: meastype.TTT160ms},
+	{Min: 256, Max: 320, Value: meastype.TTT256ms},
+	{Min: 320, Max: 480, Value: meastype.TTT320ms},
+	{Min: 480, Max: 512, Value: meastype.TTT480ms},
+	{Min: 512, Max: 640, Value: meastype.TTT512ms},
+	{Min: 640, Max: 1024, Value: meastype.TTT640ms},
+	{Min: 1024, Max: 1280, Value: meastype.TTT1024ms},
+	{Min: 1280, Max: 2560, Value: meastype.TTT1280ms},
+	{Min: 2560, Max: 5120, Value: meastype.TTT2560ms},
+	{Min: 5120, Max: math.MaxInt32, Value: meastype.TTT5120ms},
+}
+
+// MeasReportConverter is an abstraction of measurement report converter
 type MeasReportConverter interface {
 	// Convert forms measurement report defined in rrm-son-lib from model.ue defined in ransim
 	Convert(ctx context.Context, ue *model.UE) device.UE
@@ -28,6 +84,7 @@ type measReportConverter struct {
 	ueStore   ues.Store
 }
 
+// NewMeasReportConverter returns the measurement report converter object
 func NewMeasReportConverter(cellStore cells.Store, ueStore ues.Store) MeasReportConverter {
 	return &measReportConverter{
 		cellStore: cellStore,
@@ -84,103 +141,9 @@ func (c *measReportConverter) convertHysteresis(hyst int32) meastype.HysteresisR
 }
 
 func (c *measReportConverter) convertQOffset(qoffset int32) meastype.QOffsetRange {
-	if qoffset <= -24 {
-		return meastype.QOffsetMinus24dB
-	} else if qoffset <= -22 {
-		return meastype.QOffsetMinus22dB
-	} else if qoffset <= -20 {
-		return meastype.QOffsetMinus20dB
-	} else if qoffset <= -18 {
-		return meastype.QOffsetMinus18dB
-	} else if qoffset <= -16 {
-		return meastype.QOffsetMinus16dB
-	} else if qoffset <= -14 {
-		return meastype.QOffsetMinus14dB
-	} else if qoffset <= -12 {
-		return meastype.QOffsetMinus12dB
-	} else if qoffset <= -10 {
-		return meastype.QOffsetMinus10dB
-	} else if qoffset <= -8 {
-		return meastype.QOffsetMinus8dB
-	} else if qoffset <= -6 {
-		return meastype.QOffsetMinus6dB
-	} else if qoffset <= -5 {
-		return meastype.QOffsetMinus5dB
-	} else if qoffset <= -4 {
-		return meastype.QOffsetMinus4dB
-	} else if qoffset <= -3 {
-		return meastype.QOffsetMinus3dB
-	} else if qoffset <= -2 {
-		return meastype.QOffsetMinus2dB
-	} else if qoffset <= -1 {
-		return meastype.QOffsetMinus1dB
-	} else if qoffset <= 0 {
-		return meastype.QOffset0dB
-	} else if qoffset <= 1 {
-		return meastype.QOffset1dB
-	} else if qoffset <= 2 {
-		return meastype.QOffset2dB
-	} else if qoffset <= 3 {
-		return meastype.QOffset3dB
-	} else if qoffset <= 4 {
-		return meastype.QOffset4dB
-	} else if qoffset <= 5 {
-		return meastype.QOffset5dB
-	} else if qoffset <= 6 {
-		return meastype.QOffset6dB
-	} else if qoffset <= 8 {
-		return meastype.QOffset8dB
-	} else if qoffset <= 10 {
-		return meastype.QOffset10dB
-	} else if qoffset <= 12 {
-		return meastype.QOffset12dB
-	} else if qoffset <= 14 {
-		return meastype.QOffset14dB
-	} else if qoffset <= 16 {
-		return meastype.QOffset16dB
-	} else if qoffset <= 18 {
-		return meastype.QOffset18dB
-	} else if qoffset <= 20 {
-		return meastype.QOffset20dB
-	} else if qoffset <= 22 {
-		return meastype.QOffset22dB
-	} else {
-		return meastype.QOffset24dB
-	}
+	return qoffsetRanges.Search(qoffset)
 }
 
 func (c *measReportConverter) convertTimeToTrigger(ttt int32) meastype.TimeToTriggerRange {
-	if ttt <= 0 {
-		return meastype.TTT0ms
-	} else if ttt <= 40 {
-		return meastype.TTT40ms
-	} else if ttt <= 64 {
-		return meastype.TTT64ms
-	} else if ttt <= 80 {
-		return meastype.TTT80ms
-	} else if ttt <= 100 {
-		return meastype.TTT100ms
-	} else if ttt <= 128 {
-		return meastype.TTT128ms
-	} else if ttt <= 160 {
-		return meastype.TTT160ms
-	} else if ttt <= 256 {
-		return meastype.TTT256ms
-	} else if ttt <= 320 {
-		return meastype.TTT320ms
-	} else if ttt <= 480 {
-		return meastype.TTT480ms
-	} else if ttt <= 512 {
-		return meastype.TTT512ms
-	} else if ttt <= 640 {
-		return meastype.TTT640ms
-	} else if ttt <= 1024 {
-		return meastype.TTT1024ms
-	} else if ttt <= 1280 {
-		return meastype.TTT1280ms
-	} else if ttt <= 2560 {
-		return meastype.TTT2560ms
-	} else {
-		return meastype.TTT5120ms
-	}
+	return tttRanges.Search(ttt)
 }

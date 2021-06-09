@@ -12,6 +12,7 @@ import (
 
 var logEventA3 = logging.GetLogger("measurement", "eventa3")
 
+// MeasEventA3 is an abstraction of measurement Event A3
 type MeasEventA3 interface {
 
 	// Start starts the Event A3 module
@@ -31,6 +32,7 @@ type measEventA3 struct {
 	eventA3Handler *measurement.MeasEventA3Handler
 }
 
+// NewMeasEventA3 returns the measurement Event A3 object
 func NewMeasEventA3() MeasEventA3 {
 	return &measEventA3{
 		eventA3Handler: measurement.NewMeasEventA3Handler(),
