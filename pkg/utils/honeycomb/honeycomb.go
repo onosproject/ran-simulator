@@ -40,7 +40,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	maxCollisions := 10
 	var earffcnStart uint32 = 42
 	earfcn := earffcnStart
-	valid_cell_types := [4]uint32{0, 1, 2, 3}
+	validCellTypes := [4]uint32{0, 1, 2, 3}
 
 	m := &model.Model{
 		PlmnID:        plmnID,
@@ -114,7 +114,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 				TxPowerDB: 11,
 				Earfcn:    earfcn,
 			}
-			earfcn += 1
+			earfcn++
 
 			m.Cells[cellName] = cell
 			node.Cells = append(node.Cells, cell.ECGI)
@@ -136,15 +136,15 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	generatePCI(m.Cells, uint(minPCI), uint(maxPCI), uint(maxCollisions))
 	// Add random cell type
 	for name, cell := range m.Cells {
-		temp_cell := cell
-		temp_cell.CellType = types.CellType(rand.Intn(len(valid_cell_types)))
-		m.Cells[name] = temp_cell
+		tempCell := cell
+		tempCell.CellType = types.CellType(rand.Intn(len(validCellTypes)))
+		m.Cells[name] = tempCell
 	}
 	return m, nil
 }
 
 func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxCollisions uint) {
-	pci_cells := make(map[types.ECGI]auxPCI)
+	pciCells := make(map[types.ECGI]auxPCI)
 
 	// Generate PCI pools and shuffle them
 	pools := generatePools(uint(2*len(cells)), minPCI, maxPCI)
@@ -166,7 +166,7 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 		}
 
 		// Create metrics for each cell
-		pci_cells[cell.ECGI] = auxPCI{
+		pciCells[cell.ECGI] = auxPCI{
 			pci:     pickPCI(ranges),
 			pciPool: ranges,
 		}
@@ -184,18 +184,18 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 		ecgi := ecgis[cellIndexes[i]]
 
 		if _, conflicted := conflicts[ecgi]; !conflicted {
-			pciCell := pci_cells[ecgi]
+			pciCell := pciCells[ecgi]
 			cellRanges := pciCell.pciPool
 			cell := cells[names[i]]
 
 			necgi := cell.Neighbors[rand.Intn(len(cell.Neighbors))]
 			if _, conflicted := conflicts[necgi]; !conflicted {
-				neighborPciCell := pci_cells[necgi]
+				neighborPciCell := pciCells[necgi]
 
 				// Replace the first PCI pool of the neighbor with a randomly chosen one from the cell
 				neighborPciCell.pciPool[0] = cellRanges[rand.Intn(len(cellRanges))]
 				neighborPciCell.pci = pciCell.pci
-				pci_cells[necgi] = neighborPciCell
+				pciCells[necgi] = neighborPciCell
 				collisions = collisions + 1
 
 				conflicts[ecgi] = pciCell
@@ -206,9 +206,9 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 		}
 	}
 	for i := 0; i < len(cellIndexes); i++ {
-		temp_cell := cells[names[i]]
-		temp_cell.PCI = pci_cells[ecgis[i]].pci
-		cells[names[i]] = temp_cell
+		tempCell := cells[names[i]]
+		tempCell.PCI = pciCells[ecgis[i]].pci
+		cells[names[i]] = tempCell
 	}
 }
 
