@@ -9,11 +9,14 @@ import (
 	"fmt"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/handover"
+	"github.com/onosproject/ran-simulator/pkg/measurement"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/routes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"github.com/onosproject/ran-simulator/pkg/utils"
+	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 	"math"
 	"math/rand"
 	"time"
@@ -42,6 +45,8 @@ type driver struct {
 	done       chan bool
 	min        *model.Coordinate
 	max        *model.Coordinate
+	measCtrl   measurement.MeasController
+	hoCtrl     handover.HOController
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
@@ -57,6 +62,10 @@ var tickUnit = time.Second
 
 const tickFrequency = 1
 
+const measType = "EventA3" // ToDo: should be programmable
+
+const hoType = "A3" // ToDo: should be programmable
+
 func (d *driver) Start(ctx context.Context) {
 	log.Info("Driver starting")
 
@@ -67,6 +76,20 @@ func (d *driver) Start(ctx context.Context) {
 
 	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)
+
+	// Add measController
+	d.measCtrl = measurement.NewMeasController(measType, d.cellStore, d.ueStore)
+	d.measCtrl.Start(ctx)
+
+	// Add hoController
+	d.hoCtrl = handover.NewHOController(hoType, d.cellStore, d.ueStore)
+	d.hoCtrl.Start(ctx)
+
+	// link measController with hoController
+	d.linkMeasCtrlHoCtrl()
+
+	// process handover decision
+	d.processHandoverDecision(ctx)
 
 	go d.drive(ctx)
 }
@@ -91,6 +114,8 @@ func (d *driver) drive(ctx context.Context) {
 				}
 				d.updateUEPosition(ctx, route)
 				d.updateUESignalStrength(ctx, route.IMSI)
+				// report measurement
+				d.reportMeasurement(ctx, route.IMSI)
 			}
 		}
 	}
@@ -187,6 +212,9 @@ func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *mo
 		if math.IsNaN(rsrp) {
 			continue
 		}
+		if ue.Cell.ECGI == cell.ECGI {
+			continue
+		}
 		ueCell := &model.UECell{
 			ID:       types.GEnbID(cell.ECGI),
 			ECGI:     cell.ECGI,
@@ -211,4 +239,35 @@ func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.
 		return ueCells[0:numAdjCells]
 	}
 	return ueCells
+}
+
+func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
+	ue, err := d.ueStore.Get(ctx, imsi)
+	if err != nil {
+		log.Warn("Unable to find UE %d", imsi)
+		return
+	}
+	d.measCtrl.GetInputChan() <- ue
+}
+
+func (d *driver) linkMeasCtrlHoCtrl() {
+	for report := range d.measCtrl.GetOutputChan() {
+		d.hoCtrl.GetInputChan() <- report
+	}
+}
+
+func (d *driver) processHandoverDecision(ctx context.Context) {
+	for hoDecision := range d.hoCtrl.GetOutputChan() {
+		imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
+		tCellEcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
+		ue, err := d.ueStore.Get(ctx, types.IMSI(imsi))
+		if err != nil {
+			log.Errorf("Can't get UE from UE store")
+		}
+		ue.Cell = &model.UECell{
+			ID: types.GEnbID(uint64(tCellEcgi)),
+		}
+
+		d.updateUESignalStrength(ctx, types.IMSI(imsi))
+	}
 }
