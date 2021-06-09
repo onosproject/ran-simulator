@@ -54,8 +54,6 @@ func (m *measController) Start(ctx context.Context) {
 	switch m.measType {
 	case "EventA3":
 		m.startMeasEventA3Handler(ctx)
-	case "External":
-		m.startMeasExternalHandler(ctx)
 	}
 }
 
@@ -84,11 +82,6 @@ func (m *measController) forwardReportFromEventA3Handler(handler MeasEventA3) {
 		logMeasCtrl.Debugf("[output] Measurement report for Event A3: %v", report)
 		m.outputChan <- report
 	}
-}
-
-func (m *measController) startMeasExternalHandler(ctx context.Context) {
-	logMeasCtrl.Info("Measurement controller starting with external handler")
-	//ToDo: fill this out if measurement handler is running outside
 }
 
 func (m *measController) GetInputChan() chan *model.UE {

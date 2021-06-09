@@ -52,7 +52,13 @@ func main() {
 	grpcPort := flag.Int("grpcPort", 5150, "GRPC port for e2T server")
 	modelName := flag.String("modelName", "model", "RANSim model name")
 	metricName := flag.String("metricName", "metric", "RANSim metric name")
+	hoLogic := flag.String("hoLogic", "local", "the location of handover logic {local, mho}")
 	flag.Parse()
+
+	if *hoLogic != "local" && *hoLogic != "mho" {
+		log.Errorf("hoLogic arg should be one of {local, mho}")
+		return
+	}
 
 	cfg := &manager.Config{
 		CAPath:              *caPath,
@@ -62,6 +68,7 @@ func main() {
 		ServiceModelPlugins: serviceModelPlugins,
 		ModelName:           *modelName,
 		MetricName:          *metricName,
+		HOLogic:             *hoLogic,
 	}
 
 	mgr, err := manager.NewManager(cfg)

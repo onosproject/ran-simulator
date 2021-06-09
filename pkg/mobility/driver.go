@@ -47,14 +47,16 @@ type driver struct {
 	max        *model.Coordinate
 	measCtrl   measurement.MeasController
 	hoCtrl     handover.HOController
+	hoLogic    string
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
-func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string) Driver {
+func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string, hoLogic string) Driver {
 	return &driver{
 		cellStore:  cellStore,
 		routeStore: routeStore,
 		ueStore:    ueStore,
+		hoLogic:    hoLogic,
 	}
 }
 
@@ -82,14 +84,22 @@ func (d *driver) Start(ctx context.Context) {
 	d.measCtrl.Start(ctx)
 
 	// Add hoController
-	d.hoCtrl = handover.NewHOController(hoType, d.cellStore, d.ueStore)
-	d.hoCtrl.Start(ctx)
-
-	// link measController with hoController
-	d.linkMeasCtrlHoCtrl()
-
-	// process handover decision
-	d.processHandoverDecision(ctx)
+	if d.hoLogic == "local" {
+		log.Info("HO logic is running locally")
+		d.hoCtrl = handover.NewHOController(hoType, d.cellStore, d.ueStore)
+		d.hoCtrl.Start(ctx)
+		// link measController with hoController
+		go d.linkMeasCtrlHoCtrl()
+		// process handover decision
+		go d.processHandoverDecision(ctx)
+	} else if d.hoLogic == "mho" {
+		log.Info("HO logic is running outside - mho")
+		// process event a3 measurement report
+		go d.processEventA3MeasReport()
+		// ToDo: Implement below if necessary
+	} else {
+		log.Warn("There is no handover logic - running measurement only")
+	}
 
 	go d.drive(ctx)
 }
@@ -172,14 +182,14 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 	// update RSRP from serving cell
 	err = d.updateUESignalStrengthServCell(ctx, ue)
 	if err != nil {
-		log.Warnf("%v", err)
+		log.Warnf("For UE %v: %v", *ue, err)
 		return
 	}
 
 	// update RSRP from candidate serving cells
 	err = d.updateUESignalStrengthCandServCells(ctx, ue)
 	if err != nil {
-		log.Warnf("%v", err)
+		log.Warnf("For UE %v: %v", *ue, err)
 		return
 	}
 
@@ -191,6 +201,13 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 
 	// report measurement
 	d.reportMeasurement(ue)
+
+	// comment out the log below - but useful for handover debugging
+	//log.Debugf("UE: %v", ue)
+	//log.Debugf("servCell Strength: %v", ue.Cell.Strength)
+	//log.Debugf("cservCell Strength: %v", ue.Cells[0].Strength)
+	//log.Debugf("cservCell Strength: %v", ue.Cells[1].Strength)
+	//log.Debugf("cservCell Strength: %v", ue.Cells[2].Strength)
 }
 
 func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
@@ -247,23 +264,44 @@ func (d *driver) reportMeasurement(ue *model.UE) {
 }
 
 func (d *driver) linkMeasCtrlHoCtrl() {
+	log.Info("Connecting measurement and handover controllers")
 	for report := range d.measCtrl.GetOutputChan() {
 		d.hoCtrl.GetInputChan() <- report
 	}
+	log.Info("Measurement and handover controllers disconnected")
 }
 
 func (d *driver) processHandoverDecision(ctx context.Context) {
+	log.Info("Handover decision process starting")
 	for hoDecision := range d.hoCtrl.GetOutputChan() {
+		log.Debugf("Received HO Decision: %v", hoDecision)
 		imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
 		tCellEcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
-		ue, err := d.ueStore.Get(ctx, types.IMSI(imsi))
-		if err != nil {
-			log.Errorf("Can't get UE from UE store")
+		tCell := &model.UECell{
+			ID:   types.GEnbID(tCellEcgi),
+			ECGI: types.ECGI(tCellEcgi),
 		}
-		ue.Cell = &model.UECell{
-			ID: types.GEnbID(uint64(tCellEcgi)),
-		}
+		d.doHandover(ctx, types.IMSI(imsi), tCell)
+	}
+	log.Info("HO decision process stopped")
+}
 
-		d.updateUESignalStrength(ctx, types.IMSI(imsi))
+func (d *driver) doHandover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
+	err := d.ueStore.UpdateCell(ctx, imsi, tCell)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", imsi)
+	}
+
+	// after changing serving cell, calculate channel quality/signal strength again
+	d.updateUESignalStrength(ctx, imsi)
+
+	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
+}
+
+func (d *driver) processEventA3MeasReport() {
+	log.Info("Start processing event a3 measurement report")
+	for report := range d.measCtrl.GetOutputChan() {
+		log.Debugf("received event a3 measurement report: %v", report)
+		// ToDo: implement me
 	}
 }

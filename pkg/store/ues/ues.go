@@ -54,6 +54,9 @@ type Store interface {
 	// UpdateCells updates the visible cells and their signal strength
 	UpdateCells(ctx context.Context, imsi types.IMSI, cells []*model.UECell) error
 
+	// UpdateCell updates the serving cell
+	UpdateCell(ctx context.Context, imsi types.IMSI, cell *model.UECell) error
+
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs(ctx context.Context) []*model.UE
 
@@ -236,6 +239,23 @@ func (s *store) UpdateCells(ctx context.Context, imsi types.IMSI, cells []*model
 		s.watchers.Send(updateEvent)
 		return nil
 	}
+	return errors.New(errors.NotFound, "UE not found")
+}
+
+func (s *store) UpdateCell(ctx context.Context, imsi types.IMSI, cell *model.UECell) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ue, ok := s.ues[imsi]; ok {
+		ue.Cell = cell
+		updateEvent := event.Event{
+			Key:   ue.IMSI,
+			Value: ue,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
+		return nil
+	}
+
 	return errors.New(errors.NotFound, "UE not found")
 }
 

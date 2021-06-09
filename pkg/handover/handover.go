@@ -18,10 +18,11 @@ var logHoCtrl = logging.GetLogger("handover", "controller")
 // NewHOController returns the hanover controller
 func NewHOController(hoType HOType, cellStore cells.Store, ueStore ues.Store) HOController {
 	return &hoController{
-		hoType:    hoType,
-		cellStore: cellStore,
-		ueStore:   ueStore,
-		inputChan: make(chan device.UE),
+		hoType:     hoType,
+		cellStore:  cellStore,
+		ueStore:    ueStore,
+		inputChan:  make(chan device.UE),
+		outputChan: make(chan handover.A3HandoverDecision),
 	}
 }
 
@@ -53,8 +54,6 @@ func (h *hoController) Start(ctx context.Context) {
 	switch h.hoType {
 	case "A3":
 		h.startA3HandoverHandler(ctx)
-	case "External":
-		h.startExternalHandler(ctx)
 	}
 }
 
@@ -81,10 +80,6 @@ func (h *hoController) forwardHandoverDecision(handler A3Handover) {
 		logHoCtrl.Debugf("[output] Handover decision: %v", hoDecision)
 		h.outputChan <- hoDecision
 	}
-}
-
-func (h *hoController) startExternalHandler(ctx context.Context) {
-	logHoCtrl.Info("Handover controller starting with external handler")
 }
 
 func (h *hoController) GetInputChan() chan device.UE {
