@@ -215,6 +215,9 @@ func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.U
 	if err != nil {
 		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
 	}
+
+
+
 	ue.Cell.Strength = StrengthAtLocation(ue.Location, *sCell)
 	return nil
 }
@@ -294,6 +297,9 @@ func (d *driver) doHandover(ctx context.Context, imsi types.IMSI, tCell *model.U
 
 	// after changing serving cell, calculate channel quality/signal strength again
 	d.updateUESignalStrength(ctx, imsi)
+
+	// update the maximum number of UEs
+	d.ueStore.UpdateMaxUEsPerCell(ctx)
 
 	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
 }
