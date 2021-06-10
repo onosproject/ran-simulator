@@ -196,12 +196,12 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 	// report measurement
 	d.reportMeasurement(ue)
 
-	// comment out the log below - but useful for handover debugging
 	//log.Debugf("UE: %v", ue)
-	//log.Debugf("servCell Strength: %v", ue.Cell.Strength)
-	//log.Debugf("cservCell Strength: %v", ue.Cells[0].Strength)
-	//log.Debugf("cservCell Strength: %v", ue.Cells[1].Strength)
-	//log.Debugf("cservCell Strength: %v", ue.Cells[2].Strength)
+	log.Debugf("for UE [%v]: sCell strength - %v, " +
+		"csCell1 strength - %v " +
+		"csCell2 strength - %v " +
+		"csCell3 strength - %v", ue.IMSI, ue.Cell.Strength, ue.Cells[0].Strength,
+		ue.Cells[1].Strength, ue.Cells[2].Strength)
 }
 
 func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {

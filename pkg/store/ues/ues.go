@@ -101,6 +101,7 @@ func NewUERegistry(count uint, cellStore cells.Store) Store {
 	store := &store{
 		mu:        sync.RWMutex{},
 		ues:       make(map[types.IMSI]*model.UE),
+		maxUEs:    make(map[uint64]int),
 		cellStore: cellStore,
 		watchers:  watchers,
 	}
@@ -153,15 +154,30 @@ func (s *store) SetMaxUEsPerCell(ctx context.Context, cellECGI uint64, maxNumUEs
 }
 
 func (s *store) UpdateMaxUEsPerCell(ctx context.Context) {
+	cNumUEsMap := make(map[uint64]int)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for _, ue := range s.ues {
 		if _, ok := s.maxUEs[uint64(ue.Cell.ECGI)]; !ok {
-			s.maxUEs[uint64(ue.Cell.ECGI)] = 1
+			cNumUEsMap[uint64(ue.Cell.ECGI)] = 1
 			continue
 		}
-		s.maxUEs[uint64(ue.Cell.ECGI)]++
+		cNumUEsMap[uint64(ue.Cell.ECGI)]++
 	}
+
+	log.Debugf("[before] cNumUEsMap: %v", cNumUEsMap)
+	log.Debugf("[before] maxUEs: %v", s.maxUEs)
+
+	// compare
+	for k, v := range cNumUEsMap {
+		oNumUEs, ok := s.maxUEs[k]
+		if !ok || v > oNumUEs {
+			s.maxUEs[k] = v
+			continue
+		}
+	}
+
+	log.Debugf("[after] maxUEs: %v", s.maxUEs)
 }
 
 func (s *store) removeSomeUEs(ctx context.Context, count int) {
