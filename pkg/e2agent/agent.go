@@ -167,6 +167,9 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	case registry.Rc:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICControl(ctx, request)
+	case registry.Mho:
+		client := sm.Client.(*mho.Client)
+		response, failure, err = client.RICControl(ctx, request)
 	}
 	if err != nil {
 		return nil, nil, err

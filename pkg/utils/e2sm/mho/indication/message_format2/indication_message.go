@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package message
+package message_format2
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ import (
 // Message indication message fields for MHO service model
 type Message struct {
 	ueID       string
-	MeasReport []*e2sm_mho.E2SmMhoMeasurementReportItem
+	RrcStatus e2sm_mho.Rrcstatus
 }
 
 // NewIndicationMessage creates a new indication message
@@ -37,20 +37,20 @@ func WithUeID(ueID string) func(message *Message) {
 }
 
 // WithMeasReport sets measReport
-func WithMeasReport(measReport []*e2sm_mho.E2SmMhoMeasurementReportItem) func(message *Message) {
+func WithRrcStatus(rrcStatus e2sm_mho.Rrcstatus) func(message *Message) {
 	return func(message *Message) {
-		message.MeasReport = measReport
+		message.RrcStatus = rrcStatus
 	}
 }
 
 // Build builds indication message for MHO service model
 func (message *Message) Build() (*e2sm_mho.E2SmMhoIndicationMessage, error) {
-	e2SmIndicationMsg := e2sm_mho.E2SmMhoIndicationMessage_IndicationMessageFormat1{
-		IndicationMessageFormat1: &e2sm_mho.E2SmMhoIndicationMessageFormat1{
+	e2SmIndicationMsg := e2sm_mho.E2SmMhoIndicationMessage_IndicationMessageFormat2{
+		IndicationMessageFormat2: &e2sm_mho.E2SmMhoIndicationMessageFormat2{
 			UeId: &e2sm_mho.UeIdentity{
 				Value: message.ueID,
 			},
-			MeasReport: message.MeasReport,
+			RrcStatus: message.RrcStatus,
 		},
 	}
 
