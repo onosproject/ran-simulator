@@ -193,12 +193,6 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 		return
 	}
 
-	// update cells on ueStore
-	err = d.ueStore.UpdateCells(ctx, imsi, ue.Cells)
-	if err != nil {
-		log.Warn("Unable to update UE %d cell info", imsi)
-	}
-
 	// report measurement
 	d.reportMeasurement(ue)
 
@@ -216,9 +210,19 @@ func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.U
 		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
 	}
 
+	strength := StrengthAtLocation(ue.Location, *sCell)
 
+	newUECell := &model.UECell{
+		ID: ue.Cell.ID,
+		ECGI: ue.Cell.ECGI,
+		Strength: strength,
+	}
 
-	ue.Cell.Strength = StrengthAtLocation(ue.Location, *sCell)
+	err = d.ueStore.UpdateCell(ctx, ue.IMSI, newUECell)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", ue.IMSI)
+	}
+
 	return nil
 }
 
@@ -243,7 +247,11 @@ func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *mo
 		}
 		csCellList = d.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
 	}
-	ue.Cells = csCellList
+	err = d.ueStore.UpdateCells(ctx, ue.IMSI, csCellList)
+	if err != nil {
+		log.Warn("Unable to update UE %d cells info", ue.IMSI)
+	}
+
 	return nil
 }
 
