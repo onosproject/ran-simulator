@@ -18,6 +18,7 @@ import (
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
@@ -37,7 +38,6 @@ import (
 	"math"
 	"strconv"
 	"time"
-	"github.com/onosproject/ran-simulator/pkg/mobility"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -326,8 +326,8 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	tCellEcgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
 
 	tCell := &model.UECell{
-		ID: types.GEnbID(tCellEcgi),
-		ECGI: types.ECGI(tCellEcgi),
+		ID:   types.GEnbID(tCellEcgi),
+		ECGI: tCellEcgi,
 	}
 
 	sm.doHandover(ctx, types.IMSI(imsi), tCell)
@@ -520,7 +520,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 
 func (sm *Client) doHandover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
 	err := sm.ServiceModel.UEs.UpdateCell(ctx, imsi, tCell)
-  	if err != nil {
+	if err != nil {
 		log.Warn("Unable to update UE %d cell info", imsi)
 	}
 

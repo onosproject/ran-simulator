@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package message_format2
+package messageformat2
 
 import (
 	"testing"

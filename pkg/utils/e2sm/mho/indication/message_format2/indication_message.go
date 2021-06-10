@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package message_format2
+package messageformat2
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ import (
 
 // Message indication message fields for MHO service model
 type Message struct {
-	ueID       string
+	ueID      string
 	RrcStatus e2sm_mho.Rrcstatus
 }
 
@@ -36,7 +36,7 @@ func WithUeID(ueID string) func(message *Message) {
 	}
 }
 
-// WithMeasReport sets measReport
+// WithRrcStatus sets RrcStatus
 func WithRrcStatus(rrcStatus e2sm_mho.Rrcstatus) func(message *Message) {
 	return func(message *Message) {
 		message.RrcStatus = rrcStatus
