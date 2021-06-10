@@ -193,21 +193,15 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 		return
 	}
 
-	// update cells on ueStore
-	err = d.ueStore.UpdateCells(ctx, imsi, ue.Cells)
-	if err != nil {
-		log.Warn("Unable to update UE %d cell info", imsi)
-	}
-
 	// report measurement
 	d.reportMeasurement(ue)
 
-	// comment out the log below - but useful for handover debugging
 	//log.Debugf("UE: %v", ue)
-	//log.Debugf("servCell Strength: %v", ue.Cell.Strength)
-	//log.Debugf("cservCell Strength: %v", ue.Cells[0].Strength)
-	//log.Debugf("cservCell Strength: %v", ue.Cells[1].Strength)
-	//log.Debugf("cservCell Strength: %v", ue.Cells[2].Strength)
+	log.Debugf("for UE [%v]: sCell strength - %v, "+
+		"csCell1 strength - %v "+
+		"csCell2 strength - %v "+
+		"csCell3 strength - %v", ue.IMSI, ue.Cell.Strength, ue.Cells[0].Strength,
+		ue.Cells[1].Strength, ue.Cells[2].Strength)
 }
 
 func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
@@ -215,7 +209,20 @@ func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.U
 	if err != nil {
 		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
 	}
-	ue.Cell.Strength = StrengthAtLocation(ue.Location, *sCell)
+
+	strength := StrengthAtLocation(ue.Location, *sCell)
+
+	newUECell := &model.UECell{
+		ID:       ue.Cell.ID,
+		ECGI:     ue.Cell.ECGI,
+		Strength: strength,
+	}
+
+	err = d.ueStore.UpdateCell(ctx, ue.IMSI, newUECell)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", ue.IMSI)
+	}
+
 	return nil
 }
 
@@ -240,7 +247,11 @@ func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *mo
 		}
 		csCellList = d.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
 	}
-	ue.Cells = csCellList
+	err = d.ueStore.UpdateCells(ctx, ue.IMSI, csCellList)
+	if err != nil {
+		log.Warn("Unable to update UE %d cells info", ue.IMSI)
+	}
+
 	return nil
 }
 
@@ -294,6 +305,9 @@ func (d *driver) doHandover(ctx context.Context, imsi types.IMSI, tCell *model.U
 
 	// after changing serving cell, calculate channel quality/signal strength again
 	d.updateUESignalStrength(ctx, imsi)
+
+	// update the maximum number of UEs
+	d.ueStore.UpdateMaxUEsPerCell(ctx)
 
 	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
 }
