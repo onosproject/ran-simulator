@@ -197,9 +197,9 @@ func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
 	d.reportMeasurement(ue)
 
 	//log.Debugf("UE: %v", ue)
-	log.Debugf("for UE [%v]: sCell strength - %v, " +
-		"csCell1 strength - %v " +
-		"csCell2 strength - %v " +
+	log.Debugf("for UE [%v]: sCell strength - %v, "+
+		"csCell1 strength - %v "+
+		"csCell2 strength - %v "+
 		"csCell3 strength - %v", ue.IMSI, ue.Cell.Strength, ue.Cells[0].Strength,
 		ue.Cells[1].Strength, ue.Cells[2].Strength)
 }
@@ -213,8 +213,8 @@ func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.U
 	strength := StrengthAtLocation(ue.Location, *sCell)
 
 	newUECell := &model.UECell{
-		ID: ue.Cell.ID,
-		ECGI: ue.Cell.ECGI,
+		ID:       ue.Cell.ID,
+		ECGI:     ue.Cell.ECGI,
 		Strength: strength,
 	}
 
