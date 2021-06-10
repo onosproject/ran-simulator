@@ -38,6 +38,7 @@ type Config struct {
 	ServiceModelPlugins []string
 	ModelName           string
 	MetricName          string
+	HOLogic             string
 }
 
 // NewManager creates a new manager
@@ -108,7 +109,7 @@ func (m *Manager) Start() error {
 		return err
 	}
 
-	m.mobilityDriver = mobility.NewMobilityDriver(m.cellStore, m.routeStore, m.ueStore, m.model.APIKey)
+	m.mobilityDriver = mobility.NewMobilityDriver(m.cellStore, m.routeStore, m.ueStore, m.model.APIKey, m.config.HOLogic)
 	// TODO: Make initial speeds configurable
 	m.mobilityDriver.GenerateRoutes(context.Background(), 30000, 160000, 20000)
 	m.mobilityDriver.Start(context.Background())

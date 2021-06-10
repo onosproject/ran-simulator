@@ -23,20 +23,19 @@ require (
 	github.com/onosproject/onos-lib-go v0.7.10
 	github.com/onosproject/onos-ric-sdk-go v0.7.11
 	github.com/onosproject/onos-test v0.6.4
+	github.com/onosproject/rrm-son-lib v0.0.2
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab
 	github.com/prometheus/client_golang v1.4.1 // indirect
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	go.uber.org/multierr v1.4.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	google.golang.org/grpc v1.33.2
 	google.golang.org/protobuf v1.25.0
 	googlemaps.github.io/maps v1.3.2
-	gopkg.in/yaml.v2 v2.3.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
 )
 
