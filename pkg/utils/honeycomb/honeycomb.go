@@ -7,13 +7,15 @@ package honeycomb
 
 import (
 	"fmt"
+	"math"
+	"math/rand"
+	"strconv"
+	"strings"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"github.com/pmcxs/hexgrid"
-	"math"
-	"strconv"
-	"strings"
 )
 
 // GenerateHoneycombTopology generates a set of simulated nodes and cells organized in a honeycomb
