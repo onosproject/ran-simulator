@@ -7,6 +7,10 @@ package mobility
 import (
 	"context"
 	"fmt"
+	"math"
+	"math/rand"
+	"time"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/handover"
@@ -17,9 +21,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	"github.com/onosproject/rrm-son-lib/pkg/model/id"
-	"math"
-	"math/rand"
-	"time"
 )
 
 var log = logging.GetLogger("mobility", "driver")
@@ -241,7 +242,7 @@ func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *mo
 			continue
 		}
 		ueCell := &model.UECell{
-			ID:       types.GEnbID(cell.ECGI),
+			ID:       types.GnbID(cell.ECGI),
 			ECGI:     cell.ECGI,
 			Strength: rsrp,
 		}
@@ -289,7 +290,7 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 		imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
 		tCellEcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
 		tCell := &model.UECell{
-			ID:   types.GEnbID(tCellEcgi),
+			ID:   types.GnbID(tCellEcgi),
 			ECGI: types.ECGI(tCellEcgi),
 		}
 		d.doHandover(ctx, types.IMSI(imsi), tCell)
