@@ -52,7 +52,7 @@ func main() {
 	grpcPort := flag.Int("grpcPort", 5150, "GRPC port for e2T server")
 	modelName := flag.String("modelName", "model", "RANSim model name")
 	metricName := flag.String("metricName", "metric", "RANSim metric name")
-	hoLogic := flag.String("hoLogic", "mho", "the location of handover logic {local, mho}")
+	hoLogic := flag.String("hoLogic", "local", "the location of handover logic {local, mho}")
 	flag.Parse()
 
 	if *hoLogic != "local" && *hoLogic != "mho" {
