@@ -159,14 +159,12 @@ func hexMesh(pitch float64, numTowers uint) []*model.Coordinate {
 	phi := (rand.Float64() - 0.5) * 2 * math.Pi
 	for _, h := range hexArray {
 		x, y := hexgrid.Point(hexgrid.HexToPixel(hexgrid.LayoutPointY00(pitch, pitch), h))
-		x = x * math.Pi / 180
-		y = y * math.Pi / 180
 		// angle offset in radians
+		x = (x + (rand.Float64()-0.5)*.02) * math.Pi / 180
+		y = (y + (rand.Float64()-0.5)*.02) * math.Pi / 180
+		// perturb each individual point
 		lat := (math.Asin(math.Cos(theta)*math.Sin(x) + math.Cos(y)*math.Sin(theta)*math.Cos(x))) * 180 / math.Pi
 		lon := (math.Atan2(math.Sin(y), -math.Tan(x)*math.Sin(theta)+math.Cos(y)*math.Cos(theta)) + phi) * 180 / math.Pi
-		// perturb each individual point
-		lat = lat + (rand.Float64()-0.5)*0.01
-		lon = lon + (rand.Float64()-0.5)*0.01
 		points = append(points, &model.Coordinate{Lat: lat, Lng: lon})
 		// logging location
 		// fmt.Printf("%f, %f\n", lat, lon)
