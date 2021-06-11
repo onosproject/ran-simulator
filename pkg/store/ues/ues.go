@@ -212,7 +212,7 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			Location: model.Coordinate{Lat: 0, Lng: 0},
 			Heading:  0,
 			Cell: &model.UECell{
-				ID:       types.GEnbID(ecgi), // placeholder
+				ID:       types.GnbID(ecgi), // placeholder
 				ECGI:     ecgi,
 				Strength: rand.Float64() * 100,
 			},
