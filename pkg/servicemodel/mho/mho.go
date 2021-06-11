@@ -9,6 +9,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/pdubuilder"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
@@ -17,6 +18,7 @@ import (
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
@@ -29,10 +31,11 @@ import (
 	e2apIndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
-	mhoIndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
-	mhoMessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message"
+	indHdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
+	indMsgFmt1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format1"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
 	"google.golang.org/protobuf/proto"
+	"math"
 	"strconv"
 	"time"
 )
@@ -277,7 +280,59 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 // RICControl implements control handler for MHO service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	return nil, nil, err
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+	//reqID := controlutils.GetRequesterID(request)
+	//ranFuncID := controlutils.GetRanFunctionID(request)
+	//ricInstanceID := controlutils.GetRicInstanceID(request)
+	//modelPlugin, err := sm.getModelPlugin()
+	//if err != nil {
+	//	log.Error(err)
+	//	return nil, nil, err
+	//}
+
+	controlHeader, err := sm.getControlHeader(request)
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+
+	// TODO - check MHO command
+	log.Debugf("MHO control header: %v", controlHeader)
+
+	controlMessage, err := sm.getControlMessage(request)
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+
+	log.Debugf("MHO control message: %v", controlMessage)
+
+	imsi, err := strconv.Atoi(controlMessage.GetControlMessageFormat1().GetUedId().GetValue())
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+	ue, err := sm.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
+	if err != nil {
+		log.Errorf("UE: %v not found err: %v", ue, err)
+		return nil, nil, err
+	}
+	log.Debugf("imsi: %v", imsi)
+
+	plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
+	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
+	eci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
+	log.Debugf("ECI is %d and PLMN ID is %d", eci, plmnID)
+	tCellEcgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
+
+	tCell := &model.UECell{
+		ID:   types.GEnbID(tCellEcgi),
+		ECGI: tCellEcgi,
+	}
+
+	sm.doHandover(ctx, types.IMSI(imsi), tCell)
+
+	return nil, nil, nil
 }
 
 func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
@@ -367,9 +422,9 @@ func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimty
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	timestamp := make([]byte, 4)
 	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
-	header := mhoIndicationHeader.NewIndicationHeader(
-		mhoIndicationHeader.WithPlmnID(*plmnID),
-		mhoIndicationHeader.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.ECGI)))))
+	header := indHdr.NewIndicationHeader(
+		indHdr.WithPlmnID(*plmnID),
+		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.ECGI)))))
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	if err != nil {
@@ -394,6 +449,28 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 		err := fmt.Errorf("no cells found for ueID:%d", ue.IMSI)
 		return nil, err
 	}
+
+	// add serving cell to measReport
+	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
+		Cgi: &e2sm_mho.CellGlobalId{
+			CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
+				NrCgi: &e2sm_mho.Nrcgi{
+					PLmnIdentity: &e2sm_mho.PlmnIdentity{
+						Value: plmnID.ToBytes(),
+					},
+					NRcellIdentity: &e2sm_mho.NrcellIdentity{
+						Value: &e2sm_mho.BitString{
+							Value: uint64(ransimtypes.GetECI(uint64(ue.Cell.ECGI))),
+							Len:   36,
+						},
+					},
+				},
+			},
+		},
+		Rsrp: &e2sm_mho.Rsrp{
+			Value: int32(ue.Cell.Strength),
+		},
+	})
 
 	for _, cell := range ue.Cells {
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
@@ -422,9 +499,9 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 
 	log.Debugf("MHO measurement report for ueID %s: %v", ueID, measReport)
 
-	indicationMessage := mhoMessageFormat1.NewIndicationMessage(
-		mhoMessageFormat1.WithUeID(ueID),
-		mhoMessageFormat1.WithMeasReport(measReport))
+	indicationMessage := indMsgFmt1.NewIndicationMessage(
+		indMsgFmt1.WithUeID(ueID),
+		indMsgFmt1.WithMeasReport(measReport))
 
 	log.Debugf("MHO indication message for ueID %s: %v", ueID, indicationMessage)
 
@@ -439,4 +516,109 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 	}
 
 	return indicationMessageBytes, nil
+}
+
+func (sm *Client) doHandover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
+	err := sm.ServiceModel.UEs.UpdateCell(ctx, imsi, tCell)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", imsi)
+	}
+
+	// after changing serving cell, calculate channel quality/signal strength again
+	sm.updateUESignalStrength(ctx, imsi)
+
+	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
+}
+
+func (sm *Client) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
+	ue, err := sm.ServiceModel.UEs.Get(ctx, imsi)
+	if err != nil {
+		log.Warn("Unable to find UE %d", imsi)
+		return
+	}
+
+	// update RSRP from serving cell
+	err = sm.updateUESignalStrengthServCell(ctx, ue)
+	if err != nil {
+		log.Warnf("For UE %v: %v", *ue, err)
+		return
+	}
+
+	// update RSRP from candidate serving cells
+	err = sm.updateUESignalStrengthCandServCells(ctx, ue)
+	if err != nil {
+		log.Warnf("For UE %v: %v", *ue, err)
+		return
+	}
+
+	log.Debugf("for UE [%v]: sCell strength - %v, "+
+		"csCell1 strength - %v "+
+		"csCell2 strength - %v "+
+		"csCell3 strength - %v", ue.IMSI, ue.Cell.Strength, ue.Cells[0].Strength,
+		ue.Cells[1].Strength, ue.Cells[2].Strength)
+}
+
+func (sm *Client) updateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE) error {
+	cellList, err := sm.ServiceModel.CellStore.List(ctx)
+	if err != nil {
+		return fmt.Errorf("Unable to get all cells")
+	}
+	var csCellList []*model.UECell
+	for _, cell := range cellList {
+		rsrp := mobility.StrengthAtLocation(ue.Location, *cell)
+		if math.IsNaN(rsrp) {
+			continue
+		}
+		if ue.Cell.ECGI == cell.ECGI {
+			continue
+		}
+		ueCell := &model.UECell{
+			ID:       types.GEnbID(cell.ECGI),
+			ECGI:     cell.ECGI,
+			Strength: rsrp,
+		}
+		csCellList = sm.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
+	}
+	err = sm.ServiceModel.UEs.UpdateCells(ctx, ue.IMSI, csCellList)
+	if err != nil {
+		log.Warn("Unable to update UE %d cells info", ue.IMSI)
+	}
+
+	return nil
+}
+
+func (sm *Client) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
+	sCell, err := sm.ServiceModel.CellStore.Get(ctx, ue.Cell.ECGI)
+	if err != nil {
+		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
+	}
+
+	strength := mobility.StrengthAtLocation(ue.Location, *sCell)
+
+	newUECell := &model.UECell{
+		ID:       ue.Cell.ID,
+		ECGI:     ue.Cell.ECGI,
+		Strength: strength,
+	}
+
+	err = sm.ServiceModel.UEs.UpdateCell(ctx, ue.IMSI, newUECell)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", ue.IMSI)
+	}
+	return nil
+}
+
+func (sm *Client) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.UECell {
+	// bubble sort
+	for i := 0; i < len(ueCells)-1; i++ {
+		for j := 0; j < len(ueCells)-i-1; j++ {
+			if ueCells[j].Strength < ueCells[j+1].Strength {
+				ueCells[j], ueCells[j+1] = ueCells[j+1], ueCells[j]
+			}
+		}
+	}
+	if len(ueCells) >= numAdjCells {
+		return ueCells[0:numAdjCells]
+	}
+	return ueCells
 }

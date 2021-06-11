@@ -12,6 +12,42 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
+	modelPlugin, err := sm.getModelPlugin()
+	if err != nil {
+		return nil, err
+	}
+	controlMessageProtoBytes, err := modelPlugin.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
+	if err != nil {
+		return nil, err
+	}
+	controlMessage := &e2sm_mho.E2SmMhoControlMessage{}
+	err = proto.Unmarshal(controlMessageProtoBytes, controlMessage)
+
+	if err != nil {
+		return nil, err
+	}
+	return controlMessage, nil
+}
+
+func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
+	modelPlugin, err := sm.getModelPlugin()
+	if err != nil {
+		return nil, err
+	}
+	controlHeaderProtoBytes, err := modelPlugin.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
+	if err != nil {
+		return nil, err
+	}
+	controlHeader := &e2sm_mho.E2SmMhoControlHeader{}
+	err = proto.Unmarshal(controlHeaderProtoBytes, controlHeader)
+	if err != nil {
+		return nil, err
+	}
+
+	return controlHeader, nil
+}
+
 // getEventTriggerType extracts event trigger type
 func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_mho.MhoTriggerType, error) {
 	modelPlugin, err := sm.getModelPlugin()
