@@ -33,8 +33,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		ServiceModels: generateServiceModels(serviceModels),
 	}
 
-	aspectRatio := utils.AspectRatio(mapCenter.Lat)
-	points := hexMesh(float64(pitch), numTowers)
+	points := hexMesh(float64(pitch), numTowers, m.MapLayout.Center)
 	arc := int32(360.0 / sectorsPerTower)
 
 	controllers := make([]string, 0, len(controllerAddresses))
@@ -85,9 +84,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 			cell := model.Cell{
 				ECGI: types.ToECGI(plmnID, types.ToECI(enbID, cellID)),
 				Sector: model.Sector{
-					Center: model.Coordinate{
-						Lat: mapCenter.Lat + points[t].Lat,
-						Lng: mapCenter.Lng + points[t].Lng/aspectRatio},
+					Center:  *points[t],
 					Azimuth: azimuth,
 					Arc:     arc},
 				Color:     "green",
@@ -95,11 +92,9 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 				Neighbors: make([]types.ECGI, 0, sectorsPerTower),
 				TxPowerDB: 11,
 			}
-
 			m.Cells[cellName] = cell
 			node.Cells = append(node.Cells, cell.ECGI)
 		}
-
 		m.Nodes[nodeName] = node
 	}
 
@@ -150,18 +145,18 @@ func reachPoint(sector model.Sector, distance float64) model.Coordinate {
 	return utils.TargetPoint(sector.Center, float64((sector.Azimuth+sector.Arc/2)%360), distance)
 }
 
-func hexMesh(pitch float64, numTowers uint) []*model.Coordinate {
+func hexMesh(pitch float64, numTowers uint, center model.Coordinate) []*model.Coordinate {
 	rings, _ := numRings(numTowers)
 	points := make([]*model.Coordinate, 0)
 	hexArray := hexgrid.HexRange(hexgrid.NewHex(0, 0), int(rings))
 	// randomly generate a center point (will be biased towards poles). this is deterministic since go rand is deterministic
-	theta := (rand.Float64() - 0.5) * 2 * math.Pi
-	phi := (rand.Float64() - 0.5) * 2 * math.Pi
+	theta := utils.DegreesToRads(center.Lat)
+	phi := utils.DegreesToRads(center.Lng)
 	for _, h := range hexArray {
 		x, y := hexgrid.Point(hexgrid.HexToPixel(hexgrid.LayoutPointY00(pitch, pitch), h))
 		// angle offset in radians
-		x = (x + (rand.Float64()-0.5)*.02) * math.Pi / 180
-		y = (y + (rand.Float64()-0.5)*.02) * math.Pi / 180
+		x = utils.DegreesToRads(x + (rand.Float64()-0.5)*.01)
+		y = utils.DegreesToRads(y + (rand.Float64()-0.5)*.01)
 		// perturb each individual point
 		lat := (math.Asin(math.Cos(theta)*math.Sin(x) + math.Cos(y)*math.Sin(theta)*math.Cos(x))) * 180 / math.Pi
 		lon := (math.Atan2(math.Sin(y), -math.Tan(x)*math.Sin(theta)+math.Cos(y)*math.Cos(theta)) + phi) * 180 / math.Pi
