@@ -8,6 +8,9 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"strconv"
+	"time"
+
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -35,8 +38,6 @@ import (
 	indMsgFmt1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format1"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
 	"google.golang.org/protobuf/proto"
-	"strconv"
-	"time"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -317,7 +318,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	tCellEcgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
 
 	tCell := &model.UECell{
-		ID:   types.GEnbID(tCellEcgi),
+		ID:   types.GnbID(tCellEcgi),
 		ECGI: tCellEcgi,
 	}
 

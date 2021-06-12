@@ -72,7 +72,7 @@ func UpdateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE, ueSt
 			continue
 		}
 		ueCell := &model.UECell{
-			ID:       types.GEnbID(cell.ECGI),
+			ID:       types.GnbID(cell.ECGI),
 			ECGI:     cell.ECGI,
 			Strength: rsrp,
 		}

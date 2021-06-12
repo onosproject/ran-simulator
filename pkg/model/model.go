@@ -87,7 +87,7 @@ type UEType string
 
 // UECell represents UE-cell relationship
 type UECell struct {
-	ID       types.GEnbID
+	ID       types.GnbID
 	ECGI     types.ECGI // Auxiliary form of association
 	Strength float64
 }
