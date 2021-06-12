@@ -6,7 +6,6 @@ package mobility
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -124,7 +123,8 @@ func (d *driver) drive(ctx context.Context) {
 					d.initializeUEPosition(ctx, route)
 				}
 				d.updateUEPosition(ctx, route)
-				d.updateUESignalStrength(ctx, route.IMSI)
+				UpdateUESignalStrength(ctx, route.IMSI, d.ueStore, d.cellStore)
+				d.reportMeasurement(ctx, route.IMSI)
 			}
 		}
 	}
@@ -173,105 +173,12 @@ func (d *driver) updateUEPosition(ctx context.Context, route *model.Route) {
 	}
 }
 
-func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
+func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
 	ue, err := d.ueStore.Get(ctx, imsi)
 	if err != nil {
 		log.Warn("Unable to find UE %d", imsi)
 		return
 	}
-
-	// update RSRP from serving cell
-	err = d.updateUESignalStrengthServCell(ctx, ue)
-	if err != nil {
-		log.Warnf("For UE %v: %v", *ue, err)
-		return
-	}
-
-	// update RSRP from candidate serving cells
-	err = d.updateUESignalStrengthCandServCells(ctx, ue)
-	if err != nil {
-		log.Warnf("For UE %v: %v", *ue, err)
-		return
-	}
-
-	// report measurement
-	d.reportMeasurement(ue)
-
-	//log.Debugf("UE: %v", ue)
-	log.Debugf("for UE [%v]: sCell strength - %v, "+
-		"csCell1 strength - %v "+
-		"csCell2 strength - %v "+
-		"csCell3 strength - %v", ue.IMSI, ue.Cell.Strength, ue.Cells[0].Strength,
-		ue.Cells[1].Strength, ue.Cells[2].Strength)
-}
-
-func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
-	sCell, err := d.cellStore.Get(ctx, ue.Cell.ECGI)
-	if err != nil {
-		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
-	}
-
-	strength := StrengthAtLocation(ue.Location, *sCell)
-
-	newUECell := &model.UECell{
-		ID:       ue.Cell.ID,
-		ECGI:     ue.Cell.ECGI,
-		Strength: strength,
-	}
-
-	err = d.ueStore.UpdateCell(ctx, ue.IMSI, newUECell)
-	if err != nil {
-		log.Warn("Unable to update UE %d cell info", ue.IMSI)
-	}
-
-	return nil
-}
-
-func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE) error {
-	cellList, err := d.cellStore.List(ctx)
-	if err != nil {
-		return fmt.Errorf("Unable to get all cells")
-	}
-	var csCellList []*model.UECell
-	for _, cell := range cellList {
-		rsrp := StrengthAtLocation(ue.Location, *cell)
-		if math.IsNaN(rsrp) {
-			continue
-		}
-		if ue.Cell.ECGI == cell.ECGI {
-			continue
-		}
-		ueCell := &model.UECell{
-			ID:       types.GnbID(cell.ECGI),
-			ECGI:     cell.ECGI,
-			Strength: rsrp,
-		}
-		csCellList = d.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
-	}
-	err = d.ueStore.UpdateCells(ctx, ue.IMSI, csCellList)
-	if err != nil {
-		log.Warn("Unable to update UE %d cells info", ue.IMSI)
-	}
-
-	return nil
-}
-
-func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.UECell {
-	// bubble sort
-	for i := 0; i < len(ueCells)-1; i++ {
-		for j := 0; j < len(ueCells)-i-1; j++ {
-			if ueCells[j].Strength < ueCells[j+1].Strength {
-				ueCells[j], ueCells[j+1] = ueCells[j+1], ueCells[j]
-			}
-		}
-	}
-	if len(ueCells) >= numAdjCells {
-		return ueCells[0:numAdjCells]
-	}
-	return ueCells
-}
-
-func (d *driver) reportMeasurement(ue *model.UE) {
 	d.measCtrl.GetInputChan() <- ue
 }
 
@@ -293,24 +200,9 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 			ID:   types.GnbID(tCellEcgi),
 			ECGI: types.ECGI(tCellEcgi),
 		}
-		d.doHandover(ctx, types.IMSI(imsi), tCell)
+		DoHandover(ctx, types.IMSI(imsi), tCell, d.ueStore, d.cellStore)
 	}
 	log.Info("HO decision process stopped")
-}
-
-func (d *driver) doHandover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
-	err := d.ueStore.UpdateCell(ctx, imsi, tCell)
-	if err != nil {
-		log.Warn("Unable to update UE %d cell info", imsi)
-	}
-
-	// after changing serving cell, calculate channel quality/signal strength again
-	d.updateUESignalStrength(ctx, imsi)
-
-	// update the maximum number of UEs
-	d.ueStore.UpdateMaxUEsPerCell(ctx)
-
-	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
 }
 
 func (d *driver) processEventA3MeasReport() {

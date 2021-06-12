@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"math"
 	"strconv"
 	"time"
 
@@ -282,14 +281,6 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 // RICControl implements control handler for MHO service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
-	//reqID := controlutils.GetRequesterID(request)
-	//ranFuncID := controlutils.GetRanFunctionID(request)
-	//ricInstanceID := controlutils.GetRicInstanceID(request)
-	//modelPlugin, err := sm.getModelPlugin()
-	//if err != nil {
-	//	log.Error(err)
-	//	return nil, nil, err
-	//}
 
 	controlHeader, err := sm.getControlHeader(request)
 	if err != nil {
@@ -331,7 +322,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		ECGI: tCellEcgi,
 	}
 
-	sm.doHandover(ctx, types.IMSI(imsi), tCell)
+	mobility.DoHandover(ctx, types.IMSI(imsi), tCell, sm.ServiceModel.UEs, sm.ServiceModel.CellStore)
 
 	return nil, nil, nil
 }
@@ -517,109 +508,4 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 	}
 
 	return indicationMessageBytes, nil
-}
-
-func (sm *Client) doHandover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
-	err := sm.ServiceModel.UEs.UpdateCell(ctx, imsi, tCell)
-	if err != nil {
-		log.Warn("Unable to update UE %d cell info", imsi)
-	}
-
-	// after changing serving cell, calculate channel quality/signal strength again
-	sm.updateUESignalStrength(ctx, imsi)
-
-	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
-}
-
-func (sm *Client) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
-	ue, err := sm.ServiceModel.UEs.Get(ctx, imsi)
-	if err != nil {
-		log.Warn("Unable to find UE %d", imsi)
-		return
-	}
-
-	// update RSRP from serving cell
-	err = sm.updateUESignalStrengthServCell(ctx, ue)
-	if err != nil {
-		log.Warnf("For UE %v: %v", *ue, err)
-		return
-	}
-
-	// update RSRP from candidate serving cells
-	err = sm.updateUESignalStrengthCandServCells(ctx, ue)
-	if err != nil {
-		log.Warnf("For UE %v: %v", *ue, err)
-		return
-	}
-
-	log.Debugf("for UE [%v]: sCell strength - %v, "+
-		"csCell1 strength - %v "+
-		"csCell2 strength - %v "+
-		"csCell3 strength - %v", ue.IMSI, ue.Cell.Strength, ue.Cells[0].Strength,
-		ue.Cells[1].Strength, ue.Cells[2].Strength)
-}
-
-func (sm *Client) updateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE) error {
-	cellList, err := sm.ServiceModel.CellStore.List(ctx)
-	if err != nil {
-		return fmt.Errorf("Unable to get all cells")
-	}
-	var csCellList []*model.UECell
-	for _, cell := range cellList {
-		rsrp := mobility.StrengthAtLocation(ue.Location, *cell)
-		if math.IsNaN(rsrp) {
-			continue
-		}
-		if ue.Cell.ECGI == cell.ECGI {
-			continue
-		}
-		ueCell := &model.UECell{
-			ID:       types.GnbID(cell.ECGI),
-			ECGI:     cell.ECGI,
-			Strength: rsrp,
-		}
-		csCellList = sm.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
-	}
-	err = sm.ServiceModel.UEs.UpdateCells(ctx, ue.IMSI, csCellList)
-	if err != nil {
-		log.Warn("Unable to update UE %d cells info", ue.IMSI)
-	}
-
-	return nil
-}
-
-func (sm *Client) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
-	sCell, err := sm.ServiceModel.CellStore.Get(ctx, ue.Cell.ECGI)
-	if err != nil {
-		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
-	}
-
-	strength := mobility.StrengthAtLocation(ue.Location, *sCell)
-
-	newUECell := &model.UECell{
-		ID:       ue.Cell.ID,
-		ECGI:     ue.Cell.ECGI,
-		Strength: strength,
-	}
-
-	err = sm.ServiceModel.UEs.UpdateCell(ctx, ue.IMSI, newUECell)
-	if err != nil {
-		log.Warn("Unable to update UE %d cell info", ue.IMSI)
-	}
-	return nil
-}
-
-func (sm *Client) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.UECell {
-	// bubble sort
-	for i := 0; i < len(ueCells)-1; i++ {
-		for j := 0; j < len(ueCells)-i-1; j++ {
-			if ueCells[j].Strength < ueCells[j+1].Strength {
-				ueCells[j], ueCells[j+1] = ueCells[j+1], ueCells[j]
-			}
-		}
-	}
-	if len(ueCells) >= numAdjCells {
-		return ueCells[0:numAdjCells]
-	}
-	return ueCells
 }
