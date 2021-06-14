@@ -110,7 +110,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{
 										GnbId: &e2ap_commondatatypes.BitString{
 											Value: request.e2NodeID,
-											Len:   22,
+											Len:   28,
 										}},
 								},
 							},
