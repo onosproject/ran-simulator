@@ -215,9 +215,8 @@ func pickPCI(ranges []pciRange) uint32 {
 	pi := rand.Intn(len(ranges))
 	if ranges[pi].max-ranges[pi].min == 0 {
 		return ranges[pi].min
-	} else {
-		return ranges[pi].min + uint32(rand.Intn(int(ranges[pi].max-ranges[pi].min)))
 	}
+	return ranges[pi].min + uint32(rand.Intn(int(ranges[pi].max-ranges[pi].min)))
 }
 
 // Generate 2 x cell count number of pools evenly split between min and max
