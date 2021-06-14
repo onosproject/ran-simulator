@@ -12,7 +12,7 @@ Usage:
 
 Flags:
       --controller-addresses strings   List of E2T controller addresses or service names (default [onos-e2t])
-  -e, --enbidstart uint32              EnbID start (default 5152)
+  -e, --enbidstart uint32              GnbID start (default 5152)
   -h, --help                           help for topo
   -a, --latitude float                 Map centre latitude in degrees (default 52.52)
   -g, --longitude float                Map centre longitude in degrees (default 13.405)

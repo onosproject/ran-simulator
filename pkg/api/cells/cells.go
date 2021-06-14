@@ -50,7 +50,7 @@ func cellToAPI(cell *model.Cell) *types.Cell {
 	sector := sectorToAPI(cell.Sector)
 	eventA3Param := eventA3ParamsToAPI(cell.EventA3Params)
 	return &types.Cell{
-		ECGI:          cell.ECGI,
+		NCGI:          cell.NCGI,
 		Location:      sector.Centroid,
 		Sector:        sector,
 		Color:         cell.Color,
@@ -63,7 +63,7 @@ func cellToAPI(cell *model.Cell) *types.Cell {
 
 func cellToModel(cell *types.Cell) *model.Cell {
 	return &model.Cell{
-		ECGI: cell.ECGI,
+		NCGI: cell.NCGI,
 		Sector: model.Sector{
 			Center:  model.Coordinate{Lat: cell.Sector.Centroid.Lat, Lng: cell.Sector.Centroid.Lng},
 			Arc:     cell.Sector.Arc,
@@ -118,7 +118,7 @@ func (s *Server) CreateCell(ctx context.Context, request *modelapi.CreateCellReq
 // GetCell retrieves the specified simulated cell
 func (s *Server) GetCell(ctx context.Context, request *modelapi.GetCellRequest) (*modelapi.GetCellResponse, error) {
 	log.Debugf("Received get cell request: %v", request)
-	node, err := s.cellStore.Get(ctx, request.ECGI)
+	node, err := s.cellStore.Get(ctx, request.NCGI)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (s *Server) UpdateCell(ctx context.Context, request *modelapi.UpdateCellReq
 // DeleteCell deletes the specified simulated cell
 func (s *Server) DeleteCell(ctx context.Context, request *modelapi.DeleteCellRequest) (*modelapi.DeleteCellResponse, error) {
 	log.Debugf("Received delete cell request: %v", request)
-	_, err := s.cellStore.Delete(ctx, request.ECGI)
+	_, err := s.cellStore.Delete(ctx, request.NCGI)
 	if err != nil {
 		return nil, err
 	}

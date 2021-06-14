@@ -51,7 +51,7 @@ Use "onos ransim [command] --help" for more information about a command.
 4) For example, the following command lists all of  E2 nodes that are running
 ```bash
 > onos ransim get nodes
-EnbID            Status   Service Models   E2T Controllers      Cell ECGIs
+GnbID            Status   Service Models   E2T Controllers      Cell NCGIs
 5153             Running  kpm,rc           e2t-1                21458294227473,21458294227474,21458294227475
 5154             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227475
 ```
@@ -66,7 +66,7 @@ after running the above command, an e2 node will be created and will be
 connected to e2t-1 which is specified in the model as a E2T endpoint.
 ```bash
 > onos ransim get nodes 
-EnbID            Status   Service Models   E2T Controllers      Cell ECGIs
+GnbID            Status   Service Models   E2T Controllers      Cell NCGIs
 5153             Running  kpm,rc           e2t-1                21458294227473,21458294227474,21458294227475
 5154             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227475
 5155             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227491

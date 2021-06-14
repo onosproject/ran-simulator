@@ -143,7 +143,7 @@ nodes:
     status: stopped
 cells:
   cell1:
-    ecgi: 343332707639553
+    ncgi: 343332707639553
     sector:
       center:
         lat: 52.45071796924582
@@ -167,7 +167,7 @@ cells:
     earfcn: 42
     celltype: 1
   cell2:
-    ecgi: 343332707639554
+    ncgi: 343332707639554
     sector:
       center:
         lat: 52.45071796924582
@@ -190,7 +190,7 @@ cells:
     earfcn: 43
     celltype: 0
   cell3:
-    ecgi: 343332707639555
+    ncgi: 343332707639555
     sector:
       center:
         lat: 52.45071796924582
@@ -214,7 +214,7 @@ cells:
     earfcn: 44
     celltype: 0
   cell4:
-    ecgi: 343332707639809
+    ncgi: 343332707639809
     sector:
       center:
         lat: 52.46803847693437
@@ -238,7 +238,7 @@ cells:
     earfcn: 45
     celltype: 2
   cell5:
-    ecgi: 343332707639810
+    ncgi: 343332707639810
     sector:
       center:
         lat: 52.46803847693437
@@ -261,7 +261,7 @@ cells:
     earfcn: 46
     celltype: 3
   cell6:
-    ecgi: 343332707639811
+    ncgi: 343332707639811
     sector:
       center:
         lat: 52.46803847693437
@@ -286,7 +286,7 @@ cells:
     earfcn: 47
     celltype: 3
   cell7:
-    ecgi: 343332707640065
+    ncgi: 343332707640065
     sector:
       center:
         lat: 52.48535898462291
@@ -309,7 +309,7 @@ cells:
     earfcn: 48
     celltype: 0
   cell8:
-    ecgi: 343332707640066
+    ncgi: 343332707640066
     sector:
       center:
         lat: 52.48535898462291
@@ -332,7 +332,7 @@ cells:
     earfcn: 49
     celltype: 0
   cell9:
-    ecgi: 343332707640067
+    ncgi: 343332707640067
     sector:
       center:
         lat: 52.48535898462291
@@ -356,7 +356,7 @@ cells:
     earfcn: 50
     celltype: 1
   cell10:
-    ecgi: 343332707640321
+    ncgi: 343332707640321
     sector:
       center:
         lat: 52.46803847693437
@@ -381,7 +381,7 @@ cells:
     earfcn: 51
     celltype: 3
   cell11:
-    ecgi: 343332707640322
+    ncgi: 343332707640322
     sector:
       center:
         lat: 52.46803847693437
@@ -404,7 +404,7 @@ cells:
     earfcn: 52
     celltype: 3
   cell12:
-    ecgi: 343332707640323
+    ncgi: 343332707640323
     sector:
       center:
         lat: 52.46803847693437
@@ -427,7 +427,7 @@ cells:
     earfcn: 53
     celltype: 1
   cell13:
-    ecgi: 343332707640577
+    ncgi: 343332707640577
     sector:
       center:
         lat: 52.48535898462291
@@ -451,7 +451,7 @@ cells:
     earfcn: 54
     celltype: 1
   cell14:
-    ecgi: 343332707640578
+    ncgi: 343332707640578
     sector:
       center:
         lat: 52.48535898462291
@@ -474,7 +474,7 @@ cells:
     earfcn: 55
     celltype: 2
   cell15:
-    ecgi: 343332707640579
+    ncgi: 343332707640579
     sector:
       center:
         lat: 52.48535898462291
@@ -498,7 +498,7 @@ cells:
     earfcn: 56
     celltype: 0
   cell16:
-    ecgi: 343332707640833
+    ncgi: 343332707640833
     sector:
       center:
         lat: 52.50267949231146
@@ -521,7 +521,7 @@ cells:
     earfcn: 57
     celltype: 3
   cell17:
-    ecgi: 343332707640834
+    ncgi: 343332707640834
     sector:
       center:
         lat: 52.50267949231146
@@ -545,7 +545,7 @@ cells:
     earfcn: 58
     celltype: 3
   cell18:
-    ecgi: 343332707640835
+    ncgi: 343332707640835
     sector:
       center:
         lat: 52.50267949231146
@@ -569,7 +569,7 @@ cells:
     earfcn: 59
     celltype: 2
   cell19:
-    ecgi: 343332707641089
+    ncgi: 343332707641089
     sector:
       center:
         lat: 52.52
@@ -592,7 +592,7 @@ cells:
     earfcn: 60
     celltype: 0
   cell20:
-    ecgi: 343332707641090
+    ncgi: 343332707641090
     sector:
       center:
         lat: 52.52
@@ -616,7 +616,7 @@ cells:
     earfcn: 61
     celltype: 0
   cell21:
-    ecgi: 343332707641091
+    ncgi: 343332707641091
     sector:
       center:
         lat: 52.52
@@ -640,7 +640,7 @@ cells:
     earfcn: 62
     celltype: 2
   cell22:
-    ecgi: 343332707641345
+    ncgi: 343332707641345
     sector:
       center:
         lat: 52.48535898462291
@@ -664,7 +664,7 @@ cells:
     earfcn: 63
     celltype: 0
   cell23:
-    ecgi: 343332707641346
+    ncgi: 343332707641346
     sector:
       center:
         lat: 52.48535898462291
@@ -687,7 +687,7 @@ cells:
     earfcn: 64
     celltype: 1
   cell24:
-    ecgi: 343332707641347
+    ncgi: 343332707641347
     sector:
       center:
         lat: 52.48535898462291
@@ -710,7 +710,7 @@ cells:
     earfcn: 65
     celltype: 2
   cell25:
-    ecgi: 343332707641601
+    ncgi: 343332707641601
     sector:
       center:
         lat: 52.50267949231146
@@ -734,7 +734,7 @@ cells:
     earfcn: 66
     celltype: 0
   cell26:
-    ecgi: 343332707641602
+    ncgi: 343332707641602
     sector:
       center:
         lat: 52.50267949231146
@@ -758,7 +758,7 @@ cells:
     earfcn: 67
     celltype: 3
   cell27:
-    ecgi: 343332707641603
+    ncgi: 343332707641603
     sector:
       center:
         lat: 52.50267949231146
@@ -781,7 +781,7 @@ cells:
     earfcn: 68
     celltype: 0
   cell28:
-    ecgi: 343332707641857
+    ncgi: 343332707641857
     sector:
       center:
         lat: 52.52
@@ -805,7 +805,7 @@ cells:
     earfcn: 69
     celltype: 1
   cell29:
-    ecgi: 343332707641858
+    ncgi: 343332707641858
     sector:
       center:
         lat: 52.52
@@ -830,7 +830,7 @@ cells:
     earfcn: 70
     celltype: 1
   cell30:
-    ecgi: 343332707641859
+    ncgi: 343332707641859
     sector:
       center:
         lat: 52.52

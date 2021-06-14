@@ -142,7 +142,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 // RICSubscription implements subscription handler for MHO service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
 	log.Debugf("MHO subscription, request: %v", request)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
@@ -239,7 +239,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for MHO service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
@@ -280,7 +280,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 // RICControl implements control handler for MHO service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
 
 	controlHeader, err := sm.getControlHeader(request)
 	if err != nil {
@@ -313,13 +313,13 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 	plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
 	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
-	eci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
-	log.Debugf("ECI is %d and PLMN ID is %d", eci, plmnID)
-	tCellEcgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
+	nci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
+	log.Debugf("ECI is %d and PLMN ID is %d", nci, plmnID)
+	tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci))
 
 	tCell := &model.UECell{
-		ID:   types.GnbID(tCellEcgi),
-		ECGI: tCellEcgi,
+		ID:   types.GnbID(tCellNcgi),
+		NCGI: tCellNcgi,
 	}
 
 	mobility.DoHandover(ctx, types.IMSI(imsi), tCell, sm.ServiceModel.UEs, sm.ServiceModel.CellStore)
@@ -356,11 +356,11 @@ func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, 
 func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node
-	for _, ecgi := range node.Cells {
-		log.Debugf("Send MHO indications for cell ecgi:%d", ecgi)
-		for _, ue := range sm.ServiceModel.UEs.ListUEs(ctx, ecgi) {
-			log.Debugf("Send MHO indications for cell ecgi:%d, IMSI:%d", ecgi, ue.IMSI)
-			err := sm.sendRicIndicationFormat1(ctx, ecgi, ue, subscription)
+	for _, ncgi := range node.Cells {
+		log.Debugf("Send MHO indications for cell ncgi:%d", ncgi)
+		for _, ue := range sm.ServiceModel.UEs.ListUEs(ctx, ncgi) {
+			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
+			err := sm.sendRicIndicationFormat1(ctx, ncgi, ue, subscription)
 			if err != nil {
 				log.Warn(err)
 				continue
@@ -370,7 +370,7 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	return nil
 }
 
-func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes.ECGI, ue *model.UE, subscription *subutils.Subscription) error {
+func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, subscription *subutils.Subscription) error {
 
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -378,7 +378,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 		return err
 	}
 
-	indicationHeaderBytes, err := sm.createIndicationHeaderBytes(ctx, ecgi, fileFormatVersion1)
+	indicationHeaderBytes, err := sm.createIndicationHeaderBytes(ctx, ncgi, fileFormatVersion1)
 	if err != nil {
 		return err
 	}
@@ -408,15 +408,15 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 	return nil
 }
 
-func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimtypes.ECGI, fileFormatVersion string) ([]byte, error) {
+func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ncgi ransimtypes.NCGI, fileFormatVersion string) ([]byte, error) {
 
-	cell, _ := sm.ServiceModel.CellStore.Get(ctx, ecgi)
+	cell, _ := sm.ServiceModel.CellStore.Get(ctx, ncgi)
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	timestamp := make([]byte, 4)
 	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
 	header := indHdr.NewIndicationHeader(
 		indHdr.WithPlmnID(*plmnID),
-		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.ECGI)))))
+		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.NCGI)))))
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	if err != nil {
@@ -452,7 +452,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 					},
 					NRcellIdentity: &e2sm_mho.NrcellIdentity{
 						Value: &e2sm_mho.BitString{
-							Value: uint64(ransimtypes.GetECI(uint64(ue.Cell.ECGI))),
+							Value: uint64(ransimtypes.GetECI(uint64(ue.Cell.NCGI))),
 							Len:   36,
 						},
 					},
@@ -474,7 +474,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 						},
 						NRcellIdentity: &e2sm_mho.NrcellIdentity{
 							Value: &e2sm_mho.BitString{
-								Value: uint64(ransimtypes.GetECI(uint64(cell.ECGI))),
+								Value: uint64(ransimtypes.GetECI(uint64(cell.NCGI))),
 								Len:   36,
 							},
 						},

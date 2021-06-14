@@ -30,14 +30,14 @@ type Store interface {
 	// Add adds the specified cell to the registry
 	Add(ctx context.Context, cell *model.Cell) error
 
-	// Get retrieves the cell with the specified ECGI
-	Get(ctx context.Context, ecgi types.ECGI) (*model.Cell, error)
+	// Get retrieves the cell with the specified NCGI
+	Get(ctx context.Context, ncgi types.NCGI) (*model.Cell, error)
 
 	// Update updates the cell
 	Update(ctx context.Context, Cell *model.Cell) error
 
-	// Delete deletes the cell with the specified ECGI
-	Delete(ctx context.Context, ecgi types.ECGI) (*model.Cell, error)
+	// Delete deletes the cell with the specified NCGI
+	Delete(ctx context.Context, ncgi types.NCGI) (*model.Cell, error)
 
 	// Watch watches the cell inventory events using the supplied channel
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
@@ -63,7 +63,7 @@ type WatchOptions struct {
 
 type store struct {
 	mu        sync.RWMutex
-	cells     map[types.ECGI]*model.Cell
+	cells     map[types.NCGI]*model.Cell
 	nodeStore nodes.Store
 	watchers  *watcher.Watchers
 }
@@ -74,7 +74,7 @@ func NewCellRegistry(cells map[string]model.Cell, nodeStore nodes.Store) Store {
 	watchers := watcher.NewWatchers()
 	reg := &store{
 		mu:        sync.RWMutex{},
-		cells:     make(map[types.ECGI]*model.Cell),
+		cells:     make(map[types.NCGI]*model.Cell),
 		nodeStore: nodeStore,
 		watchers:  watchers,
 	}
@@ -92,7 +92,7 @@ func (s *store) Load(ctx context.Context, cells map[string]model.Cell) {
 	// Copy the Cells into our own map
 	for _, c := range cells {
 		cell := c // avoids scopelint issue
-		s.cells[cell.ECGI] = &cell
+		s.cells[cell.NCGI] = &cell
 	}
 }
 
@@ -109,13 +109,13 @@ func (s *store) Clear(ctx context.Context) {
 func (s *store) Add(ctx context.Context, cell *model.Cell) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, ok := s.cells[cell.ECGI]; ok {
-		return errors.New(errors.NotFound, "cell with EnbID already exists")
+	if _, ok := s.cells[cell.NCGI]; ok {
+		return errors.New(errors.NotFound, "cell with GnbID already exists")
 	}
 
-	s.cells[cell.ECGI] = cell
+	s.cells[cell.NCGI] = cell
 	cellEvent := event.Event{
-		Key:   cell.ECGI,
+		Key:   cell.NCGI,
 		Value: cell,
 		Type:  Created,
 	}
@@ -124,10 +124,10 @@ func (s *store) Add(ctx context.Context, cell *model.Cell) error {
 }
 
 // Get gets a cell
-func (s *store) Get(ctx context.Context, ecgi types.ECGI) (*model.Cell, error) {
+func (s *store) Get(ctx context.Context, ncgi types.NCGI) (*model.Cell, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	if cell, ok := s.cells[ecgi]; ok {
+	if cell, ok := s.cells[ncgi]; ok {
 		return cell, nil
 	}
 
@@ -138,13 +138,13 @@ func (s *store) Get(ctx context.Context, ecgi types.ECGI) (*model.Cell, error) {
 func (s *store) Update(ctx context.Context, cell *model.Cell) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if prevCell, ok := s.cells[cell.ECGI]; ok {
-		s.cells[cell.ECGI] = cell
+	if prevCell, ok := s.cells[cell.NCGI]; ok {
+		s.cells[cell.NCGI] = cell
 		prevNeighbors := prevCell.Neighbors
 		equalNeighborsResult := equalNeighbors(prevNeighbors, cell.Neighbors)
 		if !equalNeighborsResult {
 			cellEvent := event.Event{
-				Key:   cell.ECGI,
+				Key:   cell.NCGI,
 				Value: cell,
 				Type:  UpdatedNeighbors,
 			}
@@ -152,7 +152,7 @@ func (s *store) Update(ctx context.Context, cell *model.Cell) error {
 		}
 
 		cellEvent := event.Event{
-			Key:   cell.ECGI,
+			Key:   cell.NCGI,
 			Value: cell,
 			Type:  Updated,
 		}
@@ -164,18 +164,18 @@ func (s *store) Update(ctx context.Context, cell *model.Cell) error {
 }
 
 // Delete deletes a cell
-func (s *store) Delete(ctx context.Context, ecgi types.ECGI) (*model.Cell, error) {
+func (s *store) Delete(ctx context.Context, ncgi types.NCGI) (*model.Cell, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if cell, ok := s.cells[ecgi]; ok {
-		delete(s.cells, ecgi)
+	if cell, ok := s.cells[ncgi]; ok {
+		delete(s.cells, ncgi)
 		deleteEvent := event.Event{
-			Key:   cell.ECGI,
+			Key:   cell.NCGI,
 			Value: cell,
 			Type:  Deleted,
 		}
 		s.watchers.Send(deleteEvent)
-		err := s.nodeStore.PruneCell(ctx, ecgi)
+		err := s.nodeStore.PruneCell(ctx, ncgi)
 		if err != nil {
 			return nil, err
 		}
@@ -206,7 +206,7 @@ func (s *store) Watch(ctx context.Context, ch chan<- event.Event, options ...Wat
 		go func() {
 			for _, cell := range s.cells {
 				ch <- event.Event{
-					Key:   cell.ECGI,
+					Key:   cell.NCGI,
 					Value: cell,
 					Type:  None,
 				}
@@ -229,6 +229,6 @@ func (s *store) List(ctx context.Context) ([]*model.Cell, error) {
 
 func (s *store) GetRandomCell() (*model.Cell, error) {
 	keys := reflect.ValueOf(s.cells).MapKeys()
-	ecgi := types.ECGI(keys[rand.Intn(len(keys))].Uint())
-	return s.cells[ecgi], nil
+	ncgi := types.NCGI(keys[rand.Intn(len(keys))].Uint())
+	return s.cells[ncgi], nil
 }

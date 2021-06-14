@@ -37,13 +37,13 @@ type Store interface {
 	Len(ctx context.Context) int
 
 	// LenPerCell returns the number of active UEs per cell
-	LenPerCell(ctx context.Context, cellECGI uint64) int
+	LenPerCell(ctx context.Context, cellNCGI uint64) int
 
 	// MaxUEsPerCell returns the maximum number of active UEs per cell
-	MaxUEsPerCell(ctx context.Context, cellECGI uint64) int
+	MaxUEsPerCell(ctx context.Context, cellNCGI uint64) int
 
 	// SetMaxUEsPerCell sets the maximum number of active UEs per cell
-	SetMaxUEsPerCell(ctx context.Context, cellECGI uint64, maxNumUEs int)
+	SetMaxUEsPerCell(ctx context.Context, cellNCGI uint64, maxNumUEs int)
 
 	// UpdateMaxUEsPerCell updates the maximum number of active UEs for all cells
 	UpdateMaxUEsPerCell(ctx context.Context)
@@ -58,7 +58,7 @@ type Store interface {
 	Delete(ctx context.Context, imsi types.IMSI) (*model.UE, error)
 
 	// MoveToCell update the cell affiliation of the specified UE
-	MoveToCell(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error
+	MoveToCell(ctx context.Context, imsi types.IMSI, ncgi types.NCGI, strength float64) error
 
 	// MoveToCoordinate updates the UEs geo location and compass heading
 	MoveToCoordinate(ctx context.Context, imsi types.IMSI, location model.Coordinate, heading uint32) error
@@ -73,7 +73,7 @@ type Store interface {
 	ListAllUEs(ctx context.Context) []*model.UE
 
 	// ListUEs returns an array of all UEs associated with the specified cell
-	ListUEs(ctx context.Context, ecgi types.ECGI) []*model.UE
+	ListUEs(ctx context.Context, ncgi types.NCGI) []*model.UE
 
 	// Watch watches the UE inventory events using the supplied channel
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
@@ -125,32 +125,32 @@ func (s *store) Len(ctx context.Context) int {
 	return len(s.ues)
 }
 
-func (s *store) LenPerCell(ctx context.Context, cellECGI uint64) int {
+func (s *store) LenPerCell(ctx context.Context, cellNCGI uint64) int {
 	result := 0
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, ue := range s.ues {
-		if uint64(ue.Cell.ECGI) == cellECGI {
+		if uint64(ue.Cell.NCGI) == cellNCGI {
 			result++
 		}
 	}
 	return result
 }
 
-func (s *store) MaxUEsPerCell(ctx context.Context, cellECGI uint64) int {
+func (s *store) MaxUEsPerCell(ctx context.Context, cellNCGI uint64) int {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	result, ok := s.maxUEs[cellECGI]
+	result, ok := s.maxUEs[cellNCGI]
 	if !ok {
 		return 0
 	}
 	return result
 }
 
-func (s *store) SetMaxUEsPerCell(ctx context.Context, cellECGI uint64, maxNumUEs int) {
+func (s *store) SetMaxUEsPerCell(ctx context.Context, cellNCGI uint64, maxNumUEs int) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.maxUEs[cellECGI] = maxNumUEs
+	s.maxUEs[cellNCGI] = maxNumUEs
 }
 
 func (s *store) UpdateMaxUEsPerCell(ctx context.Context) {
@@ -158,11 +158,11 @@ func (s *store) UpdateMaxUEsPerCell(ctx context.Context) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for _, ue := range s.ues {
-		if _, ok := s.maxUEs[uint64(ue.Cell.ECGI)]; !ok {
-			cNumUEsMap[uint64(ue.Cell.ECGI)] = 1
+		if _, ok := s.maxUEs[uint64(ue.Cell.NCGI)]; !ok {
+			cNumUEsMap[uint64(ue.Cell.NCGI)] = 1
 			continue
 		}
-		cNumUEsMap[uint64(ue.Cell.ECGI)]++
+		cNumUEsMap[uint64(ue.Cell.NCGI)]++
 	}
 
 	log.Debugf("[before] cNumUEsMap: %v", cNumUEsMap)
@@ -205,15 +205,15 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 		if err != nil {
 			log.Error(err)
 		}
-		ecgi := randomCell.ECGI
+		ncgi := randomCell.NCGI
 		ue := &model.UE{
 			IMSI:     imsi,
 			Type:     "phone",
 			Location: model.Coordinate{Lat: 0, Lng: 0},
 			Heading:  0,
 			Cell: &model.UECell{
-				ID:       types.GnbID(ecgi), // placeholder
-				ECGI:     ecgi,
+				ID:       types.GnbID(ncgi), // placeholder
+				NCGI:     ncgi,
 				Strength: rand.Float64() * 100,
 			},
 			CRNTI:      types.CRNTI(90125 + i),
@@ -262,11 +262,11 @@ func (s *store) ListAllUEs(ctx context.Context) []*model.UE {
 	return list
 }
 
-func (s *store) MoveToCell(ctx context.Context, imsi types.IMSI, ecgi types.ECGI, strength float64) error {
+func (s *store) MoveToCell(ctx context.Context, imsi types.IMSI, ncgi types.NCGI, strength float64) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if ue, ok := s.ues[imsi]; ok {
-		ue.Cell.ECGI = ecgi
+		ue.Cell.NCGI = ncgi
 		ue.Cell.Strength = strength
 		updateEvent := event.Event{
 			Key:   ue.IMSI,
@@ -329,12 +329,12 @@ func (s *store) UpdateCell(ctx context.Context, imsi types.IMSI, cell *model.UEC
 	return errors.New(errors.NotFound, "UE not found")
 }
 
-func (s *store) ListUEs(ctx context.Context, ecgi types.ECGI) []*model.UE {
+func (s *store) ListUEs(ctx context.Context, ncgi types.NCGI) []*model.UE {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	list := make([]*model.UE, 0, len(s.ues))
 	for _, ue := range s.ues {
-		if ue.Cell.ECGI == ecgi {
+		if ue.Cell.NCGI == ncgi {
 			list = append(list, ue)
 		}
 	}

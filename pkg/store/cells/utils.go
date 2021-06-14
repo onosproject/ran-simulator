@@ -8,7 +8,7 @@ import (
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 )
 
-func equalNeighbors(a, b []types.ECGI) bool {
+func equalNeighbors(a, b []types.NCGI) bool {
 
 	// If one is nil, the other must also be nil.
 	if (a == nil) != (b == nil) {

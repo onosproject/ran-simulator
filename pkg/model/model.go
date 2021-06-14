@@ -50,10 +50,10 @@ type Route struct {
 
 // Node e2 node
 type Node struct {
-	EnbID         types.EnbID  `mapstructure:"enbID"`
+	GnbID         types.GnbID  `mapstructure:"enbID"`
 	Controllers   []string     `mapstructure:"controllers"`
 	ServiceModels []string     `mapstructure:"servicemodels"`
-	Cells         []types.ECGI `mapstructure:"cells"`
+	Cells         []types.NCGI `mapstructure:"cells"`
 	Status        string       `mapstructure:"status"`
 }
 
@@ -75,11 +75,11 @@ type EventA3Params struct {
 
 // Cell represents a section of coverage
 type Cell struct {
-	ECGI          types.ECGI     `mapstructure:"ecgi"`
+	NCGI          types.NCGI     `mapstructure:"ncgi"`
 	Sector        Sector         `mapstructure:"sector"`
 	Color         string         `mapstructure:"color"`
 	MaxUEs        uint32         `mapstructure:"maxUEs"`
-	Neighbors     []types.ECGI   `mapstructure:"neighbors"`
+	Neighbors     []types.NCGI   `mapstructure:"neighbors"`
 	TxPowerDB     float64        `mapstructure:"txPower"`
 	EventA3Params EventA3Params  `mapstructure:"eventA3Params"`
 	PCI           uint32         `mapstructure:"pci"`
@@ -93,7 +93,7 @@ type UEType string
 // UECell represents UE-cell relationship
 type UECell struct {
 	ID       types.GnbID
-	ECGI     types.ECGI // Auxiliary form of association
+	NCGI     types.NCGI // Auxiliary form of association
 	Strength float64
 }
 

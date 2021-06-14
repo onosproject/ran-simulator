@@ -23,8 +23,8 @@ func TestNodes(t *testing.T) {
 	ctx := context.Background()
 
 	nodeStore := NewNodeRegistry(m.Nodes)
-	node1EnbID := types.EnbID(144472)
-	node2EnbID := types.EnbID(144473)
+	node1GnbID := types.GnbID(144472)
+	node2GnbID := types.GnbID(144473)
 	numNodes, err := nodeStore.Len(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, numNodes)
@@ -33,17 +33,17 @@ func TestNodes(t *testing.T) {
 	err = nodeStore.Watch(ctx, ch)
 	assert.NoError(t, err)
 	node1 := &model.Node{
-		EnbID:         node1EnbID,
+		GnbID:         node1GnbID,
 		Controllers:   []string{"controller1"},
 		ServiceModels: []string{"kpm"},
-		Cells:         []types.ECGI{1234, 4321},
+		Cells:         []types.NCGI{1234, 4321},
 	}
 
 	node2 := &model.Node{
-		EnbID:         node2EnbID,
+		GnbID:         node2GnbID,
 		Controllers:   []string{"controller1"},
 		ServiceModels: []string{"kpm"},
-		Cells:         []types.ECGI{5678, 8765},
+		Cells:         []types.NCGI{5678, 8765},
 	}
 	err = nodeStore.Add(ctx, node1)
 	assert.NoError(t, err)
@@ -55,15 +55,15 @@ func TestNodes(t *testing.T) {
 	nodeEvent = <-ch
 	assert.Equal(t, Created, nodeEvent.Type.(NodeEvent))
 
-	node1, err = nodeStore.Get(ctx, node1EnbID)
+	node1, err = nodeStore.Get(ctx, node1GnbID)
 	assert.NoError(t, err)
-	assert.Equal(t, node1.EnbID, node1EnbID)
-	_, err = nodeStore.Delete(ctx, node1EnbID)
+	assert.Equal(t, node1.GnbID, node1GnbID)
+	_, err = nodeStore.Delete(ctx, node1GnbID)
 	assert.NoError(t, err)
 	nodeEvent = <-ch
 	assert.Equal(t, Deleted, nodeEvent.Type.(NodeEvent))
 
-	_, err = nodeStore.Get(ctx, node1EnbID)
+	_, err = nodeStore.Get(ctx, node1GnbID)
 	assert.Error(t, err, "node found")
 
 	nodeStore.Clear(ctx)

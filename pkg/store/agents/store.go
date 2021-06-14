@@ -19,20 +19,20 @@ var log = logging.GetLogger("store", "agents")
 
 // E2Agents e2 agents
 type E2Agents struct {
-	agents map[types.EnbID]e2agent.E2Agent
+	agents map[types.GnbID]e2agent.E2Agent
 	mu     sync.RWMutex
 }
 
 // NewStore creates a new e2 agents store
 func NewStore() *E2Agents {
 	return &E2Agents{
-		agents: make(map[types.EnbID]e2agent.E2Agent),
+		agents: make(map[types.GnbID]e2agent.E2Agent),
 		mu:     sync.RWMutex{},
 	}
 }
 
 // Get gets an e2 agent
-func (e *E2Agents) Get(id types.EnbID) (e2agent.E2Agent, error) {
+func (e *E2Agents) Get(id types.GnbID) (e2agent.E2Agent, error) {
 	log.Debug("Getting e2 agent with ID:", id)
 	e.mu.RLock()
 	defer e.mu.RUnlock()
@@ -43,7 +43,7 @@ func (e *E2Agents) Get(id types.EnbID) (e2agent.E2Agent, error) {
 }
 
 // Add adds an e2 agent
-func (e *E2Agents) Add(id types.EnbID, agent e2agent.E2Agent) error {
+func (e *E2Agents) Add(id types.GnbID, agent e2agent.E2Agent) error {
 	log.Debug("Adding e2 agent with ID:", id)
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -56,7 +56,7 @@ func (e *E2Agents) Add(id types.EnbID, agent e2agent.E2Agent) error {
 }
 
 // Remove removes an e2 agent
-func (e *E2Agents) Remove(id types.EnbID) error {
+func (e *E2Agents) Remove(id types.GnbID) error {
 	log.Debug("Removing e2 agent with ID:", id)
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -68,23 +68,23 @@ func (e *E2Agents) Remove(id types.EnbID) error {
 }
 
 // List list e2 agents
-func (e *E2Agents) List() (map[types.EnbID]e2agent.E2Agent, error) {
+func (e *E2Agents) List() (map[types.GnbID]e2agent.E2Agent, error) {
 	return e.agents, nil
 }
 
 // Store e2 agents store interface
 type Store interface {
 	// Add an e2 agent
-	Add(types.EnbID, e2agent.E2Agent) error
+	Add(types.GnbID, e2agent.E2Agent) error
 
 	// Remove an e2 agent
-	Remove(types.EnbID) error
+	Remove(types.GnbID) error
 
 	// List list all of the e2 agents
-	List() (map[types.EnbID]e2agent.E2Agent, error)
+	List() (map[types.GnbID]e2agent.E2Agent, error)
 
 	// Get gets an e2 agent
-	Get(types.EnbID) (e2agent.E2Agent, error)
+	Get(types.GnbID) (e2agent.E2Agent, error)
 }
 
 var _ Store = &E2Agents{}

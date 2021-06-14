@@ -19,7 +19,7 @@ var log = logging.GetLogger("pci", "load")
 
 // PciMetrics is an auxiliary structure for importing PCI data from YAML configuration
 type PciMetrics struct {
-	Cells map[types.ECGI]PciCell `mapstructure:"cells" yaml:"cells"`
+	Cells map[types.NCGI]PciCell `mapstructure:"cells" yaml:"cells"`
 }
 
 // PciCell is an auxiliary structure for inport PCI data from YAML configuration
@@ -84,8 +84,8 @@ func unmarshal(store metrics.Store) error {
 	log.Infof("Storing PCI metrics for %d cells...", len(pcis.Cells))
 
 	ctx := context.Background()
-	for ecgi, m := range pcis.Cells {
-		id := uint64(ecgi)
+	for ncgi, m := range pcis.Cells {
+		id := uint64(ncgi)
 		_ = store.Set(ctx, id, "cellSize", m.CellSize)
 		_ = store.Set(ctx, id, "earfcn", m.Earfcn)
 		_ = store.Set(ctx, id, "pci", m.Pci)

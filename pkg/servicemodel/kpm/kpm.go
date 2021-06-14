@@ -121,7 +121,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 func (sm *Client) reportIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
-	gNbID, err := strconv.ParseUint(fmt.Sprintf("%d", sm.ServiceModel.Node.EnbID), 10, 64)
+	gNbID, err := strconv.ParseUint(fmt.Sprintf("%d", sm.ServiceModel.Node.GnbID), 10, 64)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -199,7 +199,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
+	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.GnbID, sm.ServiceModel.ModelName)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -271,7 +271,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
+	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.GnbID, sm.ServiceModel.ModelName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)

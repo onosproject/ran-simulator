@@ -72,7 +72,7 @@ type e2Agent struct {
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (E2Agent, error) {
-	log.Info("Creating New E2 Agent for node with eNbID:", node.EnbID)
+	log.Info("Creating New E2 Agent for node with eNbID:", node.GnbID)
 	reg := registry.NewServiceModelRegistry()
 
 	// Each new e2 agent has its own subscription store
@@ -107,29 +107,29 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 				return nil, err
 			}
 		case registry.Kpm2:
-			log.Info("KPM2 service model for node with eNbID:", node.EnbID)
+			log.Info("KPM2 service model for node with eNbID:", node.GnbID)
 			kpm2Sm, err := kpm2.NewServiceModel(node, model, modelPluginRegistry,
 				subStore, nodeStore, ueStore)
 			if err != nil {
-				log.Info("Failure creating KPM2 service model for eNbID:", node.EnbID)
+				log.Info("Failure creating KPM2 service model for eNbID:", node.GnbID)
 				return nil, err
 			}
 			err = reg.RegisterServiceModel(kpm2Sm)
 			if err != nil {
-				log.Info("Failure registering KPM2 service model for eNbID:", node.EnbID)
+				log.Info("Failure registering KPM2 service model for eNbID:", node.GnbID)
 				log.Error(err)
 				return nil, err
 			}
 		case registry.Mho:
-			log.Info("MHO service model for node with eNbID:", node.EnbID)
+			log.Info("MHO service model for node with eNbID:", node.GnbID)
 			mhoSm, err := mho.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore, cellStore, metricStore)
 			if err != nil {
-				log.Info("Failure creating MHO service model for eNbID:", node.EnbID)
+				log.Info("Failure creating MHO service model for eNbID:", node.GnbID)
 				return nil, err
 			}
 			err = reg.RegisterServiceModel(mhoSm)
 			if err != nil {
-				log.Info("Failure registering MHO service model for eNbID:", node.EnbID)
+				log.Info("Failure registering MHO service model for eNbID:", node.GnbID)
 				log.Error(err)
 				return nil, err
 			}
@@ -341,31 +341,31 @@ func (a *e2Agent) Start() error {
 		return errors.New(errors.Invalid, "no controller is associated with this node")
 	}
 
-	log.Infof("E2 node %d is starting; attempting to connect", a.node.EnbID)
+	log.Infof("E2 node %d is starting; attempting to connect", a.node.GnbID)
 	b := newExpBackoff()
 
 	// Attempt to connect to the E2T controller; use exponential back-off retry
 	count := 0
 	connectNotify := func(err error, t time.Duration) {
 		count++
-		log.Infof("E2 node %d failed to connect; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
+		log.Infof("E2 node %d failed to connect; retry after %v; attempt %d", a.node.GnbID, b.GetElapsedTime(), count)
 	}
 
 	err := backoff.RetryNotify(a.connect, b, connectNotify)
 	if err != nil {
 		return err
 	}
-	log.Infof("E2 node %d connected; attempting setup", a.node.EnbID)
+	log.Infof("E2 node %d connected; attempting setup", a.node.GnbID)
 
 	// Attempt to negotiate E2 setup procedure; use exponential back-off retry
 	count = 0
 	setupNotify := func(err error, t time.Duration) {
 		count++
-		log.Infof("E2 node %d failed setup procedure; retry after %v; attempt %d", a.node.EnbID, b.GetElapsedTime(), count)
+		log.Infof("E2 node %d failed setup procedure; retry after %v; attempt %d", a.node.GnbID, b.GetElapsedTime(), count)
 	}
 
 	err = backoff.RetryNotify(a.setup, b, setupNotify)
-	log.Infof("E2 node %d completed connection setup", a.node.EnbID)
+	log.Infof("E2 node %d completed connection setup", a.node.GnbID)
 	return err
 }
 
@@ -389,15 +389,11 @@ func (a *e2Agent) connect() error {
 }
 
 func (a *e2Agent) setup() error {
-	e2GlobalID, err := nodeID(a.model.PlmnID, a.node.EnbID)
 	plmnID := ransimtypes.NewUint24(uint32(a.model.PlmnID))
-	if err != nil {
-		return err
-	}
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
 		setup.WithPlmnID(plmnID.Value()),
-		setup.WithE2NodeID(e2GlobalID))
+		setup.WithE2NodeID(uint64(a.node.GnbID)))
 
 	e2SetupRequest, err := setupRequest.Build()
 
@@ -418,7 +414,7 @@ func (a *e2Agent) setup() error {
 }
 
 func (a *e2Agent) Stop() error {
-	log.Debugf("Stopping e2 agent with ID %d:", a.node.EnbID)
+	log.Debugf("Stopping e2 agent with ID %d:", a.node.GnbID)
 
 	if a.channel != nil {
 		return a.channel.Close()

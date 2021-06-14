@@ -79,19 +79,19 @@ func ueToAPI(ue *model.UE) *simtypes.Ue {
 		Admitted: ue.IsAdmitted,
 	}
 	if ue.Cell != nil {
-		r.ServingTower = simtypes.ECGI(ue.Cell.ID)
+		r.ServingTower = simtypes.NCGI(ue.Cell.ID)
 		r.ServingTowerStrength = ue.Cell.Strength
 	}
 	if len(ue.Cells) > 0 {
-		r.Tower1 = simtypes.ECGI(ue.Cells[0].ID)
+		r.Tower1 = simtypes.NCGI(ue.Cells[0].ID)
 		r.Tower1Strength = ue.Cells[0].Strength
 	}
 	if len(ue.Cells) > 1 {
-		r.Tower2 = simtypes.ECGI(ue.Cells[1].ID)
+		r.Tower2 = simtypes.NCGI(ue.Cells[1].ID)
 		r.Tower2Strength = ue.Cells[1].Strength
 	}
 	if len(ue.Cells) > 2 {
-		r.Tower3 = simtypes.ECGI(ue.Cells[2].ID)
+		r.Tower3 = simtypes.NCGI(ue.Cells[2].ID)
 		r.Tower3Strength = ue.Cells[2].Strength
 	}
 	return r
