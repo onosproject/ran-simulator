@@ -33,6 +33,8 @@ type Sector struct {
 	Center  Coordinate `mapstructure:"center"`
 	Azimuth int32      `mapstructure:"azimuth"`
 	Arc     int32      `mapstructure:"arc"`
+	Tilt    int32      `mapstructure:"tilt"`
+	Height  int32      `mapstructure:"height"`
 }
 
 // Route represents a series of points for tracking movement of user-equipment

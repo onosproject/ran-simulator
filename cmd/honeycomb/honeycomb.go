@@ -6,14 +6,17 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils/honeycomb"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"os"
 )
 
 // A simple too to generate a tower configuration in a honeycomb layout
@@ -56,6 +59,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().Uint32P("enbidstart", "e", 5152, "EnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
 	cmd.Flags().Bool("single-node", false, "generate a single node for all cells")
+	cmd.Flags().String("controller-yaml", "", "if specified, location of yaml file for controller")
 	return cmd
 }
 
@@ -72,6 +76,7 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	controllerAddresses, _ := cmd.Flags().GetStringSlice("controller-addresses")
 	serviceModels, _ := cmd.Flags().GetStringSlice("service-models")
 	singleNode, _ := cmd.Flags().GetBool("single-node")
+	controllerFile, _ := cmd.Flags().GetString("controller-yaml")
 
 	fmt.Printf("Creating honeycomb array of %d towers with %d cells each.\n", numTowers, sectorsPerTower)
 
@@ -90,6 +95,59 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Unable to marshal model data: %v", err)
 		return err
 	}
-
+	if controllerFile != "" {
+		writeControllerYaml(*m, controllerFile)
+	}
 	return ioutil.WriteFile(args[0], d, 0644)
+}
+
+func writeControllerYaml(model model.Model, location string) {
+	f, err := os.OpenFile(location, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("failed creating file: %s", err)
+	}
+	w := bufio.NewWriter(f)
+
+	// print out Nodes and their connections
+	for node := range model.Nodes {
+		// print the node
+		w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nmetadata:\n  kind: Entity\n")
+		w.WriteString(fmt.Sprintf("  name: %d\n", model.Nodes[node].EnbID))
+		w.WriteString("spec:\n  aspects:\n    servicemodels:\n")
+		// and print service models
+		for service_model := range model.Nodes[node].ServiceModels {
+			w.WriteString(fmt.Sprintf("      - %s\n", model.Nodes[node].ServiceModels[service_model]))
+		}
+		w.WriteString("---\n")
+		// then print the connections separately
+		for cell := range model.Nodes[node].Cells {
+			w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n  name: e2-node-cell\n")
+			w.WriteString("spec:\n  aspects:\n")
+			w.WriteString(fmt.Sprintf("    nodeid: %d\n", model.Nodes[node].EnbID))
+			w.WriteString(fmt.Sprintf("    cellid: %d\n", model.Nodes[node].Cells[cell]))
+			w.WriteString("---\n")
+		}
+	}
+
+	// print out Cells
+	for cell := range model.Cells {
+		// print the cell
+		w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nmetadata:\n  kind: Entity\n")
+		w.WriteString(fmt.Sprintf("  name: %d\n", model.Cells[cell].ECGI))
+		w.WriteString("spec:\n  aspects:\n")
+		w.WriteString("    onos.topo.Location:\n")
+		w.WriteString(fmt.Sprintf("      lat: %f\n", model.Cells[cell].Sector.Center.Lat))
+		w.WriteString(fmt.Sprintf("      lng: %f\n", model.Cells[cell].Sector.Center.Lng))
+		w.WriteString("    onos.topo.E2Cell:\n")
+		w.WriteString(fmt.Sprintf("      earfcn: %d\n", model.Cells[cell].Earfcn))
+		w.WriteString(fmt.Sprintf("      cell_type: %s\n", model.Cells[cell].CellType.String()))
+		w.WriteString("    onos.topo.Coverage:\n")
+		w.WriteString(fmt.Sprintf("      arc_width: %d\n", model.Cells[cell].Sector.Arc))
+		w.WriteString(fmt.Sprintf("      tilt: %d\n", model.Cells[cell].Sector.Tilt))
+		w.WriteString(fmt.Sprintf("      height: %d\n", model.Cells[cell].Sector.Height))
+		w.WriteString(fmt.Sprintf("      azimuth: %d\n", model.Cells[cell].Sector.Azimuth))
+		w.WriteString("---\n")
+	}
+
+	w.Flush()
 }
