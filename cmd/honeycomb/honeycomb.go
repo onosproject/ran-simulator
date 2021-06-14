@@ -7,13 +7,14 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils/honeycomb"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
-	"os"
 )
 
 // A simple too to generate a tower configuration in a honeycomb layout
@@ -56,6 +57,11 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().Uint32P("enbidstart", "e", 5152, "EnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
 	cmd.Flags().Bool("single-node", false, "generate a single node for all cells")
+	cmd.Flags().Uint("min-pci", 0, "minimum PCI value")
+	cmd.Flags().Uint("max-pci", 503, "maximum PCI value")
+	cmd.Flags().Uint("max-collisions", 8, "maximum number of collisions")
+	cmd.Flags().Uint32("earfcn-start", 42, "start point for EARFCN generation")
+	cmd.Flags().StringSlice("cell-types", []string{"FEMTO", "ENTERPRISE", "OUTDOOR_SMALL", "MACRO"}, "List of cell size types")
 	return cmd
 }
 
@@ -73,12 +79,18 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	serviceModels, _ := cmd.Flags().GetStringSlice("service-models")
 	singleNode, _ := cmd.Flags().GetBool("single-node")
 
+	minPci, _ := cmd.Flags().GetUint("min-pci")
+	maxPci, _ := cmd.Flags().GetUint("max-pci")
+	maxCollisions, _ := cmd.Flags().GetUint("max-collisions")
+	earfcnStart, _ := cmd.Flags().GetUint32("earfcn-start")
+	cellTypes, _ := cmd.Flags().GetStringSlice("cell-types")
+
 	fmt.Printf("Creating honeycomb array of %d towers with %d cells each.\n", numTowers, sectorsPerTower)
 
 	mapCenter := model.Coordinate{Lat: latitude, Lng: longitude}
 
 	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower,
-		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance, maxNeighbors, controllerAddresses, serviceModels, singleNode)
+		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance, maxNeighbors, controllerAddresses, serviceModels, singleNode, minPci, maxPci, maxCollisions, earfcnStart, cellTypes)
 	if err != nil {
 		return err
 	}
