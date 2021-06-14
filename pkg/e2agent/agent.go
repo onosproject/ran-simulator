@@ -389,15 +389,11 @@ func (a *e2Agent) connect() error {
 }
 
 func (a *e2Agent) setup() error {
-	e2GlobalID, err := nodeID(a.model.PlmnID, a.node.GnbID)
 	plmnID := ransimtypes.NewUint24(uint32(a.model.PlmnID))
-	if err != nil {
-		return err
-	}
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(a.registry.GetRanFunctions()),
 		setup.WithPlmnID(plmnID.Value()),
-		setup.WithE2NodeID(e2GlobalID))
+		setup.WithE2NodeID(uint64(a.node.GnbID)))
 
 	e2SetupRequest, err := setupRequest.Build()
 

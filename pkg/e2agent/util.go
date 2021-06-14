@@ -5,12 +5,7 @@
 package e2agent
 
 import (
-	"bytes"
-	"encoding/gob"
-	"hash/fnv"
 	"time"
-
-	"github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/cenkalti/backoff"
 )
@@ -28,18 +23,4 @@ func newExpBackoff() *backoff.ExponentialBackOff {
 	// Never stops retrying
 	b.MaxElapsedTime = 0
 	return b
-}
-
-func nodeID(plmndID types.PlmnID, gnbID types.GnbID) (uint64, error) {
-	gGnbID := types.ToNodeID(plmndID, gnbID)
-	buf := bytes.Buffer{}
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(gGnbID)
-	if err != nil {
-		return 0, err
-	}
-
-	h := fnv.New64a()
-	_, _ = h.Write(buf.Bytes())
-	return h.Sum64(), nil
 }
