@@ -73,13 +73,16 @@ type EventA3Params struct {
 
 // Cell represents a section of coverage
 type Cell struct {
-	ECGI          types.ECGI    `mapstructure:"ecgi"`
-	Sector        Sector        `mapstructure:"sector"`
-	Color         string        `mapstructure:"color"`
-	MaxUEs        uint32        `mapstructure:"maxUEs"`
-	Neighbors     []types.ECGI  `mapstructure:"neighbors"`
-	TxPowerDB     float64       `mapstructure:"txPower"`
-	EventA3Params EventA3Params `mapstructure:"eventA3Params"`
+	ECGI          types.ECGI     `mapstructure:"ecgi"`
+	Sector        Sector         `mapstructure:"sector"`
+	Color         string         `mapstructure:"color"`
+	MaxUEs        uint32         `mapstructure:"maxUEs"`
+	Neighbors     []types.ECGI   `mapstructure:"neighbors"`
+	TxPowerDB     float64        `mapstructure:"txPower"`
+	EventA3Params EventA3Params  `mapstructure:"eventA3Params"`
+	PCI           uint32         `mapstructure:"pci"`
+	Earfcn        uint32         `mapstructure:"earfcn"`
+	CellType      types.CellType `mapstructure:"cellType"`
 }
 
 // UEType represents type of user-equipment

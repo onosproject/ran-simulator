@@ -18,11 +18,29 @@ import (
 	"github.com/pmcxs/hexgrid"
 )
 
+// used for generating the pci
+type auxPCI struct {
+	pci     uint32
+	pciPool []pciRange
+}
+
+type pciRange struct {
+	min uint32
+	max uint32
+}
+
 // GenerateHoneycombTopology generates a set of simulated nodes and cells organized in a honeycomb
 // outward from the specified center.
 func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint, plmnID types.PlmnID,
 	enbStart uint32, pitch float32, maxDistance float64, maxNeighbors int,
 	controllerAddresses []string, serviceModels []string, singleNode bool) (*model.Model, error) {
+
+	// temp numbers, copied from metrics
+	minPCI, maxPCI := 0, 503
+	maxCollisions := 10
+	var earffcnStart uint32 = 42
+	earfcn := earffcnStart
+	validCellTypes := [4]uint32{0, 1, 2, 3}
 
 	m := &model.Model{
 		PlmnID:        plmnID,
@@ -91,7 +109,10 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 				MaxUEs:    99999,
 				Neighbors: make([]types.ECGI, 0, sectorsPerTower),
 				TxPowerDB: 11,
+				Earfcn:    earfcn,
 			}
+			earfcn++
+
 			m.Cells[cellName] = cell
 			node.Cells = append(node.Cells, cell.ECGI)
 		}
@@ -107,8 +128,102 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		}
 		m.Cells[cellName] = cell
 	}
-
+	// Add pci values
+	generatePCI(m.Cells, uint(minPCI), uint(maxPCI), uint(maxCollisions))
+	// Add random cell type
+	for name, cell := range m.Cells {
+		tempCell := cell
+		tempCell.CellType = types.CellType(rand.Intn(len(validCellTypes)))
+		m.Cells[name] = tempCell
+	}
 	return m, nil
+}
+
+func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxCollisions uint) {
+	pciCells := make(map[types.ECGI]auxPCI)
+
+	// Generate PCI pools and shuffle them
+	pools := generatePools(uint(2*len(cells)), minPCI, maxPCI)
+	indexes := rand.Perm(len(pools))
+
+	// Create PCI metrics for each cell using unique PCI pools; so without collisions
+	pi := 0
+
+	// Prepare to index by ECGI and cell name alike
+	ecgis := make([]types.ECGI, 0, len(cells))
+	names := make([]string, 0, len(cells))
+
+	for name, cell := range cells {
+		// Assign each cell up to two PCI pools
+		ranges := make([]pciRange, 0, 2)
+		for i := rand.Intn(2); i >= 0; i-- {
+			ranges = append(ranges, pools[indexes[pi]])
+			pi = pi + 1
+		}
+
+		// Create metrics for each cell
+		pciCells[cell.ECGI] = auxPCI{
+			pci:     pickPCI(ranges),
+			pciPool: ranges,
+		}
+
+		ecgis = append(ecgis, cell.ECGI)
+		names = append(names, name)
+	}
+
+	// Now inject requested number of collisions; between neighbour cells
+	// Shuffle the cells so that conflict assignment is somewhat random
+	conflicts := make(map[types.ECGI]auxPCI)
+	cellIndexes := rand.Perm(len(ecgis))
+	collisions := uint(0)
+	for i := 0; i < len(cellIndexes) && collisions < maxCollisions; i++ {
+		ecgi := ecgis[cellIndexes[i]]
+
+		if _, conflicted := conflicts[ecgi]; !conflicted {
+			pciCell := pciCells[ecgi]
+			cellRanges := pciCell.pciPool
+			cell := cells[names[i]]
+
+			necgi := cell.Neighbors[rand.Intn(len(cell.Neighbors))]
+			if _, conflicted := conflicts[necgi]; !conflicted {
+				neighborPciCell := pciCells[necgi]
+
+				// Replace the first PCI pool of the neighbor with a randomly chosen one from the cell
+				neighborPciCell.pciPool[0] = cellRanges[rand.Intn(len(cellRanges))]
+				neighborPciCell.pci = pciCell.pci
+				pciCells[necgi] = neighborPciCell
+				collisions = collisions + 1
+
+				conflicts[ecgi] = pciCell
+				conflicts[necgi] = neighborPciCell
+
+				fmt.Printf("Injected conflict between %d and %d\n", ecgi, necgi)
+			}
+		}
+	}
+	for i := 0; i < len(cellIndexes); i++ {
+		tempCell := cells[names[i]]
+		tempCell.PCI = pciCells[ecgis[i]].pci
+		cells[names[i]] = tempCell
+	}
+}
+
+func pickPCI(ranges []pciRange) uint32 {
+	pi := rand.Intn(len(ranges))
+	return ranges[pi].min + uint32(rand.Intn(int(ranges[pi].max-ranges[pi].min)))
+}
+
+// Generate 2 x cell count number of pools evenly split between min and max
+func generatePools(poolCount uint, minPCI uint, maxPCI uint) []pciRange {
+	pools := make([]pciRange, 0, poolCount)
+	poolSize := uint32((maxPCI - minPCI) / poolCount)
+
+	pci := uint32(minPCI)
+	for i := uint(0); i < poolCount; i++ {
+		pools = append(pools, pciRange{min: pci, max: pci + poolSize - 1})
+		pci = pci + poolSize
+	}
+	return pools
 }
 
 func generateControllers(addresses []string) map[string]model.Controller {
@@ -165,6 +280,7 @@ func hexMesh(pitch float64, numTowers uint, center model.Coordinate) []*model.Co
 		// fmt.Printf("%f, %f\n", lat, lon)
 	}
 	return points
+	// deform mesh
 }
 
 // Number of cells in the hexagon layout 3x^2+9x+7
