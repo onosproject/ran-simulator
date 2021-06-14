@@ -33,14 +33,9 @@ type pciRange struct {
 // outward from the specified center.
 func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint, plmnID types.PlmnID,
 	enbStart uint32, pitch float32, maxDistance float64, maxNeighbors int,
-	controllerAddresses []string, serviceModels []string, singleNode bool) (*model.Model, error) {
+	controllerAddresses []string, serviceModels []string, singleNode bool, minPci uint, maxPci uint, maxCollisions uint, earfcnStart uint32, cellTypes []string) (*model.Model, error) {
 
-	// temp numbers, copied from metrics
-	minPCI, maxPCI := 0, 503
-	maxCollisions := 10
-	var earffcnStart uint32 = 42
-	earfcn := earffcnStart
-	validCellTypes := [4]uint32{0, 1, 2, 3}
+	earfcn := earfcnStart
 
 	m := &model.Model{
 		PlmnID:        plmnID,
@@ -129,8 +124,13 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		m.Cells[cellName] = cell
 	}
 	// Add pci values
-	generatePCI(m.Cells, uint(minPCI), uint(maxPCI), uint(maxCollisions))
+	generatePCI(m.Cells, minPci, maxPci, maxCollisions)
 	// Add random cell type
+	validCellTypes := make([]int32, 0)
+	// validCellTypes := [4]uint32{0, 1, 2, 3}
+	for cellType := range cellTypes {
+		validCellTypes = append(validCellTypes, types.CellType_value[cellTypes[cellType]])
+	}
 	for name, cell := range m.Cells {
 		tempCell := cell
 		tempCell.CellType = types.CellType(rand.Intn(len(validCellTypes)))
@@ -140,6 +140,9 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 }
 
 func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxCollisions uint) {
+	if len(cells) > int(maxPCI-minPCI) {
+		panic("Too little space in between the minimum and maximum PCI values. Try setting --min-pci lower or --max-pci higher")
+	}
 	pciCells := make(map[types.ECGI]auxPCI)
 
 	// Generate PCI pools and shuffle them
@@ -210,6 +213,9 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 
 func pickPCI(ranges []pciRange) uint32 {
 	pi := rand.Intn(len(ranges))
+	if ranges[pi].max-ranges[pi].min == 0 {
+		return ranges[pi].min
+	}
 	return ranges[pi].min + uint32(rand.Intn(int(ranges[pi].max-ranges[pi].min)))
 }
 
