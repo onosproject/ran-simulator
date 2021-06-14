@@ -8,7 +8,11 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"strconv"
+	"time"
+
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/pdubuilder"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
@@ -17,6 +21,7 @@ import (
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
@@ -29,12 +34,10 @@ import (
 	e2apIndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
-	mhoIndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
-	mhoMessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message"
+	indHdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
+	indMsgFmt1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format1"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
 	"google.golang.org/protobuf/proto"
-	"strconv"
-	"time"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -277,7 +280,51 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 
 // RICControl implements control handler for MHO service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	return nil, nil, err
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+
+	controlHeader, err := sm.getControlHeader(request)
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+
+	// TODO - check MHO command
+	log.Debugf("MHO control header: %v", controlHeader)
+
+	controlMessage, err := sm.getControlMessage(request)
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+
+	log.Debugf("MHO control message: %v", controlMessage)
+
+	imsi, err := strconv.Atoi(controlMessage.GetControlMessageFormat1().GetUedId().GetValue())
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+	ue, err := sm.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
+	if err != nil {
+		log.Errorf("UE: %v not found err: %v", ue, err)
+		return nil, nil, err
+	}
+	log.Debugf("imsi: %v", imsi)
+
+	plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
+	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
+	eci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
+	log.Debugf("ECI is %d and PLMN ID is %d", eci, plmnID)
+	tCellEcgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
+
+	tCell := &model.UECell{
+		ID:   types.GnbID(tCellEcgi),
+		ECGI: tCellEcgi,
+	}
+
+	mobility.DoHandover(ctx, types.IMSI(imsi), tCell, sm.ServiceModel.UEs, sm.ServiceModel.CellStore)
+
+	return nil, nil, nil
 }
 
 func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
@@ -365,13 +412,11 @@ func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ecgi ransimty
 
 	cell, _ := sm.ServiceModel.CellStore.Get(ctx, ecgi)
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-	cellEci := ransimtypes.GetECI(uint64(cell.ECGI))
-
 	timestamp := make([]byte, 4)
 	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
-	header := mhoIndicationHeader.NewIndicationHeader(
-		mhoIndicationHeader.WithPlmnID(*plmnID),
-		mhoIndicationHeader.WithNrcellIdentity(uint64(cellEci)))
+	header := indHdr.NewIndicationHeader(
+		indHdr.WithPlmnID(*plmnID),
+		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.ECGI)))))
 
 	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
 	if err != nil {
@@ -397,8 +442,29 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 		return nil, err
 	}
 
-	for i, cell := range ue.Cells {
-		log.Debugf("Add MHO measurement report #%d: ecgi:%d, rsrp:%d", i, cell.ECGI, int32(cell.Strength))
+	// add serving cell to measReport
+	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
+		Cgi: &e2sm_mho.CellGlobalId{
+			CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
+				NrCgi: &e2sm_mho.Nrcgi{
+					PLmnIdentity: &e2sm_mho.PlmnIdentity{
+						Value: plmnID.ToBytes(),
+					},
+					NRcellIdentity: &e2sm_mho.NrcellIdentity{
+						Value: &e2sm_mho.BitString{
+							Value: uint64(ransimtypes.GetECI(uint64(ue.Cell.ECGI))),
+							Len:   36,
+						},
+					},
+				},
+			},
+		},
+		Rsrp: &e2sm_mho.Rsrp{
+			Value: int32(ue.Cell.Strength),
+		},
+	})
+
+	for _, cell := range ue.Cells {
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 			Cgi: &e2sm_mho.CellGlobalId{
 				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
@@ -408,7 +474,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 						},
 						NRcellIdentity: &e2sm_mho.NrcellIdentity{
 							Value: &e2sm_mho.BitString{
-								Value: uint64(cell.ECGI),
+								Value: uint64(ransimtypes.GetECI(uint64(cell.ECGI))),
 								Len:   36,
 							},
 						},
@@ -425,9 +491,9 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 
 	log.Debugf("MHO measurement report for ueID %s: %v", ueID, measReport)
 
-	indicationMessage := mhoMessageFormat1.NewIndicationMessage(
-		mhoMessageFormat1.WithUeID(ueID),
-		mhoMessageFormat1.WithMeasReport(measReport))
+	indicationMessage := indMsgFmt1.NewIndicationMessage(
+		indMsgFmt1.WithUeID(ueID),
+		indMsgFmt1.WithMeasReport(measReport))
 
 	log.Debugf("MHO indication message for ueID %s: %v", ueID, indicationMessage)
 

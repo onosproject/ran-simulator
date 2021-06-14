@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package message
+package messageformat1
 
 import (
 	"fmt"

@@ -36,6 +36,18 @@ type Store interface {
 	// Len returns the number of active UEs
 	Len(ctx context.Context) int
 
+	// LenPerCell returns the number of active UEs per cell
+	LenPerCell(ctx context.Context, cellECGI uint64) int
+
+	// MaxUEsPerCell returns the maximum number of active UEs per cell
+	MaxUEsPerCell(ctx context.Context, cellECGI uint64) int
+
+	// SetMaxUEsPerCell sets the maximum number of active UEs per cell
+	SetMaxUEsPerCell(ctx context.Context, cellECGI uint64, maxNumUEs int)
+
+	// UpdateMaxUEsPerCell updates the maximum number of active UEs for all cells
+	UpdateMaxUEsPerCell(ctx context.Context)
+
 	// CreateUEs creates the specified number of UEs
 	CreateUEs(ctx context.Context, count uint)
 
@@ -53,6 +65,9 @@ type Store interface {
 
 	// UpdateCells updates the visible cells and their signal strength
 	UpdateCells(ctx context.Context, imsi types.IMSI, cells []*model.UECell) error
+
+	// UpdateCell updates the serving cell
+	UpdateCell(ctx context.Context, imsi types.IMSI, cell *model.UECell) error
 
 	// ListAllUEs returns an array of all UEs
 	ListAllUEs(ctx context.Context) []*model.UE
@@ -73,6 +88,7 @@ type WatchOptions struct {
 type store struct {
 	mu        sync.RWMutex
 	ues       map[types.IMSI]*model.UE
+	maxUEs    map[uint64]int
 	cellStore cells.Store
 	watchers  *watcher.Watchers
 }
@@ -85,6 +101,7 @@ func NewUERegistry(count uint, cellStore cells.Store) Store {
 	store := &store{
 		mu:        sync.RWMutex{},
 		ues:       make(map[types.IMSI]*model.UE),
+		maxUEs:    make(map[uint64]int),
 		cellStore: cellStore,
 		watchers:  watchers,
 	}
@@ -101,10 +118,66 @@ func (s *store) SetUECount(ctx context.Context, count uint) {
 	} else if delta > 0 {
 		s.removeSomeUEs(ctx, delta)
 	}
+	s.UpdateMaxUEsPerCell(ctx)
 }
 
 func (s *store) Len(ctx context.Context) int {
 	return len(s.ues)
+}
+
+func (s *store) LenPerCell(ctx context.Context, cellECGI uint64) int {
+	result := 0
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for _, ue := range s.ues {
+		if uint64(ue.Cell.ECGI) == cellECGI {
+			result++
+		}
+	}
+	return result
+}
+
+func (s *store) MaxUEsPerCell(ctx context.Context, cellECGI uint64) int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	result, ok := s.maxUEs[cellECGI]
+	if !ok {
+		return 0
+	}
+	return result
+}
+
+func (s *store) SetMaxUEsPerCell(ctx context.Context, cellECGI uint64, maxNumUEs int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.maxUEs[cellECGI] = maxNumUEs
+}
+
+func (s *store) UpdateMaxUEsPerCell(ctx context.Context) {
+	cNumUEsMap := make(map[uint64]int)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, ue := range s.ues {
+		if _, ok := s.maxUEs[uint64(ue.Cell.ECGI)]; !ok {
+			cNumUEsMap[uint64(ue.Cell.ECGI)] = 1
+			continue
+		}
+		cNumUEsMap[uint64(ue.Cell.ECGI)]++
+	}
+
+	log.Debugf("[before] cNumUEsMap: %v", cNumUEsMap)
+	log.Debugf("[before] maxUEs: %v", s.maxUEs)
+
+	// compare
+	for k, v := range cNumUEsMap {
+		oNumUEs, ok := s.maxUEs[k]
+		if !ok || v > oNumUEs {
+			s.maxUEs[k] = v
+			continue
+		}
+	}
+
+	log.Debugf("[after] maxUEs: %v", s.maxUEs)
 }
 
 func (s *store) removeSomeUEs(ctx context.Context, count int) {
@@ -139,7 +212,7 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			Location: model.Coordinate{Lat: 0, Lng: 0},
 			Heading:  0,
 			Cell: &model.UECell{
-				ID:       types.GEnbID(ecgi), // placeholder
+				ID:       types.GnbID(ecgi), // placeholder
 				ECGI:     ecgi,
 				Strength: rand.Float64() * 100,
 			},
@@ -236,6 +309,23 @@ func (s *store) UpdateCells(ctx context.Context, imsi types.IMSI, cells []*model
 		s.watchers.Send(updateEvent)
 		return nil
 	}
+	return errors.New(errors.NotFound, "UE not found")
+}
+
+func (s *store) UpdateCell(ctx context.Context, imsi types.IMSI, cell *model.UECell) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ue, ok := s.ues[imsi]; ok {
+		ue.Cell = cell
+		updateEvent := event.Event{
+			Key:   ue.IMSI,
+			Value: ue,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
+		return nil
+	}
+
 	return errors.New(errors.NotFound, "UE not found")
 }
 

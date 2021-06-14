@@ -209,7 +209,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 }
 
 func (sm *Client) collect(ctx context.Context,
-	actionDefinition *e2smkpmv2.E2SmKpmActionDefinition) (*e2smkpmv2.MeasurementDataItem, error) {
+	actionDefinition *e2smkpmv2.E2SmKpmActionDefinition,
+	cellECGI ransimtypes.ECGI) (*e2smkpmv2.MeasurementDataItem, error) {
 	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
 	measRecord := e2smkpmv2.MeasurementRecord{
 		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
@@ -220,15 +221,17 @@ func (sm *Client) collect(ctx context.Context,
 			if measType.measTypeName.String() == measInfo.MeasType.GetMeasName().Value {
 				switch measType.measTypeName {
 				case RRCConnMax:
-					log.Debug("Max number of UEs set for RRC Con Max:", sm.ServiceModel.UEs.Len(ctx))
+					log.Debugf("Max number of UEs for Cell %v set for RRC Con Max: %v",
+						cellECGI, int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellECGI))))
 					measRecordInteger := measurments.NewMeasurementRecordItemInteger(
-						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
+						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellECGI))))).
 						Build()
 					measRecord.Value = append(measRecord.Value, measRecordInteger)
 				case RRCConnAvg:
-					log.Debug("Avg number of UEs set for RRC Con Avg:", sm.ServiceModel.UEs.Len(ctx))
+					log.Debugf("Avg number of UEs for Cell %v set for RRC Con Max: %v",
+						cellECGI, int64(sm.ServiceModel.UEs.LenPerCell(ctx, uint64(cellECGI))))
 					measRecordInteger := measurments.NewMeasurementRecordItemInteger(
-						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.Len(ctx)))).
+						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.LenPerCell(ctx, uint64(cellECGI))))).
 						Build()
 					measRecord.Value = append(measRecord.Value, measRecordInteger)
 				default:
@@ -259,7 +262,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 	numDataItems := int(interval / granularity)
 
 	for i := 0; i < numDataItems; i++ {
-		measDataItem, err := sm.collect(ctx, actionDefinition)
+		measDataItem, err := sm.collect(ctx, actionDefinition, cellECGI)
 		if err != nil {
 			log.Warn(err)
 			return nil, err

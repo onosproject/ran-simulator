@@ -6,17 +6,20 @@ package mobility
 
 import (
 	"context"
-	"fmt"
+	"math"
+	"math/rand"
+	"time"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/handover"
+	"github.com/onosproject/ran-simulator/pkg/measurement"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/routes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 	"github.com/onosproject/ran-simulator/pkg/utils"
-	"math"
-	"math/rand"
-	"time"
+	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 )
 
 var log = logging.GetLogger("mobility", "driver")
@@ -42,20 +45,28 @@ type driver struct {
 	done       chan bool
 	min        *model.Coordinate
 	max        *model.Coordinate
+	measCtrl   measurement.MeasController
+	hoCtrl     handover.HOController
+	hoLogic    string
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
-func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string) Driver {
+func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string, hoLogic string) Driver {
 	return &driver{
 		cellStore:  cellStore,
 		routeStore: routeStore,
 		ueStore:    ueStore,
+		hoLogic:    hoLogic,
 	}
 }
 
 var tickUnit = time.Second
 
 const tickFrequency = 1
+
+const measType = "EventA3" // ToDo: should be programmable
+
+const hoType = "A3" // ToDo: should be programmable
 
 func (d *driver) Start(ctx context.Context) {
 	log.Info("Driver starting")
@@ -67,6 +78,28 @@ func (d *driver) Start(ctx context.Context) {
 
 	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)
+
+	// Add measController
+	d.measCtrl = measurement.NewMeasController(measType, d.cellStore, d.ueStore)
+	d.measCtrl.Start(ctx)
+
+	// Add hoController
+	if d.hoLogic == "local" {
+		log.Info("HO logic is running locally")
+		d.hoCtrl = handover.NewHOController(hoType, d.cellStore, d.ueStore)
+		d.hoCtrl.Start(ctx)
+		// link measController with hoController
+		go d.linkMeasCtrlHoCtrl()
+		// process handover decision
+		go d.processHandoverDecision(ctx)
+	} else if d.hoLogic == "mho" {
+		log.Info("HO logic is running outside - mho")
+		// process event a3 measurement report
+		go d.processEventA3MeasReport()
+		// ToDo: Implement below if necessary
+	} else {
+		log.Warn("There is no handover logic - running measurement only")
+	}
 
 	go d.drive(ctx)
 }
@@ -90,7 +123,8 @@ func (d *driver) drive(ctx context.Context) {
 					d.initializeUEPosition(ctx, route)
 				}
 				d.updateUEPosition(ctx, route)
-				d.updateUESignalStrength(ctx, route.IMSI)
+				UpdateUESignalStrength(ctx, route.IMSI, d.ueStore, d.cellStore)
+				d.reportMeasurement(ctx, route.IMSI)
 			}
 		}
 	}
@@ -139,76 +173,42 @@ func (d *driver) updateUEPosition(ctx context.Context, route *model.Route) {
 	}
 }
 
-func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
+func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
 	ue, err := d.ueStore.Get(ctx, imsi)
 	if err != nil {
 		log.Warn("Unable to find UE %d", imsi)
 		return
 	}
-
-	// update RSRP from serving cell
-	err = d.updateUESignalStrengthServCell(ctx, ue)
-	if err != nil {
-		log.Warnf("%v", err)
-		return
-	}
-
-	// update RSRP from candidate serving cells
-	err = d.updateUESignalStrengthCandServCells(ctx, ue)
-	if err != nil {
-		log.Warnf("%v", err)
-		return
-	}
-
-	// update cells on ueStore
-	err = d.ueStore.UpdateCells(ctx, imsi, ue.Cells)
-	if err != nil {
-		log.Warn("Unable to update UE %d cell info", imsi)
-	}
+	d.measCtrl.GetInputChan() <- ue
 }
 
-func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
-	sCell, err := d.cellStore.Get(ctx, ue.Cell.ECGI)
-	if err != nil {
-		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
+func (d *driver) linkMeasCtrlHoCtrl() {
+	log.Info("Connecting measurement and handover controllers")
+	for report := range d.measCtrl.GetOutputChan() {
+		d.hoCtrl.GetInputChan() <- report
 	}
-	ue.Cell.Strength = StrengthAtLocation(ue.Location, *sCell)
-	return nil
+	log.Info("Measurement and handover controllers disconnected")
 }
 
-func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE) error {
-	cellList, err := d.cellStore.List(ctx)
-	if err != nil {
-		return fmt.Errorf("Unable to get all cells")
-	}
-	var csCellList []*model.UECell
-	for _, cell := range cellList {
-		rsrp := StrengthAtLocation(ue.Location, *cell)
-		if math.IsNaN(rsrp) {
-			continue
+func (d *driver) processHandoverDecision(ctx context.Context) {
+	log.Info("Handover decision process starting")
+	for hoDecision := range d.hoCtrl.GetOutputChan() {
+		log.Debugf("Received HO Decision: %v", hoDecision)
+		imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
+		tCellEcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
+		tCell := &model.UECell{
+			ID:   types.GnbID(tCellEcgi),
+			ECGI: types.ECGI(tCellEcgi),
 		}
-		ueCell := &model.UECell{
-			ID:       types.GEnbID(cell.ECGI),
-			ECGI:     cell.ECGI,
-			Strength: rsrp,
-		}
-		csCellList = d.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
+		DoHandover(ctx, types.IMSI(imsi), tCell, d.ueStore, d.cellStore)
 	}
-	ue.Cells = csCellList
-	return nil
+	log.Info("HO decision process stopped")
 }
 
-func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.UECell {
-	// bubble sort
-	for i := 0; i < len(ueCells)-1; i++ {
-		for j := 0; j < len(ueCells)-i-1; j++ {
-			if ueCells[j].Strength < ueCells[j+1].Strength {
-				ueCells[j], ueCells[j+1] = ueCells[j+1], ueCells[j]
-			}
-		}
+func (d *driver) processEventA3MeasReport() {
+	log.Info("Start processing event a3 measurement report")
+	for report := range d.measCtrl.GetOutputChan() {
+		log.Debugf("received event a3 measurement report: %v", report)
+		// ToDo: implement me
 	}
-	if len(ueCells) >= numAdjCells {
-		return ueCells[0:numAdjCells]
-	}
-	return ueCells
 }
