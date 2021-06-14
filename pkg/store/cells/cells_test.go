@@ -39,7 +39,7 @@ func TestCells(t *testing.T) {
 	ecgi1 := types.ECGI(84325717507)
 	cell1 := &model.Cell{
 		ECGI:   ecgi1,
-		Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 180},
+		Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 180, Height: 30, Tilt: -10},
 		Color:  "blue"}
 
 	err = cellStore.Add(ctx, cell1)

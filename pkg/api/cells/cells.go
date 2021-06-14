@@ -68,6 +68,8 @@ func cellToModel(cell *types.Cell) *model.Cell {
 			Center:  model.Coordinate{Lat: cell.Sector.Centroid.Lat, Lng: cell.Sector.Centroid.Lng},
 			Arc:     cell.Sector.Arc,
 			Azimuth: cell.Sector.Azimuth,
+			Tilt:    cell.Sector.Tilt,
+			Height:  cell.Sector.Height,
 		},
 		Color:     cell.Color,
 		MaxUEs:    cell.MaxUEs,
@@ -88,6 +90,8 @@ func sectorToAPI(sector model.Sector) *types.Sector {
 		Azimuth:  sector.Azimuth,
 		Arc:      sector.Arc,
 		Centroid: &types.Point{Lat: sector.Center.Lat, Lng: sector.Center.Lng},
+		Tilt:     sector.Tilt,
+		Height:   sector.Height,
 	}
 }
 

@@ -99,7 +99,9 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 				Sector: model.Sector{
 					Center:  *points[t],
 					Azimuth: azimuth,
-					Arc:     arc},
+					Arc:     arc,
+					Height:  int32(rand.Intn(31) + 20),
+					Tilt:    int32(rand.Intn(31) - 15)},
 				Color:     "green",
 				MaxUEs:    99999,
 				Neighbors: make([]types.ECGI, 0, sectorsPerTower),
