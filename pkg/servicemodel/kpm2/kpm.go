@@ -101,10 +101,10 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	cells := node.Cells
 	cellMeasObjectItems := make([]*e2smkpmv2.CellMeasurementObjectItem, 0)
-	for _, cellEcgi := range cells {
-		eci := ransimtypes.GetECI(uint64(cellEcgi))
+	for _, cellNcgi := range cells {
+		nci := ransimtypes.GetNCI(cellNcgi)
 		eciBitString := &e2smkpmv2.BitString{
-			Value: uint64(eci),
+			Value: uint64(nci),
 			Len:   28,
 		}
 
@@ -115,7 +115,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		}
 
 		cellMeasObjItem := measobjectitem.NewCellMeasObjectItem(
-			measobjectitem.WithCellObjectID(strconv.FormatUint(uint64(cellEcgi), 10)),
+			measobjectitem.WithCellObjectID(strconv.FormatUint(uint64(cellNcgi), 10)),
 			measobjectitem.WithCellGlobalID(cellGlobalID)).
 			Build()
 
@@ -124,7 +124,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	// Creates an indication header
 	gNBID := &e2smkpmv2.BitString{
-		Value: uint64(node.EnbID),
+		Value: uint64(node.GnbID),
 		Len:   22,
 	}
 
@@ -210,7 +210,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 func (sm *Client) collect(ctx context.Context,
 	actionDefinition *e2smkpmv2.E2SmKpmActionDefinition,
-	cellECGI ransimtypes.ECGI) (*e2smkpmv2.MeasurementDataItem, error) {
+	cellNCGI ransimtypes.NCGI) (*e2smkpmv2.MeasurementDataItem, error) {
 	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
 	measRecord := e2smkpmv2.MeasurementRecord{
 		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
@@ -222,16 +222,16 @@ func (sm *Client) collect(ctx context.Context,
 				switch measType.measTypeName {
 				case RRCConnMax:
 					log.Debugf("Max number of UEs for Cell %v set for RRC Con Max: %v",
-						cellECGI, int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellECGI))))
+						cellNCGI, int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellNCGI))))
 					measRecordInteger := measurments.NewMeasurementRecordItemInteger(
-						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellECGI))))).
+						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellNCGI))))).
 						Build()
 					measRecord.Value = append(measRecord.Value, measRecordInteger)
 				case RRCConnAvg:
 					log.Debugf("Avg number of UEs for Cell %v set for RRC Con Max: %v",
-						cellECGI, int64(sm.ServiceModel.UEs.LenPerCell(ctx, uint64(cellECGI))))
+						cellNCGI, int64(sm.ServiceModel.UEs.LenPerCell(ctx, uint64(cellNCGI))))
 					measRecordInteger := measurments.NewMeasurementRecordItemInteger(
-						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.LenPerCell(ctx, uint64(cellECGI))))).
+						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.LenPerCell(ctx, uint64(cellNCGI))))).
 						Build()
 					measRecord.Value = append(measRecord.Value, measRecordInteger)
 				default:
@@ -252,8 +252,8 @@ func (sm *Client) collect(ctx context.Context,
 }
 
 func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
-	cellECGI ransimtypes.ECGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval uint32) ([]byte, error) {
-	log.Debug("Create Indication message format 1 based on action defs for cell:", cellECGI)
+	cellNCGI ransimtypes.NCGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval uint32) ([]byte, error) {
+	log.Debug("Create Indication message format 1 based on action defs for cell:", cellNCGI)
 	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
 	measData := &e2smkpmv2.MeasurementData{
 		Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
@@ -262,7 +262,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 	numDataItems := int(interval / granularity)
 
 	for i := 0; i < numDataItems; i++ {
-		measDataItem, err := sm.collect(ctx, actionDefinition, cellECGI)
+		measDataItem, err := sm.collect(ctx, actionDefinition, cellNCGI)
 		if err != nil {
 			log.Warn(err)
 			return nil, err
@@ -274,7 +274,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 
 	// Creating an indication message format 1
 	indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
-		kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellECGI), 10)),
+		kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellNCGI), 10)),
 		kpm2MessageFormat1.WithGranularity(granularity),
 		kpm2MessageFormat1.WithSubscriptionID(subID),
 		kpm2MessageFormat1.WithMeasData(measData),
@@ -297,7 +297,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 	// Creates an indication header
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	gNBID := &e2smkpmv2.BitString{
-		Value: uint64(sm.ServiceModel.Node.EnbID),
+		Value: uint64(sm.ServiceModel.Node.GnbID),
 		Len:   22,
 	}
 
@@ -333,7 +333,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 
 }
 
-func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes.ECGI,
+func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI,
 	subscription *subutils.Subscription,
 	actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition,
 	interval uint32) error {
@@ -353,9 +353,9 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 	for _, actionDefinition := range actionDefinitions {
 		if actionDefinition.GetActionDefinitionFormat1() != nil {
 			cellObjectID := actionDefinition.GetActionDefinitionFormat1().GetCellObjId().Value
-			if cellObjectID == strconv.FormatUint(uint64(ecgi), 10) {
+			if cellObjectID == strconv.FormatUint(uint64(ncgi), 10) {
 				log.Debug("Sending indication message for Cell with ID:", cellObjectID)
-				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ecgi, actionDefinition, interval)
+				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ncgi, actionDefinition, interval)
 				if err != nil {
 					return err
 				}
@@ -369,7 +369,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ecgi ransimtypes
 
 				ricIndication, err := indication.Build()
 				if err != nil {
-					log.Error("creating indication message is failed for Cell with ID", ecgi, err)
+					log.Error("creating indication message is failed for Cell with ID", ncgi, err)
 					return err
 				}
 
@@ -388,8 +388,8 @@ func (sm *Client) sendRicIndication(ctx context.Context,
 	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval uint32) error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
-	for _, ecgi := range node.Cells {
-		err := sm.sendRicIndicationFormat1(ctx, ecgi, subscription, actionDefinitions, interval)
+	for _, ncgi := range node.Cells {
+		err := sm.sendRicIndicationFormat1(ctx, ncgi, subscription, actionDefinitions, interval)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -435,7 +435,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for kpm service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
+	log.Infof("RIC Subscription request received for e2 node %d and service model %s:", sm.ServiceModel.Node.GnbID, sm.ServiceModel.ModelName)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -516,7 +516,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.EnbID, sm.ServiceModel.ModelName)
+	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.GnbID, sm.ServiceModel.ModelName)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)

@@ -56,7 +56,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().StringSlice("service-models", []string{"kpm/1", "ni/2", "rc/3"}, "List of service models supported by the nodes")
 	cmd.Flags().StringSlice("controller-addresses", []string{"onos-e2t"}, "List of E2T controller addresses or service names")
 	cmd.Flags().String("plmnid", "315010", "PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN")
-	cmd.Flags().Uint32P("enbidstart", "e", 5152, "EnbID start")
+	cmd.Flags().Uint32P("enbidstart", "e", 5152, "GnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
 	cmd.Flags().Bool("single-node", false, "generate a single node for all cells")
 	cmd.Flags().String("controller-yaml", "", "if specified, location of yaml file for controller")
@@ -123,7 +123,7 @@ func writeControllerYaml(model model.Model, location string) {
 	for node := range model.Nodes {
 		// print the node
 		_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nmetadata:\n  kind: Entity\n")
-		_, _ = w.WriteString(fmt.Sprintf("  name: %d\n", model.Nodes[node].EnbID))
+		_, _ = w.WriteString(fmt.Sprintf("  name: %d\n", model.Nodes[node].GnbID))
 		_, _ = w.WriteString("spec:\n  aspects:\n    servicemodels:\n")
 		// and print service models
 		for serviceModel := range model.Nodes[node].ServiceModels {
@@ -134,7 +134,7 @@ func writeControllerYaml(model model.Model, location string) {
 		for cell := range model.Nodes[node].Cells {
 			_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n  name: e2-node-cell\n")
 			_, _ = w.WriteString("spec:\n  aspects:\n")
-			_, _ = w.WriteString(fmt.Sprintf("    nodeid: %d\n", model.Nodes[node].EnbID))
+			_, _ = w.WriteString(fmt.Sprintf("    nodeid: %d\n", model.Nodes[node].GnbID))
 			_, _ = w.WriteString(fmt.Sprintf("    cellid: %d\n", model.Nodes[node].Cells[cell]))
 			_, _ = w.WriteString("---\n")
 		}
@@ -144,7 +144,7 @@ func writeControllerYaml(model model.Model, location string) {
 	for cell := range model.Cells {
 		// print the cell
 		_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nmetadata:\n  kind: Entity\n")
-		_, _ = w.WriteString(fmt.Sprintf("  name: %d\n", model.Cells[cell].ECGI))
+		_, _ = w.WriteString(fmt.Sprintf("  name: %d\n", model.Cells[cell].NCGI))
 		_, _ = w.WriteString("spec:\n  aspects:\n")
 		_, _ = w.WriteString("    onos.topo.Location:\n")
 		_, _ = w.WriteString(fmt.Sprintf("      lat: %f\n", model.Cells[cell].Sector.Center.Lat))

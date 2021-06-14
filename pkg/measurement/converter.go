@@ -93,12 +93,12 @@ func NewMeasReportConverter(cellStore cells.Store, ueStore ues.Store) MeasReport
 }
 
 func (c *measReportConverter) Convert(ctx context.Context, ue *model.UE) device.UE {
-	ueid := id.NewUEID(uint64(ue.IMSI), uint32(ue.CRNTI), uint64(ue.Cell.ECGI))
-	sCellInStore, err := c.cellStore.Get(ctx, ue.Cell.ECGI)
+	ueid := id.NewUEID(uint64(ue.IMSI), uint32(ue.CRNTI), uint64(ue.Cell.NCGI))
+	sCellInStore, err := c.cellStore.Get(ctx, ue.Cell.NCGI)
 	if err != nil {
 		logConverter.Errorf("Can't get serving cell from cell store: %v", err)
 	}
-	sCell := device.NewCell(id.NewECGI(uint64(sCellInStore.ECGI)),
+	sCell := device.NewCell(id.NewECGI(uint64(sCellInStore.NCGI)),
 		c.convertA3Offset(sCellInStore.EventA3Params.A3CellOffset),
 		c.convertHysteresis(sCellInStore.EventA3Params.A3Hysteresis),
 		c.convertQOffset(sCellInStore.EventA3Params.A3CellOffset),
@@ -107,23 +107,23 @@ func (c *measReportConverter) Convert(ctx context.Context, ue *model.UE) device.
 
 	var csCells []device.Cell
 	measurements := make(map[string]measurement.Measurement)
-	sCellMeas := measurement.NewMeasEventA3(id.NewECGI(uint64(sCellInStore.ECGI)), measurement.RSRP(ue.Cell.Strength))
+	sCellMeas := measurement.NewMeasEventA3(id.NewECGI(uint64(sCellInStore.NCGI)), measurement.RSRP(ue.Cell.Strength))
 	measurements[sCellMeas.GetCellID().String()] = sCellMeas
 
 	for _, ueCell := range ue.Cells {
-		tmpCellInStore, _ := c.cellStore.Get(ctx, ueCell.ECGI)
+		tmpCellInStore, _ := c.cellStore.Get(ctx, ueCell.NCGI)
 		if err != nil {
 			logConverter.Errorf("Can't get candidate serving cell from cell storeL: %v", err)
 		}
 
-		csCells = append(csCells, device.NewCell(id.NewECGI(uint64(tmpCellInStore.ECGI)),
+		csCells = append(csCells, device.NewCell(id.NewECGI(uint64(tmpCellInStore.NCGI)),
 			c.convertA3Offset(tmpCellInStore.EventA3Params.A3CellOffset),
 			c.convertHysteresis(tmpCellInStore.EventA3Params.A3Hysteresis),
 			c.convertQOffset(tmpCellInStore.EventA3Params.A3CellOffset),
 			c.convertQOffset(tmpCellInStore.EventA3Params.A3FrequencyOffset),
 			c.convertTimeToTrigger(tmpCellInStore.EventA3Params.A3TimeToTrigger)))
 
-		tmpCsCell := measurement.NewMeasEventA3(id.NewECGI(uint64(tmpCellInStore.ECGI)), measurement.RSRP(ueCell.Strength))
+		tmpCsCell := measurement.NewMeasEventA3(id.NewECGI(uint64(tmpCellInStore.NCGI)), measurement.RSRP(ueCell.Strength))
 		measurements[tmpCsCell.GetCellID().String()] = tmpCsCell
 	}
 

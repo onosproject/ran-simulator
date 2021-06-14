@@ -112,10 +112,10 @@ func (sm *Client) toCellSizeEnum(cellSize string) e2smrcpreies.CellSize {
 	}
 }
 
-func (sm *Client) getCellPci(ctx context.Context, ecgi ransimtypes.ECGI) (int32, error) {
-	cellPci, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "pci")
+func (sm *Client) getCellPci(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
+	cellPci, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), "pci")
 	if !found {
-		return 0, errors.New(errors.NotFound, "pci value is not found for cell:", ecgi)
+		return 0, errors.New(errors.NotFound, "pci value is not found for cell:", ncgi)
 	}
 	// TODO we should handle this properly in metric store
 	switch cellPci := cellPci.(type) {
@@ -147,19 +147,19 @@ func (sm *Client) getCellPci(ctx context.Context, ecgi ransimtypes.ECGI) (int32,
 
 }
 
-func (sm *Client) getEarfcn(ctx context.Context, ecgi ransimtypes.ECGI) (int32, error) {
-	earfcn, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "earfcn")
+func (sm *Client) getEarfcn(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
+	earfcn, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), "earfcn")
 	if !found {
-		return 0, errors.New(errors.NotFound, "earfc value is not found for cell:", ecgi)
+		return 0, errors.New(errors.NotFound, "earfc value is not found for cell:", ncgi)
 	}
 
 	return int32(earfcn.(uint32)), nil
 }
 
-func (sm *Client) getCellSize(ctx context.Context, ecgi ransimtypes.ECGI) (string, error) {
-	cellSize, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), "cellSize")
+func (sm *Client) getCellSize(ctx context.Context, ncgi ransimtypes.NCGI) (string, error) {
+	cellSize, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), "cellSize")
 	if !found {
-		return "", errors.New(errors.NotFound, "cell size value is not found for  neighbour  cell:", ecgi)
+		return "", errors.New(errors.NotFound, "cell size value is not found for  neighbour  cell:", ncgi)
 	}
 	return cellSize.(string), nil
 }
@@ -186,43 +186,43 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 }
 
 // createRicIndication creates ric indication  for each cell in the node
-func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
+func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
 	plmnID := sm.getPlmnID()
 	var neighbourList []*e2smrcpreies.Nrt
 	neighbourList = make([]*e2smrcpreies.Nrt, 0)
-	cell, err := sm.ServiceModel.CellStore.Get(ctx, ecgi)
+	cell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
 	if err != nil {
 		return nil, err
 	}
-	cellPci, err := sm.getCellPci(ctx, ecgi)
+	cellPci, err := sm.getCellPci(ctx, ncgi)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	earfcn, err := sm.getEarfcn(ctx, ecgi)
+	earfcn, err := sm.getEarfcn(ctx, ncgi)
 	if err != nil {
 		return nil, err
 	}
 
-	cellSize, err := sm.getCellSize(ctx, ecgi)
+	cellSize, err := sm.getCellSize(ctx, ncgi)
 	if err != nil {
 		return nil, err
 	}
-	for _, neighbourEcgi := range cell.Neighbors {
-		neighbourCellPci, err := sm.getCellPci(ctx, neighbourEcgi)
+	for _, neighbourNcgi := range cell.Neighbors {
+		neighbourCellPci, err := sm.getCellPci(ctx, neighbourNcgi)
 		if err != nil {
 			log.Error(err)
 			return nil, err
 		}
-		neighbourEarfcn, err := sm.getEarfcn(ctx, neighbourEcgi)
+		neighbourEarfcn, err := sm.getEarfcn(ctx, neighbourNcgi)
 		if err != nil {
 			return nil, err
 		}
-		neighbourCellSize, err := sm.getCellSize(ctx, neighbourEcgi)
+		neighbourCellSize, err := sm.getCellSize(ctx, neighbourNcgi)
 		if err != nil {
 			return nil, err
 		}
-		neighbourEci := ransimtypes.GetECI(uint64(neighbourEcgi))
+		neighbourEci := ransimtypes.GetNCI(neighbourNcgi)
 		neighbour, err := nrt.NewNeighbour(
 			nrt.WithPci(neighbourCellPci),
 			nrt.WithNrcellIdentity(uint64(neighbourEci)),
@@ -234,7 +234,7 @@ func (sm *Client) createRicIndication(ctx context.Context, ecgi ransimtypes.ECGI
 		}
 	}
 
-	cellEci := ransimtypes.GetECI(uint64(cell.ECGI))
+	cellEci := ransimtypes.GetNCI(cell.NCGI)
 	// Creates RC indication header
 	header := rcindicationhdr.NewIndicationHeader(
 		rcindicationhdr.WithPlmnID(plmnID.Value()),

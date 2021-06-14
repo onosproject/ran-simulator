@@ -195,10 +195,10 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 	for hoDecision := range d.hoCtrl.GetOutputChan() {
 		log.Debugf("Received HO Decision: %v", hoDecision)
 		imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
-		tCellEcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
+		tCellcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
 		tCell := &model.UECell{
-			ID:   types.GnbID(tCellEcgi),
-			ECGI: types.ECGI(tCellEcgi),
+			ID:   types.GnbID(tCellcgi),
+			NCGI: types.NCGI(tCellcgi),
 		}
 		DoHandover(ctx, types.IMSI(imsi), tCell, d.ueStore, d.cellStore)
 	}

@@ -83,7 +83,7 @@ Global ID            PLNM ID   IP Addr        Port    Conn Type
 or use RAN simulator CLI to check status of E2 nodes:
 ```bash
 > onos ransim get nodes
-EnbID            Status   Service Models   E2T Controllers      Cell ECGIs
+GnbID            Status   Service Models   E2T Controllers      Cell NCGIs
 5153             Running  kpm,rc           e2t-1                21458294227473,21458294227474,21458294227475
 5154             Running  kpm,rc           e2t-1                21458294227489,21458294227490,21458294227475
 ```

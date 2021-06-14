@@ -60,7 +60,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	}
 
 	var t, s uint
-	var enbID types.EnbID
+	var enbID types.GnbID
 	var nodeName string
 	var node model.Node
 	for t = 0; t < numTowers; t++ {
@@ -70,14 +70,14 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		}
 
 		if !singleNode || t == 0 {
-			enbID = types.EnbID(enbStart + uint32(t+1))
+			enbID = types.GnbID(enbStart + uint32(t+1))
 			nodeName = fmt.Sprintf("node%d", t+1)
 
 			node = model.Node{
-				EnbID:         enbID,
+				GnbID:         enbID,
 				Controllers:   controllers,
 				ServiceModels: models,
-				Cells:         make([]types.ECGI, 0, sectorsPerTower),
+				Cells:         make([]types.NCGI, 0, sectorsPerTower),
 				Status:        "stopped",
 			}
 		}
@@ -95,7 +95,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 			}
 
 			cell := model.Cell{
-				ECGI: types.ToECGI(plmnID, types.ToECI(enbID, cellID)),
+				NCGI: types.ToNCGI(plmnID, types.ToNCI(enbID, cellID)),
 				Sector: model.Sector{
 					Center:  *points[t],
 					Azimuth: azimuth,
@@ -104,14 +104,14 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 					Tilt:    int32(rand.Intn(31) - 15)},
 				Color:     "green",
 				MaxUEs:    99999,
-				Neighbors: make([]types.ECGI, 0, sectorsPerTower),
+				Neighbors: make([]types.NCGI, 0, sectorsPerTower),
 				TxPowerDB: 11,
 				Earfcn:    earfcn,
 			}
 			earfcn++
 
 			m.Cells[cellName] = cell
-			node.Cells = append(node.Cells, cell.ECGI)
+			node.Cells = append(node.Cells, cell.NCGI)
 		}
 		m.Nodes[nodeName] = node
 	}
@@ -119,8 +119,8 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	// Add cells neighbors
 	for cellName, cell := range m.Cells {
 		for _, other := range m.Cells {
-			if cell.ECGI != other.ECGI && isNeighbor(cell, other, maxDistance, sectorsPerTower == 1) && len(cell.Neighbors) < maxNeighbors {
-				cell.Neighbors = append(cell.Neighbors, other.ECGI)
+			if cell.NCGI != other.NCGI && isNeighbor(cell, other, maxDistance, sectorsPerTower == 1) && len(cell.Neighbors) < maxNeighbors {
+				cell.Neighbors = append(cell.Neighbors, other.NCGI)
 			}
 		}
 		m.Cells[cellName] = cell
@@ -145,7 +145,7 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 	if len(cells) > int(maxPCI-minPCI) {
 		panic("Too little space in between the minimum and maximum PCI values. Try setting --min-pci lower or --max-pci higher")
 	}
-	pciCells := make(map[types.ECGI]auxPCI)
+	pciCells := make(map[types.NCGI]auxPCI)
 
 	// Generate PCI pools and shuffle them
 	pools := generatePools(uint(2*len(cells)), minPCI, maxPCI)
@@ -154,8 +154,8 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 	// Create PCI metrics for each cell using unique PCI pools; so without collisions
 	pi := 0
 
-	// Prepare to index by ECGI and cell name alike
-	ecgis := make([]types.ECGI, 0, len(cells))
+	// Prepare to index by NCGI and cell name alike
+	ecgis := make([]types.NCGI, 0, len(cells))
 	names := make([]string, 0, len(cells))
 
 	for name, cell := range cells {
@@ -167,25 +167,25 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 		}
 
 		// Create metrics for each cell
-		pciCells[cell.ECGI] = auxPCI{
+		pciCells[cell.NCGI] = auxPCI{
 			pci:     pickPCI(ranges),
 			pciPool: ranges,
 		}
 
-		ecgis = append(ecgis, cell.ECGI)
+		ecgis = append(ecgis, cell.NCGI)
 		names = append(names, name)
 	}
 
 	// Now inject requested number of collisions; between neighbour cells
 	// Shuffle the cells so that conflict assignment is somewhat random
-	conflicts := make(map[types.ECGI]auxPCI)
+	conflicts := make(map[types.NCGI]auxPCI)
 	cellIndexes := rand.Perm(len(ecgis))
 	collisions := uint(0)
 	for i := 0; i < len(cellIndexes) && collisions < maxCollisions; i++ {
-		ecgi := ecgis[cellIndexes[i]]
+		ncgi := ecgis[cellIndexes[i]]
 
-		if _, conflicted := conflicts[ecgi]; !conflicted {
-			pciCell := pciCells[ecgi]
+		if _, conflicted := conflicts[ncgi]; !conflicted {
+			pciCell := pciCells[ncgi]
 			cellRanges := pciCell.pciPool
 			cell := cells[names[i]]
 
@@ -199,10 +199,10 @@ func generatePCI(cells map[string]model.Cell, minPCI uint, maxPCI uint, maxColli
 				pciCells[necgi] = neighborPciCell
 				collisions = collisions + 1
 
-				conflicts[ecgi] = pciCell
+				conflicts[ncgi] = pciCell
 				conflicts[necgi] = neighborPciCell
 
-				fmt.Printf("Injected conflict between %d and %d\n", ecgi, necgi)
+				fmt.Printf("Injected conflict between %d and %d\n", ncgi, necgi)
 			}
 		}
 	}

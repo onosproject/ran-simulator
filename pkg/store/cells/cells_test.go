@@ -34,11 +34,11 @@ func TestCells(t *testing.T) {
 	assert.NoError(t, err)
 	cell, err := cellStore.Get(ctx, 84325717505)
 	assert.NoError(t, err)
-	assert.Equal(t, types.ECGI(84325717505), cell.ECGI)
+	assert.Equal(t, types.NCGI(84325717505), cell.NCGI)
 
-	ecgi1 := types.ECGI(84325717507)
+	ecgi1 := types.NCGI(84325717507)
 	cell1 := &model.Cell{
-		ECGI:   ecgi1,
+		NCGI:   ecgi1,
 		Sector: model.Sector{Center: model.Coordinate{Lat: 46, Lng: 29}, Azimuth: 180, Arc: 180, Height: 30, Tilt: -10},
 		Color:  "blue"}
 
@@ -50,7 +50,7 @@ func TestCells(t *testing.T) {
 
 	cell1, err = cellStore.Get(ctx, ecgi1)
 	assert.NoError(t, err)
-	assert.Equal(t, ecgi1, cell1.ECGI)
+	assert.Equal(t, ecgi1, cell1.NCGI)
 
 	_, err = cellStore.Delete(ctx, ecgi1)
 	assert.NoError(t, err)

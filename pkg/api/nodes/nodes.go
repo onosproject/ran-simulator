@@ -53,20 +53,20 @@ type Server struct {
 
 func nodeToAPI(node *model.Node) *types.Node {
 	return &types.Node{
-		EnbID:         node.EnbID,
+		GnbID:         node.GnbID,
 		Controllers:   node.Controllers,
 		ServiceModels: node.ServiceModels,
-		CellECGIs:     node.Cells,
+		CellNCGIs:     node.Cells,
 		Status:        node.Status,
 	}
 }
 
 func nodeToModel(node *types.Node) *model.Node {
 	return &model.Node{
-		EnbID:         node.EnbID,
+		GnbID:         node.GnbID,
 		Controllers:   node.Controllers,
 		ServiceModels: node.ServiceModels,
-		Cells:         node.CellECGIs,
+		Cells:         node.CellNCGIs,
 		Status:        node.Status,
 	}
 }
@@ -89,7 +89,7 @@ func (s *Server) CreateNode(ctx context.Context, request *modelapi.CreateNodeReq
 // GetNode retrieves the specified simulated E2 node
 func (s *Server) GetNode(ctx context.Context, request *modelapi.GetNodeRequest) (*modelapi.GetNodeResponse, error) {
 	log.Debugf("Received get node request: %+v", request)
-	node, err := s.nodeStore.Get(ctx, request.EnbID)
+	node, err := s.nodeStore.Get(ctx, request.GnbID)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (s *Server) UpdateNode(ctx context.Context, request *modelapi.UpdateNodeReq
 // DeleteNode deletes the specified simulated E2 node
 func (s *Server) DeleteNode(ctx context.Context, request *modelapi.DeleteNodeRequest) (*modelapi.DeleteNodeResponse, error) {
 	log.Debugf("Received delete node request: %v", request)
-	_, err := s.nodeStore.Delete(ctx, request.EnbID)
+	_, err := s.nodeStore.Delete(ctx, request.GnbID)
 	if err != nil {
 		return nil, err
 	}
@@ -171,14 +171,14 @@ func (s *Server) WatchNodes(request *modelapi.WatchNodesRequest, server modelapi
 
 // AgentControl allows control over the lifecycle of the agent running on behalf of the simulated E2 node
 func (s *Server) AgentControl(ctx context.Context, request *modelapi.AgentControlRequest) (*modelapi.AgentControlResponse, error) {
-	node, err := s.nodeStore.Get(ctx, request.EnbID)
+	node, err := s.nodeStore.Get(ctx, request.GnbID)
 	if err != nil {
 		return nil, err
 	}
-	log.Infof("Requested '%s' of agent %d", request.Command, node.EnbID)
+	log.Infof("Requested '%s' of agent %d", request.Command, node.GnbID)
 	// TODO: implement agent stop|start, implement connection drop|reconnect, etc.
 	// For now, just put the command into the status
-	err = s.nodeStore.SetStatus(ctx, node.EnbID, request.Command)
+	err = s.nodeStore.SetStatus(ctx, node.GnbID, request.Command)
 	if err != nil {
 		return nil, err
 	}

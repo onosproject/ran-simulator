@@ -92,8 +92,8 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node
-	for _, ecgi := range node.Cells {
-		ricIndication, err := sm.createRicIndication(ctx, ecgi, subscription)
+	for _, ncgi := range node.Cells {
+		ricIndication, err := sm.createRicIndication(ctx, ncgi, subscription)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -108,7 +108,7 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 }
 
 func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *subutils.Subscription) error {
-	log.Debugf("Sending report indication on change from node: %d", sm.ServiceModel.Node.EnbID)
+	log.Debugf("Sending report indication on change from node: %d", sm.ServiceModel.Node.GnbID)
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
@@ -140,7 +140,7 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 			if cellEventType == cells.UpdatedNeighbors {
 				cell := cellEvent.Value.(*model.Cell)
 				for _, nodeCell := range nodeCells {
-					if nodeCell == cell.ECGI {
+					if nodeCell == cell.NCGI {
 						err = sm.sendRicIndication(ctx, subscription)
 						if err != nil {
 							log.Error(err)
@@ -253,7 +253,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 // RICControl implements control handler for RC service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
 	reqID := controlutils.GetRequesterID(request)
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
@@ -278,18 +278,18 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	log.Debugf("RC control message: %v", controlMessage)
 
 	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value
-	eci := controlHeader.GetControlHeaderFormat1().GetCgi().GetNrCgi().NRcellIdentity.Value.Value
+	nci := controlHeader.GetControlHeaderFormat1().GetCgi().GetNrCgi().NRcellIdentity.Value.Value
 	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
-	log.Debugf("ECI is %d and PLMN ID is %d", eci, plmnID)
+	log.Debugf("NCI is %d and PLMN ID is %d", nci, plmnID)
 
-	ecgi := ransimtypes.ToECGI(ransimtypes.PlmnID(plmnID), ransimtypes.GetECI(eci))
+	ncgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci))
 	parameterName := controlMessage.GetControlMessage().ParameterType.RanParameterName.Value
 	parameterID := controlMessage.GetControlMessage().ParameterType.RanParameterId.Value
 
-	oldValue, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ecgi), parameterName)
-	log.Debugf("Current value for ecgi %d is %v", ecgi, oldValue)
+	oldValue, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), parameterName)
+	log.Debugf("Current value for ncgi %d is %v", ncgi, oldValue)
 	if !found {
-		log.Debugf("Ran parameter for entity %d not found", ecgi)
+		log.Debugf("Ran parameter for entity %d not found", ncgi)
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 			controloutcome.WithRanParameterID(parameterID)).
 			ToAsn1Bytes(modelPlugin)
@@ -316,7 +316,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValuePrtS()
 	}
 
-	err = sm.ServiceModel.MetricStore.Set(ctx, uint64(ecgi), parameterName, parameterValue)
+	err = sm.ServiceModel.MetricStore.Set(ctx, uint64(ncgi), parameterName, parameterValue)
 	if err != nil {
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 			controloutcome.WithRanParameterID(parameterID)).
@@ -355,7 +355,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 // RICSubscription implements subscription handler for RC service model
 func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -443,7 +443,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 // RICSubscriptionDelete implements subscription delete handler for RC service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.EnbID)
+	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)

@@ -56,7 +56,7 @@ func (agents *E2Agents) processNodeEvents() {
 		switch nodeEvent.Type {
 		case nodes.Created:
 			node := nodeEvent.Value.(*model.Node)
-			log.Debugf("Starting e2 agent %d", nodeEvent.Key.(types.EnbID))
+			log.Debugf("Starting e2 agent %d", nodeEvent.Key.(types.GnbID))
 			e2Node, err := e2agent.NewE2Agent(*node, agents.model,
 				agents.modelPluginRegistry, agents.nodeStore, agents.ueStore,
 				agents.cellStore, agents.metricStore)
@@ -64,7 +64,7 @@ func (agents *E2Agents) processNodeEvents() {
 				log.Error(err)
 				continue
 			}
-			err = agents.agentStore.Add(node.EnbID, e2Node)
+			err = agents.agentStore.Add(node.GnbID, e2Node)
 			if err != nil {
 				log.Error(err)
 			}
@@ -72,20 +72,20 @@ func (agents *E2Agents) processNodeEvents() {
 			err = e2Node.Start()
 			if err != nil {
 				log.Error(err)
-				err = agents.agentStore.Remove(node.EnbID)
+				err = agents.agentStore.Remove(node.GnbID)
 				if err != nil {
 					log.Error(err)
 				}
 			}
-			err = agents.nodeStore.SetStatus(context.Background(), node.EnbID, "Running")
+			err = agents.nodeStore.SetStatus(context.Background(), node.GnbID, "Running")
 			if err != nil {
 				log.Error(err)
 			}
 
 		case nodes.Deleted:
-			log.Debugf("Stopping e2 agent %d", nodeEvent.Key.(types.EnbID))
+			log.Debugf("Stopping e2 agent %d", nodeEvent.Key.(types.GnbID))
 			node := nodeEvent.Value.(*model.Node)
-			e2Node, err := agents.agentStore.Get(node.EnbID)
+			e2Node, err := agents.agentStore.Get(node.GnbID)
 			if err != nil {
 				log.Error(err)
 				continue
@@ -96,11 +96,11 @@ func (agents *E2Agents) processNodeEvents() {
 				continue
 			}
 
-			err = agents.agentStore.Remove(node.EnbID)
+			err = agents.agentStore.Remove(node.GnbID)
 			if err != nil {
 				log.Error(err)
 			}
-			err = agents.nodeStore.SetStatus(context.Background(), node.EnbID, "Stopped")
+			err = agents.nodeStore.SetStatus(context.Background(), node.GnbID, "Stopped")
 			if err != nil {
 				log.Error(err)
 			}
@@ -130,12 +130,12 @@ func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 			return nil, err
 		}
 
-		err = agentStore.Add(node.EnbID, e2Node)
+		err = agentStore.Add(node.GnbID, e2Node)
 		if err != nil {
 			log.Error(err)
 			return nil, err
 		}
-		err = nodeStore.SetStatus(context.Background(), node.EnbID, "Running")
+		err = nodeStore.SetStatus(context.Background(), node.GnbID, "Running")
 		if err != nil {
 			log.Error(err)
 			return nil, err

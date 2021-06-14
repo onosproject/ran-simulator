@@ -28,7 +28,7 @@ func TestModel(t *testing.T) {
 	assert.Equal(t, "314628", model.Plmn)
 	assert.Equal(t, types.PlmnID(0x138426), model.PlmnID)
 
-	assert.Equal(t, types.ECGI(84325717761), model.Cells["cell3"].ECGI)
+	assert.Equal(t, types.NCGI(84325717761), model.Cells["cell3"].NCGI)
 	assert.Equal(t, 2, len(model.Nodes["node1"].Cells))
 	assert.Equal(t, 44.0, model.Cells["cell3"].Sector.Center.Lat)
 

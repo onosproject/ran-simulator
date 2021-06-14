@@ -15,7 +15,7 @@ import (
 // GeneratePCIMetrics generates semi-random PCI metrics for the specified model
 func GeneratePCIMetrics(m *model.Model, minPCI uint, maxPCI uint, maxCollisions uint, earfcnStart uint32, sizeTypes []string) *PciMetrics {
 	metrics := &PciMetrics{
-		Cells: make(map[types.ECGI]PciCell),
+		Cells: make(map[types.NCGI]PciCell),
 	}
 
 	// Generate PCI pools and shuffle them
@@ -26,8 +26,8 @@ func GeneratePCIMetrics(m *model.Model, minPCI uint, maxPCI uint, maxCollisions 
 	earfcn := earfcnStart
 	pi := 0
 
-	// Prepare to index by ECGI and cell name alike
-	ecgis := make([]types.ECGI, 0, len(m.Cells))
+	// Prepare to index by NCGI and cell name alike
+	ecgis := make([]types.NCGI, 0, len(m.Cells))
 	names := make([]string, 0, len(m.Cells))
 
 	for name, cell := range m.Cells {
@@ -39,7 +39,7 @@ func GeneratePCIMetrics(m *model.Model, minPCI uint, maxPCI uint, maxCollisions 
 		}
 
 		// Create metrics for each cell
-		metrics.Cells[cell.ECGI] = PciCell{
+		metrics.Cells[cell.NCGI] = PciCell{
 			CellSize: sizeTypes[rand.Intn(len(sizeTypes))],
 			Earfcn:   earfcn,
 			Pci:      pickPCI(ranges),
@@ -47,20 +47,20 @@ func GeneratePCIMetrics(m *model.Model, minPCI uint, maxPCI uint, maxCollisions 
 		}
 		earfcn = earfcn + 1
 
-		ecgis = append(ecgis, cell.ECGI)
+		ecgis = append(ecgis, cell.NCGI)
 		names = append(names, name)
 	}
 
 	// Now inject requested number of collisions; between neighbour cells
 	// Shuffle the cells so that conflict assignment is somewhat random
-	conflicts := make(map[types.ECGI]PciCell)
+	conflicts := make(map[types.NCGI]PciCell)
 	cellIndexes := rand.Perm(len(ecgis))
 	collisions := uint(0)
 	for i := 0; i < len(cellIndexes) && collisions < maxCollisions; i++ {
-		ecgi := ecgis[cellIndexes[i]]
+		ncgi := ecgis[cellIndexes[i]]
 
-		if _, conflicted := conflicts[ecgi]; !conflicted {
-			pciCell := metrics.Cells[ecgi]
+		if _, conflicted := conflicts[ncgi]; !conflicted {
+			pciCell := metrics.Cells[ncgi]
 			cellRanges := pciCell.PciPool
 			cell := m.Cells[names[i]]
 
@@ -75,10 +75,10 @@ func GeneratePCIMetrics(m *model.Model, minPCI uint, maxPCI uint, maxCollisions 
 				metrics.Cells[necgi] = neighborPciCell
 				collisions = collisions + 1
 
-				conflicts[ecgi] = pciCell
+				conflicts[ncgi] = pciCell
 				conflicts[necgi] = neighborPciCell
 
-				fmt.Printf("Injected conflict between %d and %d\n", ecgi, necgi)
+				fmt.Printf("Injected conflict between %d and %d\n", ncgi, necgi)
 			}
 		}
 	}

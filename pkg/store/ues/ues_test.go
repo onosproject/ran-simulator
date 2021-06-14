@@ -46,27 +46,27 @@ func TestMoveUEToCell(t *testing.T) {
 	cellStore := cellStore(t)
 	ues := NewUERegistry(18, cellStore)
 	assert.NotNil(t, ues, "unable to create UE registry")
-	// Get a cell ECGI
+	// Get a cell NCGI
 	cell1, err := cellStore.GetRandomCell()
 	assert.NoError(t, err)
-	ecgi1 := cell1.ECGI
+	ecgi1 := cell1.NCGI
 
-	// Get another cell ECGI; make sure it's different than the first.
+	// Get another cell NCGI; make sure it's different than the first.
 	cell2, err := cellStore.GetRandomCell()
 	assert.NoError(t, err)
-	ecgi2 := cell2.ECGI
+	ecgi2 := cell2.NCGI
 	for ecgi1 == ecgi2 {
 		cell2, err = cellStore.GetRandomCell()
 		assert.NoError(t, err)
-		ecgi2 = cell2.ECGI
+		ecgi2 = cell2.NCGI
 	}
 
 	for i, ue := range ues.ListAllUEs(ctx) {
-		ecgi := ecgi1
+		ncgi := ecgi1
 		if i%3 == 0 {
-			ecgi = ecgi2
+			ncgi = ecgi2
 		}
-		err := ues.MoveToCell(ctx, ue.IMSI, ecgi, rand.Float64())
+		err := ues.MoveToCell(ctx, ue.IMSI, ncgi, rand.Float64())
 		assert.NoError(t, err)
 	}
 
@@ -98,7 +98,7 @@ func TestUpdateCells(t *testing.T) {
 	assert.NotNil(t, ues, "unable to create UE registry")
 
 	ue := ues.ListAllUEs(ctx)[0]
-	uecells := []*model.UECell{{ECGI: 123001, Strength: 42.0}, {ECGI: 123002, Strength: 6.28}}
+	uecells := []*model.UECell{{NCGI: 123001, Strength: 42.0}, {NCGI: 123002, Strength: 6.28}}
 	err := ues.UpdateCells(ctx, ue.IMSI, uecells)
 	assert.NoError(t, err)
 

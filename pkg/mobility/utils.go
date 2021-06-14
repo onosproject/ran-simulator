@@ -68,12 +68,12 @@ func UpdateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE, ueSt
 		if math.IsNaN(rsrp) {
 			continue
 		}
-		if ue.Cell.ECGI == cell.ECGI {
+		if ue.Cell.NCGI == cell.NCGI {
 			continue
 		}
 		ueCell := &model.UECell{
-			ID:       types.GnbID(cell.ECGI),
-			ECGI:     cell.ECGI,
+			ID:       types.GnbID(cell.NCGI),
+			NCGI:     cell.NCGI,
 			Strength: rsrp,
 		}
 		csCellList = SortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
@@ -88,16 +88,16 @@ func UpdateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE, ueSt
 
 // UpdateUESignalStrengthServCell  updates UE signal strength for serving cell
 func UpdateUESignalStrengthServCell(ctx context.Context, ue *model.UE, ueStore ues.Store, cellStore cells.Store) error {
-	sCell, err := cellStore.Get(ctx, ue.Cell.ECGI)
+	sCell, err := cellStore.Get(ctx, ue.Cell.NCGI)
 	if err != nil {
-		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.ECGI)
+		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.NCGI)
 	}
 
 	strength := StrengthAtLocation(ue.Location, *sCell)
 
 	newUECell := &model.UECell{
 		ID:       ue.Cell.ID,
-		ECGI:     ue.Cell.ECGI,
+		NCGI:     ue.Cell.NCGI,
 		Strength: strength,
 	}
 

@@ -36,7 +36,7 @@ nodes:
 
 cells:
   cell1:
-    ecgi: 84325717505
+    ncgi: 84325717505
     sector:
       center:
         lat: 46.00
@@ -52,7 +52,7 @@ cells:
       a3CellOffset: 3
       a3FrequencyOffset: 4
   cell2:
-    ecgi: 84325717506
+    ncgi: 84325717506
     sector:
       center:
         lat: 46.00
@@ -68,7 +68,7 @@ cells:
       a3CellOffset: 13
       a3FrequencyOffset: 14
   cell3:
-    ecgi: 84325717761
+    ncgi: 84325717761
     sector:
       center:
         lat: 44.00
@@ -84,7 +84,7 @@ cells:
       a3CellOffset: 23
       a3FrequencyOffset: 24
   cell4:
-    ecgi: 84325717762
+    ncgi: 84325717762
     sector:
       center:
         lat: 44.00
