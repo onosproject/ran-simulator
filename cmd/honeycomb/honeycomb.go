@@ -6,10 +6,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -107,58 +105,11 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if controllerFile != "" {
-		writeControllerYaml(*m, controllerFile)
+		err = honeycomb.WriteControllerYaml(*m, controllerFile)
+		if err != nil {
+			fmt.Printf("Unable to output topology operator file: %v", err)
+			return err
+		}
 	}
 	return ioutil.WriteFile(args[0], d, 0644)
-}
-
-func writeControllerYaml(model model.Model, location string) {
-	f, err := os.OpenFile(location, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatalf("failed creating file: %s", err)
-	}
-	w := bufio.NewWriter(f)
-
-	// print out Nodes and their connections
-	for node := range model.Nodes {
-		// print the node
-		_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nmetadata:\n  kind: Entity\n")
-		_, _ = w.WriteString(fmt.Sprintf("  name: %d\n", model.Nodes[node].GnbID))
-		_, _ = w.WriteString("spec:\n  aspects:\n    servicemodels:\n")
-		// and print service models
-		for serviceModel := range model.Nodes[node].ServiceModels {
-			_, _ = w.WriteString(fmt.Sprintf("      - %s\n", model.Nodes[node].ServiceModels[serviceModel]))
-		}
-		_, _ = w.WriteString("---\n")
-		// then print the connections separately
-		for cell := range model.Nodes[node].Cells {
-			_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n  name: e2-node-cell\n")
-			_, _ = w.WriteString("spec:\n  aspects:\n")
-			_, _ = w.WriteString(fmt.Sprintf("    nodeid: %d\n", model.Nodes[node].GnbID))
-			_, _ = w.WriteString(fmt.Sprintf("    cellid: %d\n", model.Nodes[node].Cells[cell]))
-			_, _ = w.WriteString("---\n")
-		}
-	}
-
-	// print out Cells
-	for cell := range model.Cells {
-		// print the cell
-		_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nmetadata:\n  kind: Entity\n")
-		_, _ = w.WriteString(fmt.Sprintf("  name: %d\n", model.Cells[cell].NCGI))
-		_, _ = w.WriteString("spec:\n  aspects:\n")
-		_, _ = w.WriteString("    onos.topo.Location:\n")
-		_, _ = w.WriteString(fmt.Sprintf("      lat: %f\n", model.Cells[cell].Sector.Center.Lat))
-		_, _ = w.WriteString(fmt.Sprintf("      lng: %f\n", model.Cells[cell].Sector.Center.Lng))
-		_, _ = w.WriteString("    onos.topo.E2Cell:\n")
-		_, _ = w.WriteString(fmt.Sprintf("      earfcn: %d\n", model.Cells[cell].Earfcn))
-		_, _ = w.WriteString(fmt.Sprintf("      cell_type: %s\n", model.Cells[cell].CellType.String()))
-		_, _ = w.WriteString("    onos.topo.Coverage:\n")
-		_, _ = w.WriteString(fmt.Sprintf("      arc_width: %d\n", model.Cells[cell].Sector.Arc))
-		_, _ = w.WriteString(fmt.Sprintf("      tilt: %d\n", model.Cells[cell].Sector.Tilt))
-		_, _ = w.WriteString(fmt.Sprintf("      height: %d\n", model.Cells[cell].Sector.Height))
-		_, _ = w.WriteString(fmt.Sprintf("      azimuth: %d\n", model.Cells[cell].Sector.Azimuth))
-		_, _ = w.WriteString("---\n")
-	}
-
-	w.Flush()
 }
