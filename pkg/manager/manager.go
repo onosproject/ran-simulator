@@ -145,7 +145,9 @@ func (m *Manager) initMetricStore() {
 	m.metricsStore = metrics.NewMetricsStore()
 
 	// Load additional initial use-case data; ignore errors
-	_ = pciload.LoadPCIMetrics(m.metricsStore, m.config.MetricName)
+	if len(m.config.MetricName) > 0 {
+		_ = pciload.LoadPCIMetrics(m.metricsStore, m.config.MetricName)
+	}
 }
 
 // startSouthboundServer starts the northbound gRPC server
