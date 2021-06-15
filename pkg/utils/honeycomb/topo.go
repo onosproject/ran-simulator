@@ -1,16 +1,7 @@
-// Copyright 2021-present Open Networking Foundation.
+// SPDX-FileCopyrightText: 2021-present Open Networking Foundation <info@opennetworking.org>
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
 package honeycomb
 
@@ -21,6 +12,7 @@ import (
 	"os"
 )
 
+// WriteControllerYaml outputs YAML file that can be consumed by the onos topo operator.
 func WriteControllerYaml(model model.Model, location string) error {
 	f, err := os.OpenFile(location, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -78,4 +70,3 @@ func WriteControllerYaml(model model.Model, location string) error {
 
 	return w.Flush()
 }
-

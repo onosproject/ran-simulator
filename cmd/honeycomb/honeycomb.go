@@ -105,7 +105,11 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if controllerFile != "" {
-		honeycomb.WriteControllerYaml(*m, controllerFile)
+		err = honeycomb.WriteControllerYaml(*m, controllerFile)
+		if err != nil {
+			fmt.Printf("Unable to output topology operator file: %v", err)
+			return err
+		}
 	}
 	return ioutil.WriteFile(args[0], d, 0644)
 }
