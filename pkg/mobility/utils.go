@@ -48,12 +48,6 @@ func UpdateUESignalStrength(ctx context.Context, imsi types.IMSI, ueStore ues.St
 		log.Warnf("For UE %v: %v", *ue, err)
 		return
 	}
-
-	log.Debugf("for UE [%v]: sCell strength - %v, "+
-		"csCell1 strength - %v "+
-		"csCell2 strength - %v "+
-		"csCell3 strength - %v", ue.IMSI, ue.Cell.Strength, ue.Cells[0].Strength,
-		ue.Cells[1].Strength, ue.Cells[2].Strength)
 }
 
 // UpdateUESignalStrengthCandServCells updates UE signal strength for serving and candidate cells
