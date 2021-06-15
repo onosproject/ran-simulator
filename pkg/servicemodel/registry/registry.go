@@ -5,6 +5,7 @@
 package registry
 
 import (
+	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 	"sync"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
@@ -54,6 +55,7 @@ type ServiceModel struct {
 	UEs                 ues.Store
 	CellStore           cells.Store
 	MetricStore         metrics.Store
+	MeasChan            chan device.UE
 }
 
 // NewServiceModelRegistry creates a service model registry

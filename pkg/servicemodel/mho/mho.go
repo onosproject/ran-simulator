@@ -7,7 +7,8 @@ package mho
 import (
 	"context"
 	"encoding/binary"
-	"fmt"
+	"github.com/onosproject/rrm-son-lib/pkg/model/device"
+	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 	"strconv"
 	"time"
 
@@ -24,7 +25,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
@@ -40,8 +40,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var _ servicemodel.Client = &Client{}
-
 var log = logging.GetLogger("sm", "mho")
 
 const (
@@ -54,13 +52,16 @@ const (
 // Client mho service model client
 type Client struct {
 	ServiceModel *registry.ServiceModel
+	subscription *subutils.Subscription
+	context      context.Context
 }
 
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model,
 	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
-	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
+	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
+	measChan chan device.UE) (registry.ServiceModel, error) {
 	modelName := e2smtypes.ShortName(modelFullName)
 	mhoSm := registry.ServiceModel{
 		RanFunctionID:       registry.Mho,
@@ -76,6 +77,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 		UEs:                 ueStore,
 		CellStore:           cellStore,
 		MetricStore:         metricStore,
+		MeasChan:            measChan,
 	}
 
 	mhoClient := &Client{
@@ -177,7 +179,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
-	subscription := subutils.NewSubscription(
+	sm.subscription = subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
 		subutils.WithRanFuncID(ranFuncID),
 		subutils.WithRicInstanceID(ricInstanceID),
@@ -187,7 +189,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		log.Warn("MHO subscription failed: no actions are accepted")
-		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		subscriptionFailure, err := sm.subscription.BuildSubscriptionFailure()
 		if err != nil {
 			log.Error(err)
 			return nil, nil, err
@@ -196,7 +198,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, subscriptionFailure, nil
 	}
 
-	response, err = subscription.BuildSubscriptionResponse()
+	response, err = sm.subscription.BuildSubscriptionResponse()
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
@@ -208,25 +210,21 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, nil, err
 	}
 
+	sm.context = ctx
+
 	log.Debugf("MHO subscription event trigger type: %v", eventTriggerType)
 	switch eventTriggerType {
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_PERIODIC:
 		log.Debug("Received periodic report subscription request")
-		go func() {
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
-			interval, err := sm.getReportPeriod(request)
-			if err != nil {
-				log.Error(err)
-				return
-			}
-			err = sm.reportPeriodicIndication(ctx, interval, subscription)
-			if err != nil {
-				return
-			}
-		}()
+		interval, err := sm.getReportPeriod(request)
+		if err != nil {
+			log.Error(err)
+			return nil, nil, err
+		}
+		go sm.reportPeriodicIndication(interval)
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT:
 		log.Debug("Received MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT subscription request")
+		go sm.processEventA3MeasReport()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Debug("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
 	default:
@@ -327,40 +325,39 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	return nil, nil, nil
 }
 
-func (sm *Client) reportPeriodicIndication(ctx context.Context, interval int32, subscription *subutils.Subscription) error {
+func (sm *Client) reportPeriodicIndication(interval int32) {
 	log.Debugf("Starting periodic report with interval %d ms", interval)
-	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	subID := subscriptions.NewID(sm.subscription.GetRicInstanceID(), sm.subscription.GetReqID(), sm.subscription.GetRanFuncID())
 	intervalDuration := time.Duration(interval)
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
-		return err
+		return
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
 	for {
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending periodic indication report for subscription:", sub.ID)
-			err = sm.sendRicIndication(ctx, subscription)
+			err = sm.sendRicIndication()
 			if err != nil {
 				log.Error("Failure sending indication message: ", err)
-				return err
 			}
 
 		case <-sub.E2Channel.Context().Done():
 			sub.Ticker.Stop()
-			return nil
+			return
 		}
 	}
 }
 
-func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
+func (sm *Client) sendRicIndication() error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node
 	for _, ncgi := range node.Cells {
 		log.Debugf("Send MHO indications for cell ncgi:%d", ncgi)
-		for _, ue := range sm.ServiceModel.UEs.ListUEs(ctx, ncgi) {
+		for _, ue := range sm.ServiceModel.UEs.ListUEs(sm.context, ncgi) {
 			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
-			err := sm.sendRicIndicationFormat1(ctx, ncgi, ue, subscription)
+			err := sm.sendRicIndicationFormat1(ncgi, ue)
 			if err != nil {
 				log.Warn(err)
 				continue
@@ -370,28 +367,30 @@ func (sm *Client) sendRicIndication(ctx context.Context, subscription *subutils.
 	return nil
 }
 
-func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, subscription *subutils.Subscription) error {
-
-	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+func (sm *Client) sendRicIndicationFormat1(ncgi ransimtypes.NCGI, ue *model.UE) error {
+	subID := subscriptions.NewID(sm.subscription.GetRicInstanceID(), sm.subscription.GetReqID(), sm.subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return err
 	}
 
-	indicationHeaderBytes, err := sm.createIndicationHeaderBytes(ctx, ncgi, fileFormatVersion1)
+	indicationHeaderBytes, err := sm.createIndicationHeaderBytes(ncgi, fileFormatVersion1)
 	if err != nil {
 		return err
 	}
 
-	indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ue)
+	indicationMessageBytes, err := sm.createIndicationMsgFormat1(ue)
 	if err != nil {
 		return err
+	}
+	if indicationMessageBytes == nil {
+		return nil
 	}
 
 	indication := e2apIndicationUtils.NewIndication(
-		e2apIndicationUtils.WithRicInstanceID(subscription.GetRicInstanceID()),
-		e2apIndicationUtils.WithRanFuncID(subscription.GetRanFuncID()),
-		e2apIndicationUtils.WithRequestID(subscription.GetReqID()),
+		e2apIndicationUtils.WithRicInstanceID(sm.subscription.GetRicInstanceID()),
+		e2apIndicationUtils.WithRanFuncID(sm.subscription.GetRanFuncID()),
+		e2apIndicationUtils.WithRequestID(sm.subscription.GetReqID()),
 		e2apIndicationUtils.WithIndicationHeader(indicationHeaderBytes),
 		e2apIndicationUtils.WithIndicationMessage(indicationMessageBytes))
 
@@ -400,7 +399,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 		return err
 	}
 
-	err = sub.E2Channel.RICIndication(ctx, ricIndication)
+	err = sub.E2Channel.RICIndication(sm.context, ricIndication)
 	if err != nil {
 		return err
 	}
@@ -408,9 +407,9 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 	return nil
 }
 
-func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ncgi ransimtypes.NCGI, fileFormatVersion string) ([]byte, error) {
+func (sm *Client) createIndicationHeaderBytes(ncgi ransimtypes.NCGI, fileFormatVersion string) ([]byte, error) {
 
-	cell, _ := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+	cell, _ := sm.ServiceModel.CellStore.Get(sm.context, ncgi)
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	timestamp := make([]byte, 4)
 	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
@@ -431,15 +430,15 @@ func (sm *Client) createIndicationHeaderBytes(ctx context.Context, ncgi ransimty
 	return indicationHeaderAsn1Bytes, nil
 }
 
-func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) ([]byte, error) {
+func (sm *Client) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 	log.Debugf("Create MHO Indication message ueID: %d", ue.IMSI)
 
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	measReport := make([]*e2sm_mho.E2SmMhoMeasurementReportItem, 0)
 
 	if len(ue.Cells) == 0 {
-		err := fmt.Errorf("no cells found for ueID:%d", ue.IMSI)
-		return nil, err
+		log.Infof("no neighbor cells found for ueID:%d", ue.IMSI)
+		return nil, nil
 	}
 
 	// add serving cell to measReport
@@ -508,4 +507,25 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context, ue *model.UE) 
 	}
 
 	return indicationMessageBytes, nil
+}
+
+func (sm *Client) processEventA3MeasReport() {
+	log.Info("Start processing event a3 measurement report")
+	for report := range sm.ServiceModel.MeasChan {
+		log.Debugf("received event a3 measurement report: %v", report)
+		log.Debugf("Send upon-rcv-meas-report indication for cell ecgi:%d, IMSI:%s",
+			report.GetSCell().GetID().GetID().(id.ECGI), report.GetID().String())
+		ecgi := report.GetSCell().GetID().GetID().(id.ECGI)
+		imsi := report.GetID().GetID().(id.UEID).IMSI
+		ue, err := sm.ServiceModel.UEs.Get(sm.context, types.IMSI(imsi))
+		if err != nil {
+			log.Warn(err)
+			continue
+		}
+		err = sm.sendRicIndicationFormat1(ransimtypes.NCGI(ecgi), ue)
+		if err != nil {
+			log.Warn(err)
+			continue
+		}
+	}
 }
