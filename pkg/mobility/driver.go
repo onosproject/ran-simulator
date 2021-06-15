@@ -34,6 +34,9 @@ type Driver interface {
 
 	// GenerateRoutes generates routes for all UEs that currently do not have a route; remove routes with no UEs
 	GenerateRoutes(ctx context.Context, minSpeed uint32, maxSpeed uint32, speedStdDev uint32)
+
+	// GetMeasCtrl returns the Measurement Controller
+	GetMeasCtrl() measurement.MeasController
 }
 
 type driver struct {
@@ -94,9 +97,6 @@ func (d *driver) Start(ctx context.Context) {
 		go d.processHandoverDecision(ctx)
 	} else if d.hoLogic == "mho" {
 		log.Info("HO logic is running outside - mho")
-		// process event a3 measurement report
-		go d.processEventA3MeasReport()
-		// ToDo: Implement below if necessary
 	} else {
 		log.Warn("There is no handover logic - running measurement only")
 	}
@@ -108,6 +108,10 @@ func (d *driver) Stop() {
 	log.Info("Driver stopping")
 	d.ticker.Stop()
 	d.done <- true
+}
+
+func (d *driver) GetMeasCtrl() measurement.MeasController {
+	return d.measCtrl
 }
 
 func (d *driver) drive(ctx context.Context) {
@@ -203,12 +207,4 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 		DoHandover(ctx, types.IMSI(imsi), tCell, d.ueStore, d.cellStore)
 	}
 	log.Info("HO decision process stopped")
-}
-
-func (d *driver) processEventA3MeasReport() {
-	log.Info("Start processing event a3 measurement report")
-	for report := range d.measCtrl.GetOutputChan() {
-		log.Debugf("received event a3 measurement report: %v", report)
-		// ToDo: implement me
-	}
 }
