@@ -12,7 +12,6 @@ build: # @HELP build the Go binaries and run all validations (default)
 build:
 	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/ransim ./cmd/ransim
 	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/honeycomb ./cmd/honeycomb
-	go build ${BUILD_FLAGS} -o ${OUTPUT_DIR}/metricsgen ./cmd/metricsgen
 
 debug: BUILD_FLAGS += -gcflags=all="-N -l"
 debug: build # @HELP build the Go binaries with debug symbols

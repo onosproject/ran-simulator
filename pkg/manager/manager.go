@@ -22,7 +22,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc/pciload"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -145,11 +144,6 @@ func (m *Manager) initModelStores() {
 func (m *Manager) initMetricStore() {
 	// Create store for tracking arbitrary metrics and attributes for nodes, cells and UEs
 	m.metricsStore = metrics.NewMetricsStore()
-
-	// Load additional initial use-case data; ignore errors
-	if len(m.config.MetricName) > 0 {
-		_ = pciload.LoadPCIMetrics(m.metricsStore, m.config.MetricName)
-	}
 }
 
 // startSouthboundServer starts the northbound gRPC server
@@ -231,11 +225,7 @@ func (m *Manager) LoadModel(ctx context.Context, data []byte) error {
 
 // LoadMetrics loads new metrics into the simulator
 func (m *Manager) LoadMetrics(ctx context.Context, name string, data []byte) error {
-	if name == "rc.pci" {
-		if err := pciload.LoadPCIMetricsData(m.metricsStore, data); err != nil {
-			return err
-		}
-	}
+	// TODO: Deprecated; remove this
 	return nil
 }
 
