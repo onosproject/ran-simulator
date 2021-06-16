@@ -112,6 +112,7 @@ func (s *Server) ListUes(request *simapi.ListUesRequest, stream simapi.Traffic_L
 		resp := &simapi.ListUesResponse{
 			Ue: ueToAPI(ue),
 		}
+		log.Infof("UE: %v", ue)
 		err := stream.Send(resp)
 		if err != nil {
 			log.Error(err)
