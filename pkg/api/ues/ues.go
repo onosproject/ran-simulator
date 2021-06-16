@@ -7,8 +7,11 @@ package ues
 
 import (
 	"context"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/store/event"
+	"github.com/onosproject/ran-simulator/pkg/store/routes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 
 	modelapi "github.com/onosproject/onos-api/go/onos/ransim/model"
@@ -68,22 +71,56 @@ func (s *Server) GetUE(ctx context.Context, request *modelapi.GetUERequest) (*mo
 
 // MoveToCell moves the specified UE to the given cell
 func (s *Server) MoveToCell(ctx context.Context, request *modelapi.MoveToCellRequest) (*modelapi.MoveToCellResponse, error) {
-	panic("implement me")
+	log.Debugf("Received MoveToCell request: %+v", request)
+	return &modelapi.MoveToCellResponse{}, s.ueStore.MoveToCell(ctx, request.IMSI, request.NCGI, 0)
 }
 
 // MoveToLocation moves the specified UE to the given location
 func (s *Server) MoveToLocation(ctx context.Context, request *modelapi.MoveToLocationRequest) (*modelapi.MoveToLocationResponse, error) {
-	panic("implement me")
+	log.Debugf("Received MoveToLocation request: %+v", request)
+	return &modelapi.MoveToLocationResponse{}, s.ueStore.MoveToCoordinate(ctx, request.IMSI, model.Coordinate(*request.Location), request.Heading)
 }
 
 // DeleteUE removes the specified UE
 func (s *Server) DeleteUE(ctx context.Context, request *modelapi.DeleteUERequest) (*modelapi.DeleteUEResponse, error) {
-	panic("implement me")
+	log.Debugf("Received MoveToLocation request: %+v", request)
+	_, err := s.ueStore.Delete(ctx, request.IMSI)
+	return &modelapi.DeleteUEResponse{}, err
+}
+
+func eventType(routeEvent routes.RouteEvent) modelapi.EventType {
+	if routeEvent == routes.Created {
+		return modelapi.EventType_CREATED
+	} else if routeEvent == routes.Updated {
+		return modelapi.EventType_UPDATED
+	} else if routeEvent == routes.Deleted {
+		return modelapi.EventType_DELETED
+	} else {
+		return modelapi.EventType_NONE
+	}
 }
 
 // WatchUEs returns events pertaining to changes in the UE state.
 func (s *Server) WatchUEs(request *modelapi.WatchUEsRequest, server modelapi.UEModel_WatchUEsServer) error {
-	panic("implement me")
+	log.Debugf("Received WatchUEs request: %+v", request)
+	ch := make(chan event.Event)
+	err := s.ueStore.Watch(server.Context(), ch, ues.WatchOptions{Replay: !request.NoReplay, Monitor: !request.NoSubscribe})
+
+	if err != nil {
+		return err
+	}
+
+	for ueEvent := range ch {
+		response := &modelapi.WatchUEsResponse{
+			Ue:   ueToAPI(ueEvent.Value.(*model.UE)),
+			Type: eventType(ueEvent.Type.(routes.RouteEvent)),
+		}
+		err := server.Send(response)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // ListUEs returns list of simulated UEs.
