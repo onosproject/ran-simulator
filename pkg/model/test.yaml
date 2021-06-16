@@ -14,7 +14,7 @@ layout:
 
 nodes:
   node1:
-    enbID: 144470
+    gnbid: 144470
     controllers:
       - controller1
     servicemodels:
@@ -25,7 +25,7 @@ nodes:
       - 84325717506
 
   node2:
-    enbID: 144471
+    gnbid: 144471
     controllers:
       - controller2
     servicemodels:

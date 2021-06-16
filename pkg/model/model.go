@@ -50,7 +50,7 @@ type Route struct {
 
 // Node e2 node
 type Node struct {
-	GnbID         types.GnbID  `mapstructure:"enbID"`
+	GnbID         types.GnbID  `mapstructure:"gnbid"`
 	Controllers   []string     `mapstructure:"controllers"`
 	ServiceModels []string     `mapstructure:"servicemodels"`
 	Cells         []types.NCGI `mapstructure:"cells"`

@@ -60,7 +60,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	}
 
 	var t, s uint
-	var enbID types.GnbID
+	var gnbID types.GnbID
 	var nodeName string
 	var node model.Node
 	for t = 0; t < numTowers; t++ {
@@ -70,11 +70,11 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		}
 
 		if !singleNode || t == 0 {
-			enbID = types.GnbID(enbStart + uint32(t+1))
+			gnbID = types.GnbID(enbStart + uint32(t+1))
 			nodeName = fmt.Sprintf("node%d", t+1)
 
 			node = model.Node{
-				GnbID:         enbID,
+				GnbID:         gnbID,
 				Controllers:   controllers,
 				ServiceModels: models,
 				Cells:         make([]types.NCGI, 0, sectorsPerTower),
@@ -95,7 +95,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 			}
 
 			cell := model.Cell{
-				NCGI: types.ToNCGI(plmnID, types.ToNCI(enbID, cellID)),
+				NCGI: types.ToNCGI(plmnID, types.ToNCI(gnbID, cellID)),
 				Sector: model.Sector{
 					Center:  *points[t],
 					Azimuth: azimuth,

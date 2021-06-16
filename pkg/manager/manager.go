@@ -16,7 +16,9 @@ import (
 	metricsapi "github.com/onosproject/ran-simulator/pkg/api/metrics"
 	modelapi "github.com/onosproject/ran-simulator/pkg/api/model"
 	nodeapi "github.com/onosproject/ran-simulator/pkg/api/nodes"
+	routeapi "github.com/onosproject/ran-simulator/pkg/api/routes"
 	"github.com/onosproject/ran-simulator/pkg/api/trafficsim"
+	ueapi "github.com/onosproject/ran-simulator/pkg/api/ues"
 	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
@@ -145,7 +147,9 @@ func (m *Manager) initMetricStore() {
 	m.metricsStore = metrics.NewMetricsStore()
 
 	// Load additional initial use-case data; ignore errors
-	_ = pciload.LoadPCIMetrics(m.metricsStore, m.config.MetricName)
+	if len(m.config.MetricName) > 0 {
+		_ = pciload.LoadPCIMetrics(m.metricsStore, m.config.MetricName)
+	}
 }
 
 // startSouthboundServer starts the northbound gRPC server
@@ -163,6 +167,8 @@ func (m *Manager) startNorthboundServer() error {
 	m.server.AddService(cellapi.NewService(m.cellStore))
 	m.server.AddService(trafficsim.NewService(m.model, m.cellStore, m.ueStore))
 	m.server.AddService(metricsapi.NewService(m.metricsStore))
+	m.server.AddService(ueapi.NewService(m.ueStore))
+	m.server.AddService(routeapi.NewService(m.routeStore))
 	m.server.AddService(modelapi.NewService(m))
 
 	doneCh := make(chan error)

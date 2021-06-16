@@ -28,13 +28,13 @@ type Store interface {
 	Add(ctx context.Context, node *model.Node) error
 
 	// Get retrieves the node with the specified GnbID
-	Get(ctx context.Context, enbID types.GnbID) (*model.Node, error)
+	Get(ctx context.Context, gnbID types.GnbID) (*model.Node, error)
 
 	// Update updates the node
 	Update(ctx context.Context, node *model.Node) error
 
 	// Delete deletes the node with the specified GnbID
-	Delete(ctx context.Context, enbID types.GnbID) (*model.Node, error)
+	Delete(ctx context.Context, gnbID types.GnbID) (*model.Node, error)
 
 	// Watch watches the node inventory events using the supplied channel
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
@@ -46,7 +46,7 @@ type Store interface {
 	Len(ctx context.Context) (int, error)
 
 	// SetsStatus changes the E2 node agent status value
-	SetStatus(ctx context.Context, enbID types.GnbID, status string) error
+	SetStatus(ctx context.Context, gnbID types.GnbID, status string) error
 
 	// PruneCell  the node that has the specified cell
 	PruneCell(ctx context.Context, ncgi types.NCGI) error
@@ -127,11 +127,11 @@ func (s *store) Add(ctx context.Context, node *model.Node) error {
 }
 
 // Get gets a node based on a given ID
-func (s *store) Get(ctx context.Context, enbID types.GnbID) (*model.Node, error) {
-	log.Debugf("Getting node with ID: %d", enbID)
+func (s *store) Get(ctx context.Context, gnbID types.GnbID) (*model.Node, error) {
+	log.Debugf("Getting node with ID: %d", gnbID)
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	if node, ok := s.nodes[enbID]; ok {
+	if node, ok := s.nodes[gnbID]; ok {
 		return node, nil
 	}
 
@@ -179,10 +179,10 @@ func (s *store) PruneCell(ctx context.Context, ncgi types.NCGI) error {
 	return nil
 }
 
-func (s *store) SetStatus(ctx context.Context, enbID types.GnbID, status string) error {
+func (s *store) SetStatus(ctx context.Context, gnbID types.GnbID, status string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if node, ok := s.nodes[enbID]; ok {
+	if node, ok := s.nodes[gnbID]; ok {
 		node.Status = status
 		return nil
 	}
@@ -190,12 +190,12 @@ func (s *store) SetStatus(ctx context.Context, enbID types.GnbID, status string)
 }
 
 // Delete deletes a node
-func (s *store) Delete(ctx context.Context, enbID types.GnbID) (*model.Node, error) {
-	log.Debugf("Deleting node %d:", enbID)
+func (s *store) Delete(ctx context.Context, gnbID types.GnbID) (*model.Node, error) {
+	log.Debugf("Deleting node %d:", gnbID)
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if node, ok := s.nodes[enbID]; ok {
-		delete(s.nodes, enbID)
+	if node, ok := s.nodes[gnbID]; ok {
+		delete(s.nodes, gnbID)
 		deleteEvent := event.Event{
 			Key:   node.GnbID,
 			Value: node,
