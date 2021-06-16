@@ -8,6 +8,7 @@ package honeycomb
 import (
 	"bufio"
 	"fmt"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"os"
 )
@@ -21,52 +22,76 @@ func WriteControllerYaml(model model.Model, location string) error {
 	w := bufio.NewWriter(f)
 
 	// print out Nodes and their connections
-	for node := range model.Nodes {
-		// print the node
-		_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
-		_, _ = w.WriteString(fmt.Sprintf("  name: \"%d\"\n", model.Nodes[node].GnbID))
-		_, _ = w.WriteString("spec:\n")
-		_, _ = w.WriteString("  kind:\n    name: e2-node\n")
-		_, _ = w.WriteString("  aspects:\n")
-		_, _ = w.WriteString("    onos.topo.E2Node:\n")
-		_, _ = w.WriteString("      service_models:\n")
-		_, _ = w.WriteString("---\n")
+	for _, node := range model.Nodes {
+		printNode(w, node)
 	}
 
 	// print out Cells
-	for cell := range model.Cells {
-		// print the cell
-		_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
-		_, _ = w.WriteString(fmt.Sprintf("  name: \"%d\"\n", model.Cells[cell].NCGI))
-		_, _ = w.WriteString("spec:\n")
-		_, _ = w.WriteString("  kind:\n    name: e-cell\n")
-		_, _ = w.WriteString("  aspects:\n")
-		_, _ = w.WriteString("    onos.topo.Location:\n")
-		_, _ = w.WriteString(fmt.Sprintf("      lat: %f\n", model.Cells[cell].Sector.Center.Lat))
-		_, _ = w.WriteString(fmt.Sprintf("      lng: %f\n", model.Cells[cell].Sector.Center.Lng))
-		_, _ = w.WriteString("    onos.topo.E2Cell:\n")
-		_, _ = w.WriteString(fmt.Sprintf("      earfcn: %d\n", model.Cells[cell].Earfcn))
-		_, _ = w.WriteString(fmt.Sprintf("      cell_type: %s\n", model.Cells[cell].CellType.String()))
-		_, _ = w.WriteString("    onos.topo.Coverage:\n")
-		_, _ = w.WriteString(fmt.Sprintf("      arc_width: %d\n", model.Cells[cell].Sector.Arc))
-		_, _ = w.WriteString(fmt.Sprintf("      tilt: %d\n", model.Cells[cell].Sector.Tilt))
-		_, _ = w.WriteString(fmt.Sprintf("      height: %d\n", model.Cells[cell].Sector.Height))
-		_, _ = w.WriteString(fmt.Sprintf("      azimuth: %d\n", model.Cells[cell].Sector.Azimuth))
-		_, _ = w.WriteString("---\n")
+	for _, cell := range model.Cells {
+		printCell(w, cell)
+
+		for _, neighbor := range cell.Neighbors {
+			printCellNeighbor(w, cell, neighbor)
+		}
 	}
 
 	// print the node-cell relations separately
 	for _, node := range model.Nodes {
 		for _, ncgi := range node.Cells {
-			_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
-			_, _ = w.WriteString(fmt.Sprintf("  name: \"%d-%d\"\n", node.GnbID, ncgi))
-			_, _ = w.WriteString("spec:\n")
-			_, _ = w.WriteString("  kind:\n    name: e-node-cell\n")
-			_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%d\"\n", node.GnbID))
-			_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%d\"\n", ncgi))
-			_, _ = w.WriteString("---\n")
+			printNodeCellRelation(w, node, ncgi)
 		}
 	}
 
 	return w.Flush()
+}
+
+func printNode(w *bufio.Writer, node model.Node) {
+	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d\"\n", node.GnbID))
+	_, _ = w.WriteString("spec:\n")
+	_, _ = w.WriteString("  kind:\n    name: e2-node\n")
+	_, _ = w.WriteString("  aspects:\n")
+	_, _ = w.WriteString("    onos.topo.E2Node:\n")
+	_, _ = w.WriteString("      service_models:\n")
+	_, _ = w.WriteString("---\n")
+}
+
+func printCell(w *bufio.Writer, cell model.Cell) {
+	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d\"\n", cell.NCGI))
+	_, _ = w.WriteString("spec:\n")
+	_, _ = w.WriteString("  kind:\n    name: e2-cell\n")
+	_, _ = w.WriteString("  aspects:\n")
+	_, _ = w.WriteString("    onos.topo.Location:\n")
+	_, _ = w.WriteString(fmt.Sprintf("      lat: %f\n", cell.Sector.Center.Lat))
+	_, _ = w.WriteString(fmt.Sprintf("      lng: %f\n", cell.Sector.Center.Lng))
+	_, _ = w.WriteString("    onos.topo.E2Cell:\n")
+	_, _ = w.WriteString(fmt.Sprintf("      earfcn: %d\n", cell.Earfcn))
+	_, _ = w.WriteString(fmt.Sprintf("      cell_type: %s\n", cell.CellType.String()))
+	_, _ = w.WriteString("    onos.topo.Coverage:\n")
+	_, _ = w.WriteString(fmt.Sprintf("      arc_width: %d\n", cell.Sector.Arc))
+	_, _ = w.WriteString(fmt.Sprintf("      tilt: %d\n", cell.Sector.Tilt))
+	_, _ = w.WriteString(fmt.Sprintf("      height: %d\n", cell.Sector.Height))
+	_, _ = w.WriteString(fmt.Sprintf("      azimuth: %d\n", cell.Sector.Azimuth))
+	_, _ = w.WriteString("---\n")
+}
+
+func printNodeCellRelation(w *bufio.Writer, node model.Node, ncgi types.NCGI) {
+	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d-%d\"\n", node.GnbID, ncgi))
+	_, _ = w.WriteString("spec:\n")
+	_, _ = w.WriteString("  kind:\n    name: e2-node-cell\n")
+	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%d\"\n", node.GnbID))
+	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%d\"\n", ncgi))
+	_, _ = w.WriteString("---\n")
+}
+
+func printCellNeighbor(w *bufio.Writer, cell model.Cell, neighbor types.NCGI) {
+	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d-%d\"\n", cell.NCGI, neighbor))
+	_, _ = w.WriteString("spec:\n")
+	_, _ = w.WriteString("  kind:\n    name: e2-cell-neighbor\n")
+	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%d\"\n", cell.NCGI))
+	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%d\"\n", neighbor))
+	_, _ = w.WriteString("---\n")
 }
