@@ -236,10 +236,10 @@ func NewServiceModel(node model.Node, model *model.Model,
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	rcModelPlugin, _ := modelPluginRegistry.GetPlugin(modelOID)
+	rcModelPlugin, err := modelPluginRegistry.GetPlugin(modelOID)
 	if rcModelPlugin == nil {
 		log.Debug("model plugin names:", modelPluginRegistry.GetPlugins())
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
+		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil: %v", err)
 	}
 	ranFuncDescBytes, err := rcModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {

@@ -195,9 +195,9 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	kpmModelPlugin, _ := modelPluginRegistry.GetPlugin(ranFunctionE2SmOid)
+	kpmModelPlugin, err := modelPluginRegistry.GetPlugin(ranFunctionE2SmOid)
 	if kpmModelPlugin == nil {
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil")
+		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil: %v", err)
 	}
 	ranFuncDescBytes, err := kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
