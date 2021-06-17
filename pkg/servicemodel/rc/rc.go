@@ -298,14 +298,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	case e2smrcpreies.RanparameterType_RANPARAMETER_TYPE_PRINTABLE_STRING:
 		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValuePrtS()
 	}
-
-	if parameterName == "pci" {
-		switch parameterValue.(type) {
-		case int32:
-			cell.PCI = uint32(parameterValue.(int32))
-		}
-
-	}
+	setPCI(parameterName, parameterValue, cell)
 
 	err = sm.ServiceModel.CellStore.Update(ctx, cell)
 	if err != nil {

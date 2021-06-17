@@ -7,6 +7,8 @@ package rc
 import (
 	"context"
 
+	"github.com/onosproject/ran-simulator/pkg/model"
+
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
@@ -247,4 +249,19 @@ func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI
 		return nil, err
 	}
 	return ricIndication, nil
+}
+
+func setPCI(parameterName string, parameterValue interface{}, cell *model.Cell) {
+	if parameterName == "pci" {
+		switch parameterValue := parameterValue.(type) {
+		case int32:
+			cell.PCI = uint32(parameterValue)
+		case uint32:
+			cell.PCI = parameterValue
+		case int64:
+			cell.PCI = uint32(parameterValue)
+		case uint64:
+			cell.PCI = uint32(parameterValue)
+		}
+	}
 }
