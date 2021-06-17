@@ -49,14 +49,31 @@ type Server struct {
 }
 
 func ueToAPI(ue *model.UE) *types.Ue {
-	return &types.Ue{
-		IMSI:                 ue.IMSI,
-		ServingTower:         ue.Cell.NCGI,
-		ServingTowerStrength: ue.Cell.Strength,
-		CRNTI:                ue.CRNTI,
-		Admitted:             false,
-		Metrics:              nil,
+	r := &types.Ue{
+		IMSI:     ue.IMSI,
+		Type:     string(ue.Type),
+		Position: &types.Point{Lat: ue.Location.Lat, Lng: ue.Location.Lng},
+		Rotation: ue.Heading,
+		CRNTI:    ue.CRNTI,
+		Admitted: ue.IsAdmitted,
 	}
+	if ue.Cell != nil {
+		r.ServingTower = types.NCGI(ue.Cell.ID)
+		r.ServingTowerStrength = ue.Cell.Strength
+	}
+	if len(ue.Cells) > 0 {
+		r.Tower1 = types.NCGI(ue.Cells[0].ID)
+		r.Tower1Strength = ue.Cells[0].Strength
+	}
+	if len(ue.Cells) > 1 {
+		r.Tower2 = types.NCGI(ue.Cells[1].ID)
+		r.Tower2Strength = ue.Cells[1].Strength
+	}
+	if len(ue.Cells) > 2 {
+		r.Tower3 = types.NCGI(ue.Cells[2].ID)
+		r.Tower3Strength = ue.Cells[2].Strength
+	}
+	return r
 }
 
 // GetUE returns information on the specified UE
