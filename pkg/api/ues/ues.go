@@ -45,6 +45,16 @@ type Server struct {
 	ueStore ues.Store
 }
 
+// GetUECount gets the number of UEs
+func (s *Server) GetUECount(ctx context.Context, request *modelapi.GetUECountRequest) (*modelapi.GetUECountResponse, error) {
+	panic("implement me")
+}
+
+// SetUECount sets the number of UEs
+func (s *Server) SetUECount(ctx context.Context, request *modelapi.SetUECountRequest) (*modelapi.SetUECountResponse, error) {
+	panic("implement me")
+}
+
 func ueToAPI(ue *model.UE) *types.Ue {
 	return &types.Ue{
 		IMSI:                 ue.IMSI,

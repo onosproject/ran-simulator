@@ -64,27 +64,34 @@ type Controller struct {
 	Port    int    `mapstructure:"port"`
 }
 
-// EventA3Params represents a set of A3 handover event parameters
+// MeasurementParams has measurement parameters
+type MeasurementParams struct {
+	TimeToTrigger          int32                `mapstructure:"timeToTrigger"`
+	FrequencyOffset        int32                `mapstructure:"frequencyOffset"`
+	PCellIndividualOffset  int32                `mapstructure:"pcellIndividualOffset"`
+	NCellIndividualOffsets map[types.NCGI]int32 `mapstructure:"ncellIndividualOffsets"`
+	Hysteresis             int32                `mapstructure:"hysteresis"`
+	EventA3Params          EventA3Params        `mapstructure:"eventA3Params"`
+}
+
+// EventA3Params has event a3 parameters
 type EventA3Params struct {
-	A3Offset          int32 `mapstructure:"a3Offset"`          // Integer: -30 to 30
-	A3TimeToTrigger   int32 `mapstructure:"a3TimeToTrigger"`   // timetotrigger: 0ms, 40ms, 64ms, 80ms, 100ms, 128ms, 160ms, 256ms, 320ms, 480ms, 512ms, 640ms, 1024ms, 1280ms, 2560ms, 5120ms
-	A3Hysteresis      int32 `mapstructure:"a3Hysteresis"`      // Integer: 0 to 30
-	A3CellOffset      int32 `mapstructure:"a3CellOffset"`      // q-offsetrange: -24, -22, -20, -18, -16, -14, -12, -10, -8, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24
-	A3FrequencyOffset int32 `mapstructure:"a3FrequencyOffset"` // q-offsetrange: -24, -22, -20, -18, -16, -14, -12, -10, -8, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24
+	A3Offset      int32 `mapstructure:"a3Offset"`
+	ReportOnLeave bool  `mapstructure:"reportOnLeave"`
 }
 
 // Cell represents a section of coverage
 type Cell struct {
-	NCGI          types.NCGI     `mapstructure:"ncgi"`
-	Sector        Sector         `mapstructure:"sector"`
-	Color         string         `mapstructure:"color"`
-	MaxUEs        uint32         `mapstructure:"maxUEs"`
-	Neighbors     []types.NCGI   `mapstructure:"neighbors"`
-	TxPowerDB     float64        `mapstructure:"txPower"`
-	EventA3Params EventA3Params  `mapstructure:"eventA3Params"`
-	PCI           uint32         `mapstructure:"pci"`
-	Earfcn        uint32         `mapstructure:"earfcn"`
-	CellType      types.CellType `mapstructure:"cellType"`
+	NCGI              types.NCGI        `mapstructure:"ncgi"`
+	Sector            Sector            `mapstructure:"sector"`
+	Color             string            `mapstructure:"color"`
+	MaxUEs            uint32            `mapstructure:"maxUEs"`
+	Neighbors         []types.NCGI      `mapstructure:"neighbors"`
+	TxPowerDB         float64           `mapstructure:"txpowerdb"`
+	MeasurementParams MeasurementParams `mapstructure:"measurementParams"`
+	PCI               uint32            `mapstructure:"pci"`
+	Earfcn            uint32            `mapstructure:"earfcn"`
+	CellType          types.CellType    `mapstructure:"cellType"`
 }
 
 // UEType represents type of user-equipment
