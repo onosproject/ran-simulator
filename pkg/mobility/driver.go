@@ -24,11 +24,10 @@ import (
 
 var log = logging.GetLogger("mobility", "driver")
 
-
 const (
 	// Probability [0.0,1.0) of a UE changing its RRC state. The higher this
 	// value, the more number of UE RRC state changes will be observed
-	probabilityOfRrcStateChange =  0.2
+	probabilityOfRrcStateChange = 0.2
 )
 
 // Driver is an abstraction of an entity driving the UE mobility
