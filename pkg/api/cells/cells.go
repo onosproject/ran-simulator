@@ -48,16 +48,16 @@ type Server struct {
 
 func cellToAPI(cell *model.Cell) *types.Cell {
 	sector := sectorToAPI(cell.Sector)
-	eventA3Param := eventA3ParamsToAPI(cell.EventA3Params)
+	measurementParams := measurementParamsToAPI(cell.MeasurementParams)
 	return &types.Cell{
-		NCGI:          cell.NCGI,
-		Location:      sector.Centroid,
-		Sector:        sector,
-		Color:         cell.Color,
-		MaxUEs:        cell.MaxUEs,
-		Neighbors:     cell.Neighbors,
-		TxPowerdB:     cell.TxPowerDB,
-		EventA3Params: eventA3Param,
+		NCGI:              cell.NCGI,
+		Location:          sector.Centroid,
+		Sector:            sector,
+		Color:             cell.Color,
+		MaxUEs:            cell.MaxUEs,
+		Neighbors:         cell.Neighbors,
+		TxPowerdB:         cell.TxPowerDB,
+		MeasurementParams: measurementParams,
 	}
 }
 
@@ -75,12 +75,16 @@ func cellToModel(cell *types.Cell) *model.Cell {
 		MaxUEs:    cell.MaxUEs,
 		Neighbors: cell.Neighbors,
 		TxPowerDB: cell.TxPowerdB,
-		EventA3Params: model.EventA3Params{
-			A3Offset:          cell.EventA3Params.A3Offset,
-			A3TimeToTrigger:   cell.EventA3Params.A3TimeToTrigger,
-			A3Hysteresis:      cell.EventA3Params.A3Hysteresis,
-			A3CellOffset:      cell.EventA3Params.A3CellOffset,
-			A3FrequencyOffset: cell.EventA3Params.A3FrequencyOffset,
+		MeasurementParams: model.MeasurementParams{
+			TimeToTrigger:          cell.MeasurementParams.TimeToTrigger,
+			FrequencyOffset:        cell.MeasurementParams.FrequencyOffset,
+			PCellIndividualOffset:  cell.MeasurementParams.PcellIndividualOffset,
+			NCellIndividualOffsets: cell.MeasurementParams.NcellIndividualOffsets,
+			Hysteresis:             cell.MeasurementParams.Hysteresis,
+			EventA3Params: model.EventA3Params{
+				A3Offset:      cell.MeasurementParams.EventA3Params.A3Offset,
+				ReportOnLeave: cell.MeasurementParams.EventA3Params.ReportOnLeave,
+			},
 		},
 	}
 }
@@ -95,13 +99,21 @@ func sectorToAPI(sector model.Sector) *types.Sector {
 	}
 }
 
+func measurementParamsToAPI(params model.MeasurementParams) *types.MeasurementParams {
+	return &types.MeasurementParams{
+		TimeToTrigger:          params.TimeToTrigger,
+		FrequencyOffset:        params.FrequencyOffset,
+		PcellIndividualOffset:  params.PCellIndividualOffset,
+		NcellIndividualOffsets: params.NCellIndividualOffsets,
+		Hysteresis:             params.Hysteresis,
+		EventA3Params:          eventA3ParamsToAPI(params.EventA3Params),
+	}
+}
+
 func eventA3ParamsToAPI(params model.EventA3Params) *types.EventA3Params {
 	return &types.EventA3Params{
-		A3Offset:          params.A3Offset,
-		A3TimeToTrigger:   params.A3TimeToTrigger,
-		A3Hysteresis:      params.A3Hysteresis,
-		A3CellOffset:      params.A3CellOffset,
-		A3FrequencyOffset: params.A3FrequencyOffset,
+		A3Offset:      params.A3Offset,
+		ReportOnLeave: params.ReportOnLeave,
 	}
 }
 

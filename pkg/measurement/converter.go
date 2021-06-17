@@ -99,11 +99,11 @@ func (c *measReportConverter) Convert(ctx context.Context, ue *model.UE) device.
 		logConverter.Errorf("Can't get serving cell from cell store: %v", err)
 	}
 	sCell := device.NewCell(id.NewECGI(uint64(sCellInStore.NCGI)),
-		c.convertA3Offset(sCellInStore.EventA3Params.A3CellOffset),
-		c.convertHysteresis(sCellInStore.EventA3Params.A3Hysteresis),
-		c.convertQOffset(sCellInStore.EventA3Params.A3CellOffset),
-		c.convertQOffset(sCellInStore.EventA3Params.A3FrequencyOffset),
-		c.convertTimeToTrigger(sCellInStore.EventA3Params.A3TimeToTrigger))
+		c.convertA3Offset(sCellInStore.MeasurementParams.EventA3Params.A3Offset),
+		c.convertHysteresis(sCellInStore.MeasurementParams.Hysteresis),
+		c.convertQOffset(sCellInStore.MeasurementParams.PCellIndividualOffset),
+		c.convertQOffset(sCellInStore.MeasurementParams.FrequencyOffset),
+		c.convertTimeToTrigger(sCellInStore.MeasurementParams.TimeToTrigger))
 
 	var csCells []device.Cell
 	measurements := make(map[string]measurement.Measurement)
@@ -116,12 +116,19 @@ func (c *measReportConverter) Convert(ctx context.Context, ue *model.UE) device.
 			logConverter.Errorf("Can't get candidate serving cell from cell storeL: %v", err)
 		}
 
+		var csCellIndividualOffset int32
+		if _, ok := sCellInStore.MeasurementParams.NCellIndividualOffsets[ueCell.NCGI]; !ok {
+			csCellIndividualOffset = 0
+		} else {
+			csCellIndividualOffset = sCellInStore.MeasurementParams.NCellIndividualOffsets[ueCell.NCGI]
+		}
+
 		csCells = append(csCells, device.NewCell(id.NewECGI(uint64(tmpCellInStore.NCGI)),
-			c.convertA3Offset(tmpCellInStore.EventA3Params.A3CellOffset),
-			c.convertHysteresis(tmpCellInStore.EventA3Params.A3Hysteresis),
-			c.convertQOffset(tmpCellInStore.EventA3Params.A3CellOffset),
-			c.convertQOffset(tmpCellInStore.EventA3Params.A3FrequencyOffset),
-			c.convertTimeToTrigger(tmpCellInStore.EventA3Params.A3TimeToTrigger)))
+			c.convertA3Offset(tmpCellInStore.MeasurementParams.EventA3Params.A3Offset),
+			c.convertHysteresis(tmpCellInStore.MeasurementParams.Hysteresis),
+			c.convertQOffset(csCellIndividualOffset),
+			c.convertQOffset(tmpCellInStore.MeasurementParams.FrequencyOffset),
+			c.convertTimeToTrigger(tmpCellInStore.MeasurementParams.TimeToTrigger)))
 
 		tmpCsCell := measurement.NewMeasEventA3(id.NewECGI(uint64(tmpCellInStore.NCGI)), measurement.RSRP(ueCell.Strength))
 		measurements[tmpCsCell.GetCellID().String()] = tmpCsCell
