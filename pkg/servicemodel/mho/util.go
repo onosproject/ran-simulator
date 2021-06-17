@@ -12,8 +12,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
-	modelPlugin, err := sm.getModelPlugin()
+func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
+	modelPlugin, err := m.getModelPlugin()
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +30,8 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 	return controlMessage, nil
 }
 
-func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
-	modelPlugin, err := sm.getModelPlugin()
+func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
+	modelPlugin, err := m.getModelPlugin()
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +49,8 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 }
 
 // getEventTriggerType extracts event trigger type
-func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_mho.MhoTriggerType, error) {
-	modelPlugin, err := sm.getModelPlugin()
+func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_mho.MhoTriggerType, error) {
+	modelPlugin, err := m.getModelPlugin()
 	if err != nil {
 		log.Error(err)
 		return -1, err
@@ -69,8 +69,8 @@ func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRe
 	return eventTriggerType, nil
 }
 
-func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
-	modelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
+func (m *Mho) getModelPlugin() (modelplugins.ServiceModel, error) {
+	modelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
 	if err != nil {
 		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
 	}
@@ -79,8 +79,8 @@ func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
 }
 
 // getReportPeriod extracts report period
-func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {
-	modelPlugin, err := sm.getModelPlugin()
+func (m *Mho) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {
+	modelPlugin, err := m.getModelPlugin()
 	if err != nil {
 		log.Error(err)
 		return 0, err
