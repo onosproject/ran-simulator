@@ -115,13 +115,8 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 		return err
 	}
 	cellEventCh := make(chan event.Event)
-	metricEventCh := make(chan event.Event)
 	nodeCells := sm.ServiceModel.Node.Cells
 	err = sm.ServiceModel.CellStore.Watch(context.Background(), cellEventCh)
-	if err != nil {
-		return err
-	}
-	err = sm.ServiceModel.MetricStore.Watch(context.Background(), metricEventCh)
 	if err != nil {
 		return err
 	}
@@ -137,7 +132,7 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 		case cellEvent := <-cellEventCh:
 			log.Debug("Received cell event:", cellEvent)
 			cellEventType := cellEvent.Type.(cells.CellEvent)
-			if cellEventType == cells.UpdatedNeighbors {
+			if cellEventType == cells.UpdatedNeighbors || cellEventType == cells.Updated {
 				cell := cellEvent.Value.(*model.Cell)
 				for _, nodeCell := range nodeCells {
 					if nodeCell == cell.NCGI {
@@ -145,17 +140,6 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 						if err != nil {
 							log.Error(err)
 						}
-					}
-				}
-			}
-		case metricEvent := <-metricEventCh:
-			log.Debug("Received metric event:", metricEvent)
-			metricKey := metricEvent.Key.(metrics.Key)
-			for _, nodeCell := range nodeCells {
-				if uint64(nodeCell) == metricKey.EntityID && metricKey.Name == "pci" {
-					err = sm.sendRicIndication(ctx, subscription)
-					if err != nil {
-						log.Error(err)
 					}
 				}
 			}
@@ -285,10 +269,8 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	ncgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci))
 	parameterName := controlMessage.GetControlMessage().ParameterType.RanParameterName.Value
 	parameterID := controlMessage.GetControlMessage().ParameterType.RanParameterId.Value
-
-	oldValue, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), parameterName)
-	log.Debugf("Current value for ncgi %d is %v", ncgi, oldValue)
-	if !found {
+	cell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+	if err != nil {
 		log.Debugf("Ran parameter for entity %d not found", ncgi)
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 			controloutcome.WithRanParameterID(parameterID)).
@@ -306,6 +288,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		}
 		return nil, failure, nil
 	}
+
 	var parameterValue interface{}
 	switch controlMessage.GetControlMessage().ParameterType.RanParameterType {
 	case e2smrcpreies.RanparameterType_RANPARAMETER_TYPE_INTEGER:
@@ -315,8 +298,9 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	case e2smrcpreies.RanparameterType_RANPARAMETER_TYPE_PRINTABLE_STRING:
 		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValuePrtS()
 	}
+	setPCI(parameterName, parameterValue, cell)
 
-	err = sm.ServiceModel.MetricStore.Set(ctx, uint64(ncgi), parameterName, parameterValue)
+	err = sm.ServiceModel.CellStore.Update(ctx, cell)
 	if err != nil {
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 			controloutcome.WithRanParameterID(parameterID)).
