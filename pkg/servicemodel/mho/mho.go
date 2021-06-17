@@ -6,12 +6,6 @@ package mho
 
 import (
 	"context"
-	"encoding/binary"
-	"github.com/onosproject/rrm-son-lib/pkg/model/device"
-	"github.com/onosproject/rrm-son-lib/pkg/model/id"
-	"strconv"
-	"time"
-
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -31,26 +25,18 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	e2apIndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
-	indHdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
-	indMsgFmt1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format1"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
+	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 	"google.golang.org/protobuf/proto"
+	"strconv"
 )
 
 var log = logging.GetLogger("sm", "mho")
 
-const (
-	fileFormatVersion1 string = "version1"
-	//senderName         string = "RAN Simulator"
-	//senderType         string = ""
-	//vendorName         string = "ONF"
-)
-
-// Client mho service model client
-type Client struct {
+// Mho represents the MHO service model
+type Mho struct {
 	ServiceModel *registry.ServiceModel
 	subscription *subutils.Subscription
 	context      context.Context
@@ -80,11 +66,11 @@ func NewServiceModel(node model.Node, model *model.Model,
 		MeasChan:            measChan,
 	}
 
-	mhoClient := &Client{
+	mho := &Mho{
 		ServiceModel: &mhoSm,
 	}
 
-	mhoSm.Client = mhoClient
+	mhoSm.Client = mho
 
 	var ranFunctionShortName = modelFullName
 	var ranFunctionE2SmOid = modelOID
@@ -143,8 +129,8 @@ func NewServiceModel(node model.Node, model *model.Model,
 }
 
 // RICSubscription implements subscription handler for MHO service model
-func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
+func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
+	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID:%d", m.ServiceModel.ModelName, m.ServiceModel.Node.GnbID)
 	log.Debugf("MHO subscription, request: %v", request)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
@@ -179,7 +165,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
-	sm.subscription = subutils.NewSubscription(
+	m.subscription = subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
 		subutils.WithRanFuncID(ranFuncID),
 		subutils.WithRicInstanceID(ricInstanceID),
@@ -189,7 +175,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		log.Warn("MHO subscription failed: no actions are accepted")
-		subscriptionFailure, err := sm.subscription.BuildSubscriptionFailure()
+		subscriptionFailure, err := m.subscription.BuildSubscriptionFailure()
 		if err != nil {
 			log.Error(err)
 			return nil, nil, err
@@ -198,33 +184,33 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, subscriptionFailure, nil
 	}
 
-	response, err = sm.subscription.BuildSubscriptionResponse()
+	response, err = m.subscription.BuildSubscriptionResponse()
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
 	}
 
-	eventTriggerType, err := sm.getEventTriggerType(request)
+	eventTriggerType, err := m.getEventTriggerType(request)
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
 	}
 
-	sm.context = ctx
+	m.context = ctx
 
 	log.Debugf("MHO subscription event trigger type: %v", eventTriggerType)
 	switch eventTriggerType {
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_PERIODIC:
 		log.Debug("Received periodic report subscription request")
-		interval, err := sm.getReportPeriod(request)
+		interval, err := m.getReportPeriod(request)
 		if err != nil {
 			log.Error(err)
 			return nil, nil, err
 		}
-		go sm.reportPeriodicIndication(interval)
+		go m.reportPeriodicIndication(interval)
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT:
 		log.Debug("Received MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT subscription request")
-		go sm.processEventA3MeasReport()
+		go m.processEventA3MeasReport()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Debug("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
 	default:
@@ -236,18 +222,18 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 }
 
 // RICSubscriptionDelete implements subscription delete handler for MHO service model
-func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
+func (m *Mho) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
+	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", m.ServiceModel.ModelName, m.ServiceModel.Node.GnbID)
 	reqID := subdeleteutils.GetRequesterID(request)
 	ranFuncID := subdeleteutils.GetRanFunctionID(request)
 	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
 	subID := subscriptions.NewID(ricInstanceID, reqID, ranFuncID)
-	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
+	sub, err := m.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return nil, nil, err
 	}
 	eventTriggerAsnBytes := sub.Details.RicEventTriggerDefinition.Value
-	mhoModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
+	mhoModelPlugin, _ := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
 	eventTriggerProtoBytes, err := mhoModelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return nil, nil, err
@@ -277,10 +263,10 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 }
 
 // RICControl implements control handler for MHO service model
-func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
+func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", m.ServiceModel.ModelName, m.ServiceModel.Node.GnbID)
 
-	controlHeader, err := sm.getControlHeader(request)
+	controlHeader, err := m.getControlHeader(request)
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
@@ -289,7 +275,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	// TODO - check MHO command
 	log.Debugf("MHO control header: %v", controlHeader)
 
-	controlMessage, err := sm.getControlMessage(request)
+	controlMessage, err := m.getControlMessage(request)
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
@@ -302,7 +288,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		log.Error(err)
 		return nil, nil, err
 	}
-	ue, err := sm.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
+	ue, err := m.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
 	if err != nil {
 		log.Errorf("UE: %v not found err: %v", ue, err)
 		return nil, nil, err
@@ -320,212 +306,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		NCGI: tCellNcgi,
 	}
 
-	mobility.DoHandover(ctx, types.IMSI(imsi), tCell, sm.ServiceModel.UEs, sm.ServiceModel.CellStore)
+	mobility.DoHandover(ctx, types.IMSI(imsi), tCell, m.ServiceModel.UEs, m.ServiceModel.CellStore)
 
 	return nil, nil, nil
-}
-
-func (sm *Client) reportPeriodicIndication(interval int32) {
-	log.Debugf("Starting periodic report with interval %d ms", interval)
-	subID := subscriptions.NewID(sm.subscription.GetRicInstanceID(), sm.subscription.GetReqID(), sm.subscription.GetRanFuncID())
-	intervalDuration := time.Duration(interval)
-	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
-	if err != nil {
-		return
-	}
-	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
-	for {
-		select {
-		case <-sub.Ticker.C:
-			log.Debug("Sending periodic indication report for subscription:", sub.ID)
-			err = sm.sendRicIndication()
-			if err != nil {
-				log.Error("Failure sending indication message: ", err)
-			}
-
-		case <-sub.E2Channel.Context().Done():
-			sub.Ticker.Stop()
-			return
-		}
-	}
-}
-
-func (sm *Client) sendRicIndication() error {
-	node := sm.ServiceModel.Node
-	// Creates and sends an indication message for each cell in the node
-	for _, ncgi := range node.Cells {
-		log.Debugf("Send MHO indications for cell ncgi:%d", ncgi)
-		for _, ue := range sm.ServiceModel.UEs.ListUEs(sm.context, ncgi) {
-			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
-			err := sm.sendRicIndicationFormat1(ncgi, ue)
-			if err != nil {
-				log.Warn(err)
-				continue
-			}
-		}
-	}
-	return nil
-}
-
-func (sm *Client) sendRicIndicationFormat1(ncgi ransimtypes.NCGI, ue *model.UE) error {
-	subID := subscriptions.NewID(sm.subscription.GetRicInstanceID(), sm.subscription.GetReqID(), sm.subscription.GetRanFuncID())
-	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
-	if err != nil {
-		return err
-	}
-
-	indicationHeaderBytes, err := sm.createIndicationHeaderBytes(ncgi, fileFormatVersion1)
-	if err != nil {
-		return err
-	}
-
-	indicationMessageBytes, err := sm.createIndicationMsgFormat1(ue)
-	if err != nil {
-		return err
-	}
-	if indicationMessageBytes == nil {
-		return nil
-	}
-
-	indication := e2apIndicationUtils.NewIndication(
-		e2apIndicationUtils.WithRicInstanceID(sm.subscription.GetRicInstanceID()),
-		e2apIndicationUtils.WithRanFuncID(sm.subscription.GetRanFuncID()),
-		e2apIndicationUtils.WithRequestID(sm.subscription.GetReqID()),
-		e2apIndicationUtils.WithIndicationHeader(indicationHeaderBytes),
-		e2apIndicationUtils.WithIndicationMessage(indicationMessageBytes))
-
-	ricIndication, err := indication.Build()
-	if err != nil {
-		return err
-	}
-
-	err = sub.E2Channel.RICIndication(sm.context, ricIndication)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (sm *Client) createIndicationHeaderBytes(ncgi ransimtypes.NCGI, fileFormatVersion string) ([]byte, error) {
-
-	cell, _ := sm.ServiceModel.CellStore.Get(sm.context, ncgi)
-	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-	timestamp := make([]byte, 4)
-	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
-	header := indHdr.NewIndicationHeader(
-		indHdr.WithPlmnID(*plmnID),
-		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.NCGI)))))
-
-	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-
-	indicationHeaderAsn1Bytes, err := header.MhoToAsn1Bytes(mhoModelPlugin)
-	if err != nil {
-		return nil, err
-	}
-
-	return indicationHeaderAsn1Bytes, nil
-}
-
-func (sm *Client) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
-	log.Debugf("Create MHO Indication message ueID: %d", ue.IMSI)
-
-	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-	measReport := make([]*e2sm_mho.E2SmMhoMeasurementReportItem, 0)
-
-	if len(ue.Cells) == 0 {
-		log.Infof("no neighbor cells found for ueID:%d", ue.IMSI)
-		return nil, nil
-	}
-
-	// add serving cell to measReport
-	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
-		Cgi: &e2sm_mho.CellGlobalId{
-			CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
-				NrCgi: &e2sm_mho.Nrcgi{
-					PLmnIdentity: &e2sm_mho.PlmnIdentity{
-						Value: plmnID.ToBytes(),
-					},
-					NRcellIdentity: &e2sm_mho.NrcellIdentity{
-						Value: &e2sm_mho.BitString{
-							Value: uint64(ransimtypes.GetECI(uint64(ue.Cell.NCGI))),
-							Len:   36,
-						},
-					},
-				},
-			},
-		},
-		Rsrp: &e2sm_mho.Rsrp{
-			Value: int32(ue.Cell.Strength),
-		},
-	})
-
-	for _, cell := range ue.Cells {
-		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
-			Cgi: &e2sm_mho.CellGlobalId{
-				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
-					NrCgi: &e2sm_mho.Nrcgi{
-						PLmnIdentity: &e2sm_mho.PlmnIdentity{
-							Value: plmnID.ToBytes(),
-						},
-						NRcellIdentity: &e2sm_mho.NrcellIdentity{
-							Value: &e2sm_mho.BitString{
-								Value: uint64(ransimtypes.GetECI(uint64(cell.NCGI))),
-								Len:   36,
-							},
-						},
-					},
-				},
-			},
-			Rsrp: &e2sm_mho.Rsrp{
-				Value: int32(cell.Strength),
-			},
-		})
-	}
-
-	ueID := strconv.Itoa(int(ue.IMSI))
-
-	log.Debugf("MHO measurement report for ueID %s: %v", ueID, measReport)
-
-	indicationMessage := indMsgFmt1.NewIndicationMessage(
-		indMsgFmt1.WithUeID(ueID),
-		indMsgFmt1.WithMeasReport(measReport))
-
-	log.Debugf("MHO indication message for ueID %s: %v", ueID, indicationMessage)
-
-	mhoModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(mhoModelPlugin)
-	if err != nil {
-		log.Warn(err)
-		return nil, err
-	}
-
-	return indicationMessageBytes, nil
-}
-
-func (sm *Client) processEventA3MeasReport() {
-	log.Info("Start processing event a3 measurement report")
-	for report := range sm.ServiceModel.MeasChan {
-		log.Debugf("received event a3 measurement report: %v", report)
-		log.Debugf("Send upon-rcv-meas-report indication for cell ecgi:%d, IMSI:%s",
-			report.GetSCell().GetID().GetID().(id.ECGI), report.GetID().String())
-		ecgi := report.GetSCell().GetID().GetID().(id.ECGI)
-		imsi := report.GetID().GetID().(id.UEID).IMSI
-		ue, err := sm.ServiceModel.UEs.Get(sm.context, types.IMSI(imsi))
-		if err != nil {
-			log.Warn(err)
-			continue
-		}
-		err = sm.sendRicIndicationFormat1(ransimtypes.NCGI(ecgi), ue)
-		if err != nil {
-			log.Warn(err)
-			continue
-		}
-	}
 }

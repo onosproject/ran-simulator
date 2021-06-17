@@ -171,7 +171,7 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICControl(ctx, request)
 	case registry.Mho:
-		client := sm.Client.(*mho.Client)
+		client := sm.Client.(*mho.Mho)
 		response, failure, err = client.RICControl(ctx, request)
 	}
 	if err != nil {
@@ -245,7 +245,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 		client := sm.Client.(*kpm2.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
 	case registry.Mho:
-		client := sm.Client.(*mho.Client)
+		client := sm.Client.(*mho.Mho)
 		response, failure, err = client.RICSubscription(ctx, request)
 
 	}
