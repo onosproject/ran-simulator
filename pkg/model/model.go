@@ -6,6 +6,7 @@ package model
 
 import (
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 )
 
@@ -108,6 +109,7 @@ type UECell struct {
 type UE struct {
 	IMSI     types.IMSI
 	Type     UEType
+	RrcState e2sm_mho.Rrcstatus
 	Location Coordinate
 	Heading  uint32
 

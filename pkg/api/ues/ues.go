@@ -63,6 +63,7 @@ func ueToAPI(ue *model.UE) *types.Ue {
 		CRNTI:                ue.CRNTI,
 		Admitted:             false,
 		Metrics:              nil,
+		RrcState:             uint32(ue.RrcState),
 	}
 }
 
