@@ -50,12 +50,13 @@ type Server struct {
 
 // GetUECount gets the number of UEs
 func (s *Server) GetUECount(ctx context.Context, request *modelapi.GetUECountRequest) (*modelapi.GetUECountResponse, error) {
-	panic("implement me")
+	return &modelapi.GetUECountResponse{Count: uint32(s.ueStore.Len(ctx))}, nil
 }
 
 // SetUECount sets the number of UEs
 func (s *Server) SetUECount(ctx context.Context, request *modelapi.SetUECountRequest) (*modelapi.SetUECountResponse, error) {
-	panic("implement me")
+	s.ueStore.SetUECount(ctx, uint(request.Count))
+	return &modelapi.SetUECountResponse{}, nil
 }
 
 func ueToAPI(ue *model.UE) *types.Ue {
