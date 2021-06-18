@@ -54,6 +54,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().StringSlice("service-models", []string{"kpm/1", "ni/2", "rc/3", "kpm2/4", "mho/5"}, "List of service models supported by the nodes")
 	cmd.Flags().StringSlice("controller-addresses", []string{"onos-e2t"}, "List of E2T controller addresses or service names")
 	cmd.Flags().String("plmnid", "315010", "PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN")
+	cmd.Flags().Uint("ue-count", 0, "User Equipment count")
 	cmd.Flags().Uint32P("enbidstart", "e", 5152, "GnbID start")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
 	cmd.Flags().Bool("single-node", false, "generate a single node for all cells")
@@ -72,6 +73,7 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	latitude, _ := cmd.Flags().GetFloat64("latitude")
 	longitude, _ := cmd.Flags().GetFloat64("longitude")
 	plmnid, _ := cmd.Flags().GetString("plmnid")
+	ueCount, _ := cmd.Flags().GetUint("ue-count")
 	enbidStart, _ := cmd.Flags().GetUint32("enbidstart")
 	pitch, _ := cmd.Flags().GetFloat32("pitch")
 	maxDistance, _ := cmd.Flags().GetFloat64("max-neighbor-distance")
@@ -98,6 +100,7 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	}
 
 	m.Plmn = plmnid // we want the MCC-MNC format in our YAML
+	m.UECount = ueCount
 
 	d, err := yaml.Marshal(&m)
 	if err != nil {
