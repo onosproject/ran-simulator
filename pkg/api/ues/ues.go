@@ -58,19 +58,19 @@ func ueToAPI(ue *model.UE) *types.Ue {
 		Admitted: ue.IsAdmitted,
 	}
 	if ue.Cell != nil {
-		r.ServingTower = types.NCGI(ue.Cell.ID)
+		r.ServingTower = ue.Cell.NCGI
 		r.ServingTowerStrength = ue.Cell.Strength
 	}
 	if len(ue.Cells) > 0 {
-		r.Tower1 = types.NCGI(ue.Cells[0].ID)
+		r.Tower1 = ue.Cells[0].NCGI
 		r.Tower1Strength = ue.Cells[0].Strength
 	}
 	if len(ue.Cells) > 1 {
-		r.Tower2 = types.NCGI(ue.Cells[1].ID)
+		r.Tower2 = ue.Cells[1].NCGI
 		r.Tower2Strength = ue.Cells[1].Strength
 	}
 	if len(ue.Cells) > 2 {
-		r.Tower3 = types.NCGI(ue.Cells[2].ID)
+		r.Tower3 = ue.Cells[2].NCGI
 		r.Tower3Strength = ue.Cells[2].Strength
 	}
 	return r
@@ -88,8 +88,12 @@ func (s *Server) GetUE(ctx context.Context, request *modelapi.GetUERequest) (*mo
 
 // MoveToCell moves the specified UE to the given cell
 func (s *Server) MoveToCell(ctx context.Context, request *modelapi.MoveToCellRequest) (*modelapi.MoveToCellResponse, error) {
-	log.Debugf("Received MoveToCell request: %+v", request)
-	return &modelapi.MoveToCellResponse{}, s.ueStore.MoveToCell(ctx, request.IMSI, request.NCGI, 0)
+	log.Infof("Received MoveToCell request: %+v", request)
+	err := s.ueStore.MoveToCell(ctx, request.IMSI, request.NCGI, 0)
+	if err != nil {
+		return nil, err
+	}
+	return &modelapi.MoveToCellResponse{}, nil
 }
 
 // MoveToLocation moves the specified UE to the given location
