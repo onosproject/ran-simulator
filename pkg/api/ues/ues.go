@@ -66,9 +66,8 @@ func ueToAPI(ue *model.UE) *types.Ue {
 		Rotation: ue.Heading,
 		CRNTI:    ue.CRNTI,
 		Admitted: ue.IsAdmitted,
-    RrcState: uint32(ue.RrcState),
-    Metrics:  nil,
-
+		RrcState: uint32(ue.RrcState),
+		Metrics:  nil,
 	}
 	if ue.Cell != nil {
 		r.ServingTower = ue.Cell.NCGI
