@@ -44,13 +44,19 @@ cells:
       arc: 180.0
       azimuth: 0.0
     color: red
-    txPower: 30
-    eventA3Params:
-      a3Offset: 1
-      a3TimeToTrigger: 1
-      a3Hysteresis: 2
-      a3CellOffset: 3
-      a3FrequencyOffset: 4
+    txpowerdb: 30
+    measurementParams:
+      timeToTrigger: 0
+      frequencyOffset: 0
+      pcellIndividualOffset: 0
+      ncellIndividualOffsets:
+        84325717506: 0
+        84325717761: 0
+        84325717762: 0
+      hysteresis: 0
+      eventA3Params:
+        a3Offset: 0
+        reportOnLeave: false
   cell2:
     ncgi: 84325717506
     sector:
@@ -60,13 +66,19 @@ cells:
       arc: 180.0
       azimuth: 180.0
     color: blue
-    txPower: 30
-    eventA3Params:
-      a3Offset: 11
-      a3TimeToTrigger: 11
-      a3Hysteresis: 12
-      a3CellOffset: 13
-      a3FrequencyOffset: 14
+    txpowerdb: 30
+    measurementParams:
+      timeToTrigger: 0
+      frequencyOffset: 0
+      pcellIndividualOffset: 0
+      ncellIndividualOffsets:
+        84325717505: 0
+        84325717761: 0
+        84325717762: 0
+      hysteresis: 0
+      eventA3Params:
+        a3Offset: 0
+        reportOnLeave: false
   cell3:
     ncgi: 84325717761
     sector:
@@ -76,13 +88,19 @@ cells:
       arc: 180.0
       azimuth: 0.0
     color: red
-    txPower: 30
-    eventA3Params:
-      a3Offset: 21
-      a3TimeToTrigger: 21
-      a3Hysteresis: 22
-      a3CellOffset: 23
-      a3FrequencyOffset: 24
+    txpowerdb: 30
+    measurementParams:
+      timeToTrigger: 0
+      frequencyOffset: 0
+      pcellIndividualOffset: 0
+      ncellIndividualOffsets:
+        84325717505: 0
+        84325717506: 0
+        84325717762: 0
+      hysteresis: 0
+      eventA3Params:
+        a3Offset: 0
+        reportOnLeave: false
   cell4:
     ncgi: 84325717762
     sector:
@@ -92,14 +110,19 @@ cells:
       arc: 180.0
       azimuth: 180.0
     color: blue
-    txPower: 30
-    eventA3Params:
-      a3Offset: 31
-      a3TimeToTrigger: 31
-      a3Hysteresis: 32
-      a3CellOffset: 33
-      a3FrequencyOffset: 34
-
+    txpowerdb: 30
+    measurementParams:
+      timeToTrigger: 0
+      frequencyOffset: 0
+      pcellIndividualOffset: 0
+      ncellIndividualOffsets:
+        84325717505: 0
+        84325717506: 0
+        84325717761: 0
+      hysteresis: 0
+      eventA3Params:
+        a3Offset: 0
+        reportOnLeave: false
 controllers:
   controller1:
     id: E2T

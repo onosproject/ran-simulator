@@ -6,6 +6,7 @@ package ues
 
 import (
 	"context"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 	"math/rand"
 	"sync"
 
@@ -219,6 +220,7 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			CRNTI:      types.CRNTI(90125 + i),
 			Cells:      nil,
 			IsAdmitted: false,
+			RrcState:   e2sm_mho.Rrcstatus_RRCSTATUS_IDLE,
 		}
 		s.ues[ue.IMSI] = ue
 	}

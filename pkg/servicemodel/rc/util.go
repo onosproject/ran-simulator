@@ -6,7 +6,8 @@ package rc
 
 import (
 	"context"
-	"strconv"
+
+	"github.com/onosproject/ran-simulator/pkg/model"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 
@@ -112,56 +113,30 @@ func (sm *Client) toCellSizeEnum(cellSize string) e2smrcpreies.CellSize {
 	}
 }
 
-func (sm *Client) getCellPci(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
-	cellPci, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), "pci")
-	if !found {
-		return 0, errors.New(errors.NotFound, "pci value is not found for cell:", ncgi)
-	}
-	// TODO we should handle this properly in metric store
-	switch cellPci := cellPci.(type) {
-	case uint32:
-		return int32(cellPci), nil
-	case int32:
-		return cellPci, nil
-	case int64:
-		return int32(cellPci), nil
-	case uint64:
-		return int32(cellPci), nil
-	case uint8:
-		return int32(cellPci), nil
-	case int8:
-		return int32(cellPci), nil
-	case int16:
-		return int32(cellPci), nil
-	case uint16:
-		return int32(cellPci), nil
-	case string:
-		val, err := strconv.Atoi(cellPci)
-		if err != nil {
-			return 0, err
-		}
-		return int32(val), nil
-	default:
-		return 0, nil
+func (sm *Client) getCellPCI(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
+	cell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+	if err != nil {
+		return 0, err
 	}
 
+	return int32(cell.PCI), nil
 }
 
-func (sm *Client) getEarfcn(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
-	earfcn, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), "earfcn")
-	if !found {
-		return 0, errors.New(errors.NotFound, "earfc value is not found for cell:", ncgi)
+func (sm *Client) getEARFCN(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
+	cell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+	if err != nil {
+		return 0, err
 	}
 
-	return int32(earfcn.(uint32)), nil
+	return int32(cell.Earfcn), nil
 }
 
 func (sm *Client) getCellSize(ctx context.Context, ncgi ransimtypes.NCGI) (string, error) {
-	cellSize, found := sm.ServiceModel.MetricStore.Get(ctx, uint64(ncgi), "cellSize")
-	if !found {
-		return "", errors.New(errors.NotFound, "cell size value is not found for  neighbour  cell:", ncgi)
+	cell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+	if err != nil {
+		return "", err
 	}
-	return cellSize.(string), nil
+	return cell.CellType.String(), nil
 }
 
 // getReportPeriod extracts report period
@@ -194,12 +169,12 @@ func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI
 	if err != nil {
 		return nil, err
 	}
-	cellPci, err := sm.getCellPci(ctx, ncgi)
+	cellPci, err := sm.getCellPCI(ctx, ncgi)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	earfcn, err := sm.getEarfcn(ctx, ncgi)
+	earfcn, err := sm.getEARFCN(ctx, ncgi)
 	if err != nil {
 		return nil, err
 	}
@@ -209,12 +184,12 @@ func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI
 		return nil, err
 	}
 	for _, neighbourNcgi := range cell.Neighbors {
-		neighbourCellPci, err := sm.getCellPci(ctx, neighbourNcgi)
+		neighbourCellPci, err := sm.getCellPCI(ctx, neighbourNcgi)
 		if err != nil {
 			log.Error(err)
 			return nil, err
 		}
-		neighbourEarfcn, err := sm.getEarfcn(ctx, neighbourNcgi)
+		neighbourEarfcn, err := sm.getEARFCN(ctx, neighbourNcgi)
 		if err != nil {
 			return nil, err
 		}
@@ -274,4 +249,19 @@ func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI
 		return nil, err
 	}
 	return ricIndication, nil
+}
+
+func setPCI(parameterName string, parameterValue interface{}, cell *model.Cell) {
+	if parameterName == "pci" {
+		switch parameterValue := parameterValue.(type) {
+		case int32:
+			cell.PCI = uint32(parameterValue)
+		case uint32:
+			cell.PCI = parameterValue
+		case int64:
+			cell.PCI = uint32(parameterValue)
+		case uint64:
+			cell.PCI = uint32(parameterValue)
+		}
+	}
 }
