@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"testing"
 
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -41,7 +42,7 @@ func TestUERegistry(t *testing.T) {
 	assert.Equal(t, 200, ues.Len(ctx))
 }
 
-func TestMoveUEToCell(t *testing.T) {
+func TestMoveUEsToCell(t *testing.T) {
 	ctx := context.Background()
 	cellStore := cellStore(t)
 	ues := NewUERegistry(18, cellStore)
@@ -72,6 +73,28 @@ func TestMoveUEToCell(t *testing.T) {
 
 	assert.Equal(t, 12, len(ues.ListUEs(ctx, ecgi1)))
 	assert.Equal(t, 6, len(ues.ListUEs(ctx, ecgi2)))
+}
+
+func TestMoveUEToCell(t *testing.T) {
+	ctx := context.Background()
+	cellStore := cellStore(t)
+	ues := NewUERegistry(18, cellStore)
+	assert.NotNil(t, ues, "unable to create UE registry")
+	ue := ues.ListAllUEs(ctx)[0]
+	err := ues.MoveToCell(ctx, ue.IMSI, types.NCGI(321), 11.0)
+	assert.NoError(t, err)
+	ue1, _ := ues.Get(ctx, ue.IMSI)
+	assert.NoError(t, err)
+	assert.Equal(t, types.NCGI(321), ue1.Cell.NCGI)
+	assert.Equal(t, 11.0, ue1.Cell.Strength)
+	list := ues.ListAllUEs(ctx)
+	assert.Len(t, list, 18)
+	for _, ue := range list {
+		if ue.Cell.NCGI == types.NCGI(321) {
+			return
+		}
+	}
+	assert.Fail(t, "boom")
 }
 
 func TestMoveUEToCoord(t *testing.T) {
