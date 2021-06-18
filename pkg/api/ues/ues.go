@@ -100,7 +100,7 @@ func (s *Server) MoveToLocation(ctx context.Context, request *modelapi.MoveToLoc
 
 // DeleteUE removes the specified UE
 func (s *Server) DeleteUE(ctx context.Context, request *modelapi.DeleteUERequest) (*modelapi.DeleteUEResponse, error) {
-	log.Debugf("Received MoveToLocation request: %+v", request)
+	log.Debugf("Received Delete request: %+v", request)
 	_, err := s.ueStore.Delete(ctx, request.IMSI)
 	return &modelapi.DeleteUEResponse{}, err
 }
