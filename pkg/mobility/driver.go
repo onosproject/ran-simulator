@@ -43,6 +43,9 @@ type Driver interface {
 
 	// GetMeasCtrl returns the Measurement Controller
 	GetMeasCtrl() measurement.MeasController
+
+	// GetRrcCtrl returns the Rrc Controller
+	GetRrcCtrl() RrcCtrl
 }
 
 type driver struct {
@@ -57,6 +60,7 @@ type driver struct {
 	measCtrl   measurement.MeasController
 	hoCtrl     handover.HOController
 	hoLogic    string
+	rrcCtrl    RrcCtrl
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
@@ -94,6 +98,8 @@ func (d *driver) Start(ctx context.Context) {
 	d.measCtrl = measurement.NewMeasController(measType, d.cellStore, d.ueStore)
 	d.measCtrl.Start(ctx)
 
+	d.rrcCtrl.RrcUpdateChan = make(chan model.UE)
+
 	// Add hoController
 	if d.hoLogic == "local" {
 		log.Info("HO logic is running locally")
@@ -120,6 +126,10 @@ func (d *driver) Stop() {
 
 func (d *driver) GetMeasCtrl() measurement.MeasController {
 	return d.measCtrl
+}
+
+func (d *driver) GetRrcCtrl() RrcCtrl {
+	return d.rrcCtrl
 }
 
 func (d *driver) drive(ctx context.Context) {

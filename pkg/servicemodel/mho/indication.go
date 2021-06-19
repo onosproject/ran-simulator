@@ -17,6 +17,7 @@ import (
 	e2apIndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	indHdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
 	indMsgFmt1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format1"
+	indMsgFmt2 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format2"
 )
 
 func (m *Mho) sendRicIndication() error {
@@ -49,6 +50,46 @@ func (m *Mho) sendRicIndicationFormat1(ncgi ransimtypes.NCGI, ue *model.UE) erro
 	}
 
 	indicationMessageBytes, err := m.createIndicationMsgFormat1(ue)
+	if err != nil {
+		return err
+	}
+	if indicationMessageBytes == nil {
+		return nil
+	}
+
+	indication := e2apIndicationUtils.NewIndication(
+		e2apIndicationUtils.WithRicInstanceID(m.subscription.GetRicInstanceID()),
+		e2apIndicationUtils.WithRanFuncID(m.subscription.GetRanFuncID()),
+		e2apIndicationUtils.WithRequestID(m.subscription.GetReqID()),
+		e2apIndicationUtils.WithIndicationHeader(indicationHeaderBytes),
+		e2apIndicationUtils.WithIndicationMessage(indicationMessageBytes))
+
+	ricIndication, err := indication.Build()
+	if err != nil {
+		return err
+	}
+
+	err = sub.E2Channel.RICIndication(m.context, ricIndication)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Mho) sendRicIndicationFormat2(ncgi ransimtypes.NCGI, ue *model.UE) error {
+	subID := subscriptions.NewID(m.subscription.GetRicInstanceID(), m.subscription.GetReqID(), m.subscription.GetRanFuncID())
+	sub, err := m.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
+
+	indicationHeaderBytes, err := m.createIndicationHeaderBytes(ncgi)
+	if err != nil {
+		return err
+	}
+
+	indicationMessageBytes, err := m.createIndicationMsgFormat2(ue)
 	if err != nil {
 		return err
 	}
@@ -163,7 +204,31 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		indMsgFmt1.WithUeID(ueID),
 		indMsgFmt1.WithMeasReport(measReport))
 
-	log.Debugf("MHO indication message for ueID %s: %v", ueID, indicationMessage)
+	log.Debugf("MHO measurement report indication message for ueID %s: %v", ueID, indicationMessage)
+
+	mhoModelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
+	if err != nil {
+		return nil, err
+	}
+	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(mhoModelPlugin)
+	if err != nil {
+		log.Warn(err)
+		return nil, err
+	}
+
+	return indicationMessageBytes, nil
+}
+
+func (m *Mho) createIndicationMsgFormat2(ue *model.UE) ([]byte, error) {
+	log.Debugf("Create MHO RRC indication message ueID: %d", ue.IMSI)
+
+	ueID := strconv.Itoa(int(ue.IMSI))
+
+	indicationMessage := indMsgFmt2.NewIndicationMessage(
+		indMsgFmt2.WithUeID(ueID),
+		indMsgFmt2.WithRrcStatus(ue.RrcState))
+
+	log.Debugf("MHO RRC state indication message for ueID %s: %v", ueID, indicationMessage)
 
 	mhoModelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
 	if err != nil {
