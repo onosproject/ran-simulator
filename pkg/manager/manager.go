@@ -182,7 +182,8 @@ func (m *Manager) startE2Agents() error {
 	// Create the E2 agents for all simulated nodes and specified controllers
 	var err error
 	m.agents, err = agents.NewE2Agents(m.model, m.modelPluginRegistry,
-		m.nodeStore, m.ueStore, m.cellStore, m.metricsStore, m.mobilityDriver.GetMeasCtrl().GetOutputChan())
+		m.nodeStore, m.ueStore, m.cellStore, m.metricsStore, m.mobilityDriver.GetMeasCtrl().GetOutputChan(),
+		m.mobilityDriver.GetRrcCtrl().RrcUpdateChan)
 	if err != nil {
 		log.Error(err)
 		return err

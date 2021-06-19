@@ -37,9 +37,10 @@ var log = logging.GetLogger("sm", "mho")
 
 // Mho represents the MHO service model
 type Mho struct {
-	ServiceModel *registry.ServiceModel
-	subscription *subutils.Subscription
-	context      context.Context
+	ServiceModel  *registry.ServiceModel
+	subscription  *subutils.Subscription
+	context       context.Context
+	rrcUpdateChan chan model.UE
 }
 
 // NewServiceModel creates a new service model
@@ -47,7 +48,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE) (registry.ServiceModel, error) {
+	measChan chan device.UE, rrcUpdateChan chan model.UE) (registry.ServiceModel, error) {
 	modelName := e2smtypes.ShortName(modelFullName)
 	mhoSm := registry.ServiceModel{
 		RanFunctionID:       registry.Mho,
@@ -71,6 +72,8 @@ func NewServiceModel(node model.Node, model *model.Model,
 	}
 
 	mhoSm.Client = mho
+
+	mho.rrcUpdateChan = rrcUpdateChan
 
 	var ranFunctionShortName = modelFullName
 	var ranFunctionE2SmOid = modelOID
@@ -213,6 +216,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		go m.processEventA3MeasReport()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Debug("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
+		go m.processRrcUpdate()
 	default:
 		log.Errorf("MHO subscription failed, invalid event trigger type: %v", eventTriggerType)
 	}

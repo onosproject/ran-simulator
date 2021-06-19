@@ -73,7 +73,7 @@ type e2Agent struct {
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE) (E2Agent, error) {
+	measChan chan device.UE, rrcUpdateChan chan model.UE) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.GnbID)
 	reg := registry.NewServiceModelRegistry()
 
@@ -125,7 +125,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 		case registry.Mho:
 			log.Info("MHO service model for node with eNbID:", node.GnbID)
 			mhoSm, err := mho.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore, cellStore,
-				metricStore, measChan)
+				metricStore, measChan, rrcUpdateChan)
 			if err != nil {
 				log.Info("Failure creating MHO service model for eNbID:", node.GnbID)
 				return nil, err
