@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/id/cellglobalid"
+
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/measobjectitem"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/reportstyle"
@@ -103,16 +105,15 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	cellMeasObjectItems := make([]*e2smkpmv2.CellMeasurementObjectItem, 0)
 	for _, cellNcgi := range cells {
 		nci := ransimtypes.GetNCI(cellNcgi)
-		eciBitString := &e2smkpmv2.BitString{
-			Value: uint64(nci),
-			Len:   28,
-		}
 
-		cellGlobalID, err := pdubuilder.CreateCellGlobalIDEUTRACGI(plmnID.ToBytes(), eciBitString)
-		if err != nil {
-			log.Error(err)
-			return registry.ServiceModel{}, err
+		ncibs := &e2smkpmv2.BitString{
+			Value: uint64(nci),
+			Len:   36,
 		}
+		cellGlobalID, _ := cellglobalid.
+			NewGlobalNRCGIID(cellglobalid.WithPlmnID(plmnID),
+				cellglobalid.WithNRCellID(ncibs)).
+			Build()
 
 		cellMeasObjItem := measobjectitem.NewCellMeasObjectItem(
 			measobjectitem.WithCellObjectID(strconv.FormatUint(uint64(cellNcgi), 10)),
