@@ -12,6 +12,7 @@ import (
 	"math/rand"
 )
 
+// RrcStateChangeProbability determines the rate of change of RRC states in ransim
 var RrcStateChangeProbability float64 = 0.02
 
 // RrcCtrl is the RRC controller
