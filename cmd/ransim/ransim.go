@@ -21,6 +21,8 @@ package main
 
 import (
 	"flag"
+	"math/rand"
+	"time"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/manager"
@@ -42,6 +44,9 @@ func (i *arrayFlags) Set(value string) error {
 // The main entry point
 func main() {
 	log.Info("Starting Ran simulator")
+
+	rand.Seed(time.Now().UnixNano())
+
 	ready := make(chan bool)
 
 	var serviceModelPlugins arrayFlags

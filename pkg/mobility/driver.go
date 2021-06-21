@@ -6,6 +6,7 @@ package mobility
 
 import (
 	"context"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 	"math"
 	"math/rand"
 	"time"
@@ -23,12 +24,6 @@ import (
 )
 
 var log = logging.GetLogger("mobility", "driver")
-
-const (
-	// Probability [0.0,1.0) of a UE changing its RRC state. The higher this
-	// value, the more number of UE RRC state changes will be observed
-	probabilityOfRrcStateChange = 0.2
-)
 
 // Driver is an abstraction of an entity driving the UE mobility
 type Driver interface {
@@ -83,8 +78,6 @@ const hoType = "A3" // ToDo: should be programmable
 
 func (d *driver) Start(ctx context.Context) {
 	log.Info("Driver starting")
-
-	rand.Seed(time.Now().UnixNano())
 
 	// Iterate over all routes and position the UEs at the start of their routes
 	for _, route := range d.routeStore.List(ctx) {
@@ -147,7 +140,7 @@ func (d *driver) drive(ctx context.Context) {
 				d.updateUEPosition(ctx, route)
 				UpdateUESignalStrength(ctx, route.IMSI, d.ueStore, d.cellStore)
 				d.reportMeasurement(ctx, route.IMSI)
-				d.updateRrc(ctx, route.IMSI, probabilityOfRrcStateChange)
+				d.updateRrc(ctx, route.IMSI)
 			}
 		}
 	}
@@ -202,6 +195,12 @@ func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
 		log.Warn("Unable to find UE %d", imsi)
 		return
 	}
+
+	// Skip reporting measurement for IDLE UE
+	if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_IDLE {
+		return
+	}
+
 	d.measCtrl.GetInputChan() <- ue
 }
 

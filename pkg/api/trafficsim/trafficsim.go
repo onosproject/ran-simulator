@@ -77,6 +77,7 @@ func ueToAPI(ue *model.UE) *simtypes.Ue {
 		Rotation: ue.Heading,
 		CRNTI:    ue.CRNTI,
 		Admitted: ue.IsAdmitted,
+		RrcState: uint32(ue.RrcState),
 	}
 	if ue.Cell != nil {
 		r.ServingTower = simtypes.NCGI(ue.Cell.ID)
