@@ -110,10 +110,13 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 			Value: uint64(nci),
 			Len:   36,
 		}
-		cellGlobalID, _ := cellglobalid.
+		cellGlobalID, err := cellglobalid.
 			NewGlobalNRCGIID(cellglobalid.WithPlmnID(plmnID),
 				cellglobalid.WithNRCellID(ncibs)).
 			Build()
+		if err != nil {
+			return registry.ServiceModel{}, err
+		}
 
 		cellMeasObjItem := measobjectitem.NewCellMeasObjectItem(
 			measobjectitem.WithCellObjectID(strconv.FormatUint(uint64(cellNcgi), 10)),
