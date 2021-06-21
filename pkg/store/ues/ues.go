@@ -192,6 +192,10 @@ func (s *store) removeSomeUEs(ctx context.Context, count int) {
 	}
 }
 
+func randomBoolean() bool {
+	return rand.Float32() < 0.5
+}
+
 func (s *store) CreateUEs(ctx context.Context, count uint) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -207,6 +211,12 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			log.Error(err)
 		}
 		ncgi := randomCell.NCGI
+		var rrcState e2sm_mho.Rrcstatus
+		if randomBoolean() {
+			rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+		} else {
+			rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+		}
 		ue := &model.UE{
 			IMSI:     imsi,
 			Type:     "phone",
@@ -220,7 +230,7 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			CRNTI:      types.CRNTI(90125 + i),
 			Cells:      nil,
 			IsAdmitted: false,
-			RrcState:   e2sm_mho.Rrcstatus_RRCSTATUS_IDLE,
+			RrcState:   rrcState,
 		}
 		s.ues[ue.IMSI] = ue
 	}

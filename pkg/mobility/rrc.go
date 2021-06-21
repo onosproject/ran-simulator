@@ -12,6 +12,8 @@ import (
 	"math/rand"
 )
 
+var RrcStateChangeProbability float64 = 0.02
+
 // RrcCtrl is the RRC controller
 type RrcCtrl struct {
 	RrcUpdateChan chan model.UE
@@ -22,8 +24,8 @@ func (d *driver) NewRrcCtrl() *RrcCtrl {
 	return &RrcCtrl{}
 }
 
-func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI, probabilityOfRrcStateChange float64) {
-	var randomBoolean = rand.Float64() < probabilityOfRrcStateChange
+func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
+	var randomBoolean = rand.Float64() < RrcStateChangeProbability
 
 	if randomBoolean {
 		ue, err := d.ueStore.Get(ctx, imsi)
@@ -43,7 +45,9 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI, probabilityOfRr
 			return
 		}
 
-		d.rrcCtrl.RrcUpdateChan <- *ue
+		if d.hoLogic != "local" {
+			d.rrcCtrl.RrcUpdateChan <- *ue
+		}
 
 	}
 }
