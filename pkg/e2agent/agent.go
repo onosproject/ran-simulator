@@ -7,6 +7,7 @@ package e2agent
 import (
 	"context"
 	"fmt"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 	"time"
@@ -73,7 +74,7 @@ type e2Agent struct {
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE, rrcUpdateChan chan model.UE) (E2Agent, error) {
+	measChan chan device.UE, mobilityDriver mobility.Driver) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.GnbID)
 	reg := registry.NewServiceModelRegistry()
 
@@ -125,7 +126,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 		case registry.Mho:
 			log.Info("MHO service model for node with eNbID:", node.GnbID)
 			mhoSm, err := mho.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore, cellStore,
-				metricStore, measChan, rrcUpdateChan)
+				metricStore, measChan, mobilityDriver)
 			if err != nil {
 				log.Info("Failure creating MHO service model for eNbID:", node.GnbID)
 				return nil, err

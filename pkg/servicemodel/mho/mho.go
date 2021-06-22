@@ -41,6 +41,7 @@ type Mho struct {
 	subscription  *subutils.Subscription
 	context       context.Context
 	rrcUpdateChan chan model.UE
+	mobilityDriver       mobility.Driver
 }
 
 // NewServiceModel creates a new service model
@@ -48,7 +49,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE, rrcUpdateChan chan model.UE) (registry.ServiceModel, error) {
+	measChan chan device.UE, mobilityDriver mobility.Driver) (registry.ServiceModel, error) {
 	modelName := e2smtypes.ShortName(modelFullName)
 	mhoSm := registry.ServiceModel{
 		RanFunctionID:       registry.Mho,
@@ -73,7 +74,8 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	mhoSm.Client = mho
 
-	mho.rrcUpdateChan = rrcUpdateChan
+	mho.rrcUpdateChan = mobilityDriver.GetRrcCtrl().RrcUpdateChan
+	mho.mobilityDriver = mobilityDriver
 
 	var ranFunctionShortName = modelFullName
 	var ranFunctionE2SmOid = modelOID

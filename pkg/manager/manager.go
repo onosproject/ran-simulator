@@ -183,7 +183,7 @@ func (m *Manager) startE2Agents() error {
 	var err error
 	m.agents, err = agents.NewE2Agents(m.model, m.modelPluginRegistry,
 		m.nodeStore, m.ueStore, m.cellStore, m.metricsStore, m.mobilityDriver.GetMeasCtrl().GetOutputChan(),
-		m.mobilityDriver.GetRrcCtrl().RrcUpdateChan)
+		m.mobilityDriver)
 	if err != nil {
 		log.Error(err)
 		return err
