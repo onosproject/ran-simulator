@@ -46,7 +46,6 @@ type Driver interface {
 
 	// Handover
 	Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell)
-
 }
 
 type driver struct {
@@ -138,14 +137,14 @@ func (d *driver) SetHoLogic(hoLogic string) {
 	d.hoLogic = hoLogic
 }
 
-func (d *driver) LockUE(imsi types.IMSI) {
+func (d *driver) lockUE(imsi types.IMSI) {
 	if _, ok := d.ueLock[imsi]; !ok {
 		d.ueLock[imsi] = &sync.Mutex{}
 	}
 	d.ueLock[imsi].Lock()
 }
 
-func (d *driver) UnlockUE(imsi types.IMSI) {
+func (d *driver) unlockUE(imsi types.IMSI) {
 	if _, ok := d.ueLock[imsi]; !ok {
 		log.Errorf("lock not found for IMSI %d", imsi)
 		return
@@ -169,8 +168,8 @@ func (d *driver) drive(ctx context.Context) {
 }
 
 func (d *driver) processRoute(ctx context.Context, route *model.Route) {
-	d.LockUE(route.IMSI)
-	defer d.UnlockUE(route.IMSI)
+	d.lockUE(route.IMSI)
+	defer d.unlockUE(route.IMSI)
 	if route.NextPoint == 0 && !route.Reverse {
 		d.initializeUEPosition(ctx, route)
 	}
@@ -266,8 +265,8 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 
 // Handover handovers ue to target cell
 func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
-	d.LockUE(imsi)
-	defer d.UnlockUE(imsi)
+	d.lockUE(imsi)
+	defer d.unlockUE(imsi)
 	err := d.ueStore.UpdateCell(ctx, imsi, tCell)
 	if err != nil {
 		log.Warn("Unable to update UE %d cell info", imsi)
