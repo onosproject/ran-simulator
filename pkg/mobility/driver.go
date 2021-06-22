@@ -9,6 +9,7 @@ import (
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 	"math"
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -41,6 +42,12 @@ type Driver interface {
 
 	// GetRrcCtrl returns the Rrc Controller
 	GetRrcCtrl() RrcCtrl
+
+	// LockUE
+	LockUE(imsi types.IMSI)
+
+	// UnlockUE
+	UnlockUE(imsi types.IMSI)
 }
 
 type driver struct {
@@ -56,6 +63,7 @@ type driver struct {
 	hoCtrl     handover.HOController
 	hoLogic    string
 	rrcCtrl    RrcCtrl
+	ueLock     map[types.IMSI]*sync.Mutex
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
@@ -83,6 +91,8 @@ func (d *driver) Start(ctx context.Context) {
 	for _, route := range d.routeStore.List(ctx) {
 		d.initializeUEPosition(ctx, route)
 	}
+
+	d.ueLock =     make(map[types.IMSI]*sync.Mutex)
 
 	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)
@@ -129,6 +139,21 @@ func (d *driver) SetHoLogic(hoLogic string) {
 	d.hoLogic = hoLogic
 }
 
+func (d *driver) LockUE(imsi types.IMSI) {
+	if _, ok := d.ueLock[imsi]; !ok {
+		d.ueLock[imsi] = &sync.Mutex{}
+	}
+	d.ueLock[imsi].Lock()
+}
+
+func (d *driver) UnlockUE(imsi types.IMSI) {
+	if _, ok := d.ueLock[imsi]; !ok {
+		log.Errorf("lock not found for IMSI %d", imsi)
+		return
+	}
+	d.ueLock[imsi].Unlock()
+}
+
 func (d *driver) drive(ctx context.Context) {
 	for {
 		select {
@@ -138,18 +163,24 @@ func (d *driver) drive(ctx context.Context) {
 			return
 		case <-d.ticker.C:
 			for _, route := range d.routeStore.List(ctx) {
-				if route.NextPoint == 0 && !route.Reverse {
-					d.initializeUEPosition(ctx, route)
-				}
-				d.updateUEPosition(ctx, route)
-				UpdateUESignalStrength(ctx, route.IMSI, d.ueStore, d.cellStore)
-				d.reportMeasurement(ctx, route.IMSI)
-				err := d.updateRrc(ctx, route.IMSI)
-				if err != nil {
-					log.Error(err)
-				}
+				d.processRoute(ctx, route)
 			}
 		}
+	}
+}
+
+func (d *driver) processRoute(ctx context.Context, route *model.Route) {
+	d.LockUE(route.IMSI)
+	defer d.UnlockUE(route.IMSI)
+	if route.NextPoint == 0 && !route.Reverse {
+		d.initializeUEPosition(ctx, route)
+	}
+	d.updateUEPosition(ctx, route)
+	UpdateUESignalStrength(ctx, route.IMSI, d.ueStore, d.cellStore)
+	d.reportMeasurement(ctx, route.IMSI)
+	err := d.updateRrc(ctx, route.IMSI)
+	if err != nil {
+		log.Error(err)
 	}
 }
 

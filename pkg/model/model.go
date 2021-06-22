@@ -8,6 +8,7 @@ import (
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"sync"
 )
 
 // Model simulation model
@@ -118,6 +119,8 @@ type UE struct {
 	Cells []*UECell
 
 	IsAdmitted bool
+
+	Mu sync.Mutex  // TODO - change to RWMutex if that makes more sense
 }
 
 // ServiceModel service model information
