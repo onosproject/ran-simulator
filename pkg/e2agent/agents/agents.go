@@ -6,6 +6,7 @@ package agents
 
 import (
 	"context"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -36,7 +37,7 @@ type E2Agents struct {
 	metricStore         metrics.Store
 	model               *model.Model
 	measChan            chan device.UE
-	rrcUpdateChan       chan model.UE
+	mobilityDriver      mobility.Driver
 }
 
 // Agents agents interface
@@ -62,7 +63,7 @@ func (agents *E2Agents) processNodeEvents() {
 			log.Debugf("Starting e2 agent %d", nodeEvent.Key.(types.GnbID))
 			e2Node, err := e2agent.NewE2Agent(*node, agents.model,
 				agents.modelPluginRegistry, agents.nodeStore, agents.ueStore,
-				agents.cellStore, agents.metricStore, agents.measChan, agents.rrcUpdateChan)
+				agents.cellStore, agents.metricStore, agents.measChan, agents.mobilityDriver)
 			if err != nil {
 				log.Error(err)
 				continue
@@ -115,7 +116,7 @@ func (agents *E2Agents) processNodeEvents() {
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
 func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE, rrcUpdateChan chan model.UE) (*E2Agents, error) {
+	measChan chan device.UE, mobilityDriver mobility.Driver) (*E2Agents, error) {
 	agentStore := agents.NewStore()
 	e2agents := &E2Agents{
 		agentStore:          agentStore,
@@ -126,11 +127,11 @@ func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 		cellStore:           cellStore,
 		metricStore:         metricStore,
 		measChan:            measChan,
-		rrcUpdateChan:       rrcUpdateChan,
+		mobilityDriver:      mobilityDriver,
 	}
 
 	for _, node := range m.Nodes {
-		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore, metricStore, measChan, rrcUpdateChan)
+		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore, metricStore, measChan, mobilityDriver)
 		if err != nil {
 			log.Error(err)
 			return nil, err

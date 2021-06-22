@@ -6,9 +6,11 @@ package mobility
 
 import (
 	"context"
+	"fmt"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 	"math"
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -41,6 +43,9 @@ type Driver interface {
 
 	// GetRrcCtrl returns the Rrc Controller
 	GetRrcCtrl() RrcCtrl
+
+	// Handover
+	Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell)
 }
 
 type driver struct {
@@ -56,6 +61,7 @@ type driver struct {
 	hoCtrl     handover.HOController
 	hoLogic    string
 	rrcCtrl    RrcCtrl
+	ueLock     map[types.IMSI]*sync.Mutex
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
@@ -83,6 +89,8 @@ func (d *driver) Start(ctx context.Context) {
 	for _, route := range d.routeStore.List(ctx) {
 		d.initializeUEPosition(ctx, route)
 	}
+
+	d.ueLock = make(map[types.IMSI]*sync.Mutex)
 
 	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)
@@ -129,6 +137,21 @@ func (d *driver) SetHoLogic(hoLogic string) {
 	d.hoLogic = hoLogic
 }
 
+func (d *driver) lockUE(imsi types.IMSI) {
+	if _, ok := d.ueLock[imsi]; !ok {
+		d.ueLock[imsi] = &sync.Mutex{}
+	}
+	d.ueLock[imsi].Lock()
+}
+
+func (d *driver) unlockUE(imsi types.IMSI) {
+	if _, ok := d.ueLock[imsi]; !ok {
+		log.Errorf("lock not found for IMSI %d", imsi)
+		return
+	}
+	d.ueLock[imsi].Unlock()
+}
+
 func (d *driver) drive(ctx context.Context) {
 	for {
 		select {
@@ -138,18 +161,24 @@ func (d *driver) drive(ctx context.Context) {
 			return
 		case <-d.ticker.C:
 			for _, route := range d.routeStore.List(ctx) {
-				if route.NextPoint == 0 && !route.Reverse {
-					d.initializeUEPosition(ctx, route)
-				}
-				d.updateUEPosition(ctx, route)
-				UpdateUESignalStrength(ctx, route.IMSI, d.ueStore, d.cellStore)
-				d.reportMeasurement(ctx, route.IMSI)
-				err := d.updateRrc(ctx, route.IMSI)
-				if err != nil {
-					log.Error(err)
-				}
+				d.processRoute(ctx, route)
 			}
 		}
+	}
+}
+
+func (d *driver) processRoute(ctx context.Context, route *model.Route) {
+	d.lockUE(route.IMSI)
+	defer d.unlockUE(route.IMSI)
+	if route.NextPoint == 0 && !route.Reverse {
+		d.initializeUEPosition(ctx, route)
+	}
+	d.updateUEPosition(ctx, route)
+	d.updateUESignalStrength(ctx, route.IMSI)
+	d.reportMeasurement(ctx, route.IMSI)
+	err := d.updateRrc(ctx, route.IMSI)
+	if err != nil {
+		log.Error(err)
 	}
 }
 
@@ -229,7 +258,113 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 			ID:   types.GnbID(tCellcgi),
 			NCGI: types.NCGI(tCellcgi),
 		}
-		DoHandover(ctx, types.IMSI(imsi), tCell, d.ueStore, d.cellStore)
+		d.Handover(ctx, types.IMSI(imsi), tCell)
 	}
 	log.Info("HO decision process stopped")
+}
+
+// Handover handovers ue to target cell
+func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
+	d.lockUE(imsi)
+	defer d.unlockUE(imsi)
+	err := d.ueStore.UpdateCell(ctx, imsi, tCell)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", imsi)
+	}
+
+	// after changing serving cell, calculate channel quality/signal strength again
+	d.updateUESignalStrength(ctx, imsi)
+
+	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
+}
+
+// UpdateUESignalStrength updates UE signal strength
+func (d *driver) updateUESignalStrength(ctx context.Context, imsi types.IMSI) {
+	ue, err := d.ueStore.Get(ctx, imsi)
+	if err != nil {
+		log.Warn("Unable to find UE %d", imsi)
+		return
+	}
+
+	// update RSRP from serving cell
+	err = d.updateUESignalStrengthServCell(ctx, ue)
+	if err != nil {
+		log.Warnf("For UE %v: %v", *ue, err)
+		return
+	}
+
+	// update RSRP from candidate serving cells
+	err = d.updateUESignalStrengthCandServCells(ctx, ue)
+	if err != nil {
+		log.Warnf("For UE %v: %v", *ue, err)
+		return
+	}
+}
+
+// UpdateUESignalStrengthCandServCells updates UE signal strength for serving and candidate cells
+func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *model.UE) error {
+	cellList, err := d.cellStore.List(ctx)
+	if err != nil {
+		return fmt.Errorf("Unable to get all cells")
+	}
+	var csCellList []*model.UECell
+	for _, cell := range cellList {
+		rsrp := StrengthAtLocation(ue.Location, *cell)
+		if math.IsNaN(rsrp) {
+			continue
+		}
+		if ue.Cell.NCGI == cell.NCGI {
+			continue
+		}
+		ueCell := &model.UECell{
+			ID:       types.GnbID(cell.NCGI),
+			NCGI:     cell.NCGI,
+			Strength: rsrp,
+		}
+		csCellList = d.sortUECells(append(csCellList, ueCell), 3) // hardcoded: to be parameterized for the future
+	}
+	err = d.ueStore.UpdateCells(ctx, ue.IMSI, csCellList)
+	if err != nil {
+		log.Warn("Unable to update UE %d cells info", ue.IMSI)
+	}
+
+	return nil
+}
+
+// UpdateUESignalStrengthServCell  updates UE signal strength for serving cell
+func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.UE) error {
+	sCell, err := d.cellStore.Get(ctx, ue.Cell.NCGI)
+	if err != nil {
+		return fmt.Errorf("Unable to find serving cell %d", ue.Cell.NCGI)
+	}
+
+	strength := StrengthAtLocation(ue.Location, *sCell)
+
+	newUECell := &model.UECell{
+		ID:       ue.Cell.ID,
+		NCGI:     ue.Cell.NCGI,
+		Strength: strength,
+	}
+
+	err = d.ueStore.UpdateCell(ctx, ue.IMSI, newUECell)
+	if err != nil {
+		log.Warn("Unable to update UE %d cell info", ue.IMSI)
+	}
+	return nil
+}
+
+// SortUECells sorts ue cells
+func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.UECell {
+	// bubble sort
+	for i := 0; i < len(ueCells)-1; i++ {
+		for j := 0; j < len(ueCells)-i-1; j++ {
+			if ueCells[j].Strength < ueCells[j+1].Strength {
+				ueCells[j], ueCells[j+1] = ueCells[j+1], ueCells[j]
+			}
+		}
+	}
+	if len(ueCells) >= numAdjCells {
+		return ueCells[0:numAdjCells]
+	}
+	return ueCells
 }
