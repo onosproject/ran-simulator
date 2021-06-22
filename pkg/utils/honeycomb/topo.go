@@ -47,7 +47,7 @@ func WriteControllerYaml(model model.Model, location string) error {
 
 func printNode(w *bufio.Writer, node model.Node) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d\"\n", node.GnbID))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x\"\n", node.GnbID))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: e2-node\n")
 	_, _ = w.WriteString("  aspects:\n")
@@ -58,7 +58,7 @@ func printNode(w *bufio.Writer, node model.Node) {
 
 func printCell(w *bufio.Writer, cell model.Cell) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d\"\n", cell.NCGI))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x\"\n", types.GetNCI(cell.NCGI)))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: e2-cell\n")
 	_, _ = w.WriteString("  aspects:\n")
@@ -78,20 +78,20 @@ func printCell(w *bufio.Writer, cell model.Cell) {
 
 func printNodeCellRelation(w *bufio.Writer, node model.Node, ncgi types.NCGI) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d-%d\"\n", node.GnbID, ncgi))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-%x\"\n", node.GnbID, types.GetNCI(ncgi)))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: e2-node-cell\n")
-	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%d\"\n", node.GnbID))
-	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%d\"\n", ncgi))
+	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%x\"\n", node.GnbID))
+	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%x\"\n", types.GetNCI(ncgi)))
 	_, _ = w.WriteString("---\n")
 }
 
 func printCellNeighbor(w *bufio.Writer, cell model.Cell, neighbor types.NCGI) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%d-%d\"\n", cell.NCGI, neighbor))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-%x\"\n", types.GetNCI(cell.NCGI), types.GetNCI(neighbor)))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: e2-cell-neighbor\n")
-	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%d\"\n", cell.NCGI))
-	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%d\"\n", neighbor))
+	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%x\"\n", types.GetNCI(cell.NCGI)))
+	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%x\"\n", types.GetNCI(neighbor)))
 	_, _ = w.WriteString("---\n")
 }

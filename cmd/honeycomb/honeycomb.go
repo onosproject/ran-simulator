@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
@@ -55,7 +56,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().StringSlice("controller-addresses", []string{"onos-e2t"}, "List of E2T controller addresses or service names")
 	cmd.Flags().String("plmnid", "315010", "PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN")
 	cmd.Flags().Uint("ue-count", 0, "User Equipment count")
-	cmd.Flags().Uint32P("enbidstart", "e", 5152, "GnbID start")
+	cmd.Flags().String("gnbid-start", "5152", "GnbID start in hex")
 	cmd.Flags().Float32P("pitch", "i", 0.02, "pitch between cells in degrees")
 	cmd.Flags().Bool("single-node", false, "generate a single node for all cells")
 	cmd.Flags().String("controller-yaml", "", "if specified, location of yaml file for controller")
@@ -74,7 +75,7 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	longitude, _ := cmd.Flags().GetFloat64("longitude")
 	plmnid, _ := cmd.Flags().GetString("plmnid")
 	ueCount, _ := cmd.Flags().GetUint("ue-count")
-	enbidStart, _ := cmd.Flags().GetUint32("enbidstart")
+	gnbidStartS, _ := cmd.Flags().GetString("gnbid-start")
 	pitch, _ := cmd.Flags().GetFloat32("pitch")
 	maxDistance, _ := cmd.Flags().GetFloat64("max-neighbor-distance")
 	maxNeighbors, _ := cmd.Flags().GetInt("max-neighbors")
@@ -89,12 +90,18 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	earfcnStart, _ := cmd.Flags().GetUint32("earfcn-start")
 	cellTypes, _ := cmd.Flags().GetStringSlice("cell-types")
 
+	gnbidStart, err := strconv.ParseUint(gnbidStartS, 16, 32)
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("Creating honeycomb array of %d towers with %d cells each.\n", numTowers, sectorsPerTower)
 
 	mapCenter := model.Coordinate{Lat: latitude, Lng: longitude}
 
 	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower,
-		types.PlmnIDFromString(plmnid), enbidStart, pitch, maxDistance, maxNeighbors, controllerAddresses, serviceModels, singleNode, minPci, maxPci, maxCollisions, earfcnStart, cellTypes)
+		types.PlmnIDFromString(plmnid), uint32(gnbidStart), pitch, maxDistance, maxNeighbors,
+		controllerAddresses, serviceModels, singleNode, minPci, maxPci, maxCollisions, earfcnStart, cellTypes)
 	if err != nil {
 		return err
 	}
