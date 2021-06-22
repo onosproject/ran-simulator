@@ -125,6 +125,10 @@ func (d *driver) GetRrcCtrl() RrcCtrl {
 	return d.rrcCtrl
 }
 
+func (d *driver) SetHoLogic(hoLogic string) {
+	d.hoLogic = hoLogic
+}
+
 func (d *driver) drive(ctx context.Context) {
 	for {
 		select {
@@ -140,7 +144,10 @@ func (d *driver) drive(ctx context.Context) {
 				d.updateUEPosition(ctx, route)
 				UpdateUESignalStrength(ctx, route.IMSI, d.ueStore, d.cellStore)
 				d.reportMeasurement(ctx, route.IMSI)
-				d.updateRrc(ctx, route.IMSI)
+				err := d.updateRrc(ctx, route.IMSI)
+				if err != nil {
+					log.Error(err)
+				}
 			}
 		}
 	}
