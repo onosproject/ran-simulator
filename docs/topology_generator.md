@@ -15,7 +15,7 @@ Flags:
       --controller-addresses strings   List of E2T controller addresses or service names (default [onos-e2t])
       --controller-yaml string         if specified, location of yaml file for controller
       --earfcn-start uint32            start point for EARFCN generation (default 42)
-  -e, --enbidstart uint32              GnbID start (default 5152)
+      --gnbid-start string             GnbID start in hex (default "5152")
   -h, --help                           help for topo
   -a, --latitude float                 Map centre latitude in degrees (default 52.52)
   -g, --longitude float                Map centre longitude in degrees (default 13.405)
@@ -27,9 +27,10 @@ Flags:
   -i, --pitch float32                  pitch between cells in degrees (default 0.02)
       --plmnid string                  PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN (default "315010")
   -s, --sectors-per-tower uint         sectors per tower (default 3)
-      --service-models strings         List of service models supported by the nodes (default [kpm/1,ni/2,rc/3,kpm2/4])
+      --service-models strings         List of service models supported by the nodes (default [kpm/1,ni/2,rc/3,kpm2/4,mho/5])
       --single-node                    generate a single node for all cells
   -t, --towers uint                    number of towers
+      --ue-count uint                  User Equipment count
 ```
 
 Most options have reasonable defaults and only the `--towers` is mandatory.
