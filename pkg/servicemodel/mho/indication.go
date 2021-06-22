@@ -26,6 +26,10 @@ func (m *Mho) sendRicIndication() error {
 	for _, ncgi := range node.Cells {
 		log.Debugf("Send MHO indications for cell ncgi:%d", ncgi)
 		for _, ue := range m.ServiceModel.UEs.ListUEs(m.context, ncgi) {
+			// Ignore idle UEs
+			if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_IDLE {
+				continue
+			}
 			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
 			err := m.sendRicIndicationFormat1(ncgi, ue)
 			if err != nil {
