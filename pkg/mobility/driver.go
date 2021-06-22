@@ -47,11 +47,6 @@ type Driver interface {
 	// Handover
 	Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell)
 
-	// LockUE
-	LockUE(imsi types.IMSI)
-
-	// UnlockUE
-	UnlockUE(imsi types.IMSI)
 }
 
 type driver struct {
