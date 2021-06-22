@@ -312,7 +312,7 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 		NCGI: tCellNcgi,
 	}
 
-	mobility.DoHandover(ctx, types.IMSI(imsi), tCell, m.ServiceModel.UEs, m.ServiceModel.CellStore)
+	m.mobilityDriver.Handover(ctx, types.IMSI(imsi), tCell)
 
 	return nil, nil, nil
 }
