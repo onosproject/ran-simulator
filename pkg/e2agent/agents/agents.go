@@ -37,7 +37,6 @@ type E2Agents struct {
 	metricStore         metrics.Store
 	model               *model.Model
 	measChan            chan device.UE
-	rrcUpdateChan       chan model.UE
 	mobilityDriver      mobility.Driver
 }
 
@@ -128,7 +127,7 @@ func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 		cellStore:           cellStore,
 		metricStore:         metricStore,
 		measChan:            measChan,
-		mobilityDriver: mobilityDriver,
+		mobilityDriver:      mobilityDriver,
 	}
 
 	for _, node := range m.Nodes {

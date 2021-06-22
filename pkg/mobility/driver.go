@@ -96,7 +96,7 @@ func (d *driver) Start(ctx context.Context) {
 		d.initializeUEPosition(ctx, route)
 	}
 
-	d.ueLock =     make(map[types.IMSI]*sync.Mutex)
+	d.ueLock = make(map[types.IMSI]*sync.Mutex)
 
 	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)

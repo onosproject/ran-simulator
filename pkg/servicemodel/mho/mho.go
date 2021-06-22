@@ -37,11 +37,11 @@ var log = logging.GetLogger("sm", "mho")
 
 // Mho represents the MHO service model
 type Mho struct {
-	ServiceModel  *registry.ServiceModel
-	subscription  *subutils.Subscription
-	context       context.Context
-	rrcUpdateChan chan model.UE
-	mobilityDriver       mobility.Driver
+	ServiceModel   *registry.ServiceModel
+	subscription   *subutils.Subscription
+	context        context.Context
+	rrcUpdateChan  chan model.UE
+	mobilityDriver mobility.Driver
 }
 
 // NewServiceModel creates a new service model
