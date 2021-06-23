@@ -12,15 +12,16 @@ import (
 
 // Model simulation model
 type Model struct {
-	MapLayout     MapLayout               `mapstructure:"layout" yaml:"layout"`
-	Nodes         map[string]Node         `mapstructure:"nodes" yaml:"nodes"`
-	Cells         map[string]Cell         `mapstructure:"cells" yaml:"cells"`
-	Controllers   map[string]Controller   `mapstructure:"controllers" yaml:"controllers"`
-	ServiceModels map[string]ServiceModel `mapstructure:"servicemodels" yaml:"servicemodels"`
-	UECount       uint                    `mapstructure:"ueCount" yaml:"ueCount"`
-	Plmn          string                  `mapstructure:"plmnID" yaml:"plmnID"`
-	PlmnID        types.PlmnID            `mapstructure:"plmnNumber" yaml:"plmnNumber"` // overridden and derived post-load from "Plmn" field
-	APIKey        string                  `mapstructure:"apiKey" yaml:"apiKey"`         // Google Maps API key (optional)
+	MapLayout      MapLayout               `mapstructure:"layout" yaml:"layout"`
+	Nodes          map[string]Node         `mapstructure:"nodes" yaml:"nodes"`
+	Cells          map[string]Cell         `mapstructure:"cells" yaml:"cells"`
+	Controllers    map[string]Controller   `mapstructure:"controllers" yaml:"controllers"`
+	ServiceModels  map[string]ServiceModel `mapstructure:"servicemodels" yaml:"servicemodels"`
+	UECount        uint                    `mapstructure:"ueCount" yaml:"ueCount"`
+	UECountPerCell uint                    `mapstructure:"ueCountPerCell" yaml:"ueCountPerCell"`
+	Plmn           string                  `mapstructure:"plmnID" yaml:"plmnID"`
+	PlmnID         types.PlmnID            `mapstructure:"plmnNumber" yaml:"plmnNumber"` // overridden and derived post-load from "Plmn" field
+	APIKey         string                  `mapstructure:"apiKey" yaml:"apiKey"`         // Google Maps API key (optional)
 }
 
 // Coordinate represents a geographical location
