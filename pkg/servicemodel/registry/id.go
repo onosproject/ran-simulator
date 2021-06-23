@@ -19,8 +19,8 @@ const (
 	Kpm
 	// Ni
 	Ni
-	// Rc
-	Rc
+	// Rcpre2
+	Rcpre2
 	// Kpm2
 	Kpm2
 	// MHO

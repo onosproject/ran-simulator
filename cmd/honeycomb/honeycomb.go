@@ -52,7 +52,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().Float64P("longitude", "g", 13.4050, "Map centre longitude in degrees")
 	cmd.Flags().Float64P("max-neighbor-distance", "d", 3600.0, "Maximum 'distance' between neighbor cells; see docs")
 	cmd.Flags().Int("max-neighbors", 5, "Maximum number of neighbors a cell will have; -1 no limit")
-	cmd.Flags().StringSlice("service-models", []string{"kpm/1", "rc/3", "kpm2/4", "mho/5"}, "List of service models supported by the nodes")
+	cmd.Flags().StringSlice("service-models", []string{"kpm/1", "rcpre2/3", "kpm2/4", "mho/5"}, "List of service models supported by the nodes")
 	cmd.Flags().StringSlice("controller-addresses", []string{"onos-e2t"}, "List of E2T controller addresses or service names")
 	cmd.Flags().String("plmnid", "315010", "PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN")
 	cmd.Flags().Uint("ue-count", 0, "User Equipment count")
