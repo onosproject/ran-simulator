@@ -158,7 +158,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
 	modelName := e2smtypes.ShortName(modelFullName)
 	rcSm := registry.ServiceModel{
-		RanFunctionID:       registry.Rc,
+		RanFunctionID:       registry.Rcpre2,
 		ModelName:           modelName,
 		Revision:            1,
 		OID:                 modelOID,

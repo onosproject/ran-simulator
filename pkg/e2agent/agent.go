@@ -98,7 +98,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 				log.Error(err)
 				return nil, err
 			}
-		case registry.Rc:
+		case registry.Rcpre2:
 			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry,
 				subStore, nodeStore, ueStore, cellStore, metricStore)
 			if err != nil {
@@ -168,7 +168,7 @@ func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
 		response, failure, err = client.RICControl(ctx, request)
-	case registry.Rc:
+	case registry.Rcpre2:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICControl(ctx, request)
 	case registry.Mho:
@@ -239,7 +239,7 @@ func (a *e2Agent) RICSubscription(ctx context.Context, request *e2appducontents.
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
-	case registry.Rc:
+	case registry.Rcpre2:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
 	case registry.Kpm2:
@@ -318,7 +318,7 @@ func (a *e2Agent) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	case registry.Kpm:
 		client := sm.Client.(*kpm.Client)
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
-	case registry.Rc:
+	case registry.Rcpre2:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	case registry.Kpm2:
