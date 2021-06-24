@@ -58,6 +58,8 @@ func cellToAPI(cell *model.Cell) *types.Cell {
 		Neighbors:         cell.Neighbors,
 		TxPowerdB:         cell.TxPowerDB,
 		MeasurementParams: measurementParams,
+		RrcIdleCount:      cell.RrcIdleCount,
+		RrcConnectedCount: cell.RrcConnectedCount,
 	}
 }
 

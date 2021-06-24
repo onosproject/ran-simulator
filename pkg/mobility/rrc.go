@@ -66,6 +66,9 @@ func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI) error {
 	log.Debugf("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
 	ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
 
+	d.cellStore.IncrementRrcIdleCount(ctx, ue.Cell.NCGI)
+	d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+
 	//Detach UE
 	return ueDetach(ctx, ue, d.ueStore, d.cellStore)
 }
@@ -77,6 +80,9 @@ func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI) error {
 	}
 	log.Debugf("RRC state change imsi:%d from IDLE to CONNECTED", imsi)
 	ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+
+	d.cellStore.IncrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+	d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
 
 	// Attach UE to nearest cell
 	return ueAttach(ctx, ue, d.ueStore, d.cellStore)
