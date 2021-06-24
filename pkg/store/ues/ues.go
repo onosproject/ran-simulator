@@ -214,8 +214,10 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 		var rrcState e2sm_mho.Rrcstatus
 		if randomBoolean() {
 			rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+			s.cellStore.IncrementRrcIdleCount(ctx, ncgi)
 		} else {
 			rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+			s.cellStore.IncrementRrcConnectedCount(ctx, ncgi)
 		}
 		ue := &model.UE{
 			IMSI:     imsi,

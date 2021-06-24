@@ -45,6 +45,18 @@ type Store interface {
 	// List list all of the cells
 	List(ctx context.Context) ([]*model.Cell, error)
 
+	// IncrementRrcIdleCount
+	IncrementRrcIdleCount(ctx context.Context, ncgi types.NCGI)
+
+	// IncrementRrcConnectedCount
+	IncrementRrcConnectedCount(ctx context.Context, ncgi types.NCGI)
+
+	// DecrementRrcIdleCount decrements
+	DecrementRrcIdleCount(ctx context.Context, ncgi types.NCGI)
+
+	// IncrementRrcConnectedCount increments
+	DecrementRrcConnectedCount(ctx context.Context, ncgi types.NCGI)
+
 	// GetRandomCell retrieves a random cell from the registry
 	GetRandomCell() (*model.Cell, error)
 
@@ -231,4 +243,36 @@ func (s *store) GetRandomCell() (*model.Cell, error) {
 	keys := reflect.ValueOf(s.cells).MapKeys()
 	ncgi := types.NCGI(keys[rand.Intn(len(keys))].Uint())
 	return s.cells[ncgi], nil
+}
+
+// IncrementRrcIdleCount
+func (s *store) IncrementRrcIdleCount(ctx context.Context, ncgi types.NCGI) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	s.cells[ncgi].RrcIdleCount++
+}
+
+// IncrementRrcConnectedCount
+func (s *store) IncrementRrcConnectedCount(ctx context.Context, ncgi types.NCGI) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	s.cells[ncgi].RrcConnectedCount++
+}
+
+// DecrementRrcIdleCount
+func (s *store) DecrementRrcIdleCount(ctx context.Context, ncgi types.NCGI) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if s.cells[ncgi].RrcIdleCount != 0 {
+		s.cells[ncgi].RrcIdleCount--
+	}
+}
+
+// DecrementRrcConnectedCount
+func (s *store) DecrementRrcConnectedCount(ctx context.Context, ncgi types.NCGI) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if s.cells[ncgi].RrcConnectedCount != 0 {
+		s.cells[ncgi].RrcConnectedCount--
+	}
 }

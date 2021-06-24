@@ -933,6 +933,7 @@ servicemodels:
     description: rc service model
     version: 1.0.0
 ueCount: 0
+ueCountPerCell: 15
 plmnID: "314628"
 plmnNumber: 1279014
 apiKey: ""

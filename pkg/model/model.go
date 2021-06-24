@@ -94,6 +94,8 @@ type Cell struct {
 	PCI               uint32            `mapstructure:"pci"`
 	Earfcn            uint32            `mapstructure:"earfcn"`
 	CellType          types.CellType    `mapstructure:"cellType"`
+	RrcIdleCount      uint32
+	RrcConnectedCount uint32
 }
 
 // UEType represents type of user-equipment

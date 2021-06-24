@@ -267,7 +267,22 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
 	d.lockUE(imsi)
 	defer d.unlockUE(imsi)
-	err := d.ueStore.UpdateCell(ctx, imsi, tCell)
+
+	// Update RRC state on handover
+	ue, err := d.ueStore.Get(ctx, imsi)
+	if err != nil {
+		log.Warn("Unable to find UE %d", imsi)
+		return
+	}
+	if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_IDLE {
+		d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
+		d.cellStore.IncrementRrcIdleCount(ctx, tCell.NCGI)
+	} else if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED {
+		d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+		d.cellStore.IncrementRrcConnectedCount(ctx, tCell.NCGI)
+	}
+
+	err = d.ueStore.UpdateCell(ctx, imsi, tCell)
 	if err != nil {
 		log.Warn("Unable to update UE %d cell info", imsi)
 	}
