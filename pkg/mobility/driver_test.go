@@ -46,7 +46,7 @@ func TestDriver(t *testing.T) {
 	err = rs.Add(ctx, route)
 	assert.NoError(t, err)
 
-	driver := NewMobilityDriver(cs, rs, us, "", "local")
+	driver := NewMobilityDriver(cs, rs, us, "", "local", 15)
 	tickUnit = time.Millisecond // For testing
 	driver.Start(ctx)
 
@@ -82,7 +82,7 @@ func TestRouteGeneration(t *testing.T) {
 	us.SetUECount(ctx, 100)
 	assert.Equal(t, 100, us.Len(ctx))
 
-	driver := NewMobilityDriver(cs, rs, us, "", "local")
+	driver := NewMobilityDriver(cs, rs, us, "", "local", 15)
 	driver.GenerateRoutes(ctx, 30000, 160000, 20000)
 	assert.Equal(t, 100, rs.Len(ctx))
 

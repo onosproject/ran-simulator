@@ -16,76 +16,155 @@ import (
 )
 
 // RrcStateChangeProbability determines the rate of change of RRC states in ransim
-var RrcStateChangeProbability float64 = 0.02
+var RrcStateChangeProbability float64 = 0.2
+
+// RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
+var RrcStateChangeVariance float64 = 0.9
+
+// UeCountPerCellDefault is the default number of RRC Connected UEs per cell
+var UeCountPerCellDefault uint = 15
 
 // RrcCtrl is the RRC controller
 type RrcCtrl struct {
-	RrcUpdateChan chan model.UE
+	RrcUpdateChan  chan model.UE
+	ueCountPerCell uint
 }
 
 // NewRrcCtrl returns a new RRC Controller
-func (d *driver) NewRrcCtrl() *RrcCtrl {
-	return &RrcCtrl{}
+func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
+	if ueCountPerCell == 0 {
+		ueCountPerCell = UeCountPerCellDefault
+	}
+	return RrcCtrl{
+		RrcUpdateChan:  make(chan model.UE),
+		ueCountPerCell: ueCountPerCell,
+	}
+}
+
+func (d *driver) totalUeCount(ctx context.Context, ncgi types.NCGI) uint {
+	cell, err := d.cellStore.Get(ctx, ncgi)
+	if err != nil {
+		log.Error(err)
+		return 0
+	}
+	return uint(cell.RrcConnectedCount + cell.RrcIdleCount)
+}
+
+//func (d *driver) idleUeCount(ctx context.Context, ncgi types.NCGI) uint {
+//	cell, err := d.cellStore.Get(ctx, ncgi)
+//	if err != nil {
+//		log.Error(err)
+//		return 0
+//	}
+//	return uint(cell.RrcIdleCount)
+//}
+
+func (d *driver) connectedUeCount(ctx context.Context, ncgi types.NCGI) uint {
+	cell, err := d.cellStore.Get(ctx, ncgi)
+	if err != nil {
+		log.Error(err)
+		return 0
+	}
+	return uint(cell.RrcConnectedCount)
 }
 
 func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) error {
-	var randomBoolean = rand.Float64() < RrcStateChangeProbability
+	var err error
+	var rrcStateChanged bool
 
-	if randomBoolean {
+	if rand.Float64() < RrcStateChangeProbability {
 		ue, err := d.ueStore.Get(ctx, imsi)
 		if err != nil {
 			return err
 		}
 
 		if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_IDLE {
-			err = d.rrcConnected(ctx, imsi)
+			rrcStateChanged, err = d.rrcConnected(ctx, imsi, RrcStateChangeVariance)
 		} else if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED {
-			err = d.rrcIdle(ctx, imsi)
+			rrcStateChanged, err = d.rrcIdle(ctx, imsi, RrcStateChangeVariance)
 		} else { // Ignore e2sm_mho.Rrcstatus_RRCSTATUS_INACTIVE
 			return nil
 		}
-		if err != nil {
-			return err
-		}
 
-		if d.hoLogic != "local" {
+		if err == nil && d.hoLogic != "local" && rrcStateChanged {
 			d.rrcCtrl.RrcUpdateChan <- *ue
 		}
 
 	}
 
-	return nil
+	return err
 
 }
 
-func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI) error {
+func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool, error) {
+	var rrcStateChanged bool = false
+
 	ue, err := d.ueStore.Get(ctx, imsi)
 	if err != nil {
-		return err
+		return false, err
 	}
-	log.Debugf("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
-	ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
 
-	d.cellStore.IncrementRrcIdleCount(ctx, ue.Cell.NCGI)
-	d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+	if d.totalUeCount(ctx, ue.Cell.NCGI) > d.rrcCtrl.ueCountPerCell {
+		r := rand.Float64()
+		if d.connectedUeCount(ctx, ue.Cell.NCGI) > d.rrcCtrl.ueCountPerCell {
+			if r < p {
+				rrcStateChanged = true
+			}
+		} else {
+			if r < 1-p {
+				rrcStateChanged = true
+			}
+		}
+	} else {
+		rrcStateChanged = true
+	}
 
-	//Detach UE
-	return ueDetach(ctx, ue, d.ueStore, d.cellStore)
+	if rrcStateChanged {
+		if err = ueDetach(ctx, ue, d.ueStore, d.cellStore); err == nil {
+			log.Debugf("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
+			ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+			d.cellStore.IncrementRrcIdleCount(ctx, ue.Cell.NCGI)
+			d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+		}
+	}
+
+	return rrcStateChanged, err
+
 }
 
-func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI) error {
+func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI, p float64) (bool, error) {
+	var rrcStateChanged bool = false
+
 	ue, err := d.ueStore.Get(ctx, imsi)
 	if err != nil {
-		return err
+		return false, err
 	}
-	log.Debugf("RRC state change imsi:%d from IDLE to CONNECTED", imsi)
-	ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
 
-	d.cellStore.IncrementRrcConnectedCount(ctx, ue.Cell.NCGI)
-	d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
+	if d.totalUeCount(ctx, ue.Cell.NCGI) > d.rrcCtrl.ueCountPerCell {
+		r := rand.Float64()
+		if d.connectedUeCount(ctx, ue.Cell.NCGI) > d.rrcCtrl.ueCountPerCell {
+			if r < 1-p {
+				rrcStateChanged = true
+			}
+		} else {
+			if r < p {
+				rrcStateChanged = true
+			}
+		}
+	} else {
+		rrcStateChanged = true
+	}
 
-	// Attach UE to nearest cell
-	return ueAttach(ctx, ue, d.ueStore, d.cellStore)
+	if rrcStateChanged {
+		if err = ueAttach(ctx, ue, d.ueStore, d.cellStore); err == nil {
+			ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+			d.cellStore.IncrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+			d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
+		}
+	}
+
+	return rrcStateChanged, err
+
 }
 
 func ueAttach(ctx context.Context, ue *model.UE, ueStore ues.Store, cellStore cells.Store) error {
@@ -111,12 +190,8 @@ func ueAttach(ctx context.Context, ue *model.UE, ueStore ues.Store, cellStore ce
 		Strength: maxRsrp,
 	}
 
-	err = ueStore.UpdateCell(ctx, ue.IMSI, newUECell)
-	if err != nil {
-		return err
-	}
+	return ueStore.UpdateCell(ctx, ue.IMSI, newUECell)
 
-	return nil
 }
 
 func ueDetach(ctx context.Context, ue *model.UE, ueStore ues.Store, cellStore cells.Store) error {
