@@ -60,6 +60,7 @@ func cellToAPI(cell *model.Cell) *types.Cell {
 		MeasurementParams: measurementParams,
 		RrcIdleCount:      cell.RrcIdleCount,
 		RrcConnectedCount: cell.RrcConnectedCount,
+		Pci:               cell.PCI,
 	}
 }
 
@@ -88,6 +89,7 @@ func cellToModel(cell *types.Cell) *model.Cell {
 				ReportOnLeave: cell.MeasurementParams.EventA3Params.ReportOnLeave,
 			},
 		},
+		PCI: cell.Pci,
 	}
 }
 
