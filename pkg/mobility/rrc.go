@@ -17,13 +17,16 @@ import (
 
 // RrcStateChangeProbability determines the rate of change of RRC states in ransim
 var RrcStateChangeProbability float64 = 0.2
+
+// RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
 var RrcStateChangeVariance float64 = 0.9
+
 // UeCountPerCellDefault is the default number of RRC Connected UEs per cell
 var UeCountPerCellDefault uint = 15
 
 // RrcCtrl is the RRC controller
 type RrcCtrl struct {
-	RrcUpdateChan chan model.UE
+	RrcUpdateChan  chan model.UE
 	ueCountPerCell uint
 }
 
@@ -33,7 +36,7 @@ func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 		ueCountPerCell = UeCountPerCellDefault
 	}
 	return RrcCtrl{
-		RrcUpdateChan: make(chan model.UE),
+		RrcUpdateChan:  make(chan model.UE),
 		ueCountPerCell: ueCountPerCell,
 	}
 }
@@ -47,14 +50,14 @@ func (d *driver) totalUeCount(ctx context.Context, ncgi types.NCGI) uint {
 	return uint(cell.RrcConnectedCount + cell.RrcIdleCount)
 }
 
-func (d *driver) idleUeCount(ctx context.Context, ncgi types.NCGI) uint {
-	cell, err := d.cellStore.Get(ctx, ncgi)
-	if err != nil {
-		log.Error(err)
-		return 0
-	}
-	return uint(cell.RrcIdleCount)
-}
+//func (d *driver) idleUeCount(ctx context.Context, ncgi types.NCGI) uint {
+//	cell, err := d.cellStore.Get(ctx, ncgi)
+//	if err != nil {
+//		log.Error(err)
+//		return 0
+//	}
+//	return uint(cell.RrcIdleCount)
+//}
 
 func (d *driver) connectedUeCount(ctx context.Context, ncgi types.NCGI) uint {
 	cell, err := d.cellStore.Get(ctx, ncgi)
@@ -67,7 +70,7 @@ func (d *driver) connectedUeCount(ctx context.Context, ncgi types.NCGI) uint {
 
 func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) error {
 	var err error
-	var rrcStateChanged bool = false
+	var rrcStateChanged bool
 
 	if rand.Float64() < RrcStateChangeProbability {
 		ue, err := d.ueStore.Get(ctx, imsi)
