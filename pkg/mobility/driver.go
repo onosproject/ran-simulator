@@ -65,12 +65,13 @@ type driver struct {
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
-func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string, hoLogic string) Driver {
+func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string, hoLogic string, ueCountPerCell uint) Driver {
 	return &driver{
 		cellStore:  cellStore,
 		routeStore: routeStore,
 		ueStore:    ueStore,
 		hoLogic:    hoLogic,
+		rrcCtrl:    NewRrcCtrl(ueCountPerCell),
 	}
 }
 
@@ -91,6 +92,9 @@ func (d *driver) Start(ctx context.Context) {
 	}
 
 	d.ueLock = make(map[types.IMSI]*sync.Mutex)
+	for _, ue := range d.ueStore.ListAllUEs(ctx) {
+		d.ueLock[ue.IMSI] = &sync.Mutex{}
+	}
 
 	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)
@@ -98,8 +102,6 @@ func (d *driver) Start(ctx context.Context) {
 	// Add measController
 	d.measCtrl = measurement.NewMeasController(measType, d.cellStore, d.ueStore)
 	d.measCtrl.Start(ctx)
-
-	d.rrcCtrl.RrcUpdateChan = make(chan model.UE)
 
 	// Add hoController
 	if d.hoLogic == "local" {
@@ -138,9 +140,6 @@ func (d *driver) SetHoLogic(hoLogic string) {
 }
 
 func (d *driver) lockUE(imsi types.IMSI) {
-	if _, ok := d.ueLock[imsi]; !ok {
-		d.ueLock[imsi] = &sync.Mutex{}
-	}
 	d.ueLock[imsi].Lock()
 }
 
@@ -274,13 +273,16 @@ func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UEC
 		log.Warn("Unable to find UE %d", imsi)
 		return
 	}
-	if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_IDLE {
-		d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
-		d.cellStore.IncrementRrcIdleCount(ctx, tCell.NCGI)
-	} else if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED {
-		d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
-		d.cellStore.IncrementRrcConnectedCount(ctx, tCell.NCGI)
+
+	if ue.RrcState != e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED {
+		//d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
+		//d.cellStore.IncrementRrcIdleCount(ctx, tCell.NCGI)
+		log.Warnf("HO skipped for not connected UE %d", imsi)
+		return
 	}
+
+	d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+	d.cellStore.IncrementRrcConnectedCount(ctx, tCell.NCGI)
 
 	err = d.ueStore.UpdateCell(ctx, imsi, tCell)
 	if err != nil {
