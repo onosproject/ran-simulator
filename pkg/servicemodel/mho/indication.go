@@ -129,7 +129,7 @@ func (m *Mho) createIndicationHeaderBytes(ncgi ransimtypes.NCGI) ([]byte, error)
 	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
 	header := indHdr.NewIndicationHeader(
 		indHdr.WithPlmnID(*plmnID),
-		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetECI(uint64(cell.NCGI)))))
+		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetNCI(cell.NCGI))))
 
 	mhoModelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
 	if err != nil {
@@ -165,7 +165,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 					},
 					NRcellIdentity: &e2sm_mho.NrcellIdentity{
 						Value: &e2sm_mho.BitString{
-							Value: uint64(ransimtypes.GetECI(uint64(ue.Cell.NCGI))),
+							Value: uint64(ransimtypes.GetNCI(ue.Cell.NCGI)),
 							Len:   36,
 						},
 					},
@@ -187,7 +187,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 						},
 						NRcellIdentity: &e2sm_mho.NrcellIdentity{
 							Value: &e2sm_mho.BitString{
-								Value: uint64(ransimtypes.GetECI(uint64(cell.NCGI))),
+								Value: uint64(ransimtypes.GetNCI(cell.NCGI)),
 								Len:   36,
 							},
 						},

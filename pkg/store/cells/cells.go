@@ -54,7 +54,7 @@ type Store interface {
 	// DecrementRrcIdleCount decrements
 	DecrementRrcIdleCount(ctx context.Context, ncgi types.NCGI)
 
-	// IncrementRrcConnectedCount increments
+	// DecrementRrcConnectedCount increments
 	DecrementRrcConnectedCount(ctx context.Context, ncgi types.NCGI)
 
 	// GetRandomCell retrieves a random cell from the registry
