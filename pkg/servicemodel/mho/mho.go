@@ -206,7 +206,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 	log.Debugf("MHO subscription event trigger type: %v", eventTriggerType)
 	switch eventTriggerType {
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_PERIODIC:
-		log.Debug("Received periodic report subscription request")
+		log.Infof("Received periodic report subscription request")
 		interval, err := m.getReportPeriod(request)
 		if err != nil {
 			log.Error(err)
@@ -214,10 +214,10 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		}
 		go m.reportPeriodicIndication(interval)
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT:
-		log.Debug("Received MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT subscription request")
+		log.Infof("Received MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT subscription request")
 		go m.processEventA3MeasReport()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
-		log.Debug("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
+		log.Infof("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
 		go m.processRrcUpdate()
 	default:
 		log.Errorf("MHO subscription failed, invalid event trigger type: %v", eventTriggerType)

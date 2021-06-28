@@ -292,7 +292,7 @@ func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UEC
 	// after changing serving cell, calculate channel quality/signal strength again
 	d.updateUESignalStrength(ctx, imsi)
 
-	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
+	log.Infof("HO is done successfully: %v to %v", imsi, tCell)
 }
 
 // UpdateUESignalStrength updates UE signal strength
