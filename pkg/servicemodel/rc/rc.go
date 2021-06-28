@@ -301,9 +301,6 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	setPCI(parameterName, parameterValue, cell)
 	sm.setHandoverOcn(ctx, parameterName, parameterValue, cell)
 
-	// wkim
-	request.GetProtocolIes()
-
 	err = sm.ServiceModel.CellStore.Update(ctx, cell)
 	if err != nil {
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(

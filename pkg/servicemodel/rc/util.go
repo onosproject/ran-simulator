@@ -282,18 +282,22 @@ func (sm *Client) setHandoverOcn(ctx context.Context, parameterName string, para
 		case uint64:
 			ocnRc = meastype.QOffsetRange(parameterValue)
 		}
+
+		for _, ncgi := range sm.ServiceModel.Node.Cells {
+			if ncgi == nCellNCGI {
+				continue
+			}
+			sCell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+			if err != nil {
+				log.Errorf("NCGI (%v) is not in cell store")
+			}
+			if _, ok := sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI]; !ok {
+				log.Errorf("the cell NCGI (%v) is not a neighbor of the cell NCGI (%v)", nCellNCGI, ncgi)
+				continue
+			}
+			log.Debugf("Cell (%v) Ocn in the cell (%v) is set from %v to %v", cell.NCGI, ncgi, sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI], ocnRc.GetValue().(int))
+			sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI] = int32(ocnRc.GetValue().(int))
+		}
 	}
 
-	for _, ncgi := range sm.ServiceModel.Node.Cells {
-		sCell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
-		if err != nil {
-			log.Errorf("NCGI (%v) is not in cell store")
-		}
-		if _, ok := sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI]; !ok {
-			log.Errorf("the cell NCGI (%v) is not a neighbor of the cell NCGI (%v)", nCellNCGI, ncgi)
-			continue
-		}
-		log.Debugf("Cell (%v) Ocn in the cell (%v) is set from %v to %v", cell.NCGI, ncgi, sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI], ocnRc.GetValue().(int))
-		sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI] = int32(ocnRc.GetValue().(int))
-	}
 }
