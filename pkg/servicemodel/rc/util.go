@@ -6,6 +6,7 @@ package rc
 
 import (
 	"context"
+	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
@@ -264,4 +265,39 @@ func setPCI(parameterName string, parameterValue interface{}, cell *model.Cell) 
 			cell.PCI = uint32(parameterValue)
 		}
 	}
+}
+
+func (sm *Client) setHandoverOcn(ctx context.Context, parameterName string, parameterValue interface{}, cell *model.Cell) {
+	var ocnRc meastype.QOffsetRange
+	nCellNCGI := cell.NCGI
+
+	if parameterName == "ocn_rc" {
+		switch parameterValue := parameterValue.(type) {
+		case int32:
+			ocnRc = meastype.QOffsetRange(parameterValue)
+		case uint32:
+			ocnRc = meastype.QOffsetRange(parameterValue)
+		case int64:
+			ocnRc = meastype.QOffsetRange(parameterValue)
+		case uint64:
+			ocnRc = meastype.QOffsetRange(parameterValue)
+		}
+
+		for _, ncgi := range sm.ServiceModel.Node.Cells {
+			if ncgi == nCellNCGI {
+				continue
+			}
+			sCell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+			if err != nil {
+				log.Errorf("NCGI (%v) is not in cell store")
+			}
+			if _, ok := sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI]; !ok {
+				log.Errorf("the cell NCGI (%v) is not a neighbor of the cell NCGI (%v)", nCellNCGI, ncgi)
+				continue
+			}
+			log.Debugf("Cell (%v) Ocn in the cell (%v) is set from %v to %v", cell.NCGI, ncgi, sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI], ocnRc.GetValue().(int))
+			sCell.MeasurementParams.NCellIndividualOffsets[nCellNCGI] = int32(ocnRc.GetValue().(int))
+		}
+	}
+
 }

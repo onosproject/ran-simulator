@@ -46,6 +46,14 @@ func LoadConfig(model *Model, configname string) error {
 	// Convert the MCC-MNC format into numeric PLMNID
 	model.PlmnID = types.PlmnIDFromString(model.Plmn)
 
+	// initialize neighbor's Ocn value - for mlb/handover
+	for k, v := range model.Cells {
+		v.MeasurementParams.NCellIndividualOffsets = make(map[types.NCGI]int32)
+		for _, n := range v.Neighbors {
+			v.MeasurementParams.NCellIndividualOffsets[n] = 0
+		}
+		model.Cells[k] = v
+	}
 	return err
 }
 
@@ -69,5 +77,13 @@ func LoadConfigFromBytes(model *Model, modelData []byte) error {
 	// Convert the MCC-MNC format into numeric PLMNID
 	model.PlmnID = types.PlmnIDFromString(model.Plmn)
 
+	// initialize neighbor's Ocn value - for mlb/handover
+	for k, v := range model.Cells {
+		v.MeasurementParams.NCellIndividualOffsets = make(map[types.NCGI]int32)
+		for _, n := range v.Neighbors {
+			v.MeasurementParams.NCellIndividualOffsets[n] = 0
+		}
+		model.Cells[k] = v
+	}
 	return err
 }

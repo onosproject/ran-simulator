@@ -299,6 +299,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		parameterValue = controlMessage.GetControlMessage().GetParameterVal().GetValuePrtS()
 	}
 	setPCI(parameterName, parameterValue, cell)
+	sm.setHandoverOcn(ctx, parameterName, parameterValue, cell)
 
 	err = sm.ServiceModel.CellStore.Update(ctx, cell)
 	if err != nil {
