@@ -161,6 +161,7 @@ func (d *driver) drive(ctx context.Context) {
 		case <-d.ticker.C:
 			for _, route := range d.routeStore.List(ctx) {
 				d.processRoute(ctx, route)
+
 			}
 		}
 	}
@@ -292,7 +293,10 @@ func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UEC
 	// after changing serving cell, calculate channel quality/signal strength again
 	d.updateUESignalStrength(ctx, imsi)
 
-	log.Infof("HO is done successfully: %v to %v", imsi, tCell)
+	// update the maximum number of UEs
+	d.ueStore.UpdateMaxUEsPerCell(ctx)
+
+	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
 }
 
 // UpdateUESignalStrength updates UE signal strength
