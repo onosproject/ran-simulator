@@ -109,6 +109,7 @@ func NewUERegistry(count uint, cellStore cells.Store) Store {
 	ctx := context.Background()
 	store.CreateUEs(ctx, count)
 	log.Infof("Created registry primed with %d UEs", len(store.ues))
+
 	return store
 }
 
@@ -119,7 +120,6 @@ func (s *store) SetUECount(ctx context.Context, count uint) {
 	} else if delta > 0 {
 		s.removeSomeUEs(ctx, delta)
 	}
-	s.UpdateMaxUEsPerCell(ctx)
 }
 
 func (s *store) Len(ctx context.Context) int {
@@ -198,7 +198,6 @@ func randomBoolean() bool {
 
 func (s *store) CreateUEs(ctx context.Context, count uint) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	for i := uint(0); i < count; i++ {
 		imsi := types.IMSI(rand.Int63n(maxIMSI-minIMSI) + minIMSI)
 		if _, ok := s.ues[imsi]; ok {
@@ -236,6 +235,8 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 		}
 		s.ues[ue.IMSI] = ue
 	}
+	s.mu.Unlock()
+	s.UpdateMaxUEsPerCell(ctx)
 }
 
 // Get gets a UE based on a given imsi
