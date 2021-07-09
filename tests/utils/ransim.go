@@ -35,6 +35,7 @@ func NewRansimConnection() (*grpc.ClientConn, error) {
 	return conn, nil
 }
 
+// NewRansimNodeClient returns a node model client
 func NewRansimNodeClient() (modelapi.NodeModelClient, error) {
 	conn, err := NewRansimConnection()
 	if err != nil {
@@ -43,6 +44,7 @@ func NewRansimNodeClient() (modelapi.NodeModelClient, error) {
 	return modelapi.NewNodeModelClient(conn), nil
 }
 
+// NewRansimCellClient returns a cell model client
 func NewRansimCellClient() (modelapi.CellModelClient, error) {
 	conn, err := NewRansimConnection()
 	if err != nil {

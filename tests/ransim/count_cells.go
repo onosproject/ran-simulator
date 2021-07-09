@@ -16,6 +16,7 @@ import (
 	"github.com/onosproject/ran-simulator/tests/utils"
 )
 
+// TestCountCells tests if there is the correct number of cells
 func (s *TestSuite) TestCountCells(t *testing.T) {
 	cells, err := getCells()
 	assert.NoError(t, err, "unable to connect to Ransim cell service %v", err)

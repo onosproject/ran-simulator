@@ -16,6 +16,7 @@ import (
 	"github.com/onosproject/ran-simulator/tests/utils"
 )
 
+// TestCountNodes tests if there is the correct number of nodes
 func (s *TestSuite) TestCountNodes(t *testing.T) {
 	nodes, err := getNodes()
 	assert.NoError(t, err, "unable to connect to Ransim node service %v", err)
