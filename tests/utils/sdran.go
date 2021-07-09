@@ -40,10 +40,7 @@ func CreateSdranRelease(c *input.Context) (*helm.HelmRelease, error) {
 		SetUsername(username).
 		SetPassword(password).
 		Set("global.image.registry", registry).
-		Set("import.onos-config.enabled", false).
-		Set("import.onos-topo.enabled", false).
-		Set("onos-e2t.image.tag", "latest").
-		Set("onos-e2sub.image.tag", "latest")
+		Set("import.onos-config.enabled", false)
 
 	return sdran, nil
 }
