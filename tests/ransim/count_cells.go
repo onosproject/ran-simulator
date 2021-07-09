@@ -42,5 +42,4 @@ func getCells() ([]*modelapi.ListCellsResponse, error) {
 		}
 	}
 	return connections, err
-
 }
