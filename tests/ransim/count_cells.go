@@ -17,9 +17,9 @@ import (
 )
 
 func (s *TestSuite) TestCountCells(t *testing.T) {
-	nodes, err := getCells()
+	cells, err := getCells()
 	assert.NoError(t, err, "unable to connect to Ransim cell service %v", err)
-	assert.Equal(t, 2, len(nodes))
+	assert.Equal(t, 6, len(cells))
 }
 
 func getCells() ([]*modelapi.ListCellsResponse, error) {
