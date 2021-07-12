@@ -119,7 +119,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		}
 
 		cellMeasObjItem := measobjectitem.NewCellMeasObjectItem(
-			measobjectitem.WithCellObjectID(strconv.FormatUint(uint64(cellNcgi), 10)),
+			measobjectitem.WithCellObjectID(strconv.FormatUint(uint64(cellNcgi), 16)),
 			measobjectitem.WithCellGlobalID(cellGlobalID)).
 			Build()
 
@@ -278,7 +278,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 
 	// Creating an indication message format 1
 	indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
-		kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellNCGI), 10)),
+		kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellNCGI), 16)),
 		kpm2MessageFormat1.WithGranularity(granularity),
 		kpm2MessageFormat1.WithSubscriptionID(subID),
 		kpm2MessageFormat1.WithMeasData(measData),
@@ -357,7 +357,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 	for _, actionDefinition := range actionDefinitions {
 		if actionDefinition.GetActionDefinitionFormat1() != nil {
 			cellObjectID := actionDefinition.GetActionDefinitionFormat1().GetCellObjId().Value
-			if cellObjectID == strconv.FormatUint(uint64(ncgi), 10) {
+			if cellObjectID == strconv.FormatUint(uint64(ncgi), 16) {
 				log.Debug("Sending indication message for Cell with ID:", cellObjectID)
 				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ncgi, actionDefinition, interval)
 				if err != nil {
