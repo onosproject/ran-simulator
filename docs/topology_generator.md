@@ -1,10 +1,10 @@
 # Honeycomb Topology Generator
 
-The RAN simulator comes with an accompanying utility that generates RAN topolog
+The RAN simulator comes with an accompanying utility that generates RAN topology
 YAML file, that is ready to be loaded by the RAN simulaotor.
 
 This utility generates a hexagonal grid of RAN towers (E2 Nodes), each with a prescribed
-number of cells with equal arc of coverage. The following is the command-line usage:
+number of cells with equal arc of coverage. Each node is perturbed by a small random The following is the command-line usage:
 
 ```
 Usage:
@@ -14,6 +14,7 @@ Flags:
       --cell-types strings             List of cell size types (default [FEMTO,ENTERPRISE,OUTDOOR_SMALL,MACRO])
       --controller-addresses strings   List of E2T controller addresses or service names (default [onos-e2t])
       --controller-yaml string         if specified, location of yaml file for controller
+      --deform-scale float             scale factor for perturbation (default 0.01)
       --earfcn-start uint32            start point for EARFCN generation (default 42)
       --gnbid-start string             GnbID start in hex (default "5152")
   -h, --help                           help for topo
@@ -27,10 +28,11 @@ Flags:
   -i, --pitch float32                  pitch between cells in degrees (default 0.02)
       --plmnid string                  PlmnID in MCC-MNC format, e.g. CCCNNN or CCCNN (default "315010")
   -s, --sectors-per-tower uint         sectors per tower (default 3)
-      --service-models strings         List of service models supported by the nodes (default [kpm/1,ni/2,rc/3,kpm2/4,mho/5])
+      --service-models strings         List of service models supported by the nodes (default [kpm/1,rcpre2/3,kpm2/4,mho/5])
       --single-node                    generate a single node for all cells
   -t, --towers uint                    number of towers
       --ue-count uint                  User Equipment count
+      --ue-count-per-cell uint         Desired UE count per cell (default 15)
 ```
 
 Most options have reasonable defaults and only the `--towers` is mandatory.

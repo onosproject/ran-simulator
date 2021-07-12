@@ -33,7 +33,7 @@ type pciRange struct {
 // outward from the specified center.
 func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, sectorsPerTower uint, plmnID types.PlmnID,
 	enbStart uint32, pitch float32, maxDistance float64, maxNeighbors int,
-	controllerAddresses []string, serviceModels []string, singleNode bool, minPci uint, maxPci uint, maxCollisions uint, earfcnStart uint32, cellTypes []string) (*model.Model, error) {
+	controllerAddresses []string, serviceModels []string, singleNode bool, minPci uint, maxPci uint, maxCollisions uint, earfcnStart uint32, cellTypes []string, deformScale float64) (*model.Model, error) {
 
 	earfcn := earfcnStart
 
@@ -46,7 +46,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 		ServiceModels: generateServiceModels(serviceModels),
 	}
 
-	points := hexMesh(float64(pitch), numTowers, m.MapLayout.Center)
+	points := hexMesh(float64(pitch), numTowers, m.MapLayout.Center, deformScale)
 	arc := int32(360.0 / sectorsPerTower)
 
 	controllers := make([]string, 0, len(controllerAddresses))
@@ -268,18 +268,19 @@ func reachPoint(sector model.Sector, distance float64) model.Coordinate {
 	return utils.TargetPoint(sector.Center, float64((sector.Azimuth+sector.Arc/2)%360), distance)
 }
 
-func hexMesh(pitch float64, numTowers uint, center model.Coordinate) []*model.Coordinate {
+func hexMesh(pitch float64, numTowers uint, center model.Coordinate, deformScale float64) []*model.Coordinate {
 	rings, _ := numRings(numTowers)
 	points := make([]*model.Coordinate, 0)
 	hexArray := hexgrid.HexRange(hexgrid.NewHex(0, 0), int(rings))
 	// randomly generate a center point (will be biased towards poles). this is deterministic since go rand is deterministic
 	theta := utils.DegreesToRads(center.Lat)
 	phi := utils.DegreesToRads(center.Lng)
+	// deform mesh
 	for _, h := range hexArray {
 		x, y := hexgrid.Point(hexgrid.HexToPixel(hexgrid.LayoutPointY00(pitch, pitch), h))
 		// angle offset in radians
-		x = utils.DegreesToRads(x + (rand.Float64()-0.5)*.01)
-		y = utils.DegreesToRads(y + (rand.Float64()-0.5)*.01)
+		x = utils.DegreesToRads(x + (rand.Float64()-0.5)*deformScale)
+		y = utils.DegreesToRads(y + (rand.Float64()-0.5)*deformScale)
 		// perturb each individual point
 		lat := (math.Asin(math.Cos(theta)*math.Sin(x) + math.Cos(y)*math.Sin(theta)*math.Cos(x))) * 180 / math.Pi
 		lon := (math.Atan2(math.Sin(y), -math.Tan(x)*math.Sin(theta)+math.Cos(y)*math.Cos(theta)) + phi) * 180 / math.Pi
@@ -288,7 +289,6 @@ func hexMesh(pitch float64, numTowers uint, center model.Coordinate) []*model.Co
 		// fmt.Printf("%f, %f\n", lat, lon)
 	}
 	return points
-	// deform mesh
 }
 
 // Number of cells in the hexagon layout 3x^2+9x+7

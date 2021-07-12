@@ -66,6 +66,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().Uint("max-collisions", 8, "maximum number of collisions")
 	cmd.Flags().Uint32("earfcn-start", 42, "start point for EARFCN generation")
 	cmd.Flags().StringSlice("cell-types", []string{"FEMTO", "ENTERPRISE", "OUTDOOR_SMALL", "MACRO"}, "List of cell size types")
+	cmd.Flags().Float64("deform-scale", .01, "scale factor for perturbation")
 	return cmd
 }
 
@@ -91,6 +92,7 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 	maxCollisions, _ := cmd.Flags().GetUint("max-collisions")
 	earfcnStart, _ := cmd.Flags().GetUint32("earfcn-start")
 	cellTypes, _ := cmd.Flags().GetStringSlice("cell-types")
+	deformScale, _ := cmd.Flags().GetFloat64("deform-scale")
 
 	gnbidStart, err := strconv.ParseUint(gnbidStartS, 16, 32)
 	if err != nil {
@@ -103,7 +105,7 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 
 	m, err := honeycomb.GenerateHoneycombTopology(mapCenter, numTowers, sectorsPerTower,
 		types.PlmnIDFromString(plmnid), uint32(gnbidStart), pitch, maxDistance, maxNeighbors,
-		controllerAddresses, serviceModels, singleNode, minPci, maxPci, maxCollisions, earfcnStart, cellTypes)
+		controllerAddresses, serviceModels, singleNode, minPci, maxPci, maxCollisions, earfcnStart, cellTypes, deformScale)
 	if err != nil {
 		return err
 	}
