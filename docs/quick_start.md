@@ -30,12 +30,13 @@ If you deploy the sd-ran chart successfully, you should be able to see sdran sub
 ```bash
 > kubectl get pods -n sd-ran
 NAME                           READY   STATUS    RESTARTS   AGE
-onos-cli-5d8b489f69-595l7      1/1     Running   0          4m31s
-onos-config-79b7f4bb65-9qllf   1/1     Running   0          4m31s
-onos-consensus-db-1-0          1/1     Running   0          4m31s
-onos-e2sub-696574c74d-dnhqf    1/1     Running   0          4m31s
-onos-e2t-5646b945cd-zv8d6      1/1     Running   0          4m31s
-onos-topo-84d9847bd4-669qn     1/1     Running   0          4m31s
+onos-cli-6f45d4b475-cw78c        1/1     Running             0          2m
+onos-config-6f648c5b57-27vlk     0/4     Init:0/1            0          119s
+onos-consensus-db-1-0            0/1     ContainerCreating   0          2m
+onos-consensus-store-1-0         1/1     Running             0          117s
+onos-e2t-5698597f6c-rbswj        0/3     Init:0/4            0          119s
+onos-topo-66c7757f6d-t84r9       3/3     Running             0          2m
+onos-uenib-6b8bd5cddf-68nm2      0/3     ContainerCreating   0          2m
 ```
 
 3) Deploy ran-simulator helm chart using the following command:
@@ -43,7 +44,7 @@ onos-topo-84d9847bd4-669qn     1/1     Running   0          4m31s
 ```bash
 helm install ran-simulator ran-simulator -n sd-ran
 ```
-Ran simulator is not enabled in the sd-ran chart by default. You can enable it when you deploy sd-ran helm chart using the following command 
+RAN simulator is not enabled in the sd-ran chart by default. You can enable it when you deploy sd-ran helm chart using the following command 
 ```bash
 helm install sd-ran sd-ran -n sd-ran --set import.ran-simulator.enabled=true
 ```
@@ -53,13 +54,14 @@ If you deploy RAN simulator successfully, you should be able to see it in the li
 ```bash
 > kubectl get pods -n sd-ran
 NAME                             READY   STATUS    RESTARTS   AGE
-onos-cli-5d8b489f69-595l7        1/1     Running   0          12m
-onos-config-79b7f4bb65-9qllf     1/1     Running   0          12m
-onos-consensus-db-1-0            1/1     Running   0          12m
-onos-e2sub-696574c74d-dnhqf      1/1     Running   0          12m
-onos-e2t-5646b945cd-zv8d6        1/1     Running   0          12m
-onos-topo-84d9847bd4-669qn       1/1     Running   0          12m
-ran-simulator-6d9c89cdc7-6t6tl   1/1     Running   0          99s
+onos-cli-6f45d4b475-cw78c        1/1     Running   0          3m21s
+onos-config-6f648c5b57-27vlk     4/4     Running   0          3m20s
+onos-consensus-db-1-0            1/1     Running   0          3m21s
+onos-consensus-store-1-0         1/1     Running   0          3m18s
+onos-e2t-5698597f6c-rbswj        3/3     Running   0          3m20s
+onos-topo-66c7757f6d-t84r9       3/3     Running   0          3m21s
+onos-uenib-6b8bd5cddf-68nm2      3/3     Running   0          3m21s
+ran-simulator-67bb8894cd-8jgbd   1/1     Running   0          3m21s
 ```
 
 After deploying ran-simulator, it loads the models, create E2 nodes and make connections using SCTP to onos-e2t endpoint which is specified in the model. 
