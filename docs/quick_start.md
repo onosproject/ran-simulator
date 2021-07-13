@@ -30,13 +30,13 @@ If you deploy the sd-ran chart successfully, you should be able to see sdran sub
 ```bash
 > kubectl get pods -n sd-ran
 NAME                           READY   STATUS    RESTARTS   AGE
-onos-cli-6f45d4b475-cw78c        1/1     Running             0          2m
-onos-config-6f648c5b57-27vlk     0/4     Init:0/1            0          119s
-onos-consensus-db-1-0            0/1     ContainerCreating   0          2m
-onos-consensus-store-1-0         1/1     Running             0          117s
-onos-e2t-5698597f6c-rbswj        0/3     Init:0/4            0          119s
-onos-topo-66c7757f6d-t84r9       3/3     Running             0          2m
-onos-uenib-6b8bd5cddf-68nm2      0/3     ContainerCreating   0          2m
+onos-cli-6f45d4b475-cw78c      1/1     Running   0          21s
+onos-config-6f648c5b57-27vlk   4/4     Running   0          20s
+onos-consensus-db-1-0          1/1     Running   0          21s
+onos-consensus-store-1-0       1/1     Running   0          18s
+onos-e2t-5698597f6c-rbswj      3/3     Running   0          20s
+onos-topo-66c7757f6d-t84r9     3/3     Running   0          21s
+onos-uenib-6b8bd5cddf-68nm2    3/3     Running   0          21s
 ```
 
 3) Deploy ran-simulator helm chart using the following command:
