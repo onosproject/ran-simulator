@@ -1,10 +1,8 @@
 # Honeycomb Topology Generator
 
-The RAN simulator comes with an accompanying utility that generates RAN topology
-YAML file, that is ready to be loaded by the RAN simulaotor.
+The RAN simulator comes with an accompanying utility that generates a RAN topology YAML file that is ready to be loaded by the RAN simulator.
 
-This utility generates a hexagonal grid of RAN towers (E2 Nodes), each with a prescribed
-number of cells with equal arc of coverage. Each node is perturbed by a small random The following is the command-line usage:
+This utility generates a hexagonal grid of RAN towers (E2 Nodes), each with a prescribed number of cells with equal arc of coverage. The following is the command-line usage:
 
 ```
 Usage:
