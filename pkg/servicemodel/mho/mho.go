@@ -25,6 +25,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
+	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
@@ -294,25 +295,39 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 		log.Error(err)
 		return nil, nil, err
 	}
-	ue, err := m.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
+
+	go func() {
+		ue, err := m.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
+		if err != nil {
+			log.Errorf("UE: %v not found err: %v", ue, err)
+			return
+		}
+		log.Debugf("imsi: %v", imsi)
+
+		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
+		plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
+		nci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
+		log.Debugf("ECI is %d and PLMN ID is %d", nci, plmnID)
+		tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci))
+
+		tCell := &model.UECell{
+			ID:   types.GnbID(tCellNcgi),
+			NCGI: tCellNcgi,
+		}
+
+		m.mobilityDriver.Handover(ctx, types.IMSI(imsi), tCell)
+	}()
+
+	reqID := controlutils.GetRequesterID(request)
+	ranFuncID := controlutils.GetRanFunctionID(request)
+	ricInstanceID := controlutils.GetRicInstanceID(request)
+	response, err = controlutils.NewControl(
+		controlutils.WithRanFuncID(ranFuncID),
+		controlutils.WithRequestID(reqID),
+		controlutils.WithRicInstanceID(ricInstanceID)).BuildControlAcknowledge()
 	if err != nil {
-		log.Errorf("UE: %v not found err: %v", ue, err)
+		log.Error(err)
 		return nil, nil, err
 	}
-	log.Debugf("imsi: %v", imsi)
-
-	plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
-	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
-	nci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
-	log.Debugf("ECI is %d and PLMN ID is %d", nci, plmnID)
-	tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci))
-
-	tCell := &model.UECell{
-		ID:   types.GnbID(tCellNcgi),
-		NCGI: tCellNcgi,
-	}
-
-	m.mobilityDriver.Handover(ctx, types.IMSI(imsi), tCell)
-
-	return nil, nil, nil
+	return response, nil, nil
 }
