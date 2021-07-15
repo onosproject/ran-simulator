@@ -78,7 +78,7 @@ func printCell(w *bufio.Writer, cell model.Cell) {
 
 func printNodeCellRelation(w *bufio.Writer, node model.Node, ncgi types.NCGI) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-%x\"\n", node.GnbID, types.GetNCI(ncgi)))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-contains-%x\"\n", node.GnbID, types.GetNCI(ncgi)))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: contains\n")
 	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%x\"\n", node.GnbID))
@@ -88,7 +88,7 @@ func printNodeCellRelation(w *bufio.Writer, node model.Node, ncgi types.NCGI) {
 
 func printCellNeighbor(w *bufio.Writer, cell model.Cell, neighbor types.NCGI) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-%x\"\n", types.GetNCI(cell.NCGI), types.GetNCI(neighbor)))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-neighbors-%x\"\n", types.GetNCI(cell.NCGI), types.GetNCI(neighbor)))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: neighbors\n")
 	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%x\"\n", types.GetNCI(cell.NCGI)))
