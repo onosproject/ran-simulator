@@ -6,6 +6,7 @@
 package utils
 
 import (
+	"encoding/binary"
 	"math"
 	"math/rand"
 
@@ -140,4 +141,18 @@ func DegreesToRads(degrees float64) float64 {
 // AspectRatio - Compensate for the narrowing of meridians at higher latitudes
 func AspectRatio(latitude float64) float64 {
 	return math.Cos(DegreesToRads(latitude))
+}
+
+func Unit64ToByteArray(value uint64) []byte {
+	result := make([]byte, 8)
+	binary.LittleEndian.PutUint64(result, value)
+	return result
+}
+
+func ByteArrayToUint64(value []byte) uint64 {
+	var result uint64
+	for i, x := range value {
+		result |= uint64(x) << uint64(i*8)
+	}
+	return result
 }
