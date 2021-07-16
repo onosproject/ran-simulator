@@ -78,7 +78,7 @@ func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 					},
 					NRcellIdentity: &e2smrcpreies.NrcellIdentity{
 						Value: &e2smrcpreies.BitString{
-							Value: utils.Unit64ToByteArray(neighbour.nRCellIdentity), //uint64
+							Value: utils.Uint64ToByteArray(neighbour.nRCellIdentity), //uint64
 							Len:   36,                                                //uint32
 						},
 					},

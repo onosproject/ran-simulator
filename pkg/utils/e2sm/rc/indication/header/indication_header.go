@@ -61,7 +61,7 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 							},
 							NRcellIdentity: &e2smrcpreies.NrcellIdentity{
 								Value: &e2smrcpreies.BitString{
-									Value: utils.Unit64ToByteArray(header.eutraCellIdentity), //uint64
+									Value: utils.Uint64ToByteArray(header.eutraCellIdentity), //uint64
 									Len:   36,                                                //uint32
 								},
 							},
