@@ -87,7 +87,12 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) error {
 		}
 
 		if err == nil && d.hoLogic != "local" && rrcStateChanged {
-			d.rrcCtrl.RrcUpdateChan <- *ue
+			select {
+			case d.rrcCtrl.RrcUpdateChan <- *ue:
+				// TODO - increment counters
+			default:
+				log.Debugf("RRC state changed but not reported imsi:%v state:%v", imsi, ue.RrcState)
+			}
 		}
 
 	}

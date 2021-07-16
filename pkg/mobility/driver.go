@@ -265,6 +265,7 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 
 // Handover handovers ue to target cell
 func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell) {
+	log.Debugf("Handover() imsi:%v, tCell:%v", imsi, tCell)
 	d.lockUE(imsi)
 	defer d.unlockUE(imsi)
 
