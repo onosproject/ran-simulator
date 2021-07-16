@@ -40,7 +40,6 @@ var log = logging.GetLogger("sm", "mho")
 type Mho struct {
 	ServiceModel   *registry.ServiceModel
 	subscription   *subutils.Subscription
-	context        context.Context
 	rrcUpdateChan  chan model.UE
 	mobilityDriver mobility.Driver
 }
@@ -202,24 +201,34 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		return nil, nil, err
 	}
 
-	m.context = ctx
-
 	log.Debugf("MHO subscription event trigger type: %v", eventTriggerType)
 	switch eventTriggerType {
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_PERIODIC:
 		log.Infof("Received periodic report subscription request")
-		interval, err := m.getReportPeriod(request)
-		if err != nil {
-			log.Error(err)
-			return nil, nil, err
-		}
-		go m.reportPeriodicIndication(interval)
+		go func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			interval, err := m.getReportPeriod(request)
+			if err != nil {
+				log.Error(err)
+				return
+			}
+			m.reportPeriodicIndication(ctx, interval)
+		}()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT:
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT subscription request")
-		go m.processEventA3MeasReport()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go func() {
+			 m.processEventA3MeasReport(ctx)
+		}()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
-		go m.processRrcUpdate()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go func() {
+			go m.processRrcUpdate(ctx)
+		}()
 	default:
 		log.Errorf("MHO subscription failed, invalid event trigger type: %v", eventTriggerType)
 	}

@@ -5,12 +5,13 @@
 package mho
 
 import (
+	"context"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 )
 
-func (m *Mho) processEventA3MeasReport() {
+func (m *Mho) processEventA3MeasReport(ctx context.Context) {
 	log.Info("Start processing event a3 measurement report")
 	for report := range m.ServiceModel.MeasChan {
 		log.Debugf("received event a3 measurement report: %v", report)
@@ -18,12 +19,12 @@ func (m *Mho) processEventA3MeasReport() {
 			report.GetSCell().GetID().GetID().(id.ECGI), report.GetID().String())
 		ecgi := report.GetSCell().GetID().GetID().(id.ECGI)
 		imsi := report.GetID().GetID().(id.UEID).IMSI
-		ue, err := m.ServiceModel.UEs.Get(m.context, types.IMSI(imsi))
+		ue, err := m.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
 		if err != nil {
 			log.Warn(err)
 			continue
 		}
-		err = m.sendRicIndicationFormat1(ransimtypes.NCGI(ecgi), ue)
+		err = m.sendRicIndicationFormat1(ctx, ransimtypes.NCGI(ecgi), ue)
 		if err != nil {
 			log.Warn(err)
 			continue

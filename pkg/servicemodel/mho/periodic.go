@@ -5,11 +5,12 @@
 package mho
 
 import (
+	"context"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	"time"
 )
 
-func (m *Mho) reportPeriodicIndication(interval int32) {
+func (m *Mho) reportPeriodicIndication(ctx context.Context, interval int32) {
 	log.Debugf("Starting periodic report with interval %d ms", interval)
 	subID := subscriptions.NewID(m.subscription.GetRicInstanceID(), m.subscription.GetReqID(), m.subscription.GetRanFuncID())
 	intervalDuration := time.Duration(interval)
@@ -22,7 +23,7 @@ func (m *Mho) reportPeriodicIndication(interval int32) {
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending periodic indication report for subscription:", sub.ID)
-			err = m.sendRicIndication()
+			err = m.sendRicIndication(ctx)
 			if err != nil {
 				log.Error("Failure sending indication message: ", err)
 			}
