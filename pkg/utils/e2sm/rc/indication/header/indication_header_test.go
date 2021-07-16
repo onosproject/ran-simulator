@@ -5,8 +5,9 @@
 package header
 
 import (
-	"encoding/binary"
 	"testing"
+
+	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
@@ -20,6 +21,6 @@ func TestCreateIndicationHeader(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, plmnID.ToBytes(), indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value)
-	assert.Equal(t, uint64(32), binary.LittleEndian.Uint64(indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().NRcellIdentity.Value.GetValue()))
+	assert.Equal(t, uint64(32), utils.ByteArrayToUint64(indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().NRcellIdentity.Value.GetValue()))
 
 }
