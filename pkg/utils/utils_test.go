@@ -6,6 +6,7 @@
 package utils
 
 import (
+	"fmt"
 	"math"
 	"testing"
 
@@ -81,4 +82,9 @@ func Test_AzimuthToRads(t *testing.T) {
 func Test_AspectRatio(t *testing.T) {
 	ar := AspectRatio(52.52)
 	assert.Equal(t, 608, int(math.Round(ar*1e3)))
+}
+
+func Test_BitString(t *testing.T) {
+	value := BitString(20820, 22)
+	fmt.Printf("%b", value)
 }

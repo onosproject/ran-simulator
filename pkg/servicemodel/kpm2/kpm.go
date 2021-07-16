@@ -108,7 +108,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	for _, cellNcgi := range cells {
 		nci := ransimtypes.GetNCI(cellNcgi)
 		ncibs := &e2smkpmv2.BitString{
-			Value: utils.Uint64ToByteArray(uint64(nci)),
+			Value: utils.BitString(uint64(nci), 36),
 			Len:   36,
 		}
 		cellGlobalID, err := cellglobalid.
@@ -129,7 +129,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	// Creates an indication header
 	gNBID := &e2smkpmv2.BitString{
-		Value: utils.Uint64ToByteArray(uint64(node.GnbID)),
+		Value: utils.BitString(uint64(node.GnbID), 22),
 		Len:   22,
 	}
 
@@ -302,7 +302,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 	// Creates an indication header
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	gNBID := &e2smkpmv2.BitString{
-		Value: utils.Uint64ToByteArray(uint64(sm.ServiceModel.Node.GnbID)),
+		Value: utils.BitString(uint64(sm.ServiceModel.Node.GnbID), 22),
 		Len:   22,
 	}
 

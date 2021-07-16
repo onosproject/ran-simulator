@@ -143,11 +143,15 @@ func AspectRatio(latitude float64) float64 {
 	return math.Cos(DegreesToRads(latitude))
 }
 
-// Uint64ToByteArray converts a uint64 to byte array
-func Uint64ToByteArray(value uint64) []byte {
+func BitString(value uint64, bitCount uint8) []byte {
 	result := make([]byte, 8)
+	if bitCount%8 > 0 {
+		packedValue := value << (8 - bitCount%8)
+		binary.LittleEndian.PutUint64(result, packedValue)
+		return result[0:(bitCount/8 + 1)]
+	}
 	binary.LittleEndian.PutUint64(result, value)
-	return result
+	return result[0:(bitCount / 8)]
 }
 
 // ByteArrayToUint64 converts a byte array to uint64
