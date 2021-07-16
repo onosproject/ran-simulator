@@ -7,6 +7,8 @@ package mho
 import (
 	"context"
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	"strconv"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/pdubuilder"
@@ -31,7 +33,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
 	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 	"google.golang.org/protobuf/proto"
-	"strconv"
 )
 
 var log = logging.GetLogger("sm", "mho")
@@ -219,7 +220,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go func() {
-			 m.processEventA3MeasReport(ctx, subscription)
+			m.processEventA3MeasReport(ctx, subscription)
 		}()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
@@ -286,7 +287,6 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 		log.Error(err)
 		return nil, nil, err
 	}
-
 	// TODO - check MHO command
 	log.Debugf("MHO control header: %v", controlHeader)
 
@@ -295,34 +295,30 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 		log.Error(err)
 		return nil, nil, err
 	}
-
 	log.Debugf("MHO control message: %v", controlMessage)
 
-	imsi, err := strconv.Atoi(controlMessage.GetControlMessageFormat1().GetUedId().GetValue())
-	if err != nil {
-		log.Error(err)
-		return nil, nil, err
-	}
-
 	go func() {
+
+		imsi, err := strconv.Atoi(controlMessage.GetControlMessageFormat1().GetUedId().GetValue())
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
 		ue, err := m.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
 		if err != nil {
 			log.Errorf("UE: %v not found err: %v", ue, err)
 			return
 		}
-		log.Debugf("imsi: %v", imsi)
 
 		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
 		plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
 		nci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
-		log.Debugf("ECI is %d and PLMN ID is %d", nci, plmnID)
 		tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci))
-
 		tCell := &model.UECell{
 			ID:   types.GnbID(tCellNcgi),
 			NCGI: tCellNcgi,
 		}
-
 		m.mobilityDriver.Handover(ctx, types.IMSI(imsi), tCell)
 	}()
 
