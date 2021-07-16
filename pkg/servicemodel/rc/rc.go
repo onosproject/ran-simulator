@@ -264,7 +264,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	log.Debugf("RC control message: %v", controlMessage)
 
 	plmnIDBytes := controlHeader.GetControlHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value
-	nci := utils.ByteArrayToUint64(controlHeader.GetControlHeaderFormat1().GetCgi().GetNrCgi().NRcellIdentity.Value.GetValue())
+	nci := utils.BitStringToUint64(controlHeader.GetControlHeaderFormat1().GetCgi().GetNrCgi().NRcellIdentity.Value.GetValue(), 36)
 	plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
 	log.Debugf("NCI is %d and PLMN ID is %d", nci, plmnID)
 

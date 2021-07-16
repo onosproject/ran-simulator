@@ -6,7 +6,6 @@
 package utils
 
 import (
-	"encoding/binary"
 	"math"
 	"math/rand"
 
@@ -143,22 +142,26 @@ func AspectRatio(latitude float64) float64 {
 	return math.Cos(DegreesToRads(latitude))
 }
 
-func BitString(value uint64, bitCount uint8) []byte {
-	result := make([]byte, 8)
+// Uint64ToBitString converts uint64 to a bit string byte array
+func Uint64ToBitString(value uint64, bitCount int) []byte {
+	result := make([]byte, bitCount/8+1)
 	if bitCount%8 > 0 {
-		packedValue := value << (8 - bitCount%8)
-		binary.LittleEndian.PutUint64(result, packedValue)
-		return result[0:(bitCount/8 + 1)]
+		value = value << (8 - bitCount%8)
 	}
-	binary.LittleEndian.PutUint64(result, value)
-	return result[0:(bitCount / 8)]
+
+	for i := 0; i <= (bitCount / 8); i++ {
+		result[i] = byte(value >> (((bitCount / 8) - i) * 8) & 0xFF)
+	}
+
+	return result
 }
 
-// ByteArrayToUint64 converts a byte array to uint64
-func ByteArrayToUint64(value []byte) uint64 {
-	var result uint64
-	for i, x := range value {
-		result |= uint64(x) << uint64(i*8)
+// BitStringToUint64 converts bit string to uint 64
+func BitStringToUint64(bitString []byte, bitCount int) uint64 {
+	unusedBits := 8 - bitCount%8
+	var result uint64 = 0
+	for i, b := range bitString {
+		result += uint64(b) << ((len(bitString) - i - 1) * 8)
 	}
-	return result
+	return result >> unusedBits
 }
