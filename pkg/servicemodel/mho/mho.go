@@ -39,7 +39,6 @@ var log = logging.GetLogger("sm", "mho")
 // Mho represents the MHO service model
 type Mho struct {
 	ServiceModel   *registry.ServiceModel
-	subscription   *subutils.Subscription
 	rrcUpdateChan  chan model.UE
 	mobilityDriver mobility.Driver
 }
@@ -170,7 +169,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
-	m.subscription = subutils.NewSubscription(
+	subscription := subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
 		subutils.WithRanFuncID(ranFuncID),
 		subutils.WithRicInstanceID(ricInstanceID),
@@ -180,7 +179,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		log.Warn("MHO subscription failed: no actions are accepted")
-		subscriptionFailure, err := m.subscription.BuildSubscriptionFailure()
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
 			log.Error(err)
 			return nil, nil, err
@@ -189,7 +188,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		return nil, subscriptionFailure, nil
 	}
 
-	response, err = m.subscription.BuildSubscriptionResponse()
+	response, err = subscription.BuildSubscriptionResponse()
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
@@ -213,21 +212,21 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 				log.Error(err)
 				return
 			}
-			m.reportPeriodicIndication(ctx, interval)
+			m.reportPeriodicIndication(ctx, interval, subscription)
 		}()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT:
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT subscription request")
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go func() {
-			 m.processEventA3MeasReport(ctx)
+			 m.processEventA3MeasReport(ctx, subscription)
 		}()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go func() {
-			go m.processRrcUpdate(ctx)
+			go m.processRrcUpdate(ctx, subscription)
 		}()
 	default:
 		log.Errorf("MHO subscription failed, invalid event trigger type: %v", eventTriggerType)

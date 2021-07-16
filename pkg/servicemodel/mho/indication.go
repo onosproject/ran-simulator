@@ -7,6 +7,7 @@ package mho
 import (
 	"context"
 	"encoding/binary"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	"strconv"
 	"time"
 
@@ -21,7 +22,7 @@ import (
 	indMsgFmt2 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format2"
 )
 
-func (m *Mho) sendRicIndication(ctx context.Context) error {
+func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
 	node := m.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node
 	for _, ncgi := range node.Cells {
@@ -32,7 +33,7 @@ func (m *Mho) sendRicIndication(ctx context.Context) error {
 				continue
 			}
 			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
-			err := m.sendRicIndicationFormat1(ctx, ncgi, ue)
+			err := m.sendRicIndicationFormat1(ctx, ncgi, ue, subscription)
 			if err != nil {
 				log.Warn(err)
 				continue
@@ -42,8 +43,8 @@ func (m *Mho) sendRicIndication(ctx context.Context) error {
 	return nil
 }
 
-func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE) error {
-	subID := subscriptions.NewID(m.subscription.GetRicInstanceID(), m.subscription.GetReqID(), m.subscription.GetRanFuncID())
+func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, subscription *subutils.Subscription) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := m.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return err
@@ -63,9 +64,9 @@ func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCG
 	}
 
 	indication := e2apIndicationUtils.NewIndication(
-		e2apIndicationUtils.WithRicInstanceID(m.subscription.GetRicInstanceID()),
-		e2apIndicationUtils.WithRanFuncID(m.subscription.GetRanFuncID()),
-		e2apIndicationUtils.WithRequestID(m.subscription.GetReqID()),
+		e2apIndicationUtils.WithRicInstanceID(subscription.GetRicInstanceID()),
+		e2apIndicationUtils.WithRanFuncID(subscription.GetRanFuncID()),
+		e2apIndicationUtils.WithRequestID(subscription.GetReqID()),
 		e2apIndicationUtils.WithIndicationHeader(indicationHeaderBytes),
 		e2apIndicationUtils.WithIndicationMessage(indicationMessageBytes))
 
@@ -82,8 +83,8 @@ func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCG
 	return nil
 }
 
-func (m *Mho) sendRicIndicationFormat2(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE) error {
-	subID := subscriptions.NewID(m.subscription.GetRicInstanceID(), m.subscription.GetReqID(), m.subscription.GetRanFuncID())
+func (m *Mho) sendRicIndicationFormat2(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, subscription *subutils.Subscription) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := m.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return err
@@ -103,9 +104,9 @@ func (m *Mho) sendRicIndicationFormat2(ctx context.Context, ncgi ransimtypes.NCG
 	}
 
 	indication := e2apIndicationUtils.NewIndication(
-		e2apIndicationUtils.WithRicInstanceID(m.subscription.GetRicInstanceID()),
-		e2apIndicationUtils.WithRanFuncID(m.subscription.GetRanFuncID()),
-		e2apIndicationUtils.WithRequestID(m.subscription.GetReqID()),
+		e2apIndicationUtils.WithRicInstanceID(subscription.GetRicInstanceID()),
+		e2apIndicationUtils.WithRanFuncID(subscription.GetRanFuncID()),
+		e2apIndicationUtils.WithRequestID(subscription.GetReqID()),
 		e2apIndicationUtils.WithIndicationHeader(indicationHeaderBytes),
 		e2apIndicationUtils.WithIndicationMessage(indicationMessageBytes))
 

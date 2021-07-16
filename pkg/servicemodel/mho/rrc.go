@@ -4,9 +4,12 @@
 
 package mho
 
-import "context"
+import (
+	"context"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
+)
 
-func (m *Mho) processRrcUpdate(ctx context.Context) {
+func (m *Mho) processRrcUpdate(ctx context.Context, subscription *subutils.Subscription) {
 	log.Info("Start processing RRC updates")
 	for update := range m.rrcUpdateChan {
 		log.Debugf("Received RRC Update, IMSI:%v, GnbID:%v, NCGI:%v", update.IMSI, update.Cell.ID, update.Cell.NCGI)
@@ -16,7 +19,7 @@ func (m *Mho) processRrcUpdate(ctx context.Context) {
 			log.Warn(err)
 			continue
 		}
-		err = m.sendRicIndicationFormat2(ctx, update.Cell.NCGI, ue)
+		err = m.sendRicIndicationFormat2(ctx, update.Cell.NCGI, ue, subscription)
 		if err != nil {
 			log.Warn(err)
 			continue

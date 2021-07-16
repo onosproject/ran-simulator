@@ -8,10 +8,11 @@ import (
 	"context"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 )
 
-func (m *Mho) processEventA3MeasReport(ctx context.Context) {
+func (m *Mho) processEventA3MeasReport(ctx context.Context, subscription *subutils.Subscription) {
 	log.Info("Start processing event a3 measurement report")
 	for report := range m.ServiceModel.MeasChan {
 		log.Debugf("received event a3 measurement report: %v", report)
@@ -24,7 +25,7 @@ func (m *Mho) processEventA3MeasReport(ctx context.Context) {
 			log.Warn(err)
 			continue
 		}
-		err = m.sendRicIndicationFormat1(ctx, ransimtypes.NCGI(ecgi), ue)
+		err = m.sendRicIndicationFormat1(ctx, ransimtypes.NCGI(ecgi), ue, subscription)
 		if err != nil {
 			log.Warn(err)
 			continue
