@@ -7,6 +7,8 @@ package header
 import (
 	"testing"
 
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/stretchr/testify/assert"
@@ -18,7 +20,7 @@ func TestCreateIndicationHeader(t *testing.T) {
 		WithNRcellIdentity(32)).Build()
 	assert.NoError(t, err)
 
-	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value, plmnID.ToBytes())
-	assert.Equal(t, indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().NRcellIdentity.Value.Value, uint64(32))
+	assert.Equal(t, plmnID.ToBytes(), indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().PLmnIdentity.Value)
+	assert.Equal(t, uint64(32), utils.BitStringToUint64(indicationHeader.GetIndicationHeaderFormat1().Cgi.GetNrCgi().NRcellIdentity.Value.GetValue(), 36))
 
 }

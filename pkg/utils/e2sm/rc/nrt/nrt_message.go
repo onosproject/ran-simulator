@@ -7,6 +7,8 @@ package nrt
 import (
 	"fmt"
 
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
 )
@@ -76,8 +78,8 @@ func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 					},
 					NRcellIdentity: &e2smrcpreies.NrcellIdentity{
 						Value: &e2smrcpreies.BitString{
-							Value: neighbour.nRCellIdentity, //uint64
-							Len:   36,                       //uint32
+							Value: utils.Uint64ToBitString(neighbour.nRCellIdentity, 36),
+							Len:   36,
 						},
 					},
 				},

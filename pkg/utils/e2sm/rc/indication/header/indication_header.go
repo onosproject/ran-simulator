@@ -7,6 +7,8 @@ package header
 import (
 	"fmt"
 
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
@@ -59,8 +61,8 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 							},
 							NRcellIdentity: &e2smrcpreies.NrcellIdentity{
 								Value: &e2smrcpreies.BitString{
-									Value: header.eutraCellIdentity, //uint64
-									Len:   36,                       //uint32
+									Value: utils.Uint64ToBitString(header.eutraCellIdentity, 36),
+									Len:   36,
 								},
 							},
 						},

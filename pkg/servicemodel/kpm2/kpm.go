@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/id/cellglobalid"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/measobjectitem"
@@ -105,9 +107,8 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	cellMeasObjectItems := make([]*e2smkpmv2.CellMeasurementObjectItem, 0)
 	for _, cellNcgi := range cells {
 		nci := ransimtypes.GetNCI(cellNcgi)
-
 		ncibs := &e2smkpmv2.BitString{
-			Value: uint64(nci),
+			Value: utils.Uint64ToBitString(uint64(nci), 36),
 			Len:   36,
 		}
 		cellGlobalID, err := cellglobalid.
@@ -128,7 +129,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 
 	// Creates an indication header
 	gNBID := &e2smkpmv2.BitString{
-		Value: uint64(node.GnbID),
+		Value: utils.Uint64ToBitString(uint64(node.GnbID), 22),
 		Len:   22,
 	}
 
@@ -301,7 +302,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 	// Creates an indication header
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
 	gNBID := &e2smkpmv2.BitString{
-		Value: uint64(sm.ServiceModel.Node.GnbID),
+		Value: utils.Uint64ToBitString(uint64(sm.ServiceModel.Node.GnbID), 22),
 		Len:   22,
 	}
 

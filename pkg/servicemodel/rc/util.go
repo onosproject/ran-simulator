@@ -6,6 +6,7 @@ package rc
 
 import (
 	"context"
+
 	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
