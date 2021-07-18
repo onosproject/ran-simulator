@@ -6,6 +6,8 @@ package setup
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	"github.com/onosproject/ran-simulator/pkg/utils"
+
 	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
 	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
@@ -109,7 +111,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 								GnbId: &e2apies.GnbIdChoice{
 									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{
 										GnbId: &e2ap_commondatatypes.BitString{
-											Value: request.e2NodeID,
+											Value: utils.Uint64ToBitString(request.e2NodeID, 28),
 											Len:   28,
 										}},
 								},

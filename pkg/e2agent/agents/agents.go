@@ -6,10 +6,10 @@ package agents
 
 import (
 	"context"
-	"github.com/onosproject/ran-simulator/pkg/mobility"
-	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
+	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
