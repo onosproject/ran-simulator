@@ -27,7 +27,7 @@ const (
 )
 
 func (m MeasTypeName) String() string {
-	return [...]string{"RRC.ConnEstabAtt.",
+	return [...]string{"RRC.ConnEstabAtt.Sum",
 		"RRC.ConnEstabSucc.Sum",
 		"RRC.ConnReEstabAtt.Sum",
 		"RRC.ConnReEstabAtt.reconfigFail",
