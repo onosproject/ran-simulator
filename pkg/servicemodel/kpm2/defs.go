@@ -8,12 +8,12 @@ package kpm2
 type MeasTypeName int
 
 const (
-	// RRCConnEstabAttTot total number of RRC connection establishment attempts
-	RRCConnEstabAttTot MeasTypeName = iota
-	// RRCConnEstabSuccTot  total number of successful RRC Connection establishments
-	RRCConnEstabSuccTot
-	// RRCConnReEstabAttTot total number of RRC connection re-establishment attempts
-	RRCConnReEstabAttTot
+	// RRCConnEstabAttSum total number of RRC connection establishment attempts
+	RRCConnEstabAttSum MeasTypeName = iota
+	// RRCConnEstabSuccSum  total number of successful RRC Connection establishments
+	RRCConnEstabSuccSum
+	// RRCConnReEstabAttSum total number of RRC connection re-establishment attempts
+	RRCConnReEstabAttSum
 	// RRCConnReEstabAttreconfigFail  total number of RRC connection re-establishment attempts due to reconfiguration failure
 	RRCConnReEstabAttreconfigFail
 	// RRCConnReEstabAttHOFail total number of RRC connection re-establishment attempts due to Handover failure
@@ -27,9 +27,9 @@ const (
 )
 
 func (m MeasTypeName) String() string {
-	return [...]string{"RRC.ConnEstabAtt.Tot",
-		"RRC.ConnEstabSucc.Tot",
-		"RRC.ConnReEstabAtt.Tot",
+	return [...]string{"RRC.ConnEstabAtt.Sum",
+		"RRC.ConnEstabSucc.Sum",
+		"RRC.ConnReEstabAtt.Sum",
 		"RRC.ConnReEstabAtt.reconfigFail",
 		"RRC.ConnReEstabAtt.HOFail",
 		"RRC.ConnReEstabAtt.Other",
@@ -45,15 +45,15 @@ type MeasType struct {
 
 var measTypes = []MeasType{
 	{
-		measTypeName: RRCConnEstabAttTot,
+		measTypeName: RRCConnEstabAttSum,
 		measTypeID:   1,
 	},
 	{
-		measTypeName: RRCConnEstabSuccTot,
+		measTypeName: RRCConnEstabSuccSum,
 		measTypeID:   2,
 	},
 	{
-		measTypeName: RRCConnReEstabAttTot,
+		measTypeName: RRCConnReEstabAttSum,
 		measTypeID:   3,
 	},
 	{
