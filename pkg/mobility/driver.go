@@ -238,9 +238,9 @@ func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
 	}
 
 	select {
-		case d.measCtrl.GetInputChan() <- ue:
-		default:
-			log.Debug("measCtrl not ready")
+	case d.measCtrl.GetInputChan() <- ue:
+	default:
+		log.Debug("measCtrl not ready")
 	}
 }
 
