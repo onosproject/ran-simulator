@@ -237,7 +237,11 @@ func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
 		return
 	}
 
-	d.measCtrl.GetInputChan() <- ue
+	select {
+	case d.measCtrl.GetInputChan() <- ue:
+	default:
+		log.Debug("measCtrl not ready")
+	}
 }
 
 func (d *driver) linkMeasCtrlHoCtrl() {
