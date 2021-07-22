@@ -55,12 +55,10 @@ license_check: build-tools # @HELP examine and ensure license headers exist
 gofmt: # @HELP run the Go format validation
 	bash -c "diff -u <(echo -n) <(gofmt -d pkg/ cmd/ tests/)"
 
-protos: # @HELP compile the protobuf files (using protoc-go Docker)
-	docker run -it -v `pwd`:/go/src/github.com/onosproject/ran-simulator \
-		-v `pwd`/../build-tools/licensing:/build-tools/licensing \
-		-w /go/src/github.com/onosproject/ran-simulator \
-		--entrypoint build/bin/compile-protos.sh \
-		onosproject/protoc-go:${ONOS_PROTOC_VERSION}
+model-files: # @HELP generate various model and model-topo YAML files in sdran-helm-charts/ran-simulator
+	go run cmd/honeycomb/honeycomb.go topo --plmnid 314628 --towers 2  --ue-count 10 --controller-yaml ../sdran-helm-charts/ran-simulator/files/topo/model-topo.yaml ../sdran-helm-charts/ran-simulator/files/model/model.yaml
+	go run cmd/honeycomb/honeycomb.go topo --plmnid 314628 --towers 12 --ue-count 100 --sectors-per-tower 6 --controller-yaml ../sdran-helm-charts/ran-simulator/files/topo/scale-model-topo.yaml ../sdran-helm-charts/ran-simulator/files/model/scale-model.yaml
+	go run cmd/honeycomb/honeycomb.go topo --plmnid 314628 --towers 1 --ue-count 5 --controller-yaml ../sdran-helm-charts/ran-simulator/files/topo/three-cell-model-topo.yaml ../sdran-helm-charts/ran-simulator/files/model/three-cell-model.yaml
 
 ran-simulator-docker: # @HELP build ran-simulator Docker image
 	@go mod vendor
