@@ -50,7 +50,7 @@ func getHoneycombTopoCommand() *cobra.Command {
 	cmd.Flags().UintP("sectors-per-tower", "s", 3, "sectors per tower")
 	cmd.Flags().Float64P("latitude", "a", 52.5200, "Map centre latitude in degrees")
 	cmd.Flags().Float64P("longitude", "g", 13.4050, "Map centre longitude in degrees")
-	cmd.Flags().Float64P("max-neighbor-distance", "d", 3600.0, "Maximum 'distance' between neighbor cells; see docs")
+	cmd.Flags().Float64P("max-neighbor-distance", "d", 8000.0, "Maximum 'distance' between neighbor cells; see docs")
 	cmd.Flags().Int("max-neighbors", 5, "Maximum number of neighbors a cell will have; -1 no limit")
 	cmd.Flags().StringSlice("service-models", []string{"kpm/1", "rcpre2/3", "kpm2/4", "mho/5"}, "List of service models supported by the nodes")
 	cmd.Flags().StringSlice("controller-addresses", []string{"onos-e2t"}, "List of E2T controller addresses or service names")
