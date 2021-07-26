@@ -46,22 +46,29 @@ type Driver interface {
 
 	// Handover
 	Handover(ctx context.Context, imsi types.IMSI, tCell *model.UECell)
+
+	//GetHoLogic
+	GetHoLogic() string
+
+	//SetHoLogic
+	SetHoLogic(hoLogic string)
 }
 
 type driver struct {
-	cellStore  cells.Store
-	routeStore routes.Store
-	ueStore    ues.Store
-	apiKey     string
-	ticker     *time.Ticker
-	done       chan bool
-	min        *model.Coordinate
-	max        *model.Coordinate
-	measCtrl   measurement.MeasController
-	hoCtrl     handover.HOController
-	hoLogic    string
-	rrcCtrl    RrcCtrl
-	ueLock     map[types.IMSI]*sync.Mutex
+	cellStore   cells.Store
+	routeStore  routes.Store
+	ueStore     ues.Store
+	apiKey      string
+	ticker      *time.Ticker
+	done        chan bool
+	stopLocalHO chan bool
+	min         *model.Coordinate
+	max         *model.Coordinate
+	measCtrl    measurement.MeasController
+	hoCtrl      handover.HOController
+	hoLogic     string
+	rrcCtrl     RrcCtrl
+	ueLock      map[types.IMSI]*sync.Mutex
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
@@ -98,6 +105,7 @@ func (d *driver) Start(ctx context.Context) {
 
 	d.ticker = time.NewTicker(tickFrequency * tickUnit)
 	d.done = make(chan bool)
+	d.stopLocalHO = make(chan bool)
 
 	// Add measController
 	d.measCtrl = measurement.NewMeasController(measType, d.cellStore, d.ueStore)
@@ -136,6 +144,13 @@ func (d *driver) GetRrcCtrl() RrcCtrl {
 }
 
 func (d *driver) SetHoLogic(hoLogic string) {
+	if d.hoLogic == "local" && hoLogic == "mho" {
+		log.Info("Stopping local HO")
+		d.stopLocalHO <- true
+	} else if d.hoLogic == "mho" && hoLogic == "local" {
+		log.Info("Starting local HO")
+		go d.linkMeasCtrlHoCtrl()
+	}
 	d.hoLogic = hoLogic
 }
 
@@ -160,7 +175,7 @@ func (d *driver) drive(ctx context.Context) {
 			return
 		case <-d.ticker.C:
 			for _, route := range d.routeStore.List(ctx) {
-				d.processRoute(ctx, route)
+				go d.processRoute(ctx, route)
 
 			}
 		}
@@ -175,11 +190,8 @@ func (d *driver) processRoute(ctx context.Context, route *model.Route) {
 	}
 	d.updateUEPosition(ctx, route)
 	d.updateUESignalStrength(ctx, route.IMSI)
-	d.reportMeasurement(ctx, route.IMSI)
-	err := d.updateRrc(ctx, route.IMSI)
-	if err != nil {
-		log.Error(err)
-	}
+	go d.reportMeasurement(ctx, route.IMSI)
+	go d.updateRrc(ctx, route.IMSI)
 }
 
 // Initializes UE positions to the start of its routes.
@@ -237,19 +249,20 @@ func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
 		return
 	}
 
-	select {
-	case d.measCtrl.GetInputChan() <- ue:
-	default:
-		log.Debug("measCtrl not ready")
-	}
+	d.measCtrl.GetInputChan() <- ue
 }
 
 func (d *driver) linkMeasCtrlHoCtrl() {
 	log.Info("Connecting measurement and handover controllers")
-	for report := range d.measCtrl.GetOutputChan() {
-		d.hoCtrl.GetInputChan() <- report
+	for {
+		select {
+		case report := <-d.measCtrl.GetOutputChan():
+			d.hoCtrl.GetInputChan() <- report
+		case <-d.stopLocalHO:
+			log.Info("local HO stopped")
+			return
+		}
 	}
-	log.Info("Measurement and handover controllers disconnected")
 }
 
 func (d *driver) processHandoverDecision(ctx context.Context) {
@@ -301,7 +314,7 @@ func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UEC
 	// update the maximum number of UEs
 	d.ueStore.UpdateMaxUEsPerCell(ctx)
 
-	log.Debugf("HO is done successfully: %v to %v", imsi, tCell)
+	log.Infof("HO is done successfully: %v to %v", imsi, tCell)
 }
 
 // UpdateUESignalStrength updates UE signal strength
@@ -393,4 +406,9 @@ func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.
 		return ueCells[0:numAdjCells]
 	}
 	return ueCells
+}
+
+//GetHoLogic returns the HO Logic ("local" or "mho")
+func (d *driver) GetHoLogic() string {
+	return d.hoLogic
 }

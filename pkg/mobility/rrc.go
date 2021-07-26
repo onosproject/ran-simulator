@@ -68,14 +68,14 @@ func (d *driver) connectedUeCount(ctx context.Context, ncgi types.NCGI) uint {
 	return uint(cell.RrcConnectedCount)
 }
 
-func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) error {
-	var err error
+func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 	var rrcStateChanged bool
 
 	if rand.Float64() < RrcStateChangeProbability {
 		ue, err := d.ueStore.Get(ctx, imsi)
 		if err != nil {
-			return err
+			log.Error(err)
+			return
 		}
 
 		if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_IDLE {
@@ -83,21 +83,15 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) error {
 		} else if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED {
 			rrcStateChanged, err = d.rrcIdle(ctx, imsi, RrcStateChangeVariance)
 		} else { // Ignore e2sm_mho.Rrcstatus_RRCSTATUS_INACTIVE
-			return nil
+			return
 		}
 
 		if err == nil && d.hoLogic != "local" && rrcStateChanged {
-			select {
-			case d.rrcCtrl.RrcUpdateChan <- *ue:
-				// TODO - increment counters
-			default:
-				log.Debugf("RRC state changed but not reported imsi:%v state:%v", imsi, ue.RrcState)
-			}
+			// TODO - check subscription for RRC state changes
+			d.rrcCtrl.RrcUpdateChan <- *ue
 		}
 
 	}
-
-	return err
 
 }
 
