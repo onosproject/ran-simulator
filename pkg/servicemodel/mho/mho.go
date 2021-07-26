@@ -219,9 +219,15 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT subscription request")
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
+
+		if m.mobilityDriver.GetHoLogic() == "local" {
+			go m.mobilityDriver.SetHoLogic("mho")
+		}
+
 		go func() {
 			m.processEventA3MeasReport(ctx, subscription)
 		}()
+
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
 		ctx, cancel := context.WithCancel(context.Background())
