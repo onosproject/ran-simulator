@@ -9,9 +9,6 @@ import (
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/store/cells"
-	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	"math"
 	"math/rand"
 )
 
@@ -119,12 +116,10 @@ func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool,
 	}
 
 	if rrcStateChanged {
-		if err = ueDetach(ctx, ue, d.ueStore, d.cellStore); err == nil {
-			log.Debugf("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
-			ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
-			d.cellStore.IncrementRrcIdleCount(ctx, ue.Cell.NCGI)
-			d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
-		}
+		log.Debugf("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
+		ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+		d.cellStore.IncrementRrcIdleCount(ctx, ue.Cell.NCGI)
+		d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
 	}
 
 	return rrcStateChanged, err
@@ -155,45 +150,13 @@ func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI, p float64) (
 	}
 
 	if rrcStateChanged {
-		if err = ueAttach(ctx, ue, d.ueStore, d.cellStore); err == nil {
-			ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
-			d.cellStore.IncrementRrcConnectedCount(ctx, ue.Cell.NCGI)
-			d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
-		}
+		log.Debugf("RRC state change imsi:%d from IDLE to CONNECTED", imsi)
+		ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+		d.cellStore.IncrementRrcConnectedCount(ctx, ue.Cell.NCGI)
+		d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
 	}
 
 	return rrcStateChanged, err
 
 }
 
-func ueAttach(ctx context.Context, ue *model.UE, ueStore ues.Store, cellStore cells.Store) error {
-	cellList, err := cellStore.List(ctx)
-	if err != nil {
-		return err
-	}
-	var servCell *model.Cell
-	maxRsrp := -math.MaxFloat64
-	for _, cell := range cellList {
-		rsrp := StrengthAtLocation(ue.Location, *cell)
-		if math.IsNaN(rsrp) {
-			continue
-		}
-		if rsrp > maxRsrp {
-			servCell = cell
-			maxRsrp = rsrp
-		}
-	}
-	newUECell := &model.UECell{
-		ID:       types.GnbID(servCell.NCGI),
-		NCGI:     servCell.NCGI,
-		Strength: maxRsrp,
-	}
-
-	return ueStore.UpdateCell(ctx, ue.IMSI, newUECell)
-
-}
-
-func ueDetach(ctx context.Context, ue *model.UE, ueStore ues.Store, cellStore cells.Store) error {
-	// TODO
-	return nil
-}
