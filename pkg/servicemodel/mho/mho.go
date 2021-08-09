@@ -311,12 +311,6 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 			return
 		}
 
-		ue, err := m.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
-		if err != nil {
-			log.Errorf("UE: %v not found err: %v", ue, err)
-			return
-		}
-
 		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
 		plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
 		nci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
