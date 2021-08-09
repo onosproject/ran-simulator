@@ -8,6 +8,7 @@ package honeycomb
 import (
 	"bufio"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"os"
@@ -47,7 +48,7 @@ func WriteControllerYaml(model model.Model, location string) error {
 
 func printNode(w *bufio.Writer, node model.Node) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x\"\n", node.GnbID))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"e2.1.%x\"\n", node.GnbID))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: e2node\n")
 	_, _ = w.WriteString("  aspects:\n")
@@ -58,7 +59,7 @@ func printNode(w *bufio.Writer, node model.Node) {
 
 func printCell(w *bufio.Writer, cell model.Cell) {
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Entity\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x\"\n", types.GetNCI(cell.NCGI)))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"e2.1.%x.%x\"\n", types.GetGnbID(uint64(cell.NCGI)), types.GetCellID(uint64(cell.NCGI))))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: e2cell\n")
 	_, _ = w.WriteString("  aspects:\n")
@@ -77,21 +78,23 @@ func printCell(w *bufio.Writer, cell model.Cell) {
 }
 
 func printNodeCellRelation(w *bufio.Writer, node model.Node, ncgi types.NCGI) {
+	rid, _ := uuid.NewRandom()
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-contains-%x\"\n", node.GnbID, types.GetNCI(ncgi)))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"uuid.%s\"\n", rid.String()))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: contains\n")
-	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%x\"\n", node.GnbID))
-	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%x\"\n", types.GetNCI(ncgi)))
+	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"e2:1/%x\"\n", node.GnbID))
+	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"e2:1/%x/%x\"\n", node.GnbID, types.GetCellID(uint64(ncgi))))
 	_, _ = w.WriteString("---\n")
 }
 
 func printCellNeighbor(w *bufio.Writer, cell model.Cell, neighbor types.NCGI) {
+	rid, _ := uuid.NewRandom()
 	_, _ = w.WriteString("apiVersion: topo.onosproject.org/v1beta1\nkind: Relation\nmetadata:\n")
-	_, _ = w.WriteString(fmt.Sprintf("  name: \"%x-neighbors-%x\"\n", types.GetNCI(cell.NCGI), types.GetNCI(neighbor)))
+	_, _ = w.WriteString(fmt.Sprintf("  name: \"uuid.%s\"\n", rid.String()))
 	_, _ = w.WriteString("spec:\n")
 	_, _ = w.WriteString("  kind:\n    name: neighbors\n")
-	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"%x\"\n", types.GetNCI(cell.NCGI)))
-	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"%x\"\n", types.GetNCI(neighbor)))
+	_, _ = w.WriteString(fmt.Sprintf("  source:\n    name: \"e2:1/%x/%x\"\n", types.GetGnbID(uint64(cell.NCGI)), types.GetCellID(uint64(cell.NCGI))))
+	_, _ = w.WriteString(fmt.Sprintf("  target:\n    name: \"e2:1/%x/%x\"\n", types.GetGnbID(uint64(neighbor)), types.GetCellID(uint64(neighbor))))
 	_, _ = w.WriteString("---\n")
 }
