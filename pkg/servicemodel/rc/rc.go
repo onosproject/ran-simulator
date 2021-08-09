@@ -236,6 +236,9 @@ func NewServiceModel(node model.Node, model *model.Model,
 	rcSm.Description = ranFuncDescBytes
 	return rcSm, nil
 }
+func (sm *Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+	return nil, nil, errors.NewNotSupported("E2 connection update is not supported")
+}
 
 // RICControl implements control handler for RC service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {

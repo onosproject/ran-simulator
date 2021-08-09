@@ -7,10 +7,11 @@ package e2agent
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/rrm-son-lib/pkg/model/device"
-	"time"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
@@ -148,6 +149,11 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 		ueStore:   ueStore,
 		cellStore: cellStore,
 	}, nil
+}
+
+func (a *e2Agent) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+
+	return nil, nil, nil
 }
 
 func (a *e2Agent) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
