@@ -159,4 +159,3 @@ func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI, p float64) (
 	return rrcStateChanged, err
 
 }
-
