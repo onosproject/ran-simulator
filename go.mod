@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
+	github.com/cenkalti/backoff/v4 v4.0.0 // indirect
 	github.com/garyburd/redigo v1.1.1-0.20170914051019-70e1b1943d4f // indirect
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0 // indirect
@@ -16,7 +17,7 @@ require (
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.52
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho v0.7.52
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.52
-	github.com/onosproject/onos-e2t v0.7.35
+	github.com/onosproject/onos-e2t v0.8.0
 	github.com/onosproject/onos-lib-go v0.7.15
 	github.com/onosproject/onos-ric-sdk-go v0.7.22
 	github.com/onosproject/onos-test v0.6.4
@@ -36,5 +37,3 @@ require (
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200229013735-71373c6105e3
 
 replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
-
-replace github.com/onosproject/onos-e2t => ../onos-e2t

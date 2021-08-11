@@ -6,9 +6,10 @@ package manager
 
 import (
 	"context"
+	"time"
+
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/store/routes"
-	"time"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"

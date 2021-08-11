@@ -131,7 +131,8 @@ func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	}
 
 	for _, node := range m.Nodes {
-		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore, metricStore, measChan, mobilityDriver)
+		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore,
+			cellStore, metricStore, measChan, mobilityDriver)
 		if err != nil {
 			log.Error(err)
 			return nil, err

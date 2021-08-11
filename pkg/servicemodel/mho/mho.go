@@ -134,6 +134,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	return mhoSm, nil
 }
 
+// E2ConnectionUpdate implements connection update handler
 func (m *Mho) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
 	return nil, nil, errors.NewNotSupported("E2 connection update is not supported")
 }

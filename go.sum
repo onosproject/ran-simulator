@@ -134,6 +134,7 @@ github.com/bugsnag/panicwrap v0.0.0-20151223152923-e2c28503fcd0/go.mod h1:D/8v3k
 github.com/casbin/casbin/v2 v2.1.2/go.mod h1:YcPU1XXisHhLzuxH9coDNf2FbKpjGlbCg3n9yuLkIJQ=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
+github.com/cenkalti/backoff/v4 v4.0.0 h1:6VeaLF9aI+MAUQ95106HwWzYZgJJpZ4stumjj6RFYAU=
 github.com/cenkalti/backoff/v4 v4.0.0/go.mod h1:eEew/i+1Q6OrCDZh3WiXYv3+nJwBASZ8Bog/87DQnVg=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
@@ -694,6 +695,8 @@ github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.52 h1:lMEM1kP5u
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.52/go.mod h1:k17lRVVYFOJZ6XpJeiuaT655iuRs8tOcwgtpF1toXZ8=
 github.com/onosproject/onos-e2t v0.7.35 h1:m1Lo++JU6rsVAw+tTKqX65n1LMyAYxeha/IV5pmVALU=
 github.com/onosproject/onos-e2t v0.7.35/go.mod h1:e8gOBKOCw9+Ryr9HnSy5eMTjeO3DV5wDIBCAUCuYk9M=
+github.com/onosproject/onos-e2t v0.8.0 h1:h0DAoUJ1ZwJHljruA8aaiwn5MvknFubspe5keTqZkdU=
+github.com/onosproject/onos-e2t v0.8.0/go.mod h1:ESj8xvzXxmxD/Wmp8z6jy8qDkvlbSawpw+hnUiU/iso=
 github.com/onosproject/onos-lib-go v0.7.0/go.mod h1:ttkK+fV2CULZFHiq6FBZ69i7/Nymi1Wow1DNy0Ik/2o=
 github.com/onosproject/onos-lib-go v0.7.10 h1:4lfrfjmKyte9RwFbGgcKhRdsEF9qzRNCKVOLXXyNz9I=
 github.com/onosproject/onos-lib-go v0.7.10/go.mod h1:/QjMn+Lb+vxZfnCFLtoxhwHAAuHQnRjjOj3qCbcknhQ=
