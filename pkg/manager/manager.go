@@ -107,7 +107,7 @@ func (m *Manager) Start() error {
 
 	m.mobilityDriver = mobility.NewMobilityDriver(m.cellStore, m.routeStore, m.ueStore, m.model.APIKey, m.config.HOLogic, m.model.UECountPerCell)
 	// TODO: Make initial speeds configurable
-	m.mobilityDriver.GenerateRoutes(context.Background(), 30000, 160000, 20000)
+	m.mobilityDriver.GenerateRoutes(context.Background(), 160000, 320000, 20000)
 	m.mobilityDriver.Start(context.Background())
 
 	// Start E2 agents

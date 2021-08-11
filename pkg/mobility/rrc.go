@@ -13,7 +13,7 @@ import (
 )
 
 // RrcStateChangeProbability determines the rate of change of RRC states in ransim
-var RrcStateChangeProbability float64 = 0.2
+var RrcStateChangeProbability float64 = 0.005
 
 // RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
 var RrcStateChangeVariance float64 = 0.9
@@ -116,7 +116,7 @@ func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool,
 	}
 
 	if rrcStateChanged {
-		log.Debugf("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
+		log.Infof("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
 		ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
 		d.cellStore.IncrementRrcIdleCount(ctx, ue.Cell.NCGI)
 		d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
@@ -150,7 +150,7 @@ func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI, p float64) (
 	}
 
 	if rrcStateChanged {
-		log.Debugf("RRC state change imsi:%d from IDLE to CONNECTED", imsi)
+		log.Infof("RRC state change imsi:%d from IDLE to CONNECTED", imsi)
 		ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
 		d.cellStore.IncrementRrcConnectedCount(ctx, ue.Cell.NCGI)
 		d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
