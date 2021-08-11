@@ -293,6 +293,11 @@ func (d *driver) Handover(ctx context.Context, imsi types.IMSI, tCell *model.UEC
 		return
 	}
 
+	if ue.Cell.NCGI == tCell.NCGI {
+		log.Infof("Duplicate HO skipped imsi%d, cgi:%v", imsi, tCell.NCGI)
+		return
+	}
+
 	if ue.RrcState != e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED {
 		//d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
 		//d.cellStore.IncrementRrcIdleCount(ctx, tCell.NCGI)
