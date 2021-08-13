@@ -41,6 +41,9 @@ type Driver interface {
 	// GetMeasCtrl returns the Measurement Controller
 	GetMeasCtrl() measurement.MeasController
 
+	// GetHoCtrl
+	GetHoCtrl() handover.HOController
+
 	// GetRrcCtrl returns the Rrc Controller
 	GetRrcCtrl() RrcCtrl
 
@@ -52,6 +55,9 @@ type Driver interface {
 
 	//SetHoLogic
 	SetHoLogic(hoLogic string)
+
+	// AddRrcChan
+	AddRrcChan(ch chan model.UE)
 }
 
 type driver struct {
@@ -110,14 +116,14 @@ func (d *driver) Start(ctx context.Context) {
 	// Add measController
 	d.measCtrl = measurement.NewMeasController(measType, d.cellStore, d.ueStore)
 	d.measCtrl.Start(ctx)
+	d.hoCtrl = handover.NewHOController(hoType, d.cellStore, d.ueStore)
+	d.hoCtrl.Start(ctx)
+	// link measController with hoController
+	go d.linkMeasCtrlHoCtrl()
 
 	// Add hoController
 	if d.hoLogic == "local" {
 		log.Info("HO logic is running locally")
-		d.hoCtrl = handover.NewHOController(hoType, d.cellStore, d.ueStore)
-		d.hoCtrl.Start(ctx)
-		// link measController with hoController
-		go d.linkMeasCtrlHoCtrl()
 		// process handover decision
 		go d.processHandoverDecision(ctx)
 	} else if d.hoLogic == "mho" {
@@ -139,6 +145,10 @@ func (d *driver) GetMeasCtrl() measurement.MeasController {
 	return d.measCtrl
 }
 
+func (d *driver) GetHoCtrl() handover.HOController {
+	return d.hoCtrl
+}
+
 func (d *driver) GetRrcCtrl() RrcCtrl {
 	return d.rrcCtrl
 }
@@ -152,6 +162,10 @@ func (d *driver) SetHoLogic(hoLogic string) {
 		go d.linkMeasCtrlHoCtrl()
 	}
 	d.hoLogic = hoLogic
+}
+
+func (d *driver) AddRrcChan(ch chan model.UE) {
+	d.addRrcChan(ch)
 }
 
 func (d *driver) lockUE(imsi types.IMSI) {
@@ -190,8 +204,8 @@ func (d *driver) processRoute(ctx context.Context, route *model.Route) {
 	}
 	d.updateUEPosition(ctx, route)
 	d.updateUESignalStrength(ctx, route.IMSI)
-	go d.reportMeasurement(ctx, route.IMSI)
-	go d.updateRrc(ctx, route.IMSI)
+	d.updateRrc(ctx, route.IMSI)
+	d.reportMeasurement(ctx, route.IMSI)
 }
 
 // Initializes UE positions to the start of its routes.
@@ -254,28 +268,28 @@ func (d *driver) reportMeasurement(ctx context.Context, imsi types.IMSI) {
 
 func (d *driver) linkMeasCtrlHoCtrl() {
 	log.Info("Connecting measurement and handover controllers")
-	for {
-		select {
-		case report := <-d.measCtrl.GetOutputChan():
-			d.hoCtrl.GetInputChan() <- report
-		case <-d.stopLocalHO:
-			log.Info("local HO stopped")
-			return
-		}
+	for report := range d.measCtrl.GetOutputChan() {
+		d.hoCtrl.GetInputChan() <- report
 	}
 }
 
 func (d *driver) processHandoverDecision(ctx context.Context) {
 	log.Info("Handover decision process starting")
-	for hoDecision := range d.hoCtrl.GetOutputChan() {
-		log.Debugf("Received HO Decision: %v", hoDecision)
-		imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
-		tCellcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
-		tCell := &model.UECell{
-			ID:   types.GnbID(tCellcgi),
-			NCGI: types.NCGI(tCellcgi),
+	for {
+		select {
+			case hoDecision := <- d.hoCtrl.GetOutputChan():
+				log.Debugf("Received HO Decision: %v", hoDecision)
+				imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
+				tCellcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
+				tCell := &model.UECell{
+					ID:   types.GnbID(tCellcgi),
+					NCGI: types.NCGI(tCellcgi),
+				}
+				d.Handover(ctx, types.IMSI(imsi), tCell)
+			case <-d.stopLocalHO:
+				log.Info("local HO stopped")
+				return
 		}
-		d.Handover(ctx, types.IMSI(imsi), tCell)
 	}
 	log.Info("HO decision process stopped")
 }

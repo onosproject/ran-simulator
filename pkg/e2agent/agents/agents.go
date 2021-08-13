@@ -6,11 +6,10 @@ package agents
 
 import (
 	"context"
+	"github.com/onosproject/rrm-son-lib/pkg/handover"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/mobility"
-	"github.com/onosproject/rrm-son-lib/pkg/model/device"
-
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -36,7 +35,7 @@ type E2Agents struct {
 	cellStore           cells.Store
 	metricStore         metrics.Store
 	model               *model.Model
-	measChan            chan device.UE
+	a3Chan           chan handover.A3HandoverDecision
 	mobilityDriver      mobility.Driver
 }
 
@@ -63,7 +62,7 @@ func (agents *E2Agents) processNodeEvents() {
 			log.Debugf("Starting e2 agent %d", nodeEvent.Key.(types.GnbID))
 			e2Node, err := e2agent.NewE2Agent(*node, agents.model,
 				agents.modelPluginRegistry, agents.nodeStore, agents.ueStore,
-				agents.cellStore, agents.metricStore, agents.measChan, agents.mobilityDriver)
+				agents.cellStore, agents.metricStore, agents.a3Chan, agents.mobilityDriver)
 			if err != nil {
 				log.Error(err)
 				continue
@@ -116,7 +115,7 @@ func (agents *E2Agents) processNodeEvents() {
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
 func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE, mobilityDriver mobility.Driver) (*E2Agents, error) {
+	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (*E2Agents, error) {
 	agentStore := agents.NewStore()
 	e2agents := &E2Agents{
 		agentStore:          agentStore,
@@ -126,12 +125,12 @@ func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 		ueStore:             ueStore,
 		cellStore:           cellStore,
 		metricStore:         metricStore,
-		measChan:            measChan,
+		a3Chan:           a3Chan,
 		mobilityDriver:      mobilityDriver,
 	}
 
 	for _, node := range m.Nodes {
-		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore, metricStore, measChan, mobilityDriver)
+		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore, metricStore, a3Chan, mobilityDriver)
 		if err != nil {
 			log.Error(err)
 			return nil, err

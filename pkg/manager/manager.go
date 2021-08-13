@@ -107,7 +107,7 @@ func (m *Manager) Start() error {
 
 	m.mobilityDriver = mobility.NewMobilityDriver(m.cellStore, m.routeStore, m.ueStore, m.model.APIKey, m.config.HOLogic, m.model.UECountPerCell)
 	// TODO: Make initial speeds configurable
-	m.mobilityDriver.GenerateRoutes(context.Background(), 160000, 320000, 20000)
+	m.mobilityDriver.GenerateRoutes(context.Background(), 720000, 1080000, 20000)
 	m.mobilityDriver.Start(context.Background())
 
 	// Start E2 agents
@@ -182,8 +182,7 @@ func (m *Manager) startE2Agents() error {
 	// Create the E2 agents for all simulated nodes and specified controllers
 	var err error
 	m.agents, err = agents.NewE2Agents(m.model, m.modelPluginRegistry,
-		m.nodeStore, m.ueStore, m.cellStore, m.metricsStore, m.mobilityDriver.GetMeasCtrl().GetOutputChan(),
-		m.mobilityDriver)
+		m.nodeStore, m.ueStore, m.cellStore, m.metricsStore, m.mobilityDriver.GetHoCtrl().GetOutputChan(), m.mobilityDriver)
 	if err != nil {
 		log.Error(err)
 		return err

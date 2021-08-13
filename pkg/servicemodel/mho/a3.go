@@ -23,12 +23,12 @@ func (m *Mho) processEventA3MeasReport(ctx context.Context, subscription *subuti
 	}
 	for {
 		select {
-		case report := <-m.ServiceModel.MeasChan:
+		case report := <-m.ServiceModel.A3Chan:
 			log.Debugf("received event a3 measurement report: %v", report)
 			log.Debugf("Send upon-rcv-meas-report indication for cell ecgi:%d, IMSI:%s",
-				report.GetSCell().GetID().GetID().(id.ECGI), report.GetID().String())
-			ecgi := report.GetSCell().GetID().GetID().(id.ECGI)
-			imsi := report.GetID().GetID().(id.UEID).IMSI
+				report.UE.GetSCell().GetID().GetID().(id.ECGI), report.UE.GetID().String())
+			ecgi := report.UE.GetSCell().GetID().GetID().(id.ECGI)
+			imsi := report.UE.GetID().GetID().(id.UEID).IMSI
 			ue, err := m.ServiceModel.UEs.Get(ctx, types.IMSI(imsi))
 			if err != nil {
 				log.Warn(err)

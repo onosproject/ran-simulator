@@ -7,6 +7,7 @@ package mho
 import (
 	"context"
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	"github.com/onosproject/rrm-son-lib/pkg/handover"
 	"strconv"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -31,7 +32,6 @@ import (
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/ranfundesc"
-	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -49,7 +49,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE, mobilityDriver mobility.Driver) (registry.ServiceModel, error) {
+	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (registry.ServiceModel, error) {
 	modelName := e2smtypes.ShortName(modelFullName)
 	mhoSm := registry.ServiceModel{
 		RanFunctionID:       registry.Mho,
@@ -65,7 +65,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 		UEs:                 ueStore,
 		CellStore:           cellStore,
 		MetricStore:         metricStore,
-		MeasChan:            measChan,
+		A3Chan:            a3Chan,
 	}
 
 	mho := &Mho{
@@ -74,7 +74,6 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	mhoSm.Client = mho
 
-	mho.rrcUpdateChan = mobilityDriver.GetRrcCtrl().RrcUpdateChan
 	mho.mobilityDriver = mobilityDriver
 
 	var ranFunctionShortName = modelFullName
@@ -221,20 +220,20 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		defer cancel()
 
 		if m.mobilityDriver.GetHoLogic() == "local" {
-			go m.mobilityDriver.SetHoLogic("mho")
+			m.mobilityDriver.SetHoLogic("mho")
 		}
 
-		go func() {
-			m.processEventA3MeasReport(ctx, subscription)
-		}()
+		go m.processEventA3MeasReport(ctx, subscription)
 
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS:
 		log.Infof("Received MHO_TRIGGER_TYPE_UPON_CHANGE_RRC_STATUS subscription request")
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		go func() {
-			go m.processRrcUpdate(ctx, subscription)
-		}()
+
+		m.rrcUpdateChan = make(chan model.UE)
+  	    go m.processRrcUpdate(ctx, subscription)
+		m.mobilityDriver.AddRrcChan(m.rrcUpdateChan)
+
 	default:
 		log.Errorf("MHO subscription failed, invalid event trigger type: %v", eventTriggerType)
 	}
