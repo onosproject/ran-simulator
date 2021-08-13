@@ -23,7 +23,7 @@ var UeCountPerCellDefault uint = 15
 
 // RrcCtrl is the RRC controller
 type RrcCtrl struct {
-	RrcUpdateChan  chan model.UE
+	rrcUpdateChan  chan model.UE
 	ueCountPerCell uint
 }
 
@@ -33,9 +33,12 @@ func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 		ueCountPerCell = UeCountPerCellDefault
 	}
 	return RrcCtrl{
-		RrcUpdateChan:  make(chan model.UE),
 		ueCountPerCell: ueCountPerCell,
 	}
+}
+
+func (d *driver) addRrcChan(ch chan model.UE) {
+	d.rrcCtrl.rrcUpdateChan = ch
 }
 
 func (d *driver) totalUeCount(ctx context.Context, ncgi types.NCGI) uint {
@@ -46,15 +49,6 @@ func (d *driver) totalUeCount(ctx context.Context, ncgi types.NCGI) uint {
 	}
 	return uint(cell.RrcConnectedCount + cell.RrcIdleCount)
 }
-
-//func (d *driver) idleUeCount(ctx context.Context, ncgi types.NCGI) uint {
-//	cell, err := d.cellStore.Get(ctx, ncgi)
-//	if err != nil {
-//		log.Error(err)
-//		return 0
-//	}
-//	return uint(cell.RrcIdleCount)
-//}
 
 func (d *driver) connectedUeCount(ctx context.Context, ncgi types.NCGI) uint {
 	cell, err := d.cellStore.Get(ctx, ncgi)
@@ -83,13 +77,11 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 			return
 		}
 
-		if err == nil && d.hoLogic != "local" && rrcStateChanged {
+		if err == nil && d.hoLogic != "local" && rrcStateChanged && d.rrcCtrl.rrcUpdateChan != nil {
 			// TODO - check subscription for RRC state changes
-			d.rrcCtrl.RrcUpdateChan <- *ue
+			d.rrcCtrl.rrcUpdateChan <- *ue
 		}
-
 	}
-
 }
 
 func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool, error) {

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
-	"github.com/onosproject/rrm-son-lib/pkg/model/device"
+	"github.com/onosproject/rrm-son-lib/pkg/handover"
 	"time"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
@@ -74,7 +74,7 @@ type e2Agent struct {
 // NewE2Agent creates a new E2 agent
 func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
-	measChan chan device.UE, mobilityDriver mobility.Driver) (E2Agent, error) {
+	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.GnbID)
 	reg := registry.NewServiceModelRegistry()
 
@@ -126,7 +126,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 		case registry.Mho:
 			log.Info("MHO service model for node with eNbID:", node.GnbID)
 			mhoSm, err := mho.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore, cellStore,
-				metricStore, measChan, mobilityDriver)
+				metricStore, a3Chan, mobilityDriver)
 			if err != nil {
 				log.Info("Failure creating MHO service model for eNbID:", node.GnbID)
 				return nil, err
