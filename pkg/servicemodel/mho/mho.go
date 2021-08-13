@@ -65,7 +65,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 		UEs:                 ueStore,
 		CellStore:           cellStore,
 		MetricStore:         metricStore,
-		A3Chan:            a3Chan,
+		A3Chan:              a3Chan,
 	}
 
 	mho := &Mho{
@@ -231,7 +231,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		defer cancel()
 
 		m.rrcUpdateChan = make(chan model.UE)
-  	    go m.processRrcUpdate(ctx, subscription)
+		go m.processRrcUpdate(ctx, subscription)
 		m.mobilityDriver.AddRrcChan(m.rrcUpdateChan)
 
 	default:

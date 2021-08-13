@@ -55,7 +55,7 @@ type ServiceModel struct {
 	UEs                 ues.Store
 	CellStore           cells.Store
 	MetricStore         metrics.Store
-	A3Chan            chan handover.A3HandoverDecision
+	A3Chan              chan handover.A3HandoverDecision
 }
 
 // NewServiceModelRegistry creates a service model registry

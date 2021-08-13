@@ -27,7 +27,6 @@ type RrcCtrl struct {
 	ueCountPerCell uint
 }
 
-
 // NewRrcCtrl returns a new RRC Controller
 func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 	if ueCountPerCell == 0 {

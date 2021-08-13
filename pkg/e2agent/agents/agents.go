@@ -35,7 +35,7 @@ type E2Agents struct {
 	cellStore           cells.Store
 	metricStore         metrics.Store
 	model               *model.Model
-	a3Chan           chan handover.A3HandoverDecision
+	a3Chan              chan handover.A3HandoverDecision
 	mobilityDriver      mobility.Driver
 }
 
@@ -125,7 +125,7 @@ func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
 		ueStore:             ueStore,
 		cellStore:           cellStore,
 		metricStore:         metricStore,
-		a3Chan:           a3Chan,
+		a3Chan:              a3Chan,
 		mobilityDriver:      mobilityDriver,
 	}
 

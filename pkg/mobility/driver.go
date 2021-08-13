@@ -277,21 +277,20 @@ func (d *driver) processHandoverDecision(ctx context.Context) {
 	log.Info("Handover decision process starting")
 	for {
 		select {
-			case hoDecision := <- d.hoCtrl.GetOutputChan():
-				log.Debugf("Received HO Decision: %v", hoDecision)
-				imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
-				tCellcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
-				tCell := &model.UECell{
-					ID:   types.GnbID(tCellcgi),
-					NCGI: types.NCGI(tCellcgi),
-				}
-				d.Handover(ctx, types.IMSI(imsi), tCell)
-			case <-d.stopLocalHO:
-				log.Info("local HO stopped")
-				return
+		case hoDecision := <-d.hoCtrl.GetOutputChan():
+			log.Debugf("Received HO Decision: %v", hoDecision)
+			imsi := hoDecision.UE.GetID().GetID().(id.UEID).IMSI
+			tCellcgi := hoDecision.TargetCell.GetID().GetID().(id.ECGI)
+			tCell := &model.UECell{
+				ID:   types.GnbID(tCellcgi),
+				NCGI: types.NCGI(tCellcgi),
+			}
+			d.Handover(ctx, types.IMSI(imsi), tCell)
+		case <-d.stopLocalHO:
+			log.Info("local HO stopped")
+			return
 		}
 	}
-	log.Info("HO decision process stopped")
 }
 
 // Handover handovers ue to target cell
