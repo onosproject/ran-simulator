@@ -48,7 +48,7 @@ func (p *Port) ToUint() uint64 {
 	return port
 }
 
-func (e *e2Instance) getRICAddress(tnlInfo *e2apies.Tnlinformation) RICAddress {
+func (e *e2Channel) getRICAddress(tnlInfo *e2apies.Tnlinformation) RICAddress {
 	tnlAddr := tnlInfo.GetTnlAddress().GetValue()
 	tnlAddrLen := tnlInfo.GetTnlAddress().GetLen()
 	var ricAddress RICAddress

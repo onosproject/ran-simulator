@@ -43,8 +43,8 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
-// E2Instance a new instance of E2 agent
-type E2Instance interface {
+// E2Channel a new instance of E2 agent
+type E2Channel interface {
 	e2.ClientInterface
 
 	Start() error
@@ -62,7 +62,7 @@ type RICAddress struct {
 	port      uint64
 }
 
-type e2Instance struct {
+type e2Channel struct {
 	node         model.Node
 	model        *model.Model
 	channel      e2.ClientChannel
@@ -72,19 +72,19 @@ type e2Instance struct {
 	ricAddress   RICAddress
 }
 
-func (e *e2Instance) GetChannel() e2.ClientChannel {
+func (e *e2Channel) GetChannel() e2.ClientChannel {
 	return e.channel
 }
 
-// NewE2Instance creates new E2 agent instance
-func NewE2Instance(opts ...InstanceOption) E2Instance {
+// NewE2Channel creates new E2 channel instance
+func NewE2Channel(opts ...InstanceOption) E2Channel {
 	log.Info("Creating a new E2 Instance")
 	instanceOptions := &InstanceOptions{}
 	for _, option := range opts {
 		option(instanceOptions)
 	}
 
-	return &e2Instance{
+	return &e2Channel{
 		model:        instanceOptions.model,
 		node:         instanceOptions.node,
 		registry:     instanceOptions.registry,
@@ -96,7 +96,7 @@ func NewE2Instance(opts ...InstanceOption) E2Instance {
 }
 
 // E2ConnectionUpdate implements E2 connection update procedure
-func (e *e2Instance) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
 	log.Info("Connection Update request is received %v", request)
 	connectionUpdateItemIes := make([]*e2appducontents.E2ConnectionUpdateItemIes, 0)
 	connectionSetupFailedItemIes := make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0)
@@ -142,14 +142,14 @@ func (e *e2Instance) E2ConnectionUpdate(ctx context.Context, request *e2appducon
 
 				}
 
-				e2Instance := NewE2Instance(WithNode(e.node),
+				e2Channel := NewE2Channel(WithNode(e.node),
 					WithModel(e.model),
 					WithSMRegistry(e.registry),
 					WithSubStore(e.subStore),
 					WithRICAddress(ricAddress),
 					WithChannelStore(e.channelStore))
 
-				err := e2Instance.connect()
+				err := e2Channel.connect()
 				if err != nil {
 					log.Warn(err)
 					// If connection is not established then creates a connection setup failed item IE
@@ -250,7 +250,7 @@ func (e *e2Instance) E2ConnectionUpdate(ctx context.Context, request *e2appducon
 	return ack, nil, nil
 }
 
-func (e *e2Instance) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
+func (e *e2Channel) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	ranFuncID := registry.RanFunctionID(controlutils.GetRanFunctionID(request))
 	log.Debugf("Received Control Request %+v for ran function %d", request, ranFuncID)
 	sm, err := e.registry.GetServiceModel(ranFuncID)
@@ -282,7 +282,7 @@ func (e *e2Instance) RICControl(ctx context.Context, request *e2appducontents.Ri
 	return response, failure, err
 }
 
-func (e *e2Instance) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
+func (e *e2Channel) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
 	log.Debugf("Received Subscription Request %v for ran function %d", request, ranFuncID)
 	sm, err := e.registry.GetServiceModel(ranFuncID)
@@ -358,7 +358,7 @@ func (e *e2Instance) RICSubscription(ctx context.Context, request *e2appduconten
 	return response, failure, err
 }
 
-func (e *e2Instance) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
+func (e *e2Channel) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	log.Debugf("Received Subscription Delete Request %v for ran function ID %d", request, ranFuncID)
 	subID := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
@@ -440,7 +440,7 @@ func (e *e2Instance) RICSubscriptionDelete(ctx context.Context, request *e2appdu
 	return response, failure, err
 }
 
-func (e *e2Instance) Start() error {
+func (e *e2Channel) Start() error {
 	log.Infof("E2 node %d is starting; attempting to connect", e.node.GnbID)
 	b := newExpBackoff()
 
@@ -469,7 +469,7 @@ func (e *e2Instance) Start() error {
 	return err
 }
 
-func (e *e2Instance) connect() error {
+func (e *e2Channel) connect() error {
 	addr := fmt.Sprintf("%s:%d", e.ricAddress.ipAddress.String(), e.ricAddress.port)
 	log.Info("Connecting to E2T with IP address:", addr)
 	channel, err := e2.Connect(context.TODO(), addr,
@@ -493,7 +493,7 @@ func (e *e2Instance) connect() error {
 	return nil
 }
 
-func (e *e2Instance) setup() error {
+func (e *e2Channel) setup() error {
 	plmnID := ransimtypes.NewUint24(uint32(e.model.PlmnID))
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(e.registry.GetRanFunctions()),
@@ -518,13 +518,23 @@ func (e *e2Instance) setup() error {
 	return nil
 }
 
-func (e *e2Instance) Stop() error {
-	log.Debugf("Stopping e2 agent with ID %d:", e.node.GnbID)
+func (e *e2Channel) Stop() error {
+	channelID := channels.NewChannelID(e.ricAddress.ipAddress.String(), e.ricAddress.port)
+	log.Debugf("Closing E2 channel with ID %d:", channelID)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	if e.channel != nil {
-		return e.channel.Close()
+		err := e.channel.Close()
+		if err != nil {
+			return err
+		}
+		err = e.channelStore.Remove(ctx, channelID)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
-var _ E2Instance = &e2Instance{}
+var _ E2Channel = &e2Channel{}

@@ -5,6 +5,7 @@
 package e2agent
 
 import (
+	"context"
 	"net"
 
 	"github.com/onosproject/ran-simulator/pkg/mobility"
@@ -158,14 +159,14 @@ func (a *e2Agent) Start() error {
 	channelStore := channels.NewStore()
 	a.channelStore = channelStore
 
-	e2Instance := NewE2Instance(WithNode(a.node),
+	e2Channel := NewE2Channel(WithNode(a.node),
 		WithModel(a.model),
 		WithSMRegistry(a.registry),
 		WithSubStore(a.subStore),
 		WithRICAddress(ricAddress),
 		WithChannelStore(channelStore))
 
-	err = e2Instance.Start()
+	err = e2Channel.Start()
 	if err != nil {
 		return err
 	}
@@ -174,6 +175,14 @@ func (a *e2Agent) Start() error {
 
 func (a *e2Agent) Stop() error {
 	log.Debugf("Stopping e2 agent with ID %d:", a.node.GnbID)
+	channelList := a.channelStore.List(context.Background())
+	for _, channel := range channelList {
+		err := channel.Close()
+		if err != nil {
+			return err
+		}
+
+	}
 	return nil
 }
 
