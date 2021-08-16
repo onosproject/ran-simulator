@@ -8,6 +8,10 @@ import (
 	"context"
 	"net"
 
+	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
+
+	"github.com/onosproject/ran-simulator/pkg/e2agent/channel"
+
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/ran-simulator/pkg/store/channels"
@@ -30,7 +34,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 
-	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
@@ -51,7 +54,6 @@ type E2Agent interface {
 type e2Agent struct {
 	node         model.Node
 	model        *model.Model
-	channel      e2.ClientChannel
 	registry     *registry.ServiceModelRegistry
 	subStore     *subscriptions.Subscriptions
 	nodeStore    nodes.Store
@@ -152,19 +154,19 @@ func (a *e2Agent) Start() error {
 	if err != nil {
 		return err
 	}
-	ricAddress := RICAddress{
-		ipAddress: net.ParseIP(controllerAddresses[0]),
-		port:      uint64(controller.Port),
+	ricAddress := addressing.RICAddress{
+		IPAddress: net.ParseIP(controllerAddresses[0]),
+		Port:      uint64(controller.Port),
 	}
 	channelStore := channels.NewStore()
 	a.channelStore = channelStore
 
-	e2Channel := NewE2Channel(WithNode(a.node),
-		WithModel(a.model),
-		WithSMRegistry(a.registry),
-		WithSubStore(a.subStore),
-		WithRICAddress(ricAddress),
-		WithChannelStore(channelStore))
+	e2Channel := channel.NewE2Channel(channel.WithNode(a.node),
+		channel.WithModel(a.model),
+		channel.WithSMRegistry(a.registry),
+		channel.WithSubStore(a.subStore),
+		channel.WithRICAddress(ricAddress),
+		channel.WithChannelStore(channelStore))
 
 	err = e2Channel.Start()
 	if err != nil {
@@ -176,8 +178,8 @@ func (a *e2Agent) Start() error {
 func (a *e2Agent) Stop() error {
 	log.Debugf("Stopping e2 agent with ID %d:", a.node.GnbID)
 	channelList := a.channelStore.List(context.Background())
-	for _, channel := range channelList {
-		err := channel.Close()
+	for _, ch := range channelList {
+		err := ch.Close()
 		if err != nil {
 			return err
 		}

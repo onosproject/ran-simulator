@@ -1,21 +1,23 @@
-// SPDX-FileCopyrightText: ${year}-present Open Networking Foundation <info@opennetworking.org>
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
+//
+// SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package e2agent
+package channel
 
 import (
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/store/channels"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 )
 
-// InstanceOptions e2 instance options
+// InstanceOptions e2 channel instance options
 type InstanceOptions struct {
 	node         model.Node
 	model        *model.Model
-	ricAddress   RICAddress
+	ricAddress   addressing.RICAddress
 	channel      e2.ClientChannel
 	registry     *registry.ServiceModelRegistry
 	subStore     *subscriptions.Subscriptions
@@ -40,7 +42,7 @@ func WithModel(model *model.Model) func(options *InstanceOptions) {
 }
 
 // WithRICAddress sets RIC address
-func WithRICAddress(ricAddress RICAddress) func(options *InstanceOptions) {
+func WithRICAddress(ricAddress addressing.RICAddress) func(options *InstanceOptions) {
 	return func(options *InstanceOptions) {
 		options.ricAddress = ricAddress
 	}

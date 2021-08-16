@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
+	github.com/cenkalti/backoff/v4 v4.0.0
 	github.com/garyburd/redigo v1.1.1-0.20170914051019-70e1b1943d4f // indirect
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0 // indirect

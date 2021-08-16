@@ -20,6 +20,10 @@ type mockServiceModel struct {
 	t *testing.T
 }
 
+func (sm mockServiceModel) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+	panic("implement me")
+}
+
 func (sm mockServiceModel) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	panic("implement me")
 }

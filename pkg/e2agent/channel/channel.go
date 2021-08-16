@@ -2,13 +2,16 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package e2agent
+package channel
 
 import (
 	"context"
 	"fmt"
-	"net"
 	"time"
+
+	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
+
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 
 	"github.com/onosproject/ran-simulator/pkg/store/channels"
 
@@ -43,6 +46,8 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
+var log = logging.GetLogger("e2agent", "channel")
+
 // E2Channel a new instance of E2 agent
 type E2Channel interface {
 	e2.ClientInterface
@@ -56,12 +61,6 @@ type E2Channel interface {
 	GetChannel() e2.ClientChannel
 }
 
-// RICAddress RIC IP and port number
-type RICAddress struct {
-	ipAddress net.IP
-	port      uint64
-}
-
 type e2Channel struct {
 	node         model.Node
 	model        *model.Model
@@ -69,7 +68,7 @@ type e2Channel struct {
 	registry     *registry.ServiceModelRegistry
 	subStore     *subscriptions.Subscriptions
 	channelStore channels.Store
-	ricAddress   RICAddress
+	ricAddress   addressing.RICAddress
 }
 
 func (e *e2Channel) GetChannel() e2.ClientChannel {
@@ -114,7 +113,7 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 
 	}
 
-	var ricAddress RICAddress
+	var ricAddress addressing.RICAddress
 	// If E2 Connection To Add List IE is contained in the E2 CONNECTION UPDATE message,
 	//  then the E2 Node shall, if supported, use it to establish additional TNL Association(s) and configure
 	// for use for RIC services and/or E2 support functions according to the TNL Association Usage IE in the message.
@@ -130,7 +129,7 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 
 				ricAddress = e.getRICAddress(tnlInfo)
 
-				if ricAddress.ipAddress == nil {
+				if ricAddress.IPAddress == nil {
 					cause := &e2apies.Cause{
 						Cause: &e2apies.Cause_Protocol{
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
@@ -182,7 +181,7 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 			for _, connectionUpdateRemoveItem := range connectionUpdateRemoveItems {
 				tnlInfo := connectionUpdateRemoveItem.GetValue().GetTnlInformation()
 				ricAddress = e.getRICAddress(tnlInfo)
-				if ricAddress.ipAddress == nil {
+				if ricAddress.IPAddress == nil {
 					cause := &e2apies.Cause{
 						Cause: &e2apies.Cause_Protocol{
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
@@ -194,7 +193,7 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 
 				}
 
-				channelID := channels.NewChannelID(ricAddress.ipAddress.String(), ricAddress.port)
+				channelID := channels.NewChannelID(ricAddress.IPAddress.String(), ricAddress.Port)
 				channel, err := e.channelStore.Get(ctx, channelID)
 				if err != nil {
 					log.Warn(err)
@@ -470,7 +469,7 @@ func (e *e2Channel) Start() error {
 }
 
 func (e *e2Channel) connect() error {
-	addr := fmt.Sprintf("%s:%d", e.ricAddress.ipAddress.String(), e.ricAddress.port)
+	addr := fmt.Sprintf("%s:%d", e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	log.Info("Connecting to E2T with IP address:", addr)
 	channel, err := e2.Connect(context.TODO(), addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {
@@ -482,7 +481,7 @@ func (e *e2Channel) connect() error {
 		return err
 	}
 	// Add channels to the channel store
-	channelID := channels.NewChannelID(e.ricAddress.ipAddress.String(), e.ricAddress.port)
+	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	err = e.channelStore.Add(context.Background(),
 		channelID, channel)
 	if err != nil {
@@ -519,7 +518,7 @@ func (e *e2Channel) setup() error {
 }
 
 func (e *e2Channel) Stop() error {
-	channelID := channels.NewChannelID(e.ricAddress.ipAddress.String(), e.ricAddress.port)
+	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	log.Debugf("Closing E2 channel with ID %d:", channelID)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
