@@ -6,9 +6,10 @@ package mho
 
 import (
 	"context"
+	"strconv"
+
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	"github.com/onosproject/rrm-son-lib/pkg/handover"
-	"strconv"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -130,6 +131,11 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	mhoSm.Description = ranFuncDescBytes
 	return mhoSm, nil
+}
+
+// E2ConnectionUpdate implements connection update handler
+func (m *Mho) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+	return nil, nil, errors.NewNotSupported("E2 connection update is not supported")
 }
 
 // RICSubscription implements subscription handler for MHO service model
