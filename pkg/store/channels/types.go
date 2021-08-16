@@ -22,3 +22,9 @@ const (
 func (e ChannelEvent) String() string {
 	return [...]string{"None", "Created", "Updated", "Deleted"}[e]
 }
+
+// ChannelID channel ID consists of IP and port number of E2T instance
+type ChannelID struct {
+	ricAddress string
+	ricPort    uint64
+}

@@ -58,21 +58,21 @@ type E2Channel interface {
 
 	connect() error
 
-	GetChannel() e2.ClientChannel
+	GetClient() e2.ClientChannel
 }
 
 type e2Channel struct {
 	node         model.Node
 	model        *model.Model
-	channel      e2.ClientChannel
+	client       e2.ClientChannel
 	registry     *registry.ServiceModelRegistry
 	subStore     *subscriptions.Subscriptions
 	channelStore channels.Store
 	ricAddress   addressing.RICAddress
 }
 
-func (e *e2Channel) GetChannel() e2.ClientChannel {
-	return e.channel
+func (e *e2Channel) GetClient() e2.ClientChannel {
+	return e.client
 }
 
 // NewE2Channel creates new E2 channel instance
@@ -324,7 +324,7 @@ func (e *e2Channel) RICSubscription(ctx context.Context, request *e2appducontent
 		}
 		return nil, failure, nil
 	}
-	subscription, err := subscriptions.NewSubscription(id, request, e.channel)
+	subscription, err := subscriptions.NewSubscription(id, request, e.client)
 	if err != nil {
 		return response, failure, err
 	}
@@ -471,7 +471,7 @@ func (e *e2Channel) Start() error {
 func (e *e2Channel) connect() error {
 	addr := fmt.Sprintf("%s:%d", e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	log.Info("Connecting to E2T with IP address:", addr)
-	channel, err := e2.Connect(context.TODO(), addr,
+	client, err := e2.Connect(context.TODO(), addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {
 			return e
 		},
@@ -483,11 +483,11 @@ func (e *e2Channel) connect() error {
 	// Add channels to the channel store
 	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	err = e.channelStore.Add(context.Background(),
-		channelID, channel)
+		channelID, client)
 	if err != nil {
 		return err
 	}
-	e.channel = channel
+	e.client = client
 
 	return nil
 }
@@ -505,7 +505,7 @@ func (e *e2Channel) setup() error {
 		log.Error(err)
 		return err
 	}
-	_, e2SetupFailure, err := e.channel.E2Setup(context.Background(), e2SetupRequest)
+	_, e2SetupFailure, err := e.client.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		log.Error(err)
 		return errors.NewUnknown("E2 setup failed: %v", err)
@@ -523,8 +523,8 @@ func (e *e2Channel) Stop() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if e.channel != nil {
-		err := e.channel.Close()
+	if e.client != nil {
+		err := e.client.Close()
 		if err != nil {
 			return err
 		}
