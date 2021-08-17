@@ -24,9 +24,10 @@ var log = logging.GetLogger("e2agent", "controller")
 const defaultTimeout = 30 * time.Second
 const queueSize = 100
 
-// NewController returns a new network controller
+// NewController returns a new channel controller. This controller is responsible to open and close
+// E2 channels that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
 func NewController(channelStore channels.Store) *controller.Controller {
-	c := controller.NewController("Connections")
+	c := controller.NewController("E2Channels")
 	c.Watch(&ChannelWatcher{
 		channels: channelStore,
 	})
@@ -66,19 +67,19 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 
 func (r *Reconciler) reconcileOpenChannel(channel *channels.Channel) (controller.Result, error) {
 
+	// If the channel state is not in Pending state returns with nil error
 	if channel.Status.State != channels.Pending {
 		return controller.Result{}, nil
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
-	addr := fmt.Sprintf("%s:%d", channel.ID.GetRICAddress(), channel.ID.GetRICPort())
+	addr := fmt.Sprintf("%s:%d", channel.ID.GetRICIPAddress(), channel.ID.GetRICPort())
 
 	e2Channel := e2channel.NewE2Channel()
-	client, err := e2.Connect(context.TODO(), addr,
-		func(channel e2.ClientChannel) e2.ClientInterface {
-			return e2Channel
-		},
+	client, err := e2.Connect(ctx, addr, func(channel e2.ClientChannel) e2.ClientInterface {
+		return e2Channel
+	},
 	)
 
 	if err != nil {

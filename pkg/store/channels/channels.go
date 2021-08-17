@@ -30,14 +30,14 @@ type WatchOptions struct {
 // NewChannelID creates a new channel ID
 func NewChannelID(ricAddress string, ricPort uint64) ChannelID {
 	return ChannelID{
-		ricAddress: ricAddress,
-		ricPort:    ricPort,
+		ricIPAddress: ricAddress,
+		ricPort:      ricPort,
 	}
 }
 
-// GetRICAddress gets RIC address
-func (ch ChannelID) GetRICAddress() string {
-	return ch.ricAddress
+// GetRICIPAddress gets RIC IP address
+func (ch ChannelID) GetRICIPAddress() string {
+	return ch.ricIPAddress
 }
 
 // GetRICPort gets RIC port
@@ -67,7 +67,7 @@ func (c *Channels) Add(ctx context.Context, id ChannelID, channel *Channel) erro
 	log.Info("Adding a channel with channel ID: %v", id)
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if id.ricAddress == "" || id.ricPort == 0 {
+	if id.ricIPAddress == "" || id.ricPort == 0 {
 		return errors.NewInvalid("ric address or port number is invalid")
 	}
 	c.channels[id] = channel

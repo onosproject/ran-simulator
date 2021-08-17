@@ -4,7 +4,9 @@
 
 package channels
 
-import e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+import (
+	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+)
 
 // ChannelEvent a channel event
 type ChannelEvent int
@@ -27,8 +29,8 @@ func (e ChannelEvent) String() string {
 
 // ChannelID channel ID consists of IP and port number of E2T instance
 type ChannelID struct {
-	ricAddress string
-	ricPort    uint64
+	ricIPAddress string
+	ricPort      uint64
 }
 
 // Phase channel phase
