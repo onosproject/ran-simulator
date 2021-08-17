@@ -56,8 +56,6 @@ type E2Channel interface {
 
 	Stop() error
 
-	Connect() error
-
 	GetClient() e2.ClientChannel
 }
 
@@ -443,7 +441,7 @@ func (e *e2Channel) Start() error {
 		log.Infof("E2 node %d failed to connect; retry after %v; attempt %d", e.node.GnbID, b.GetElapsedTime(), count)
 	}
 
-	err := backoff.RetryNotify(e.Connect, b, connectNotify)
+	err := backoff.RetryNotify(e.connect, b, connectNotify)
 	if err != nil {
 		return err
 	}
@@ -461,7 +459,7 @@ func (e *e2Channel) Start() error {
 	return err
 }
 
-func (e *e2Channel) Connect() error {
+func (e *e2Channel) connect() error {
 	addr := fmt.Sprintf("%s:%d", e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	log.Info("Connecting to E2T with IP address:", addr)
 	client, err := e2.Connect(context.TODO(), addr,
@@ -482,6 +480,7 @@ func (e *e2Channel) Connect() error {
 			Phase: channels.Open,
 			State: channels.Completed,
 		},
+		Client: client,
 	}
 
 	err = e.channelStore.Add(context.Background(),
