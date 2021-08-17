@@ -17,8 +17,6 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 
 	"github.com/onosproject/ran-simulator/pkg/store/event"
-
-	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
 )
 
 var log = logging.GetLogger("store", "channels")
@@ -49,7 +47,7 @@ func (ch ChannelID) GetRICPort() uint64 {
 
 // Channels data structure for storing channels
 type Channels struct {
-	channels map[ChannelID]e2.ClientChannel
+	channels map[ChannelID]*Channel
 	mu       sync.RWMutex
 	watchers *watcher.Watchers
 }
@@ -58,14 +56,14 @@ type Channels struct {
 func NewStore() *Channels {
 	watchers := watcher.NewWatchers()
 	return &Channels{
-		channels: make(map[ChannelID]e2.ClientChannel),
+		channels: make(map[ChannelID]*Channel),
 		mu:       sync.RWMutex{},
 		watchers: watchers,
 	}
 }
 
 // Add adds a channel to channel store
-func (c *Channels) Add(ctx context.Context, id ChannelID, channel e2.ClientChannel) error {
+func (c *Channels) Add(ctx context.Context, id ChannelID, channel *Channel) error {
 	log.Info("Adding a channel with channel ID: %v", id)
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -102,7 +100,7 @@ func (c *Channels) Remove(ctx context.Context, id ChannelID) error {
 }
 
 // Get gets channel based on a given channel ID
-func (c *Channels) Get(ctx context.Context, id ChannelID) (e2.ClientChannel, error) {
+func (c *Channels) Get(ctx context.Context, id ChannelID) (*Channel, error) {
 	log.Debugf("Getting a channel with channel ID: %v", id)
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -113,15 +111,31 @@ func (c *Channels) Get(ctx context.Context, id ChannelID) (e2.ClientChannel, err
 }
 
 // List list all of the available channels
-func (c *Channels) List(ctx context.Context) []e2.ClientChannel {
+func (c *Channels) List(ctx context.Context) []*Channel {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	channels := make([]e2.ClientChannel, 0)
+	channels := make([]*Channel, 0)
 	for _, channel := range c.channels {
 		channels = append(channels, channel)
 	}
 
 	return channels
+}
+
+// Update update a channel
+func (c *Channels) Update(ctx context.Context, channel *Channel) error {
+	log.Info("Updating channel with ID %v:", channel.ID)
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.channels[channel.ID] = channel
+	updateEvent := event.Event{
+		Key:   channel.ID,
+		Value: channel,
+		Type:  Updated,
+	}
+
+	c.watchers.Send(updateEvent)
+	return nil
 }
 
 // Watch watch channel events
@@ -163,13 +177,15 @@ func (c *Channels) Watch(ctx context.Context, ch chan<- event.Event, options ...
 
 // Store channel store interface
 type Store interface {
-	Add(ctx context.Context, id ChannelID, channel e2.ClientChannel) error
+	Add(ctx context.Context, id ChannelID, channel *Channel) error
 
 	Remove(ctx context.Context, id ChannelID) error
 
-	Get(ctx context.Context, id ChannelID) (e2.ClientChannel, error)
+	Get(ctx context.Context, id ChannelID) (*Channel, error)
 
-	List(ctx context.Context) []e2.ClientChannel
+	List(ctx context.Context) []*Channel
+
+	Update(ctx context.Context, channel *Channel) error
 
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
 }

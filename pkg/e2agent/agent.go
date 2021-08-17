@@ -36,6 +36,7 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	channelController "github.com/onosproject/ran-simulator/pkg/e2agent/controller"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
@@ -161,6 +162,12 @@ func (a *e2Agent) Start() error {
 	channelStore := channels.NewStore()
 	a.channelStore = channelStore
 
+	c := channelController.NewController(channelStore)
+	err = c.Start()
+	if err != nil {
+		return err
+	}
+
 	e2Channel := channel.NewE2Channel(channel.WithNode(a.node),
 		channel.WithModel(a.model),
 		channel.WithSMRegistry(a.registry),
@@ -179,7 +186,7 @@ func (a *e2Agent) Stop() error {
 	log.Debugf("Stopping e2 agent with ID %d:", a.node.GnbID)
 	channelList := a.channelStore.List(context.Background())
 	for _, ch := range channelList {
-		err := ch.Close()
+		err := ch.Client.Close()
 		if err != nil {
 			return err
 		}

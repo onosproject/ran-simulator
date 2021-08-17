@@ -9,13 +9,13 @@ import (
 	"fmt"
 	"time"
 
+	connectionsetupfaileditem "github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionSetupFailedItemie"
+
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
 	"github.com/onosproject/ran-simulator/pkg/store/channels"
-
-	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionSetupFailedItemie"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionUpdateitemie"
 
@@ -56,7 +56,7 @@ type E2Channel interface {
 
 	Stop() error
 
-	connect() error
+	Connect() error
 
 	GetClient() e2.ClientChannel
 }
@@ -141,16 +141,18 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 
 				}
 
-				e2Channel := NewE2Channel(WithNode(e.node),
-					WithModel(e.model),
-					WithSMRegistry(e.registry),
-					WithSubStore(e.subStore),
-					WithRICAddress(ricAddress),
-					WithChannelStore(e.channelStore))
+				// Adds a new channel to the channel store
+				channelID := channels.NewChannelID(ricAddress.IPAddress.String(), ricAddress.Port)
+				channel := &channels.Channel{
+					ID: channelID,
+					Status: channels.ChannelStatus{
+						Phase: channels.Open,
+						State: channels.Pending,
+					},
+				}
 
-				err := e2Channel.connect()
+				err := e.channelStore.Add(ctx, channelID, channel)
 				if err != nil {
-					log.Warn(err)
 					// If connection is not established then creates a connection setup failed item IE
 					// to be reported in ACK
 					connSetupFailedItemIe := connectionsetupfaileditem.NewConnectionSetupFailedItemIe(
@@ -195,6 +197,7 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 
 				channelID := channels.NewChannelID(ricAddress.IPAddress.String(), ricAddress.Port)
 				channel, err := e.channelStore.Get(ctx, channelID)
+
 				if err != nil {
 					log.Warn(err)
 					cause := &e2apies.Cause{
@@ -207,20 +210,10 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 					return nil, connectionUpdateFailure, nil
 				}
 
-				err = channel.Close()
-				if err != nil {
-					log.Warn(err)
-					cause := &e2apies.Cause{
-						Cause: &e2apies.Cause_Protocol{
-							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
-						},
-					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
-						BuildConnectionUpdateFailure()
-					return nil, connectionUpdateFailure, nil
-				}
+				channel.Status.Phase = channels.Closed
+				channel.Status.State = channels.Pending
 
-				err = e.channelStore.Remove(ctx, channelID)
+				err = e.channelStore.Update(ctx, channel)
 				if err != nil {
 					log.Warn(err)
 					cause := &e2apies.Cause{
@@ -450,7 +443,7 @@ func (e *e2Channel) Start() error {
 		log.Infof("E2 node %d failed to connect; retry after %v; attempt %d", e.node.GnbID, b.GetElapsedTime(), count)
 	}
 
-	err := backoff.RetryNotify(e.connect, b, connectNotify)
+	err := backoff.RetryNotify(e.Connect, b, connectNotify)
 	if err != nil {
 		return err
 	}
@@ -468,7 +461,7 @@ func (e *e2Channel) Start() error {
 	return err
 }
 
-func (e *e2Channel) connect() error {
+func (e *e2Channel) Connect() error {
 	addr := fmt.Sprintf("%s:%d", e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	log.Info("Connecting to E2T with IP address:", addr)
 	client, err := e2.Connect(context.TODO(), addr,
@@ -482,8 +475,17 @@ func (e *e2Channel) connect() error {
 	}
 	// Add channels to the channel store
 	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
+
+	channel := &channels.Channel{
+		ID: channelID,
+		Status: channels.ChannelStatus{
+			Phase: channels.Open,
+			State: channels.Completed,
+		},
+	}
+
 	err = e.channelStore.Add(context.Background(),
-		channelID, client)
+		channelID, channel)
 	if err != nil {
 		return err
 	}
