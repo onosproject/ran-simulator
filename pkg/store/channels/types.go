@@ -59,19 +59,19 @@ type ChannelStatus struct {
 type State int
 
 const (
-	// Completed completed state
-	Completed State = iota
+	// Connected connected state
+	Connected State = iota
 
-	// Pending pending state
-	Pending
+	// Disconnected disconected state
+	Disconnected
 
-	// Failed failed state
-	Failed
+	// Initialized initialized state
+	Initialized
 )
 
 // String return state in string format
 func (s State) String() string {
-	return [...]string{"Completed", "Pending", "Failed"}[s]
+	return [...]string{"Connected", "Disconnected", "Initialized"}[s]
 }
 
 // Channel channel data structure for storing in channel store

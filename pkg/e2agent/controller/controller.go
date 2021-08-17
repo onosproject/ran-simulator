@@ -67,38 +67,42 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 
 func (r *Reconciler) reconcileOpenChannel(channel *channels.Channel) (controller.Result, error) {
 
-	// If the channel state is not in Pending state returns with nil error
-	if channel.Status.State != channels.Pending {
+	// If the channel state is in Initialized  state returns with nil error
+	if channel.Status.State == channels.Initialized {
 		return controller.Result{}, nil
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
+
 	addr := fmt.Sprintf("%s:%d", channel.ID.GetRICIPAddress(), channel.ID.GetRICPort())
 
-	e2Channel := e2channel.NewE2Channel()
-	client, err := e2.Connect(ctx, addr, func(channel e2.ClientChannel) e2.ClientInterface {
-		return e2Channel
-	},
-	)
+	if channel.Status.State == channels.Disconnected {
+		e2Channel := e2channel.NewE2Channel()
+		client, err := e2.Connect(ctx, addr, func(channel e2.ClientChannel) e2.ClientInterface {
+			return e2Channel
+		})
 
-	if err != nil {
-		log.Warnf("Failed to reconcile opening channel %+v: %s", channel, err)
-		channel.Status.State = channels.Failed
-		return controller.Result{}, err
+		if err != nil {
+			log.Warnf("Failed to reconcile opening channel %+v: %s", channel, err)
+			return controller.Result{}, err
+		}
+
+		channel.Client = client
+		channel.Status.State = channels.Connected
+
+		err = r.channels.Update(ctx, channel)
+		if err != nil {
+			log.Warnf("Failed to reconcile opening channel %+v: %s", channel, err)
+			channel.Status.State = channels.Disconnected
+			return controller.Result{}, err
+		}
 	}
-
-	channel.Client = client
-	channel.Status.State = channels.Completed
-
-	err = r.channels.Update(ctx, channel)
-	if err != nil {
-		log.Warnf("Failed to reconcile opening channel %+v: %s", channel, err)
-		channel.Status.State = channels.Failed
-		return controller.Result{}, err
+	if channel.Status.State == channels.Connected {
+		log.Debug("Sending configuration update")
+		// TODO use configuration update to inform E2T about new connection
+		// 		and change channel state to Initialized
 	}
-
-	// TODO use configuration update to inform E2T about new connection
 
 	return controller.Result{}, nil
 
@@ -108,7 +112,7 @@ func (r *Reconciler) reconcileClosedChannel(channel *channels.Channel) (controll
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	if channel.Status.State == channels.Completed {
+	if channel.Status.State == channels.Disconnected {
 		err := r.channels.Remove(ctx, channel.ID)
 		if err != nil {
 			log.Warnf("Failed to reconcile closing channel %+v: %s", channel, err)
@@ -116,7 +120,7 @@ func (r *Reconciler) reconcileClosedChannel(channel *channels.Channel) (controll
 		}
 	}
 
-	if channel.Status.State == channels.Pending {
+	if channel.Status.State == channels.Initialized {
 		// TODO use configuration update to inform E2T that E2 node is intended to close the connection
 		//      (i.e. before calling close function)
 		err := channel.Client.Close()
@@ -124,7 +128,7 @@ func (r *Reconciler) reconcileClosedChannel(channel *channels.Channel) (controll
 			log.Warnf("Failed to reconcile closing channel %+v: %s", channel, err)
 			return controller.Result{}, err
 		}
-		channel.Status.State = channels.Completed
+		channel.Status.State = channels.Disconnected
 		err = r.channels.Update(ctx, channel)
 		if err != nil {
 			log.Warnf("Failed to reconcile closing channel %+v: %s", channel, err)

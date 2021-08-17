@@ -69,6 +69,7 @@ type e2Channel struct {
 	ricAddress   addressing.RICAddress
 }
 
+// GetClient returns E2 client
 func (e *e2Channel) GetClient() e2.ClientChannel {
 	return e.client
 }
@@ -145,7 +146,7 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 					ID: channelID,
 					Status: channels.ChannelStatus{
 						Phase: channels.Open,
-						State: channels.Pending,
+						State: channels.Disconnected,
 					},
 				}
 
@@ -209,7 +210,6 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 				}
 
 				channel.Status.Phase = channels.Closed
-				channel.Status.State = channels.Pending
 
 				err = e.channelStore.Update(ctx, channel)
 				if err != nil {
@@ -471,23 +471,7 @@ func (e *e2Channel) connect() error {
 	if err != nil {
 		return err
 	}
-	// Add channels to the channel store
-	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 
-	channel := &channels.Channel{
-		ID: channelID,
-		Status: channels.ChannelStatus{
-			Phase: channels.Open,
-			State: channels.Completed,
-		},
-		Client: client,
-	}
-
-	err = e.channelStore.Add(context.Background(),
-		channelID, channel)
-	if err != nil {
-		return err
-	}
 	e.client = client
 
 	return nil
@@ -513,6 +497,23 @@ func (e *e2Channel) setup() error {
 	} else if e2SetupFailure != nil {
 		err := errors.NewInvalid("E2 setup failed")
 		log.Error(err)
+		return err
+	}
+	// Add channels to the channel store
+	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
+
+	channel := &channels.Channel{
+		ID: channelID,
+		Status: channels.ChannelStatus{
+			Phase: channels.Open,
+			State: channels.Initialized,
+		},
+		Client: e.client,
+	}
+
+	err = e.channelStore.Add(context.Background(),
+		channelID, channel)
+	if err != nil {
 		return err
 	}
 	return nil
