@@ -64,7 +64,7 @@ func GenerateHoneycombTopology(mapCenter model.Coordinate, numTowers uint, secto
 	var nodeName string
 	var node model.Node
 	for t = 0; t < numTowers; t++ {
-		var azOffset int32 = 0
+		var azOffset int32
 		if sectorsPerTower == 6 {
 			azOffset = int32(math.Mod(float64(t), 2) * 30)
 		}

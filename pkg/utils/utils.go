@@ -158,7 +158,7 @@ func Uint64ToBitString(value uint64, bitCount int) []byte {
 
 // BitStringToUint64 converts bit string to uint 64
 func BitStringToUint64(bitString []byte, bitCount int) uint64 {
-	var result uint64 = 0
+	var result uint64
 	for i, b := range bitString {
 		result += uint64(b) << ((len(bitString) - i - 1) * 8)
 	}

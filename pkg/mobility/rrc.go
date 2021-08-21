@@ -13,10 +13,10 @@ import (
 )
 
 // RrcStateChangeProbability determines the rate of change of RRC states in ransim
-var RrcStateChangeProbability float64 = 0.005
+var RrcStateChangeProbability = 0.005
 
 // RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
-var RrcStateChangeVariance float64 = 0.9
+var RrcStateChangeVariance = 0.9
 
 // UeCountPerCellDefault is the default number of RRC Connected UEs per cell
 var UeCountPerCellDefault uint = 15
@@ -85,7 +85,7 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 }
 
 func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool, error) {
-	var rrcStateChanged bool = false
+	var rrcStateChanged = false
 
 	ue, err := d.ueStore.Get(ctx, imsi)
 	if err != nil {
@@ -119,7 +119,7 @@ func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool,
 }
 
 func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI, p float64) (bool, error) {
-	var rrcStateChanged bool = false
+	var rrcStateChanged = false
 
 	ue, err := d.ueStore.Get(ctx, imsi)
 	if err != nil {
