@@ -13,16 +13,16 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 )
 
-// ConnectionWatcher is a connection watcher
-type ConnectionWatcher struct {
+// Watcher is a connection watcher
+type Watcher struct {
 	connections  connections.Store
 	connectionCh chan event.Event
 	cancel       context.CancelFunc
 	mu           sync.Mutex
 }
 
-// Start starts the channel watcher
-func (w *ConnectionWatcher) Start(ch chan<- controller.ID) error {
+// Start starts the connection watcher
+func (w *Watcher) Start(ch chan<- controller.ID) error {
 	log.Info("Starting Connection Watcher")
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -52,7 +52,7 @@ func (w *ConnectionWatcher) Start(ch chan<- controller.ID) error {
 }
 
 // Stop stops the connection watcher
-func (w *ConnectionWatcher) Stop() {
+func (w *Watcher) Stop() {
 	w.mu.Lock()
 	if w.cancel != nil {
 		w.cancel()

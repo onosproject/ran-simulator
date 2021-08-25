@@ -28,7 +28,7 @@ const queueSize = 100
 // E2 channels that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
 func NewController(connections connections.Store) *controller.Controller {
 	c := controller.NewController("E2Connections")
-	c.Watch(&ConnectionWatcher{
+	c.Watch(&Watcher{
 		connections: connections,
 	})
 
