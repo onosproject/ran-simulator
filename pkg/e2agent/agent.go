@@ -184,10 +184,16 @@ func (a *e2Agent) Start() error {
 
 func (a *e2Agent) Stop() error {
 	log.Debugf("Stopping e2 agent with ID %d:", a.node.GnbID)
-	channelList := a.connectionStore.List(context.Background())
-	for _, ch := range channelList {
-		if ch.Client != nil {
-			err := ch.Client.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	connections := a.connectionStore.List(context.Background())
+	for _, conn := range connections {
+		if conn.Client != nil {
+			err := conn.Client.Close()
+			if err != nil {
+				return err
+			}
+			err = a.connectionStore.Remove(ctx, conn.ID)
 			if err != nil {
 				return err
 			}

@@ -54,7 +54,7 @@ type E2Connection interface {
 
 	Setup() error
 
-	Stop() error
+	Close() error
 
 	GetClient() e2.ClientChannel
 }
@@ -474,7 +474,6 @@ func (e *e2Connection) connect() error {
 	}
 
 	e.client = client
-
 	return nil
 }
 
@@ -520,7 +519,7 @@ func (e *e2Connection) setup() error {
 	return nil
 }
 
-func (e *e2Connection) Stop() error {
+func (e *e2Connection) Close() error {
 	connectionID := connections.NewConnectionID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	log.Debugf("Closing E2 connection with ID %d:", connectionID)
 	ctx, cancel := context.WithCancel(context.Background())

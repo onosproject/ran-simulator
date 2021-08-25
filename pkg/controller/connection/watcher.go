@@ -41,6 +41,7 @@ func (w *Watcher) Start(ch chan<- controller.ID) error {
 
 	go func() {
 		for connectionEvent := range w.connectionCh {
+			log.Debugf("Received connection event: %v", connectionEvent)
 			ch <- controller.NewID(connectionEvent.Key)
 
 		}
