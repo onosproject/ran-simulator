@@ -2,33 +2,33 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package channels
+package connections
 
 import (
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
 )
 
-// ChannelEvent a channel event
-type ChannelEvent int
+// ConnectionEvent a connection event
+type ConnectionEvent int
 
 const (
-	// None none channel event
-	None ChannelEvent = iota
+	// None none connection event
+	None ConnectionEvent = iota
 	// Created created  event
 	Created
-	// Updated updated channel event
+	// Updated updated connection event
 	Updated
-	// Deleted deleted  channel event
+	// Deleted deleted  connection event
 	Deleted
 )
 
-// String converts channel event to string
-func (e ChannelEvent) String() string {
+// String converts connection event to string
+func (e ConnectionEvent) String() string {
 	return [...]string{"None", "Created", "Updated", "Deleted"}[e]
 }
 
-// ChannelID channel ID consists of IP and port number of E2T instance
-type ChannelID struct {
+// ConnectionID consists of IP and port number of E2T instance
+type ConnectionID struct {
 	ricIPAddress string
 	ricPort      uint64
 }
@@ -49,8 +49,8 @@ func (p Phase) String() string {
 	return [...]string{"Open", "Closed"}[p]
 }
 
-// ChannelStatus channel status
-type ChannelStatus struct {
+// ConnectionStatus connection status
+type ConnectionStatus struct {
 	Phase Phase
 	State State
 }
@@ -74,9 +74,9 @@ func (s State) String() string {
 	return [...]string{"Connected", "Disconnected", "Initialized"}[s]
 }
 
-// Channel channel data structure for storing in channel store
-type Channel struct {
-	ID     ChannelID
+// Connection connection data for storing in connection store
+type Connection struct {
+	ID     ConnectionID
 	Client e2.ClientChannel
-	Status ChannelStatus
+	Status ConnectionStatus
 }

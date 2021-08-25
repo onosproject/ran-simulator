@@ -2,26 +2,26 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package channel
+package connection
 
 import (
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
-	"github.com/onosproject/ran-simulator/pkg/store/channels"
+	"github.com/onosproject/ran-simulator/pkg/store/connections"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 )
 
 // InstanceOptions e2 channel instance options
 type InstanceOptions struct {
-	node         model.Node
-	model        *model.Model
-	ricAddress   addressing.RICAddress
-	channel      e2.ClientChannel
-	registry     *registry.ServiceModelRegistry
-	subStore     *subscriptions.Subscriptions
-	channelStore channels.Store
+	node            model.Node
+	model           *model.Model
+	ricAddress      addressing.RICAddress
+	channel         e2.ClientChannel
+	registry        *registry.ServiceModelRegistry
+	subStore        *subscriptions.Subscriptions
+	connectionStore connections.Store
 }
 
 // InstanceOption instance option
@@ -69,9 +69,9 @@ func WithSubStore(subStore *subscriptions.Subscriptions) func(options *InstanceO
 	}
 }
 
-// WithChannelStore sets channel store
-func WithChannelStore(channelStore channels.Store) func(options *InstanceOptions) {
+// WithConnectionStore sets connection store
+func WithConnectionStore(connectionStore connections.Store) func(options *InstanceOptions) {
 	return func(options *InstanceOptions) {
-		options.channelStore = channelStore
+		options.connectionStore = connectionStore
 	}
 }

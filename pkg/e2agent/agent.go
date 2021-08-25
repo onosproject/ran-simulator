@@ -10,11 +10,11 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 
-	"github.com/onosproject/ran-simulator/pkg/e2agent/channel"
+	"github.com/onosproject/ran-simulator/pkg/e2agent/connection"
 
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
-	"github.com/onosproject/ran-simulator/pkg/store/channels"
+	"github.com/onosproject/ran-simulator/pkg/store/connections"
 	"github.com/onosproject/rrm-son-lib/pkg/handover"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
@@ -36,7 +36,7 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
-	channelController "github.com/onosproject/ran-simulator/pkg/e2agent/controller"
+	connectionController "github.com/onosproject/ran-simulator/pkg/controller/connection"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
@@ -53,14 +53,14 @@ type E2Agent interface {
 
 // e2Agent is an E2 agent
 type e2Agent struct {
-	node         model.Node
-	model        *model.Model
-	registry     *registry.ServiceModelRegistry
-	subStore     *subscriptions.Subscriptions
-	nodeStore    nodes.Store
-	ueStore      ues.Store
-	cellStore    cells.Store
-	channelStore channels.Store
+	node            model.Node
+	model           *model.Model
+	registry        *registry.ServiceModelRegistry
+	subStore        *subscriptions.Subscriptions
+	nodeStore       nodes.Store
+	ueStore         ues.Store
+	cellStore       cells.Store
+	connectionStore connections.Store
 }
 
 // NewE2Agent creates a new E2 agent
@@ -159,23 +159,23 @@ func (a *e2Agent) Start() error {
 		IPAddress: net.ParseIP(controllerAddresses[0]),
 		Port:      uint64(controller.Port),
 	}
-	channelStore := channels.NewStore()
-	a.channelStore = channelStore
+	connectionStore := connections.NewStore()
+	a.connectionStore = connectionStore
 
-	c := channelController.NewController(channelStore)
+	c := connectionController.NewController(connectionStore)
 	err = c.Start()
 	if err != nil {
 		return err
 	}
 
-	e2Channel := channel.NewE2Channel(channel.WithNode(a.node),
-		channel.WithModel(a.model),
-		channel.WithSMRegistry(a.registry),
-		channel.WithSubStore(a.subStore),
-		channel.WithRICAddress(ricAddress),
-		channel.WithChannelStore(channelStore))
+	e2Connection := connection.NewE2Connection(connection.WithNode(a.node),
+		connection.WithModel(a.model),
+		connection.WithSMRegistry(a.registry),
+		connection.WithSubStore(a.subStore),
+		connection.WithRICAddress(ricAddress),
+		connection.WithConnectionStore(connectionStore))
 
-	err = e2Channel.Start()
+	err = e2Connection.Setup()
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func (a *e2Agent) Start() error {
 
 func (a *e2Agent) Stop() error {
 	log.Debugf("Stopping e2 agent with ID %d:", a.node.GnbID)
-	channelList := a.channelStore.List(context.Background())
+	channelList := a.connectionStore.List(context.Background())
 	for _, ch := range channelList {
 		if ch.Client != nil {
 			err := ch.Client.Close()

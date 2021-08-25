@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package channel
+package connection
 
 import (
 	"context"
@@ -15,7 +15,7 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 
-	"github.com/onosproject/ran-simulator/pkg/store/channels"
+	"github.com/onosproject/ran-simulator/pkg/store/connections"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionUpdateitemie"
 
@@ -46,55 +46,54 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
-var log = logging.GetLogger("e2agent", "channel")
+var log = logging.GetLogger("e2agent", "connection")
 
-// E2Channel a new instance of E2 agent
-type E2Channel interface {
+// E2Connection a client interface for of E2 connection
+type E2Connection interface {
 	e2.ClientInterface
 
-	Start() error
+	Setup() error
 
 	Stop() error
 
 	GetClient() e2.ClientChannel
 }
 
-type e2Channel struct {
-	node         model.Node
-	model        *model.Model
-	client       e2.ClientChannel
-	registry     *registry.ServiceModelRegistry
-	subStore     *subscriptions.Subscriptions
-	channelStore channels.Store
-	ricAddress   addressing.RICAddress
+type e2Connection struct {
+	node            model.Node
+	model           *model.Model
+	client          e2.ClientChannel
+	registry        *registry.ServiceModelRegistry
+	subStore        *subscriptions.Subscriptions
+	connectionStore connections.Store
+	ricAddress      addressing.RICAddress
 }
 
 // GetClient returns E2 client
-func (e *e2Channel) GetClient() e2.ClientChannel {
+func (e *e2Connection) GetClient() e2.ClientChannel {
 	return e.client
 }
 
-// NewE2Channel creates new E2 channel instance
-func NewE2Channel(opts ...InstanceOption) E2Channel {
-	log.Info("Creating a new E2 Instance")
+// NewE2Connection creates new E2 connection
+func NewE2Connection(opts ...InstanceOption) E2Connection {
+	log.Info("Creating a new E2 Connection")
 	instanceOptions := &InstanceOptions{}
 	for _, option := range opts {
 		option(instanceOptions)
 	}
-
-	return &e2Channel{
-		model:        instanceOptions.model,
-		node:         instanceOptions.node,
-		registry:     instanceOptions.registry,
-		subStore:     instanceOptions.subStore,
-		ricAddress:   instanceOptions.ricAddress,
-		channelStore: instanceOptions.channelStore,
+	return &e2Connection{
+		model:           instanceOptions.model,
+		node:            instanceOptions.node,
+		registry:        instanceOptions.registry,
+		subStore:        instanceOptions.subStore,
+		ricAddress:      instanceOptions.ricAddress,
+		connectionStore: instanceOptions.connectionStore,
 	}
 
 }
 
 // E2ConnectionUpdate implements E2 connection update procedure
-func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
 	log.Info("Connection Update request is received %v", request)
 	connectionUpdateItemIes := make([]*e2appducontents.E2ConnectionUpdateItemIes, 0)
 	connectionSetupFailedItemIes := make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0)
@@ -140,17 +139,17 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 
 				}
 
-				// Adds a new channel to the channel store
-				channelID := channels.NewChannelID(ricAddress.IPAddress.String(), ricAddress.Port)
-				channel := &channels.Channel{
-					ID: channelID,
-					Status: channels.ChannelStatus{
-						Phase: channels.Open,
-						State: channels.Disconnected,
+				// Adds a new connection to the connection store
+				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
+				connection := &connections.Connection{
+					ID: connectionID,
+					Status: connections.ConnectionStatus{
+						Phase: connections.Open,
+						State: connections.Disconnected,
 					},
 				}
 
-				err := e.channelStore.Add(ctx, channelID, channel)
+				err := e.connectionStore.Add(ctx, connectionID, connection)
 				if err != nil {
 					// If connection is not established then creates a connection setup failed item IE
 					// to be reported in ACK
@@ -194,8 +193,8 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 
 				}
 
-				channelID := channels.NewChannelID(ricAddress.IPAddress.String(), ricAddress.Port)
-				channel, err := e.channelStore.Get(ctx, channelID)
+				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
+				connection, err := e.connectionStore.Get(ctx, connectionID)
 
 				if err != nil {
 					log.Warn(err)
@@ -209,9 +208,9 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 					return nil, connectionUpdateFailure, nil
 				}
 
-				channel.Status.Phase = channels.Closed
+				connection.Status.Phase = connections.Closed
 
-				err = e.channelStore.Update(ctx, channel)
+				err = e.connectionStore.Update(ctx, connection)
 				if err != nil {
 					log.Warn(err)
 					cause := &e2apies.Cause{
@@ -240,7 +239,7 @@ func (e *e2Channel) E2ConnectionUpdate(ctx context.Context, request *e2appducont
 	return ack, nil, nil
 }
 
-func (e *e2Channel) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
+func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	ranFuncID := registry.RanFunctionID(controlutils.GetRanFunctionID(request))
 	log.Debugf("Received Control Request %+v for ran function %d", request, ranFuncID)
 	sm, err := e.registry.GetServiceModel(ranFuncID)
@@ -272,7 +271,7 @@ func (e *e2Channel) RICControl(ctx context.Context, request *e2appducontents.Ric
 	return response, failure, err
 }
 
-func (e *e2Channel) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
+func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
 	log.Debugf("Received Subscription Request %v for ran function %d", request, ranFuncID)
 	sm, err := e.registry.GetServiceModel(ranFuncID)
@@ -348,7 +347,7 @@ func (e *e2Channel) RICSubscription(ctx context.Context, request *e2appducontent
 	return response, failure, err
 }
 
-func (e *e2Channel) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
+func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	log.Debugf("Received Subscription Delete Request %v for ran function ID %d", request, ranFuncID)
 	subID := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
@@ -430,7 +429,7 @@ func (e *e2Channel) RICSubscriptionDelete(ctx context.Context, request *e2appduc
 	return response, failure, err
 }
 
-func (e *e2Channel) Start() error {
+func (e *e2Connection) Setup() error {
 	log.Infof("E2 node %d is starting; attempting to connect", e.node.GnbID)
 	b := newExpBackoff()
 
@@ -459,10 +458,12 @@ func (e *e2Channel) Start() error {
 	return err
 }
 
-func (e *e2Channel) connect() error {
+func (e *e2Connection) connect() error {
 	addr := fmt.Sprintf("%s:%d", e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 	log.Info("Connecting to E2T with IP address:", addr)
-	client, err := e2.Connect(context.TODO(), addr,
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	client, err := e2.Connect(ctx, addr,
 		func(channel e2.ClientChannel) e2.ClientInterface {
 			return e
 		},
@@ -477,7 +478,7 @@ func (e *e2Channel) connect() error {
 	return nil
 }
 
-func (e *e2Channel) setup() error {
+func (e *e2Connection) setup() error {
 	plmnID := ransimtypes.NewUint24(uint32(e.model.PlmnID))
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(e.registry.GetRanFunctions()),
@@ -499,29 +500,29 @@ func (e *e2Channel) setup() error {
 		log.Error(err)
 		return err
 	}
-	// Add channels to the channel store
-	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
+	// Add connection to the connection store
+	connectionID := connections.NewConnectionID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 
-	channel := &channels.Channel{
-		ID: channelID,
-		Status: channels.ChannelStatus{
-			Phase: channels.Open,
-			State: channels.Initialized,
+	connection := &connections.Connection{
+		ID: connectionID,
+		Status: connections.ConnectionStatus{
+			Phase: connections.Open,
+			State: connections.Initialized,
 		},
 		Client: e.client,
 	}
 
-	err = e.channelStore.Add(context.Background(),
-		channelID, channel)
+	err = e.connectionStore.Add(context.Background(),
+		connectionID, connection)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (e *e2Channel) Stop() error {
-	channelID := channels.NewChannelID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
-	log.Debugf("Closing E2 channel with ID %d:", channelID)
+func (e *e2Connection) Stop() error {
+	connectionID := connections.NewConnectionID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
+	log.Debugf("Closing E2 connection with ID %d:", connectionID)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -530,7 +531,7 @@ func (e *e2Channel) Stop() error {
 		if err != nil {
 			return err
 		}
-		err = e.channelStore.Remove(ctx, channelID)
+		err = e.connectionStore.Remove(ctx, connectionID)
 		if err != nil {
 			return err
 		}
@@ -538,4 +539,4 @@ func (e *e2Channel) Stop() error {
 	return nil
 }
 
-var _ E2Channel = &e2Channel{}
+var _ E2Connection = &e2Connection{}

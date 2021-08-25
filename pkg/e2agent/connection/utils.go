@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-1.0
 
-package channel
+package connection
 
 import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
@@ -14,7 +14,7 @@ import (
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
 )
 
-func (e *e2Channel) getRICAddress(tnlInfo *e2apies.Tnlinformation) addressing.RICAddress {
+func (e *e2Connection) getRICAddress(tnlInfo *e2apies.Tnlinformation) addressing.RICAddress {
 	tnlAddr := tnlInfo.GetTnlAddress().GetValue()
 	tnlAddrLen := tnlInfo.GetTnlAddress().GetLen()
 	var ricAddress addressing.RICAddress
