@@ -12,16 +12,21 @@ import (
 
 // Model simulation model
 type Model struct {
-	MapLayout      MapLayout               `mapstructure:"layout" yaml:"layout"`
-	Nodes          map[string]Node         `mapstructure:"nodes" yaml:"nodes"`
-	Cells          map[string]Cell         `mapstructure:"cells" yaml:"cells"`
-	Controllers    map[string]Controller   `mapstructure:"controllers" yaml:"controllers"`
-	ServiceModels  map[string]ServiceModel `mapstructure:"servicemodels" yaml:"servicemodels"`
-	UECount        uint                    `mapstructure:"ueCount" yaml:"ueCount"`
-	UECountPerCell uint                    `mapstructure:"ueCountPerCell" yaml:"ueCountPerCell"`
-	Plmn           string                  `mapstructure:"plmnID" yaml:"plmnID"`
-	PlmnID         types.PlmnID            `mapstructure:"plmnNumber" yaml:"plmnNumber"` // overridden and derived post-load from "Plmn" field
-	APIKey         string                  `mapstructure:"apiKey" yaml:"apiKey"`         // Google Maps API key (optional)
+	MapLayout               MapLayout               `mapstructure:"layout" yaml:"layout"`
+	RouteEndPoints          []RouteEndPoint         `mapstructure:"routeEndPoints" yaml:"routeEndPoints"`
+	WayPointRoute           bool                    `mapstructure:"wayPointRoute" yaml:"wayPointRoute"`
+	DirectRoute             bool                    `mapstructure:"directRoute" yaml:"directRoute"`
+	Nodes                   map[string]Node         `mapstructure:"nodes" yaml:"nodes"`
+	Cells                   map[string]Cell         `mapstructure:"cells" yaml:"cells"`
+	Controllers             map[string]Controller   `mapstructure:"controllers" yaml:"controllers"`
+	ServiceModels           map[string]ServiceModel `mapstructure:"servicemodels" yaml:"servicemodels"`
+	RrcStateChangesDisabled bool                    `mapstructure:"RrcStateChangesDisabled" yaml:"RrcStateChangesDisabled"`
+	InitialRrcState         string                  `mapstructure:"initialRrcState" yaml:"initialRrcState"`
+	UECount                 uint                    `mapstructure:"ueCount" yaml:"ueCount"`
+	UECountPerCell          uint                    `mapstructure:"ueCountPerCell" yaml:"ueCountPerCell"`
+	Plmn                    string                  `mapstructure:"plmnID" yaml:"plmnID"`
+	PlmnID                  types.PlmnID            `mapstructure:"plmnNumber" yaml:"plmnNumber"` // overridden and derived post-load from "Plmn" field
+	APIKey                  string                  `mapstructure:"apiKey" yaml:"apiKey"`         // Google Maps API key (optional)
 }
 
 // Coordinate represents a geographical location
@@ -37,6 +42,12 @@ type Sector struct {
 	Arc     int32      `mapstructure:"arc"`
 	Tilt    int32      `mapstructure:"tilt"`
 	Height  int32      `mapstructure:"height"`
+}
+
+// RouteEndPoint ...
+type RouteEndPoint struct {
+	Start Coordinate `mapstructure:"start"`
+	End   Coordinate `mapstructure:"end"`
 }
 
 // Route represents a series of points for tracking movement of user-equipment

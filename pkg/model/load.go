@@ -54,6 +54,7 @@ func LoadConfig(model *Model, configname string) error {
 		}
 		model.Cells[k] = v
 	}
+
 	return err
 }
 
@@ -85,5 +86,6 @@ func LoadConfigFromBytes(model *Model, modelData []byte) error {
 		}
 		model.Cells[k] = v
 	}
+	log.Infof("routeEndPoints: %v", model.RouteEndPoints)
 	return err
 }

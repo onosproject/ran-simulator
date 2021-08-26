@@ -87,24 +87,26 @@ type WatchOptions struct {
 }
 
 type store struct {
-	mu        sync.RWMutex
-	ues       map[types.IMSI]*model.UE
-	maxUEs    map[uint64]int
-	cellStore cells.Store
-	watchers  *watcher.Watchers
+	mu              sync.RWMutex
+	ues             map[types.IMSI]*model.UE
+	maxUEs          map[uint64]int
+	cellStore       cells.Store
+	watchers        *watcher.Watchers
+	initialRrcState string
 }
 
 // NewUERegistry creates a new user-equipment registry primed with the specified number of UEs to start.
 // UEs will be semi-randomly distributed between the specified cells
-func NewUERegistry(count uint, cellStore cells.Store) Store {
+func NewUERegistry(count uint, cellStore cells.Store, initialRrcState string) Store {
 	log.Infof("Creating registry from model with %d UEs", count)
 	watchers := watcher.NewWatchers()
 	store := &store{
-		mu:        sync.RWMutex{},
-		ues:       make(map[types.IMSI]*model.UE),
-		maxUEs:    make(map[uint64]int),
-		cellStore: cellStore,
-		watchers:  watchers,
+		mu:              sync.RWMutex{},
+		ues:             make(map[types.IMSI]*model.UE),
+		maxUEs:          make(map[uint64]int),
+		cellStore:       cellStore,
+		watchers:        watchers,
+		initialRrcState: initialRrcState,
 	}
 	ctx := context.Background()
 	store.CreateUEs(ctx, count)
@@ -211,12 +213,22 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 		}
 		ncgi := randomCell.NCGI
 		var rrcState e2sm_mho.Rrcstatus
-		if randomBoolean() {
-			rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
-			s.cellStore.IncrementRrcIdleCount(ctx, ncgi)
+		if s.initialRrcState == "connected" || s.initialRrcState == "idle" {
+			if s.initialRrcState == "idle" {
+				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+				s.cellStore.IncrementRrcIdleCount(ctx, ncgi)
+			} else {
+				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+				s.cellStore.IncrementRrcConnectedCount(ctx, ncgi)
+			}
 		} else {
-			rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
-			s.cellStore.IncrementRrcConnectedCount(ctx, ncgi)
+			if randomBoolean() {
+				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+				s.cellStore.IncrementRrcIdleCount(ctx, ncgi)
+			} else {
+				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+				s.cellStore.IncrementRrcConnectedCount(ctx, ncgi)
+			}
 		}
 		ue := &model.UE{
 			IMSI:     imsi,
