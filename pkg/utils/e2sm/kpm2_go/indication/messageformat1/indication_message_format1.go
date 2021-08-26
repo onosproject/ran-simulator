@@ -5,8 +5,8 @@
 package messageformat1
 
 import (
+	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
 	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -65,7 +65,7 @@ func WithMeasInfoList(measInfoList *e2smkpmv2.MeasurementInfoList) func(msg *Mes
 }
 
 // ToAsn1Bytes converts to Asn1 bytes
-func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (message *Message) ToAsn1Bytes(serviceModel servicemodel.Kpm2ServiceModel) ([]byte, error) {
 	indicationMessage, err := message.Build()
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]by
 		return nil, err
 	}
 
-	indicationMessageAsn1Bytes, err := modelPlugin.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
+	indicationMessageAsn1Bytes, err := serviceModel.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
 	if err != nil {
 		return nil, err
 	}
