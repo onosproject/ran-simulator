@@ -35,7 +35,7 @@ func newTestService() (northbound.Service, error) {
 	}
 	nodeStore := nodes.NewNodeRegistry(m.Nodes)
 	cellStore := cells.NewCellRegistry(m.Cells, nodeStore)
-	ueStore := ues.NewUERegistry(m.UECount, cellStore)
+	ueStore := ues.NewUERegistry(m.UECount, cellStore, "random")
 	return &Service{model: m, cellStore: cellStore, ueStore: ueStore}, nil
 }
 

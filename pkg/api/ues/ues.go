@@ -162,7 +162,6 @@ func (s *Server) ListUEs(request *modelapi.ListUEsRequest, server modelapi.UEMod
 	log.Debugf("Received listing UEs request: %v", request)
 	ueList := s.ueStore.ListAllUEs(server.Context())
 	for _, ue := range ueList {
-		log.Info("UE:", ue)
 		resp := &modelapi.ListUEsResponse{
 			Ue: ueToAPI(ue),
 		}

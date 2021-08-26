@@ -24,15 +24,17 @@ const stepsPerDecimalDegree = 500
 const latMargin = 0.04 // ~ 4.4km at equator; ~3.1km at 45
 const lngMargin = 0.01 // ~ 4.4km
 
-func (d *driver) GenerateRoutes(ctx context.Context, minSpeed uint32, maxSpeed uint32, speedStdDev uint32) {
+var routeEndPointIndex = 0
+
+func (d *driver) GenerateRoutes(ctx context.Context, minSpeed uint32, maxSpeed uint32, speedStdDev uint32, routeEndPoints []model.RouteEndPoint, directRoute bool) {
 	d.establishArea(ctx)
 	log.Infof("Generating routes in area min=%v; max=%v\n", d.min, d.max)
 	for _, ue := range d.ueStore.ListAllUEs(ctx) {
 		_, err := d.routeStore.Get(ctx, ue.IMSI)
 		if err != nil {
-			err = d.generateRoute(ctx, ue.IMSI, uint32(rand.Intn(int(maxSpeed-minSpeed))), speedStdDev)
+			err = d.generateRoute(ctx, ue.IMSI, uint32(rand.Intn(int(maxSpeed-minSpeed))), speedStdDev, routeEndPoints, directRoute)
 			if err != nil {
-				log.Warn("Unable to generate route for %d", ue.IMSI)
+				log.Warnf("Unable to generate route for %d, %v", ue.IMSI, err)
 			}
 		}
 	}
@@ -62,18 +64,28 @@ func (d *driver) establishArea(ctx context.Context) {
 	d.max.Lng = d.max.Lng + lngMargin
 }
 
-func (d *driver) generateRoute(ctx context.Context, imsi types.IMSI, speedAvg uint32, speedStdDev uint32) error {
+func (d *driver) generateRoute(ctx context.Context, imsi types.IMSI, speedAvg uint32, speedStdDev uint32, routeEndPoints []model.RouteEndPoint, directRoute bool) error {
 	var err error
-	start := d.randomCoordinate()
-	end := d.randomCoordinate()
+	var start, end *model.Coordinate
+
+	if len(routeEndPoints) == 0 {
+		// chose random end points
+		start = d.randomCoordinate()
+		end = d.randomCoordinate()
+	} else {
+		// round-robin through the model's end points
+		start = &routeEndPoints[routeEndPointIndex].Start
+		end = &routeEndPoints[routeEndPointIndex].End
+		routeEndPointIndex = (routeEndPointIndex + 1) % len(routeEndPoints)
+	}
 
 	var points []*model.Coordinate
 	if len(d.apiKey) >= googleAPIKeyMinLen {
 		points, err = googleRoute(start, end, d.apiKey)
 		log.Infof("Generated route for UE %d with %d points using Google Directions", imsi, len(points))
 	} else {
-		points, err = randomRoute(start, end)
-		log.Infof("Generated route for UE %d with %d points using Random Directions", imsi, len(points))
+		points, err = randomRoute(start, end, directRoute)
+		log.Infof("Generated route for UE %d with %d points using Random Directions, start:%v, end:%v", imsi, len(points), start, end)
 	}
 	if err != nil {
 		return err
@@ -135,7 +147,7 @@ func googleRoute(startLoc *model.Coordinate, endLoc *model.Coordinate, apiKey st
 	return points, nil
 }
 
-func randomRoute(startLoc *model.Coordinate, endLoc *model.Coordinate) ([]*model.Coordinate, error) {
+func randomRoute(startLoc *model.Coordinate, endLoc *model.Coordinate, directRoute bool) ([]*model.Coordinate, error) {
 	routeWidth := endLoc.Lng - startLoc.Lng
 	routeHeight := endLoc.Lat - startLoc.Lat
 
@@ -145,7 +157,7 @@ func randomRoute(startLoc *model.Coordinate, endLoc *model.Coordinate) ([]*model
 
 	for i := range points {
 		randFactor := (rand.Float64() - 0.5) / stepsPerDecimalDegree
-		if i == 0 {
+		if i == 0 || directRoute {
 			randFactor = 0.0
 		}
 		deltaX := routeWidth*float64(i)/float64(len(points)) + randFactor

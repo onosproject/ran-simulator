@@ -36,7 +36,7 @@ type Driver interface {
 	Stop()
 
 	// GenerateRoutes generates routes for all UEs that currently do not have a route; remove routes with no UEs
-	GenerateRoutes(ctx context.Context, minSpeed uint32, maxSpeed uint32, speedStdDev uint32)
+	GenerateRoutes(ctx context.Context, minSpeed uint32, maxSpeed uint32, speedStdDev uint32, routeEndPoints []model.RouteEndPoint, directRoute bool)
 
 	// GetMeasCtrl returns the Measurement Controller
 	GetMeasCtrl() measurement.MeasController
@@ -61,30 +61,34 @@ type Driver interface {
 }
 
 type driver struct {
-	cellStore   cells.Store
-	routeStore  routes.Store
-	ueStore     ues.Store
-	apiKey      string
-	ticker      *time.Ticker
-	done        chan bool
-	stopLocalHO chan bool
-	min         *model.Coordinate
-	max         *model.Coordinate
-	measCtrl    measurement.MeasController
-	hoCtrl      handover.HOController
-	hoLogic     string
-	rrcCtrl     RrcCtrl
-	ueLock      map[types.IMSI]*sync.Mutex
+	cellStore               cells.Store
+	routeStore              routes.Store
+	ueStore                 ues.Store
+	apiKey                  string
+	ticker                  *time.Ticker
+	done                    chan bool
+	stopLocalHO             chan bool
+	min                     *model.Coordinate
+	max                     *model.Coordinate
+	measCtrl                measurement.MeasController
+	hoCtrl                  handover.HOController
+	hoLogic                 string
+	rrcCtrl                 RrcCtrl
+	ueLock                  map[types.IMSI]*sync.Mutex
+	rrcStateChangesDisabled bool
+	wayPointRoute           bool
 }
 
 // NewMobilityDriver returns a driving engine capable of "driving" UEs along pre-specified routes
-func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string, hoLogic string, ueCountPerCell uint) Driver {
+func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore ues.Store, apiKey string, hoLogic string, ueCountPerCell uint, rrcStateChangesDisabled bool, wayPointRoute bool) Driver {
 	return &driver{
-		cellStore:  cellStore,
-		routeStore: routeStore,
-		ueStore:    ueStore,
-		hoLogic:    hoLogic,
-		rrcCtrl:    NewRrcCtrl(ueCountPerCell),
+		cellStore:               cellStore,
+		routeStore:              routeStore,
+		ueStore:                 ueStore,
+		hoLogic:                 hoLogic,
+		rrcCtrl:                 NewRrcCtrl(ueCountPerCell),
+		rrcStateChangesDisabled: rrcStateChangesDisabled,
+		wayPointRoute:           wayPointRoute,
 	}
 }
 
@@ -204,7 +208,9 @@ func (d *driver) processRoute(ctx context.Context, route *model.Route) {
 	}
 	d.updateUEPosition(ctx, route)
 	d.updateUESignalStrength(ctx, route.IMSI)
-	d.updateRrc(ctx, route.IMSI)
+	if !d.rrcStateChangesDisabled {
+		d.updateRrc(ctx, route.IMSI)
+	}
 	d.reportMeasurement(ctx, route.IMSI)
 }
 
@@ -235,6 +241,9 @@ func (d *driver) updateUEPosition(ctx context.Context, route *model.Route) {
 	// Otherwise just use the next waypoint
 	newPoint := *route.Points[route.NextPoint]
 	reachedWaypoint := remainingDistance <= distanceDriven
+	if d.wayPointRoute {
+		reachedWaypoint = true
+	}
 	if !reachedWaypoint {
 		newPoint = utils.TargetPoint(ue.Location, bearing, distanceDriven)
 	}
