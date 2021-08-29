@@ -4,7 +4,7 @@ export GO111MODULE=on
 .PHONY: build
 
 RAN_SIMULATOR_VERSION := latest
-ONOS_PROTOC_VERSION := v0.6.7
+ONOS_PROTOC_VERSION := v0.6.9
 
 OUTPUT_DIR=./build/_output
 
