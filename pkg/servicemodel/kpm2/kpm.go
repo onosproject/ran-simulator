@@ -539,6 +539,8 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		return nil, nil, err
 	}
 	// Stops the goroutine sending the indication messages
-	sub.Ticker.Stop()
+	if sub.Ticker != nil {
+		sub.Ticker.Stop()
+	}
 	return subDeleteResponse, nil, nil
 }
