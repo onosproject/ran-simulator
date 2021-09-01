@@ -75,8 +75,7 @@ GnbID            Status   Service Models   E2T Controllers      Cell NCGIs
 6) The following command displays the cell information, including the number of UEs per cell that are in RRC State Idle and Connected.
 
 ```bash
-onos ransim get cells                                                                                                             Shads-MBP.attlocal.net: Wed Aug 18 20:29:44 2021
-
+$ onos ransim get cells
 NCGI                 #UEs Max UEs    TxDB       Lat       Lng Azimuth     Arc   A3Offset     TTT  A3Hyst CellOffset FreqOffset      PCI    Color Idle Conn Neighbors
 13842601454c002         0   99999   11.00    52.486    13.412     120     120          0       0       0          0          0      148    green   49,   17, 13842601454c001,13842601454c003,1
 38426014550002
