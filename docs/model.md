@@ -7,7 +7,8 @@ RAN simulator defines two levels of simulation models:
 
 * **Use Case Specific Models**: The simulation information that is not common between use cases can be added as new service models will be introduced. These models can be added to the [ran-simulator helm chart][RAN simulator helm chart] and can be loaded by RAN simulator. 
 
-One such use case specific model, the **two-cell-two-node-model.yaml** model, is used but **onos-mho** xApplication to emulate UEs moving between pre-determined end-points. As opposed to the generic model that supports UEs moving on random routes (with randomly generated end-points), the two-cell-two-node-model is ideally suited to test handover scenarios deterministically. In order to support this model, RANSim supports the ability to specify the following directives in the model's yaml description:
+## MHO specific model
+One example of a use case specific model is the **two-cell-two-node-model.yaml** model, is used by **onos-mho** xApplication to emulate UEs moving between pre-determined end-points. As opposed to the generic model that supports UEs moving on random routes (with randomly generated end-points), the two-cell-two-node-model is ideally suited to test handover scenarios deterministically. In order to support this model, RANSim supports the ability to specify the following directives in the model's yaml description:
 
 * routeEndPoints: Start and end end-point coordinates for routes 
 * directRoute: Direct route between end-points (as opposed to the default randomly zig-zagging route)
