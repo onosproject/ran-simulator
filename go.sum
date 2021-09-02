@@ -641,8 +641,8 @@ github.com/onosproject/onos-api/go v0.7.76/go.mod h1:dUChRuNCBGrF6sVdaAZl5T2ZeyE
 github.com/onosproject/onos-api/go v0.7.77/go.mod h1:dUChRuNCBGrF6sVdaAZl5T2ZeyEC6ybsAdEBu0YwlMw=
 github.com/onosproject/onos-api/go v0.7.80/go.mod h1:dUChRuNCBGrF6sVdaAZl5T2ZeyEC6ybsAdEBu0YwlMw=
 github.com/onosproject/onos-api/go v0.7.85/go.mod h1:dUChRuNCBGrF6sVdaAZl5T2ZeyEC6ybsAdEBu0YwlMw=
-github.com/onosproject/onos-api/go v0.7.89 h1:RPxA4kttdSW50gCr5Hq063yHai5iILuUGQfLei9DvQk=
-github.com/onosproject/onos-api/go v0.7.89/go.mod h1:dUChRuNCBGrF6sVdaAZl5T2ZeyEC6ybsAdEBu0YwlMw=
+github.com/onosproject/onos-api/go v0.7.93 h1:iG9x1eSLHnvVO+bIKAjV6MMDdxXvy4f7AM/8T5qM9H8=
+github.com/onosproject/onos-api/go v0.7.93/go.mod h1:dUChRuNCBGrF6sVdaAZl5T2ZeyEC6ybsAdEBu0YwlMw=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.47/go.mod h1:vhYUpOK9A/VNdCGeu4tVuOyX2BS7oaA9KO3w8bO4+mg=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.56 h1:cxDPAI29DGnjYSrUISfETLtuSblcLrIKJ8zzyUW/CZ0=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.56/go.mod h1:4DQjVbWd9m7Gi/tJY/rpGOq41giWXsat4JUgSDtiuio=
