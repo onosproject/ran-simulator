@@ -13,22 +13,22 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
-	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/id/cellglobalid"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/id/cellglobalid"
 
-	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/measobjectitem"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/measobjectitem"
 
-	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/reportstyle"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/reportstyle"
 
-	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/ranfuncdescription"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/ranfuncdescription"
 
-	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/nodeitem"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/nodeitem"
 
-	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/measurments"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/measurments"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
-	kpm2gNBID "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/id/gnbid"
-	kpm2IndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/indication"
-	kpm2MessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2-go/indication/messageformat1"
+	kpm2gNBID "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/id/gnbid"
+	kpm2IndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/indication"
+	kpm2MessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/indication/messageformat1"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/pdubuilder"

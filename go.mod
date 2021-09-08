@@ -23,7 +23,6 @@ require (
 	github.com/onosproject/onos-test v0.6.4
 	github.com/onosproject/rrm-son-lib v0.0.2
 	github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab
-	github.com/prometheus/common v0.10.0 // indirect
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
