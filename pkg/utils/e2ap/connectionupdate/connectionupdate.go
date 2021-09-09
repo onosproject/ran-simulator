@@ -5,10 +5,10 @@
 package connectionupdate
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 )
 
 // ConnectionUpdate info for building connection update ack and failure responses
@@ -65,9 +65,9 @@ func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E
 
 	if c.connectionUpdateItemIes != nil {
 		ie39 = &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes39{
-			Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
+			Id:          int32(v2beta1.ProtocolIeIDRicrequestID),
 			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-			ConnectionSetup: &e2appducontents.E2ConnectionUpdateList{
+			Value: &e2appducontents.E2ConnectionUpdateList{
 				Value: make([]*e2appducontents.E2ConnectionUpdateItemIes, 0),
 			},
 			Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
@@ -77,9 +77,9 @@ func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E
 
 	if c.connectionSetupFailedItemIes != nil {
 		ie40 = &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes40{
-			Id:          int32(v1beta2.ProtocolIeIDE2connectionSetupFailed),
+			Id:          int32(v2beta1.ProtocolIeIDE2connectionSetupFailed),
 			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-			ConnectionSetupFailed: &e2appducontents.E2ConnectionSetupFailedList{
+			Value: &e2appducontents.E2ConnectionSetupFailedList{
 				Value: make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0),
 			},
 			Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
@@ -92,11 +92,11 @@ func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E
 
 	if len(c.connectionUpdateItemIes) != 0 {
 		response.GetProtocolIes().E2ApProtocolIes39 = ie39
-		response.GetProtocolIes().GetE2ApProtocolIes39().ConnectionSetup.Value = c.connectionUpdateItemIes
+		response.GetProtocolIes().GetE2ApProtocolIes39().Value.Value = c.connectionUpdateItemIes
 	}
 	if len(c.connectionSetupFailedItemIes) != 0 {
 		response.GetProtocolIes().E2ApProtocolIes40 = ie40
-		response.GetProtocolIes().GetE2ApProtocolIes40().ConnectionSetupFailed.Value = c.connectionSetupFailedItemIes
+		response.GetProtocolIes().GetE2ApProtocolIes40().Value.Value = c.connectionSetupFailedItemIes
 	}
 
 	return response
@@ -107,13 +107,13 @@ func (c *ConnectionUpdate) BuildConnectionUpdateFailure() *e2appducontents.E2Con
 	failure := &e2appducontents.E2ConnectionUpdateFailure{
 		ProtocolIes: &e2appducontents.E2ConnectionUpdateFailureIes{
 			E2ApProtocolIes1: &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes1{
-				Id:          int32(v1beta2.ProtocolIeIDCause),
+				Id:          int32(v2beta1.ProtocolIeIDCause),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value:       c.cause,
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 			},
 			E2ApProtocolIes31: &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes31{
-				Id:          int32(v1beta2.ProtocolIeIDTimeToWait),
+				Id:          int32(v2beta1.ProtocolIeIDTimeToWait),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 				Value:       *c.timeToWait,
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),

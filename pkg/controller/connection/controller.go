@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	e2connection "github.com/onosproject/ran-simulator/pkg/e2agent/connection"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -79,7 +79,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 
 	if connection.Status.State == connections.Disconnected {
 		e2Connection := e2connection.NewE2Connection()
-		client, err := e2.Connect(ctx, addr, func(channel e2.ClientChannel) e2.ClientInterface {
+		client, err := e2.Connect(ctx, addr, func(channel e2.ClientConn) e2.ClientInterface {
 			return e2Connection
 		})
 

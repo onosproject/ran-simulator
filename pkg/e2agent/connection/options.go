@@ -5,7 +5,7 @@
 package connection
 
 import (
-	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
@@ -18,7 +18,7 @@ type InstanceOptions struct {
 	node            model.Node
 	model           *model.Model
 	ricAddress      addressing.RICAddress
-	channel         e2.ClientChannel
+	channel         e2.ClientConn
 	registry        *registry.ServiceModelRegistry
 	subStore        *subscriptions.Subscriptions
 	connectionStore connections.Store
@@ -49,7 +49,7 @@ func WithRICAddress(ricAddress addressing.RICAddress) func(options *InstanceOpti
 }
 
 // WithChannel sets E2 channel
-func WithChannel(channel e2.ClientChannel) func(options *InstanceOptions) {
+func WithChannel(channel e2.ClientConn) func(options *InstanceOptions) {
 	return func(options *InstanceOptions) {
 		options.channel = channel
 	}

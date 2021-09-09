@@ -22,7 +22,7 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"

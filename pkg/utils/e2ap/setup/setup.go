@@ -6,13 +6,14 @@ package setup
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
@@ -62,7 +63,7 @@ func WithE2NodeID(e2NodeID uint64) func(*Setup) {
 func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err error) {
 	//plmnID := types.NewUint24(request.plmnID)
 	ranFunctionList := e2appducontents.E2SetupRequestIes_E2SetupRequestIes10{
-		Id:          int32(v1beta2.ProtocolIeIDRanfunctionsAdded),
+		Id:          int32(v2beta1.ProtocolIeIDRanfunctionsAdded),
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2appducontents.RanfunctionsList{
@@ -73,7 +74,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 	for id, ranFunctionID := range request.ranFunctions {
 		ranFunction := e2appducontents.RanfunctionItemIes{
 			E2ApProtocolIes10: &e2appducontents.RanfunctionItemIes_RanfunctionItemIes8{
-				Id:          int32(v1beta2.ProtocolIeIDRanfunctionItem),
+				Id:          int32(v2beta1.ProtocolIeIDRanfunctionItem),
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 				Value: &e2appducontents.RanfunctionItem{
@@ -87,7 +88,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 						Value: int32(ranFunctionID.Revision),
 					},
 					RanFunctionOid: &e2ap_commondatatypes.RanfunctionOid{
-						Value: []byte(ranFunctionID.OID),
+						Value: string(ranFunctionID.OID),
 					},
 				},
 			},
@@ -98,7 +99,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 	e2SetupRequest := &e2appducontents.E2SetupRequest{
 		ProtocolIes: &e2appducontents.E2SetupRequestIes{
 			E2ApProtocolIes3: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes3{
-				Id:          int32(v1beta2.ProtocolIeIDGlobalE2nodeID),
+				Id:          int32(v2beta1.ProtocolIeIDGlobalE2nodeID),
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2apies.GlobalE2NodeId{
@@ -110,7 +111,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 								},
 								GnbId: &e2apies.GnbIdChoice{
 									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{
-										GnbId: &e2ap_commondatatypes.BitString{
+										GnbId: &asn1.BitString{
 											Value: utils.Uint64ToBitString(request.e2NodeID, 28),
 											Len:   28,
 										}},
@@ -124,11 +125,12 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 		},
 	}
 
-	err = e2SetupRequest.Validate()
+	// TODO enable it when it is available
+	/*err = e2SetupRequest.Validate()
 	if err != nil {
 		log.Warnf("Validation error %s", err.Error())
 		return nil, err
-	}
+	}*/
 	log.Debugf("Created E2SetupRequest %v", e2SetupRequest)
 	return e2SetupRequest, nil
 }

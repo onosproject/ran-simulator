@@ -33,8 +33,8 @@ import (
 
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder"
@@ -42,7 +42,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"

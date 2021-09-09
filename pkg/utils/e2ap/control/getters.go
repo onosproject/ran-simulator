@@ -5,7 +5,7 @@
 package control
 
 import (
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 )
 
 // GetRequesterID gets requester ID

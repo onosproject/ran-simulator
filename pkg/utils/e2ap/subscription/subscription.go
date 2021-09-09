@@ -5,11 +5,11 @@
 package subscription
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 )
 
 // Subscription defines required fields for creating subscription response and failures
@@ -86,7 +86,7 @@ func WithActionsNotAdmitted(ricActionsNotAdmitted map[types.RicActionID]*e2apies
 // BuildSubscriptionFailure builds e2ap subscription failure
 func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appducontents.RicsubscriptionFailure, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes29{
-		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
+		Id:          int32(v2beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: subscription.reqID,
@@ -96,7 +96,7 @@ func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appduc
 	}
 
 	ranFunctionID := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes5{
-		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
+		Id:          int32(v2beta1.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: subscription.ranFuncID,
@@ -104,18 +104,18 @@ func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appduc
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 
-	ricActionNotAdmittedList := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes18{
-		Id:          int32(v1beta2.ProtocolIeIDRicactionsNotAdmitted),
+	/*ricActionNotAdmittedList := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes18{
+		Id:          int32(v2beta1.ProtocolIeIDRicactionsNotAdmitted),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2appducontents.RicactionNotAdmittedList{
 			Value: make([]*e2appducontents.RicactionNotAdmittedItemIes, 0),
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-	}
+	}*/
 
-	for ricActionID, cause := range subscription.ricActionsNotAdmitted {
+	/*for ricActionID, cause := range subscription.ricActionsNotAdmitted {
 		ranaItemIe := e2appducontents.RicactionNotAdmittedItemIes{
-			Id:          int32(v1beta2.ProtocolIeIDRicactionNotAdmittedItem),
+			Id:          int32(v2beta1.ProtocolIeIDRicactionNotAdmittedItem),
 			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 			Value: &e2appducontents.RicactionNotAdmittedItem{
 				RicActionId: &e2apies.RicactionId{
@@ -126,12 +126,11 @@ func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appduc
 			Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 		}
 		ricActionNotAdmittedList.GetValue().Value = append(ricActionNotAdmittedList.GetValue().Value, &ranaItemIe)
-	}
+	}*/
 
 	resp := &e2appducontents.RicsubscriptionFailure{
 		ProtocolIes: &e2appducontents.RicsubscriptionFailureIes{
 			E2ApProtocolIes5:  &ranFunctionID,
-			E2ApProtocolIes18: &ricActionNotAdmittedList,
 			E2ApProtocolIes29: &ricRequestID,
 		},
 	}
@@ -142,7 +141,7 @@ func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appduc
 // BuildSubscriptionResponse builds e2ap subscription response
 func (subscription *Subscription) BuildSubscriptionResponse() (response *e2appducontents.RicsubscriptionResponse, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes29{
-		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
+		Id:          int32(v2beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: subscription.reqID,
@@ -152,7 +151,7 @@ func (subscription *Subscription) BuildSubscriptionResponse() (response *e2appdu
 	}
 
 	ranFunctionID := e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes5{
-		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
+		Id:          int32(v2beta1.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: subscription.ranFuncID,
@@ -161,7 +160,7 @@ func (subscription *Subscription) BuildSubscriptionResponse() (response *e2appdu
 	}
 
 	ricActionAdmit := e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes17{
-		Id:          int32(v1beta2.ProtocolIeIDRicactionsAdmitted),
+		Id:          int32(v2beta1.ProtocolIeIDRicactionsAdmitted),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2appducontents.RicactionAdmittedList{
 			Value: make([]*e2appducontents.RicactionAdmittedItemIes, 0),
@@ -171,7 +170,7 @@ func (subscription *Subscription) BuildSubscriptionResponse() (response *e2appdu
 
 	for _, raa := range subscription.ricActionsAccepted {
 		raaIe := &e2appducontents.RicactionAdmittedItemIes{
-			Id:          int32(v1beta2.ProtocolIeIDRicactionAdmittedItem),
+			Id:          int32(v2beta1.ProtocolIeIDRicactionAdmittedItem),
 			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 			Value: &e2appducontents.RicactionAdmittedItem{
 				RicActionId: &e2apies.RicactionId{

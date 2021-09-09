@@ -5,8 +5,9 @@
 package registry
 
 import (
-	"github.com/onosproject/rrm-son-lib/pkg/handover"
 	"sync"
+
+	"github.com/onosproject/rrm-son-lib/pkg/handover"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 
@@ -23,7 +24,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"

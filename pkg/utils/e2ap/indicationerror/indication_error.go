@@ -5,11 +5,11 @@
 package indicationerror
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 )
 
 // ErrorIndication required fields for creating error indication error message
@@ -17,11 +17,11 @@ type ErrorIndication struct {
 	reqID           int32
 	ricInstanceID   int32
 	ranFuncID       int32
-	cause           e2apies.Cause
+	cause           *e2apies.Cause
 	failureProcCode int32
-	failureTrigMsg  e2ap_commondatatypes.TriggeringMessage
+	failureTrigMsg  *e2ap_commondatatypes.TriggeringMessage
 	critDiags       []*types.CritDiag
-	failureCrit     e2ap_commondatatypes.Criticality
+	failureCrit     *e2ap_commondatatypes.Criticality
 }
 
 // NewErrorIndication creates a new error indication
@@ -64,7 +64,7 @@ func WithFailureProcCode(failureProcCode int32) func(*ErrorIndication) {
 }
 
 // WithCause sets cause of error
-func WithCause(cause e2apies.Cause) func(*ErrorIndication) {
+func WithCause(cause *e2apies.Cause) func(*ErrorIndication) {
 	return func(errorIndication *ErrorIndication) {
 		errorIndication.cause = cause
 	}
@@ -73,7 +73,7 @@ func WithCause(cause e2apies.Cause) func(*ErrorIndication) {
 // Build builds an error indication message
 func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 	ricRequestID := e2appducontents.ErrorIndicationIes_ErrorIndicationIes29{
-		Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
+		Id:          int32(v2beta1.ProtocolIeIDRicrequestID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RicrequestId{
 			RicRequestorId: e.reqID,
@@ -83,7 +83,7 @@ func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 	}
 
 	ranFunctionID := e2appducontents.ErrorIndicationIes_ErrorIndicationIes5{
-		Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
+		Id:          int32(v2beta1.ProtocolIeIDRanfunctionID),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2apies.RanfunctionId{
 			Value: e.ranFuncID,
@@ -92,14 +92,14 @@ func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
 	}
 
 	errorCause := e2appducontents.ErrorIndicationIes_ErrorIndicationIes1{
-		Id:          int32(v1beta2.ProtocolIeIDCause),
+		Id:          int32(v2beta1.ProtocolIeIDCause),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-		Value:       &e.cause,
+		Value:       e.cause,
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 	}
 
 	criticalityDiagnostics := e2appducontents.ErrorIndicationIes_ErrorIndicationIes2{
-		Id:          int32(v1beta2.ProtocolIeIDCriticalityDiagnostics),
+		Id:          int32(v2beta1.ProtocolIeIDCriticalityDiagnostics),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value: &e2apies.CriticalityDiagnostics{
 			ProcedureCode: &e2ap_commondatatypes.ProcedureCode{

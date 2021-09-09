@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
 )
 
 func (e *e2Connection) getRICAddress(tnlInfo *e2apies.Tnlinformation) addressing.RICAddress {

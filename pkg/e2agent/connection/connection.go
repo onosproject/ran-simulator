@@ -23,7 +23,7 @@ import (
 
 	"github.com/cenkalti/backoff"
 
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
@@ -40,9 +40,9 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
-	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
@@ -56,13 +56,13 @@ type E2Connection interface {
 
 	Close() error
 
-	GetClient() e2.ClientChannel
+	GetClient() e2.ClientConn
 }
 
 type e2Connection struct {
 	node            model.Node
 	model           *model.Model
-	client          e2.ClientChannel
+	client          e2.ClientConn
 	registry        *registry.ServiceModelRegistry
 	subStore        *subscriptions.Subscriptions
 	connectionStore connections.Store
@@ -70,7 +70,7 @@ type e2Connection struct {
 }
 
 // GetClient returns E2 client
-func (e *e2Connection) GetClient() e2.ClientChannel {
+func (e *e2Connection) GetClient() e2.ClientConn {
 	return e.client
 }
 
@@ -116,7 +116,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	//  then the E2 Node shall, if supported, use it to establish additional TNL Association(s) and configure
 	// for use for RIC services and/or E2 support functions according to the TNL Association Usage IE in the message.
 	if ies44 != nil {
-		connectionUpdateList := ies44.GetConnectionAdd()
+		connectionUpdateList := ies44.Value
 		if connectionUpdateList != nil {
 			log.Debug("Adding new connections")
 			connectionUpdateItems := connectionUpdateList.Value
@@ -174,7 +174,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 
 	// remove connections
 	if ies46 != nil {
-		connectionRemoveList := ies46.GetConnectionRemove()
+		connectionRemoveList := ies46.Value
 		if connectionRemoveList != nil {
 			log.Debug("Removing connections")
 			connectionUpdateRemoveItems := connectionRemoveList.GetValue()
@@ -464,7 +464,7 @@ func (e *e2Connection) connect() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	client, err := e2.Connect(ctx, addr,
-		func(channel e2.ClientChannel) e2.ClientInterface {
+		func(channel e2.ClientConn) e2.ClientInterface {
 			return e
 		},
 	)

@@ -5,10 +5,10 @@
 package connectionsetupfaileditem
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 )
 
 // IEs connection setup failed item Ies
@@ -38,7 +38,7 @@ func WithTnlInfo(tnlInfo *e2apies.Tnlinformation) func(ie *IEs) {
 // BuildConnectionSetupFailedItemIes builds connection setup failed Item Ies
 func (c *IEs) BuildConnectionSetupFailedItemIes() *e2appducontents.E2ConnectionSetupFailedItemIes {
 	connectionSetupFailedItemIes := &e2appducontents.E2ConnectionSetupFailedItemIes{
-		Id:          int32(v1beta2.ProtocolIeIDE2connectionSetupFailedItem),
+		Id:          int32(v2beta1.ProtocolIeIDE2connectionSetupFailedItem),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value: &e2appducontents.E2ConnectionSetupFailedItem{
 			TnlInformation: c.tnlInfo,

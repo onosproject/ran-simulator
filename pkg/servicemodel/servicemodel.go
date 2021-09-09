@@ -4,7 +4,7 @@
 
 package servicemodel
 
-import e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+import e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 
 // Client service model client interface
 type Client interface {

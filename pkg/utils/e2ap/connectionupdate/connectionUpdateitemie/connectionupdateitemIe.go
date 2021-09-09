@@ -5,10 +5,10 @@
 package connectionupdateitem
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
-	e2ap_ies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	e2ap_ies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 )
 
 // IEs connection item update
@@ -45,7 +45,7 @@ func WithTnlUsage(tnlUsage e2ap_ies.Tnlusage) func(*IEs) {
 // BuildConnectionUpdateItemIes builds connection Update Item Ies
 func (c *IEs) BuildConnectionUpdateItemIes() *e2appducontents.E2ConnectionUpdateItemIes {
 	connectionUpdateItemIes := &e2appducontents.E2ConnectionUpdateItemIes{
-		Id:          int32(v1beta2.ProtocolIeIDE2connectionUpdateItem),
+		Id:          int32(v2beta1.ProtocolIeIDE2connectionUpdateItem),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value: &e2appducontents.E2ConnectionUpdateItem{
 			TnlInformation: c.tnlInfo,
