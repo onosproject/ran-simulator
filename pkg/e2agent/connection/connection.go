@@ -489,7 +489,7 @@ func (e *e2Connection) setup() error {
 	configComponentUpdateItems := []*e2aptypes.E2NodeComponentConfigUpdateItem{
 		{E2NodeComponentType: e2apies.E2NodeComponentType_E2NODE_COMPONENT_TYPE_G_NB,
 			E2NodeComponentID:           &componentID,
-			E2NodeComponentConfigUpdate: pdubuilder.CreateE2NodeComponentConfigUpdateGnb([]byte("ngAp"), []byte("test"), []byte("e1Ap"), []byte("f1Ap"), []byte("test2"))},
+			E2NodeComponentConfigUpdate: pdubuilder.CreateE2NodeComponentConfigUpdateGnb(nil, nil, nil, nil, nil)},
 	}
 
 	configUpdateList := &e2appducontents.E2NodeComponentConfigUpdateList{
