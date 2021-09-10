@@ -9,6 +9,12 @@ import (
 	"fmt"
 	"time"
 
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
+
 	connectionsetupfaileditem "github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionSetupFailedItemie"
 
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
@@ -41,7 +47,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/model"
 
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
@@ -479,10 +484,37 @@ func (e *e2Connection) connect() error {
 
 func (e *e2Connection) setup() error {
 	plmnID := ransimtypes.NewUint24(uint32(e.model.PlmnID))
+
+	componentID := pdubuilder.CreateE2NodeComponentIDGnbCuUp(int64(e.node.GnbID))
+	configComponentUpdateItems := []*e2aptypes.E2NodeComponentConfigUpdateItem{
+		{E2NodeComponentType: e2apies.E2NodeComponentType_E2NODE_COMPONENT_TYPE_G_NB,
+			E2NodeComponentID:           &componentID,
+			E2NodeComponentConfigUpdate: pdubuilder.CreateE2NodeComponentConfigUpdateGnb([]byte("ngAp"), []byte("test"), []byte("e1Ap"), []byte("f1Ap"), []byte("test2"))},
+	}
+
+	configUpdateList := &e2appducontents.E2NodeComponentConfigUpdateList{
+		Value: make([]*e2appducontents.E2NodeComponentConfigUpdateItemIes, 0),
+	}
+	for _, configUpdateItem := range configComponentUpdateItems {
+		cui := &e2appducontents.E2NodeComponentConfigUpdateItemIes{
+			Id:          int32(v2beta1.ProtocolIeIDE2nodeComponentConfigUpdateItem),
+			Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
+			Value: &e2appducontents.E2NodeComponentConfigUpdateItem{
+				E2NodeComponentType:         configUpdateItem.E2NodeComponentType,
+				E2NodeComponentId:           configUpdateItem.E2NodeComponentID,
+				E2NodeComponentConfigUpdate: &configUpdateItem.E2NodeComponentConfigUpdate,
+			},
+			Presence: int32(e2apcommondatatypes.Presence_PRESENCE_MANDATORY),
+		}
+		configUpdateList.Value = append(configUpdateList.Value, cui)
+	}
+
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(e.registry.GetRanFunctions()),
 		setup.WithPlmnID(plmnID.Value()),
-		setup.WithE2NodeID(uint64(e.node.GnbID)))
+		setup.WithE2NodeID(uint64(e.node.GnbID)),
+		setup.WithComponentConfigUpdateList(configUpdateList),
+		setup.WithTransactionID(2))
 
 	e2SetupRequest, err := setupRequest.Build()
 

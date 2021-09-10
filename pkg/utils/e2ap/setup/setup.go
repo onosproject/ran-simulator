@@ -21,9 +21,11 @@ var log = logging.GetLogger("servicemodel", "utils", "setup")
 
 // Setup setup request
 type Setup struct {
-	ranFunctions e2aptypes.RanFunctions
-	plmnID       ransimtypes.Uint24
-	e2NodeID     uint64
+	ranFunctions              e2aptypes.RanFunctions
+	plmnID                    ransimtypes.Uint24
+	e2NodeID                  uint64
+	componentConfigUpdateList *e2appducontents.E2NodeComponentConfigUpdateList
+	transactionID             int32
 }
 
 // NewSetupRequest creates a new setup request
@@ -59,12 +61,26 @@ func WithE2NodeID(e2NodeID uint64) func(*Setup) {
 	}
 }
 
+// WithComponentConfigUpdateList sets E2 node component config update list
+func WithComponentConfigUpdateList(componentConfigUpdateList *e2appducontents.E2NodeComponentConfigUpdateList) func(setup *Setup) {
+	return func(request *Setup) {
+		request.componentConfigUpdateList = componentConfigUpdateList
+	}
+}
+
+// WithTransactionID sets transaction ID
+func WithTransactionID(transID int32) func(setup *Setup) {
+	return func(request *Setup) {
+		request.transactionID = transID
+	}
+}
+
 // Build builds e2ap setup request
 func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err error) {
 	//plmnID := types.NewUint24(request.plmnID)
 	ranFunctionList := e2appducontents.E2SetupRequestIes_E2SetupRequestIes10{
 		Id:          int32(v2beta1.ProtocolIeIDRanfunctionsAdded),
-		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
+		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2appducontents.RanfunctionsList{
 			Value: make([]*e2appducontents.RanfunctionItemIes, 0),
@@ -122,6 +138,20 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 				},
 			},
 			E2ApProtocolIes10: &ranFunctionList,
+			E2ApProtocolIes33: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes33{
+				Id:          int32(v2beta1.ProtocolIeIDE2nodeComponentConfigUpdate),
+				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+				Value:       request.componentConfigUpdateList,
+				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+			},
+			E2ApProtocolIes49: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes49{
+				Id:          int32(v2beta1.ProtocolIeIDTransactionID),
+				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+				Value: &e2apies.TransactionId{
+					Value: request.transactionID,
+				},
+				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+			},
 		},
 	}
 
