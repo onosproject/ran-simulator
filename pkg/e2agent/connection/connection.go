@@ -291,28 +291,20 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 		//  announced as a supported RAN function in the E2 Setup procedure or
 		//  the RIC Service Update procedure, the target E2 Node shall send the RIC SUBSCRIPTION FAILURE message
 		//  to the Near-RT RIC with an appropriate cause value.
-		var ricActionsAccepted []*e2aptypes.RicActionID
-		ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
-		actionList := subutils.GetRicActionToBeSetupList(request)
+
 		reqID := subutils.GetRequesterID(request)
 		ranFuncID := subutils.GetRanFunctionID(request)
 		ricInstanceID := subutils.GetRicInstanceID(request)
-
-		for _, action := range actionList {
-			actionID := e2aptypes.RicActionID(action.Value.RicActionId.Value)
-			cause := &e2apies.Cause{
-				Cause: &e2apies.Cause_RicRequest{
-					RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
-				},
-			}
-			ricActionsNotAdmitted[actionID] = cause
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
+			},
 		}
 		subscription := subutils.NewSubscription(
 			subutils.WithRequestID(reqID),
 			subutils.WithRanFuncID(ranFuncID),
 			subutils.WithRicInstanceID(ricInstanceID),
-			subutils.WithActionsAccepted(ricActionsAccepted),
-			subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
+			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
 			return nil, nil, err

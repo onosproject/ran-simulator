@@ -232,16 +232,20 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
-	subscription := subutils.NewSubscription(
-		subutils.WithRequestID(reqID),
-		subutils.WithRanFuncID(ranFuncID),
-		subutils.WithRicInstanceID(ricInstanceID),
-		subutils.WithActionsAccepted(ricActionsAccepted),
-		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
-		log.Debug("no action is accepted")
+		log.Warn("no action is accepted")
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
 			return nil, nil, err
@@ -251,13 +255,31 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	reportInterval, err := sm.getReportPeriod(request)
 	if err != nil {
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
-			return nil, nil, err
+			log.Warn(err)
+			return nil, subscriptionFailure, nil
 		}
 		return nil, subscriptionFailure, nil
 	}
 
+	subscription := subutils.NewSubscription(
+		subutils.WithRequestID(reqID),
+		subutils.WithRanFuncID(ranFuncID),
+		subutils.WithRicInstanceID(ricInstanceID),
+		subutils.WithActionsAccepted(ricActionsAccepted),
+		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 	subscriptionResponse, err := subscription.BuildSubscriptionResponse()
 	if err != nil {
 		return nil, nil, err

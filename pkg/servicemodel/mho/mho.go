@@ -175,35 +175,71 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
+
+	// At least one required action must be accepted otherwise sends a subscription failure response
+	if len(ricActionsAccepted) == 0 {
+		log.Warn("no action is accepted")
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, subscriptionFailure, nil
+	}
+
+	eventTriggerType, err := m.getEventTriggerType(request)
+	if err != nil {
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, subscriptionFailure, err
+		}
+		return nil, subscriptionFailure, nil
+	}
+
 	subscription := subutils.NewSubscription(
 		subutils.WithRequestID(reqID),
 		subutils.WithRanFuncID(ranFuncID),
 		subutils.WithRicInstanceID(ricInstanceID),
 		subutils.WithActionsAccepted(ricActionsAccepted),
 		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
-
-	// At least one required action must be accepted otherwise sends a subscription failure response
-	if len(ricActionsAccepted) == 0 {
-		log.Warn("MHO subscription failed: no actions are accepted")
-		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
-		if err != nil {
-			log.Error(err)
-			return nil, nil, err
-		}
-		log.Warnf("MHO subscription failed, no actions accepted: %v", actionList)
-		return nil, subscriptionFailure, nil
-	}
-
 	response, err = subscription.BuildSubscriptionResponse()
 	if err != nil {
-		log.Error(err)
-		return nil, nil, err
-	}
-
-	eventTriggerType, err := m.getEventTriggerType(request)
-	if err != nil {
-		log.Error(err)
-		return nil, nil, err
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, subscriptionFailure, err
+		}
+		return nil, subscriptionFailure, nil
 	}
 
 	log.Debugf("MHO subscription event trigger type: %v", eventTriggerType)

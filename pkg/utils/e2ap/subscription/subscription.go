@@ -19,6 +19,7 @@ type Subscription struct {
 	ranFuncID             int32
 	ricActionsAccepted    []*types.RicActionID
 	ricActionsNotAdmitted map[types.RicActionID]*e2apies.Cause
+	cause                 *e2apies.Cause
 }
 
 // NewSubscription creates a new instance of subscription
@@ -83,6 +84,13 @@ func WithActionsNotAdmitted(ricActionsNotAdmitted map[types.RicActionID]*e2apies
 	}
 }
 
+// WithCause sets subscription failure cause
+func WithCause(cause *e2apies.Cause) func(subscription *Subscription) {
+	return func(subscription *Subscription) {
+		subscription.cause = cause
+	}
+}
+
 // BuildSubscriptionFailure builds e2ap subscription failure
 func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appducontents.RicsubscriptionFailure, err error) {
 	ricRequestID := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes29{
@@ -104,6 +112,13 @@ func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appduc
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 
+	cause := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes1{
+		Id:          int32(v2beta1.ProtocolIeIDCause),
+		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
+		Value:       subscription.cause,
+		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	}
+
 	/*ricActionNotAdmittedList := e2appducontents.RicsubscriptionFailureIes_RicsubscriptionFailureIes18{
 		Id:          int32(v2beta1.ProtocolIeIDRicactionsNotAdmitted),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
@@ -111,9 +126,9 @@ func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appduc
 			Value: make([]*e2appducontents.RicactionNotAdmittedItemIes, 0),
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-	}*/
+	}
 
-	/*for ricActionID, cause := range subscription.ricActionsNotAdmitted {
+	for ricActionID, cause := range subscription.ricActionsNotAdmitted {
 		ranaItemIe := e2appducontents.RicactionNotAdmittedItemIes{
 			Id:          int32(v2beta1.ProtocolIeIDRicactionNotAdmittedItem),
 			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
@@ -132,6 +147,7 @@ func (subscription *Subscription) BuildSubscriptionFailure() (response *e2appduc
 		ProtocolIes: &e2appducontents.RicsubscriptionFailureIes{
 			E2ApProtocolIes5:  &ranFunctionID,
 			E2ApProtocolIes29: &ricRequestID,
+			E2ApProtocolIes1:  &cause,
 		},
 	}
 
@@ -182,11 +198,36 @@ func (subscription *Subscription) BuildSubscriptionResponse() (response *e2appdu
 		ricActionAdmit.GetValue().Value = append(ricActionAdmit.GetValue().Value, raaIe)
 	}
 
+	ricActionNotAdmittedList := e2appducontents.RicsubscriptionResponseIes_RicsubscriptionResponseIes18{
+		Id:          int32(v2beta1.ProtocolIeIDRicactionsNotAdmitted),
+		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+		Value: &e2appducontents.RicactionNotAdmittedList{
+			Value: make([]*e2appducontents.RicactionNotAdmittedItemIes, 0),
+		},
+		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	}
+
+	for ricActionID, cause := range subscription.ricActionsNotAdmitted {
+		ranaItemIe := e2appducontents.RicactionNotAdmittedItemIes{
+			Id:          int32(v2beta1.ProtocolIeIDRicactionNotAdmittedItem),
+			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
+			Value: &e2appducontents.RicactionNotAdmittedItem{
+				RicActionId: &e2apies.RicactionId{
+					Value: int32(ricActionID),
+				},
+				Cause: cause,
+			},
+			Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+		}
+		ricActionNotAdmittedList.GetValue().Value = append(ricActionNotAdmittedList.GetValue().Value, &ranaItemIe)
+	}
+
 	resp := &e2appducontents.RicsubscriptionResponse{
 		ProtocolIes: &e2appducontents.RicsubscriptionResponseIes{
 			E2ApProtocolIes29: &ricRequestID,  //RIC request ID
 			E2ApProtocolIes5:  &ranFunctionID, //RAN function ID
 			E2ApProtocolIes17: &ricActionAdmit,
+			E2ApProtocolIes18: &ricActionNotAdmittedList,
 		},
 	}
 
