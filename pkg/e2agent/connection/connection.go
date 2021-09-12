@@ -277,13 +277,16 @@ func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.
 }
 
 func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	ranFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
-	log.Debugf("Received Subscription Request %v for ran function %d", request, ranFuncID)
-	sm, err := e.registry.GetServiceModel(ranFuncID)
+	registeredRanFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
+	log.Debugf("Received Subscription Request %v for ran function %d", request, registeredRanFuncID)
+	sm, err := e.registry.GetServiceModel(registeredRanFuncID)
 	id := subscriptions.NewID(subutils.GetRicInstanceID(request),
 		subutils.GetRequesterID(request),
 		subutils.GetRanFunctionID(request))
 
+	reqID := subutils.GetRequesterID(request)
+	ranFuncID := subutils.GetRanFunctionID(request)
+	ricInstanceID := subutils.GetRicInstanceID(request)
 	if err != nil {
 		log.Warn(err)
 		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
@@ -292,9 +295,6 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 		//  the RIC Service Update procedure, the target E2 Node shall send the RIC SUBSCRIPTION FAILURE message
 		//  to the Near-RT RIC with an appropriate cause value.
 
-		reqID := subutils.GetRequesterID(request)
-		ranFuncID := subutils.GetRanFunctionID(request)
-		ricInstanceID := subutils.GetRicInstanceID(request)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
 				RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
@@ -313,11 +313,42 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 	}
 	subscription, err := subscriptions.NewSubscription(id, request, e.client)
 	if err != nil {
-		return response, failure, err
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		failure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 	}
 	err = e.subStore.Add(subscription)
 	if err != nil {
-		return response, failure, err
+		log.Warn(err)
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		failure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 	}
 
 	// TODO - Assumes ono-to-one mapping between ran function and server model
@@ -338,7 +369,22 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 	}
 	// Ric subscription is failed
 	if err != nil {
-		return response, failure, err
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		failure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 	}
 
 	return response, failure, err
