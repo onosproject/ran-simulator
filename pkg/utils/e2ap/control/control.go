@@ -20,7 +20,7 @@ type Control struct {
 	ricCallPrID   types.RicCallProcessID
 	ricCtrlStatus e2apies.RiccontrolStatus
 	ricCtrlOut    []byte
-	cause         e2apies.Cause
+	cause         *e2apies.Cause
 }
 
 // NewControl creates a new instance of control
@@ -78,7 +78,7 @@ func WithRicInstanceID(ricInstanceID int32) func(control *Control) {
 }
 
 // WithCause sets failure cause
-func WithCause(cause e2apies.Cause) func(control *Control) {
+func WithCause(cause *e2apies.Cause) func(control *Control) {
 	return func(control *Control) {
 		control.cause = cause
 	}
@@ -192,7 +192,7 @@ func (control *Control) BuildControlFailure() (response *e2appducontents.Riccont
 	ricCause := e2appducontents.RiccontrolFailureIes_RiccontrolFailureIes1{
 		Id:          int32(v2beta1.ProtocolIeIDCause),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-		Value:       &control.cause,
+		Value:       control.cause,
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 

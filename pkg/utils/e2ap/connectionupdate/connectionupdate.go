@@ -17,6 +17,7 @@ type ConnectionUpdate struct {
 	connectionSetupFailedItemIes []*e2appducontents.E2ConnectionSetupFailedItemIes
 	cause                        *e2apies.Cause
 	timeToWait                   *e2apies.TimeToWait
+	transactionID                int32
 }
 
 // NewConnectionUpdate creates a new instance of connection update
@@ -57,11 +58,26 @@ func WithConnectionSetupFailedItemIes(connectionSetupFailedItemIes []*e2appducon
 	}
 }
 
+// WithTransactionID sets transaction ID
+func WithTransactionID(transID int32) func(*ConnectionUpdate) {
+	return func(connectionUpdate *ConnectionUpdate) {
+		connectionUpdate.transactionID = transID
+	}
+}
+
 // BuildConnectionUpdateAcknowledge creates a connection update acknowledge
 func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E2ConnectionUpdateAcknowledge {
 
 	ie39 := &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes39{}
 	ie40 := &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes40{}
+	ie49 := &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes49{
+		Id:          int32(v2beta1.ProtocolIeIDTransactionID),
+		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+		Value: &e2apies.TransactionId{
+			Value: c.transactionID,
+		},
+		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	}
 
 	if c.connectionUpdateItemIes != nil {
 		ie39 = &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes39{
@@ -98,12 +114,20 @@ func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E
 		response.GetProtocolIes().E2ApProtocolIes40 = ie40
 		response.GetProtocolIes().GetE2ApProtocolIes40().Value.Value = c.connectionSetupFailedItemIes
 	}
-
+	response.GetProtocolIes().E2ApProtocolIes49 = ie49
 	return response
 }
 
 // BuildConnectionUpdateFailure creates a connection update failure message
 func (c *ConnectionUpdate) BuildConnectionUpdateFailure() *e2appducontents.E2ConnectionUpdateFailure {
+	ie49 := &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes49{
+		Id:          int32(v2beta1.ProtocolIeIDTransactionID),
+		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+		Value: &e2apies.TransactionId{
+			Value: c.transactionID,
+		},
+		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	}
 	failure := &e2appducontents.E2ConnectionUpdateFailure{
 		ProtocolIes: &e2appducontents.E2ConnectionUpdateFailureIes{
 			E2ApProtocolIes1: &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes1{
@@ -119,6 +143,7 @@ func (c *ConnectionUpdate) BuildConnectionUpdateFailure() *e2appducontents.E2Con
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 			},
 			//E2ApProtocolIes2: &criticalityDiagnostics, // TODO
+			E2ApProtocolIes49: ie49,
 		},
 	}
 	return failure

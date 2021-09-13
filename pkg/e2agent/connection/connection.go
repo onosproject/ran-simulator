@@ -552,7 +552,7 @@ func (e *e2Connection) setup() error {
 		setup.WithPlmnID(plmnID.Value()),
 		setup.WithE2NodeID(uint64(e.node.GnbID)),
 		setup.WithComponentConfigUpdateList(configUpdateList),
-		setup.WithTransactionID(2))
+		setup.WithTransactionID(1))
 
 	e2SetupRequest, err := setupRequest.Build()
 

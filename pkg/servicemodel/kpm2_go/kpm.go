@@ -82,8 +82,9 @@ type Client struct {
 	ServiceModel *registry.ServiceModel
 }
 
+// E2ConnectionUpdate implements connection update procedure
 func (sm *Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
-	panic("implement me")
+	return nil, nil, errors.NewNotSupported("connection update is not supported")
 }
 
 // NewServiceModel creates a new service model
