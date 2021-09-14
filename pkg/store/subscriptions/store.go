@@ -9,12 +9,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/onosproject/onos-e2t/pkg/protocols/e2ap101"
+	"github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 )
 
 // ID is an alias for string subscription ID
@@ -26,7 +26,7 @@ type Subscription struct {
 	ReqID     *e2apies.RicrequestId
 	FnID      *e2apies.RanfunctionId
 	Details   *e2appducontents.RicsubscriptionDetails
-	E2Channel e2.ClientChannel
+	E2Channel e2ap.ClientConn
 	Ticker    *time.Ticker
 }
 
@@ -36,7 +36,7 @@ func NewID(instID int32, rqID int32, fnID int32) ID {
 }
 
 // NewSubscription generates a subscription record from the E2AP subscription request
-func NewSubscription(id ID, e2apsub *e2appducontents.RicsubscriptionRequest, ch e2.ClientChannel) (*Subscription, error) {
+func NewSubscription(id ID, e2apsub *e2appducontents.RicsubscriptionRequest, ch e2ap.ClientConn) (*Subscription, error) {
 	if id == "" {
 		return nil, errors.New(errors.Forbidden, "id cannot be empty")
 	}

@@ -32,9 +32,9 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
 	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
@@ -433,6 +433,11 @@ func (sm *Client) reportIndication(ctx context.Context, interval uint32, subscri
 	}
 }
 
+// E2ConnectionUpdate implements connection update handler
+func (sm *Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+	return nil, nil, errors.NewNotSupported("E2 connection update is not supported")
+}
+
 // RICControl implements control handler for kpm service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	return nil, nil, errors.New(errors.NotSupported, "Control operation is not supported")
@@ -469,16 +474,19 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		}
 	}
 
-	subscription := subutils.NewSubscription(
-		subutils.WithRequestID(reqID),
-		subutils.WithRanFuncID(ranFuncID),
-		subutils.WithRicInstanceID(ricInstanceID),
-		subutils.WithActionsAccepted(ricActionsAccepted),
-		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
-
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		log.Warn("no action is accepted")
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
 			return nil, nil, err
@@ -488,10 +496,21 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 
 	reportInterval, err := sm.getReportPeriod(request)
 	if err != nil {
-		// TODO ric action not admitted should be updated to reflect the correct cause
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
-			return nil, nil, err
+			log.Warn(err)
+			return nil, subscriptionFailure, nil
 		}
 		return nil, subscriptionFailure, nil
 	}
@@ -499,13 +518,49 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	actionDefinitions, err := sm.getActionDefinition(actionList, ricActionsAccepted)
 	if err != nil {
 		log.Warn(err)
-		return nil, nil, err
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			log.Warn(err)
+			return nil, subscriptionFailure, nil
+		}
+		return nil, subscriptionFailure, nil
 	}
 
+	subscription := subutils.NewSubscription(
+		subutils.WithRequestID(reqID),
+		subutils.WithRanFuncID(ranFuncID),
+		subutils.WithRicInstanceID(ricInstanceID),
+		subutils.WithActionsAccepted(ricActionsAccepted),
+		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 	subscriptionResponse, err := subscription.BuildSubscriptionResponse()
 	if err != nil {
 		log.Warn(err)
-		return nil, nil, err
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			log.Warn(err)
+			return nil, subscriptionFailure, nil
+		}
+		return nil, subscriptionFailure, nil
 	}
 	go func() {
 		ctx, cancel := context.WithCancel(context.Background())

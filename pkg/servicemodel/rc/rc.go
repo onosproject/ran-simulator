@@ -33,8 +33,8 @@ import (
 
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap101/types"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder"
@@ -42,7 +42,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
@@ -237,6 +237,11 @@ func NewServiceModel(node model.Node, model *model.Model,
 	return rcSm, nil
 }
 
+// E2ConnectionUpdate implements connection update handler
+func (sm *Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+	return nil, nil, errors.NewNotSupported("E2 connection update is not supported")
+}
+
 // RICControl implements control handler for RC service model
 func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	log.Infof("Control Request is received for service model %v and e2 node ID: %d", sm.ServiceModel.ModelName, sm.ServiceModel.Node.GnbID)
@@ -370,15 +375,19 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			ricActionsNotAdmitted[actionID] = cause
 		}
 	}
-	subscription := subutils.NewSubscription(
-		subutils.WithRequestID(reqID),
-		subutils.WithRanFuncID(ranFuncID),
-		subutils.WithRicInstanceID(ricInstanceID),
-		subutils.WithActionsAccepted(ricActionsAccepted),
-		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
 			return nil, nil, err
@@ -386,14 +395,51 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		return nil, subscriptionFailure, nil
 	}
 
-	response, err = subscription.BuildSubscriptionResponse()
-	if err != nil {
-		return nil, nil, err
-	}
-
 	eventTriggerType, err := sm.getEventTriggerType(request)
 	if err != nil {
-		return nil, nil, err
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, subscriptionFailure, nil
+		}
+		return nil, subscriptionFailure, nil
+	}
+
+	subscription := subutils.NewSubscription(
+		subutils.WithRequestID(reqID),
+		subutils.WithRanFuncID(ranFuncID),
+		subutils.WithRicInstanceID(ricInstanceID),
+		subutils.WithActionsAccepted(ricActionsAccepted),
+		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
+
+	response, err = subscription.BuildSubscriptionResponse()
+	if err != nil {
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(reqID),
+			subutils.WithRanFuncID(ranFuncID),
+			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, subscriptionFailure, nil
+		}
+		return nil, subscriptionFailure, nil
 	}
 
 	switch eventTriggerType {

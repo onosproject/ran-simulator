@@ -5,10 +5,10 @@
 package indication
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v1beta2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v1beta2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 )
 
 // Indication indication data struct
@@ -74,7 +74,7 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 	ricIndication := &e2appducontents.Ricindication{
 		ProtocolIes: &e2appducontents.RicindicationIes{
 			E2ApProtocolIes29: &e2appducontents.RicindicationIes_RicindicationIes29{
-				Id:          int32(v1beta2.ProtocolIeIDRicrequestID),
+				Id:          int32(v2beta1.ProtocolIeIDRicrequestID),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2apies.RicrequestId{
 					RicRequestorId: indication.reqID,
@@ -83,7 +83,7 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 			},
 			E2ApProtocolIes5: &e2appducontents.RicindicationIes_RicindicationIes5{
-				Id:          int32(v1beta2.ProtocolIeIDRanfunctionID),
+				Id:          int32(v2beta1.ProtocolIeIDRanfunctionID),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2apies.RanfunctionId{
 					Value: indication.ranFuncID,
@@ -91,7 +91,7 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 			},
 			E2ApProtocolIes15: &e2appducontents.RicindicationIes_RicindicationIes15{
-				Id:          int32(v1beta2.ProtocolIeIDRicactionID),
+				Id:          int32(v2beta1.ProtocolIeIDRicactionID),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2apies.RicactionId{
 					Value: 2,
@@ -99,7 +99,7 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 			},
 			E2ApProtocolIes27: &e2appducontents.RicindicationIes_RicindicationIes27{
-				Id:          int32(v1beta2.ProtocolIeIDRicindicationSn),
+				Id:          int32(v2beta1.ProtocolIeIDRicindicationSn),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2apies.RicindicationSn{
 					Value: 3,
@@ -107,13 +107,13 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 			},
 			E2ApProtocolIes28: &e2appducontents.RicindicationIes_RicindicationIes28{
-				Id:          int32(v1beta2.ProtocolIeIDRicindicationType),
+				Id:          int32(v2beta1.ProtocolIeIDRicindicationType),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value:       e2apies.RicindicationType_RICINDICATION_TYPE_REPORT,
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 			},
 			E2ApProtocolIes25: &e2appducontents.RicindicationIes_RicindicationIes25{
-				Id:          int32(v1beta2.ProtocolIeIDRicindicationHeader),
+				Id:          int32(v2beta1.ProtocolIeIDRicindicationHeader),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2ap_commondatatypes.RicindicationHeader{
 					Value: indication.indicationHeader,
@@ -121,7 +121,7 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 			},
 			E2ApProtocolIes26: &e2appducontents.RicindicationIes_RicindicationIes26{
-				Id:          int32(v1beta2.ProtocolIeIDRicindicationMessage),
+				Id:          int32(v2beta1.ProtocolIeIDRicindicationMessage),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2ap_commondatatypes.RicindicationMessage{
 					Value: indication.indicationMessage,
@@ -129,7 +129,7 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 			},
 			E2ApProtocolIes20: &e2appducontents.RicindicationIes_RicindicationIes20{
-				Id:          int32(v1beta2.ProtocolIeIDRiccallProcessID),
+				Id:          int32(v2beta1.ProtocolIeIDRiccallProcessID),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2ap_commondatatypes.RiccallProcessId{
 					Value: indication.ricCallProcessID,
