@@ -8,6 +8,10 @@ import (
 	"context"
 	"net"
 
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
+
+	kpm2go "github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2_go"
+
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 
 	"github.com/onosproject/ran-simulator/pkg/e2agent/connection"
@@ -16,8 +20,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/ran-simulator/pkg/store/connections"
 	"github.com/onosproject/rrm-son-lib/pkg/handover"
-
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 
@@ -30,13 +32,11 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
-	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
-
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	connectionController "github.com/onosproject/ran-simulator/pkg/controller/connection"
+	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
@@ -103,7 +103,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 			}
 		case registry.Kpm2:
 			log.Info("KPM2 service model for node with eNbID:", node.GnbID)
-			kpm2Sm, err := kpm2.NewServiceModel(node, model, modelPluginRegistry,
+			kpm2Sm, err := kpm2go.NewServiceModel(node, model,
 				subStore, nodeStore, ueStore)
 			if err != nil {
 				log.Info("Failure creating KPM2 service model for eNbID:", node.GnbID)

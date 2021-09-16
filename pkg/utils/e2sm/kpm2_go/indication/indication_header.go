@@ -5,9 +5,9 @@
 package indication
 
 import (
+	e2smkpmv2sm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	// "google.golang.org/protobuf/proto"
 
 	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
@@ -77,7 +77,7 @@ func WithGlobalKpmNodeID(globalKpmNodeID *e2smkpmv2.GlobalKpmnodeId) func(header
 }
 
 // ToAsn1Bytes converts header to asn1 bytes
-func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (header *Header) ToAsn1Bytes() ([]byte, error) {
 	// Creating an indication header
 	indicationHeader, err := header.Build()
 	if err != nil {
@@ -88,8 +88,9 @@ func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte
 	if err != nil {
 		return nil, err
 	}
+	var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
 
-	indicationHeaderAsn1Bytes, err := modelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
+	indicationHeaderAsn1Bytes, err := kpm2ServiceModel.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
 
 	if err != nil {
 		return nil, err

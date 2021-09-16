@@ -26,7 +26,6 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/measurments"
 
-	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	kpm2gNBID "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/id/gnbid"
 	kpm2IndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/indication"
 	kpm2MessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2_go/indication/messageformat1"
@@ -41,7 +40,6 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -88,20 +86,19 @@ func (sm *Client) E2ConnectionUpdate(ctx context.Context, request *e2appduconten
 }
 
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
+func NewServiceModel(node model.Node, model *model.Model,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
 	kpmSm := registry.ServiceModel{
-		RanFunctionID:       registry.Kpm2,
-		ModelName:           ranFunctionShortName,
-		Revision:            1,
-		OID:                 ranFunctionE2SmOid,
-		Version:             modelVersion,
-		ModelPluginRegistry: modelPluginRegistry,
-		Node:                node,
-		Model:               model,
-		Subscriptions:       subStore,
-		Nodes:               nodeStore,
-		UEs:                 ueStore,
+		RanFunctionID: registry.Kpm2,
+		ModelName:     ranFunctionShortName,
+		Revision:      1,
+		OID:           ranFunctionE2SmOid,
+		Version:       modelVersion,
+		Node:          node,
+		Model:         model,
+		Subscriptions: subStore,
+		Nodes:         nodeStore,
+		UEs:           ueStore,
 	}
 	kpmClient := &Client{
 		ServiceModel: &kpmSm,
@@ -208,11 +205,9 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	kpmModelPlugin, err := modelPluginRegistry.GetPlugin(ranFunctionE2SmOid)
-	if kpmModelPlugin == nil {
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil: %v", err)
-	}
-	ranFuncDescBytes, err := kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
+
+	var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
+	ranFuncDescBytes, err := kpm2ServiceModel.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
@@ -294,11 +289,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 		kpm2MessageFormat1.WithMeasData(measData),
 		kpm2MessageFormat1.WithMeasInfoList(measInfoList))
 
-	kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin.(e2smkpmv2sm.Kpm2ServiceModel))
+	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes()
 	if err != nil {
 		log.Warn(err)
 		return nil, err
@@ -333,11 +324,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 		kpm2IndicationHeader.WithVendorName(vendorName),
 		kpm2IndicationHeader.WithTimeStamp(timestamp))
 
-	kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
+	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes()
 	if err != nil {
 		log.Warn(err)
 		return nil, err
