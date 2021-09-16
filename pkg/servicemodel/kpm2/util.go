@@ -5,27 +5,22 @@
 package kpm2
 
 import (
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
+	e2smkpmv2sm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 )
 
 func (sm *Client) getActionDefinition(actionList []*e2appducontents.RicactionToBeSetupItemIes, ricActionsAccepted []*e2aptypes.RicActionID) ([]*e2smkpmv2.E2SmKpmActionDefinition, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		log.Warn(err)
-		return nil, err
-	}
-
 	var actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition
 	for _, action := range actionList {
 		for _, acceptedActionID := range ricActionsAccepted {
 			if action.Value.RicActionId.Value == int32(*acceptedActionID) {
 				actionDefinitionBytes := action.Value.RicActionDefinition.Value
-				actionDefinitionProtoBytes, err := modelPlugin.ActionDefinitionASN1toProto(actionDefinitionBytes)
+				var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
+
+				actionDefinitionProtoBytes, err := kpm2ServiceModel.ActionDefinitionASN1toProto(actionDefinitionBytes)
 				if err != nil {
 					log.Warn(err)
 					return nil, err
@@ -47,14 +42,10 @@ func (sm *Client) getActionDefinition(actionList []*e2appducontents.RicactionToB
 }
 
 // getReportPeriod extracts report period
-func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (uint32, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		log.Error(err)
-		return 0, err
-	}
+func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int64, error) {
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
-	eventTriggerProtoBytes, err := modelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+	var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
+	eventTriggerProtoBytes, err := kpm2ServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return 0, err
 	}
@@ -63,15 +54,6 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	if err != nil {
 		return 0, err
 	}
-	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormat1().GetReportingPeriod()
+	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().GetReportingPeriod()
 	return reportPeriod, nil
-}
-
-func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
-	modelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(ranFunctionE2SmOid)
-	if err != nil {
-		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", ranFunctionShortName)
-	}
-
-	return modelPlugin, nil
 }

@@ -8,9 +8,9 @@ import (
 	"context"
 	"net"
 
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
-	kpm2go "github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2_go"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 
@@ -103,7 +103,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 			}
 		case registry.Kpm2:
 			log.Info("KPM2 service model for node with eNbID:", node.GnbID)
-			kpm2Sm, err := kpm2go.NewServiceModel(node, model,
+			kpm2Sm, err := kpm2.NewServiceModel(node, model,
 				subStore, nodeStore, ueStore)
 			if err != nil {
 				log.Info("Failure creating KPM2 service model for eNbID:", node.GnbID)
