@@ -6,13 +6,14 @@ package gnbid
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 )
 
 // GlobalGNBID global gNB ID
 type GlobalGNBID struct {
 	plmnID      ransimtypes.Uint24
-	gNBIDChoice *e2smkpmv2.BitString
+	gNBIDChoice *asn1.BitString
 	gNBCuUpID   int64
 	gNBDuID     int64
 }
@@ -36,7 +37,7 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(gNBID *GlobalGNBID) {
 }
 
 // WithGNBIDChoice sets gNBID choice
-func WithGNBIDChoice(gnbIDChoice *e2smkpmv2.BitString) func(gNBID *GlobalGNBID) {
+func WithGNBIDChoice(gnbIDChoice *asn1.BitString) func(gNBID *GlobalGNBID) {
 	return func(gNBID *GlobalGNBID) {
 		gNBID.gNBIDChoice = gnbIDChoice
 	}

@@ -5,8 +5,7 @@
 package measurments
 
 import (
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 )
 
 // MeasurementInfoItem measurement info item
@@ -46,9 +45,10 @@ func (m *MeasurementInfoItem) Build() (*e2smkpmv2.MeasurementInfoItem, error) {
 		LabelInfoList: m.labelInfoList,
 	}
 
-	if err := item.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := item.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 
 	return &item, nil
 }

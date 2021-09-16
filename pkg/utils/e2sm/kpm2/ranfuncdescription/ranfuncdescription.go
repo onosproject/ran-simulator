@@ -5,8 +5,7 @@
 package ranfuncdescription
 
 import (
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 )
 
 // RANFunctionDescription ran function description fields
@@ -86,15 +85,16 @@ func (r *RANFunctionDescription) Build() (*e2smkpmv2.E2SmKpmRanfunctionDescripti
 			RanFunctionShortName:   r.ranFunctionShortName,
 			RanFunctionE2SmOid:     r.ranFunctionE2SmOID,
 			RanFunctionDescription: r.ranFunctionDescription,
-			RanFunctionInstance:    r.ranFuncInstance,
+			RanFunctionInstance:    &r.ranFuncInstance,
 		},
 		RicKpmNodeList:           r.ricKpmNodeList,
 		RicEventTriggerStyleList: r.ricEventTriggerStyleList,
 		RicReportStyleList:       r.ricReportStyleList,
 	}
 
-	if err := e2SmKpmPdu.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := e2SmKpmPdu.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 	return &e2SmKpmPdu, nil
 }

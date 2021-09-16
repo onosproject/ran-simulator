@@ -5,8 +5,7 @@
 package measurments
 
 import (
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 )
 
 // MeasurementTypeMeasName measurement type meas name
@@ -42,9 +41,10 @@ func (m *MeasurementTypeMeasName) Build() (*e2smkpmv2.MeasurementType, error) {
 		},
 	}
 
-	if err := measType.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := measType.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 
 	return &measType, nil
 }
@@ -74,9 +74,10 @@ func (m *MeasurementTypeMeasID) Build() (*e2smkpmv2.MeasurementType, error) {
 		},
 	}
 
-	if err := measType.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := measType.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 
 	return &measType, nil
 }

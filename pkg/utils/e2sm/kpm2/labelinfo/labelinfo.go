@@ -6,7 +6,7 @@ package labelinfo
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 )
 
@@ -205,6 +205,9 @@ func WithStartEndIndication(startEndIndication e2smkpmv2.StartEndInd) func(info 
 
 // Build builds label information item
 func (l *LabelInfo) Build() (*e2smkpmv2.LabelInfoItem, error) {
+	sum := e2smkpmv2.SUM_SUM_TRUE
+	prelabelOverride := e2smkpmv2.PreLabelOverride_PRE_LABEL_OVERRIDE_TRUE
+
 	labelInfoItem := e2smkpmv2.LabelInfoItem{
 		MeasLabel: &e2smkpmv2.MeasurementLabel{
 			PlmnId: &e2smkpmv2.PlmnIdentity{
@@ -235,20 +238,21 @@ func (l *LabelInfo) Build() (*e2smkpmv2.LabelInfoItem, error) {
 			ARpmin: &e2smkpmv2.Arp{
 				Value: l.arpMin,
 			},
-			BitrateRange:     l.bitrateRange,
-			LayerMuMimo:      l.layerMuMimo,
-			SUm:              e2smkpmv2.SUM_SUM_TRUE,
-			DistBinX:         l.distX,
-			DistBinY:         l.distY,
-			DistBinZ:         l.distZ,
-			PreLabelOverride: e2smkpmv2.PreLabelOverride_PRE_LABEL_OVERRIDE_TRUE,
-			StartEndInd:      l.startEndIndication,
+			BitrateRange:     &l.bitrateRange,
+			LayerMuMimo:      &l.layerMuMimo,
+			SUm:              &sum,
+			DistBinX:         &l.distX,
+			DistBinY:         &l.distY,
+			DistBinZ:         &l.distZ,
+			PreLabelOverride: &prelabelOverride,
+			StartEndInd:      &l.startEndIndication,
 		},
 	}
 
-	if err := labelInfoItem.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := labelInfoItem.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 
 	return &labelInfoItem, nil
 

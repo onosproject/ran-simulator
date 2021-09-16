@@ -5,14 +5,12 @@
 package indication
 
 import (
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-
+	e2smkpmv2sm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	// "google.golang.org/protobuf/proto"
 
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 )
 
 // Header indication header for kpm service model
@@ -79,7 +77,7 @@ func WithGlobalKpmNodeID(globalKpmNodeID *e2smkpmv2.GlobalKpmnodeId) func(header
 }
 
 // ToAsn1Bytes converts header to asn1 bytes
-func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (header *Header) ToAsn1Bytes() ([]byte, error) {
 	// Creating an indication header
 	indicationHeader, err := header.Build()
 	if err != nil {
@@ -90,8 +88,9 @@ func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte
 	if err != nil {
 		return nil, err
 	}
+	var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
 
-	indicationHeaderAsn1Bytes, err := modelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
+	indicationHeaderAsn1Bytes, err := kpm2ServiceModel.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
 
 	if err != nil {
 		return nil, err
@@ -102,22 +101,25 @@ func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte
 // Build builds kpm v2 indication header message
 func (header *Header) Build() (*e2smkpmv2.E2SmKpmIndicationHeader, error) {
 	e2SmKpmPdu := e2smkpmv2.E2SmKpmIndicationHeader{
-		E2SmKpmIndicationHeader: &e2smkpmv2.E2SmKpmIndicationHeader_IndicationHeaderFormat1{
-			IndicationHeaderFormat1: &e2smkpmv2.E2SmKpmIndicationHeaderFormat1{
-				ColletStartTime: &e2smkpmv2.TimeStamp{
-					Value: header.timeStamp,
+		IndicationHeaderFormats: &e2smkpmv2.IndicationHeaderFormats{
+			E2SmKpmIndicationHeader: &e2smkpmv2.IndicationHeaderFormats_IndicationHeaderFormat1{
+				IndicationHeaderFormat1: &e2smkpmv2.E2SmKpmIndicationHeaderFormat1{
+					ColletStartTime: &e2smkpmv2.TimeStamp{
+						Value: header.timeStamp,
+					},
+					FileFormatversion: &header.fileFormatVersion,
+					SenderName:        &header.senderName,
+					SenderType:        &header.senderType,
+					VendorName:        &header.vendorName,
+					KpmNodeId:         header.globalKpmNodeID,
 				},
-				FileFormatversion: header.fileFormatVersion,
-				SenderName:        header.senderName,
-				SenderType:        header.senderType,
-				VendorName:        header.vendorName,
-				KpmNodeId:         header.globalKpmNodeID,
 			},
 		},
 	}
 
-	if err := e2SmKpmPdu.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := e2SmKpmPdu.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 	return &e2SmKpmPdu, nil
 }
