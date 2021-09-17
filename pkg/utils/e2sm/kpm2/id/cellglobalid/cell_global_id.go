@@ -6,13 +6,14 @@ package cellglobalid
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 )
 
 // GlobalNRCGIID cell global NRCGI ID
 type GlobalNRCGIID struct {
 	plmnID   *ransimtypes.Uint24
-	nrCellID *e2smkpmv2.BitString
+	nrCellID *asn1.BitString
 }
 
 // NewGlobalNRCGIID creates new global NRCGI ID
@@ -34,7 +35,7 @@ func WithPlmnID(plmnID *ransimtypes.Uint24) func(nrcgiid *GlobalNRCGIID) {
 }
 
 // WithNRCellID sets NRCellID
-func WithNRCellID(nrCellID *e2smkpmv2.BitString) func(nrcgiid *GlobalNRCGIID) {
+func WithNRCellID(nrCellID *asn1.BitString) func(nrcgiid *GlobalNRCGIID) {
 	return func(nrcgid *GlobalNRCGIID) {
 		nrcgid.nrCellID = nrCellID
 	}

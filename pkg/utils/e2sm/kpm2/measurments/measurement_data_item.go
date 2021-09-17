@@ -5,8 +5,7 @@
 package measurments
 
 import (
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 )
 
 // MeasurementDataItem measurement data item
@@ -43,11 +42,12 @@ func WithIncompleteFlag(incompleteFlag e2smkpmv2.IncompleteFlag) func(item *Meas
 func (m *MeasurementDataItem) Build() (*e2smkpmv2.MeasurementDataItem, error) {
 	mdi := e2smkpmv2.MeasurementDataItem{
 		MeasRecord:     m.mr,
-		IncompleteFlag: m.incompleteFlag,
+		IncompleteFlag: &m.incompleteFlag,
 	}
 
-	if err := mdi.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := mdi.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 	return &mdi, nil
 }

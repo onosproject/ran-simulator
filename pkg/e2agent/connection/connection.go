@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
+
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 
 	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
@@ -31,7 +33,6 @@ import (
 
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
@@ -259,9 +260,6 @@ func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.
 		return nil, nil, err
 	}
 	switch sm.RanFunctionID {
-	case registry.Kpm:
-		client := sm.Client.(*kpm.Client)
-		response, failure, err = client.RICControl(ctx, request)
 	case registry.Rcpre2:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICControl(ctx, request)
@@ -455,6 +453,9 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	case registry.Kpm2:
 		client := sm.Client.(*kpm2.Client)
+		response, failure, err = client.RICSubscriptionDelete(ctx, request)
+	case registry.Mho:
+		client := sm.Client.(*mho.Mho)
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 
 	}

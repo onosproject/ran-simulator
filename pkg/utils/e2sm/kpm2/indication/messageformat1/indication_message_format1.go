@@ -5,9 +5,8 @@
 package messageformat1
 
 import (
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	e2smkpmv2sm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -66,7 +65,7 @@ func WithMeasInfoList(measInfoList *e2smkpmv2.MeasurementInfoList) func(msg *Mes
 }
 
 // ToAsn1Bytes converts to Asn1 bytes
-func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (message *Message) ToAsn1Bytes() ([]byte, error) {
 	indicationMessage, err := message.Build()
 	if err != nil {
 		return nil, err
@@ -76,7 +75,9 @@ func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]by
 		return nil, err
 	}
 
-	indicationMessageAsn1Bytes, err := modelPlugin.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
+	var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
+
+	indicationMessageAsn1Bytes, err := kpm2ServiceModel.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -88,26 +89,29 @@ func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]by
 // Build builds indication message format 1 for kpm service model
 func (message *Message) Build() (*e2smkpmv2.E2SmKpmIndicationMessage, error) {
 	e2SmKpmPdu := e2smkpmv2.E2SmKpmIndicationMessage{
-		E2SmKpmIndicationMessage: &e2smkpmv2.E2SmKpmIndicationMessage_IndicationMessageFormat1{
-			IndicationMessageFormat1: &e2smkpmv2.E2SmKpmIndicationMessageFormat1{
-				SubscriptId: &e2smkpmv2.SubscriptionId{
-					Value: message.subscriptionID,
+		IndicationMessageFormats: &e2smkpmv2.IndicationMessageFormats{
+			E2SmKpmIndicationMessage: &e2smkpmv2.IndicationMessageFormats_IndicationMessageFormat1{
+				IndicationMessageFormat1: &e2smkpmv2.E2SmKpmIndicationMessageFormat1{
+					SubscriptId: &e2smkpmv2.SubscriptionId{
+						Value: message.subscriptionID,
+					},
+					CellObjId: &e2smkpmv2.CellObjectId{
+						Value: message.cellObjID,
+					},
+					GranulPeriod: &e2smkpmv2.GranularityPeriod{
+						Value: int64(message.granularity),
+					},
+					MeasInfoList: message.measInfoList,
+					MeasData:     message.measData,
 				},
-				CellObjId: &e2smkpmv2.CellObjectId{
-					Value: message.cellObjID,
-				},
-				GranulPeriod: &e2smkpmv2.GranularityPeriod{
-					Value: message.granularity,
-				},
-				MeasInfoList: message.measInfoList,
-				MeasData:     message.measData,
 			},
 		},
 	}
 
-	if err := e2SmKpmPdu.Validate(); err != nil {
-		return nil, errors.New(errors.Invalid, err.Error())
-	}
+	// FIXME: Add back when ready
+	//if err := e2SmKpmPdu.Validate(); err != nil {
+	//	return nil, errors.New(errors.Invalid, err.Error())
+	//}
 
 	return &e2SmKpmPdu, nil
 }

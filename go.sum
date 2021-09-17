@@ -645,8 +645,6 @@ github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.59/go.mod h1:HCK/e
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.61 h1:co6ZOCpWK4eLzt19ZC5YLApQkrCKe86Ii0EEuUc03kw=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.61/go.mod h1:HCK/eGpdXbeAAkYRF2667jl6jgbOL++7gCJ3PV0HTwo=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.59/go.mod h1:JkEi/sC5w3k66OxCKFnZFJ9mbQll7XPj4aevhu78plQ=
-github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.61 h1:Zsg77L0F8uFYlRmQJbUBTY6uKorpHbdzXazaDm3Cr7w=
-github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.61/go.mod h1:JkEi/sC5w3k66OxCKFnZFJ9mbQll7XPj4aevhu78plQ=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.7.61 h1:p/VAd5538/2eRpp+a/+mtGRb/Ld0Hit850X6yiYA8xI=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.7.61/go.mod h1:rHxty0auxHhAA8EqONMunDj8Blq3ChaNCciFWutvA2I=
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho v0.7.61 h1:Yd3OPR+AUjzyG8G2zZ0aVhFzfYgVIp2vdtaMbjus418=

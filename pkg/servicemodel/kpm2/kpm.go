@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
+
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/id/cellglobalid"
@@ -24,21 +26,20 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/measurments"
 
-	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	kpm2gNBID "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/id/gnbid"
 	kpm2IndicationHeader "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication"
 	kpm2MessageFormat1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/kpm2/indication/messageformat1"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/pdubuilder"
-	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2/v2/e2sm-kpm-v2"
+	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/pdubuilder"
+	e2smkpmv2sm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
+	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
@@ -79,21 +80,25 @@ type Client struct {
 	ServiceModel *registry.ServiceModel
 }
 
+// E2ConnectionUpdate implements connection update procedure
+func (sm *Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
+	return nil, nil, errors.NewNotSupported("connection update is not supported")
+}
+
 // NewServiceModel creates a new service model
-func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
+func NewServiceModel(node model.Node, model *model.Model,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store, ueStore ues.Store) (registry.ServiceModel, error) {
 	kpmSm := registry.ServiceModel{
-		RanFunctionID:       registry.Kpm2,
-		ModelName:           ranFunctionShortName,
-		Revision:            1,
-		OID:                 ranFunctionE2SmOid,
-		Version:             modelVersion,
-		ModelPluginRegistry: modelPluginRegistry,
-		Node:                node,
-		Model:               model,
-		Subscriptions:       subStore,
-		Nodes:               nodeStore,
-		UEs:                 ueStore,
+		RanFunctionID: registry.Kpm2,
+		ModelName:     ranFunctionShortName,
+		Revision:      1,
+		OID:           ranFunctionE2SmOid,
+		Version:       modelVersion,
+		Node:          node,
+		Model:         model,
+		Subscriptions: subStore,
+		Nodes:         nodeStore,
+		UEs:           ueStore,
 	}
 	kpmClient := &Client{
 		ServiceModel: &kpmSm,
@@ -107,7 +112,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	cellMeasObjectItems := make([]*e2smkpmv2.CellMeasurementObjectItem, 0)
 	for _, cellNcgi := range cells {
 		nci := ransimtypes.GetNCI(cellNcgi)
-		ncibs := &e2smkpmv2.BitString{
+		ncibs := &asn1.BitString{
 			Value: utils.Uint64ToBitString(uint64(nci), 36),
 			Len:   36,
 		}
@@ -128,7 +133,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 	}
 
 	// Creates an indication header
-	gNBID := &e2smkpmv2.BitString{
+	gNBID := &asn1.BitString{
 		Value: utils.Uint64ToBitString(uint64(node.GnbID), 22),
 		Len:   22,
 	}
@@ -200,11 +205,9 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	kpmModelPlugin, err := modelPluginRegistry.GetPlugin(ranFunctionE2SmOid)
-	if kpmModelPlugin == nil {
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil: %v", err)
-	}
-	ranFuncDescBytes, err := kpmModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
+
+	var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
+	ranFuncDescBytes, err := kpm2ServiceModel.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
@@ -216,7 +219,7 @@ func NewServiceModel(node model.Node, model *model.Model, modelPluginRegistry mo
 func (sm *Client) collect(ctx context.Context,
 	actionDefinition *e2smkpmv2.E2SmKpmActionDefinition,
 	cellNCGI ransimtypes.NCGI) (*e2smkpmv2.MeasurementDataItem, error) {
-	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
+	measInfoList := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1().GetMeasInfoList()
 	measRecord := e2smkpmv2.MeasurementRecord{
 		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
 	}
@@ -257,13 +260,14 @@ func (sm *Client) collect(ctx context.Context,
 }
 
 func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
-	cellNCGI ransimtypes.NCGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval uint32) ([]byte, error) {
+	cellNCGI ransimtypes.NCGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval int64) ([]byte, error) {
 	log.Debug("Create Indication message format 1 based on action defs for cell:", cellNCGI)
-	measInfoList := actionDefinition.GetActionDefinitionFormat1().GetMeasInfoList()
+	format1 := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1()
+	measInfoList := format1.GetMeasInfoList()
 	measData := &e2smkpmv2.MeasurementData{
 		Value: make([]*e2smkpmv2.MeasurementDataItem, 0),
 	}
-	granularity := actionDefinition.GetActionDefinitionFormat1().GetGranulPeriod().Value
+	granularity := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1().GetGranulPeriod().Value
 	numDataItems := int(interval / granularity)
 
 	for i := 0; i < numDataItems; i++ {
@@ -275,21 +279,17 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 
 		measData.Value = append(measData.Value, measDataItem)
 	}
-	subID := actionDefinition.GetActionDefinitionFormat1().SubscriptId.GetValue()
+	subID := format1.SubscriptId.GetValue()
 
 	// Creating an indication message format 1
 	indicationMessage := kpm2MessageFormat1.NewIndicationMessage(
 		kpm2MessageFormat1.WithCellObjID(strconv.FormatUint(uint64(cellNCGI), 16)),
-		kpm2MessageFormat1.WithGranularity(granularity),
+		kpm2MessageFormat1.WithGranularity(uint32(granularity)), // TODO: check if this is a sensible conversion
 		kpm2MessageFormat1.WithSubscriptionID(subID),
 		kpm2MessageFormat1.WithMeasData(measData),
 		kpm2MessageFormat1.WithMeasInfoList(measInfoList))
 
-	kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(kpmModelPlugin)
+	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes()
 	if err != nil {
 		log.Warn(err)
 		return nil, err
@@ -301,7 +301,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte, error) {
 	// Creates an indication header
 	plmnID := ransimtypes.NewUint24(uint32(sm.ServiceModel.Model.PlmnID))
-	gNBID := &e2smkpmv2.BitString{
+	gNBID := &asn1.BitString{
 		Value: utils.Uint64ToBitString(uint64(sm.ServiceModel.Node.GnbID), 22),
 		Len:   22,
 	}
@@ -324,11 +324,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 		kpm2IndicationHeader.WithVendorName(vendorName),
 		kpm2IndicationHeader.WithTimeStamp(timestamp))
 
-	kpmModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(kpmModelPlugin)
+	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes()
 	if err != nil {
 		log.Warn(err)
 		return nil, err
@@ -341,7 +337,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI,
 	subscription *subutils.Subscription,
 	actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition,
-	interval uint32) error {
+	interval int64) error {
 	// Creates and sends indication message format 1
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -356,8 +352,9 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 	}
 
 	for _, actionDefinition := range actionDefinitions {
-		if actionDefinition.GetActionDefinitionFormat1() != nil {
-			cellObjectID := actionDefinition.GetActionDefinitionFormat1().GetCellObjId().Value
+		format1 := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1()
+		if format1 != nil {
+			cellObjectID := format1.GetCellObjId().Value
 			if cellObjectID == strconv.FormatUint(uint64(ncgi), 16) {
 				log.Debug("Sending indication message for Cell with ID:", cellObjectID)
 				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ncgi, actionDefinition, interval)
@@ -390,7 +387,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 }
 
 func (sm *Client) sendRicIndication(ctx context.Context,
-	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval uint32) error {
+	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int64) error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
 	for _, ncgi := range node.Cells {
@@ -403,7 +400,7 @@ func (sm *Client) sendRicIndication(ctx context.Context,
 	return nil
 }
 
-func (sm *Client) reportIndication(ctx context.Context, interval uint32, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
+func (sm *Client) reportIndication(ctx context.Context, interval int64, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 
 	intervalDuration := time.Duration(interval)
@@ -431,11 +428,6 @@ func (sm *Client) reportIndication(ctx context.Context, interval uint32, subscri
 
 		}
 	}
-}
-
-// E2ConnectionUpdate implements connection update handler
-func (sm *Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
-	return nil, nil, errors.NewNotSupported("E2 connection update is not supported")
 }
 
 // RICControl implements control handler for kpm service model
