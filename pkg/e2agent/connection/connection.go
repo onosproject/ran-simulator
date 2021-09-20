@@ -568,7 +568,7 @@ func (e *e2Connection) setup() error {
 		configUpdateList.Value = append(configUpdateList.Value, cui)
 	}
 
-	transactionID, err := e.transactionIDPool.GetID()
+	transactionID, err := e.transactionIDPool.NewID()
 	if err != nil {
 		log.Error(err)
 		return err

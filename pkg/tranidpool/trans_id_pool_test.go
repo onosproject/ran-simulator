@@ -13,15 +13,15 @@ import (
 func TestTransIDPool(t *testing.T) {
 	pool := NewTransactionIDPool()
 	for i := 0; i < 256; i++ {
-		id, err := pool.GetID()
+		id, err := pool.NewID()
 		assert.NoError(t, err)
 		assert.Equal(t, i, id)
 	}
-	id, err := pool.GetID()
+	id, err := pool.NewID()
 	assert.NotNil(t, err)
 	assert.Equal(t, -1, id)
 	pool.Release(0)
-	id, err = pool.GetID()
+	id, err = pool.NewID()
 	assert.NoError(t, err)
 	assert.Equal(t, 0, id)
 }

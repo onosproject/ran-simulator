@@ -26,8 +26,8 @@ func NewTransactionIDPool() *TransactionIDPool {
 	}
 }
 
-// GetID an id from the pool.
-func (p *TransactionIDPool) GetID() (int, error) {
+// NewID an id from the pool.
+func (p *TransactionIDPool) NewID() (int, error) {
 	for i := p.min; i < p.max; i++ {
 		if p.pool.Bit(i) == 0 {
 			p.pool.SetBit(p.pool, i, 1)

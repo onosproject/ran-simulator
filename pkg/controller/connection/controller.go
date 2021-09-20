@@ -103,7 +103,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	if connection.Status.State == connections.Connected {
 		log.Debugf("Sending configuration update for connection: %+v", connection)
 		plmnID := ransimtypes.NewUint24(uint32(connection.Model.PlmnID))
-		transactionID, err := connection.TransactionIDPool.GetID()
+		transactionID, err := connection.TransactionIDPool.NewID()
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
