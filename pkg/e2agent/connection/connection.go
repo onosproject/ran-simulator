@@ -136,6 +136,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 				// TODO handle tnlUsage
 
 				ricAddress = e.getRICAddress(tnlInfo)
+				log.Debugf("RIC and IP and Port information: %v:%v", ricAddress.IPAddress, ricAddress.Port)
 
 				if ricAddress.IPAddress == nil {
 					cause := &e2apies.Cause{
@@ -145,7 +146,8 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 					}
 					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
 						connectionupdate.WithCause(cause),
-						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+						connectionupdate.WithTransactionID(ies49.GetValue().Value),
+						connectionupdate.WithTimeToWait(nil)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 
