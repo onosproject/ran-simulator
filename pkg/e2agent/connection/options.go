@@ -11,17 +11,19 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/store/connections"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
+	"github.com/onosproject/ran-simulator/pkg/tranidpool"
 )
 
 // InstanceOptions e2 channel instance options
 type InstanceOptions struct {
-	node            model.Node
-	model           *model.Model
-	ricAddress      addressing.RICAddress
-	channel         e2.ClientConn
-	registry        *registry.ServiceModelRegistry
-	subStore        *subscriptions.Subscriptions
-	connectionStore connections.Store
+	node              model.Node
+	model             *model.Model
+	ricAddress        addressing.RICAddress
+	channel           e2.ClientConn
+	registry          *registry.ServiceModelRegistry
+	subStore          *subscriptions.Subscriptions
+	connectionStore   connections.Store
+	transactionIDPool *tranidpool.TransactionIDPool
 }
 
 // InstanceOption instance option
@@ -73,5 +75,12 @@ func WithSubStore(subStore *subscriptions.Subscriptions) func(options *InstanceO
 func WithConnectionStore(connectionStore connections.Store) func(options *InstanceOptions) {
 	return func(options *InstanceOptions) {
 		options.connectionStore = connectionStore
+	}
+}
+
+// WithTransactionIDPool sets transaction ID pool
+func WithTransactionIDPool(transactionIDPool *tranidpool.TransactionIDPool) func(options *InstanceOptions) {
+	return func(options *InstanceOptions) {
+		options.transactionIDPool = transactionIDPool
 	}
 }

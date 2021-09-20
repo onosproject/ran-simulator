@@ -7,6 +7,7 @@ package connections
 import (
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/model"
+	"github.com/onosproject/ran-simulator/pkg/tranidpool"
 )
 
 // ConnectionEvent a connection event
@@ -77,9 +78,10 @@ func (s State) String() string {
 
 // Connection connection data for storing in connection store
 type Connection struct {
-	ID     ConnectionID
-	Client e2.ClientConn
-	Status ConnectionStatus
-	Node   model.Node
-	Model  *model.Model
+	ID                ConnectionID
+	Client            e2.ClientConn
+	Status            ConnectionStatus
+	Node              model.Node
+	Model             *model.Model
+	TransactionIDPool *tranidpool.TransactionIDPool
 }

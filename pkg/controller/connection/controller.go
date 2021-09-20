@@ -103,23 +103,35 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	if connection.Status.State == connections.Connected {
 		log.Debugf("Sending configuration update for connection: %+v", connection)
 		plmnID := ransimtypes.NewUint24(uint32(connection.Model.PlmnID))
-		configUpdate, err := configupdate.NewConfigurationUpdate(configupdate.WithTransactionID(2),
-			configupdate.WithE2NodeID(uint64(connection.Node.GnbID)),
-			configupdate.WithPlmnID(plmnID.Value())).Build()
+		transactionID, err := connection.TransactionIDPool.GetID()
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
-		_, _, err = connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
+		configUpdate, err := configupdate.NewConfigurationUpdate(configupdate.WithTransactionID(int32(transactionID)),
+			configupdate.WithE2NodeID(uint64(connection.Node.GnbID)),
+			configupdate.WithPlmnID(plmnID.Value())).Build()
 		if err != nil {
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			connection.TransactionIDPool.Release(transactionID)
 			return controller.Result{}, err
 		}
+		_, _, err = connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
+		if err != nil {
+			connection.TransactionIDPool.Release(transactionID)
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			return controller.Result{}, err
+		}
+		// TODO handle config update failure and ack
+
 		connection.Status.State = connections.Initialized
 		err = r.connections.Update(ctx, connection)
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
+		connection.TransactionIDPool.Release(transactionID)
+
 	}
 
 	return controller.Result{}, nil

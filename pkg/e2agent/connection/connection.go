@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/tranidpool"
+
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
@@ -66,13 +68,14 @@ type E2Connection interface {
 }
 
 type e2Connection struct {
-	node            model.Node
-	model           *model.Model
-	client          e2.ClientConn
-	registry        *registry.ServiceModelRegistry
-	subStore        *subscriptions.Subscriptions
-	connectionStore connections.Store
-	ricAddress      addressing.RICAddress
+	node              model.Node
+	model             *model.Model
+	client            e2.ClientConn
+	registry          *registry.ServiceModelRegistry
+	subStore          *subscriptions.Subscriptions
+	connectionStore   connections.Store
+	ricAddress        addressing.RICAddress
+	transactionIDPool *tranidpool.TransactionIDPool
 }
 
 // GetClient returns E2 client
@@ -88,12 +91,13 @@ func NewE2Connection(opts ...InstanceOption) E2Connection {
 		option(instanceOptions)
 	}
 	return &e2Connection{
-		model:           instanceOptions.model,
-		node:            instanceOptions.node,
-		registry:        instanceOptions.registry,
-		subStore:        instanceOptions.subStore,
-		ricAddress:      instanceOptions.ricAddress,
-		connectionStore: instanceOptions.connectionStore,
+		model:             instanceOptions.model,
+		node:              instanceOptions.node,
+		registry:          instanceOptions.registry,
+		subStore:          instanceOptions.subStore,
+		ricAddress:        instanceOptions.ricAddress,
+		connectionStore:   instanceOptions.connectionStore,
+		transactionIDPool: instanceOptions.transactionIDPool,
 	}
 
 }
@@ -160,8 +164,9 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 						Phase: connections.Open,
 						State: connections.Disconnected,
 					},
-					Model: e.model,
-					Node:  e.node,
+					Model:             e.model,
+					Node:              e.node,
+					TransactionIDPool: e.transactionIDPool,
 				}
 
 				err := e.connectionStore.Add(ctx, connectionID, connection)
@@ -228,7 +233,6 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 				}
 
 				connection.Status.Phase = connections.Closed
-
 				err = e.connectionStore.Update(ctx, connection)
 				if err != nil {
 					log.Warn(err)
@@ -564,12 +568,17 @@ func (e *e2Connection) setup() error {
 		configUpdateList.Value = append(configUpdateList.Value, cui)
 	}
 
+	transactionID, err := e.transactionIDPool.GetID()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(e.registry.GetRanFunctions()),
 		setup.WithPlmnID(plmnID.Value()),
 		setup.WithE2NodeID(uint64(e.node.GnbID)),
 		setup.WithComponentConfigUpdateList(configUpdateList),
-		setup.WithTransactionID(1))
+		setup.WithTransactionID(int32(transactionID)))
 
 	e2SetupRequest, err := setupRequest.Build()
 
@@ -595,9 +604,10 @@ func (e *e2Connection) setup() error {
 			Phase: connections.Open,
 			State: connections.Initialized,
 		},
-		Client: e.client,
-		Node:   e.node,
-		Model:  e.model,
+		Client:            e.client,
+		Node:              e.node,
+		Model:             e.model,
+		TransactionIDPool: e.transactionIDPool,
 	}
 
 	err = e.connectionStore.Add(context.Background(),
