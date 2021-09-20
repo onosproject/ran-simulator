@@ -103,9 +103,13 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	log.Info("Connection Update request is received %v", request)
 	connectionUpdateItemIes := make([]*e2appducontents.E2ConnectionUpdateItemIes, 0)
 	connectionSetupFailedItemIes := make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0)
+	// E2 Connection To Add List IE
 	ies44 := request.GetProtocolIes().GetE2ApProtocolIes44()
 	ies45 := request.GetProtocolIes().GetE2ApProtocolIes45()
+	// E2 Connection Remove List IE
 	ies46 := request.GetProtocolIes().GetE2ApProtocolIes46()
+	// Transaction ID IE
+	ies49 := request.GetProtocolIes().GetE2ApProtocolIes49()
 
 	// In case the E2 Node receives a E2 CONNECTION UPDATE message without any
 	// IE except for Message Type IE and Transaction ID IE, it shall reply with the E2 CONNECTION
@@ -139,7 +143,9 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 
@@ -193,7 +199,9 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 
@@ -209,7 +217,9 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 				}
@@ -224,7 +234,9 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 				}
@@ -239,7 +251,8 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 
 	ack := connectionupdate.NewConnectionUpdate(
 		connectionupdate.WithConnectionUpdateItemIes(connectionUpdateItemIes),
-		connectionupdate.WithConnectionSetupFailedItemIes(connectionSetupFailedItemIes)).
+		connectionupdate.WithConnectionSetupFailedItemIes(connectionSetupFailedItemIes),
+		connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 		BuildConnectionUpdateAcknowledge()
 	log.Info("Sending Connection Update Ack:", ack)
 	return ack, nil, nil
