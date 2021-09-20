@@ -9,6 +9,9 @@ import (
 	"fmt"
 	"time"
 
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/configupdate"
+
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	e2connection "github.com/onosproject/ran-simulator/pkg/e2agent/connection"
 
@@ -19,13 +22,13 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/controller"
 )
 
-var log = logging.GetLogger("e2agent", "controller")
+var log = logging.GetLogger("controller", "connection")
 
 const defaultTimeout = 30 * time.Second
 const queueSize = 100
 
-// NewController returns a new channel controller. This controller is responsible to open and close
-// E2 channels that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
+// NewController returns a new connection controller. This controller is responsible to open and close
+// E2 connections that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
 func NewController(connections connections.Store) *controller.Controller {
 	c := controller.NewController("E2Connections")
 	c.Watch(&Watcher{
@@ -38,7 +41,7 @@ func NewController(connections connections.Store) *controller.Controller {
 	return c
 }
 
-// Reconciler is a E2 channel reconciler
+// Reconciler is a E2 connection reconciler
 type Reconciler struct {
 	connections connections.Store
 }
@@ -94,14 +97,29 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 		err = r.connections.Update(ctx, connection)
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
-			connection.Status.State = connections.Disconnected
 			return controller.Result{}, err
 		}
 	}
 	if connection.Status.State == connections.Connected {
-		log.Debug("Sending configuration update")
-		// TODO use configuration update to inform E2T about new connection
-		// 		and change channel state to Initialized
+		log.Debugf("Sending configuration update for connection: %+v", connection)
+		plmnID := ransimtypes.NewUint24(uint32(connection.Model.PlmnID))
+		configUpdate, err := configupdate.NewConfigurationUpdate(configupdate.WithTransactionID(2),
+			configupdate.WithE2NodeID(uint64(connection.Node.GnbID)),
+			configupdate.WithPlmnID(plmnID.Value())).Build()
+		if err != nil {
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			return controller.Result{}, err
+		}
+		_, _, err = connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
+		if err != nil {
+			return controller.Result{}, err
+		}
+		connection.Status.State = connections.Initialized
+		err = r.connections.Update(ctx, connection)
+		if err != nil {
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			return controller.Result{}, err
+		}
 	}
 
 	return controller.Result{}, nil
@@ -134,7 +152,6 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 			log.Warnf("Failed to reconcile closing connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
-
 	}
 
 	return controller.Result{}, nil

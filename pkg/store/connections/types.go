@@ -6,6 +6,7 @@ package connections
 
 import (
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
+	"github.com/onosproject/ran-simulator/pkg/model"
 )
 
 // ConnectionEvent a connection event
@@ -79,4 +80,6 @@ type Connection struct {
 	ID     ConnectionID
 	Client e2.ClientConn
 	Status ConnectionStatus
+	Node   model.Node
+	Model  *model.Model
 }
