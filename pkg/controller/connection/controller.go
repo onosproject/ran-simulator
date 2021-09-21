@@ -9,6 +9,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/model"
+
+	"github.com/onosproject/ran-simulator/pkg/tranidpool"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/configupdate"
 
@@ -29,21 +33,28 @@ const queueSize = 100
 
 // NewController returns a new connection controller. This controller is responsible to open and close
 // E2 connections that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
-func NewController(connections connections.Store) *controller.Controller {
+func NewController(connections connections.Store,
+	transactionIDPool *tranidpool.TransactionIDPool, node model.Node, model *model.Model) *controller.Controller {
 	c := controller.NewController("E2Connections")
 	c.Watch(&Watcher{
 		connections: connections,
 	})
 
 	c.Reconcile(&Reconciler{
-		connections: connections,
+		connections:       connections,
+		transactionIDPool: transactionIDPool,
+		node:              node,
+		model:             model,
 	})
 	return c
 }
 
 // Reconciler is a E2 connection reconciler
 type Reconciler struct {
-	connections connections.Store
+	connections       connections.Store
+	transactionIDPool *tranidpool.TransactionIDPool
+	node              model.Node
+	model             *model.Model
 }
 
 // Reconcile reconciles the state of a device change
@@ -102,23 +113,24 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	}
 	if connection.Status.State == connections.Connected {
 		log.Debugf("Sending configuration update for connection: %+v", connection)
-		plmnID := ransimtypes.NewUint24(uint32(connection.Model.PlmnID))
-		transactionID, err := connection.TransactionIDPool.NewID()
+		plmnID := ransimtypes.NewUint24(uint32(r.model.PlmnID))
+		transactionID, err := r.transactionIDPool.NewID()
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
+		log.Debugf("Test Trans ID:", transactionID)
 		configUpdate, err := configupdate.NewConfigurationUpdate(configupdate.WithTransactionID(int32(transactionID)),
-			configupdate.WithE2NodeID(uint64(connection.Node.GnbID)),
+			configupdate.WithE2NodeID(uint64(r.node.GnbID)),
 			configupdate.WithPlmnID(plmnID.Value())).Build()
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
-			connection.TransactionIDPool.Release(transactionID)
+			r.transactionIDPool.Release(transactionID)
 			return controller.Result{}, err
 		}
 		_, _, err = connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
 		if err != nil {
-			connection.TransactionIDPool.Release(transactionID)
+			r.transactionIDPool.Release(transactionID)
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
@@ -130,7 +142,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
-		connection.TransactionIDPool.Release(transactionID)
+		r.transactionIDPool.Release(transactionID)
 
 	}
 

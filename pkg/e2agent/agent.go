@@ -167,7 +167,7 @@ func (a *e2Agent) Start() error {
 	connectionStore := connections.NewStore()
 	a.connectionStore = connectionStore
 
-	c := connectionController.NewController(connectionStore)
+	c := connectionController.NewController(connectionStore, a.transactionIDPool, a.node, a.model)
 	err = c.Start()
 	if err != nil {
 		return err

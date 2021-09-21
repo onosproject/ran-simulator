@@ -164,9 +164,6 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 						Phase: connections.Open,
 						State: connections.Disconnected,
 					},
-					Model:             e.model,
-					Node:              e.node,
-					TransactionIDPool: e.transactionIDPool,
 				}
 
 				err := e.connectionStore.Add(ctx, connectionID, connection)
@@ -604,10 +601,7 @@ func (e *e2Connection) setup() error {
 			Phase: connections.Open,
 			State: connections.Initialized,
 		},
-		Client:            e.client,
-		Node:              e.node,
-		Model:             e.model,
-		TransactionIDPool: e.transactionIDPool,
+		Client: e.client,
 	}
 
 	err = e.connectionStore.Add(context.Background(),
