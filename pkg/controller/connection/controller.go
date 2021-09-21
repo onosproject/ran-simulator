@@ -77,7 +77,7 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection) (controller.Result, error) {
 
 	// If the connection state is in Initialized  state returns with nil error
-	if connection.Status.State == connections.Initialized {
+	if connection.Status.State == connections.Configured {
 		return controller.Result{}, nil
 	}
 
@@ -86,7 +86,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 
 	addr := fmt.Sprintf("%s:%d", connection.ID.GetRICIPAddress(), connection.ID.GetRICPort())
 
-	if connection.Status.State == connections.Disconnected {
+	if connection.Status.State == connections.Connecting {
 		e2Connection := e2connection.NewE2Connection()
 		client, err := e2.Connect(ctx, addr, func(channel e2.ClientConn) e2.ClientInterface {
 			return e2Connection
@@ -128,7 +128,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 		}
 
 		if configUpdateAck != nil {
-			connection.Status.State = connections.Initialized
+			connection.Status.State = connections.Configured
 			err = r.connections.Update(ctx, connection)
 			if err != nil {
 				log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
@@ -152,7 +152,7 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 		}
 	}
 
-	if connection.Status.State == connections.Initialized {
+	if connection.Status.State == connections.Disconnecting {
 		// TODO use configuration update to inform E2T that E2 node is intended to close the connection
 		//      (i.e. before calling close function)
 		err := connection.Client.Close()

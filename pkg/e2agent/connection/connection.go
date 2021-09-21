@@ -158,7 +158,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 					ID: connectionID,
 					Status: connections.ConnectionStatus{
 						Phase: connections.Open,
-						State: connections.Disconnected,
+						State: connections.Connecting,
 					},
 				}
 
@@ -590,7 +590,7 @@ func (e *e2Connection) setup() error {
 		ID: connectionID,
 		Status: connections.ConnectionStatus{
 			Phase: connections.Open,
-			State: connections.Initialized,
+			State: connections.Configured,
 		},
 		Client: e.client,
 	}

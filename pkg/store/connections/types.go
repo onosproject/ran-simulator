@@ -59,19 +59,29 @@ type ConnectionStatus struct {
 type State int
 
 const (
+
+	// Connecting connecting state
+	Connecting State = iota
+
 	// Connected connected state
-	Connected State = iota
+	Connected
 
-	// Disconnected disconected state
+	// Configuring configuring state
+	Configuring
+
+	// Configured configured state
+	Configured
+
+	// Disconnecting disconnecting state
+	Disconnecting
+
+	// Disconnected disconnected state
 	Disconnected
-
-	// Initialized initialized state
-	Initialized
 )
 
 // String return state in string format
 func (s State) String() string {
-	return [...]string{"Connected", "Disconnected", "Initialized"}[s]
+	return [...]string{"Connecting", "Connected", "Configuring", "Configured", "Disconnecting", "Disconnected"}[s]
 }
 
 // Connection connection data for storing in connection store
