@@ -128,22 +128,27 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 			r.transactionIDPool.Release(transactionID)
 			return controller.Result{}, err
 		}
-		_, _, err = connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
+		configUpdateAck, configUpdateFailure, err := connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
 		if err != nil {
 			r.transactionIDPool.Release(transactionID)
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
-		// TODO handle config update failure and ack
-
-		connection.Status.State = connections.Initialized
-		err = r.connections.Update(ctx, connection)
-		if err != nil {
+		if configUpdateFailure != nil {
+			r.transactionIDPool.Release(transactionID)
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
-		r.transactionIDPool.Release(transactionID)
 
+		if configUpdateAck != nil {
+			connection.Status.State = connections.Initialized
+			err = r.connections.Update(ctx, connection)
+			if err != nil {
+				log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+				return controller.Result{}, err
+			}
+		}
+		r.transactionIDPool.Release(transactionID)
 	}
 
 	return controller.Result{}, nil
