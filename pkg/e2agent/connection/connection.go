@@ -226,6 +226,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 				}
 
 				connection.Status.Phase = connections.Closed
+				connection.Status.State = connections.Disconnecting
 				err = e.connectionStore.Update(ctx, connection)
 				if err != nil {
 					log.Warn(err)

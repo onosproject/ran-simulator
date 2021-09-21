@@ -74,9 +74,42 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 	return controller.Result{}, nil
 }
 
+func (r *Reconciler) configureDataConn(ctx context.Context, connection *connections.Connection) (controller.Result, error) {
+	plmnID := ransimtypes.NewUint24(uint32(r.model.PlmnID))
+	configUpdate, err := configupdate.NewConfigurationUpdate(
+		configupdate.WithTransactionID(int32(2)),
+		configupdate.WithE2NodeID(uint64(r.node.GnbID)),
+		configupdate.WithPlmnID(plmnID.Value())).Build()
+	if err != nil {
+		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+		return controller.Result{}, err
+	}
+	configUpdateAck, configUpdateFailure, err := connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
+	if err != nil {
+		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+		return controller.Result{}, err
+	}
+	if configUpdateFailure != nil {
+		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+		return controller.Result{}, err
+	}
+
+	if configUpdateAck != nil {
+		connection.Status.State = connections.Configured
+		err = r.connections.Update(ctx, connection)
+		if err != nil {
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			return controller.Result{}, err
+		}
+	}
+
+	return controller.Result{}, nil
+
+}
+
 func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection) (controller.Result, error) {
 
-	// If the connection state is in Initialized  state returns with nil error
+	// If the connection state is in configured  state returns with nil error
 	if connection.Status.State == connections.Configured {
 		return controller.Result{}, nil
 	}
@@ -84,8 +117,13 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	addr := fmt.Sprintf("%s:%d", connection.ID.GetRICIPAddress(), connection.ID.GetRICPort())
+	// If the connection state is in configuring state then configure the connection
+	if connection.Status.State == connections.Configuring {
+		log.Debugf("Configuring connection: %+v", connection)
+		return r.configureDataConn(ctx, connection)
+	}
 
+	addr := fmt.Sprintf("%s:%d", connection.ID.GetRICIPAddress(), connection.ID.GetRICPort())
 	if connection.Status.State == connections.Connecting {
 		e2Connection := e2connection.NewE2Connection()
 		client, err := e2.Connect(ctx, addr, func(channel e2.ClientConn) e2.ClientInterface {
@@ -106,36 +144,18 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 			return controller.Result{}, err
 		}
 	}
-	if connection.Status.State == connections.Connected {
-		log.Debugf("Sending configuration update for connection: %+v", connection)
-		plmnID := ransimtypes.NewUint24(uint32(r.model.PlmnID))
-		configUpdate, err := configupdate.NewConfigurationUpdate(
-			configupdate.WithTransactionID(int32(2)),
-			configupdate.WithE2NodeID(uint64(r.node.GnbID)),
-			configupdate.WithPlmnID(plmnID.Value())).Build()
-		if err != nil {
-			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
-			return controller.Result{}, err
-		}
-		configUpdateAck, configUpdateFailure, err := connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
-		if err != nil {
-			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
-			return controller.Result{}, err
-		}
-		if configUpdateFailure != nil {
-			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
-			return controller.Result{}, err
-		}
 
-		if configUpdateAck != nil {
-			connection.Status.State = connections.Configured
-			err = r.connections.Update(ctx, connection)
-			if err != nil {
-				log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
-				return controller.Result{}, err
-			}
+	if connection.Status.State == connections.Connected {
+		log.Debugf("Configuring connection: %+v", connection)
+		connection.Status.State = connections.Configuring
+		err := r.connections.Update(ctx, connection)
+		if err != nil {
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			return controller.Result{}, err
 		}
+		return r.configureDataConn(ctx, connection)
 	}
+
 	return controller.Result{}, nil
 
 }
@@ -150,6 +170,7 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 			log.Warnf("Failed to reconcile closing connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
+		return controller.Result{}, nil
 	}
 
 	if connection.Status.State == connections.Disconnecting {

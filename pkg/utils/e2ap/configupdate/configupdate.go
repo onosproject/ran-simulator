@@ -81,7 +81,7 @@ func (c *ConfigurationUpdate) Build() (*e2appducontents.E2NodeConfigurationUpdat
 		Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
 		Value:       gE2NodeID,
 	}
-	// Test E2 configuration update
+
 	configUpdate := &e2appducontents.E2NodeConfigurationUpdate{
 		ProtocolIes: &e2appducontents.E2NodeConfigurationUpdateIes{
 			E2ApProtocolIes49: &e2appducontents.E2NodeConfigurationUpdateIes_E2NodeConfigurationUpdateIes49{
