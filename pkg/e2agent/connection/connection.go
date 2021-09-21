@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/onosproject/ran-simulator/pkg/tranidpool"
-
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
@@ -68,14 +66,13 @@ type E2Connection interface {
 }
 
 type e2Connection struct {
-	node              model.Node
-	model             *model.Model
-	client            e2.ClientConn
-	registry          *registry.ServiceModelRegistry
-	subStore          *subscriptions.Subscriptions
-	connectionStore   connections.Store
-	ricAddress        addressing.RICAddress
-	transactionIDPool *tranidpool.TransactionIDPool
+	node            model.Node
+	model           *model.Model
+	client          e2.ClientConn
+	registry        *registry.ServiceModelRegistry
+	subStore        *subscriptions.Subscriptions
+	connectionStore connections.Store
+	ricAddress      addressing.RICAddress
 }
 
 // GetClient returns E2 client
@@ -91,13 +88,12 @@ func NewE2Connection(opts ...InstanceOption) E2Connection {
 		option(instanceOptions)
 	}
 	return &e2Connection{
-		model:             instanceOptions.model,
-		node:              instanceOptions.node,
-		registry:          instanceOptions.registry,
-		subStore:          instanceOptions.subStore,
-		ricAddress:        instanceOptions.ricAddress,
-		connectionStore:   instanceOptions.connectionStore,
-		transactionIDPool: instanceOptions.transactionIDPool,
+		model:           instanceOptions.model,
+		node:            instanceOptions.node,
+		registry:        instanceOptions.registry,
+		subStore:        instanceOptions.subStore,
+		ricAddress:      instanceOptions.ricAddress,
+		connectionStore: instanceOptions.connectionStore,
 	}
 
 }
@@ -565,17 +561,12 @@ func (e *e2Connection) setup() error {
 		configUpdateList.Value = append(configUpdateList.Value, cui)
 	}
 
-	transactionID, err := e.transactionIDPool.NewID()
-	if err != nil {
-		log.Error(err)
-		return err
-	}
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(e.registry.GetRanFunctions()),
 		setup.WithPlmnID(plmnID.Value()),
 		setup.WithE2NodeID(uint64(e.node.GnbID)),
 		setup.WithComponentConfigUpdateList(configUpdateList),
-		setup.WithTransactionID(int32(transactionID)))
+		setup.WithTransactionID(int32(1)))
 
 	e2SetupRequest, err := setupRequest.Build()
 

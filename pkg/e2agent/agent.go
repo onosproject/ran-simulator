@@ -8,8 +8,6 @@ import (
 	"context"
 	"net"
 
-	"github.com/onosproject/ran-simulator/pkg/tranidpool"
-
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
@@ -55,15 +53,14 @@ type E2Agent interface {
 
 // e2Agent is an E2 agent
 type e2Agent struct {
-	node              model.Node
-	model             *model.Model
-	registry          *registry.ServiceModelRegistry
-	subStore          *subscriptions.Subscriptions
-	nodeStore         nodes.Store
-	ueStore           ues.Store
-	cellStore         cells.Store
-	connectionStore   connections.Store
-	transactionIDPool *tranidpool.TransactionIDPool
+	node            model.Node
+	model           *model.Model
+	registry        *registry.ServiceModelRegistry
+	subStore        *subscriptions.Subscriptions
+	nodeStore       nodes.Store
+	ueStore         ues.Store
+	cellStore       cells.Store
+	connectionStore connections.Store
 }
 
 // NewE2Agent creates a new E2 agent
@@ -72,7 +69,6 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.GnbID)
 	reg := registry.NewServiceModelRegistry()
-	transactionIDPool := tranidpool.NewTransactionIDPool()
 
 	// Each new e2 agent has its own subscription store
 	subStore := subscriptions.NewStore()
@@ -136,14 +132,13 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 		}
 	}
 	return &e2Agent{
-		node:              node,
-		registry:          reg,
-		model:             model,
-		subStore:          subStore,
-		nodeStore:         nodeStore,
-		ueStore:           ueStore,
-		cellStore:         cellStore,
-		transactionIDPool: transactionIDPool,
+		node:      node,
+		registry:  reg,
+		model:     model,
+		subStore:  subStore,
+		nodeStore: nodeStore,
+		ueStore:   ueStore,
+		cellStore: cellStore,
 	}, nil
 }
 
@@ -167,7 +162,7 @@ func (a *e2Agent) Start() error {
 	connectionStore := connections.NewStore()
 	a.connectionStore = connectionStore
 
-	c := connectionController.NewController(connectionStore, a.transactionIDPool, a.node, a.model)
+	c := connectionController.NewController(connectionStore, a.node, a.model)
 	err = c.Start()
 	if err != nil {
 		return err
@@ -178,8 +173,7 @@ func (a *e2Agent) Start() error {
 		connection.WithSMRegistry(a.registry),
 		connection.WithSubStore(a.subStore),
 		connection.WithRICAddress(ricAddress),
-		connection.WithConnectionStore(connectionStore),
-		connection.WithTransactionIDPool(a.transactionIDPool))
+		connection.WithConnectionStore(connectionStore))
 
 	err = e2Connection.Setup()
 	if err != nil {
