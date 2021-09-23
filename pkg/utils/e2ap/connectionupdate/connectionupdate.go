@@ -142,5 +142,6 @@ func (c *ConnectionUpdate) BuildConnectionUpdateFailure() *e2appducontents.E2Con
 			E2ApProtocolIes49: ie49,
 		},
 	}
+
 	return failure
 }

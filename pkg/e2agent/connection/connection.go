@@ -100,13 +100,14 @@ func NewE2Connection(opts ...InstanceOption) E2Connection {
 
 // E2ConnectionUpdate implements E2 connection update procedure
 func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
-	log.Info("Connection Update request is received %v", request)
+	log.Info("Received Connection Update request %v", request)
 	connectionUpdateItemIes := make([]*e2appducontents.E2ConnectionUpdateItemIes, 0)
 	connectionSetupFailedItemIes := make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0)
-	// E2 Connection To Add List IE
+	// E2 Connection To Add list IE
 	ies44 := request.GetProtocolIes().GetE2ApProtocolIes44()
+	// E2 Connection To Modify list IE
 	ies45 := request.GetProtocolIes().GetE2ApProtocolIes45()
-	// E2 Connection Remove List IE
+	// E2 Connection Remove list IE
 	ies46 := request.GetProtocolIes().GetE2ApProtocolIes46()
 	// Transaction ID IE
 	ies49 := request.GetProtocolIes().GetE2ApProtocolIes49()
@@ -115,7 +116,8 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	// IE except for Message Type IE and Transaction ID IE, it shall reply with the E2 CONNECTION
 	//ACKNOWLEDGE message without performing any updates to the existing connections.
 	if ies44 == nil && ies45 == nil && ies46 == nil {
-		ack := connectionupdate.NewConnectionUpdate().
+		ack := connectionupdate.NewConnectionUpdate(
+			connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 			BuildConnectionUpdateAcknowledge()
 		return ack, nil, nil
 
@@ -128,7 +130,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	if ies44 != nil {
 		connectionUpdateList := ies44.Value
 		if connectionUpdateList != nil {
-			log.Debug("Adding new connections")
+			log.Debugf("Adding new connections: %+v", connectionUpdateList)
 			connectionUpdateItems := connectionUpdateList.Value
 			for _, connectionUpdateItem := range connectionUpdateItems {
 				tnlInfo := connectionUpdateItem.GetValue().GetTnlInformation()
@@ -152,7 +154,8 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 					return nil, connectionUpdateFailure, nil
 
 				}
-				// Adds a new connection to the connection store
+				// Adds a new connection in Connecting state
+				// to the connection store to trigger reconciliation of a connection
 				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
 				connection := &connections.Connection{
 					ID: connectionID,
@@ -189,7 +192,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	if ies46 != nil {
 		connectionRemoveList := ies46.Value
 		if connectionRemoveList != nil {
-			log.Debug("Removing connections")
+			log.Debugf("Removing connections: %+v", connectionRemoveList)
 			connectionUpdateRemoveItems := connectionRemoveList.GetValue()
 			for _, connectionUpdateRemoveItem := range connectionUpdateRemoveItems {
 				tnlInfo := connectionUpdateRemoveItem.GetValue().GetTnlInformation()
@@ -250,12 +253,14 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 		log.Debug("Modifying connections")
 	}
 
+	// After successful update of E2 interface connection(s), the E2 Node shall reply with the E2 CONNECTION UPDATE ACKNOWLEDGE message to inform
+	//  the initiating Near-RT RIC that the requested E2 connection update was performed successfully.
 	ack := connectionupdate.NewConnectionUpdate(
 		connectionupdate.WithConnectionUpdateItemIes(connectionUpdateItemIes),
 		connectionupdate.WithConnectionSetupFailedItemIes(connectionSetupFailedItemIes),
 		connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 		BuildConnectionUpdateAcknowledge()
-	log.Info("Sending Connection Update Ack:", ack)
+	log.Infof("Sending Connection Update Ack: %+v", ack)
 	return ack, nil, nil
 }
 

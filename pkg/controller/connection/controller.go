@@ -79,11 +79,13 @@ func (r *Reconciler) configureDataConn(ctx context.Context, connection *connecti
 	configUpdate, err := configupdate.NewConfigurationUpdate(
 		configupdate.WithTransactionID(int32(2)),
 		configupdate.WithE2NodeID(uint64(r.node.GnbID)),
-		configupdate.WithPlmnID(plmnID.Value())).Build()
+		configupdate.WithPlmnID(plmnID.Value())).
+		Build()
 	if err != nil {
 		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 		return controller.Result{}, err
 	}
+	log.Info("Sending Configuration update request:%+v", configUpdate)
 	configUpdateAck, configUpdateFailure, err := connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
 	if err != nil {
 		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
@@ -94,7 +96,9 @@ func (r *Reconciler) configureDataConn(ctx context.Context, connection *connecti
 		return controller.Result{}, err
 	}
 
+	// Update the state of connection to Configured after receiving config update ack
 	if configUpdateAck != nil {
+		log.Infof("Config update ack is received:%+v", configUpdateAck)
 		connection.Status.State = connections.Configured
 		err = r.connections.Update(ctx, connection)
 		if err != nil {
@@ -102,7 +106,6 @@ func (r *Reconciler) configureDataConn(ctx context.Context, connection *connecti
 			return controller.Result{}, err
 		}
 	}
-
 	return controller.Result{}, nil
 
 }
@@ -111,6 +114,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 
 	// If the connection state is in configured  state returns with nil error
 	if connection.Status.State == connections.Configured {
+		log.Debugf("Connection %+v is configured:", connection)
 		return controller.Result{}, nil
 	}
 
@@ -124,6 +128,8 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	}
 
 	addr := fmt.Sprintf("%s:%d", connection.ID.GetRICIPAddress(), connection.ID.GetRICPort())
+	// If the connection state is in Connecting state then opens a connection to RIC
+	// and update connectivity status to Connected
 	if connection.Status.State == connections.Connecting {
 		e2Connection := e2connection.NewE2Connection()
 		client, err := e2.Connect(ctx, addr, func(channel e2.ClientConn) e2.ClientInterface {
@@ -145,6 +151,9 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 		}
 	}
 
+	// Since the Connection is already established, then E2 NODE CONFIGURATION UPDATE procedure shall be the first E2AP procedure triggered on an
+	//  additional TNLA of an already setup E2 interface instance after the TNL association has become operational, and the Near-RT RIC shall
+	//  associate the TNLA to the E2 interface instance using the included Global E2 Node ID.
 	if connection.Status.State == connections.Connected {
 		log.Debugf("Configuring connection: %+v", connection)
 		connection.Status.State = connections.Configuring
