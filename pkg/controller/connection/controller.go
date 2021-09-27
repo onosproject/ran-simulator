@@ -9,6 +9,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
+
 	"github.com/onosproject/ran-simulator/pkg/model"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -31,7 +34,8 @@ const queueSize = 100
 
 // NewController returns a new connection controller. This controller is responsible to open and close
 // E2 connections that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
-func NewController(connections connections.Store, node model.Node, model *model.Model) *controller.Controller {
+func NewController(connections connections.Store, node model.Node, model *model.Model,
+	registry *registry.ServiceModelRegistry, subStore *subscriptions.Subscriptions) *controller.Controller {
 	c := controller.NewController("E2Connections")
 	c.Watch(&Watcher{
 		connections: connections,
@@ -41,6 +45,8 @@ func NewController(connections connections.Store, node model.Node, model *model.
 		connections: connections,
 		node:        node,
 		model:       model,
+		registry:    registry,
+		subStore:    subStore,
 	})
 	return c
 }
@@ -50,6 +56,8 @@ type Reconciler struct {
 	connections connections.Store
 	node        model.Node
 	model       *model.Model
+	registry    *registry.ServiceModelRegistry
+	subStore    *subscriptions.Subscriptions
 }
 
 // Reconcile reconciles the state of a device change
@@ -131,7 +139,13 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	// If the connection state is in Connecting state then opens a connection to RIC
 	// and update connectivity status to Connected
 	if connection.Status.State == connections.Connecting {
-		e2Connection := e2connection.NewE2Connection()
+		e2Connection := e2connection.NewE2Connection(
+			e2connection.WithNode(r.node),
+			e2connection.WithModel(r.model),
+			e2connection.WithSMRegistry(r.registry),
+			e2connection.WithSubStore(r.subStore),
+			e2connection.WithConnectionStore(r.connections))
+
 		client, err := e2.Connect(ctx, addr, func(channel e2.ClientConn) e2.ClientInterface {
 			return e2Connection
 		})
@@ -141,6 +155,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 			return controller.Result{}, err
 		}
 
+		e2Connection.SetClient(client)
 		connection.Client = client
 		connection.Status.State = connections.Connected
 

@@ -63,6 +63,8 @@ type E2Connection interface {
 	Close() error
 
 	GetClient() e2.ClientConn
+
+	SetClient(e2.ClientConn)
 }
 
 type e2Connection struct {
@@ -73,6 +75,11 @@ type e2Connection struct {
 	subStore        *subscriptions.Subscriptions
 	connectionStore connections.Store
 	ricAddress      addressing.RICAddress
+}
+
+// SetClient sets E2 client
+func (e *e2Connection) SetClient(client e2.ClientConn) {
+	e.client = client
 }
 
 // GetClient returns E2 client
@@ -94,6 +101,7 @@ func NewE2Connection(opts ...InstanceOption) E2Connection {
 		subStore:        instanceOptions.subStore,
 		ricAddress:      instanceOptions.ricAddress,
 		connectionStore: instanceOptions.connectionStore,
+		client:          instanceOptions.e2Client,
 	}
 
 }
