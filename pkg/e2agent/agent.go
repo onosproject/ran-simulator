@@ -186,9 +186,11 @@ func (a *e2Agent) Stop() error {
 	log.Debugf("Stopping e2 agent with ID %d:", a.node.GnbID)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	connections := a.connectionStore.List(context.Background())
-	for _, conn := range connections {
+	conns := a.connectionStore.List(context.Background())
+	log.Debugf("List of Connections: %+v", conns)
+	for _, conn := range conns {
 		if conn.Client != nil {
+			log.Debugf("Closing connection: %+v", conn.ID)
 			err := conn.Client.Close()
 			if err != nil {
 				return err

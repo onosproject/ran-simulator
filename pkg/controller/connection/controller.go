@@ -6,6 +6,9 @@ package connection
 
 import (
 	"context"
+
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+
 	"fmt"
 	"time"
 
@@ -69,13 +72,18 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 
 	connection, err := r.connections.Get(ctx, connectionID)
 	if err != nil {
-		return controller.Result{}, err
+		if !errors.IsNotFound(err) {
+			return controller.Result{}, err
+		}
+		return controller.Result{}, nil
 	}
 
 	switch connection.Status.Phase {
 	case connections.Open:
+		log.Infof("Opening Connection: %s", connection.ID)
 		return r.reconcileOpenConnection(connection)
 	case connections.Closed:
+		log.Infof("Closing Connection: %s", connection.ID)
 		return r.reconcileClosedConnection(connection)
 	}
 
@@ -100,7 +108,8 @@ func (r *Reconciler) configureDataConn(ctx context.Context, connection *connecti
 		return controller.Result{}, err
 	}
 	if configUpdateFailure != nil {
-		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+		err = errors.NewUnknown("Failed to reconcile opening connection %+v: %s", connection, err)
+		log.Warn(err)
 		return controller.Result{}, err
 	}
 
@@ -114,6 +123,7 @@ func (r *Reconciler) configureDataConn(ctx context.Context, connection *connecti
 			return controller.Result{}, err
 		}
 	}
+
 	return controller.Result{}, nil
 
 }

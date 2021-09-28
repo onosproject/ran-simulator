@@ -6,6 +6,7 @@ package agents
 
 import (
 	"context"
+
 	"github.com/onosproject/rrm-son-lib/pkg/handover"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -99,11 +100,12 @@ func (agents *E2Agents) processNodeEvents() {
 				continue
 			}
 
-			err = agents.agentStore.Remove(node.GnbID)
+			err = agents.nodeStore.SetStatus(context.Background(), node.GnbID, "Stopped")
 			if err != nil {
 				log.Error(err)
 			}
-			err = agents.nodeStore.SetStatus(context.Background(), node.GnbID, "Stopped")
+
+			err = agents.agentStore.Remove(node.GnbID)
 			if err != nil {
 				log.Error(err)
 			}

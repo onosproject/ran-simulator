@@ -588,7 +588,7 @@ func (e *e2Connection) setup() error {
 		log.Error(err)
 		return err
 	}
-	_, e2SetupFailure, err := e.client.E2Setup(context.Background(), e2SetupRequest)
+	e2SetupAck, e2SetupFailure, err := e.client.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		log.Error(err)
 		return errors.NewUnknown("E2 setup failed: %v", err)
@@ -597,6 +597,7 @@ func (e *e2Connection) setup() error {
 		log.Error(err)
 		return err
 	}
+	log.Infof("E2 Setup Ack is received:%+v", e2SetupAck)
 	// Add connection to the connection store
 	connectionID := connections.NewConnectionID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 
