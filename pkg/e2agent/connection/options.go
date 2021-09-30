@@ -18,7 +18,7 @@ type InstanceOptions struct {
 	node            model.Node
 	model           *model.Model
 	ricAddress      addressing.RICAddress
-	channel         e2.ClientConn
+	e2Client        e2.ClientConn
 	registry        *registry.ServiceModelRegistry
 	subStore        *subscriptions.Subscriptions
 	connectionStore connections.Store
@@ -48,10 +48,10 @@ func WithRICAddress(ricAddress addressing.RICAddress) func(options *InstanceOpti
 	}
 }
 
-// WithChannel sets E2 channel
-func WithChannel(channel e2.ClientConn) func(options *InstanceOptions) {
+// WithE2Client sets E2 channel
+func WithE2Client(e2Client e2.ClientConn) func(options *InstanceOptions) {
 	return func(options *InstanceOptions) {
-		options.channel = channel
+		options.e2Client = e2Client
 	}
 }
 

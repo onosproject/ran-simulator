@@ -128,6 +128,7 @@ func (c *ConnectionUpdate) BuildConnectionUpdateFailure() *e2appducontents.E2Con
 		},
 		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
+
 	failure := &e2appducontents.E2ConnectionUpdateFailure{
 		ProtocolIes: &e2appducontents.E2ConnectionUpdateFailureIes{
 			E2ApProtocolIes1: &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes1{
@@ -136,15 +137,11 @@ func (c *ConnectionUpdate) BuildConnectionUpdateFailure() *e2appducontents.E2Con
 				Value:       c.cause,
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
 			},
-			E2ApProtocolIes31: &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes31{
-				Id:          int32(v2beta1.ProtocolIeIDTimeToWait),
-				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-				Value:       *c.timeToWait,
-				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
-			},
+			//E2ApProtocolIes31: ie31, // TODO add time to wait whenever is needed
 			//E2ApProtocolIes2: &criticalityDiagnostics, // TODO
 			E2ApProtocolIes49: ie49,
 		},
 	}
+
 	return failure
 }

@@ -63,6 +63,8 @@ type E2Connection interface {
 	Close() error
 
 	GetClient() e2.ClientConn
+
+	SetClient(e2.ClientConn)
 }
 
 type e2Connection struct {
@@ -73,6 +75,11 @@ type e2Connection struct {
 	subStore        *subscriptions.Subscriptions
 	connectionStore connections.Store
 	ricAddress      addressing.RICAddress
+}
+
+// SetClient sets E2 client
+func (e *e2Connection) SetClient(client e2.ClientConn) {
+	e.client = client
 }
 
 // GetClient returns E2 client
@@ -94,24 +101,31 @@ func NewE2Connection(opts ...InstanceOption) E2Connection {
 		subStore:        instanceOptions.subStore,
 		ricAddress:      instanceOptions.ricAddress,
 		connectionStore: instanceOptions.connectionStore,
+		client:          instanceOptions.e2Client,
 	}
 
 }
 
 // E2ConnectionUpdate implements E2 connection update procedure
 func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
-	log.Info("Connection Update request is received %v", request)
+	log.Info("Received Connection Update request %v", request)
 	connectionUpdateItemIes := make([]*e2appducontents.E2ConnectionUpdateItemIes, 0)
 	connectionSetupFailedItemIes := make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0)
+	// E2 Connection To Add list IE
 	ies44 := request.GetProtocolIes().GetE2ApProtocolIes44()
+	// E2 Connection To Modify list IE
 	ies45 := request.GetProtocolIes().GetE2ApProtocolIes45()
+	// E2 Connection Remove list IE
 	ies46 := request.GetProtocolIes().GetE2ApProtocolIes46()
+	// Transaction ID IE
+	ies49 := request.GetProtocolIes().GetE2ApProtocolIes49()
 
 	// In case the E2 Node receives a E2 CONNECTION UPDATE message without any
 	// IE except for Message Type IE and Transaction ID IE, it shall reply with the E2 CONNECTION
 	//ACKNOWLEDGE message without performing any updates to the existing connections.
 	if ies44 == nil && ies45 == nil && ies46 == nil {
-		ack := connectionupdate.NewConnectionUpdate().
+		ack := connectionupdate.NewConnectionUpdate(
+			connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 			BuildConnectionUpdateAcknowledge()
 		return ack, nil, nil
 
@@ -124,7 +138,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	if ies44 != nil {
 		connectionUpdateList := ies44.Value
 		if connectionUpdateList != nil {
-			log.Debug("Adding new connections")
+			log.Debugf("Adding new connections: %+v", connectionUpdateList)
 			connectionUpdateItems := connectionUpdateList.Value
 			for _, connectionUpdateItem := range connectionUpdateItems {
 				tnlInfo := connectionUpdateItem.GetValue().GetTnlInformation()
@@ -132,6 +146,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 				// TODO handle tnlUsage
 
 				ricAddress = e.getRICAddress(tnlInfo)
+				log.Debugf("RIC and IP and Port information: %v:%v", ricAddress.IPAddress, ricAddress.Port)
 
 				if ricAddress.IPAddress == nil {
 					cause := &e2apies.Cause{
@@ -139,19 +154,22 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value),
+						connectionupdate.WithTimeToWait(nil)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 
 				}
-
-				// Adds a new connection to the connection store
+				// Adds a new connection in Connecting state
+				// to the connection store to trigger reconciliation of a connection
 				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
 				connection := &connections.Connection{
 					ID: connectionID,
 					Status: connections.ConnectionStatus{
 						Phase: connections.Open,
-						State: connections.Disconnected,
+						State: connections.Connecting,
 					},
 				}
 
@@ -182,7 +200,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	if ies46 != nil {
 		connectionRemoveList := ies46.Value
 		if connectionRemoveList != nil {
-			log.Debug("Removing connections")
+			log.Debugf("Removing connections: %+v", connectionRemoveList)
 			connectionUpdateRemoveItems := connectionRemoveList.GetValue()
 			for _, connectionUpdateRemoveItem := range connectionUpdateRemoveItems {
 				tnlInfo := connectionUpdateRemoveItem.GetValue().GetTnlInformation()
@@ -193,7 +211,9 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 
@@ -209,13 +229,15 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 				}
 
 				connection.Status.Phase = connections.Closed
-
+				connection.Status.State = connections.Disconnecting
 				err = e.connectionStore.Update(ctx, connection)
 				if err != nil {
 					log.Warn(err)
@@ -224,7 +246,9 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
 						},
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(connectionupdate.WithCause(cause)).
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
 				}
@@ -237,11 +261,14 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 		log.Debug("Modifying connections")
 	}
 
+	// After successful update of E2 interface connection(s), the E2 Node shall reply with the E2 CONNECTION UPDATE ACKNOWLEDGE message to inform
+	//  the initiating Near-RT RIC that the requested E2 connection update was performed successfully.
 	ack := connectionupdate.NewConnectionUpdate(
 		connectionupdate.WithConnectionUpdateItemIes(connectionUpdateItemIes),
-		connectionupdate.WithConnectionSetupFailedItemIes(connectionSetupFailedItemIes)).
+		connectionupdate.WithConnectionSetupFailedItemIes(connectionSetupFailedItemIes),
+		connectionupdate.WithTransactionID(ies49.GetValue().Value)).
 		BuildConnectionUpdateAcknowledge()
-	log.Info("Sending Connection Update Ack:", ack)
+	log.Infof("Sending Connection Update Ack: %+v", ack)
 	return ack, nil, nil
 }
 
@@ -553,7 +580,7 @@ func (e *e2Connection) setup() error {
 		setup.WithPlmnID(plmnID.Value()),
 		setup.WithE2NodeID(uint64(e.node.GnbID)),
 		setup.WithComponentConfigUpdateList(configUpdateList),
-		setup.WithTransactionID(1))
+		setup.WithTransactionID(int32(1)))
 
 	e2SetupRequest, err := setupRequest.Build()
 
@@ -561,7 +588,7 @@ func (e *e2Connection) setup() error {
 		log.Error(err)
 		return err
 	}
-	_, e2SetupFailure, err := e.client.E2Setup(context.Background(), e2SetupRequest)
+	e2SetupAck, e2SetupFailure, err := e.client.E2Setup(context.Background(), e2SetupRequest)
 	if err != nil {
 		log.Error(err)
 		return errors.NewUnknown("E2 setup failed: %v", err)
@@ -570,6 +597,7 @@ func (e *e2Connection) setup() error {
 		log.Error(err)
 		return err
 	}
+	log.Infof("E2 Setup Ack is received:%+v", e2SetupAck)
 	// Add connection to the connection store
 	connectionID := connections.NewConnectionID(e.ricAddress.IPAddress.String(), e.ricAddress.Port)
 
@@ -577,7 +605,7 @@ func (e *e2Connection) setup() error {
 		ID: connectionID,
 		Status: connections.ConnectionStatus{
 			Phase: connections.Open,
-			State: connections.Initialized,
+			State: connections.Configured,
 		},
 		Client: e.client,
 	}

@@ -7,7 +7,6 @@ package connection
 import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 
-	"net"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -16,7 +15,6 @@ import (
 
 func (e *e2Connection) getRICAddress(tnlInfo *e2apies.Tnlinformation) addressing.RICAddress {
 	tnlAddr := tnlInfo.GetTnlAddress().GetValue()
-	tnlAddrLen := tnlInfo.GetTnlAddress().GetLen()
 	var ricAddress addressing.RICAddress
 
 	if tnlInfo.GetTnlPort() != nil {
@@ -31,9 +29,7 @@ func (e *e2Connection) getRICAddress(tnlInfo *e2apies.Tnlinformation) addressing
 	} else {
 		ricAddress.Port = e.ricAddress.Port
 	}
-	if tnlAddrLen == net.IPv4len*8 {
-		ricAddress.IPAddress = net.IPv4(tnlAddr[0], tnlAddr[1], tnlAddr[2], tnlAddr[3])
-	}
+	ricAddress.IPAddress = tnlAddr
 	return ricAddress
 }
 

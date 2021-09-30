@@ -6,8 +6,19 @@ package connection
 
 import (
 	"context"
+
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+
 	"fmt"
 	"time"
+
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
+
+	"github.com/onosproject/ran-simulator/pkg/model"
+
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/configupdate"
 
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	e2connection "github.com/onosproject/ran-simulator/pkg/e2agent/connection"
@@ -19,14 +30,15 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/controller"
 )
 
-var log = logging.GetLogger("e2agent", "controller")
+var log = logging.GetLogger("controller", "connection")
 
 const defaultTimeout = 30 * time.Second
 const queueSize = 100
 
-// NewController returns a new channel controller. This controller is responsible to open and close
-// E2 channels that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
-func NewController(connections connections.Store) *controller.Controller {
+// NewController returns a new connection controller. This controller is responsible to open and close
+// E2 connections that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
+func NewController(connections connections.Store, node model.Node, model *model.Model,
+	registry *registry.ServiceModelRegistry, subStore *subscriptions.Subscriptions) *controller.Controller {
 	c := controller.NewController("E2Connections")
 	c.Watch(&Watcher{
 		connections: connections,
@@ -34,13 +46,21 @@ func NewController(connections connections.Store) *controller.Controller {
 
 	c.Reconcile(&Reconciler{
 		connections: connections,
+		node:        node,
+		model:       model,
+		registry:    registry,
+		subStore:    subStore,
 	})
 	return c
 }
 
-// Reconciler is a E2 channel reconciler
+// Reconciler is a E2 connection reconciler
 type Reconciler struct {
 	connections connections.Store
+	node        model.Node
+	model       *model.Model
+	registry    *registry.ServiceModelRegistry
+	subStore    *subscriptions.Subscriptions
 }
 
 // Reconcile reconciles the state of a device change
@@ -52,33 +72,90 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 
 	connection, err := r.connections.Get(ctx, connectionID)
 	if err != nil {
-		return controller.Result{}, err
+		if !errors.IsNotFound(err) {
+			return controller.Result{}, err
+		}
+		return controller.Result{}, nil
 	}
 
 	switch connection.Status.Phase {
 	case connections.Open:
+		log.Infof("Opening Connection: %s", connection.ID)
 		return r.reconcileOpenConnection(connection)
 	case connections.Closed:
+		log.Infof("Closing Connection: %s", connection.ID)
 		return r.reconcileClosedConnection(connection)
 	}
 
 	return controller.Result{}, nil
 }
 
+func (r *Reconciler) configureDataConn(ctx context.Context, connection *connections.Connection) (controller.Result, error) {
+	plmnID := ransimtypes.NewUint24(uint32(r.model.PlmnID))
+	configUpdate, err := configupdate.NewConfigurationUpdate(
+		configupdate.WithTransactionID(int32(2)),
+		configupdate.WithE2NodeID(uint64(r.node.GnbID)),
+		configupdate.WithPlmnID(plmnID.Value())).
+		Build()
+	if err != nil {
+		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+		return controller.Result{}, err
+	}
+	log.Info("Sending Configuration update request:%+v", configUpdate)
+	configUpdateAck, configUpdateFailure, err := connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
+	if err != nil {
+		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+		return controller.Result{}, err
+	}
+	if configUpdateFailure != nil {
+		err = errors.NewUnknown("Failed to reconcile opening connection %+v: %s", connection, err)
+		log.Warn(err)
+		return controller.Result{}, err
+	}
+
+	// Update the state of connection to Configured after receiving config update ack
+	if configUpdateAck != nil {
+		log.Infof("Config update ack is received:%+v", configUpdateAck)
+		connection.Status.State = connections.Configured
+		err = r.connections.Update(ctx, connection)
+		if err != nil {
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			return controller.Result{}, err
+		}
+	}
+
+	return controller.Result{}, nil
+
+}
+
 func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection) (controller.Result, error) {
 
-	// If the connection state is in Initialized  state returns with nil error
-	if connection.Status.State == connections.Initialized {
+	// If the connection state is in configured  state returns with nil error
+	if connection.Status.State == connections.Configured {
+		log.Debugf("Connection %+v is configured:", connection)
 		return controller.Result{}, nil
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
 
-	addr := fmt.Sprintf("%s:%d", connection.ID.GetRICIPAddress(), connection.ID.GetRICPort())
+	// If the connection state is in configuring state then configure the connection
+	if connection.Status.State == connections.Configuring {
+		log.Debugf("Configuring connection: %+v", connection)
+		return r.configureDataConn(ctx, connection)
+	}
 
-	if connection.Status.State == connections.Disconnected {
-		e2Connection := e2connection.NewE2Connection()
+	addr := fmt.Sprintf("%s:%d", connection.ID.GetRICIPAddress(), connection.ID.GetRICPort())
+	// If the connection state is in Connecting state then opens a connection to RIC
+	// and update connectivity status to Connected
+	if connection.Status.State == connections.Connecting {
+		e2Connection := e2connection.NewE2Connection(
+			e2connection.WithNode(r.node),
+			e2connection.WithModel(r.model),
+			e2connection.WithSMRegistry(r.registry),
+			e2connection.WithSubStore(r.subStore),
+			e2connection.WithConnectionStore(r.connections))
+
 		client, err := e2.Connect(ctx, addr, func(channel e2.ClientConn) e2.ClientInterface {
 			return e2Connection
 		})
@@ -88,20 +165,29 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 			return controller.Result{}, err
 		}
 
+		e2Connection.SetClient(client)
 		connection.Client = client
 		connection.Status.State = connections.Connected
 
 		err = r.connections.Update(ctx, connection)
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
-			connection.Status.State = connections.Disconnected
 			return controller.Result{}, err
 		}
 	}
+
+	// Since the Connection is already established, then E2 NODE CONFIGURATION UPDATE procedure shall be the first E2AP procedure triggered on an
+	//  additional TNLA of an already setup E2 interface instance after the TNL association has become operational, and the Near-RT RIC shall
+	//  associate the TNLA to the E2 interface instance using the included Global E2 Node ID.
 	if connection.Status.State == connections.Connected {
-		log.Debug("Sending configuration update")
-		// TODO use configuration update to inform E2T about new connection
-		// 		and change channel state to Initialized
+		log.Debugf("Configuring connection: %+v", connection)
+		connection.Status.State = connections.Configuring
+		err := r.connections.Update(ctx, connection)
+		if err != nil {
+			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			return controller.Result{}, err
+		}
+		return r.configureDataConn(ctx, connection)
 	}
 
 	return controller.Result{}, nil
@@ -118,9 +204,10 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 			log.Warnf("Failed to reconcile closing connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
+		return controller.Result{}, nil
 	}
 
-	if connection.Status.State == connections.Initialized {
+	if connection.Status.State == connections.Disconnecting {
 		// TODO use configuration update to inform E2T that E2 node is intended to close the connection
 		//      (i.e. before calling close function)
 		err := connection.Client.Close()
@@ -134,7 +221,6 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 			log.Warnf("Failed to reconcile closing connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
-
 	}
 
 	return controller.Result{}, nil
