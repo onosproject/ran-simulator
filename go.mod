@@ -17,9 +17,9 @@ require (
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.7.61
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho v0.7.61
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.61
-	github.com/onosproject/onos-e2t v0.8.8
+	github.com/onosproject/onos-e2t v0.9.1
 	github.com/onosproject/onos-lib-go v0.7.19
-	github.com/onosproject/onos-ric-sdk-go v0.7.25
+	github.com/onosproject/onos-ric-sdk-go v0.7.26
 	github.com/onosproject/onos-test v0.6.4
 	github.com/onosproject/rrm-son-lib v0.0.2
 	github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab

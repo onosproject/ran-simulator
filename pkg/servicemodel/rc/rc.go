@@ -33,7 +33,7 @@ import (
 
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 
@@ -42,7 +42,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
@@ -369,7 +369,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_POLICY {
 			cause := &e2apies.Cause{
 				Cause: &e2apies.Cause_RicRequest{
-					RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+					RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_ACTION_NOT_SUPPORTED,
 				},
 			}
 			ricActionsNotAdmitted[actionID] = cause
@@ -380,7 +380,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	if len(ricActionsAccepted) == 0 {
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_ACTION_NOT_SUPPORTED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -400,7 +400,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -427,7 +427,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(

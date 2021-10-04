@@ -6,13 +6,13 @@ package setup
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	"github.com/onosproject/onos-e2t/api/e2ap/v2"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
-	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
@@ -21,11 +21,11 @@ var log = logging.GetLogger("servicemodel", "utils", "setup")
 
 // Setup setup request
 type Setup struct {
-	ranFunctions              e2aptypes.RanFunctions
-	plmnID                    ransimtypes.Uint24
-	e2NodeID                  uint64
-	componentConfigUpdateList *e2appducontents.E2NodeComponentConfigUpdateList
-	transactionID             int32
+	ranFunctions                e2aptypes.RanFunctions
+	plmnID                      ransimtypes.Uint24
+	e2NodeID                    uint64
+	componentConfigAdditionList *e2appducontents.E2NodeComponentConfigAdditionList
+	transactionID               int32
 }
 
 // NewSetupRequest creates a new setup request
@@ -62,9 +62,9 @@ func WithE2NodeID(e2NodeID uint64) func(*Setup) {
 }
 
 // WithComponentConfigUpdateList sets E2 node component config update list
-func WithComponentConfigUpdateList(componentConfigUpdateList *e2appducontents.E2NodeComponentConfigUpdateList) func(setup *Setup) {
+func WithComponentConfigUpdateList(componentConfigAdditionList *e2appducontents.E2NodeComponentConfigAdditionList) func(setup *Setup) {
 	return func(request *Setup) {
-		request.componentConfigUpdateList = componentConfigUpdateList
+		request.componentConfigAdditionList = componentConfigAdditionList
 	}
 }
 
@@ -79,7 +79,7 @@ func WithTransactionID(transID int32) func(setup *Setup) {
 func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err error) {
 	//plmnID := types.NewUint24(request.plmnID)
 	ranFunctionList := e2appducontents.E2SetupRequestIes_E2SetupRequestIes10{
-		Id:          int32(v2beta1.ProtocolIeIDRanfunctionsAdded),
+		Id:          int32(v2.ProtocolIeIDRanfunctionsAdded),
 		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2appducontents.RanfunctionsList{
@@ -89,8 +89,8 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 
 	for id, ranFunctionID := range request.ranFunctions {
 		ranFunction := e2appducontents.RanfunctionItemIes{
-			E2ApProtocolIes10: &e2appducontents.RanfunctionItemIes_RanfunctionItemIes8{
-				Id:          int32(v2beta1.ProtocolIeIDRanfunctionItem),
+			E2ApProtocolIes8: &e2appducontents.RanfunctionItemIes_RanfunctionItemIes8{
+				Id:          int32(v2.ProtocolIeIDRanfunctionItem),
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 				Value: &e2appducontents.RanfunctionItem{
@@ -115,7 +115,7 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 	e2SetupRequest := &e2appducontents.E2SetupRequest{
 		ProtocolIes: &e2appducontents.E2SetupRequestIes{
 			E2ApProtocolIes3: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes3{
-				Id:          int32(v2beta1.ProtocolIeIDGlobalE2nodeID),
+				Id:          int32(v2.ProtocolIeIDGlobalE2nodeID),
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2apies.GlobalE2NodeId{
@@ -138,14 +138,14 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 				},
 			},
 			E2ApProtocolIes10: &ranFunctionList,
-			E2ApProtocolIes33: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes33{
-				Id:          int32(v2beta1.ProtocolIeIDE2nodeComponentConfigUpdate),
+			E2ApProtocolIes50: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes50{
+				Id:          int32(v2.ProtocolIeIDE2nodeComponentConfigUpdate),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-				Value:       request.componentConfigUpdateList,
+				Value:       request.componentConfigAdditionList,
 				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 			},
 			E2ApProtocolIes49: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes49{
-				Id:          int32(v2beta1.ProtocolIeIDTransactionID),
+				Id:          int32(v2.ProtocolIeIDTransactionID),
 				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 				Value: &e2apies.TransactionId{
 					Value: request.transactionID,

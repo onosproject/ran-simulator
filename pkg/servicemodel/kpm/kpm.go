@@ -35,8 +35,8 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 	"google.golang.org/protobuf/proto"
@@ -226,7 +226,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			actionType == e2apies.RicactionType_RICACTION_TYPE_POLICY {
 			cause := &e2apies.Cause{
 				Cause: &e2apies.Cause_RicRequest{
-					RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+					RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_ACTION_NOT_SUPPORTED,
 				},
 			}
 			ricActionsNotAdmitted[actionID] = cause
@@ -238,7 +238,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		log.Warn("no action is accepted")
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_ACTION_NOT_SUPPORTED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -258,7 +258,7 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(
