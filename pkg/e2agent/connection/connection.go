@@ -9,6 +9,12 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
+	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
+
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
@@ -546,15 +552,41 @@ func (e *e2Connection) connect() error {
 func (e *e2Connection) setup() error {
 	plmnID := ransimtypes.NewUint24(uint32(e.model.PlmnID))
 
-	configUpdateList := &e2appducontents.E2NodeComponentConfigAdditionList{
+	configAdditionList := &e2appducontents.E2NodeComponentConfigAdditionList{
 		Value: make([]*e2appducontents.E2NodeComponentConfigAdditionItemIes, 0),
+	}
+
+	// TODO initialize component interfaces properly. It is just initialized with some default values
+	// 	to avoid encoding error.
+	e2ncID1 := pdubuilder.CreateE2NodeComponentIDF1(21)
+	configComponentAdditionItems := []*types.E2NodeComponentConfigAdditionItem{
+		{
+			E2NodeComponentType: e2apies.E2NodeComponentInterfaceType_E2NODE_COMPONENT_INTERFACE_TYPE_F1,
+			E2NodeComponentID:   e2ncID1,
+			E2NodeComponentConfiguration: e2apies.E2NodeComponentConfiguration{
+				E2NodeComponentResponsePart: []byte{0x01, 0x02, 0x03},
+				E2NodeComponentRequestPart:  []byte{0x04, 0x05, 0x06},
+			}},
+	}
+	for _, configAdditionItem := range configComponentAdditionItems {
+		cui := &e2appducontents.E2NodeComponentConfigAdditionItemIes{
+			Id:          int32(v2.ProtocolIeIDE2nodeComponentConfigAdditionItem),
+			Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
+			Value: &e2appducontents.E2NodeComponentConfigAdditionItem{
+				E2NodeComponentInterfaceType: configAdditionItem.E2NodeComponentType,
+				E2NodeComponentId:            configAdditionItem.E2NodeComponentID,
+				E2NodeComponentConfiguration: &configAdditionItem.E2NodeComponentConfiguration,
+			},
+			Presence: int32(e2apcommondatatypes.Presence_PRESENCE_MANDATORY),
+		}
+		configAdditionList.Value = append(configAdditionList.Value, cui)
 	}
 
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(e.registry.GetRanFunctions()),
 		setup.WithPlmnID(plmnID.Value()),
 		setup.WithE2NodeID(uint64(e.node.GnbID)),
-		setup.WithComponentConfigUpdateList(configUpdateList),
+		setup.WithComponentConfigUpdateList(configAdditionList),
 		setup.WithTransactionID(int32(1)))
 
 	e2SetupRequest, err := setupRequest.Build()
