@@ -4,7 +4,7 @@
 
 package subscriptiondelete
 
-import e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+import e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 
 // GetRequesterID gets requester ID
 func GetRequesterID(request *e2appducontents.RicsubscriptionDeleteRequest) int32 {

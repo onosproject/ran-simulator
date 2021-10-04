@@ -15,8 +15,8 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/pdubuilder"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -169,7 +169,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_POLICY {
 			cause := &e2apies.Cause{
 				Cause: &e2apies.Cause_RicRequest{
-					RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+					RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_ACTION_NOT_SUPPORTED,
 				},
 			}
 			ricActionsNotAdmitted[actionID] = cause
@@ -181,7 +181,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		log.Warn("no action is accepted")
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_ACTION_NOT_SUPPORTED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_ACTION_NOT_SUPPORTED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -201,7 +201,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -227,7 +227,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(

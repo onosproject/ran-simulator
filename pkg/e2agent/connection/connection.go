@@ -11,11 +11,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-pdu-contents"
-
-	"github.com/onosproject/onos-e2t/api/e2ap/v2beta1"
-	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-commondatatypes"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 
 	connectionsetupfaileditem "github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionSetupFailedItemie"
 
@@ -31,7 +27,6 @@ import (
 
 	"github.com/cenkalti/backoff"
 
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
@@ -47,7 +42,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2beta1/e2ap-ies"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
@@ -322,7 +317,7 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_RAN_FUNCTION_ID_INVALID,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -341,7 +336,7 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -361,7 +356,7 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -397,7 +392,7 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 		log.Warn(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_UNSPECIFIED,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscription := subutils.NewSubscription(
@@ -430,7 +425,7 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 		//  to the Near-RT RIC. The message shall contain the Cause IE with an appropriate value.
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_REQUEST_ID_UNKNOWN,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
 		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
@@ -456,7 +451,7 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 		//  The message shall contain with an appropriate cause value.
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
-				RicRequest: e2apies.CauseRic_CAUSE_RIC_RAN_FUNCTION_ID_INVALID,
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_RAN_FUNCTION_ID_INVALID,
 			},
 		}
 		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
@@ -551,28 +546,8 @@ func (e *e2Connection) connect() error {
 func (e *e2Connection) setup() error {
 	plmnID := ransimtypes.NewUint24(uint32(e.model.PlmnID))
 
-	componentID := pdubuilder.CreateE2NodeComponentIDGnbCuUp(int64(e.node.GnbID))
-	configComponentUpdateItems := []*e2aptypes.E2NodeComponentConfigUpdateItem{
-		{E2NodeComponentType: e2apies.E2NodeComponentType_E2NODE_COMPONENT_TYPE_G_NB,
-			E2NodeComponentID:           &componentID,
-			E2NodeComponentConfigUpdate: pdubuilder.CreateE2NodeComponentConfigUpdateGnb(nil, nil, nil, nil, nil)},
-	}
-
-	configUpdateList := &e2appducontents.E2NodeComponentConfigUpdateList{
-		Value: make([]*e2appducontents.E2NodeComponentConfigUpdateItemIes, 0),
-	}
-	for _, configUpdateItem := range configComponentUpdateItems {
-		cui := &e2appducontents.E2NodeComponentConfigUpdateItemIes{
-			Id:          int32(v2beta1.ProtocolIeIDE2nodeComponentConfigUpdateItem),
-			Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
-			Value: &e2appducontents.E2NodeComponentConfigUpdateItem{
-				E2NodeComponentType:         configUpdateItem.E2NodeComponentType,
-				E2NodeComponentId:           configUpdateItem.E2NodeComponentID,
-				E2NodeComponentConfigUpdate: &configUpdateItem.E2NodeComponentConfigUpdate,
-			},
-			Presence: int32(e2apcommondatatypes.Presence_PRESENCE_MANDATORY),
-		}
-		configUpdateList.Value = append(configUpdateList.Value, cui)
+	configUpdateList := &e2appducontents.E2NodeComponentConfigAdditionList{
+		Value: make([]*e2appducontents.E2NodeComponentConfigAdditionItemIes, 0),
 	}
 
 	setupRequest := setup.NewSetupRequest(
