@@ -163,9 +163,16 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 					return nil, connectionUpdateFailure, nil
 
 				}
+
 				// Adds a new connection in Connecting state
 				// to the connection store to trigger reconciliation of a connection
 				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
+				_, err := e.connectionStore.Get(ctx, connectionID)
+				if err == nil {
+					log.Debugf("Connection %s does exist", connectionID)
+					continue
+				}
+
 				connection := &connections.Connection{
 					ID: connectionID,
 					Status: connections.ConnectionStatus{
@@ -174,7 +181,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 					},
 				}
 
-				err := e.connectionStore.Add(ctx, connectionID, connection)
+				err = e.connectionStore.Add(ctx, connectionID, connection)
 				if err != nil {
 					// If connection is not established then creates a connection setup failed item IE
 					// to be reported in ACK
