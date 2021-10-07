@@ -232,33 +232,40 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 
 				if err != nil {
 					log.Warn(err)
-					cause := &e2apies.Cause{
-						Cause: &e2apies.Cause_Protocol{
-							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
-						},
+					if !errors.IsNotFound(err) {
+						cause := &e2apies.Cause{
+							Cause: &e2apies.Cause_Protocol{
+								Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
+							},
+						}
+						connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+							connectionupdate.WithCause(cause),
+							connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+							BuildConnectionUpdateFailure()
+						return nil, connectionUpdateFailure, nil
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
-						connectionupdate.WithCause(cause),
-						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
-						BuildConnectionUpdateFailure()
-					return nil, connectionUpdateFailure, nil
-				}
+					connUpdateItemIe := connectionupdateitem.NewConnectionUpdateItemIe(
+						connectionupdateitem.WithTnlInfo(tnlInfo)).
+						BuildConnectionUpdateItemIes()
+					connectionUpdateItemIes = append(connectionUpdateItemIes, connUpdateItemIe)
 
-				connection.Status.Phase = connections.Closed
-				connection.Status.State = connections.Disconnecting
-				err = e.connectionStore.Update(ctx, connection)
-				if err != nil {
-					log.Warn(err)
-					cause := &e2apies.Cause{
-						Cause: &e2apies.Cause_Protocol{
-							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
-						},
+				} else {
+					connection.Status.Phase = connections.Closed
+					connection.Status.State = connections.Disconnecting
+					err = e.connectionStore.Update(ctx, connection)
+					if err != nil {
+						log.Warn(err)
+						cause := &e2apies.Cause{
+							Cause: &e2apies.Cause_Protocol{
+								Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
+							},
+						}
+						connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+							connectionupdate.WithCause(cause),
+							connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+							BuildConnectionUpdateFailure()
+						return nil, connectionUpdateFailure, nil
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
-						connectionupdate.WithCause(cause),
-						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
-						BuildConnectionUpdateFailure()
-					return nil, connectionUpdateFailure, nil
 				}
 			}
 		}
