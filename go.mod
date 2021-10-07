@@ -3,6 +3,7 @@ module github.com/onosproject/ran-simulator
 go 1.16
 
 require (
+	github.com/atomix/atomix-go-client v0.5.21 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cenkalti/backoff/v4 v4.0.0
 	github.com/garyburd/redigo v1.1.1-0.20170914051019-70e1b1943d4f // indirect
@@ -12,12 +13,13 @@ require (
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/onosproject/helmit v0.6.18
-	github.com/onosproject/onos-api/go v0.7.95
+	github.com/onosproject/onos-api/go v0.7.103
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.61
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.7.59 // indirect
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.7.61
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho v0.7.61
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.61
-	github.com/onosproject/onos-e2t v0.9.1
+	github.com/onosproject/onos-e2t v0.0.0-00010101000000-000000000000
 	github.com/onosproject/onos-lib-go v0.7.19
 	github.com/onosproject/onos-ric-sdk-go v0.7.26
 	github.com/onosproject/onos-test v0.6.4
@@ -37,3 +39,5 @@ require (
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200229013735-71373c6105e3
 
 replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
+
+replace github.com/onosproject/onos-e2t => /Users/adibrastegarnia/go/src/github.com/onosproject/onos-e2t
