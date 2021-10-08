@@ -515,7 +515,7 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 	return response, failure, err
 }
 
-func (e *e2Connection) Setup() error {
+func (e *e2Connection) connectAndSetup() error {
 	log.Infof("E2 node %d is starting; attempting to connect", e.node.GnbID)
 	b := newExpBackoff()
 
@@ -541,6 +541,28 @@ func (e *e2Connection) Setup() error {
 
 	err = backoff.RetryNotify(e.setup, b, setupNotify)
 	log.Infof("E2 node %d completed connection setup", e.node.GnbID)
+	return err
+
+}
+
+func (e *e2Connection) Setup() error {
+	err := e.connectAndSetup()
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		select {
+		case <-e.client.Context().Done():
+			log.Warn("Context is cancelled, reconnecting...")
+			err := e.Setup()
+			if err != nil {
+				return
+			}
+
+		}
+	}()
+
 	return err
 }
 
