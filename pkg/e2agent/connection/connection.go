@@ -163,9 +163,16 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 					return nil, connectionUpdateFailure, nil
 
 				}
+
 				// Adds a new connection in Connecting state
 				// to the connection store to trigger reconciliation of a connection
 				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
+				_, err := e.connectionStore.Get(ctx, connectionID)
+				if err == nil {
+					log.Debugf("Connection %s does exist", connectionID)
+					continue
+				}
+
 				connection := &connections.Connection{
 					ID: connectionID,
 					Status: connections.ConnectionStatus{
@@ -174,7 +181,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 					},
 				}
 
-				err := e.connectionStore.Add(ctx, connectionID, connection)
+				err = e.connectionStore.Add(ctx, connectionID, connection)
 				if err != nil {
 					// If connection is not established then creates a connection setup failed item IE
 					// to be reported in ACK
@@ -225,33 +232,40 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 
 				if err != nil {
 					log.Warn(err)
-					cause := &e2apies.Cause{
-						Cause: &e2apies.Cause_Protocol{
-							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
-						},
+					if !errors.IsNotFound(err) {
+						cause := &e2apies.Cause{
+							Cause: &e2apies.Cause_Protocol{
+								Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
+							},
+						}
+						connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+							connectionupdate.WithCause(cause),
+							connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+							BuildConnectionUpdateFailure()
+						return nil, connectionUpdateFailure, nil
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
-						connectionupdate.WithCause(cause),
-						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
-						BuildConnectionUpdateFailure()
-					return nil, connectionUpdateFailure, nil
-				}
+					connUpdateItemIe := connectionupdateitem.NewConnectionUpdateItemIe(
+						connectionupdateitem.WithTnlInfo(tnlInfo)).
+						BuildConnectionUpdateItemIes()
+					connectionUpdateItemIes = append(connectionUpdateItemIes, connUpdateItemIe)
 
-				connection.Status.Phase = connections.Closed
-				connection.Status.State = connections.Disconnecting
-				err = e.connectionStore.Update(ctx, connection)
-				if err != nil {
-					log.Warn(err)
-					cause := &e2apies.Cause{
-						Cause: &e2apies.Cause_Protocol{
-							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
-						},
+				} else {
+					connection.Status.Phase = connections.Closed
+					connection.Status.State = connections.Disconnecting
+					err = e.connectionStore.Update(ctx, connection)
+					if err != nil {
+						log.Warn(err)
+						cause := &e2apies.Cause{
+							Cause: &e2apies.Cause_Protocol{
+								Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
+							},
+						}
+						connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+							connectionupdate.WithCause(cause),
+							connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+							BuildConnectionUpdateFailure()
+						return nil, connectionUpdateFailure, nil
 					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
-						connectionupdate.WithCause(cause),
-						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
-						BuildConnectionUpdateFailure()
-					return nil, connectionUpdateFailure, nil
 				}
 			}
 		}
@@ -501,7 +515,7 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 	return response, failure, err
 }
 
-func (e *e2Connection) Setup() error {
+func (e *e2Connection) connectAndSetup() error {
 	log.Infof("E2 node %d is starting; attempting to connect", e.node.GnbID)
 	b := newExpBackoff()
 
@@ -527,6 +541,26 @@ func (e *e2Connection) Setup() error {
 
 	err = backoff.RetryNotify(e.setup, b, setupNotify)
 	log.Infof("E2 node %d completed connection setup", e.node.GnbID)
+	return err
+
+}
+
+func (e *e2Connection) Setup() error {
+	err := e.connectAndSetup()
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		<-e.client.Context().Done()
+		log.Warn("Context is cancelled, reconnecting...")
+		err := e.Setup()
+		if err != nil {
+			return
+		}
+
+	}()
+
 	return err
 }
 

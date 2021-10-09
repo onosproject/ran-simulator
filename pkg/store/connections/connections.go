@@ -64,7 +64,7 @@ func NewStore() *Connections {
 
 // Add adds a connection to connection store
 func (c *Connections) Add(ctx context.Context, id ConnectionID, connection *Connection) error {
-	log.Info("Adding a connection with connection ID: %v", id)
+	log.Infof("Adding a connection with connection ID: %v", id)
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if id.ricIPAddress == "" || id.ricPort == 0 {
@@ -84,7 +84,7 @@ func (c *Connections) Add(ctx context.Context, id ConnectionID, connection *Conn
 
 // Remove removes a connection from connection store
 func (c *Connections) Remove(ctx context.Context, id ConnectionID) error {
-	log.Info("Removing a connection with connection ID: %v", id)
+	log.Infof("Removing a connection with connection ID: %v", id)
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	removeChannelEvent := event.Event{
@@ -123,7 +123,7 @@ func (c *Connections) List(ctx context.Context) []*Connection {
 
 // Update update a connection
 func (c *Connections) Update(ctx context.Context, connection *Connection) error {
-	log.Info("Updating connection with ID %v:", connection.ID)
+	log.Infof("Updating connection with ID %v:", connection.ID)
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.connections[connection.ID] = connection
