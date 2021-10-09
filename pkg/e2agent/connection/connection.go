@@ -552,15 +552,13 @@ func (e *e2Connection) Setup() error {
 	}
 
 	go func() {
-		select {
-		case <-e.client.Context().Done():
-			log.Warn("Context is cancelled, reconnecting...")
-			err := e.Setup()
-			if err != nil {
-				return
-			}
-
+		<-e.client.Context().Done()
+		log.Warn("Context is cancelled, reconnecting...")
+		err := e.Setup()
+		if err != nil {
+			return
 		}
+
 	}()
 
 	return err
