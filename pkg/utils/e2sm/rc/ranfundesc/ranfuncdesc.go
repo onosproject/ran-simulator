@@ -5,9 +5,7 @@
 package ranfundesc
 
 import (
-	"fmt"
-
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 )
 
 // RANFunctionDescription ran function description
@@ -88,13 +86,13 @@ func (desc *RANFunctionDescription) Build() (*e2smrcpreies.E2SmRcPreRanfunctionD
 			RanFunctionShortName:   desc.ranFunctionShortName,
 			RanFunctionE2SmOid:     desc.ranFunctionE2SmOID,
 			RanFunctionDescription: desc.ranFunctionDescription,
-			RanFunctionInstance:    desc.ranFunctionInstance,
+			RanFunctionInstance:    &desc.ranFunctionInstance,
 		},
 		E2SmRcPreRanfunctionItem: &ranfunctionItem,
 	}
 
-	if err := e2smRcPrePdu.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	}
+	//if err := e2smRcPrePdu.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	//}
 	return &e2smRcPrePdu, nil
 }

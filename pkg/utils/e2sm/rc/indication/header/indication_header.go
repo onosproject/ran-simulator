@@ -5,7 +5,7 @@
 package header
 
 import (
-	"fmt"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
@@ -14,7 +14,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 )
 
 // Header indication header for rc service model
@@ -60,7 +60,7 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 								Value: header.plmnID.ToBytes(),
 							},
 							NRcellIdentity: &e2smrcpreies.NrcellIdentity{
-								Value: &e2smrcpreies.BitString{
+								Value: &asn1.BitString{
 									Value: utils.Uint64ToBitString(header.eutraCellIdentity, 36),
 									Len:   36,
 								},
@@ -72,9 +72,9 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 		},
 	}
 
-	if err := E2SmRcPrePdu.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating E2SmRcPrePDU %s", err.Error())
-	}
+	//if err := E2SmRcPrePdu.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating E2SmRcPrePDU %s", err.Error())
+	//}
 	return &E2SmRcPrePdu, nil
 
 }

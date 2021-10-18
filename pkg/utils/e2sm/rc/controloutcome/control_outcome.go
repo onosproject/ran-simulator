@@ -5,12 +5,10 @@
 package controloutcome
 
 import (
-	"fmt"
-
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 )
 
 // ControlOutcome required fields for control outcome
@@ -52,9 +50,9 @@ func (co *ControlOutcome) Build() (*e2smrcpreies.E2SmRcPreControlOutcome, error)
 		},
 	}
 
-	if err := e2smRcPrePdu.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	}
+	//if err := e2smRcPrePdu.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	//}
 	return &e2smRcPrePdu, nil
 
 }

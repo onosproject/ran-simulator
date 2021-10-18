@@ -24,7 +24,8 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
+	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
@@ -37,7 +38,7 @@ import (
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 
-	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/pdubuilder"
+	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/pdubuilder"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
@@ -222,12 +223,9 @@ func NewServiceModel(node model.Node, model *model.Model,
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	rcModelPlugin, err := modelPluginRegistry.GetPlugin(modelOID)
-	if rcModelPlugin == nil {
-		log.Debug("model plugin names:", modelPluginRegistry.GetPlugins())
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil: %v", err)
-	}
-	ranFuncDescBytes, err := rcModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
+
+	var rcsm e2smrcpresm.RcPreServiceModel
+	ranFuncDescBytes, err := rcsm.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
@@ -496,7 +494,7 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 	if err != nil {
 		return nil, nil, err
 	}
-	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormat1().TriggerType
+	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().TriggerType
 	subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
 		subdeleteutils.WithRequestID(reqID),
 		subdeleteutils.WithRanFuncID(ranFuncID),

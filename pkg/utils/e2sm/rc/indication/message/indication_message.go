@@ -5,11 +5,9 @@
 package message
 
 import (
-	"fmt"
-
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 
 	"google.golang.org/protobuf/proto"
@@ -97,9 +95,9 @@ func (message *Message) Build() (*e2smrcpreies.E2SmRcPreIndicationMessage, error
 		E2SmRcPreIndicationMessage: &e2SmIindicationMsg,
 	}
 
-	if err := E2SmRcPrePdu.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	}
+	//if err := E2SmRcPrePdu.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	//}
 	return &E2SmRcPrePdu, nil
 
 }

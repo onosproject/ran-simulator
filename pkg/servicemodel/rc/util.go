@@ -6,6 +6,7 @@ package rc
 
 import (
 	"context"
+	"fmt"
 
 	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
 
@@ -21,7 +22,7 @@ import (
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
@@ -81,7 +82,7 @@ func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRe
 	if err != nil {
 		return -1, err
 	}
-	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormat1().TriggerType
+	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().TriggerType
 	return eventTriggerType, nil
 }
 
@@ -158,8 +159,14 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	if err != nil {
 		return 0, err
 	}
-	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormat1().ReportingPeriodMs
-	return reportPeriod, nil
+	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().ReportingPeriodMs
+
+	if reportPeriod == nil {
+		return 0, fmt.Errorf("no reporting period was set, obtained %v", reportPeriod)
+	}
+	rp := uint32(*reportPeriod)
+
+	return rp, nil
 }
 
 // createRicIndication creates ric indication  for each cell in the node

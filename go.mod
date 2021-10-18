@@ -13,12 +13,12 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/onosproject/helmit v0.6.18
 	github.com/onosproject/onos-api/go v0.7.103
-	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.61
-	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.7.61
-	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho v0.7.61
-	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.7.61
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm v0.7.66
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.7.66
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho v0.7.66
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go v0.7.66
 	github.com/onosproject/onos-e2t v0.9.3
-	github.com/onosproject/onos-lib-go v0.7.19
+	github.com/onosproject/onos-lib-go v0.7.22
 	github.com/onosproject/onos-ric-sdk-go v0.7.30
 	github.com/onosproject/onos-test v0.6.4
 	github.com/onosproject/rrm-son-lib v0.0.2
