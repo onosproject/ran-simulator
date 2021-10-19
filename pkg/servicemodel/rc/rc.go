@@ -246,11 +246,12 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	reqID := controlutils.GetRequesterID(request)
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		log.Error(err)
-		return nil, nil, err
-	}
+	//modelPlugin, err := sm.getModelPlugin()
+	//if err != nil {
+	//	log.Error(err)
+	//	return nil, nil, err
+	//}
+
 	controlMessage, err := sm.getControlMessage(request)
 	if err != nil {
 		log.Error(err)
@@ -279,7 +280,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 		log.Debugf("Ran parameter for entity %d not found", ncgi)
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 			controloutcome.WithRanParameterID(parameterID)).
-			ToAsn1Bytes(modelPlugin)
+			ToAsn1Bytes()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -310,7 +311,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	if err != nil {
 		outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 			controloutcome.WithRanParameterID(parameterID)).
-			ToAsn1Bytes(modelPlugin)
+			ToAsn1Bytes()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -327,7 +328,7 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 
 	outcomeAsn1Bytes, err := controloutcome.NewControlOutcome(
 		controloutcome.WithRanParameterID(parameterID)).
-		ToAsn1Bytes(modelPlugin)
+		ToAsn1Bytes()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -484,8 +485,9 @@ func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducon
 		return nil, nil, err
 	}
 	eventTriggerAsnBytes := sub.Details.RicEventTriggerDefinition.Value
-	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	eventTriggerProtoBytes, err := rcModelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	eventTriggerProtoBytes, err := rcPreServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return nil, nil, err
 	}

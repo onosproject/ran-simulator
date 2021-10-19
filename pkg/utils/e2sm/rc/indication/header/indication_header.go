@@ -5,13 +5,13 @@
 package header
 
 import (
+	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
@@ -72,6 +72,7 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 		},
 	}
 
+	//ToDo - return it back once the Validation is functional again
 	//if err := E2SmRcPrePdu.Validate(); err != nil {
 	//	return nil, fmt.Errorf("error validating E2SmRcPrePDU %s", err.Error())
 	//}
@@ -80,7 +81,7 @@ func (header *Header) Build() (*e2smrcpreies.E2SmRcPreIndicationHeader, error) {
 }
 
 // ToAsn1Bytes converts header to asn1 bytes
-func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (header *Header) ToAsn1Bytes() ([]byte, error) {
 	// Creating an indication header
 	indicationHeader, err := header.Build()
 	if err != nil {
@@ -92,7 +93,8 @@ func (header *Header) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte
 		return nil, err
 	}
 
-	indicationHeaderAsn1Bytes, err := modelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
+	var mhoServiceModel e2smmhosm.MhoServiceModel
+	indicationHeaderAsn1Bytes, err := mhoServiceModel.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
 
 	if err != nil {
 		return nil, err

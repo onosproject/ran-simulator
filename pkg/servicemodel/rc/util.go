@@ -7,12 +7,11 @@ package rc
 import (
 	"context"
 	"fmt"
+	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
 
 	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
 
 	"github.com/onosproject/ran-simulator/pkg/model"
-
-	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
@@ -24,17 +23,16 @@ import (
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 )
 
 func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlMessage, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		return nil, err
-	}
-	controlMessageProtoBytes, err := modelPlugin.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
+	//modelPlugin, err := sm.getModelPlugin()
+	//if err != nil {
+	//	return nil, err
+	//}
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	controlMessageProtoBytes, err := rcPreServiceModel.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +46,12 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 }
 
 func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlHeader, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		return nil, err
-	}
-	controlHeaderProtoBytes, err := modelPlugin.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
+	//modelPlugin, err := sm.getModelPlugin()
+	//if err != nil {
+	//	return nil, err
+	//}
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	controlHeaderProtoBytes, err := rcPreServiceModel.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -67,13 +66,15 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 
 // getEventTriggerType extracts event trigger type
 func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2smrcpreies.RcPreTriggerType, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		log.Error(err)
-		return -1, err
-	}
+	//modelPlugin, err := sm.getModelPlugin()
+	//if err != nil {
+	//	log.Error(err)
+	//	return -1, err
+	//}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
-	eventTriggerProtoBytes, err := modelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	eventTriggerProtoBytes, err := rcPreServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return -1, err
 	}
@@ -86,14 +87,14 @@ func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRe
 	return eventTriggerType, nil
 }
 
-func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
-	modelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
-	if err != nil {
-		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
-	}
-
-	return modelPlugin, nil
-}
+//func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
+//	modelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
+//	if err != nil {
+//		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
+//	}
+//
+//	return modelPlugin, nil
+//}
 
 func (sm *Client) getPlmnID() ransimtypes.Uint24 {
 	plmnIDUint24 := ransimtypes.Uint24{}
@@ -144,13 +145,15 @@ func (sm *Client) getCellSize(ctx context.Context, ncgi ransimtypes.NCGI) (strin
 
 // getReportPeriod extracts report period
 func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (uint32, error) {
-	modelPlugin, err := sm.getModelPlugin()
-	if err != nil {
-		log.Error(err)
-		return 0, err
-	}
+	//modelPlugin, err := sm.getModelPlugin()
+	//if err != nil {
+	//	log.Error(err)
+	//	return 0, err
+	//}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
-	eventTriggerProtoBytes, err := modelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	eventTriggerProtoBytes, err := rcPreServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return 0, err
 	}
@@ -231,14 +234,18 @@ func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI
 		rcindicationmsg.WithPci(cellPci),
 		rcindicationmsg.WithNeighbours(neighbourList))
 
-	rcModelPlugin, _ := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes(rcModelPlugin)
+	//rcModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
+	//if err != nil {
+	//	log.Error(err)
+	//	return nil, err
+	//}
+	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes()
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 
-	indicationMessageAsn1Bytes, err := message.ToAsn1Bytes(rcModelPlugin)
+	indicationMessageAsn1Bytes, err := message.ToAsn1Bytes()
 	if err != nil {
 		log.Error(err)
 		return nil, err

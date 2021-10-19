@@ -97,6 +97,8 @@ func (neighbour *Neighbour) Build() (*e2smrcpreies.Nrt, error) {
 			},
 		},
 	}
+
+	//ToDo - return it back once the Validation is functional again
 	//if err := nrtMsg.Validate(); err != nil {
 	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
 	//}

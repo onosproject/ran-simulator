@@ -91,6 +91,7 @@ func (desc *RANFunctionDescription) Build() (*e2smrcpreies.E2SmRcPreRanfunctionD
 		E2SmRcPreRanfunctionItem: &ranfunctionItem,
 	}
 
+	//ToDo - return it back once the Validation is functional again
 	//if err := e2smRcPrePdu.Validate(); err != nil {
 	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
 	//}

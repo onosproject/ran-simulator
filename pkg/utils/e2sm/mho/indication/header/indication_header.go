@@ -5,14 +5,14 @@
 package header
 
 import (
-	"fmt"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
@@ -21,7 +21,7 @@ var log = logging.GetLogger("sm", "mho")
 // Header indication header for mho service model
 type Header struct {
 	plmnID         ransimtypes.Uint24
-	nrCellIdentity uint64
+	nrCellIdentity []byte
 }
 
 // NewIndicationHeader creates a new indication header
@@ -43,7 +43,7 @@ func WithPlmnID(plmnID ransimtypes.Uint24) func(header *Header) {
 }
 
 // WithNrcellIdentity sets nrCellIdentity
-func WithNrcellIdentity(nrCellIdentity uint64) func(header *Header) {
+func WithNrcellIdentity(nrCellIdentity []byte) func(header *Header) {
 	return func(header *Header) {
 		header.nrCellIdentity = nrCellIdentity
 	}
@@ -61,7 +61,8 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 								Value: header.plmnID.ToBytes(),
 							},
 							NRcellIdentity: &e2sm_mho.NrcellIdentity{
-								Value: &e2sm_mho.BitString{
+								Value: &asn1.BitString{
+									//ToDo - should be of type []byte
 									Value: header.nrCellIdentity, //uint64
 									Len:   36,                    //uint32
 								},
@@ -73,9 +74,10 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 		},
 	}
 
-	if err := E2SmMhoPdu.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating E2SmMhoPDU %s", err.Error())
-	}
+	//ToDo - return it back once the Validation is functional again
+	//if err := E2SmMhoPdu.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating E2SmMhoPDU %s", err.Error())
+	//}
 	return &E2SmMhoPdu, nil
 
 }
