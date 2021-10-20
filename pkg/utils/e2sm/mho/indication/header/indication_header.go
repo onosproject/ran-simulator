@@ -5,11 +5,11 @@
 package header
 
 import (
+	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
@@ -83,7 +83,7 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 }
 
 // MhoToAsn1Bytes converts header to asn1 bytes
-func (header *Header) MhoToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (header *Header) MhoToAsn1Bytes() ([]byte, error) {
 	log.Debug("MhoToAsn1Bytes")
 	// Creating an indication header
 	indicationHeader, err := header.Build()
@@ -96,7 +96,8 @@ func (header *Header) MhoToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]b
 		return nil, err
 	}
 
-	indicationHeaderAsn1Bytes, err := modelPlugin.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
+	var mhoServiceModel e2smmhosm.MhoServiceModel
+	indicationHeaderAsn1Bytes, err := mhoServiceModel.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
 
 	if err != nil {
 		return nil, err

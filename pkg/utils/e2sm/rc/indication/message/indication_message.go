@@ -6,16 +6,12 @@ package message
 
 import (
 	"encoding/hex"
+	"fmt"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
-	"github.com/onosproject/onos-lib-go/pkg/logging"
-
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 	"google.golang.org/protobuf/proto"
 )
-
-//ToDo - remove logs once issue is debugged
-var log = logging.GetLogger("sm", "rc")
 
 // Message indication message fields for rc service model
 type Message struct {
@@ -119,14 +115,15 @@ func (message *Message) ToAsn1Bytes() ([]byte, error) {
 	}
 
 	//ToDo - remove logs, once issue is debugged
-	log.Debugf("Encoding following RC-PRE Indication Message \n%v", indicationMessage)
+	fmt.Printf("ToAsn1Bytes(): Encoding following RC-PRE Indication Message \n%v\n", indicationMessage.String())
 	var mhoServiceModel e2smmhosm.MhoServiceModel
 	indicationMessageAsn1Bytes, err := mhoServiceModel.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Debugf("Encoded message in PER is \n%v", hex.Dump(indicationMessageAsn1Bytes))
+	//ToDo - remove logs, once issue is debugged
+	fmt.Printf("ToAsn1Bytes(): Encoded Message in PER is \n%v\n", hex.Dump(indicationMessageAsn1Bytes))
 
 	return indicationMessageAsn1Bytes, nil
 }
