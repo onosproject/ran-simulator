@@ -7,7 +7,7 @@ package header
 import (
 	"encoding/hex"
 	"fmt"
-	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
+	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
 	"github.com/onosproject/ran-simulator/pkg/utils"
@@ -98,8 +98,8 @@ func (header *Header) ToAsn1Bytes() ([]byte, error) {
 	//ToDo - remove logs, once issue is debugged
 	fmt.Printf("ToAsn1Bytes(): Encoding following RC-PRE Indication Header \n%v\n", indicationHeader.String())
 
-	var mhoServiceModel e2smmhosm.MhoServiceModel
-	indicationHeaderAsn1Bytes, err := mhoServiceModel.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	indicationHeaderAsn1Bytes, err := rcPreServiceModel.IndicationHeaderProtoToASN1(indicationHeaderProtoBytes)
 
 	//ToDo - remove logs, once issue is debugged
 	fmt.Printf("ToAsn1Bytes(): Encoded Header in PER is \n%v\n", hex.Dump(indicationHeaderAsn1Bytes))

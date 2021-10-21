@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
+	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 	"google.golang.org/protobuf/proto"
 )
@@ -116,8 +116,8 @@ func (message *Message) ToAsn1Bytes() ([]byte, error) {
 
 	//ToDo - remove logs, once issue is debugged
 	fmt.Printf("ToAsn1Bytes(): Encoding following RC-PRE Indication Message \n%v\n", indicationMessage.String())
-	var mhoServiceModel e2smmhosm.MhoServiceModel
-	indicationMessageAsn1Bytes, err := mhoServiceModel.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	indicationMessageAsn1Bytes, err := rcPreServiceModel.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
 	if err != nil {
 		return nil, err
 	}
