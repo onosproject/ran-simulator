@@ -6,7 +6,6 @@ package rc
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
 
@@ -245,14 +244,12 @@ func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI
 		log.Error(err)
 		return nil, err
 	}
-	fmt.Printf("createRicIndication(): RC-PRE Indication Header PER bytes are \n%v\n", hex.Dump(indicationHeaderAsn1Bytes))
 
 	indicationMessageAsn1Bytes, err := message.ToAsn1Bytes()
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
-	fmt.Printf("createRicIndication(): RC-PRE Indication Message PER bytes are \n%v\n", hex.Dump(indicationMessageAsn1Bytes))
 
 	// Creates e2 indication
 	indication := indicationutils.NewIndication(

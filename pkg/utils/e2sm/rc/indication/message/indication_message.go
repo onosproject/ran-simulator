@@ -5,8 +5,6 @@
 package message
 
 import (
-	"encoding/hex"
-	"fmt"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
@@ -114,16 +112,11 @@ func (message *Message) ToAsn1Bytes() ([]byte, error) {
 		return nil, err
 	}
 
-	//ToDo - remove logs, once issue is debugged
-	fmt.Printf("ToAsn1Bytes(): Encoding following RC-PRE Indication Message \n%v\n", indicationMessage.String())
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
 	indicationMessageAsn1Bytes, err := rcPreServiceModel.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
 	if err != nil {
 		return nil, err
 	}
-
-	//ToDo - remove logs, once issue is debugged
-	fmt.Printf("ToAsn1Bytes(): Encoded Message in PER is \n%v\n", hex.Dump(indicationMessageAsn1Bytes))
 
 	return indicationMessageAsn1Bytes, nil
 }
