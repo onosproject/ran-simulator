@@ -13,10 +13,6 @@ import (
 )
 
 func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
-	//modelPlugin, err := m.getModelPlugin()
-	//if err != nil {
-	//	return nil, err
-	//}
 	var mhoServiceModel e2smmhosm.MhoServiceModel
 	controlMessageProtoBytes, err := mhoServiceModel.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
 	if err != nil {
@@ -32,10 +28,6 @@ func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2
 }
 
 func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
-	//modelPlugin, err := m.getModelPlugin()
-	//if err != nil {
-	//	return nil, err
-	//}
 	var mhoServiceModel e2smmhosm.MhoServiceModel
 	controlHeaderProtoBytes, err := mhoServiceModel.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
 	if err != nil {
@@ -52,11 +44,6 @@ func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2s
 
 // getEventTriggerType extracts event trigger type
 func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_mho.MhoTriggerType, error) {
-	//modelPlugin, err := m.getModelPlugin()
-	//if err != nil {
-	//	log.Error(err)
-	//	return -1, err
-	//}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
 
 	var mhoServiceModel e2smmhosm.MhoServiceModel
@@ -73,22 +60,8 @@ func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionReques
 	return eventTriggerType, nil
 }
 
-//func (m *Mho) getModelPlugin() (modelplugins.ServiceModel, error) {
-//	modelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
-//	if err != nil {
-//		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
-//	}
-//
-//	return modelPlugin, nil
-//}
-
 // getReportPeriod extracts report period
 func (m *Mho) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {
-	//modelPlugin, err := m.getModelPlugin()
-	//if err != nil {
-	//	log.Error(err)
-	//	return 0, err
-	//}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
 
 	var mhoServiceModel e2smmhosm.MhoServiceModel

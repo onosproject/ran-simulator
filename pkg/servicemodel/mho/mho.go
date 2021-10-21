@@ -120,11 +120,6 @@ func NewServiceModel(node model.Node, model *model.Model,
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	//mhoModelPlugin, err := modelPluginRegistry.GetPlugin(modelOID)
-	//if mhoModelPlugin == nil {
-	//	log.Debug("model plugin names:", modelPluginRegistry.GetPlugins())
-	//	return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil: %v", err)
-	//}
 
 	var mhosm e2smmhosm.MhoServiceModel
 	ranFuncDescBytes, err := mhosm.RanFuncDescriptionProtoToASN1(protoBytes)

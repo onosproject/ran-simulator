@@ -27,10 +27,6 @@ import (
 )
 
 func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlMessage, error) {
-	//modelPlugin, err := sm.getModelPlugin()
-	//if err != nil {
-	//	return nil, err
-	//}
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
 	controlMessageProtoBytes, err := rcPreServiceModel.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
 	if err != nil {
@@ -46,10 +42,6 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 }
 
 func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlHeader, error) {
-	//modelPlugin, err := sm.getModelPlugin()
-	//if err != nil {
-	//	return nil, err
-	//}
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
 	controlHeaderProtoBytes, err := rcPreServiceModel.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
 	if err != nil {
@@ -66,11 +58,6 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 
 // getEventTriggerType extracts event trigger type
 func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2smrcpreies.RcPreTriggerType, error) {
-	//modelPlugin, err := sm.getModelPlugin()
-	//if err != nil {
-	//	log.Error(err)
-	//	return -1, err
-	//}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
 
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
@@ -86,15 +73,6 @@ func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRe
 	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().TriggerType
 	return eventTriggerType, nil
 }
-
-//func (sm *Client) getModelPlugin() (modelplugins.ServiceModel, error) {
-//	modelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
-//	if err != nil {
-//		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
-//	}
-//
-//	return modelPlugin, nil
-//}
 
 func (sm *Client) getPlmnID() ransimtypes.Uint24 {
 	plmnIDUint24 := ransimtypes.Uint24{}
@@ -145,11 +123,6 @@ func (sm *Client) getCellSize(ctx context.Context, ncgi ransimtypes.NCGI) (strin
 
 // getReportPeriod extracts report period
 func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (uint32, error) {
-	//modelPlugin, err := sm.getModelPlugin()
-	//if err != nil {
-	//	log.Error(err)
-	//	return 0, err
-	//}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
 
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
@@ -234,11 +207,6 @@ func (sm *Client) createRicIndication(ctx context.Context, ncgi ransimtypes.NCGI
 		rcindicationmsg.WithPci(cellPci),
 		rcindicationmsg.WithNeighbours(neighbourList))
 
-	//rcModelPlugin, err := sm.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(sm.ServiceModel.OID))
-	//if err != nil {
-	//	log.Error(err)
-	//	return nil, err
-	//}
 	indicationHeaderAsn1Bytes, err := header.ToAsn1Bytes()
 	if err != nil {
 		log.Error(err)

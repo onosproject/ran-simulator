@@ -246,11 +246,6 @@ func (sm *Client) RICControl(ctx context.Context, request *e2appducontents.Ricco
 	reqID := controlutils.GetRequesterID(request)
 	ranFuncID := controlutils.GetRanFunctionID(request)
 	ricInstanceID := controlutils.GetRicInstanceID(request)
-	//modelPlugin, err := sm.getModelPlugin()
-	//if err != nil {
-	//	log.Error(err)
-	//	return nil, nil, err
-	//}
 
 	controlMessage, err := sm.getControlMessage(request)
 	if err != nil {
