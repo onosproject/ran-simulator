@@ -6,6 +6,8 @@ package mho
 
 import (
 	"context"
+	"encoding/binary"
+	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	"strconv"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
@@ -13,8 +15,8 @@ import (
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/pdubuilder"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
+	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/pdubuilder"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
@@ -118,12 +120,9 @@ func NewServiceModel(node model.Node, model *model.Model,
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
-	mhoModelPlugin, err := modelPluginRegistry.GetPlugin(modelOID)
-	if mhoModelPlugin == nil {
-		log.Debug("model plugin names:", modelPluginRegistry.GetPlugins())
-		return registry.ServiceModel{}, errors.New(errors.Invalid, "model plugin is nil: %v", err)
-	}
-	ranFuncDescBytes, err := mhoModelPlugin.RanFuncDescriptionProtoToASN1(protoBytes)
+
+	var mhosm e2smmhosm.MhoServiceModel
+	ranFuncDescBytes, err := mhosm.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
@@ -296,8 +295,9 @@ func (m *Mho) RICSubscriptionDelete(ctx context.Context, request *e2appducontent
 		return nil, nil, err
 	}
 	eventTriggerAsnBytes := sub.Details.RicEventTriggerDefinition.Value
-	mhoModelPlugin, _ := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
-	eventTriggerProtoBytes, err := mhoModelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+
+	var mhoServiceModel e2smmhosm.MhoServiceModel
+	eventTriggerProtoBytes, err := mhoServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -306,7 +306,7 @@ func (m *Mho) RICSubscriptionDelete(ctx context.Context, request *e2appducontent
 	if err != nil {
 		return nil, nil, err
 	}
-	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormat1().TriggerType
+	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().TriggerType
 	subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
 		subdeleteutils.WithRequestID(reqID),
 		subdeleteutils.WithRanFuncID(ranFuncID),
@@ -346,7 +346,8 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 
 	go func() {
 
-		imsi, err := strconv.Atoi(controlMessage.GetControlMessageFormat1().GetUedId().GetValue())
+		// ToDo - should be reconsidered
+		imsi, err := strconv.Atoi(string(controlMessage.GetControlMessageFormat1().GetUedId().GetValue()))
 		if err != nil {
 			log.Error(err)
 			return
@@ -355,7 +356,7 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
 		plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
 		nci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
-		tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci))
+		tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(binary.LittleEndian.Uint64(nci)))
 		tCell := &model.UECell{
 			ID:   types.GnbID(tCellNcgi),
 			NCGI: tCellNcgi,

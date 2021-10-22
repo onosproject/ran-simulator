@@ -5,13 +5,9 @@
 package message
 
 import (
-	"fmt"
-
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-
+	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -97,15 +93,16 @@ func (message *Message) Build() (*e2smrcpreies.E2SmRcPreIndicationMessage, error
 		E2SmRcPreIndicationMessage: &e2SmIindicationMsg,
 	}
 
-	if err := E2SmRcPrePdu.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	}
+	//ToDo - return it back once the Validation is functional again
+	//if err := E2SmRcPrePdu.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	//}
 	return &E2SmRcPrePdu, nil
 
 }
 
 // ToAsn1Bytes converts to Asn1 bytes
-func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (message *Message) ToAsn1Bytes() ([]byte, error) {
 	indicationMessage, err := message.Build()
 	if err != nil {
 		return nil, err
@@ -115,7 +112,8 @@ func (message *Message) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]by
 		return nil, err
 	}
 
-	indicationMessageAsn1Bytes, err := modelPlugin.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	indicationMessageAsn1Bytes, err := rcPreServiceModel.IndicationMessageProtoToASN1(indicationMessageProtoBytes)
 	if err != nil {
 		return nil, err
 	}

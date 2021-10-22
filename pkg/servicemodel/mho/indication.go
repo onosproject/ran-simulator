@@ -7,19 +7,17 @@ package mho
 import (
 	"context"
 	"encoding/binary"
-	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
-	"strconv"
-	"time"
-
-	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	e2apIndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	indHdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
 	indMsgFmt1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format1"
 	indMsgFmt2 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format2"
+	"strconv"
 )
 
 func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
@@ -127,18 +125,17 @@ func (m *Mho) createIndicationHeaderBytes(ctx context.Context, ncgi ransimtypes.
 
 	cell, _ := m.ServiceModel.CellStore.Get(ctx, ncgi)
 	plmnID := ransimtypes.NewUint24(uint32(m.ServiceModel.Model.PlmnID))
-	timestamp := make([]byte, 4)
-	binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
+	//timestamp := make([]byte, 4)
+	//ToDo - why BigEndian is used here? Temporarily removing
+	//binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
+	var ncgiBytes []byte
+	binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
 	header := indHdr.NewIndicationHeader(
 		indHdr.WithPlmnID(*plmnID),
-		indHdr.WithNrcellIdentity(uint64(ransimtypes.GetNCI(cell.NCGI))))
+		//indHdr.WithNrcellIdentity(uint64(ransimtypes.GetNCI(cell.NCGI))))
+		indHdr.WithNrcellIdentity(ncgiBytes))
 
-	mhoModelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-
-	indicationHeaderAsn1Bytes, err := header.MhoToAsn1Bytes(mhoModelPlugin)
+	indicationHeaderAsn1Bytes, err := header.MhoToAsn1Bytes()
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +154,8 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		return nil, nil
 	}
 
+	var nrCellIDbytes []byte
+	binary.LittleEndian.PutUint64(nrCellIDbytes, uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
 	// add serving cell to measReport
 	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 		Cgi: &e2sm_mho.CellGlobalId{
@@ -166,8 +165,10 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 						Value: plmnID.ToBytes(),
 					},
 					NRcellIdentity: &e2sm_mho.NrcellIdentity{
-						Value: &e2sm_mho.BitString{
-							Value: uint64(ransimtypes.GetNCI(ue.Cell.NCGI)),
+						Value: &asn1.BitString{
+							// ToDo - should be of type []byte
+							//Value: uint64(ransimtypes.GetNCI(ue.Cell.NCGI)),
+							Value: nrCellIDbytes,
 							Len:   36,
 						},
 					},
@@ -180,6 +181,8 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 	})
 
 	for _, cell := range ue.Cells {
+		var ncgiBytes []byte
+		binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 			Cgi: &e2sm_mho.CellGlobalId{
 				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
@@ -188,8 +191,10 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 							Value: plmnID.ToBytes(),
 						},
 						NRcellIdentity: &e2sm_mho.NrcellIdentity{
-							Value: &e2sm_mho.BitString{
-								Value: uint64(ransimtypes.GetNCI(cell.NCGI)),
+							Value: &asn1.BitString{
+								// ToDo - should be of type []byte
+								//Value: uint64(ransimtypes.GetNCI(cell.NCGI)),
+								Value: ncgiBytes,
 								Len:   36,
 							},
 						},
@@ -212,11 +217,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 
 	log.Debugf("MHO measurement report indication message for ueID %s: %v", ueID, indicationMessage)
 
-	mhoModelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(mhoModelPlugin)
+	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes()
 	if err != nil {
 		log.Warn(err)
 		return nil, err
@@ -236,11 +237,7 @@ func (m *Mho) createIndicationMsgFormat2(ue *model.UE) ([]byte, error) {
 
 	log.Debugf("MHO RRC state indication message for ueID %s: %v", ueID, indicationMessage)
 
-	mhoModelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(e2smtypes.OID(m.ServiceModel.OID))
-	if err != nil {
-		return nil, err
-	}
-	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes(mhoModelPlugin)
+	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes()
 	if err != nil {
 		log.Warn(err)
 		return nil, err

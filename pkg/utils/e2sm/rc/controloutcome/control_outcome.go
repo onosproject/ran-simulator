@@ -5,12 +5,10 @@
 package controloutcome
 
 import (
-	"fmt"
-
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
+	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
 	"google.golang.org/protobuf/proto"
 
-	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre/v2/e2sm-rc-pre-v2"
+	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
 )
 
 // ControlOutcome required fields for control outcome
@@ -52,15 +50,16 @@ func (co *ControlOutcome) Build() (*e2smrcpreies.E2SmRcPreControlOutcome, error)
 		},
 	}
 
-	if err := e2smRcPrePdu.Validate(); err != nil {
-		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	}
+	//ToDo - return it back once the Validation is functional again
+	//if err := e2smRcPrePdu.Validate(); err != nil {
+	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	//}
 	return &e2smRcPrePdu, nil
 
 }
 
 // ToAsn1Bytes converts to Asn1 bytes
-func (co *ControlOutcome) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]byte, error) {
+func (co *ControlOutcome) ToAsn1Bytes() ([]byte, error) {
 	outcomeRcMessage, err := co.Build()
 	if err != nil {
 		return nil, err
@@ -70,7 +69,8 @@ func (co *ControlOutcome) ToAsn1Bytes(modelPlugin modelplugins.ServiceModel) ([]
 		return nil, err
 	}
 
-	outcomeAsn1Bytes, err := modelPlugin.ControlOutcomeProtoToASN1(outcomeProtoBytes)
+	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
+	outcomeAsn1Bytes, err := rcPreServiceModel.ControlOutcomeProtoToASN1(outcomeProtoBytes)
 	if err != nil {
 		return nil, err
 	}

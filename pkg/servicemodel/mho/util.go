@@ -5,19 +5,16 @@
 package mho
 
 import (
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho/v1/e2sm-mho"
+	"fmt"
+	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
-	"github.com/onosproject/onos-lib-go/pkg/errors"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 )
 
 func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
-	modelPlugin, err := m.getModelPlugin()
-	if err != nil {
-		return nil, err
-	}
-	controlMessageProtoBytes, err := modelPlugin.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
+	var mhoServiceModel e2smmhosm.MhoServiceModel
+	controlMessageProtoBytes, err := mhoServiceModel.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -31,11 +28,8 @@ func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2
 }
 
 func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
-	modelPlugin, err := m.getModelPlugin()
-	if err != nil {
-		return nil, err
-	}
-	controlHeaderProtoBytes, err := modelPlugin.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
+	var mhoServiceModel e2smmhosm.MhoServiceModel
+	controlHeaderProtoBytes, err := mhoServiceModel.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
 	if err != nil {
 		return nil, err
 	}
@@ -50,13 +44,10 @@ func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2s
 
 // getEventTriggerType extracts event trigger type
 func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_mho.MhoTriggerType, error) {
-	modelPlugin, err := m.getModelPlugin()
-	if err != nil {
-		log.Error(err)
-		return -1, err
-	}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
-	eventTriggerProtoBytes, err := modelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+
+	var mhoServiceModel e2smmhosm.MhoServiceModel
+	eventTriggerProtoBytes, err := mhoServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return -1, err
 	}
@@ -65,28 +56,16 @@ func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionReques
 	if err != nil {
 		return -1, err
 	}
-	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormat1().TriggerType
+	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().TriggerType
 	return eventTriggerType, nil
-}
-
-func (m *Mho) getModelPlugin() (modelplugins.ServiceModel, error) {
-	modelPlugin, err := m.ServiceModel.ModelPluginRegistry.GetPlugin(modelOID)
-	if err != nil {
-		return nil, errors.New(errors.NotFound, "model plugin for model %s not found", modelFullName)
-	}
-
-	return modelPlugin, nil
 }
 
 // getReportPeriod extracts report period
 func (m *Mho) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {
-	modelPlugin, err := m.getModelPlugin()
-	if err != nil {
-		log.Error(err)
-		return 0, err
-	}
 	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
-	eventTriggerProtoBytes, err := modelPlugin.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
+
+	var mhoServiceModel e2smmhosm.MhoServiceModel
+	eventTriggerProtoBytes, err := mhoServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {
 		return 0, err
 	}
@@ -95,6 +74,11 @@ func (m *Mho) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (
 	if err != nil {
 		return 0, err
 	}
-	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormat1().ReportingPeriodMs
-	return reportPeriod, nil
+	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().ReportingPeriodMs
+	if reportPeriod == nil {
+		return 0, fmt.Errorf("no reporting period was set, obtained %v", reportPeriod)
+	}
+	rp := *reportPeriod
+
+	return rp, nil
 }
