@@ -6,12 +6,12 @@ package mho
 
 import (
 	"context"
-	"encoding/binary"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	e2apIndicationUtils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	indHdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
@@ -128,12 +128,13 @@ func (m *Mho) createIndicationHeaderBytes(ctx context.Context, ncgi ransimtypes.
 	//timestamp := make([]byte, 4)
 	//ToDo - why BigEndian is used here? Temporarily removing
 	//binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
-	var ncgiBytes []byte
-	binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
+	ncgiTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(cell.NCGI)))
+
+	//binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
 	header := indHdr.NewIndicationHeader(
 		indHdr.WithPlmnID(*plmnID),
 		//indHdr.WithNrcellIdentity(uint64(ransimtypes.GetNCI(cell.NCGI))))
-		indHdr.WithNrcellIdentity(ncgiBytes))
+		indHdr.WithNrcellIdentity(ncgiTypeNCI.Bytes()))
 
 	indicationHeaderAsn1Bytes, err := header.MhoToAsn1Bytes()
 	if err != nil {
@@ -154,8 +155,9 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		return nil, nil
 	}
 
-	var nrCellIDbytes []byte
-	binary.LittleEndian.PutUint64(nrCellIDbytes, uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
+	nrCellIDTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
+
+	//binary.LittleEndian.PutUint64(nrCellIDbytes, uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
 	// add serving cell to measReport
 	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 		Cgi: &e2sm_mho.CellGlobalId{
@@ -168,7 +170,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 						Value: &asn1.BitString{
 							// ToDo - should be of type []byte
 							//Value: uint64(ransimtypes.GetNCI(ue.Cell.NCGI)),
-							Value: nrCellIDbytes,
+							Value: nrCellIDTypeNCI.Bytes(),
 							Len:   36,
 						},
 					},
@@ -181,8 +183,9 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 	})
 
 	for _, cell := range ue.Cells {
-		var ncgiBytes []byte
-		binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
+		ncgiTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(cell.NCGI)))
+
+		//binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 			Cgi: &e2sm_mho.CellGlobalId{
 				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
@@ -194,7 +197,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 							Value: &asn1.BitString{
 								// ToDo - should be of type []byte
 								//Value: uint64(ransimtypes.GetNCI(cell.NCGI)),
-								Value: ncgiBytes,
+								Value: ncgiTypeNCI.Bytes(),
 								Len:   36,
 							},
 						},

@@ -6,8 +6,8 @@ package mho
 
 import (
 	"context"
-	"encoding/binary"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	"strconv"
 
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
@@ -355,8 +355,8 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 
 		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
 		plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
-		nci := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue()
-		tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(binary.LittleEndian.Uint64(nci)))
+		nci := utils.NewNCellIDWithBytes(controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue())
+		tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci.Uint64()))
 		tCell := &model.UECell{
 			ID:   types.GnbID(tCellNcgi),
 			NCGI: tCellNcgi,
