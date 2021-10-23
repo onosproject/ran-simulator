@@ -131,9 +131,9 @@ func (control *Control) BuildControlAcknowledge() (response *e2appducontents.Ric
 
 	response = &e2appducontents.RiccontrolAcknowledge{
 		ProtocolIes: &e2appducontents.RiccontrolAcknowledgeIes{
-			E2ApProtocolIes29: &ricRequestID,      // RIC Requestor & RIC Instance ID
-			E2ApProtocolIes5:  &ranFunctionID,     // RAN function ID
-			E2ApProtocolIes20: &ricCallProcessID,  // RIC Call Process ID
+			E2ApProtocolIes29: &ricRequestID,     // RIC Requestor & RIC Instance ID
+			E2ApProtocolIes5:  &ranFunctionID,    // RAN function ID
+			E2ApProtocolIes20: &ricCallProcessID, // RIC Call Process ID
 		},
 	}
 
@@ -192,10 +192,10 @@ func (control *Control) BuildControlFailure() (response *e2appducontents.Riccont
 
 	response = &e2appducontents.RiccontrolFailure{
 		ProtocolIes: &e2appducontents.RiccontrolFailureIes{
-			E2ApProtocolIes29: &ricRequestID,      // RIC Requestor & RIC Instance ID
-			E2ApProtocolIes5:  &ranFunctionID,     // RAN function ID
-			E2ApProtocolIes20: &ricCallProcessID,  // RIC Call Process ID
-			E2ApProtocolIes1:  &ricCause,          // Cause
+			E2ApProtocolIes29: &ricRequestID,     // RIC Requestor & RIC Instance ID
+			E2ApProtocolIes5:  &ranFunctionID,    // RAN function ID
+			E2ApProtocolIes20: &ricCallProcessID, // RIC Call Process ID
+			E2ApProtocolIes1:  &ricCause,         // Cause
 		},
 	}
 
