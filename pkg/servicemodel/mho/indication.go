@@ -125,15 +125,10 @@ func (m *Mho) createIndicationHeaderBytes(ctx context.Context, ncgi ransimtypes.
 
 	cell, _ := m.ServiceModel.CellStore.Get(ctx, ncgi)
 	plmnID := ransimtypes.NewUint24(uint32(m.ServiceModel.Model.PlmnID))
-	//timestamp := make([]byte, 4)
-	//ToDo - why BigEndian is used here? Temporarily removing
-	//binary.BigEndian.PutUint32(timestamp, uint32(time.Now().Unix()))
 	ncgiTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(cell.NCGI)))
 
-	//binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
 	header := indHdr.NewIndicationHeader(
 		indHdr.WithPlmnID(*plmnID),
-		//indHdr.WithNrcellIdentity(uint64(ransimtypes.GetNCI(cell.NCGI))))
 		indHdr.WithNrcellIdentity(ncgiTypeNCI.Bytes()))
 
 	indicationHeaderAsn1Bytes, err := header.MhoToAsn1Bytes()
@@ -157,7 +152,6 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 
 	nrCellIDTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
 
-	//binary.LittleEndian.PutUint64(nrCellIDbytes, uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
 	// add serving cell to measReport
 	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 		Cgi: &e2sm_mho.CellGlobalId{
@@ -168,8 +162,6 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 					},
 					NRcellIdentity: &e2sm_mho.NrcellIdentity{
 						Value: &asn1.BitString{
-							// ToDo - should be of type []byte
-							//Value: uint64(ransimtypes.GetNCI(ue.Cell.NCGI)),
 							Value: nrCellIDTypeNCI.Bytes(),
 							Len:   36,
 						},
@@ -185,7 +177,6 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 	for _, cell := range ue.Cells {
 		ncgiTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(cell.NCGI)))
 
-		//binary.LittleEndian.PutUint64(ncgiBytes, uint64(ransimtypes.GetNCI(cell.NCGI)))
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
 			Cgi: &e2sm_mho.CellGlobalId{
 				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
@@ -195,8 +186,6 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 						},
 						NRcellIdentity: &e2sm_mho.NrcellIdentity{
 							Value: &asn1.BitString{
-								// ToDo - should be of type []byte
-								//Value: uint64(ransimtypes.GetNCI(cell.NCGI)),
 								Value: ncgiTypeNCI.Bytes(),
 								Len:   36,
 							},
