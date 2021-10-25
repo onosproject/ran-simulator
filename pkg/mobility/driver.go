@@ -416,7 +416,6 @@ func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.U
 		strength = 0
 	}
 
-
 	newUECell := &model.UECell{
 		ID:       ue.Cell.ID,
 		NCGI:     ue.Cell.NCGI,
