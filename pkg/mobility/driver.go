@@ -376,6 +376,9 @@ func (d *driver) updateUESignalStrengthCandServCells(ctx context.Context, ue *mo
 	var csCellList []*model.UECell
 	for _, cell := range cellList {
 		rsrp := StrengthAtLocation(ue.Location, *cell)
+		if math.IsInf(rsrp, 0) {
+			rsrp = 0
+		}
 		if math.IsNaN(rsrp) {
 			continue
 		}
@@ -405,6 +408,13 @@ func (d *driver) updateUESignalStrengthServCell(ctx context.Context, ue *model.U
 	}
 
 	strength := StrengthAtLocation(ue.Location, *sCell)
+
+	if math.IsNaN(strength) {
+		strength = -999
+	}
+	if math.IsInf(strength, 0) {
+		strength = 0
+	}
 
 	newUECell := &model.UECell{
 		ID:       ue.Cell.ID,
