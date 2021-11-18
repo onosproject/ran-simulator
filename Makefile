@@ -52,6 +52,11 @@ license_check: build-tools # @HELP examine and ensure license headers exist
 	@if [ ! -d "../build-tools" ]; then cd .. && git clone https://github.com/onosproject/build-tools.git; fi
 	./../build-tools/licensing/boilerplate.py -v --rootdir=${CURDIR}/pkg --boilerplate LicenseRef-ONF-Member-Only-1.0
 
+integration-tests: # @HELP run helmit integration tests
+	@kubectl delete ns test; kubectl create ns test
+	helmit test -n test ./cmd/ransim-tests --timeout 30m --no-teardown \
+		--secret sd-ran-username=${repo_user} --secret sd-ran-password=${repo_password}
+
 gofmt: # @HELP run the Go format validation
 	bash -c "diff -u <(echo -n) <(gofmt -d pkg/ cmd/ tests/)"
 
