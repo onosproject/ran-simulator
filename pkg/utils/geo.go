@@ -44,8 +44,14 @@ func TargetPoint(c model.Coordinate, bearing float64, dist float64) model.Coordi
 
 // InitialBearing returns initial bearing from c1 to c2
 func InitialBearing(c1 model.Coordinate, c2 model.Coordinate) float64 {
-	y := math.Sin(c2.Lng-c1.Lng) * math.Cos(c2.Lat)
-	x := math.Cos(c1.Lat)*math.Sin(c2.Lat) - math.Sin(c1.Lat)*math.Cos(c2.Lat)*math.Cos(c2.Lng-c1.Lng)
+	var la1, lo1, la2, lo2 float64
+	la1 = c1.Lat * math.Pi / 180
+	lo1 = c1.Lng * math.Pi / 180
+	la2 = c2.Lat * math.Pi / 180
+	lo2 = c2.Lng * math.Pi / 180
+	
+	y := math.Sin(lo2-lo1) * math.Cos(la2)
+	x := math.Cos(la1)*math.Sin(la2) - math.Sin(la1)*math.Cos(la2)*math.Cos(lo2-lo1)
 	theta := math.Atan2(y, x)
 	return math.Mod(theta*180/math.Pi+360, 360.0) // in degrees
 }
