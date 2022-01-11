@@ -9,15 +9,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap_go/pdubuilder"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap_go/types"
 
-	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
-	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap_go/v2"
+	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-commondatatypes"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
 
 	connectionsetupfaileditem "github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionSetupFailedItemie"
 
@@ -48,7 +48,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-ies"
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
@@ -288,7 +288,12 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 }
 
 func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	ranFuncID := registry.RanFunctionID(controlutils.GetRanFunctionID(request))
+	rfID, err := controlutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID := registry.RanFunctionID(*rfID)
+
 	log.Debugf("Received Control Request %+v for ran function %d", request, ranFuncID)
 	sm, err := e.registry.GetServiceModel(ranFuncID)
 	if err != nil {
@@ -317,16 +322,36 @@ func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.
 }
 
 func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	registeredRanFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
+	rfID, err := subutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	registeredRanFuncID := registry.RanFunctionID(*rfID)
 	log.Debugf("Received Subscription Request %v for ran function %d", request, registeredRanFuncID)
 	sm, err := e.registry.GetServiceModel(registeredRanFuncID)
-	id := subscriptions.NewID(subutils.GetRicInstanceID(request),
-		subutils.GetRequesterID(request),
-		subutils.GetRanFunctionID(request))
+	rrID, err := subutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	riID, err := subutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	reqID := subutils.GetRequesterID(request)
-	ranFuncID := subutils.GetRanFunctionID(request)
-	ricInstanceID := subutils.GetRicInstanceID(request)
+	id := subscriptions.NewID(*riID, *rrID, *rfID)
+
+	reqID, err := subutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := subutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := subutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
 	if err != nil {
 		log.Warn(err)
 		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
@@ -341,9 +366,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -360,9 +385,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -380,9 +405,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -416,9 +441,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -433,9 +458,21 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
 	log.Debugf("Received Subscription Delete Request %v for ran function ID %d", request, ranFuncID)
-	subID := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
-		subdeleteutils.GetRequesterID(request),
-		subdeleteutils.GetRanFunctionID(request))
+
+	rrID, err := subdeleteutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	rfID, err := subdeleteutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	riID, err := subdeleteutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	subID := subscriptions.NewID(*riID, *rrID, *rfID)
 	_, err = e.subStore.Get(subID)
 	if err != nil {
 		log.Warn(err)
@@ -448,10 +485,24 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
+
+		rrID, err := subdeleteutils.GetRequesterID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		rfID, err := subdeleteutils.GetRanFunctionID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		riID, err := subdeleteutils.GetRicInstanceID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
-			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
-			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
-			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
+			subdeleteutils.WithRanFuncID(*rfID),
+			subdeleteutils.WithRequestID(*rrID),
+			subdeleteutils.WithRicInstanceID(*riID),
 			subdeleteutils.WithCause(cause))
 		failure, err := subscriptionDelete.BuildSubscriptionDeleteFailure()
 		if err != nil {
@@ -474,10 +525,23 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_RAN_FUNCTION_ID_INVALID,
 			},
 		}
+		rrID, err := subdeleteutils.GetRequesterID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		rfID, err := subdeleteutils.GetRanFunctionID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		riID, err := subdeleteutils.GetRicInstanceID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
-			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
-			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
-			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
+			subdeleteutils.WithRanFuncID(*rfID),
+			subdeleteutils.WithRequestID(*rrID),
+			subdeleteutils.WithRicInstanceID(*riID),
 			subdeleteutils.WithCause(cause))
 		failure, err := subscriptionDelete.BuildSubscriptionDeleteFailure()
 		if err != nil {

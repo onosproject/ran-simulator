@@ -5,10 +5,10 @@
 package connectionsetupfaileditem
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/api/e2ap_go/v2"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
 )
 
 // IEs connection setup failed item Ies
@@ -40,11 +40,14 @@ func (c *IEs) BuildConnectionSetupFailedItemIes() *e2appducontents.E2ConnectionS
 	connectionSetupFailedItemIes := &e2appducontents.E2ConnectionSetupFailedItemIes{
 		Id:          int32(v2.ProtocolIeIDE2connectionSetupFailedItem),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-		Value: &e2appducontents.E2ConnectionSetupFailedItem{
-			TnlInformation: c.tnlInfo,
-			Cause:          c.cause,
+		Value: &e2appducontents.E2ConnectionSetupFailedItemIe{
+			E2ConnectionSetupFailedItemIe: &e2appducontents.E2ConnectionSetupFailedItemIe_E2Csfi{
+				E2Csfi: &e2appducontents.E2ConnectionSetupFailedItem{
+					TnlInformation: c.tnlInfo,
+					Cause:          c.cause,
+				},
+			},
 		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 
 	return connectionSetupFailedItemIes

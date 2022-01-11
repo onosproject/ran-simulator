@@ -5,11 +5,11 @@
 package indicationerror
 
 import (
-	"github.com/onosproject/onos-e2t/api/e2ap/v2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/onos-e2t/api/e2ap_go/v2"
+	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-commondatatypes"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap_go/types"
 )
 
 // ErrorIndication required fields for creating error indication error message
@@ -72,71 +72,17 @@ func WithCause(cause *e2apies.Cause) func(*ErrorIndication) {
 
 // Build builds an error indication message
 func (e *ErrorIndication) Build() (*e2appducontents.ErrorIndication, error) {
-	ricRequestID := e2appducontents.ErrorIndicationIes_ErrorIndicationIes29{
-		Id:          int32(v2.ProtocolIeIDRicrequestID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.RicrequestId{
-			RicRequestorId: e.reqID,
-			RicInstanceId:  e.ricInstanceID,
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
+	rrID := types.RicRequest{
+		RequestorID: types.RicRequestorID(e.reqID),
+		InstanceID:  types.RicInstanceID(e.ricInstanceID),
 	}
-
-	ranFunctionID := e2appducontents.ErrorIndicationIes_ErrorIndicationIes5{
-		Id:          int32(v2.ProtocolIeIDRanfunctionID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.RanfunctionId{
-			Value: e.ranFuncID,
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
-	}
-
-	errorCause := e2appducontents.ErrorIndicationIes_ErrorIndicationIes1{
-		Id:          int32(v2.ProtocolIeIDCause),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-		Value:       e.cause,
-		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
-	}
-
-	criticalityDiagnostics := e2appducontents.ErrorIndicationIes_ErrorIndicationIes2{
-		Id:          int32(v2.ProtocolIeIDCriticalityDiagnostics),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-		Value: &e2apies.CriticalityDiagnostics{
-			ProcedureCode: &e2ap_commondatatypes.ProcedureCode{
-				Value: e.failureProcCode,
-			},
-			TriggeringMessage:    e.failureTrigMsg,
-			ProcedureCriticality: e.failureCrit,
-			RicRequestorId: &e2apies.RicrequestId{
-				RicRequestorId: e.reqID,
-				RicInstanceId:  e.ricInstanceID,
-			},
-			IEsCriticalityDiagnostics: &e2apies.CriticalityDiagnosticsIeList{
-				Value: make([]*e2apies.CriticalityDiagnosticsIeItem, 0),
-			},
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
-	}
-
-	for _, critDiag := range e.critDiags {
-		criticDiagnostics := e2apies.CriticalityDiagnosticsIeItem{
-			IEcriticality: critDiag.IECriticality,
-			IEId: &e2ap_commondatatypes.ProtocolIeId{
-				Value: int32(critDiag.IEId), // value were taken from e2ap-v01.00.asn1:1278
-			},
-			TypeOfError: critDiag.TypeOfError,
-		}
-		criticalityDiagnostics.Value.IEsCriticalityDiagnostics.Value = append(criticalityDiagnostics.Value.IEsCriticalityDiagnostics.Value, &criticDiagnostics)
-	}
-
+	rfID := types.RanFunctionID(e.ranFuncID)
 	errorIndication := &e2appducontents.ErrorIndication{
-		ProtocolIes: &e2appducontents.ErrorIndicationIes{
-			E2ApProtocolIes29: &ricRequestID,           // RIC Requestor & RIC Instance ID
-			E2ApProtocolIes5:  &ranFunctionID,          // RAN function ID
-			E2ApProtocolIes1:  &errorCause,             // Cause
-			E2ApProtocolIes2:  &criticalityDiagnostics, // CriticalityDiagnostics
-		},
+		ProtocolIes: make([]*e2appducontents.ErrorIndicationIes, 0),
 	}
+	failureProcCode := v2.ProcedureCodeT(e.failureProcCode)
+	errorIndication.SetRicRequestID(&rrID).SetRanFunctionID(&rfID).SetCause(e.cause).
+		SetCriticalityDiagnostics(&failureProcCode, e.failureCrit, e.failureTrigMsg, &rrID, e.critDiags)
 
 	return errorIndication, nil
 }
