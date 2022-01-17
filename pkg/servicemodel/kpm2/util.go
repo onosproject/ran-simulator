@@ -7,8 +7,9 @@ package kpm2
 import (
 	e2smkpmv2sm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
 	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap_go/v2"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap_go/types"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -16,8 +17,8 @@ func (sm *Client) getActionDefinition(actionList []*e2appducontents.RicactionToB
 	var actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition
 	for _, action := range actionList {
 		for _, acceptedActionID := range ricActionsAccepted {
-			if action.Value.RicActionId.Value == int32(*acceptedActionID) {
-				actionDefinitionBytes := action.Value.RicActionDefinition.Value
+			if action.GetValue().GetRatbsi().GetRicActionId().GetValue() == int32(*acceptedActionID) {
+				actionDefinitionBytes := action.GetValue().GetRatbsi().GetRicActionDefinition().GetValue()
 				var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
 
 				actionDefinitionProtoBytes, err := kpm2ServiceModel.ActionDefinitionASN1toProto(actionDefinitionBytes)
@@ -43,7 +44,13 @@ func (sm *Client) getActionDefinition(actionList []*e2appducontents.RicactionToB
 
 // getReportPeriod extracts report period
 func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int64, error) {
-	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
+	var eventTriggerAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
+			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			break
+		}
+	}
 	var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
 	eventTriggerProtoBytes, err := kpm2ServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
 	if err != nil {

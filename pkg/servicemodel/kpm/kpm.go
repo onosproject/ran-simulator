@@ -222,8 +222,8 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	}
 
 	for _, action := range actionList {
-		actionID := e2aptypes.RicActionID(action.Value.RicActionId.Value)
-		actionType := action.Value.RicActionType
+		actionID := e2aptypes.RicActionID(action.GetValue().GetRatbsi().GetRicActionId().GetValue())
+		actionType := action.GetValue().GetRatbsi().GetRicActionType()
 		// kpm service model supports report action and should be added to the
 		// list of accepted actions
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT {

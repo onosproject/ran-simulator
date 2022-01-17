@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LicenseRef-ONF-Member-Only-1.0
 
+//go:build !race
 // +build !race
 
 package mobility

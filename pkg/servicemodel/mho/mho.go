@@ -17,9 +17,9 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/pdubuilder"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
-	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap_go/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/mobility"
@@ -164,8 +164,8 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 
 	for _, action := range actionList {
 		log.Debugf("MHO subscription action: %v", action)
-		actionID := e2aptypes.RicActionID(action.Value.RicActionId.Value)
-		actionType := action.Value.RicActionType
+		actionID := e2aptypes.RicActionID(action.GetValue().GetRatbsi().GetRicActionId().GetValue())
+		actionType := action.GetValue().GetRatbsi().GetRicActionType()
 		// mho service model supports report and insert action and should be added to the
 		// list of accepted actions
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT ||

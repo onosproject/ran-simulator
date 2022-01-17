@@ -78,7 +78,7 @@ func (indication *Indication) Build() (e2Indication *e2appducontents.Ricindicati
 		ProtocolIes: make([]*e2appducontents.RicindicationIes, 0),
 	}
 	ricIndication.SetRicRequestID(rrID).SetRanFunctionID(types.RanFunctionID(indication.ranFuncID)).
-		SetRicActionID(e2apies.RicactionType_RICACTION_TYPE_POLICY). // it is hardcoded to 2 as was before
+		SetRicActionID(2).
 		SetRicIndicationSN(3).SetRicIndicationType(e2apies.RicindicationType_RICINDICATION_TYPE_REPORT).
 		SetRicIndicationHeader(indication.indicationHeader).SetRicIndicationMessage(indication.indicationMessage).
 		SetRicCallProcessID(indication.ricCallProcessID)
