@@ -97,14 +97,13 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 		},
 	}
 
-	setupRequest.ProtocolIes = append(setupRequest.ProtocolIes, cal)
-
-	setupRequest.SetGlobalE2nodeID(ge2nID).SetRanFunctionsAdded(request.ranFunctions).
-		SetTransactionID(request.transactionID)
-
 	setupRequest = &e2appducontents.E2SetupRequest{
 		ProtocolIes: make([]*e2appducontents.E2SetupRequestIes, 0),
 	}
+
+	setupRequest.SetGlobalE2nodeID(ge2nID).SetRanFunctionsAdded(request.ranFunctions).
+		SetTransactionID(request.transactionID)
+	setupRequest.ProtocolIes = append(setupRequest.ProtocolIes, cal)
 
 	// TODO enable it when it is available
 	/*err = setupRequest.Validate()

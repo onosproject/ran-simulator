@@ -32,7 +32,7 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 	var controlMessageAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRiccontrolMessage) {
-			controlMessageAsnBytes = v.GetValue().GetRch().GetValue()
+			controlMessageAsnBytes = v.GetValue().GetRcm().GetValue()
 			break
 		}
 	}
