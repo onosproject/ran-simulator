@@ -242,6 +242,16 @@ func (sm *Client) collect(ctx context.Context,
 						measurments.WithIntegerValue(int64(sm.ServiceModel.UEs.LenPerCell(ctx, uint64(cellNCGI))))).
 						Build()
 					measRecord.Value = append(measRecord.Value, measRecordInteger)
+				case CellType:
+					cellSize, err := sm.getCellSize(ctx, cellNCGI)
+					if err != nil {
+						return nil, err
+					}
+					log.Debugf("Cell type of Cell %v is %v", cellNCGI, cellSize)
+					measRecordInteger := measurments.NewMeasurementRecordItemInteger(
+						measurments.WithIntegerValue(int64(sm.toCellSizeEnum(cellSize)))).
+						Build()
+					measRecord.Value = append(measRecord.Value, measRecordInteger)
 				default:
 					measRecordNoValue := measurments.NewMeasurementRecordItemNoValue()
 					measRecord.Value = append(measRecord.Value, measRecordNoValue)

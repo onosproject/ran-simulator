@@ -5,6 +5,9 @@
 package kpm2
 
 import (
+	"context"
+	"github.com/onosproject/onos-api/go/onos/ransim/types"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	e2smkpmv2sm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/servicemodel"
 	e2smkpmv2 "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go/v2/e2sm-kpm-v2-go"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
@@ -56,4 +59,27 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	}
 	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().GetReportingPeriod()
 	return reportPeriod, nil
+}
+
+func (sm *Client) getCellSize(ctx context.Context, ncgi ransimtypes.NCGI) (string, error) {
+	cell, err := sm.ServiceModel.CellStore.Get(ctx, ncgi)
+	if err != nil {
+		return "", err
+	}
+	return cell.CellType.String(), nil
+}
+
+func (sm *Client) toCellSizeEnum(cellSize string) types.CellType {
+	switch cellSize {
+	case "ENTERPRISE":
+		return types.CellType_FEMTO
+	case "FEMTO":
+		return types.CellType_FEMTO
+	case "MACRO":
+		return types.CellType_MACRO
+	case "OUTDOOR_SMALL":
+		return types.CellType_OUTDOOR_SMALL
+	default:
+		return types.CellType_FEMTO
+	}
 }

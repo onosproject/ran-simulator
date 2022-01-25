@@ -24,6 +24,8 @@ const (
 	RRCConnAvg
 	// RRCConnMax  the max number of users in RRC connected mode during each granularity period.
 	RRCConnMax
+	// CellType as per onos-api/onos/ransim/types/types.pb.go:29
+	CellType
 )
 
 func (m MeasTypeName) String() string {
@@ -34,7 +36,7 @@ func (m MeasTypeName) String() string {
 		"RRC.ConnReEstabAtt.HOFail",
 		"RRC.ConnReEstabAtt.Other",
 		"RRC.Conn.Avg",
-		"RRC.Conn.Max"}[m]
+		"RRC.Conn.Max", "CellType"}[m]
 }
 
 // MeasType meas type
@@ -75,5 +77,9 @@ var measTypes = []MeasType{
 	{
 		measTypeName: RRCConnMax,
 		measTypeID:   8,
+	},
+	{
+		measTypeName: CellType,
+		measTypeID:   9,
 	},
 }
