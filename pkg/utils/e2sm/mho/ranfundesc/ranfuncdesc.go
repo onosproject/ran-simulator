@@ -5,7 +5,8 @@
 package ranfundesc
 
 import (
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	"fmt"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 )
 
 // RANFunctionDescription ran function description
@@ -89,9 +90,8 @@ func (desc *RANFunctionDescription) Build() (*e2sm_mho.E2SmMhoRanfunctionDescrip
 		},
 	}
 
-	//ToDo - return it back once the Validation is functional again
-	//if err := e2smMhoPdu.Validate(); err != nil {
-	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	//}
+	if err := e2smMhoPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	}
 	return &e2smMhoPdu, nil
 }

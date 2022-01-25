@@ -5,6 +5,7 @@
 package header
 
 import (
+	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
@@ -12,7 +13,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
@@ -74,10 +75,9 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 		},
 	}
 
-	//ToDo - return it back once the Validation is functional again
-	//if err := E2SmMhoPdu.Validate(); err != nil {
-	//	return nil, fmt.Errorf("error validating E2SmMhoPDU %s", err.Error())
-	//}
+	if err := E2SmMhoPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmMhoPDU %s", err.Error())
+	}
 	return &E2SmMhoPdu, nil
 
 }

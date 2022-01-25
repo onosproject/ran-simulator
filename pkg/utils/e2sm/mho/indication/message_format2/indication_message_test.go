@@ -5,6 +5,8 @@
 package messageformat2
 
 import (
+	"encoding/hex"
+	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/pdubuilder"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +14,12 @@ import (
 
 func TestCreateIndicationMessage(t *testing.T) {
 
-	// TODO
-	indicationMessage := NewIndicationMessage()
+	indicationMessage := NewIndicationMessage(WithUeID("12345"), WithRrcStatus(pdubuilder.CreateRrcStatusConnected()))
 	assert.NotNil(t, indicationMessage)
+	assert.Equal(t, indicationMessage.ueID, "12345")
+	assert.Equal(t, indicationMessage.RrcStatus.Number(), pdubuilder.CreateRrcStatusConnected().Number())
+
+	aper, err := indicationMessage.ToAsn1Bytes()
+	assert.NoError(t, err)
+	t.Logf("E2SM-MHO-IndicationMessage (Format 2) APER bytes are\n%v", hex.Dump(aper))
 }
