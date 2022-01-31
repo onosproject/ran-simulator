@@ -6,7 +6,7 @@ package subscriptions
 
 import (
 	"fmt"
-	v2 "github.com/onosproject/onos-e2t/api/e2ap_go/v2"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	"sync"
 	"time"
 
@@ -14,8 +14,8 @@ import (
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-ies"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 )
 
 // ID is an alias for string subscription ID

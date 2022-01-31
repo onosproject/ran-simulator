@@ -8,8 +8,8 @@ import (
 	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
-	v2 "github.com/onosproject/onos-e2t/api/e2ap_go/v2"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	"google.golang.org/protobuf/proto"
 )
 

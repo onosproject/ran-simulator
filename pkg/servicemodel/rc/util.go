@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
-	v2 "github.com/onosproject/onos-e2t/api/e2ap_go/v2"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 
 	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
 
@@ -23,7 +23,7 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	e2smrcpreies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/v2/e2sm-rc-pre-v2-go"
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	"google.golang.org/protobuf/proto"
 )
 

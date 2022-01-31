@@ -9,15 +9,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap_go/pdubuilder"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap_go/types"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 
-	v2 "github.com/onosproject/onos-e2t/api/e2ap_go/v2"
-	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-commondatatypes"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
+	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
-	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-pdu-contents"
+	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 
 	connectionsetupfaileditem "github.com/onosproject/ran-simulator/pkg/utils/e2ap/connectionupdate/connectionSetupFailedItemie"
 
@@ -48,7 +48,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap_go/v2/e2ap-ies"
+	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2 "github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
