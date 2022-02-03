@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2019-present Open Networking Foundation <info@opennetworking.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # Simulation Models
 
 RAN simulator defines two levels of simulation models:

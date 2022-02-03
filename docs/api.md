@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2019-present Open Networking Foundation <info@opennetworking.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # RAN simulator APIs
 
 RAN simulator gRPC APIs are defined in [onos-api][onos-api] that are listed as follows:

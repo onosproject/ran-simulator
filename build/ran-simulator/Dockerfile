@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2019-present Open Networking Foundation <info@opennetworking.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 ARG ONOS_BUILD_VERSION=undefined
 
 FROM onosproject/golang-build:v1.0 as build
