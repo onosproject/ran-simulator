@@ -838,8 +838,8 @@ github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2 v0.8.1/go.mod h1:Vnx
 github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre v0.8.1/go.mod h1:AvW7UY/32mkxzHffLegOCM+ddfehNhKXbGadeJAfbzE=
 github.com/onosproject/onos-lib-go v0.7.10/go.mod h1:/QjMn+Lb+vxZfnCFLtoxhwHAAuHQnRjjOj3qCbcknhQ=
 github.com/onosproject/onos-lib-go v0.8.1/go.mod h1:1klcUPfLoXPVu4fzM/sYi1V3Pggm2NRbY2fTzG2W1HY=
-github.com/onosproject/onos-lib-go v0.8.8 h1:AwQalHXBVF6JfhoEVYgJvbfuyQLge/W3Su+g35bf+qc=
-github.com/onosproject/onos-lib-go v0.8.8/go.mod h1:1klcUPfLoXPVu4fzM/sYi1V3Pggm2NRbY2fTzG2W1HY=
+github.com/onosproject/onos-lib-go v0.8.9 h1:pjswl3vehDJeQm524R0Sg+6fDuJzM9TrFGJvJBkOxLo=
+github.com/onosproject/onos-lib-go v0.8.9/go.mod h1:1klcUPfLoXPVu4fzM/sYi1V3Pggm2NRbY2fTzG2W1HY=
 github.com/onosproject/onos-proxy v0.1.0/go.mod h1:Julz7LLRkjnwIvioNEI1CjpujpxoA33vOdWSs0/wY9I=
 github.com/onosproject/onos-ric-sdk-go v0.8.0 h1:onnGAVuD+ftnr/vEihid0QWi2yqwJtMmXV0r7EUnJgI=
 github.com/onosproject/onos-ric-sdk-go v0.8.0/go.mod h1:oIL7Pz4YddRiHS7M6FXfejGhMhzGPMkwQoWuLUQivTM=
