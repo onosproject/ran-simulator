@@ -34,10 +34,14 @@ replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.2020022901
 
 replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
 
-replace github.com/onosproject/onos-e2t => ../onos-e2t
+replace github.com/onosproject/onos-e2t => github.com/eroshiva/onos-e2t ieE2APupdGoAper
 
-replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go => ../onos-e2-sm/servicemodels/e2sm_rc_pre_go
+replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go => github.com/eroshiva/onos-e2-sm/servicemodels/e2sm_rc_pre_go ieSMbumping
+replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go => github.com/eroshiva/onos-e2-sm/servicemodels/e2sm_mho_go ieSMbumping
+replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go => github.com/eroshiva/onos-e2-sm/servicemodels/e2sm_kpm_v2_go ieSMbumping
 
-replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go => ../onos-e2-sm/servicemodels/e2sm_mho_go
+//replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go => ../onos-e2-sm/servicemodels/e2sm_rc_pre_go
 
-replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go => ../onos-e2-sm/servicemodels/e2sm_kpm_v2_go
+//replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go => ../onos-e2-sm/servicemodels/e2sm_mho_go
+
+//replace github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go => ../onos-e2-sm/servicemodels/e2sm_kpm_v2_go
