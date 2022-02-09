@@ -47,11 +47,14 @@ func (c *IEs) BuildConnectionUpdateItemIes() *e2appducontents.E2ConnectionUpdate
 	connectionUpdateItemIes := &e2appducontents.E2ConnectionUpdateItemIes{
 		Id:          int32(v2.ProtocolIeIDE2connectionUpdateItem),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-		Value: &e2appducontents.E2ConnectionUpdateItem{
-			TnlInformation: c.tnlInfo,
-			TnlUsage:       c.tnlUsage,
+		Value: &e2appducontents.E2ConnectionUpdateItemIe{
+			E2ConnectionUpdateItemIe: &e2appducontents.E2ConnectionUpdateItemIe_E2Curi{
+				E2Curi: &e2appducontents.E2ConnectionUpdateItem{
+					TnlInformation: c.tnlInfo,
+					TnlUsage:       c.tnlUsage,
+				},
+			},
 		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
 	}
 	return connectionUpdateItemIes
 }

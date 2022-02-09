@@ -441,13 +441,22 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
-	reqID := subutils.GetRequesterID(request)
-	ranFuncID := subutils.GetRanFunctionID(request)
-	ricInstanceID := subutils.GetRicInstanceID(request)
+	reqID, err := subutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := subutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := subutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	for _, action := range actionList {
-		actionID := e2aptypes.RicActionID(action.Value.RicActionId.Value)
-		actionType := action.Value.RicActionType
+		actionID := e2aptypes.RicActionID(action.GetValue().GetRatbsi().GetRicActionId().GetValue())
+		actionType := action.GetValue().GetRatbsi().GetRicActionType()
 		// kpm service model supports report action and should be added to the
 		// list of accepted actions
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT {
@@ -475,9 +484,9 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -495,9 +504,9 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -516,9 +525,9 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -529,9 +538,9 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 	}
 
 	subscription := subutils.NewSubscription(
-		subutils.WithRequestID(reqID),
-		subutils.WithRanFuncID(ranFuncID),
-		subutils.WithRicInstanceID(ricInstanceID),
+		subutils.WithRequestID(*reqID),
+		subutils.WithRanFuncID(*ranFuncID),
+		subutils.WithRicInstanceID(*ricInstanceID),
 		subutils.WithActionsAccepted(ricActionsAccepted),
 		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 	subscriptionResponse, err := subscription.BuildSubscriptionResponse()
@@ -543,9 +552,9 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -569,18 +578,27 @@ func (sm *Client) RICSubscription(ctx context.Context, request *e2appducontents.
 // RICSubscriptionDelete implements subscription delete handler for kpm service model
 func (sm *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	log.Infof("RIC subscription delete request is received for e2 node %d and  service model %s:", sm.ServiceModel.Node.GnbID, sm.ServiceModel.ModelName)
-	reqID := subdeleteutils.GetRequesterID(request)
-	ranFuncID := subdeleteutils.GetRanFunctionID(request)
-	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
-	subID := subscriptions.NewID(ricInstanceID, reqID, ranFuncID)
+	reqID, err := subdeleteutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := subdeleteutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := subdeleteutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	subID := subscriptions.NewID(*ricInstanceID, *reqID, *ranFuncID)
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return nil, nil, err
 	}
 	subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
-		subdeleteutils.WithRequestID(reqID),
-		subdeleteutils.WithRanFuncID(ranFuncID),
-		subdeleteutils.WithRicInstanceID(ricInstanceID))
+		subdeleteutils.WithRequestID(*reqID),
+		subdeleteutils.WithRanFuncID(*ranFuncID),
+		subdeleteutils.WithRicInstanceID(*ricInstanceID))
 	subDeleteResponse, err := subscriptionDelete.BuildSubscriptionDeleteResponse()
 	if err != nil {
 		return nil, nil, err

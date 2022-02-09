@@ -95,7 +95,7 @@ func (s *ServiceModelRegistry) GetServiceModel(id RanFunctionID) (ServiceModel, 
 	if ok {
 		return sm, nil
 	}
-	return ServiceModel{}, errors.New(errors.Unknown, "no service model implementation exists for ran function ID:", id)
+	return ServiceModel{}, errors.New(errors.Unknown, "no service model implementation exists for ran function ID: ", id)
 }
 
 // GetServiceModels get all of the registered service models

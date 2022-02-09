@@ -68,80 +68,57 @@ func WithTransactionID(transID int32) func(*ConnectionUpdate) {
 // BuildConnectionUpdateAcknowledge creates a connection update acknowledge
 func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E2ConnectionUpdateAcknowledge {
 
-	ie39 := &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes39{}
-	ie40 := &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes40{}
-	ie49 := &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes49{
-		Id:          int32(v2.ProtocolIeIDTransactionID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.TransactionId{
-			Value: c.transactionID,
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-	}
-
-	if c.connectionUpdateItemIes != nil {
-		ie39 = &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes39{
-			Id:          int32(v2.ProtocolIeIDRicrequestID),
-			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-			Value: &e2appducontents.E2ConnectionUpdateList{
-				Value: make([]*e2appducontents.E2ConnectionUpdateItemIes, 0),
-			},
-			Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
-		}
-
-	}
-
-	if c.connectionSetupFailedItemIes != nil {
-		ie40 = &e2appducontents.E2ConnectionUpdateAckIes_E2ConnectionUpdateAckIes40{
-			Id:          int32(v2.ProtocolIeIDE2connectionSetupFailed),
-			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-			Value: &e2appducontents.E2ConnectionSetupFailedList{
-				Value: make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0),
-			},
-			Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
-		}
-	}
-
 	response := &e2appducontents.E2ConnectionUpdateAcknowledge{
-		ProtocolIes: &e2appducontents.E2ConnectionUpdateAckIes{},
+		ProtocolIes: make([]*e2appducontents.E2ConnectionUpdateAckIes, 0),
 	}
+	response.SetTransactionID(c.transactionID)
 
 	if len(c.connectionUpdateItemIes) != 0 {
-		response.GetProtocolIes().E2ApProtocolIes39 = ie39
-		response.GetProtocolIes().GetE2ApProtocolIes39().Value.Value = c.connectionUpdateItemIes
+		e2cul := &e2appducontents.E2ConnectionUpdateList{
+			Value: make([]*e2appducontents.E2ConnectionUpdateItemIes, 0),
+		}
+		e2cul.Value = c.connectionUpdateItemIes
+
+		ie := &e2appducontents.E2ConnectionUpdateAckIes{
+			Id:          int32(v2.ProtocolIeIDE2connectionSetup),
+			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+			Value: &e2appducontents.E2ConnectionUpdateAckIe{
+				E2ConnectionUpdateAckIe: &e2appducontents.E2ConnectionUpdateAckIe_E2Cul{
+					E2Cul: e2cul,
+				},
+			},
+		}
+		response.ProtocolIes = append(response.ProtocolIes, ie)
 	}
+
 	if len(c.connectionSetupFailedItemIes) != 0 {
-		response.GetProtocolIes().E2ApProtocolIes40 = ie40
-		response.GetProtocolIes().GetE2ApProtocolIes40().Value.Value = c.connectionSetupFailedItemIes
+		e2csfl := &e2appducontents.E2ConnectionSetupFailedList{
+			Value: make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0),
+		}
+		e2csfl.Value = c.connectionSetupFailedItemIes
+
+		ie := &e2appducontents.E2ConnectionUpdateAckIes{
+			Id:          int32(v2.ProtocolIeIDE2connectionSetupFailed),
+			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
+			Value: &e2appducontents.E2ConnectionUpdateAckIe{
+				E2ConnectionUpdateAckIe: &e2appducontents.E2ConnectionUpdateAckIe_E2Csfl{
+					E2Csfl: e2csfl,
+				},
+			},
+		}
+		response.ProtocolIes = append(response.ProtocolIes, ie)
 	}
-	response.GetProtocolIes().E2ApProtocolIes49 = ie49
+
 	return response
 }
 
 // BuildConnectionUpdateFailure creates a connection update failure message
 func (c *ConnectionUpdate) BuildConnectionUpdateFailure() *e2appducontents.E2ConnectionUpdateFailure {
-	ie49 := &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes49{
-		Id:          int32(v2.ProtocolIeIDTransactionID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.TransactionId{
-			Value: c.transactionID,
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-	}
 
 	failure := &e2appducontents.E2ConnectionUpdateFailure{
-		ProtocolIes: &e2appducontents.E2ConnectionUpdateFailureIes{
-			E2ApProtocolIes1: &e2appducontents.E2ConnectionUpdateFailureIes_E2ConnectionUpdateFailureIes1{
-				Id:          int32(v2.ProtocolIeIDCause),
-				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-				Value:       c.cause,
-				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_OPTIONAL),
-			},
-			//E2ApProtocolIes31: ie31, // TODO add time to wait whenever is needed
-			//E2ApProtocolIes2: &criticalityDiagnostics, // TODO
-			E2ApProtocolIes49: ie49,
-		},
+		ProtocolIes: make([]*e2appducontents.E2ConnectionUpdateFailureIes, 0),
 	}
+	failure.SetTransactionID(c.transactionID).SetCause(c.cause)
 
 	return failure
 }

@@ -5,10 +5,9 @@
 package subscriptiondelete
 
 import (
-	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
-	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 )
 
 // SubscriptionDelete required fields for creating subscription delete response and failure
@@ -75,69 +74,32 @@ func WithCause(cause *e2apies.Cause) func(subscriptionDelete *SubscriptionDelete
 
 // BuildSubscriptionDeleteFailure builds subscription delete failure
 func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteFailure() (response *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	ricRequestID := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes29{
-		Id:          int32(v2.ProtocolIeIDRicrequestID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.RicrequestId{
-			RicRequestorId: subscriptionDelete.reqID,         // sequence from e2ap-v01.00.asn1:1126
-			RicInstanceId:  subscriptionDelete.ricInstanceID, // sequence from e2ap-v01.00.asn1:1127
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-	}
 
-	ranFunctionID := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes5{
-		Id:          int32(v2.ProtocolIeIDRanfunctionID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.RanfunctionId{
-			Value: subscriptionDelete.ranFuncID, // range of Integer from e2ap-v01.00.asn1:1050, value from line 1277
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-	}
-	causeOfFailure := e2appducontents.RicsubscriptionDeleteFailureIes_RicsubscriptionDeleteFailureIes1{
-		Id:          int32(v2.ProtocolIeIDCause),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-		Value:       subscriptionDelete.cause,
-		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	rrID := types.RicRequest{
+		RequestorID: types.RicRequestorID(subscriptionDelete.reqID),
+		InstanceID:  types.RicInstanceID(subscriptionDelete.ricInstanceID),
 	}
 
 	resp := &e2appducontents.RicsubscriptionDeleteFailure{
-		ProtocolIes: &e2appducontents.RicsubscriptionDeleteFailureIes{
-			E2ApProtocolIes29: &ricRequestID,  //RIC request ID
-			E2ApProtocolIes5:  &ranFunctionID, //RAN function ID
-			E2ApProtocolIes1:  &causeOfFailure,
-		},
+		ProtocolIes: make([]*e2appducontents.RicsubscriptionDeleteFailureIes, 0),
 	}
+	resp.SetRicRequestID(&rrID).SetRanFunctionID(types.RanFunctionID(subscriptionDelete.ranFuncID)).SetCause(subscriptionDelete.cause)
 
 	return resp, nil
 }
 
 // BuildSubscriptionDeleteResponse builds subscription delete response
 func (subscriptionDelete *SubscriptionDelete) BuildSubscriptionDeleteResponse() (response *e2appducontents.RicsubscriptionDeleteResponse, err error) {
-	ricRequestID := e2appducontents.RicsubscriptionDeleteResponseIes_RicsubscriptionDeleteResponseIes29{
-		Id:          int32(v2.ProtocolIeIDRicrequestID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.RicrequestId{
-			RicRequestorId: subscriptionDelete.reqID,         // sequence from e2ap-v01.00.asn1:1126
-			RicInstanceId:  subscriptionDelete.ricInstanceID, // sequence from e2ap-v01.00.asn1:1127
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-	}
 
-	ranFunctionID := e2appducontents.RicsubscriptionDeleteResponseIes_RicsubscriptionDeleteResponseIes5{
-		Id:          int32(v2.ProtocolIeIDRanfunctionID),
-		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2apies.RanfunctionId{
-			Value: subscriptionDelete.ranFuncID, // range of Integer from e2ap-v01.00.asn1:1050, value from line 1277
-		},
-		Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	rrID := types.RicRequest{
+		RequestorID: types.RicRequestorID(subscriptionDelete.reqID),
+		InstanceID:  types.RicInstanceID(subscriptionDelete.ricInstanceID),
 	}
 
 	resp := &e2appducontents.RicsubscriptionDeleteResponse{
-		ProtocolIes: &e2appducontents.RicsubscriptionDeleteResponseIes{
-			E2ApProtocolIes29: &ricRequestID,  //RIC request ID
-			E2ApProtocolIes5:  &ranFunctionID, //RAN function ID
-		},
+		ProtocolIes: make([]*e2appducontents.RicsubscriptionDeleteResponseIes, 0),
 	}
+	resp.SetRicRequestID(&rrID).SetRanFunctionID(types.RanFunctionID(subscriptionDelete.ranFuncID))
 
 	return resp, nil
 

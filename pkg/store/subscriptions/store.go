@@ -6,6 +6,7 @@ package subscriptions
 
 import (
 	"fmt"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	"sync"
 	"time"
 
@@ -40,11 +41,30 @@ func NewSubscription(id ID, e2apsub *e2appducontents.RicsubscriptionRequest, ch 
 	if id == "" {
 		return nil, errors.New(errors.Forbidden, "id cannot be empty")
 	}
+
+	var rrID *e2apies.RicrequestId
+	var rfID *e2apies.RanfunctionId
+	var details *e2appducontents.RicsubscriptionDetails
+	for _, v := range e2apsub.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRanfunctionID) {
+			// E2 Connection To Add list IE
+			rfID = v.GetValue().GetRfId()
+		}
+		if v.Id == int32(v2.ProtocolIeIDRicrequestID) {
+			// E2 Connection To Modify list IE
+			rrID = v.GetValue().GetRrId()
+		}
+		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
+			// E2 Connection Remove list IE
+			details = v.GetValue().GetRsd()
+		}
+	}
+
 	return &Subscription{
 		ID:        id,
-		ReqID:     e2apsub.ProtocolIes.E2ApProtocolIes29.Value,
-		FnID:      e2apsub.ProtocolIes.E2ApProtocolIes5.Value,
-		Details:   e2apsub.ProtocolIes.E2ApProtocolIes30.Value,
+		ReqID:     rrID,
+		FnID:      rfID,
+		Details:   details,
 		E2Channel: ch,
 	}, nil
 }

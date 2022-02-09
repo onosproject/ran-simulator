@@ -7,11 +7,12 @@ package setup
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2t/api/e2ap/v2"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	e2ap_commondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
-	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -78,89 +79,38 @@ func WithTransactionID(transID int32) func(setup *Setup) {
 // Build builds e2ap setup request
 func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err error) {
 	//plmnID := types.NewUint24(request.plmnID)
-	ranFunctionList := e2appducontents.E2SetupRequestIes_E2SetupRequestIes10{
-		Id:          int32(v2.ProtocolIeIDRanfunctionsAdded),
-		Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+	ge2nID, err := pdubuilder.CreateGlobalE2nodeIDGnb(types.PlmnID(request.plmnID), &asn1.BitString{
+		Value: utils.Uint64ToBitString(request.e2NodeID, 28),
+		Len:   28,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	cal := &e2appducontents.E2SetupRequestIes{
+		Id:          int32(v2.ProtocolIeIDE2nodeComponentConfigAddition),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-		Value: &e2appducontents.RanfunctionsList{
-			Value: make([]*e2appducontents.RanfunctionItemIes, 0),
-		},
-	}
-
-	for id, ranFunctionID := range request.ranFunctions {
-		ranFunction := e2appducontents.RanfunctionItemIes{
-			E2ApProtocolIes8: &e2appducontents.RanfunctionItemIes_RanfunctionItemIes8{
-				Id:          int32(v2.ProtocolIeIDRanfunctionItem),
-				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
-				Value: &e2appducontents.RanfunctionItem{
-					RanFunctionId: &e2apies.RanfunctionId{
-						Value: int32(id),
-					},
-					RanFunctionDefinition: &e2ap_commondatatypes.RanfunctionDefinition{
-						Value: []byte(ranFunctionID.Description),
-					},
-					RanFunctionRevision: &e2apies.RanfunctionRevision{
-						Value: int32(ranFunctionID.Revision),
-					},
-					RanFunctionOid: &e2ap_commondatatypes.RanfunctionOid{
-						Value: string(ranFunctionID.OID),
-					},
-				},
-			},
-		}
-		ranFunctionList.Value.Value = append(ranFunctionList.Value.Value, &ranFunction)
-	}
-
-	e2SetupRequest := &e2appducontents.E2SetupRequest{
-		ProtocolIes: &e2appducontents.E2SetupRequestIes{
-			E2ApProtocolIes3: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes3{
-				Id:          int32(v2.ProtocolIeIDGlobalE2nodeID),
-				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-				Value: &e2apies.GlobalE2NodeId{
-					GlobalE2NodeId: &e2apies.GlobalE2NodeId_GNb{
-						GNb: &e2apies.GlobalE2NodeGnbId{
-							GlobalGNbId: &e2apies.GlobalgNbId{
-								PlmnId: &e2ap_commondatatypes.PlmnIdentity{
-									Value: request.plmnID.ToBytes(),
-								},
-								GnbId: &e2apies.GnbIdChoice{
-									GnbIdChoice: &e2apies.GnbIdChoice_GnbId{
-										GnbId: &asn1.BitString{
-											Value: utils.Uint64ToBitString(request.e2NodeID, 28),
-											Len:   28,
-										}},
-								},
-							},
-						},
-					},
-				},
-			},
-			E2ApProtocolIes10: &ranFunctionList,
-			E2ApProtocolIes50: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes50{
-				Id:          int32(v2.ProtocolIeIDE2nodeComponentConfigUpdate),
-				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-				Value:       request.componentConfigAdditionList,
-				Presence:    int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
-			},
-			E2ApProtocolIes49: &e2appducontents.E2SetupRequestIes_E2SetupRequestIes49{
-				Id:          int32(v2.ProtocolIeIDTransactionID),
-				Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
-				Value: &e2apies.TransactionId{
-					Value: request.transactionID,
-				},
-				Presence: int32(e2ap_commondatatypes.Presence_PRESENCE_MANDATORY),
+		Value: &e2appducontents.E2SetupRequestIe{
+			E2SetupRequestIe: &e2appducontents.E2SetupRequestIe_E2Nccal{
+				E2Nccal: request.componentConfigAdditionList,
 			},
 		},
 	}
+
+	setupRequest = &e2appducontents.E2SetupRequest{
+		ProtocolIes: make([]*e2appducontents.E2SetupRequestIes, 0),
+	}
+
+	setupRequest.SetGlobalE2nodeID(ge2nID).SetRanFunctionsAdded(request.ranFunctions).
+		SetTransactionID(request.transactionID)
+	setupRequest.ProtocolIes = append(setupRequest.ProtocolIes, cal)
 
 	// TODO enable it when it is available
-	/*err = e2SetupRequest.Validate()
+	/*err = setupRequest.Validate()
 	if err != nil {
 		log.Warnf("Validation error %s", err.Error())
 		return nil, err
 	}*/
-	log.Debugf("Created E2SetupRequest %v", e2SetupRequest)
-	return e2SetupRequest, nil
+	log.Debugf("Created E2SetupRequest %v", setupRequest)
+	return setupRequest, nil
 }
