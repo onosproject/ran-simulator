@@ -5,14 +5,17 @@
 package messageformat2
 
 import (
+	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	e2sm_v2_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"google.golang.org/protobuf/proto"
 )
 
 // Message indication message fields for MHO service model
 type Message struct {
-	ueID      string
+	ueID      int64
 	RrcStatus e2sm_mho.Rrcstatus
 }
 
@@ -27,7 +30,7 @@ func NewIndicationMessage(options ...func(msg *Message)) *Message {
 }
 
 // WithUeID sets ueID
-func WithUeID(ueID string) func(message *Message) {
+func WithUeID(ueID int64) func(message *Message) {
 	return func(message *Message) {
 		message.ueID = ueID
 	}
@@ -44,8 +47,38 @@ func WithRrcStatus(rrcStatus e2sm_mho.Rrcstatus) func(message *Message) {
 func (message *Message) Build() (*e2sm_mho.E2SmMhoIndicationMessage, error) {
 	e2SmIndicationMsg := e2sm_mho.E2SmMhoIndicationMessage_IndicationMessageFormat2{
 		IndicationMessageFormat2: &e2sm_mho.E2SmMhoIndicationMessageFormat2{
-			UeId: &e2sm_mho.UeIdentity{
-				Value: []byte(message.ueID),
+			UeId: &e2sm_v2_ies.Ueid{
+				Ueid: &e2sm_v2_ies.Ueid_GNbUeid{
+					GNbUeid: &e2sm_v2_ies.UeidGnb{
+						AmfUeNgapId: &e2sm_v2_ies.AmfUeNgapId{
+							Value: message.ueID,
+						},
+						// ToDo - move out GUAMI hardcoding
+						Guami: &e2sm_v2_ies.Guami{
+							PLmnidentity: &e2sm_v2_ies.PlmnIdentity{
+								Value: []byte{0xAA, 0xBB, 0xCC},
+							},
+							AMfregionId: &e2sm_v2_ies.AmfregionId{
+								Value: &asn1.BitString{
+									Value: []byte{0xDD},
+									Len:   8,
+								},
+							},
+							AMfsetId: &e2sm_v2_ies.AmfsetId{
+								Value: &asn1.BitString{
+									Value: []byte{0xCC, 0xC0},
+									Len:   10,
+								},
+							},
+							AMfpointer: &e2sm_v2_ies.Amfpointer{
+								Value: &asn1.BitString{
+									Value: []byte{0xFC},
+									Len:   6,
+								},
+							},
+						},
+					},
+				},
 			},
 			RrcStatus: message.RrcStatus,
 		},
@@ -55,10 +88,9 @@ func (message *Message) Build() (*e2sm_mho.E2SmMhoIndicationMessage, error) {
 		E2SmMhoIndicationMessage: &e2SmIndicationMsg,
 	}
 
-	//ToDo - return it back once the Validation is functional again
-	//if err := E2SmMhoPdu.Validate(); err != nil {
-	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	//}
+	if err := E2SmMhoPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	}
 	return &E2SmMhoPdu, nil
 
 }

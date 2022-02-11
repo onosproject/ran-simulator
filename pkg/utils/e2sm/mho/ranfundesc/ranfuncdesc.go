@@ -5,7 +5,9 @@
 package ranfundesc
 
 import (
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	"fmt"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	e2sm_v2_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
 )
 
 // RANFunctionDescription ran function description
@@ -77,7 +79,7 @@ func WithRICReportStyleList(ricReportStyleList []*e2sm_mho.RicReportStyleList) f
 // Build builds RAN function description
 func (desc *RANFunctionDescription) Build() (*e2sm_mho.E2SmMhoRanfunctionDescription, error) {
 	e2smMhoPdu := e2sm_mho.E2SmMhoRanfunctionDescription{
-		RanFunctionName: &e2sm_mho.RanfunctionName{
+		RanFunctionName: &e2sm_v2_ies.RanfunctionName{
 			RanFunctionShortName:   desc.ranFunctionShortName,
 			RanFunctionE2SmOid:     desc.ranFunctionE2SmOID,
 			RanFunctionDescription: desc.ranFunctionDescription,
@@ -89,9 +91,8 @@ func (desc *RANFunctionDescription) Build() (*e2sm_mho.E2SmMhoRanfunctionDescrip
 		},
 	}
 
-	//ToDo - return it back once the Validation is functional again
-	//if err := e2smMhoPdu.Validate(); err != nil {
-	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	//}
+	if err := e2smMhoPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	}
 	return &e2smMhoPdu, nil
 }

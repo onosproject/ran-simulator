@@ -5,14 +5,16 @@
 package header
 
 import (
+	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
+	e2sm_v2_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"google.golang.org/protobuf/proto"
 
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
@@ -54,13 +56,13 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 	E2SmMhoPdu := e2sm_mho.E2SmMhoIndicationHeader{
 		E2SmMhoIndicationHeader: &e2sm_mho.E2SmMhoIndicationHeader_IndicationHeaderFormat1{
 			IndicationHeaderFormat1: &e2sm_mho.E2SmMhoIndicationHeaderFormat1{
-				Cgi: &e2sm_mho.CellGlobalId{
-					CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
-						NrCgi: &e2sm_mho.Nrcgi{
-							PLmnIdentity: &e2sm_mho.PlmnIdentity{
+				Cgi: &e2sm_v2_ies.Cgi{
+					Cgi: &e2sm_v2_ies.Cgi_NRCgi{
+						NRCgi: &e2sm_v2_ies.NrCgi{
+							PLmnidentity: &e2sm_v2_ies.PlmnIdentity{
 								Value: header.plmnID.ToBytes(),
 							},
-							NRcellIdentity: &e2sm_mho.NrcellIdentity{
+							NRcellIdentity: &e2sm_v2_ies.NrcellIdentity{
 								Value: &asn1.BitString{
 									//ToDo - should be of type []byte
 									Value: header.nrCellIdentity, //uint64
@@ -74,10 +76,9 @@ func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
 		},
 	}
 
-	//ToDo - return it back once the Validation is functional again
-	//if err := E2SmMhoPdu.Validate(); err != nil {
-	//	return nil, fmt.Errorf("error validating E2SmMhoPDU %s", err.Error())
-	//}
+	if err := E2SmMhoPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmMhoPDU %s", err.Error())
+	}
 	return &E2SmMhoPdu, nil
 
 }
