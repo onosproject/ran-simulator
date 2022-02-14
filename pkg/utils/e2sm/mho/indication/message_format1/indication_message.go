@@ -7,8 +7,8 @@ package messageformat1
 import (
 	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
-	e2sm_v2_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	e2smv2ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"google.golang.org/protobuf/proto"
 )
@@ -16,7 +16,7 @@ import (
 // Message indication message fields for MHO service model
 type Message struct {
 	ueID       int64
-	MeasReport []*e2sm_mho.E2SmMhoMeasurementReportItem
+	MeasReport []*mho.E2SmMhoMeasurementReportItem
 }
 
 // NewIndicationMessage creates a new indication message
@@ -37,40 +37,40 @@ func WithUeID(ueID int64) func(message *Message) {
 }
 
 // WithMeasReport sets measReport
-func WithMeasReport(measReport []*e2sm_mho.E2SmMhoMeasurementReportItem) func(message *Message) {
+func WithMeasReport(measReport []*mho.E2SmMhoMeasurementReportItem) func(message *Message) {
 	return func(message *Message) {
 		message.MeasReport = measReport
 	}
 }
 
 // Build builds indication message for MHO service model
-func (message *Message) Build() (*e2sm_mho.E2SmMhoIndicationMessage, error) {
-	e2SmIndicationMsg := e2sm_mho.E2SmMhoIndicationMessage_IndicationMessageFormat1{
-		IndicationMessageFormat1: &e2sm_mho.E2SmMhoIndicationMessageFormat1{
-			UeId: &e2sm_v2_ies.Ueid{
-				Ueid: &e2sm_v2_ies.Ueid_GNbUeid{
-					GNbUeid: &e2sm_v2_ies.UeidGnb{
-						AmfUeNgapId: &e2sm_v2_ies.AmfUeNgapId{
+func (message *Message) Build() (*mho.E2SmMhoIndicationMessage, error) {
+	e2SmIndicationMsg := mho.E2SmMhoIndicationMessage_IndicationMessageFormat1{
+		IndicationMessageFormat1: &mho.E2SmMhoIndicationMessageFormat1{
+			UeId: &e2smv2ies.Ueid{
+				Ueid: &e2smv2ies.Ueid_GNbUeid{
+					GNbUeid: &e2smv2ies.UeidGnb{
+						AmfUeNgapId: &e2smv2ies.AmfUeNgapId{
 							Value: message.ueID,
 						},
 						// ToDo - move out GUAMI hardcoding
-						Guami: &e2sm_v2_ies.Guami{
-							PLmnidentity: &e2sm_v2_ies.PlmnIdentity{
+						Guami: &e2smv2ies.Guami{
+							PLmnidentity: &e2smv2ies.PlmnIdentity{
 								Value: []byte{0xAA, 0xBB, 0xCC},
 							},
-							AMfregionId: &e2sm_v2_ies.AmfregionId{
+							AMfregionId: &e2smv2ies.AmfregionId{
 								Value: &asn1.BitString{
 									Value: []byte{0xDD},
 									Len:   8,
 								},
 							},
-							AMfsetId: &e2sm_v2_ies.AmfsetId{
+							AMfsetId: &e2smv2ies.AmfsetId{
 								Value: &asn1.BitString{
 									Value: []byte{0xCC, 0xC0},
 									Len:   10,
 								},
 							},
-							AMfpointer: &e2sm_v2_ies.Amfpointer{
+							AMfpointer: &e2smv2ies.Amfpointer{
 								Value: &asn1.BitString{
 									Value: []byte{0xFC},
 									Len:   6,
@@ -84,7 +84,7 @@ func (message *Message) Build() (*e2sm_mho.E2SmMhoIndicationMessage, error) {
 		},
 	}
 
-	E2SmMhoPdu := e2sm_mho.E2SmMhoIndicationMessage{
+	E2SmMhoPdu := mho.E2SmMhoIndicationMessage{
 		E2SmMhoIndicationMessage: &e2SmIndicationMsg,
 	}
 

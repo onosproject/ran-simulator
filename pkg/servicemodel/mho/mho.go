@@ -370,10 +370,6 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 
 		// ToDo - should be reconsidered (not locked on GNb and AmfNGap)
 		imsi := controlMessage.GetControlMessageFormat1().GetUedId().GetGNbUeid().GetAmfUeNgapId().GetValue()
-		//if err != nil {
-		//	log.Error(err)
-		//	return
-		//}
 
 		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNRCgi().GetPLmnidentity().GetValue()
 		plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)

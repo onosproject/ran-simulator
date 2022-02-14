@@ -7,7 +7,7 @@ package mobility
 import (
 	"context"
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"math/rand"
 )
@@ -69,11 +69,11 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 			return
 		}
 
-		if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_IDLE {
+		if ue.RrcState == mho.Rrcstatus_RRCSTATUS_IDLE {
 			rrcStateChanged, err = d.rrcConnected(ctx, imsi, RrcStateChangeVariance)
-		} else if ue.RrcState == e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED {
+		} else if ue.RrcState == mho.Rrcstatus_RRCSTATUS_CONNECTED {
 			rrcStateChanged, err = d.rrcIdle(ctx, imsi, RrcStateChangeVariance)
-		} else { // Ignore e2sm_mho.Rrcstatus_RRCSTATUS_INACTIVE
+		} else { // Ignore mho.Rrcstatus_RRCSTATUS_INACTIVE
 			return
 		}
 
@@ -109,7 +109,7 @@ func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool,
 
 	if rrcStateChanged {
 		log.Infof("RRC state change imsi:%d from CONNECTED to IDLE", imsi)
-		ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+		ue.RrcState = mho.Rrcstatus_RRCSTATUS_IDLE
 		d.cellStore.IncrementRrcIdleCount(ctx, ue.Cell.NCGI)
 		d.cellStore.DecrementRrcConnectedCount(ctx, ue.Cell.NCGI)
 	}
@@ -143,7 +143,7 @@ func (d *driver) rrcConnected(ctx context.Context, imsi types.IMSI, p float64) (
 
 	if rrcStateChanged {
 		log.Infof("RRC state change imsi:%d from IDLE to CONNECTED", imsi)
-		ue.RrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+		ue.RrcState = mho.Rrcstatus_RRCSTATUS_CONNECTED
 		d.cellStore.IncrementRrcConnectedCount(ctx, ue.Cell.NCGI)
 		d.cellStore.DecrementRrcIdleCount(ctx, ue.Cell.NCGI)
 	}

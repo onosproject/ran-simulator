@@ -7,14 +7,14 @@ package header
 import (
 	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
-	e2sm_v2_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
+	e2smv2ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 
 	"google.golang.org/protobuf/proto"
 
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
@@ -52,17 +52,17 @@ func WithNrcellIdentity(nrCellIdentity []byte) func(header *Header) {
 }
 
 // Build builds indication header for mho service model
-func (header *Header) Build() (*e2sm_mho.E2SmMhoIndicationHeader, error) {
-	E2SmMhoPdu := e2sm_mho.E2SmMhoIndicationHeader{
-		E2SmMhoIndicationHeader: &e2sm_mho.E2SmMhoIndicationHeader_IndicationHeaderFormat1{
-			IndicationHeaderFormat1: &e2sm_mho.E2SmMhoIndicationHeaderFormat1{
-				Cgi: &e2sm_v2_ies.Cgi{
-					Cgi: &e2sm_v2_ies.Cgi_NRCgi{
-						NRCgi: &e2sm_v2_ies.NrCgi{
-							PLmnidentity: &e2sm_v2_ies.PlmnIdentity{
+func (header *Header) Build() (*mho.E2SmMhoIndicationHeader, error) {
+	E2SmMhoPdu := mho.E2SmMhoIndicationHeader{
+		E2SmMhoIndicationHeader: &mho.E2SmMhoIndicationHeader_IndicationHeaderFormat1{
+			IndicationHeaderFormat1: &mho.E2SmMhoIndicationHeaderFormat1{
+				Cgi: &e2smv2ies.Cgi{
+					Cgi: &e2smv2ies.Cgi_NRCgi{
+						NRCgi: &e2smv2ies.NrCgi{
+							PLmnidentity: &e2smv2ies.PlmnIdentity{
 								Value: header.plmnID.ToBytes(),
 							},
-							NRcellIdentity: &e2sm_v2_ies.NrcellIdentity{
+							NRcellIdentity: &e2smv2ies.NrcellIdentity{
 								Value: &asn1.BitString{
 									//ToDo - should be of type []byte
 									Value: header.nrCellIdentity, //uint64

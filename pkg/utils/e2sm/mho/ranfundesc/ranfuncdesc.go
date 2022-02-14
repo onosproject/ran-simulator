@@ -6,8 +6,8 @@ package ranfundesc
 
 import (
 	"fmt"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
-	e2sm_v2_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	e2smv2ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
 )
 
 // RANFunctionDescription ran function description
@@ -16,8 +16,8 @@ type RANFunctionDescription struct {
 	ranFunctionE2SmOID       string
 	ranFunctionDescription   string
 	ranFunctionInstance      int32
-	ricEventTriggerStyleList []*e2sm_mho.RicEventTriggerStyleList
-	ricReportStyleList       []*e2sm_mho.RicReportStyleList
+	ricEventTriggerStyleList []*mho.RicEventTriggerStyleList
+	ricReportStyleList       []*mho.RicReportStyleList
 }
 
 // NewRANFunctionDescription creates a  new RAN function description
@@ -61,7 +61,7 @@ func WithRANFunctionInstance(instance int32) func(description *RANFunctionDescri
 }
 
 // WithRICEventTriggerStyleList sets RIC event trigger style list
-func WithRICEventTriggerStyleList(ricEventTriggerStyleList []*e2sm_mho.RicEventTriggerStyleList) func(description *RANFunctionDescription) {
+func WithRICEventTriggerStyleList(ricEventTriggerStyleList []*mho.RicEventTriggerStyleList) func(description *RANFunctionDescription) {
 	return func(description *RANFunctionDescription) {
 		description.ricEventTriggerStyleList = ricEventTriggerStyleList
 
@@ -69,7 +69,7 @@ func WithRICEventTriggerStyleList(ricEventTriggerStyleList []*e2sm_mho.RicEventT
 }
 
 // WithRICReportStyleList sets RIC report style list
-func WithRICReportStyleList(ricReportStyleList []*e2sm_mho.RicReportStyleList) func(description *RANFunctionDescription) {
+func WithRICReportStyleList(ricReportStyleList []*mho.RicReportStyleList) func(description *RANFunctionDescription) {
 	return func(description *RANFunctionDescription) {
 		description.ricReportStyleList = ricReportStyleList
 
@@ -77,15 +77,15 @@ func WithRICReportStyleList(ricReportStyleList []*e2sm_mho.RicReportStyleList) f
 }
 
 // Build builds RAN function description
-func (desc *RANFunctionDescription) Build() (*e2sm_mho.E2SmMhoRanfunctionDescription, error) {
-	e2smMhoPdu := e2sm_mho.E2SmMhoRanfunctionDescription{
-		RanFunctionName: &e2sm_v2_ies.RanfunctionName{
+func (desc *RANFunctionDescription) Build() (*mho.E2SmMhoRanfunctionDescription, error) {
+	e2smMhoPdu := mho.E2SmMhoRanfunctionDescription{
+		RanFunctionName: &e2smv2ies.RanfunctionName{
 			RanFunctionShortName:   desc.ranFunctionShortName,
 			RanFunctionE2SmOid:     desc.ranFunctionE2SmOID,
 			RanFunctionDescription: desc.ranFunctionDescription,
 			RanFunctionInstance:    &desc.ranFunctionInstance,
 		},
-		E2SmMhoRanfunctionItem: &e2sm_mho.E2SmMhoRanfunctionDescription_E2SmMhoRanfunctionItem001{
+		E2SmMhoRanfunctionItem: &mho.E2SmMhoRanfunctionDescription_E2SmMhoRanfunctionItem001{
 			RicEventTriggerStyleList: desc.ricEventTriggerStyleList,
 			RicReportStyleList:       desc.ricReportStyleList,
 		},

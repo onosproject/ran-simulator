@@ -6,7 +6,7 @@ package ues
 
 import (
 	"context"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"math/rand"
 	"sync"
 
@@ -212,21 +212,21 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			log.Error(err)
 		}
 		ncgi := randomCell.NCGI
-		var rrcState e2sm_mho.Rrcstatus
+		var rrcState mho.Rrcstatus
 		if s.initialRrcState == "connected" || s.initialRrcState == "idle" {
 			if s.initialRrcState == "idle" {
-				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+				rrcState = mho.Rrcstatus_RRCSTATUS_IDLE
 				s.cellStore.IncrementRrcIdleCount(ctx, ncgi)
 			} else {
-				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+				rrcState = mho.Rrcstatus_RRCSTATUS_CONNECTED
 				s.cellStore.IncrementRrcConnectedCount(ctx, ncgi)
 			}
 		} else {
 			if randomBoolean() {
-				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_IDLE
+				rrcState = mho.Rrcstatus_RRCSTATUS_IDLE
 				s.cellStore.IncrementRrcIdleCount(ctx, ncgi)
 			} else {
-				rrcState = e2sm_mho.Rrcstatus_RRCSTATUS_CONNECTED
+				rrcState = mho.Rrcstatus_RRCSTATUS_CONNECTED
 				s.cellStore.IncrementRrcConnectedCount(ctx, ncgi)
 			}
 		}
