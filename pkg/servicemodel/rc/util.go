@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 
 	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
 
@@ -28,7 +29,14 @@ import (
 
 func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlMessage, error) {
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
-	controlMessageProtoBytes, err := rcPreServiceModel.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
+	var controlMessageAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRiccontrolMessage) {
+			controlMessageAsnBytes = v.GetValue().GetRcm().GetValue()
+			break
+		}
+	}
+	controlMessageProtoBytes, err := rcPreServiceModel.ControlMessageASN1toProto(controlMessageAsnBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +51,14 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 
 func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2smrcpreies.E2SmRcPreControlHeader, error) {
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
-	controlHeaderProtoBytes, err := rcPreServiceModel.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
+	var controlHeaderAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRiccontrolHeader) {
+			controlHeaderAsnBytes = v.GetValue().GetRch().GetValue()
+			break
+		}
+	}
+	controlHeaderProtoBytes, err := rcPreServiceModel.ControlHeaderASN1toProto(controlHeaderAsnBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +73,13 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 
 // getEventTriggerType extracts event trigger type
 func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2smrcpreies.RcPreTriggerType, error) {
-	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
+	var eventTriggerAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
+			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			break
+		}
+	}
 
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
 	eventTriggerProtoBytes, err := rcPreServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
@@ -123,7 +144,13 @@ func (sm *Client) getCellSize(ctx context.Context, ncgi ransimtypes.NCGI) (strin
 
 // getReportPeriod extracts report period
 func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (uint32, error) {
-	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
+	var eventTriggerAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
+			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			break
+		}
+	}
 
 	var rcPreServiceModel e2smrcpresm.RcPreServiceModel
 	eventTriggerProtoBytes, err := rcPreServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)

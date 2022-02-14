@@ -6,17 +6,15 @@ package mho
 
 import (
 	"context"
+	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	"github.com/onosproject/ran-simulator/pkg/utils"
-	"strconv"
-
-	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	"github.com/onosproject/rrm-son-lib/pkg/handover"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/pdubuilder"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
@@ -92,12 +90,18 @@ func NewServiceModel(node model.Node, model *model.Model,
 	var ricIndicationMessageFormatType int32 = 1
 
 	ricEventTriggerStyleList := make([]*e2sm_mho.RicEventTriggerStyleList, 0)
-	ricEventTriggerItem1 := pdubuilder.CreateRicEventTriggerStyleItem(ricEventStyleType, ricEventStyleName, ricEventFormatType)
+	ricEventTriggerItem1, err := pdubuilder.CreateRicEventTriggerStyleItem(ricEventStyleType, ricEventStyleName, ricEventFormatType)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
 	ricEventTriggerStyleList = append(ricEventTriggerStyleList, ricEventTriggerItem1)
 
 	ricReportStyleList := make([]*e2sm_mho.RicReportStyleList, 0)
-	ricReportStyleItem1 := pdubuilder.CreateRicReportStyleItem(ricReportStyleType, ricReportStyleName, ricIndicationHeaderFormatType,
+	ricReportStyleItem1, err := pdubuilder.CreateRicReportStyleItem(ricReportStyleType, ricReportStyleName, ricIndicationHeaderFormatType,
 		ricIndicationMessageFormatType)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
 	ricReportStyleList = append(ricReportStyleList, ricReportStyleItem1)
 
 	ranFuncDescPdu, err := ranfundesc.NewRANFunctionDescription(
@@ -144,9 +148,18 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	ricActionsNotAdmitted := make(map[e2aptypes.RicActionID]*e2apies.Cause)
 	actionList := subutils.GetRicActionToBeSetupList(request)
-	reqID := subutils.GetRequesterID(request)
-	ranFuncID := subutils.GetRanFunctionID(request)
-	ricInstanceID := subutils.GetRicInstanceID(request)
+	reqID, err := subutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := subutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := subutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	log.Debugf("MHO subscription, action list: %v", actionList)
 	log.Debugf("MHO subscription, requester id: %v", reqID)
@@ -155,8 +168,8 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 
 	for _, action := range actionList {
 		log.Debugf("MHO subscription action: %v", action)
-		actionID := e2aptypes.RicActionID(action.Value.RicActionId.Value)
-		actionType := action.Value.RicActionType
+		actionID := e2aptypes.RicActionID(action.GetValue().GetRatbsi().GetRicActionId().GetValue())
+		actionType := action.GetValue().GetRatbsi().GetRicActionType()
 		// mho service model supports report and insert action and should be added to the
 		// list of accepted actions
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT ||
@@ -184,9 +197,9 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -204,9 +217,9 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -216,9 +229,9 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 	}
 
 	subscription := subutils.NewSubscription(
-		subutils.WithRequestID(reqID),
-		subutils.WithRanFuncID(ranFuncID),
-		subutils.WithRicInstanceID(ricInstanceID),
+		subutils.WithRequestID(*reqID),
+		subutils.WithRanFuncID(*ranFuncID),
+		subutils.WithRicInstanceID(*ricInstanceID),
 		subutils.WithActionsAccepted(ricActionsAccepted),
 		subutils.WithActionsNotAdmitted(ricActionsNotAdmitted))
 	response, err = subscription.BuildSubscriptionResponse()
@@ -230,9 +243,9 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -286,10 +299,19 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 // RICSubscriptionDelete implements subscription delete handler for MHO service model
 func (m *Mho) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	log.Infof("Ric subscription delete request is received for service model %v and e2 node with ID: %d", m.ServiceModel.ModelName, m.ServiceModel.Node.GnbID)
-	reqID := subdeleteutils.GetRequesterID(request)
-	ranFuncID := subdeleteutils.GetRanFunctionID(request)
-	ricInstanceID := subdeleteutils.GetRicInstanceID(request)
-	subID := subscriptions.NewID(ricInstanceID, reqID, ranFuncID)
+	reqID, err := subdeleteutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := subdeleteutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := subdeleteutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	subID := subscriptions.NewID(*ricInstanceID, *reqID, *ranFuncID)
 	sub, err := m.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
 		return nil, nil, err
@@ -308,9 +330,9 @@ func (m *Mho) RICSubscriptionDelete(ctx context.Context, request *e2appducontent
 	}
 	eventTriggerType := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().TriggerType
 	subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
-		subdeleteutils.WithRequestID(reqID),
-		subdeleteutils.WithRanFuncID(ranFuncID),
-		subdeleteutils.WithRicInstanceID(ricInstanceID))
+		subdeleteutils.WithRequestID(*reqID),
+		subdeleteutils.WithRanFuncID(*ranFuncID),
+		subdeleteutils.WithRicInstanceID(*ricInstanceID))
 	response, err = subscriptionDelete.BuildSubscriptionDeleteResponse()
 	if err != nil {
 		return nil, nil, err
@@ -346,16 +368,12 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 
 	go func() {
 
-		// ToDo - should be reconsidered
-		imsi, err := strconv.Atoi(string(controlMessage.GetControlMessageFormat1().GetUedId().GetValue()))
-		if err != nil {
-			log.Error(err)
-			return
-		}
+		// ToDo - should be reconsidered (not locked on GNb and AmfNGap)
+		imsi := controlMessage.GetControlMessageFormat1().GetUedId().GetGNbUeid().GetAmfUeNgapId().GetValue()
 
-		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetPLmnIdentity().GetValue()
+		plmnIDBytes := controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNRCgi().GetPLmnidentity().GetValue()
 		plmnID := ransimtypes.Uint24ToUint32(plmnIDBytes)
-		nci := utils.NewNCellIDWithBytes(controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNrCgi().GetNRcellIdentity().GetValue().GetValue())
+		nci := utils.NewNCellIDWithBytes(controlMessage.GetControlMessageFormat1().GetTargetCgi().GetNRCgi().GetNRcellIdentity().GetValue().GetValue())
 		tCellNcgi := ransimtypes.ToNCGI(ransimtypes.PlmnID(plmnID), ransimtypes.NCI(nci.Uint64()))
 		tCell := &model.UECell{
 			ID:   types.GnbID(tCellNcgi),
@@ -364,13 +382,22 @@ func (m *Mho) RICControl(ctx context.Context, request *e2appducontents.Riccontro
 		m.mobilityDriver.Handover(ctx, types.IMSI(imsi), tCell)
 	}()
 
-	reqID := controlutils.GetRequesterID(request)
-	ranFuncID := controlutils.GetRanFunctionID(request)
-	ricInstanceID := controlutils.GetRicInstanceID(request)
+	reqID, err := controlutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := controlutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := controlutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
 	response, err = controlutils.NewControl(
-		controlutils.WithRanFuncID(ranFuncID),
-		controlutils.WithRequestID(reqID),
-		controlutils.WithRicInstanceID(ricInstanceID)).BuildControlAcknowledge()
+		controlutils.WithRanFuncID(*ranFuncID),
+		controlutils.WithRequestID(*reqID),
+		controlutils.WithRicInstanceID(*ricInstanceID)).BuildControlAcknowledge()
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err

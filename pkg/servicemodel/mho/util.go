@@ -7,14 +7,23 @@ package mho
 import (
 	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	"google.golang.org/protobuf/proto"
 )
 
 func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlMessage, error) {
 	var mhoServiceModel e2smmhosm.MhoServiceModel
-	controlMessageProtoBytes, err := mhoServiceModel.ControlMessageASN1toProto(request.ProtocolIes.E2ApProtocolIes23.Value.Value)
+	var controlMessageAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRiccontrolMessage) {
+			controlMessageAsnBytes = v.GetValue().GetRch().GetValue()
+			break
+		}
+	}
+
+	controlMessageProtoBytes, err := mhoServiceModel.ControlMessageASN1toProto(controlMessageAsnBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +38,15 @@ func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2
 
 func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2sm_mho.E2SmMhoControlHeader, error) {
 	var mhoServiceModel e2smmhosm.MhoServiceModel
-	controlHeaderProtoBytes, err := mhoServiceModel.ControlHeaderASN1toProto(request.ProtocolIes.E2ApProtocolIes22.Value.Value)
+	var controlHeaderAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRiccontrolHeader) {
+			controlHeaderAsnBytes = v.GetValue().GetRch().GetValue()
+			break
+		}
+	}
+
+	controlHeaderProtoBytes, err := mhoServiceModel.ControlHeaderASN1toProto(controlHeaderAsnBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +61,13 @@ func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2s
 
 // getEventTriggerType extracts event trigger type
 func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionRequest) (e2sm_mho.MhoTriggerType, error) {
-	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
+	var eventTriggerAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
+			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			break
+		}
+	}
 
 	var mhoServiceModel e2smmhosm.MhoServiceModel
 	eventTriggerProtoBytes, err := mhoServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)
@@ -62,7 +85,13 @@ func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionReques
 
 // getReportPeriod extracts report period
 func (m *Mho) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (int32, error) {
-	eventTriggerAsnBytes := request.ProtocolIes.E2ApProtocolIes30.Value.RicEventTriggerDefinition.Value
+	var eventTriggerAsnBytes []byte
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
+			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			break
+		}
+	}
 
 	var mhoServiceModel e2smmhosm.MhoServiceModel
 	eventTriggerProtoBytes, err := mhoServiceModel.EventTriggerDefinitionASN1toProto(eventTriggerAsnBytes)

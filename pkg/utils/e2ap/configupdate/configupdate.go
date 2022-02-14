@@ -6,7 +6,6 @@ package configupdate
 
 import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	"github.com/onosproject/onos-e2t/api/e2ap/v2"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 
 	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
@@ -75,25 +74,10 @@ func (c *ConfigurationUpdate) Build() (*e2appducontents.E2NodeConfigurationUpdat
 		},
 	}
 
-	configUpdateNodeID := &e2appducontents.E2NodeConfigurationUpdateIes_E2NodeConfigurationUpdateIes3{
-		Id:          int32(v2.ProtocolIeIDGlobalE2nodeID),
-		Presence:    int32(e2apcommondatatypes.Presence_PRESENCE_MANDATORY),
-		Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
-		Value:       gE2NodeID,
-	}
-
 	configUpdate := &e2appducontents.E2NodeConfigurationUpdate{
-		ProtocolIes: &e2appducontents.E2NodeConfigurationUpdateIes{
-			E2ApProtocolIes49: &e2appducontents.E2NodeConfigurationUpdateIes_E2NodeConfigurationUpdateIes49{
-				Id:          int32(v2.ProtocolIeIDTransactionID),
-				Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
-				Value: &e2apies.TransactionId{
-					Value: c.transactionID,
-				},
-				Presence: int32(e2apcommondatatypes.Presence_PRESENCE_MANDATORY),
-			},
-			E2ApProtocolIes3: configUpdateNodeID,
-		},
+		ProtocolIes: make([]*e2appducontents.E2NodeConfigurationUpdateIes, 0),
 	}
+	configUpdate.SetTransactionID(c.transactionID).SetGlobalE2nodeID(gE2NodeID)
+
 	return configUpdate, nil
 }

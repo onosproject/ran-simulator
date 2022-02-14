@@ -5,15 +5,18 @@
 package messageformat2
 
 import (
+	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	e2smv2ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"google.golang.org/protobuf/proto"
 )
 
 // Message indication message fields for MHO service model
 type Message struct {
-	ueID      string
-	RrcStatus e2sm_mho.Rrcstatus
+	ueID      int64
+	RrcStatus mho.Rrcstatus
 }
 
 // NewIndicationMessage creates a new indication message
@@ -27,38 +30,67 @@ func NewIndicationMessage(options ...func(msg *Message)) *Message {
 }
 
 // WithUeID sets ueID
-func WithUeID(ueID string) func(message *Message) {
+func WithUeID(ueID int64) func(message *Message) {
 	return func(message *Message) {
 		message.ueID = ueID
 	}
 }
 
 // WithRrcStatus sets RrcStatus
-func WithRrcStatus(rrcStatus e2sm_mho.Rrcstatus) func(message *Message) {
+func WithRrcStatus(rrcStatus mho.Rrcstatus) func(message *Message) {
 	return func(message *Message) {
 		message.RrcStatus = rrcStatus
 	}
 }
 
 // Build builds indication message for MHO service model
-func (message *Message) Build() (*e2sm_mho.E2SmMhoIndicationMessage, error) {
-	e2SmIndicationMsg := e2sm_mho.E2SmMhoIndicationMessage_IndicationMessageFormat2{
-		IndicationMessageFormat2: &e2sm_mho.E2SmMhoIndicationMessageFormat2{
-			UeId: &e2sm_mho.UeIdentity{
-				Value: []byte(message.ueID),
+func (message *Message) Build() (*mho.E2SmMhoIndicationMessage, error) {
+	e2SmIndicationMsg := mho.E2SmMhoIndicationMessage_IndicationMessageFormat2{
+		IndicationMessageFormat2: &mho.E2SmMhoIndicationMessageFormat2{
+			UeId: &e2smv2ies.Ueid{
+				Ueid: &e2smv2ies.Ueid_GNbUeid{
+					GNbUeid: &e2smv2ies.UeidGnb{
+						AmfUeNgapId: &e2smv2ies.AmfUeNgapId{
+							Value: message.ueID,
+						},
+						// ToDo - move out GUAMI hardcoding
+						Guami: &e2smv2ies.Guami{
+							PLmnidentity: &e2smv2ies.PlmnIdentity{
+								Value: []byte{0xAA, 0xBB, 0xCC},
+							},
+							AMfregionId: &e2smv2ies.AmfregionId{
+								Value: &asn1.BitString{
+									Value: []byte{0xDD},
+									Len:   8,
+								},
+							},
+							AMfsetId: &e2smv2ies.AmfsetId{
+								Value: &asn1.BitString{
+									Value: []byte{0xCC, 0xC0},
+									Len:   10,
+								},
+							},
+							AMfpointer: &e2smv2ies.Amfpointer{
+								Value: &asn1.BitString{
+									Value: []byte{0xFC},
+									Len:   6,
+								},
+							},
+						},
+					},
+				},
 			},
 			RrcStatus: message.RrcStatus,
 		},
 	}
 
-	E2SmMhoPdu := e2sm_mho.E2SmMhoIndicationMessage{
+	E2SmMhoPdu := mho.E2SmMhoIndicationMessage{
 		E2SmMhoIndicationMessage: &e2SmIndicationMsg,
 	}
 
-	//ToDo - return it back once the Validation is functional again
-	//if err := E2SmMhoPdu.Validate(); err != nil {
-	//	return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
-	//}
+	if err := E2SmMhoPdu.Validate(); err != nil {
+		return nil, fmt.Errorf("error validating E2SmPDU %s", err.Error())
+	}
 	return &E2SmMhoPdu, nil
 
 }

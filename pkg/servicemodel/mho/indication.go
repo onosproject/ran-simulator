@@ -7,7 +7,8 @@ package mho
 import (
 	"context"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v1/e2sm-mho-go"
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
+	e2sm_v2_ies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-v2-ies"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
@@ -17,7 +18,6 @@ import (
 	indHdr "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/header"
 	indMsgFmt1 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format1"
 	indMsgFmt2 "github.com/onosproject/ran-simulator/pkg/utils/e2sm/mho/indication/message_format2"
-	"strconv"
 )
 
 func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subscription) error {
@@ -154,13 +154,13 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 
 	// add serving cell to measReport
 	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
-		Cgi: &e2sm_mho.CellGlobalId{
-			CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
-				NrCgi: &e2sm_mho.Nrcgi{
-					PLmnIdentity: &e2sm_mho.PlmnIdentity{
+		Cgi: &e2sm_v2_ies.Cgi{
+			Cgi: &e2sm_v2_ies.Cgi_NRCgi{
+				NRCgi: &e2sm_v2_ies.NrCgi{
+					PLmnidentity: &e2sm_v2_ies.PlmnIdentity{
 						Value: plmnID.ToBytes(),
 					},
-					NRcellIdentity: &e2sm_mho.NrcellIdentity{
+					NRcellIdentity: &e2sm_v2_ies.NrcellIdentity{
 						Value: &asn1.BitString{
 							Value: nrCellIDTypeNCI.Bytes(),
 							Len:   36,
@@ -178,13 +178,13 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		ncgiTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(cell.NCGI)))
 
 		measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
-			Cgi: &e2sm_mho.CellGlobalId{
-				CellGlobalId: &e2sm_mho.CellGlobalId_NrCgi{
-					NrCgi: &e2sm_mho.Nrcgi{
-						PLmnIdentity: &e2sm_mho.PlmnIdentity{
+			Cgi: &e2sm_v2_ies.Cgi{
+				Cgi: &e2sm_v2_ies.Cgi_NRCgi{
+					NRCgi: &e2sm_v2_ies.NrCgi{
+						PLmnidentity: &e2sm_v2_ies.PlmnIdentity{
 							Value: plmnID.ToBytes(),
 						},
-						NRcellIdentity: &e2sm_mho.NrcellIdentity{
+						NRcellIdentity: &e2sm_v2_ies.NrcellIdentity{
 							Value: &asn1.BitString{
 								Value: ncgiTypeNCI.Bytes(),
 								Len:   36,
@@ -199,7 +199,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		})
 	}
 
-	ueID := strconv.Itoa(int(ue.IMSI))
+	ueID := int64(ue.IMSI)
 
 	log.Debugf("MHO measurement report for ueID %s: %v", ueID, measReport)
 
@@ -221,7 +221,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 func (m *Mho) createIndicationMsgFormat2(ue *model.UE) ([]byte, error) {
 	log.Debugf("Create MHO RRC indication message ueID: %d", ue.IMSI)
 
-	ueID := strconv.Itoa(int(ue.IMSI))
+	ueID := int64(ue.IMSI)
 
 	indicationMessage := indMsgFmt2.NewIndicationMessage(
 		indMsgFmt2.WithUeID(ueID),

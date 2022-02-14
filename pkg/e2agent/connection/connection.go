@@ -112,21 +112,36 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	log.Info("Received Connection Update request %v", request)
 	connectionUpdateItemIes := make([]*e2appducontents.E2ConnectionUpdateItemIes, 0)
 	connectionSetupFailedItemIes := make([]*e2appducontents.E2ConnectionSetupFailedItemIes, 0)
-	// E2 Connection To Add list IE
-	ies44 := request.GetProtocolIes().GetE2ApProtocolIes44()
-	// E2 Connection To Modify list IE
-	ies45 := request.GetProtocolIes().GetE2ApProtocolIes45()
-	// E2 Connection Remove list IE
-	ies46 := request.GetProtocolIes().GetE2ApProtocolIes46()
-	// Transaction ID IE
-	ies49 := request.GetProtocolIes().GetE2ApProtocolIes49()
+
+	var ies44 *e2appducontents.E2ConnectionUpdateList
+	var ies45 *e2appducontents.E2ConnectionUpdateList
+	var ies46 *e2appducontents.E2ConnectionUpdateRemoveList
+	var trID int32
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDE2connectionUpdateAdd) {
+			// E2 Connection To Add list IE
+			ies44 = v.GetValue().GetE2Cul()
+		}
+		if v.Id == int32(v2.ProtocolIeIDE2connectionUpdateModify) {
+			// E2 Connection To Modify list IE
+			ies45 = v.GetValue().GetE2Cul()
+		}
+		if v.Id == int32(v2.ProtocolIeIDE2connectionUpdateRemove) {
+			// E2 Connection Remove list IE
+			ies46 = v.GetValue().GetE2Curl()
+		}
+		if v.Id == int32(v2.ProtocolIeIDTransactionID) {
+			// Transaction ID IE
+			trID = v.GetValue().GetTrId().GetValue()
+		}
+	}
 
 	// In case the E2 Node receives a E2 CONNECTION UPDATE message without any
 	// IE except for Message Type IE and Transaction ID IE, it shall reply with the E2 CONNECTION
 	//ACKNOWLEDGE message without performing any updates to the existing connections.
 	if ies44 == nil && ies45 == nil && ies46 == nil {
 		ack := connectionupdate.NewConnectionUpdate(
-			connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+			connectionupdate.WithTransactionID(trID)).
 			BuildConnectionUpdateAcknowledge()
 		return ack, nil, nil
 
@@ -137,135 +152,128 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	//  then the E2 Node shall, if supported, use it to establish additional TNL Association(s) and configure
 	// for use for RIC services and/or E2 support functions according to the TNL Association Usage IE in the message.
 	if ies44 != nil {
-		connectionUpdateList := ies44.Value
-		if connectionUpdateList != nil {
-			log.Debugf("Adding new connections: %+v", connectionUpdateList)
-			connectionUpdateItems := connectionUpdateList.Value
-			for _, connectionUpdateItem := range connectionUpdateItems {
-				tnlInfo := connectionUpdateItem.GetValue().GetTnlInformation()
-				tnlUsage := connectionUpdateItem.GetValue().GetTnlUsage()
-				// TODO handle tnlUsage
+		log.Debugf("Adding new connections: %+v", ies44.GetValue())
+		connectionUpdateItems := ies44.GetValue()
+		for _, connectionUpdateItem := range connectionUpdateItems {
+			tnlInfo := connectionUpdateItem.GetValue().GetE2Curi().GetTnlInformation()
+			tnlUsage := connectionUpdateItem.GetValue().GetE2Curi().GetTnlUsage()
+			// TODO handle tnlUsage
 
-				ricAddress = e.getRICAddress(tnlInfo)
-				log.Debugf("RIC and IP and Port information: %v:%v", ricAddress.IPAddress, ricAddress.Port)
+			ricAddress = e.getRICAddress(tnlInfo)
+			log.Debugf("RIC and IP and Port information: %v:%v", ricAddress.IPAddress, ricAddress.Port)
 
-				if ricAddress.IPAddress == nil {
-					cause := &e2apies.Cause{
-						Cause: &e2apies.Cause_Protocol{
-							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
-						},
-					}
-					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
-						connectionupdate.WithCause(cause),
-						connectionupdate.WithTransactionID(ies49.GetValue().Value),
-						connectionupdate.WithTimeToWait(nil)).
-						BuildConnectionUpdateFailure()
-					return nil, connectionUpdateFailure, nil
-
-				}
-
-				// Adds a new connection in Connecting state
-				// to the connection store to trigger reconciliation of a connection
-				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
-				_, err := e.connectionStore.Get(ctx, connectionID)
-				if err == nil {
-					log.Debugf("Connection %s does exist", connectionID)
-					continue
-				}
-
-				connection := &connections.Connection{
-					ID: connectionID,
-					Status: connections.ConnectionStatus{
-						Phase: connections.Open,
-						State: connections.Connecting,
+			if ricAddress.IPAddress == nil {
+				cause := &e2apies.Cause{
+					Cause: &e2apies.Cause_Protocol{
+						Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
 					},
 				}
-
-				err = e.connectionStore.Add(ctx, connectionID, connection)
-				if err != nil {
-					// If connection is not established then creates a connection setup failed item IE
-					// to be reported in ACK
-					connSetupFailedItemIe := connectionsetupfaileditem.NewConnectionSetupFailedItemIe(
-						connectionsetupfaileditem.WithTnlInfo(tnlInfo)).
-						BuildConnectionSetupFailedItemIes()
-					connectionSetupFailedItemIes = append(connectionSetupFailedItemIes, connSetupFailedItemIe)
-				}
-
-				// If connection is established successfully, creates a connection update item IE
-				// to be used in ACK
-				connUpdateItemIe := connectionupdateitem.NewConnectionUpdateItemIe(
-					connectionupdateitem.WithTnlInfo(tnlInfo),
-					connectionupdateitem.WithTnlUsage(tnlUsage)).
-					BuildConnectionUpdateItemIes()
-				connectionUpdateItemIes = append(connectionUpdateItems, connUpdateItemIe)
+				connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+					connectionupdate.WithCause(cause),
+					connectionupdate.WithTransactionID(trID),
+					connectionupdate.WithTimeToWait(nil)).
+					BuildConnectionUpdateFailure()
+				return nil, connectionUpdateFailure, nil
 
 			}
+
+			// Adds a new connection in Connecting state
+			// to the connection store to trigger reconciliation of a connection
+			connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
+			_, err := e.connectionStore.Get(ctx, connectionID)
+			if err == nil {
+				log.Debugf("Connection %s does exist", connectionID)
+				continue
+			}
+
+			connection := &connections.Connection{
+				ID: connectionID,
+				Status: connections.ConnectionStatus{
+					Phase: connections.Open,
+					State: connections.Connecting,
+				},
+			}
+
+			err = e.connectionStore.Add(ctx, connectionID, connection)
+			if err != nil {
+				// If connection is not established then creates a connection setup failed item IE
+				// to be reported in ACK
+				connSetupFailedItemIe := connectionsetupfaileditem.NewConnectionSetupFailedItemIe(
+					connectionsetupfaileditem.WithTnlInfo(tnlInfo)).
+					BuildConnectionSetupFailedItemIes()
+				connectionSetupFailedItemIes = append(connectionSetupFailedItemIes, connSetupFailedItemIe)
+			}
+
+			// If connection is established successfully, creates a connection update item IE
+			// to be used in ACK
+			connUpdateItemIe := connectionupdateitem.NewConnectionUpdateItemIe(
+				connectionupdateitem.WithTnlInfo(tnlInfo),
+				connectionupdateitem.WithTnlUsage(tnlUsage)).
+				BuildConnectionUpdateItemIes()
+			connectionUpdateItemIes = append(connectionUpdateItems, connUpdateItemIe)
 
 		}
 	}
 
 	// remove connections
 	if ies46 != nil {
-		connectionRemoveList := ies46.Value
-		if connectionRemoveList != nil {
-			log.Debugf("Removing connections: %+v", connectionRemoveList)
-			connectionUpdateRemoveItems := connectionRemoveList.GetValue()
-			for _, connectionUpdateRemoveItem := range connectionUpdateRemoveItems {
-				tnlInfo := connectionUpdateRemoveItem.GetValue().GetTnlInformation()
-				ricAddress = e.getRICAddress(tnlInfo)
-				if ricAddress.IPAddress == nil {
+		log.Debugf("Removing connections: %+v", ies46)
+		connectionUpdateRemoveItems := ies46.GetValue()
+		for _, connectionUpdateRemoveItem := range connectionUpdateRemoveItems {
+			tnlInfo := connectionUpdateRemoveItem.GetValue().GetE2Curi().GetTnlInformation()
+			ricAddress = e.getRICAddress(tnlInfo)
+			if ricAddress.IPAddress == nil {
+				cause := &e2apies.Cause{
+					Cause: &e2apies.Cause_Protocol{
+						Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
+					},
+				}
+				connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+					connectionupdate.WithCause(cause),
+					connectionupdate.WithTransactionID(trID)).
+					BuildConnectionUpdateFailure()
+				return nil, connectionUpdateFailure, nil
+
+			}
+
+			connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
+			connection, err := e.connectionStore.Get(ctx, connectionID)
+
+			if err != nil {
+				log.Warn(err)
+				if !errors.IsNotFound(err) {
 					cause := &e2apies.Cause{
 						Cause: &e2apies.Cause_Protocol{
-							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_ABSTRACT_SYNTAX_ERROR_FALSELY_CONSTRUCTED_MESSAGE,
+							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
 						},
 					}
 					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
 						connectionupdate.WithCause(cause),
-						connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+						connectionupdate.WithTransactionID(trID)).
 						BuildConnectionUpdateFailure()
 					return nil, connectionUpdateFailure, nil
-
 				}
+				connUpdateItemIe := connectionupdateitem.NewConnectionUpdateItemIe(
+					connectionupdateitem.WithTnlInfo(tnlInfo)).
+					BuildConnectionUpdateItemIes()
+				connectionUpdateItemIes = append(connectionUpdateItemIes, connUpdateItemIe)
 
-				connectionID := connections.NewConnectionID(ricAddress.IPAddress.String(), ricAddress.Port)
-				connection, err := e.connectionStore.Get(ctx, connectionID)
-
+			} else {
+				connection.Status.Phase = connections.Closed
+				connection.Status.State = connections.Disconnecting
+				err = e.connectionStore.Update(ctx, connection)
 				if err != nil {
 					log.Warn(err)
-					if !errors.IsNotFound(err) {
-						cause := &e2apies.Cause{
-							Cause: &e2apies.Cause_Protocol{
-								Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
-							},
-						}
-						connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
-							connectionupdate.WithCause(cause),
-							connectionupdate.WithTransactionID(ies49.GetValue().Value)).
-							BuildConnectionUpdateFailure()
-						return nil, connectionUpdateFailure, nil
+					cause := &e2apies.Cause{
+						Cause: &e2apies.Cause_Protocol{
+							Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
+						},
 					}
-					connUpdateItemIe := connectionupdateitem.NewConnectionUpdateItemIe(
-						connectionupdateitem.WithTnlInfo(tnlInfo)).
-						BuildConnectionUpdateItemIes()
-					connectionUpdateItemIes = append(connectionUpdateItemIes, connUpdateItemIe)
-
-				} else {
-					connection.Status.Phase = connections.Closed
-					connection.Status.State = connections.Disconnecting
-					err = e.connectionStore.Update(ctx, connection)
-					if err != nil {
-						log.Warn(err)
-						cause := &e2apies.Cause{
-							Cause: &e2apies.Cause_Protocol{
-								Protocol: e2apies.CauseProtocol_CAUSE_PROTOCOL_UNSPECIFIED,
-							},
-						}
-						connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
-							connectionupdate.WithCause(cause),
-							connectionupdate.WithTransactionID(ies49.GetValue().Value)).
-							BuildConnectionUpdateFailure()
-						return nil, connectionUpdateFailure, nil
-					}
+					connectionUpdateFailure := connectionupdate.NewConnectionUpdate(
+						connectionupdate.WithCause(cause),
+						connectionupdate.WithTransactionID(trID)).
+						BuildConnectionUpdateFailure()
+					return nil, connectionUpdateFailure, nil
 				}
 			}
 		}
@@ -281,14 +289,19 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	ack := connectionupdate.NewConnectionUpdate(
 		connectionupdate.WithConnectionUpdateItemIes(connectionUpdateItemIes),
 		connectionupdate.WithConnectionSetupFailedItemIes(connectionSetupFailedItemIes),
-		connectionupdate.WithTransactionID(ies49.GetValue().Value)).
+		connectionupdate.WithTransactionID(trID)).
 		BuildConnectionUpdateAcknowledge()
 	log.Infof("Sending Connection Update Ack: %+v", ack)
 	return ack, nil, nil
 }
 
 func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	ranFuncID := registry.RanFunctionID(controlutils.GetRanFunctionID(request))
+	rfID, err := controlutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID := registry.RanFunctionID(*rfID)
+
 	log.Debugf("Received Control Request %+v for ran function %d", request, ranFuncID)
 	sm, err := e.registry.GetServiceModel(ranFuncID)
 	if err != nil {
@@ -317,16 +330,39 @@ func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.
 }
 
 func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
-	registeredRanFuncID := registry.RanFunctionID(subutils.GetRanFunctionID(request))
+	rfID, err := subutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	registeredRanFuncID := registry.RanFunctionID(*rfID)
 	log.Debugf("Received Subscription Request %v for ran function %d", request, registeredRanFuncID)
 	sm, err := e.registry.GetServiceModel(registeredRanFuncID)
-	id := subscriptions.NewID(subutils.GetRicInstanceID(request),
-		subutils.GetRequesterID(request),
-		subutils.GetRanFunctionID(request))
+	if err != nil {
+		return nil, nil, err
+	}
+	rrID, err := subutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	riID, err := subutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	reqID := subutils.GetRequesterID(request)
-	ranFuncID := subutils.GetRanFunctionID(request)
-	ricInstanceID := subutils.GetRicInstanceID(request)
+	id := subscriptions.NewID(*riID, *rrID, *rfID)
+
+	reqID, err := subutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := subutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := subutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
 	if err != nil {
 		log.Warn(err)
 		// If the target E2 Node receives a RIC SUBSCRIPTION REQUEST
@@ -341,9 +377,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -360,9 +396,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -380,9 +416,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -416,9 +452,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 			},
 		}
 		subscription := subutils.NewSubscription(
-			subutils.WithRequestID(reqID),
-			subutils.WithRanFuncID(ranFuncID),
-			subutils.WithRicInstanceID(ricInstanceID),
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
 			subutils.WithCause(cause))
 		failure, err := subscription.BuildSubscriptionFailure()
 		if err != nil {
@@ -431,11 +467,31 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 }
 
 func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	ranFuncID := registry.RanFunctionID(request.ProtocolIes.E2ApProtocolIes5.Value.Value)
+	var ranFunctionID int32
+	for _, v := range request.GetProtocolIes() {
+		if v.Id == int32(v2.ProtocolIeIDRanfunctionID) {
+			// E2 Connection To Add list IE
+			ranFunctionID = v.GetValue().GetRfId().GetValue()
+		}
+	}
+
+	ranFuncID := registry.RanFunctionID(ranFunctionID)
 	log.Debugf("Received Subscription Delete Request %v for ran function ID %d", request, ranFuncID)
-	subID := subscriptions.NewID(subdeleteutils.GetRicInstanceID(request),
-		subdeleteutils.GetRequesterID(request),
-		subdeleteutils.GetRanFunctionID(request))
+
+	rrID, err := subdeleteutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	rfID, err := subdeleteutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	riID, err := subdeleteutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	subID := subscriptions.NewID(*riID, *rrID, *rfID)
 	_, err = e.subStore.Get(subID)
 	if err != nil {
 		log.Warn(err)
@@ -448,10 +504,24 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
 			},
 		}
+
+		rrID, err := subdeleteutils.GetRequesterID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		rfID, err := subdeleteutils.GetRanFunctionID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		riID, err := subdeleteutils.GetRicInstanceID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
-			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
-			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
-			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
+			subdeleteutils.WithRanFuncID(*rfID),
+			subdeleteutils.WithRequestID(*rrID),
+			subdeleteutils.WithRicInstanceID(*riID),
 			subdeleteutils.WithCause(cause))
 		failure, err := subscriptionDelete.BuildSubscriptionDeleteFailure()
 		if err != nil {
@@ -474,10 +544,23 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_RAN_FUNCTION_ID_INVALID,
 			},
 		}
+		rrID, err := subdeleteutils.GetRequesterID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		rfID, err := subdeleteutils.GetRanFunctionID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+		riID, err := subdeleteutils.GetRicInstanceID(request)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
-			subdeleteutils.WithRanFuncID(subdeleteutils.GetRanFunctionID(request)),
-			subdeleteutils.WithRequestID(subdeleteutils.GetRequesterID(request)),
-			subdeleteutils.WithRicInstanceID(subdeleteutils.GetRicInstanceID(request)),
+			subdeleteutils.WithRanFuncID(*rfID),
+			subdeleteutils.WithRequestID(*rrID),
+			subdeleteutils.WithRicInstanceID(*riID),
 			subdeleteutils.WithCause(cause))
 		failure, err := subscriptionDelete.BuildSubscriptionDeleteFailure()
 		if err != nil {
@@ -606,12 +689,15 @@ func (e *e2Connection) setup() error {
 		cui := &e2appducontents.E2NodeComponentConfigAdditionItemIes{
 			Id:          int32(v2.ProtocolIeIDE2nodeComponentConfigAdditionItem),
 			Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
-			Value: &e2appducontents.E2NodeComponentConfigAdditionItem{
-				E2NodeComponentInterfaceType: configAdditionItem.E2NodeComponentType,
-				E2NodeComponentId:            configAdditionItem.E2NodeComponentID,
-				E2NodeComponentConfiguration: &configAdditionItem.E2NodeComponentConfiguration,
+			Value: &e2appducontents.E2NodeComponentConfigAdditionItemIe{
+				E2NodeComponentConfigAdditionItemIe: &e2appducontents.E2NodeComponentConfigAdditionItemIe_E2Nccui{
+					E2Nccui: &e2appducontents.E2NodeComponentConfigAdditionItem{
+						E2NodeComponentInterfaceType: configAdditionItem.E2NodeComponentType,
+						E2NodeComponentId:            configAdditionItem.E2NodeComponentID,
+						E2NodeComponentConfiguration: &configAdditionItem.E2NodeComponentConfiguration,
+					},
+				},
 			},
-			Presence: int32(e2apcommondatatypes.Presence_PRESENCE_MANDATORY),
 		}
 		configAdditionList.Value = append(configAdditionList.Value, cui)
 	}
