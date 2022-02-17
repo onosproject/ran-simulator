@@ -31,7 +31,7 @@ func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subs
 				continue
 			}
 			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
-			err := m.sendRicIndicationFormat1(ctx, ncgi, ue, subscription)
+			err := m.sendRicIndicationFormat1(ctx, ncgi, ue, nil, subscription)
 			if err != nil {
 				log.Warn(err)
 				continue
@@ -41,7 +41,7 @@ func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subs
 	return nil
 }
 
-func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, subscription *subutils.Subscription) error {
+func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, fiveQi *int32, subscription *subutils.Subscription) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := m.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
@@ -53,7 +53,7 @@ func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCG
 		return err
 	}
 
-	indicationMessageBytes, err := m.createIndicationMsgFormat1(ue)
+	indicationMessageBytes, err := m.createIndicationMsgFormat1(ue, fiveQi)
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (m *Mho) createIndicationHeaderBytes(ctx context.Context, ncgi ransimtypes.
 	return indicationHeaderAsn1Bytes, nil
 }
 
-func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
+func (m *Mho) createIndicationMsgFormat1(ue *model.UE, fiveQi *int32) ([]byte, error) {
 	log.Debugf("Create MHO Indication message ueID: %d", ue.IMSI)
 
 	plmnID := ransimtypes.NewUint24(uint32(m.ServiceModel.Model.PlmnID))
@@ -153,7 +153,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 	nrCellIDTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
 
 	// add serving cell to measReport
-	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
+	item := &e2sm_mho.E2SmMhoMeasurementReportItem{
 		Cgi: &e2sm_v2_ies.Cgi{
 			Cgi: &e2sm_v2_ies.Cgi_NRCgi{
 				NRCgi: &e2sm_v2_ies.NrCgi{
@@ -172,7 +172,13 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		Rsrp: &e2sm_mho.Rsrp{
 			Value: int32(ue.Cell.Strength),
 		},
-	})
+	}
+	if fiveQi != nil {
+		item.FiveQi = &e2sm_v2_ies.FiveQi{
+			Value: *fiveQi,
+		}
+	}
+	measReport = append(measReport, item)
 
 	for _, cell := range ue.Cells {
 		ncgiTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(cell.NCGI)))

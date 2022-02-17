@@ -58,6 +58,9 @@ type Driver interface {
 
 	// AddRrcChan
 	AddRrcChan(ch chan model.UE)
+
+	// AddFiveQiChan
+	AddFiveQiChan(ch chan model.UE)
 }
 
 type driver struct {

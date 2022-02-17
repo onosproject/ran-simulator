@@ -69,6 +69,7 @@ func ueToAPI(ue *model.UE) *types.Ue {
 		Admitted: ue.IsAdmitted,
 		RrcState: uint32(ue.RrcState),
 		Metrics:  nil,
+		FiveQi:   int32(ue.FiveQi),
 	}
 	if ue.Cell != nil {
 		r.ServingTower = ue.Cell.NCGI
