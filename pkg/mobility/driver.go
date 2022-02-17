@@ -211,6 +211,7 @@ func (d *driver) processRoute(ctx context.Context, route *model.Route) {
 	if !d.rrcStateChangesDisabled {
 		d.updateRrc(ctx, route.IMSI)
 	}
+	d.updateFiveQI(ctx, route.IMSI)
 	d.reportMeasurement(ctx, route.IMSI)
 }
 

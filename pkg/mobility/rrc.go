@@ -15,6 +15,9 @@ import (
 // RrcStateChangeProbability determines the rate of change of RRC states in ransim
 var RrcStateChangeProbability = 0.005
 
+// FiveQIChangeProbability determines the rate of change of FiveQI values in ransim
+var FiveQIChangeProbability = 0.1
+
 // RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
 var RrcStateChangeVariance = 0.9
 
@@ -81,6 +84,32 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 			// TODO - check subscription for RRC state changes
 			d.rrcCtrl.rrcUpdateChan <- *ue
 		}
+	}
+}
+
+func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
+	//var fiveQiStateChanged bool
+
+	if rand.Float64() < FiveQIChangeProbability {
+		ue, err := d.ueStore.Get(ctx, imsi)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		newFiveQi := rand.Intn(256)
+
+		if newFiveQi == ue.FiveQi {
+			ue.FiveQi = newFiveQi + 1
+		} else {
+			ue.FiveQi = newFiveQi
+		}
+
+		// ToDo How to store that value back??
+		//if err == nil && d.hoLogic != "local" && fiveQiStateChanged && d.rrcCtrl.rrcUpdateChan != nil {
+		//	// TODO - check subscription for RRC state changes
+		//	d.rrcCtrl.rrcUpdateChan <- *ue
+		//}
 	}
 }
 

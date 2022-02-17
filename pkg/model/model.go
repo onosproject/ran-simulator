@@ -126,6 +126,7 @@ type UE struct {
 	RrcState e2sm_mho.Rrcstatus
 	Location Coordinate
 	Heading  uint32
+	FiveQi   int
 
 	Cell  *UECell
 	CRNTI types.CRNTI
