@@ -267,7 +267,11 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 				log.Error(err)
 				return
 			}
-			//ToDo - should FiveQI report be added there as well?
+			
+			m.fiveQiUpdateChan = make(chan model.UE)
+			go m.processFiveQiUpdate(ctx, subscription)
+			m.mobilityDriver.AddFiveQiChan(m.fiveQiUpdateChan)
+
 			m.reportPeriodicIndication(ctx, interval, subscription)
 		}()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT:
@@ -278,10 +282,6 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		if m.mobilityDriver.GetHoLogic() == "local" {
 			m.mobilityDriver.SetHoLogic("mho")
 		}
-		//ToDo - is it correct to add FiveQI report there?
-		m.fiveQiUpdateChan = make(chan model.UE)
-		go m.processFiveQiUpdate(ctx, subscription)
-		m.mobilityDriver.AddFiveQiChan(m.fiveQiUpdateChan)
 
 		go m.processEventA3MeasReport(ctx, subscription)
 
@@ -293,10 +293,6 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		m.rrcUpdateChan = make(chan model.UE)
 		go m.processRrcUpdate(ctx, subscription)
 		m.mobilityDriver.AddRrcChan(m.rrcUpdateChan)
-		//ToDo - is it correct to add FiveQI report there?
-		m.fiveQiUpdateChan = make(chan model.UE)
-		go m.processFiveQiUpdate(ctx, subscription)
-		m.mobilityDriver.AddFiveQiChan(m.fiveQiUpdateChan)
 
 	default:
 		log.Errorf("MHO subscription failed, invalid event trigger type: %v", eventTriggerType)

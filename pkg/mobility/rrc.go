@@ -46,7 +46,7 @@ func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 	}
 }
 
-// NewFiveQiCtrl returns a new RRC Controller
+// NewFiveQiCtrl returns a new FiveQi Controller
 func NewFiveQiCtrl(ueCountPerCell uint) FiveQiCtrl {
 	if ueCountPerCell == 0 {
 		ueCountPerCell = UeCountPerCellDefault
@@ -125,11 +125,7 @@ func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
 			ue.FiveQi = newFiveQi
 		}
 
-		// ToDo How to store that value back??
-		//if err == nil && d.hoLogic != "local" && fiveQiStateChanged && d.rrcCtrl.rrcUpdateChan != nil {
-		//	// TODO - check subscription for RRC state changes
-		//	d.rrcCtrl.rrcUpdateChan <- *ue
-		//}
+		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
 	}
 }
 
