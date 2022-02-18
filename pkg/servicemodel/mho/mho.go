@@ -280,6 +280,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		}
 		//ToDo - is it correct to add FiveQI report there?
 		m.fiveQiUpdateChan = make(chan model.UE)
+		go m.processFiveQiUpdate(ctx, subscription)
 		m.mobilityDriver.AddFiveQiChan(m.fiveQiUpdateChan)
 
 		go m.processEventA3MeasReport(ctx, subscription)
@@ -294,6 +295,7 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 		m.mobilityDriver.AddRrcChan(m.rrcUpdateChan)
 		//ToDo - is it correct to add FiveQI report there?
 		m.fiveQiUpdateChan = make(chan model.UE)
+		go m.processFiveQiUpdate(ctx, subscription)
 		m.mobilityDriver.AddFiveQiChan(m.fiveQiUpdateChan)
 
 	default:

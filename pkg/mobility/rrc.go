@@ -30,6 +30,12 @@ type RrcCtrl struct {
 	ueCountPerCell uint
 }
 
+// FiveQiCtrl is the FiveQI controller
+type FiveQiCtrl struct {
+	fiveQiUpdateChan chan model.UE
+	ueCountPerCell   uint
+}
+
 // NewRrcCtrl returns a new RRC Controller
 func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 	if ueCountPerCell == 0 {
@@ -40,8 +46,22 @@ func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 	}
 }
 
+// NewFiveQiCtrl returns a new RRC Controller
+func NewFiveQiCtrl(ueCountPerCell uint) FiveQiCtrl {
+	if ueCountPerCell == 0 {
+		ueCountPerCell = UeCountPerCellDefault
+	}
+	return FiveQiCtrl{
+		ueCountPerCell: ueCountPerCell,
+	}
+}
+
 func (d *driver) addRrcChan(ch chan model.UE) {
 	d.rrcCtrl.rrcUpdateChan = ch
+}
+
+func (d *driver) addFiveQiChan(ch chan model.UE) {
+	d.fiveQiCtrl.fiveQiUpdateChan = ch
 }
 
 func (d *driver) totalUeCount(ctx context.Context, ncgi types.NCGI) uint {
