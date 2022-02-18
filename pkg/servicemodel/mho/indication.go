@@ -31,7 +31,7 @@ func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subs
 				continue
 			}
 			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
-			err := m.sendRicIndicationFormat1(ctx, ncgi, ue, nil, subscription)
+			err := m.sendRicIndicationFormat1(ctx, ncgi, ue, subscription)
 			if err != nil {
 				log.Warn(err)
 				continue
@@ -41,7 +41,7 @@ func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subs
 	return nil
 }
 
-func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, fiveQi *int32, subscription *subutils.Subscription) error {
+func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI, ue *model.UE, subscription *subutils.Subscription) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := m.ServiceModel.Subscriptions.Get(subID)
 	if err != nil {
@@ -53,7 +53,7 @@ func (m *Mho) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCG
 		return err
 	}
 
-	indicationMessageBytes, err := m.createIndicationMsgFormat1(ue, fiveQi)
+	indicationMessageBytes, err := m.createIndicationMsgFormat1(ue)
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (m *Mho) createIndicationHeaderBytes(ctx context.Context, ncgi ransimtypes.
 	return indicationHeaderAsn1Bytes, nil
 }
 
-func (m *Mho) createIndicationMsgFormat1(ue *model.UE, fiveQi *int32) ([]byte, error) {
+func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 	log.Debugf("Create MHO Indication message ueID: %d", ue.IMSI)
 
 	plmnID := ransimtypes.NewUint24(uint32(m.ServiceModel.Model.PlmnID))
@@ -173,9 +173,9 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE, fiveQi *int32) ([]byte, e
 			Value: int32(ue.Cell.Strength),
 		},
 	}
-	if fiveQi != nil {
+	if ue.FiveQiIsChanged {
 		item.FiveQi = &e2sm_v2_ies.FiveQi{
-			Value: *fiveQi,
+			Value: int32(ue.FiveQi),
 		}
 	}
 	measReport = append(measReport, item)

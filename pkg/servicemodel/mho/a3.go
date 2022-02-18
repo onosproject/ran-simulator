@@ -34,7 +34,7 @@ func (m *Mho) processEventA3MeasReport(ctx context.Context, subscription *subuti
 				log.Warn(err)
 				continue
 			}
-			err = m.sendRicIndicationFormat1(ctx, ransimtypes.NCGI(ecgi), ue, nil, subscription)
+			err = m.sendRicIndicationFormat1(ctx, ransimtypes.NCGI(ecgi), ue, subscription)
 			if err != nil {
 				log.Warn(err)
 				continue

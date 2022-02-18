@@ -124,6 +124,17 @@ func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
 		} else {
 			ue.FiveQi = newFiveQi
 		}
+		ue.FiveQiIsChanged = true
+
+		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
+	} else {
+		// if the state is not changed
+		ue, err := d.ueStore.Get(ctx, imsi)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		ue.FiveQiIsChanged = false
 
 		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
 	}
