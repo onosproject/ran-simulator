@@ -6,10 +6,11 @@ package mobility
 
 import (
 	"context"
+	"math/rand"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"math/rand"
 )
 
 // RrcStateChangeProbability determines the rate of change of RRC states in ransim
@@ -110,6 +111,8 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
 	//var fiveQiStateChanged bool
 
+	newFiveQi := 0
+
 	if rand.Float64() < FiveQIChangeProbability {
 		ue, err := d.ueStore.Get(ctx, imsi)
 		if err != nil {
@@ -120,24 +123,28 @@ func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
 		newFiveQi := rand.Intn(256)
 
 		if newFiveQi == ue.FiveQi {
-			ue.FiveQi = newFiveQi + 1
-		} else {
-			ue.FiveQi = newFiveQi
+			newFiveQi += 1
 		}
-		ue.FiveQiIsChanged = true
 
-		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
-	} else {
-		// if the state is not changed
-		ue, err := d.ueStore.Get(ctx, imsi)
-		if err != nil {
-			log.Error(err)
-			return
-		}
-		ue.FiveQiIsChanged = false
-
-		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
+		// d.fiveQiCtrl.fiveQiUpdateChan <- *ue
 	}
+	// else {
+	// if the state is not changed
+	// ue, err := d.ueStore.Get(ctx, imsi)
+	// if err != nil {
+	// 	log.Error(err)
+	// 	return
+	// }
+
+	// d.fiveQiCtrl.fiveQiUpdateChan <- *ue
+
+	// }
+
+	err := d.ueStore.UpdateUE(ctx, imsi, newFiveQi)
+	if err != nil {
+		log.Warn("Unable to update UE %d FiveQi", imsi)
+	}
+
 }
 
 func (d *driver) rrcIdle(ctx context.Context, imsi types.IMSI, p float64) (bool, error) {

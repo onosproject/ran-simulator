@@ -6,9 +6,10 @@ package ues
 
 import (
 	"context"
-	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"math/rand"
 	"sync"
+
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 
 	"github.com/google/uuid"
 	"github.com/onosproject/ran-simulator/pkg/store/watcher"
@@ -75,6 +76,9 @@ type Store interface {
 
 	// ListUEs returns an array of all UEs associated with the specified cell
 	ListUEs(ctx context.Context, ncgi types.NCGI) []*model.UE
+
+	// Updates UE fiveQi value
+	UpdateUE(ctx context.Context, imsi types.IMSI, fiveQi int) error
 
 	// Watch watches the UE inventory events using the supplied channel
 	Watch(ctx context.Context, ch chan<- event.Event, options ...WatchOptions) error
@@ -312,6 +316,23 @@ func (s *store) MoveToCoordinate(ctx context.Context, imsi types.IMSI, location 
 	if ue, ok := s.ues[imsi]; ok {
 		ue.Location = location
 		ue.Heading = heading
+		updateEvent := event.Event{
+			Key:   ue.IMSI,
+			Value: ue,
+			Type:  Updated,
+		}
+		s.watchers.Send(updateEvent)
+		return nil
+	}
+	return errors.New(errors.NotFound, "UE not found")
+}
+
+func (s *store) UpdateUE(ctx context.Context, imsi types.IMSI, fiveQi int) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if ue, ok := s.ues[imsi]; ok {
+		ue.FiveQi = fiveQi
+		ue.FiveQiIsChanged = true
 		updateEvent := event.Event{
 			Key:   ue.IMSI,
 			Value: ue,
