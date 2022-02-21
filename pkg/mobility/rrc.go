@@ -16,7 +16,7 @@ import (
 var RrcStateChangeProbability = 0.005
 
 // FiveQIChangeProbability determines the rate of change of FiveQI values in ransim
-var FiveQIChangeProbability = 0.1
+var FiveQIChangeProbability = 0.3
 
 // RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
 var RrcStateChangeVariance = 0.9
@@ -33,7 +33,6 @@ type RrcCtrl struct {
 // FiveQiCtrl is the FiveQI controller
 type FiveQiCtrl struct {
 	fiveQiUpdateChan chan model.UE
-	ueCountPerCell   uint
 }
 
 // NewRrcCtrl returns a new RRC Controller
@@ -47,13 +46,8 @@ func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 }
 
 // NewFiveQiCtrl returns a new FiveQi Controller
-func NewFiveQiCtrl(ueCountPerCell uint) FiveQiCtrl {
-	if ueCountPerCell == 0 {
-		ueCountPerCell = UeCountPerCellDefault
-	}
-	return FiveQiCtrl{
-		ueCountPerCell: ueCountPerCell,
-	}
+func NewFiveQiCtrl() FiveQiCtrl {
+	return FiveQiCtrl{}
 }
 
 func (d *driver) addRrcChan(ch chan model.UE) {
@@ -110,33 +104,42 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
 	//var fiveQiStateChanged bool
 
-	if rand.Float64() < FiveQIChangeProbability {
+	prob := rand.Float64()
+	log.Warnf("Probability to change FiveQI value is %v", prob)
+
+	if prob < FiveQIChangeProbability {
+		log.Warnf("Updating FiveQI value..")
 		ue, err := d.ueStore.Get(ctx, imsi)
 		if err != nil {
 			log.Error(err)
 			return
 		}
 
+		log.Warnf("Getting UE %v to update FiveQI value (%v), RRC state is %v..", ue.IMSI, ue.FiveQi, ue.RrcState)
+
 		newFiveQi := rand.Intn(256)
+		log.Warnf("New FiveQI value is %v", newFiveQi)
 
 		if newFiveQi == ue.FiveQi {
 			ue.FiveQi = newFiveQi + 1
 		} else {
 			ue.FiveQi = newFiveQi
 		}
-		ue.FiveQiIsChanged = true
+		//ue.FiveQiIsChanged = true
+		log.Warnf("FiveQI value for UE % was updated on %v", ue.IMSI, ue.FiveQi) //, ue.FiveQiIsChanged)
 
 		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
-	} else {
-		// if the state is not changed
-		ue, err := d.ueStore.Get(ctx, imsi)
-		if err != nil {
-			log.Error(err)
-			return
-		}
-		ue.FiveQiIsChanged = false
-
-		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
+		//} else {
+		//	// if the state is not changed
+		//	ue, err := d.ueStore.Get(ctx, imsi)
+		//	if err != nil {
+		//		log.Error(err)
+		//		return
+		//	}
+		//	//ue.FiveQiIsChanged = false
+		//	log.Warnf("FiveQI value was not changed")
+		//
+		//	d.fiveQiCtrl.fiveQiUpdateChan <- *ue
 	}
 }
 

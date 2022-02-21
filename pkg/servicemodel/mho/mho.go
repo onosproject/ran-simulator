@@ -40,10 +40,10 @@ var log = logging.GetLogger("sm", "mho")
 
 // Mho represents the MHO service model
 type Mho struct {
-	ServiceModel  *registry.ServiceModel
-	rrcUpdateChan chan model.UE
-	//fiveQiUpdateChan chan model.UE
-	mobilityDriver mobility.Driver
+	ServiceModel     *registry.ServiceModel
+	rrcUpdateChan    chan model.UE
+	fiveQiUpdateChan chan model.UE
+	mobilityDriver   mobility.Driver
 }
 
 // NewServiceModel creates a new service model
@@ -269,9 +269,9 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 			}
 
 			//ToDo - probably it is redundant - test it out
-			//m.fiveQiUpdateChan = make(chan model.UE)
+			m.fiveQiUpdateChan = make(chan model.UE)
 			//go m.processFiveQiUpdate(ctx, subscription)
-			//m.mobilityDriver.AddFiveQiChan(m.fiveQiUpdateChan)
+			m.mobilityDriver.AddFiveQiChan(m.fiveQiUpdateChan)
 
 			m.reportPeriodicIndication(ctx, interval, subscription)
 		}()

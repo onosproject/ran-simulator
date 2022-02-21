@@ -91,7 +91,7 @@ func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore u
 		ueStore:                 ueStore,
 		hoLogic:                 hoLogic,
 		rrcCtrl:                 NewRrcCtrl(ueCountPerCell),
-		fiveQiCtrl:              NewFiveQiCtrl(ueCountPerCell),
+		fiveQiCtrl:              NewFiveQiCtrl(),
 		rrcStateChangesDisabled: rrcStateChangesDisabled,
 		wayPointRoute:           wayPointRoute,
 	}
@@ -210,18 +210,27 @@ func (d *driver) drive(ctx context.Context) {
 }
 
 func (d *driver) processRoute(ctx context.Context, route *model.Route) {
+	log.Warnf("Processing route for UE %v", route.IMSI)
 	d.lockUE(route.IMSI)
+	log.Warnf("UE %v was locked", route.IMSI)
 	defer d.unlockUE(route.IMSI)
+	log.Warnf("UE %v was unlocked", route.IMSI)
 	if route.NextPoint == 0 && !route.Reverse {
 		d.initializeUEPosition(ctx, route)
 	}
+	log.Warnf("UE %v direction was processed", route.IMSI)
 	d.updateUEPosition(ctx, route)
+	log.Warnf("UE %v position is changed", route.IMSI)
 	d.updateUESignalStrength(ctx, route.IMSI)
+	log.Warnf("UE %v signal strength is changed", route.IMSI)
 	if !d.rrcStateChangesDisabled {
 		d.updateRrc(ctx, route.IMSI)
 	}
+	log.Warnf("Updating FiveQI for UE %v", route.IMSI)
 	d.updateFiveQI(ctx, route.IMSI)
+	log.Warnf("FiveQI for UE %v was updated!", route.IMSI)
 	d.reportMeasurement(ctx, route.IMSI)
+	log.Warnf("Reporting measurement for UE %v", route.IMSI)
 }
 
 // Initializes UE positions to the start of its routes.
