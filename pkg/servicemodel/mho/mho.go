@@ -266,7 +266,6 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 				log.Error(err)
 				return
 			}
-
 			m.reportPeriodicIndication(ctx, interval, subscription)
 		}()
 	case e2sm_mho.MhoTriggerType_MHO_TRIGGER_TYPE_UPON_RCV_MEAS_REPORT:

@@ -336,7 +336,7 @@ func (s *store) UpdateUE(ctx context.Context, imsi types.IMSI, fiveQi int, isCha
 			Value: ue,
 			Type:  Updated,
 		}
-		log.Warnf("Updating UE %v with 5QI value %v", ue.IMSI, ue.FiveQi)
+		log.Debugf("Updating UE %v with 5QI value %v", ue.IMSI, ue.FiveQi)
 		s.watchers.Send(updateEvent)
 		return nil
 	}

@@ -31,7 +31,6 @@ func (m *Mho) sendRicIndication(ctx context.Context, subscription *subutils.Subs
 				continue
 			}
 			log.Debugf("Send MHO indications for cell ncgi:%d, IMSI:%d", ncgi, ue.IMSI)
-			log.Warnf("FiveQI value for UE.IMSI %v is %v", ue.IMSI, ue.FiveQi)
 			err := m.sendRicIndicationFormat1(ctx, ncgi, ue, subscription)
 			if err != nil {
 				log.Warn(err)
@@ -177,18 +176,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 			Value: int32(ue.FiveQi),
 		},
 	}
-	//log.Warnf("FiveQI value for UE %v was reported is %v", ue.IMSI, m.fiveQiWasReported)
-	//if !m.fiveQiWasReported {
-	//	// print flag
-	//	log.Warnf("FiveQI value for UE %v was changed! Now it is %v", ue.IMSI, ue.FiveQi)
-	//	item.FiveQi = &e2sm_v2_ies.FiveQi{
-	//		Value: int32(ue.FiveQi),
-	//	}
-	//	log.Warnf("FiveQI value for UE %v was changed! Now it is %v", ue.IMSI, item.FiveQi)
-	//	m.fiveQiWasReported = true
-	//} else {
-	//	m.fiveQiWasReported = false
-	//}
+
 	measReport = append(measReport, item)
 
 	for _, cell := range ue.Cells {

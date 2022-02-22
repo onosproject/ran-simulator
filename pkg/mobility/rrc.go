@@ -96,7 +96,7 @@ func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
 			return
 		}
 
-		log.Debugf("Getting UE %v to update FiveQI value (%v), RRC state is %v..", ue.IMSI, ue.FiveQi, ue.RrcState)
+		log.Debugf("Getting UE %v to update FiveQI value (%v), RRC state is %v", ue.IMSI, ue.FiveQi, ue.RrcState)
 
 		newFiveQi := rand.Intn(256)
 
