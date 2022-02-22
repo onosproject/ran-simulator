@@ -16,7 +16,7 @@ import (
 var RrcStateChangeProbability = 0.005
 
 // FiveQIChangeProbability determines the rate of change of FiveQI values in ransim
-var FiveQIChangeProbability = 0.1
+var FiveQIChangeProbability = 0.05
 
 // RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
 var RrcStateChangeVariance = 0.9
@@ -30,11 +30,6 @@ type RrcCtrl struct {
 	ueCountPerCell uint
 }
 
-// FiveQiCtrl is the FiveQI controller
-type FiveQiCtrl struct {
-	fiveQiUpdateChan chan model.UE
-}
-
 // NewRrcCtrl returns a new RRC Controller
 func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 	if ueCountPerCell == 0 {
@@ -45,17 +40,8 @@ func NewRrcCtrl(ueCountPerCell uint) RrcCtrl {
 	}
 }
 
-// NewFiveQiCtrl returns a new FiveQi Controller
-func NewFiveQiCtrl() FiveQiCtrl {
-	return FiveQiCtrl{}
-}
-
 func (d *driver) addRrcChan(ch chan model.UE) {
 	d.rrcCtrl.rrcUpdateChan = ch
-}
-
-func (d *driver) addFiveQiChan(ch chan model.UE) {
-	d.fiveQiCtrl.fiveQiUpdateChan = ch
 }
 
 func (d *driver) totalUeCount(ctx context.Context, ncgi types.NCGI) uint {

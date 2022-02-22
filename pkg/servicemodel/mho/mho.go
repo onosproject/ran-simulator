@@ -43,7 +43,6 @@ type Mho struct {
 	ServiceModel   *registry.ServiceModel
 	rrcUpdateChan  chan model.UE
 	mobilityDriver mobility.Driver
-	//fiveQiWasReported bool
 }
 
 // NewServiceModel creates a new service model

@@ -58,9 +58,6 @@ type Driver interface {
 
 	// AddRrcChan
 	AddRrcChan(ch chan model.UE)
-
-	// AddFiveQiChan
-	AddFiveQiChan(ch chan model.UE)
 }
 
 type driver struct {
@@ -77,7 +74,6 @@ type driver struct {
 	hoCtrl                  handover.HOController
 	hoLogic                 string
 	rrcCtrl                 RrcCtrl
-	fiveQiCtrl              FiveQiCtrl
 	ueLock                  map[types.IMSI]*sync.Mutex
 	rrcStateChangesDisabled bool
 	wayPointRoute           bool
@@ -91,7 +87,6 @@ func NewMobilityDriver(cellStore cells.Store, routeStore routes.Store, ueStore u
 		ueStore:                 ueStore,
 		hoLogic:                 hoLogic,
 		rrcCtrl:                 NewRrcCtrl(ueCountPerCell),
-		fiveQiCtrl:              NewFiveQiCtrl(),
 		rrcStateChangesDisabled: rrcStateChangesDisabled,
 		wayPointRoute:           wayPointRoute,
 	}
@@ -175,10 +170,6 @@ func (d *driver) SetHoLogic(hoLogic string) {
 
 func (d *driver) AddRrcChan(ch chan model.UE) {
 	d.addRrcChan(ch)
-}
-
-func (d *driver) AddFiveQiChan(ch chan model.UE) {
-	d.addFiveQiChan(ch)
 }
 
 func (d *driver) lockUE(imsi types.IMSI) {
