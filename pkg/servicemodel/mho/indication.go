@@ -153,7 +153,7 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 	nrCellIDTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(ue.Cell.NCGI)))
 
 	// add serving cell to measReport
-	measReport = append(measReport, &e2sm_mho.E2SmMhoMeasurementReportItem{
+	item := &e2sm_mho.E2SmMhoMeasurementReportItem{
 		Cgi: &e2sm_v2_ies.Cgi{
 			Cgi: &e2sm_v2_ies.Cgi_NRCgi{
 				NRCgi: &e2sm_v2_ies.NrCgi{
@@ -172,7 +172,12 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		Rsrp: &e2sm_mho.Rsrp{
 			Value: int32(ue.Cell.Strength),
 		},
-	})
+		FiveQi: &e2sm_v2_ies.FiveQi{
+			Value: int32(ue.FiveQi),
+		},
+	}
+
+	measReport = append(measReport, item)
 
 	for _, cell := range ue.Cells {
 		ncgiTypeNCI := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(cell.NCGI)))

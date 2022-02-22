@@ -5,6 +5,7 @@
 package mho
 
 import (
+	"encoding/hex"
 	"fmt"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
@@ -18,10 +19,11 @@ func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2
 	var controlMessageAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRiccontrolMessage) {
-			controlMessageAsnBytes = v.GetValue().GetRch().GetValue()
+			controlMessageAsnBytes = v.GetValue().GetRcm().GetValue()
 			break
 		}
 	}
+	log.Debugf("ControlMessage is\n%v", hex.Dump(controlMessageAsnBytes))
 
 	controlMessageProtoBytes, err := mhoServiceModel.ControlMessageASN1toProto(controlMessageAsnBytes)
 	if err != nil {
@@ -45,6 +47,7 @@ func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2s
 			break
 		}
 	}
+	log.Debugf("ControlHeader is\n%v", hex.Dump(controlHeaderAsnBytes))
 
 	controlHeaderProtoBytes, err := mhoServiceModel.ControlHeaderASN1toProto(controlHeaderAsnBytes)
 	if err != nil {
