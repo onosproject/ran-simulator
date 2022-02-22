@@ -16,7 +16,7 @@ import (
 var RrcStateChangeProbability = 0.005
 
 // FiveQIChangeProbability determines the rate of change of FiveQI values in ransim
-var FiveQIChangeProbability = 0.3
+var FiveQIChangeProbability = 0.1
 
 // RrcStateChangeVariance provides non-determinism in enforcing the UeCountPerCell
 var RrcStateChangeVariance = 0.9
@@ -102,44 +102,41 @@ func (d *driver) updateRrc(ctx context.Context, imsi types.IMSI) {
 }
 
 func (d *driver) updateFiveQI(ctx context.Context, imsi types.IMSI) {
-	//var fiveQiStateChanged bool
-
 	prob := rand.Float64()
-	log.Warnf("Probability to change FiveQI value is %v", prob)
-
 	if prob < FiveQIChangeProbability {
-		log.Warnf("Updating FiveQI value..")
 		ue, err := d.ueStore.Get(ctx, imsi)
 		if err != nil {
 			log.Error(err)
 			return
 		}
 
-		log.Warnf("Getting UE %v to update FiveQI value (%v), RRC state is %v..", ue.IMSI, ue.FiveQi, ue.RrcState)
+		log.Debugf("Getting UE %v to update FiveQI value (%v), RRC state is %v..", ue.IMSI, ue.FiveQi, ue.RrcState)
 
 		newFiveQi := rand.Intn(256)
-		log.Warnf("New FiveQI value is %v", newFiveQi)
 
 		if newFiveQi == ue.FiveQi {
 			ue.FiveQi = newFiveQi + 1
 		} else {
 			ue.FiveQi = newFiveQi
 		}
-		//ue.FiveQiIsChanged = true
-		log.Warnf("FiveQI value for UE % was updated on %v", ue.IMSI, ue.FiveQi) //, ue.FiveQiIsChanged)
+		log.Debugf("FiveQI value for UE % was updated on %v", ue.IMSI, ue.FiveQi)
 
-		d.fiveQiCtrl.fiveQiUpdateChan <- *ue
-		//} else {
-		//	// if the state is not changed
-		//	ue, err := d.ueStore.Get(ctx, imsi)
-		//	if err != nil {
-		//		log.Error(err)
-		//		return
-		//	}
-		//	//ue.FiveQiIsChanged = false
-		//	log.Warnf("FiveQI value was not changed")
-		//
-		//	d.fiveQiCtrl.fiveQiUpdateChan <- *ue
+		err = d.ueStore.UpdateUE(ctx, imsi, newFiveQi, true)
+		if err != nil {
+			log.Warnf("Unable to update UE %d FiveQi", imsi)
+		}
+	} else {
+		// if the state is not changed
+		ue, err := d.ueStore.Get(ctx, imsi)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		err = d.ueStore.UpdateUE(ctx, imsi, ue.FiveQi, false)
+		if err != nil {
+			log.Warnf("Unable to update UE %d FiveQi", imsi)
+		}
 	}
 }
 

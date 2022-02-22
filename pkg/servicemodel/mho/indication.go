@@ -173,17 +173,21 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 		Rsrp: &e2sm_mho.Rsrp{
 			Value: int32(ue.Cell.Strength),
 		},
-		/// hardcode fiveQI
 		FiveQi: &e2sm_v2_ies.FiveQi{
-			Value: int32(255),
+			Value: int32(ue.FiveQi),
 		},
 	}
-	//if ue.FiveQiIsChanged {
-	// print flag
-	log.Warnf("FiveQI value for UE %v was changed! Now it is %v", ue.IMSI, ue.FiveQi)
-	item.FiveQi = &e2sm_v2_ies.FiveQi{
-		Value: int32(ue.FiveQi),
-	}
+	//log.Warnf("FiveQI value for UE %v was reported is %v", ue.IMSI, m.fiveQiWasReported)
+	//if !m.fiveQiWasReported {
+	//	// print flag
+	//	log.Warnf("FiveQI value for UE %v was changed! Now it is %v", ue.IMSI, ue.FiveQi)
+	//	item.FiveQi = &e2sm_v2_ies.FiveQi{
+	//		Value: int32(ue.FiveQi),
+	//	}
+	//	log.Warnf("FiveQI value for UE %v was changed! Now it is %v", ue.IMSI, item.FiveQi)
+	//	m.fiveQiWasReported = true
+	//} else {
+	//	m.fiveQiWasReported = false
 	//}
 	measReport = append(measReport, item)
 

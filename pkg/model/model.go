@@ -132,8 +132,7 @@ type UE struct {
 	CRNTI types.CRNTI
 	Cells []*UECell
 
-	IsAdmitted      bool
-	FiveQiIsChanged bool
+	IsAdmitted bool
 }
 
 // ServiceModel service model information
