@@ -18,7 +18,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("api", "cells")
+var log = liblog.GetLogger()
 
 // NewService returns a new model Service
 func NewService(cellStore cells.Store) service.Service {

@@ -22,7 +22,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("api", "metrics")
+var log = liblog.GetLogger()
 
 // NewService returns a new metrics Service
 func NewService(metricsStore metrics.Store) service.Service {

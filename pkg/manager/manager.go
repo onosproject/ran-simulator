@@ -6,9 +6,10 @@ package manager
 
 import (
 	"context"
+	"time"
+
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/store/routes"
-	"time"
 
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/onos-lib-go/pkg/northbound"
@@ -21,43 +22,33 @@ import (
 	ueapi "github.com/onosproject/ran-simulator/pkg/api/ues"
 	"github.com/onosproject/ran-simulator/pkg/e2agent/agents"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 )
 
-var log = logging.GetLogger("manager")
+var log = logging.GetLogger()
 
 // Config is a manager configuration
 type Config struct {
-	CAPath              string
-	KeyPath             string
-	CertPath            string
-	GRPCPort            int
-	ServiceModelPlugins []string
-	ModelName           string
-	MetricName          string
-	HOLogic             string
+	CAPath     string
+	KeyPath    string
+	CertPath   string
+	GRPCPort   int
+	ModelName  string
+	MetricName string
+	HOLogic    string
 }
 
 // NewManager creates a new manager
 func NewManager(config *Config) (*Manager, error) {
 	log.Info("Creating Manager")
 
-	modelPluginRegistry := modelplugins.NewModelRegistry()
-	for _, smp := range config.ServiceModelPlugins {
-		if _, _, err := modelPluginRegistry.RegisterModelPlugin(smp); err != nil {
-			log.Error(err)
-		}
-	}
-
 	mgr := &Manager{
-		config:              *config,
-		agents:              nil,
-		model:               &model.Model{},
-		modelPluginRegistry: modelPluginRegistry,
+		config: *config,
+		agents: nil,
+		model:  &model.Model{},
 	}
 
 	return mgr, nil
@@ -66,17 +57,16 @@ func NewManager(config *Config) (*Manager, error) {
 // Manager is a manager for the E2T service
 type Manager struct {
 	modelapi.ManagementDelegate
-	config              Config
-	agents              *agents.E2Agents
-	model               *model.Model
-	modelPluginRegistry modelplugins.ModelRegistry
-	server              *northbound.Server
-	nodeStore           nodes.Store
-	cellStore           cells.Store
-	ueStore             ues.Store
-	routeStore          routes.Store
-	metricsStore        metrics.Store
-	mobilityDriver      mobility.Driver
+	config         Config
+	agents         *agents.E2Agents
+	model          *model.Model
+	server         *northbound.Server
+	nodeStore      nodes.Store
+	cellStore      cells.Store
+	ueStore        ues.Store
+	routeStore     routes.Store
+	metricsStore   metrics.Store
+	mobilityDriver mobility.Driver
 }
 
 // Run starts the manager and the associated services
@@ -181,8 +171,7 @@ func (m *Manager) startNorthboundServer() error {
 func (m *Manager) startE2Agents() error {
 	// Create the E2 agents for all simulated nodes and specified controllers
 	var err error
-	m.agents, err = agents.NewE2Agents(m.model, m.modelPluginRegistry,
-		m.nodeStore, m.ueStore, m.cellStore, m.metricsStore, m.mobilityDriver.GetHoCtrl().GetOutputChan(), m.mobilityDriver)
+	m.agents, err = agents.NewE2Agents(m.model, m.nodeStore, m.ueStore, m.cellStore, m.metricsStore, m.mobilityDriver.GetHoCtrl().GetOutputChan(), m.mobilityDriver)
 	if err != nil {
 		log.Error(err)
 		return err

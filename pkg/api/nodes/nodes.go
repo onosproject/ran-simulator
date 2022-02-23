@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("api", "nodes")
+var log = liblog.GetLogger()
 
 // NewService returns a new model Service
 func NewService(nodeStore nodes.Store, plmnID types.PlmnID) service.Service {

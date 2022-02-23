@@ -10,8 +10,6 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
 
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
-
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 
 	"github.com/onosproject/ran-simulator/pkg/e2agent/connection"
@@ -36,11 +34,10 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	connectionController "github.com/onosproject/ran-simulator/pkg/controller/connection"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
-var log = logging.GetLogger("e2agent")
+var log = logging.GetLogger()
 
 // E2Agent is an E2 agent
 type E2Agent interface {
@@ -64,7 +61,7 @@ type e2Agent struct {
 }
 
 // NewE2Agent creates a new E2 agent
-func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
+func NewE2Agent(node model.Node, model *model.Model,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
 	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (E2Agent, error) {
 	log.Info("Creating New E2 Agent for node with eNbID:", node.GnbID)
@@ -79,19 +76,8 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 			return nil, err
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
-		case registry.Kpm:
-			kpmSm, err := kpm.NewServiceModel(node, model, modelPluginRegistry,
-				subStore, nodeStore, ueStore)
-			if err != nil {
-				return nil, err
-			}
-			err = reg.RegisterServiceModel(kpmSm)
-			if err != nil {
-				log.Error(err)
-				return nil, err
-			}
 		case registry.Rcpre2:
-			rcSm, err := rc.NewServiceModel(node, model, modelPluginRegistry,
+			rcSm, err := rc.NewServiceModel(node, model,
 				subStore, nodeStore, ueStore, cellStore, metricStore)
 			if err != nil {
 				return nil, err
@@ -117,7 +103,7 @@ func NewE2Agent(node model.Node, model *model.Model, modelPluginRegistry modelpl
 			}
 		case registry.Mho:
 			log.Info("MHO service model for node with eNbID:", node.GnbID)
-			mhoSm, err := mho.NewServiceModel(node, model, modelPluginRegistry, subStore, nodeStore, ueStore, cellStore,
+			mhoSm, err := mho.NewServiceModel(node, model, subStore, nodeStore, ueStore, cellStore,
 				metricStore, a3Chan, mobilityDriver)
 			if err != nil {
 				log.Info("Failure creating MHO service model for eNbID:", node.GnbID)

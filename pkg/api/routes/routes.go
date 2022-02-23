@@ -7,6 +7,7 @@ package routes
 
 import (
 	"context"
+
 	"github.com/onosproject/ran-simulator/pkg/store/routes"
 
 	"github.com/onosproject/ran-simulator/pkg/store/event"
@@ -19,7 +20,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("api", "routes")
+var log = liblog.GetLogger()
 
 // NewService returns a new model Service
 func NewService(routeStore routes.Store) service.Service {

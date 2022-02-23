@@ -15,7 +15,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 )
 
-var log = logging.GetLogger("store", "agents")
+var log = logging.GetLogger()
 
 // E2Agents e2 agents
 type E2Agents struct {

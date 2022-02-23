@@ -19,7 +19,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 )
 
-var log = logging.GetLogger("store", "connections")
+var log = logging.GetLogger()
 
 // WatchOptions allows tailoring the WatchNodes behaviour
 type WatchOptions struct {

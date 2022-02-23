@@ -6,6 +6,7 @@ package model
 
 import (
 	"bytes"
+
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/spf13/viper"
@@ -13,7 +14,7 @@ import (
 
 const configDir = ".onos"
 
-var log = logging.GetLogger("manager", "load")
+var log = logging.GetLogger()
 
 // ViperConfigure Sets up viper for unmarshalling configuration file
 func ViperConfigure(configname string) {

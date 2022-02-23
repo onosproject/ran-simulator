@@ -30,7 +30,7 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/controller"
 )
 
-var log = logging.GetLogger("controller", "connection")
+var log = logging.GetLogger()
 
 const defaultTimeout = 30 * time.Second
 const queueSize = 100

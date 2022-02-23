@@ -14,7 +14,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/watcher"
 )
 
-var log = liblog.GetLogger("store", "metrics")
+var log = liblog.GetLogger()
 
 // Store tracks arbitrary (named) scalar metrics on per entity (cell, node) basis.
 type Store interface {

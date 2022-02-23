@@ -66,14 +66,13 @@ func main() {
 	}
 
 	cfg := &manager.Config{
-		CAPath:              *caPath,
-		KeyPath:             *keyPath,
-		CertPath:            *certPath,
-		GRPCPort:            *grpcPort,
-		ServiceModelPlugins: serviceModelPlugins,
-		ModelName:           *modelName,
-		MetricName:          *metricName,
-		HOLogic:             *hoLogic,
+		CAPath:     *caPath,
+		KeyPath:    *keyPath,
+		CertPath:   *certPath,
+		GRPCPort:   *grpcPort,
+		ModelName:  *modelName,
+		MetricName: *metricName,
+		HOLogic:    *hoLogic,
 	}
 
 	mgr, err := manager.NewManager(cfg)

@@ -21,7 +21,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("trafficsim")
+var log = liblog.GetLogger()
 
 // NewService returns a new trafficsim Service
 func NewService(model *model.Model, cellStore cells.Store, ueStore ues.Store) service.Service {

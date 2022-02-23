@@ -7,13 +7,14 @@ package cells
 
 import (
 	"context"
+
 	modelapi "github.com/onosproject/onos-api/go/onos/ransim/model"
 	liblog "github.com/onosproject/onos-lib-go/pkg/logging"
 	service "github.com/onosproject/onos-lib-go/pkg/northbound"
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("api", "model")
+var log = liblog.GetLogger()
 
 // ManagementDelegate provides means to clear and load the model and resume the simulation
 type ManagementDelegate interface {
