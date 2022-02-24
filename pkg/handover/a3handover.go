@@ -10,7 +10,7 @@ import (
 	"github.com/onosproject/rrm-son-lib/pkg/model/device"
 )
 
-var logA3ho = logging.GetLogger("handover", "a3")
+var logA3ho = logging.GetLogger()
 
 // A3Handover is an abstraction of A3 handover
 type A3Handover interface {

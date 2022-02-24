@@ -33,7 +33,6 @@ import (
 
 	"github.com/cenkalti/backoff"
 
-	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
@@ -53,7 +52,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 )
 
-var log = logging.GetLogger("e2agent", "connection")
+var log = logging.GetLogger()
 
 // E2Connection a client interface for of E2 connection
 type E2Connection interface {
@@ -429,9 +428,6 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 
 	// TODO - Assumes ono-to-one mapping between ran function and server model
 	switch sm.RanFunctionID {
-	case registry.Kpm:
-		client := sm.Client.(*kpm.Client)
-		response, failure, err = client.RICSubscription(ctx, request)
 	case registry.Rcpre2:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
@@ -570,9 +566,6 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 	}
 
 	switch sm.RanFunctionID {
-	case registry.Kpm:
-		client := sm.Client.(*kpm.Client)
-		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	case registry.Rcpre2:
 		client := sm.Client.(*rc.Client)
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)

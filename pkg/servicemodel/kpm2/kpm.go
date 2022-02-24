@@ -53,7 +53,7 @@ import (
 
 var _ servicemodel.Client = &Client{}
 
-var log = logging.GetLogger("sm", "kpm2")
+var log = logging.GetLogger()
 
 const (
 	modelVersion           = "v2"

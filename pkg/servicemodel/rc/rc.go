@@ -40,7 +40,6 @@ import (
 
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/pdubuilder"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"google.golang.org/protobuf/proto"
 
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
@@ -53,7 +52,7 @@ import (
 
 var _ servicemodel.Client = &Client{}
 
-var log = logging.GetLogger("sm", "rc")
+var log = logging.GetLogger()
 
 // Client rc service model client
 type Client struct {
@@ -156,24 +155,22 @@ func (sm *Client) reportIndicationOnChange(ctx context.Context, subscription *su
 
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model,
-	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
 	modelName := e2smtypes.ShortName(modelFullName)
 	rcSm := registry.ServiceModel{
-		RanFunctionID:       registry.Rcpre2,
-		ModelName:           modelName,
-		Revision:            1,
-		OID:                 modelOID,
-		Version:             version,
-		ModelPluginRegistry: modelPluginRegistry,
-		Node:                node,
-		Model:               model,
-		Subscriptions:       subStore,
-		Nodes:               nodeStore,
-		UEs:                 ueStore,
-		CellStore:           cellStore,
-		MetricStore:         metricStore,
+		RanFunctionID: registry.Rcpre2,
+		ModelName:     modelName,
+		Revision:      1,
+		OID:           modelOID,
+		Version:       version,
+		Node:          node,
+		Model:         model,
+		Subscriptions: subStore,
+		Nodes:         nodeStore,
+		UEs:           ueStore,
+		CellStore:     cellStore,
+		MetricStore:   metricStore,
 	}
 
 	rcClient := &Client{

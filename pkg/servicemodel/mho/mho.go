@@ -6,6 +6,7 @@ package mho
 
 import (
 	"context"
+
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	"github.com/onosproject/ran-simulator/pkg/utils"
@@ -22,7 +23,6 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
@@ -47,26 +47,24 @@ type Mho struct {
 
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model,
-	modelPluginRegistry modelplugins.ModelRegistry,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
 	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (registry.ServiceModel, error) {
 	modelName := e2smtypes.ShortName(modelFullName)
 	mhoSm := registry.ServiceModel{
-		RanFunctionID:       registry.Mho,
-		ModelName:           modelName,
-		Revision:            1,
-		OID:                 modelOID,
-		Version:             version,
-		ModelPluginRegistry: modelPluginRegistry,
-		Node:                node,
-		Model:               model,
-		Subscriptions:       subStore,
-		Nodes:               nodeStore,
-		UEs:                 ueStore,
-		CellStore:           cellStore,
-		MetricStore:         metricStore,
-		A3Chan:              a3Chan,
+		RanFunctionID: registry.Mho,
+		ModelName:     modelName,
+		Revision:      1,
+		OID:           modelOID,
+		Version:       version,
+		Node:          node,
+		Model:         model,
+		Subscriptions: subStore,
+		Nodes:         nodeStore,
+		UEs:           ueStore,
+		CellStore:     cellStore,
+		MetricStore:   metricStore,
+		A3Chan:        a3Chan,
 	}
 
 	mho := &Mho{

@@ -6,9 +6,10 @@ package ues
 
 import (
 	"context"
-	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"math/rand"
 	"sync"
+
+	mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 
 	"github.com/google/uuid"
 	"github.com/onosproject/ran-simulator/pkg/store/watcher"
@@ -27,7 +28,7 @@ const (
 	maxIMSI = 9999999
 )
 
-var log = liblog.GetLogger("store", "ues")
+var log = liblog.GetLogger()
 
 // Store tracks inventory of user-equipment for the simulation
 type Store interface {

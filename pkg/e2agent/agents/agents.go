@@ -18,26 +18,24 @@ import (
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/e2agent"
 	"github.com/onosproject/ran-simulator/pkg/model"
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
 	"github.com/onosproject/ran-simulator/pkg/store/agents"
 	"github.com/onosproject/ran-simulator/pkg/store/event"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 )
 
-var log = logging.GetLogger("e2agent", "agents")
+var log = logging.GetLogger()
 
 // E2Agents represents a collection of E2 agents to allow centralized management
 type E2Agents struct {
-	agentStore          agents.Store
-	modelPluginRegistry modelplugins.ModelRegistry
-	nodeStore           nodes.Store
-	ueStore             ues.Store
-	cellStore           cells.Store
-	metricStore         metrics.Store
-	model               *model.Model
-	a3Chan              chan handover.A3HandoverDecision
-	mobilityDriver      mobility.Driver
+	agentStore     agents.Store
+	nodeStore      nodes.Store
+	ueStore        ues.Store
+	cellStore      cells.Store
+	metricStore    metrics.Store
+	model          *model.Model
+	a3Chan         chan handover.A3HandoverDecision
+	mobilityDriver mobility.Driver
 }
 
 // Agents agents interface
@@ -61,8 +59,7 @@ func (agents *E2Agents) processNodeEvents() {
 		case nodes.Created:
 			node := nodeEvent.Value.(*model.Node)
 			log.Debugf("Starting e2 agent %d", nodeEvent.Key.(types.GnbID))
-			e2Node, err := e2agent.NewE2Agent(*node, agents.model,
-				agents.modelPluginRegistry, agents.nodeStore, agents.ueStore,
+			e2Node, err := e2agent.NewE2Agent(*node, agents.model, agents.nodeStore, agents.ueStore,
 				agents.cellStore, agents.metricStore, agents.a3Chan, agents.mobilityDriver)
 			if err != nil {
 				log.Error(err)
@@ -115,24 +112,23 @@ func (agents *E2Agents) processNodeEvents() {
 }
 
 // NewE2Agents creates a new collection of E2 agents from the specified list of nodes
-func NewE2Agents(m *model.Model, modelPluginRegistry modelplugins.ModelRegistry,
+func NewE2Agents(m *model.Model,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
 	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (*E2Agents, error) {
 	agentStore := agents.NewStore()
 	e2agents := &E2Agents{
-		agentStore:          agentStore,
-		nodeStore:           nodeStore,
-		modelPluginRegistry: modelPluginRegistry,
-		model:               m,
-		ueStore:             ueStore,
-		cellStore:           cellStore,
-		metricStore:         metricStore,
-		a3Chan:              a3Chan,
-		mobilityDriver:      mobilityDriver,
+		agentStore:     agentStore,
+		nodeStore:      nodeStore,
+		model:          m,
+		ueStore:        ueStore,
+		cellStore:      cellStore,
+		metricStore:    metricStore,
+		a3Chan:         a3Chan,
+		mobilityDriver: mobilityDriver,
 	}
 
 	for _, node := range m.Nodes {
-		e2Node, err := e2agent.NewE2Agent(node, m, modelPluginRegistry, nodeStore, ueStore, cellStore, metricStore, a3Chan, mobilityDriver)
+		e2Node, err := e2agent.NewE2Agent(node, m, nodeStore, ueStore, cellStore, metricStore, a3Chan, mobilityDriver)
 		if err != nil {
 			log.Error(err)
 			return nil, err

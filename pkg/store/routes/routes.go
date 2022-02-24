@@ -19,7 +19,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/model"
 )
 
-var log = liblog.GetLogger("store", "routes")
+var log = liblog.GetLogger()
 
 // Store tracks a collection of routes used to simulate UE mobility
 type Store interface {

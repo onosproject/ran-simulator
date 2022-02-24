@@ -20,7 +20,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/model"
 )
 
-var log = liblog.GetLogger("store", "nodes")
+var log = liblog.GetLogger()
 
 // Store tracks inventory of simulated E2 nodes.
 type Store interface {

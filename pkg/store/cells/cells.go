@@ -23,7 +23,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 )
 
-var log = liblog.GetLogger("store", "cells")
+var log = liblog.GetLogger()
 
 // Store tracks inventory of simulated cells.
 type Store interface {

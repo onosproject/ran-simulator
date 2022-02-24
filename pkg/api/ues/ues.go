@@ -20,7 +20,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var log = liblog.GetLogger("api", "ues")
+var log = liblog.GetLogger()
 
 // NewService returns a new model Service
 func NewService(ueStore ues.Store) service.Service {

@@ -22,8 +22,6 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/model"
 
-	"github.com/onosproject/ran-simulator/pkg/modelplugins"
-
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -41,22 +39,21 @@ type ServiceModelRegistry struct {
 
 // ServiceModel service model
 type ServiceModel struct {
-	RanFunctionID       RanFunctionID
-	ModelName           e2smtypes.ShortName
-	Version             string
-	Description         []byte // ASN1 bytes from Service Model
-	Revision            int
-	OID                 ModelOid
-	Client              servicemodel.Client
-	ModelPluginRegistry modelplugins.ModelRegistry
-	Node                model.Node
-	Model               *model.Model
-	Subscriptions       *subscriptions.Subscriptions
-	Nodes               nodes.Store
-	UEs                 ues.Store
-	CellStore           cells.Store
-	MetricStore         metrics.Store
-	A3Chan              chan handover.A3HandoverDecision
+	RanFunctionID RanFunctionID
+	ModelName     e2smtypes.ShortName
+	Version       string
+	Description   []byte // ASN1 bytes from Service Model
+	Revision      int
+	OID           ModelOid
+	Client        servicemodel.Client
+	Node          model.Node
+	Model         *model.Model
+	Subscriptions *subscriptions.Subscriptions
+	Nodes         nodes.Store
+	UEs           ues.Store
+	CellStore     cells.Store
+	MetricStore   metrics.Store
+	A3Chan        chan handover.A3HandoverDecision
 }
 
 // NewServiceModelRegistry creates a service model registry

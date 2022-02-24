@@ -7,11 +7,12 @@ package mobility
 import (
 	"context"
 	"fmt"
-	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	"math"
 	"math/rand"
 	"sync"
 	"time"
+
+	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
@@ -25,7 +26,7 @@ import (
 	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 )
 
-var log = logging.GetLogger("mobility", "driver")
+var log = logging.GetLogger()
 
 // Driver is an abstraction of an entity driving the UE mobility
 type Driver interface {

@@ -6,6 +6,8 @@ package measurement
 
 import (
 	"context"
+	"math"
+
 	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
@@ -15,10 +17,9 @@ import (
 	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 	"github.com/onosproject/rrm-son-lib/pkg/model/measurement"
 	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
-	"math"
 )
 
-var logConverter = logging.GetLogger("measurement", "converter")
+var logConverter = logging.GetLogger()
 
 var qoffsetRanges = utils.QOffsetRanges{
 	{Min: math.MinInt32, Max: -24, Value: meastype.QOffsetMinus24dB},
