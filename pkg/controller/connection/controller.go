@@ -6,6 +6,7 @@ package connection
 
 import (
 	"context"
+	"sync/atomic"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 
@@ -56,11 +57,12 @@ func NewController(connections connections.Store, node model.Node, model *model.
 
 // Reconciler is a E2 connection reconciler
 type Reconciler struct {
-	connections connections.Store
-	node        model.Node
-	model       *model.Model
-	registry    *registry.ServiceModelRegistry
-	subStore    *subscriptions.Subscriptions
+	connections   connections.Store
+	node          model.Node
+	model         *model.Model
+	registry      *registry.ServiceModelRegistry
+	subStore      *subscriptions.Subscriptions
+	transactionID uint64
 }
 
 // Reconcile reconciles the state of a device change
@@ -92,8 +94,10 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 
 func (r *Reconciler) configureDataConn(ctx context.Context, connection *connections.Connection) (controller.Result, error) {
 	plmnID := ransimtypes.NewUint24(uint32(r.model.PlmnID))
+	transactionID := atomic.AddUint64(&r.transactionID, 1) % 255
+
 	configUpdate, err := configupdate.NewConfigurationUpdate(
-		configupdate.WithTransactionID(int32(2)),
+		configupdate.WithTransactionID(int32(transactionID)),
 		configupdate.WithE2NodeID(uint64(r.node.GnbID)),
 		configupdate.WithPlmnID(plmnID.Value())).
 		Build()
