@@ -7,6 +7,7 @@ package connection
 import (
 	"context"
 	"fmt"
+	"net"
 	"sync/atomic"
 	"time"
 
@@ -632,7 +633,22 @@ func (e *e2Connection) Setup() error {
 	go func() {
 		<-e.client.Context().Done()
 		log.Warn("Context is cancelled, reconnecting...")
-		err := e.Setup()
+		controller, err := e.model.GetController(e.node.Controllers[0])
+		if err != nil {
+			return
+		}
+
+		controllerAddresses, err := net.LookupHost(controller.Address)
+		if err != nil {
+			return
+		}
+
+		ricAddress := addressing.RICAddress{
+			IPAddress: net.ParseIP(controllerAddresses[0]),
+			Port:      uint64(controller.Port),
+		}
+		e.ricAddress = ricAddress
+		err = e.Setup()
 		if err != nil {
 			return
 		}
