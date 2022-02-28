@@ -75,17 +75,19 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 	connection, err := r.connections.Get(ctx, connectionID)
 	if err != nil {
 		if !errors.IsNotFound(err) {
+			log.Warn(err)
 			return controller.Result{}, err
 		}
+		log.Info("Connection %s not found", id)
 		return controller.Result{}, nil
 	}
 
 	switch connection.Status.Phase {
 	case connections.Open:
-		log.Infof("Opening Connection: %s", connection.ID)
+		log.Infof("Reconcile opening connection: %s", connection.ID)
 		return r.reconcileOpenConnection(connection)
 	case connections.Closed:
-		log.Infof("Closing Connection: %s", connection.ID)
+		log.Infof("Reconcile closing connection: %s", connection.ID)
 		return r.reconcileClosedConnection(connection)
 	}
 
@@ -93,6 +95,7 @@ func (r *Reconciler) Reconcile(id controller.ID) (controller.Result, error) {
 }
 
 func (r *Reconciler) configureDataConn(ctx context.Context, connection *connections.Connection) (controller.Result, error) {
+	log.Infof("Configuring data connection %s", connection.ID)
 	plmnID := ransimtypes.NewUint24(uint32(r.model.PlmnID))
 	transactionID := atomic.AddUint64(&r.transactionID, 1) % 255
 
@@ -105,14 +108,14 @@ func (r *Reconciler) configureDataConn(ctx context.Context, connection *connecti
 		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 		return controller.Result{}, err
 	}
-	log.Info("Sending Configuration update request:%+v", configUpdate)
+	log.Infof("Sending Configuration update request:%+v", configUpdate)
 	configUpdateAck, configUpdateFailure, err := connection.Client.E2ConfigurationUpdate(ctx, configUpdate)
 	if err != nil {
-		log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+		log.Warnf("Failed to reconcile configuring connection %+v: %s", connection, err)
 		return controller.Result{}, err
 	}
 	if configUpdateFailure != nil {
-		err = errors.NewUnknown("Failed to reconcile opening connection %+v: %s", connection, err)
+		err = errors.NewUnknown("Failed to reconcile configuring connection %+v: %s", connection, err)
 		log.Warn(err)
 		return controller.Result{}, err
 	}
@@ -123,7 +126,7 @@ func (r *Reconciler) configureDataConn(ctx context.Context, connection *connecti
 		connection.Status.State = connections.Configured
 		err = r.connections.Update(ctx, connection)
 		if err != nil {
-			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
+			log.Warnf("Failed to reconcile configuring connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
 	}
@@ -136,16 +139,15 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 
 	// If the connection state is in configured  state returns with nil error
 	if connection.Status.State == connections.Configured {
-		log.Debugf("Connection %+v is configured:", connection)
+		log.Infof("Connection %+v is configured", connection)
 		return controller.Result{}, nil
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultTimeout)
 	defer cancel()
-
 	// If the connection state is in configuring state then configure the connection
 	if connection.Status.State == connections.Configuring {
-		log.Debugf("Configuring connection: %+v", connection)
+		log.Infof("Reconcile Configuring connection: %+v", connection)
 		return r.configureDataConn(ctx, connection)
 	}
 
@@ -153,6 +155,7 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	// If the connection state is in Connecting state then opens a connection to RIC
 	// and update connectivity status to Connected
 	if connection.Status.State == connections.Connecting {
+		log.Infof("Reconcile Connecting connection %+v", connection)
 		e2Connection := e2connection.NewE2Connection(
 			e2connection.WithNode(r.node),
 			e2connection.WithModel(r.model),
@@ -172,7 +175,6 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 		e2Connection.SetClient(client)
 		connection.Client = client
 		connection.Status.State = connections.Connected
-
 		err = r.connections.Update(ctx, connection)
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
@@ -184,14 +186,14 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 	//  additional TNLA of an already setup E2 interface instance after the TNL association has become operational, and the Near-RT RIC shall
 	//  associate the TNLA to the E2 interface instance using the included Global E2 Node ID.
 	if connection.Status.State == connections.Connected {
-		log.Debugf("Configuring connection: %+v", connection)
+		log.Infof("Reconcile Connected connection %+v", connection)
 		connection.Status.State = connections.Configuring
 		err := r.connections.Update(ctx, connection)
 		if err != nil {
 			log.Warnf("Failed to reconcile opening connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
-		return r.configureDataConn(ctx, connection)
+		return controller.Result{}, nil
 	}
 
 	return controller.Result{}, nil
@@ -203,6 +205,7 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 	defer cancel()
 
 	if connection.Status.State == connections.Disconnected {
+		log.Infof("Reconcile disconnected connection %+v", connection)
 		err := r.connections.Remove(ctx, connection.ID)
 		if err != nil {
 			log.Warnf("Failed to reconcile closing connection %+v: %s", connection, err)
@@ -212,6 +215,7 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 	}
 
 	if connection.Status.State == connections.Disconnecting {
+		log.Infof("Reconcile disconnecting connection %+v", connection)
 		// TODO use configuration update to inform E2T that E2 node is intended to close the connection
 		//      (i.e. before calling close function)
 		err := connection.Client.Close()
@@ -225,6 +229,7 @@ func (r *Reconciler) reconcileClosedConnection(connection *connections.Connectio
 			log.Warnf("Failed to reconcile closing connection %+v: %s", connection, err)
 			return controller.Result{}, err
 		}
+		return controller.Result{}, nil
 	}
 
 	return controller.Result{}, nil

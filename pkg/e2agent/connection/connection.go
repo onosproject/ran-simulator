@@ -732,11 +732,11 @@ func (e *e2Connection) setup() error {
 	defer cancel()
 	e2SetupAck, e2SetupFailure, err := e.client.E2Setup(ctx, e2SetupRequest)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		return errors.NewUnknown("E2 setup failed: %v", err)
 	} else if e2SetupFailure != nil {
 		err := errors.NewInvalid("E2 setup failed")
-		log.Error(err)
+		log.Warn(err)
 		return err
 	}
 	log.Infof("E2 Setup Ack is received:%+v", e2SetupAck)
