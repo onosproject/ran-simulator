@@ -852,6 +852,8 @@ github.com/onosproject/onos-e2t v0.10.6 h1:MTfKfFZGHbK2nDcGI2UWrk4P7SeqeI+8OoP7G
 github.com/onosproject/onos-e2t v0.10.6/go.mod h1:nf/uoLHLYX2uKVwth5X7+848ba5ipwQaLbUszFnozA8=
 github.com/onosproject/onos-e2t v0.10.7 h1:uaQn2cwYLRDIhkdVz/lXzKo+AyCTwDQDn6DXmxhpdRI=
 github.com/onosproject/onos-e2t v0.10.7/go.mod h1:nf/uoLHLYX2uKVwth5X7+848ba5ipwQaLbUszFnozA8=
+github.com/onosproject/onos-e2t v0.10.8 h1:WMAnD9QaY5lVJCtcLnpjzddPyPWdBKazm2RdjG5S+3w=
+github.com/onosproject/onos-e2t v0.10.8/go.mod h1:nf/uoLHLYX2uKVwth5X7+848ba5ipwQaLbUszFnozA8=
 github.com/onosproject/onos-lib-go v0.7.10/go.mod h1:/QjMn+Lb+vxZfnCFLtoxhwHAAuHQnRjjOj3qCbcknhQ=
 github.com/onosproject/onos-lib-go v0.8.1/go.mod h1:1klcUPfLoXPVu4fzM/sYi1V3Pggm2NRbY2fTzG2W1HY=
 github.com/onosproject/onos-lib-go v0.8.12 h1:aYxyQh/cbR8OHskdAJuuKPPx76K3MoOhkz5tOlASdoM=
