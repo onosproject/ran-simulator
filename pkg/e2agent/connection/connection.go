@@ -7,6 +7,8 @@ package connection
 import (
 	"context"
 	"fmt"
+	"net"
+	"sync/atomic"
 	"time"
 
 	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
@@ -75,6 +77,7 @@ type e2Connection struct {
 	subStore        *subscriptions.Subscriptions
 	connectionStore connections.Store
 	ricAddress      addressing.RICAddress
+	transactionID   uint64
 }
 
 // SetClient sets E2 client
@@ -630,7 +633,22 @@ func (e *e2Connection) Setup() error {
 	go func() {
 		<-e.client.Context().Done()
 		log.Warn("Context is cancelled, reconnecting...")
-		err := e.Setup()
+		controller, err := e.model.GetController(e.node.Controllers[0])
+		if err != nil {
+			return
+		}
+
+		controllerAddresses, err := net.LookupHost(controller.Address)
+		if err != nil {
+			return
+		}
+
+		ricAddress := addressing.RICAddress{
+			IPAddress: net.ParseIP(controllerAddresses[0]),
+			Port:      uint64(controller.Port),
+		}
+		e.ricAddress = ricAddress
+		err = e.Setup()
 		if err != nil {
 			return
 		}
@@ -695,12 +713,14 @@ func (e *e2Connection) setup() error {
 		configAdditionList.Value = append(configAdditionList.Value, cui)
 	}
 
+	transactionID := atomic.AddUint64(&e.transactionID, 1) % 255
+
 	setupRequest := setup.NewSetupRequest(
 		setup.WithRanFunctions(e.registry.GetRanFunctions()),
 		setup.WithPlmnID(plmnID.Value()),
 		setup.WithE2NodeID(uint64(e.node.GnbID)),
 		setup.WithComponentConfigUpdateList(configAdditionList),
-		setup.WithTransactionID(int32(1)))
+		setup.WithTransactionID(int32(transactionID)))
 
 	e2SetupRequest, err := setupRequest.Build()
 
@@ -708,13 +728,15 @@ func (e *e2Connection) setup() error {
 		log.Error(err)
 		return err
 	}
-	e2SetupAck, e2SetupFailure, err := e.client.E2Setup(context.Background(), e2SetupRequest)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	e2SetupAck, e2SetupFailure, err := e.client.E2Setup(ctx, e2SetupRequest)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		return errors.NewUnknown("E2 setup failed: %v", err)
 	} else if e2SetupFailure != nil {
 		err := errors.NewInvalid("E2 setup failed")
-		log.Error(err)
+		log.Warn(err)
 		return err
 	}
 	log.Infof("E2 Setup Ack is received:%+v", e2SetupAck)
@@ -730,7 +752,7 @@ func (e *e2Connection) setup() error {
 		Client: e.client,
 	}
 
-	err = e.connectionStore.Add(context.Background(),
+	err = e.connectionStore.Add(ctx,
 		connectionID, connection)
 	if err != nil {
 		return err
