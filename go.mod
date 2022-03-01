@@ -13,7 +13,7 @@ require (
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.8.7
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go v0.8.7
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go v0.8.7
-	github.com/onosproject/onos-e2t v0.10.6
+	github.com/onosproject/onos-e2t v0.10.7
 	github.com/onosproject/onos-lib-go v0.8.12
 	github.com/onosproject/onos-ric-sdk-go v0.8.0
 	github.com/onosproject/onos-test v0.6.4
@@ -32,5 +32,3 @@ require (
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200229013735-71373c6105e3
 
 replace github.com/pmcxs/hexgrid v0.0.0-20190126214921-42796ac894ab => github.com/SeanCondon/hexgrid v0.0.0-20200424141352-c3819a378a18
-
-replace github.com/onosproject/onos-e2t => ../onos-e2t
