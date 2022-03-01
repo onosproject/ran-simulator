@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/onosproject/helmit v0.6.19
-	github.com/onosproject/onos-api/go v0.9.3
+	github.com/onosproject/onos-api/go v0.9.7
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.8.7
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go v0.8.7
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go v0.8.7
