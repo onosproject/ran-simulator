@@ -12,3 +12,4 @@ api/e2/e2-interface.proto
 *report*.xml
 *coverage*.xml
 *-output.out
+build/build-tools
