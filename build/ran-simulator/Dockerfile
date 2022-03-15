@@ -13,6 +13,7 @@ COPY Makefile go.mod go.sum /go/src/github.com/onosproject/ran-simulator/
 COPY cmd/ /go/src/github.com/onosproject/ran-simulator/cmd/
 COPY pkg/ /go/src/github.com/onosproject/ran-simulator/pkg/
 COPY vendor/ /go/src/github.com/onosproject/ran-simulator/vendor/
+COPY build/build-tools /go/src/github.com/onosproject/ran-simulator/build/build-tools/
 
 RUN cd /go/src/github.com/onosproject/ran-simulator && GOFLAGS=-mod=vendor make ${ONOS_MAKE_TARGET}
 
