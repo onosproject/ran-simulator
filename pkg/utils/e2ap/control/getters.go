@@ -6,6 +6,7 @@ package control
 
 import (
 	"fmt"
+
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 )
@@ -15,7 +16,7 @@ func GetRequesterID(request *e2appducontents.RiccontrolRequest) (*int32, error) 
 	var res int32 = -1
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicrequestID) {
-			res = v.GetValue().GetRrId().GetRicRequestorId()
+			res = v.GetValue().GetRicrequestId().GetRicRequestorId()
 			break
 		}
 	}
@@ -32,7 +33,7 @@ func GetRanFunctionID(request *e2appducontents.RiccontrolRequest) (*int32, error
 	var res int32 = -1
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRanfunctionID) {
-			res = v.GetValue().GetRfId().GetValue()
+			res = v.GetValue().GetRanfunctionId().GetValue()
 			break
 		}
 	}
@@ -49,7 +50,7 @@ func GetRicInstanceID(request *e2appducontents.RiccontrolRequest) (*int32, error
 	var res int32 = -1
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicrequestID) {
-			res = v.GetValue().GetRrId().GetRicInstanceId()
+			res = v.GetValue().GetRicrequestId().GetRicInstanceId()
 			break
 		}
 	}

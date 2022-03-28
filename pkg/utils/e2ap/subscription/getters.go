@@ -5,7 +5,8 @@
 package subscription
 
 import (
-	"fmt"
+	"github.com/onosproject/onos-lib-go/pkg/errors"
+
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 )
@@ -15,13 +16,13 @@ func GetRequesterID(request *e2appducontents.RicsubscriptionRequest) (*int32, er
 	var res int32 = -1
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicrequestID) {
-			res = v.GetValue().GetRrId().GetRicRequestorId()
+			res = v.GetValue().GetRicrequestId().GetRicRequestorId()
 			break
 		}
 	}
 
 	if res == -1 {
-		return nil, fmt.Errorf("RicRequestID was not found")
+		return nil, errors.NewNotFound("RicRequestID was not found")
 	}
 
 	return &res, nil
@@ -32,13 +33,13 @@ func GetRanFunctionID(request *e2appducontents.RicsubscriptionRequest) (*int32, 
 	var res int32 = -1
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRanfunctionID) {
-			res = v.GetValue().GetRfId().GetValue()
+			res = v.GetValue().GetRanfunctionId().GetValue()
 			break
 		}
 	}
 
 	if res == -1 {
-		return nil, fmt.Errorf("RanFunctionID was not found")
+		return nil, errors.NewNotFound("RanFunctionID was not found")
 	}
 
 	return &res, nil
@@ -49,13 +50,13 @@ func GetRicInstanceID(request *e2appducontents.RicsubscriptionRequest) (*int32, 
 	var res int32 = -1
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicrequestID) {
-			res = v.GetValue().GetRrId().GetRicInstanceId()
+			res = v.GetValue().GetRicrequestId().GetRicInstanceId()
 			break
 		}
 	}
 
 	if res == -1 {
-		return nil, fmt.Errorf("RicInstanceID was not found")
+		return nil, errors.NewNotFound("RicInstanceID was not found")
 	}
 
 	return &res, nil
@@ -66,7 +67,7 @@ func GetRicActionToBeSetupList(request *e2appducontents.RicsubscriptionRequest) 
 	var res []*e2appducontents.RicactionToBeSetupItemIes
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
-			res = v.GetValue().GetRsd().GetRicActionToBeSetupList().GetValue()
+			res = v.GetValue().GetRicsubscriptionDetails().GetRicActionToBeSetupList().GetValue()
 			break
 		}
 	}

@@ -7,6 +7,7 @@ package rc
 import (
 	"context"
 	"fmt"
+
 	e2smrcpresm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go/servicemodel"
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 
@@ -32,7 +33,7 @@ func (sm *Client) getControlMessage(request *e2appducontents.RiccontrolRequest) 
 	var controlMessageAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRiccontrolMessage) {
-			controlMessageAsnBytes = v.GetValue().GetRcm().GetValue()
+			controlMessageAsnBytes = v.GetValue().GetRiccontrolMessage().GetValue()
 			break
 		}
 	}
@@ -54,7 +55,7 @@ func (sm *Client) getControlHeader(request *e2appducontents.RiccontrolRequest) (
 	var controlHeaderAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRiccontrolHeader) {
-			controlHeaderAsnBytes = v.GetValue().GetRch().GetValue()
+			controlHeaderAsnBytes = v.GetValue().GetRiccontrolHeader().GetValue()
 			break
 		}
 	}
@@ -76,7 +77,7 @@ func (sm *Client) getEventTriggerType(request *e2appducontents.RicsubscriptionRe
 	var eventTriggerAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
-			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			eventTriggerAsnBytes = v.GetValue().GetRicsubscriptionDetails().GetRicEventTriggerDefinition().GetValue()
 			break
 		}
 	}
@@ -147,7 +148,7 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	var eventTriggerAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
-			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			eventTriggerAsnBytes = v.GetValue().GetRicsubscriptionDetails().GetRicEventTriggerDefinition().GetValue()
 			break
 		}
 	}

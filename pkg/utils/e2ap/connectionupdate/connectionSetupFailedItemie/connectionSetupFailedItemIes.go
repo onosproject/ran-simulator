@@ -41,8 +41,8 @@ func (c *IEs) BuildConnectionSetupFailedItemIes() *e2appducontents.E2ConnectionS
 		Id:          int32(v2.ProtocolIeIDE2connectionSetupFailedItem),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_IGNORE),
 		Value: &e2appducontents.E2ConnectionSetupFailedItemIe{
-			E2ConnectionSetupFailedItemIe: &e2appducontents.E2ConnectionSetupFailedItemIe_E2Csfi{
-				E2Csfi: &e2appducontents.E2ConnectionSetupFailedItem{
+			E2ConnectionSetupFailedItemIe: &e2appducontents.E2ConnectionSetupFailedItemIe_E2ConnectionSetupFailedItem{
+				E2ConnectionSetupFailedItem: &e2appducontents.E2ConnectionSetupFailedItem{
 					TnlInformation: c.tnlInfo,
 					Cause:          c.cause,
 				},

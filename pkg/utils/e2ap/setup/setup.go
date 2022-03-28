@@ -91,8 +91,8 @@ func (request *Setup) Build() (setupRequest *e2appducontents.E2SetupRequest, err
 		Id:          int32(v2.ProtocolIeIDE2nodeComponentConfigAddition),
 		Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 		Value: &e2appducontents.E2SetupRequestIe{
-			E2SetupRequestIe: &e2appducontents.E2SetupRequestIe_E2Nccal{
-				E2Nccal: request.componentConfigAdditionList,
+			E2SetupRequestIe: &e2appducontents.E2SetupRequestIe_E2NodeComponentConfigAddition{
+				E2NodeComponentConfigAddition: request.componentConfigAdditionList,
 			},
 		},
 	}

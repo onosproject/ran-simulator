@@ -6,11 +6,12 @@ package mho
 
 import (
 	"encoding/hex"
-	"fmt"
+
 	e2smmhosm "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/servicemodel"
 	e2sm_mho "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go/v2/e2sm-mho-go"
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
+	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -19,7 +20,7 @@ func (m *Mho) getControlMessage(request *e2appducontents.RiccontrolRequest) (*e2
 	var controlMessageAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRiccontrolMessage) {
-			controlMessageAsnBytes = v.GetValue().GetRcm().GetValue()
+			controlMessageAsnBytes = v.GetValue().GetRiccontrolMessage().GetValue()
 			break
 		}
 	}
@@ -43,7 +44,7 @@ func (m *Mho) getControlHeader(request *e2appducontents.RiccontrolRequest) (*e2s
 	var controlHeaderAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRiccontrolHeader) {
-			controlHeaderAsnBytes = v.GetValue().GetRch().GetValue()
+			controlHeaderAsnBytes = v.GetValue().GetRiccontrolHeader().GetValue()
 			break
 		}
 	}
@@ -67,7 +68,7 @@ func (m *Mho) getEventTriggerType(request *e2appducontents.RicsubscriptionReques
 	var eventTriggerAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
-			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			eventTriggerAsnBytes = v.GetValue().GetRicsubscriptionDetails().GetRicEventTriggerDefinition().GetValue()
 			break
 		}
 	}
@@ -91,7 +92,7 @@ func (m *Mho) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (
 	var eventTriggerAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
-			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			eventTriggerAsnBytes = v.GetValue().GetRicsubscriptionDetails().GetRicEventTriggerDefinition().GetValue()
 			break
 		}
 	}
@@ -108,7 +109,7 @@ func (m *Mho) getReportPeriod(request *e2appducontents.RicsubscriptionRequest) (
 	}
 	reportPeriod := eventTriggerDefinition.GetEventDefinitionFormats().GetEventDefinitionFormat1().ReportingPeriodMs
 	if reportPeriod == nil {
-		return 0, fmt.Errorf("no reporting period was set, obtained %v", reportPeriod)
+		return 0, errors.NewNotFound("no reporting period was set, obtained %v", reportPeriod)
 	}
 	rp := *reportPeriod
 

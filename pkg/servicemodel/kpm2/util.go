@@ -17,8 +17,8 @@ func (sm *Client) getActionDefinition(actionList []*e2appducontents.RicactionToB
 	var actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition
 	for _, action := range actionList {
 		for _, acceptedActionID := range ricActionsAccepted {
-			if action.GetValue().GetRatbsi().GetRicActionId().GetValue() == int32(*acceptedActionID) {
-				actionDefinitionBytes := action.GetValue().GetRatbsi().GetRicActionDefinition().GetValue()
+			if action.GetValue().GetRicactionToBeSetupItem().GetRicActionId().GetValue() == int32(*acceptedActionID) {
+				actionDefinitionBytes := action.GetValue().GetRicactionToBeSetupItem().GetRicActionDefinition().GetValue()
 				var kpm2ServiceModel e2smkpmv2sm.Kpm2ServiceModel
 
 				actionDefinitionProtoBytes, err := kpm2ServiceModel.ActionDefinitionASN1toProto(actionDefinitionBytes)
@@ -47,7 +47,7 @@ func (sm *Client) getReportPeriod(request *e2appducontents.RicsubscriptionReques
 	var eventTriggerAsnBytes []byte
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
-			eventTriggerAsnBytes = v.GetValue().GetRsd().GetRicEventTriggerDefinition().GetValue()
+			eventTriggerAsnBytes = v.GetValue().GetRicsubscriptionDetails().GetRicEventTriggerDefinition().GetValue()
 			break
 		}
 	}
