@@ -6,9 +6,10 @@ package subscriptions
 
 import (
 	"fmt"
-	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	"sync"
 	"time"
+
+	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 
 	"github.com/onosproject/onos-e2t/pkg/protocols/e2ap"
 
@@ -47,16 +48,13 @@ func NewSubscription(id ID, e2apsub *e2appducontents.RicsubscriptionRequest, ch 
 	var details *e2appducontents.RicsubscriptionDetails
 	for _, v := range e2apsub.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRanfunctionID) {
-			// E2 Connection To Add list IE
-			rfID = v.GetValue().GetRfId()
+			rfID = v.GetValue().GetRanfunctionId()
 		}
 		if v.Id == int32(v2.ProtocolIeIDRicrequestID) {
-			// E2 Connection To Modify list IE
-			rrID = v.GetValue().GetRrId()
+			rrID = v.GetValue().GetRicrequestId()
 		}
 		if v.Id == int32(v2.ProtocolIeIDRicsubscriptionDetails) {
-			// E2 Connection Remove list IE
-			details = v.GetValue().GetRsd()
+			details = v.GetValue().GetRicsubscriptionDetails()
 		}
 	}
 

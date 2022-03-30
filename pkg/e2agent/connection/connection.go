@@ -122,19 +122,19 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDE2connectionUpdateAdd) {
 			// E2 Connection To Add list IE
-			ies44 = v.GetValue().GetE2Cul()
+			ies44 = v.GetValue().GetE2ConnectionUpdateAdd()
 		}
 		if v.Id == int32(v2.ProtocolIeIDE2connectionUpdateModify) {
 			// E2 Connection To Modify list IE
-			ies45 = v.GetValue().GetE2Cul()
+			ies45 = v.GetValue().GetE2ConnectionUpdateModify()
 		}
 		if v.Id == int32(v2.ProtocolIeIDE2connectionUpdateRemove) {
 			// E2 Connection Remove list IE
-			ies46 = v.GetValue().GetE2Curl()
+			ies46 = v.GetValue().GetE2ConnectionUpdateRemove()
 		}
 		if v.Id == int32(v2.ProtocolIeIDTransactionID) {
 			// Transaction ID IE
-			trID = v.GetValue().GetTrId().GetValue()
+			trID = v.GetValue().GetTransactionId().Value
 		}
 	}
 
@@ -157,8 +157,8 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 		log.Debugf("Adding new connections: %+v", ies44.GetValue())
 		connectionUpdateItems := ies44.GetValue()
 		for _, connectionUpdateItem := range connectionUpdateItems {
-			tnlInfo := connectionUpdateItem.GetValue().GetE2Curi().GetTnlInformation()
-			tnlUsage := connectionUpdateItem.GetValue().GetE2Curi().GetTnlUsage()
+			tnlInfo := connectionUpdateItem.GetValue().GetE2ConnectionUpdateItem().GetTnlInformation()
+			tnlUsage := connectionUpdateItem.GetValue().GetE2ConnectionUpdateItem().GetTnlUsage()
 			// TODO handle tnlUsage
 
 			ricAddress = e.getRICAddress(tnlInfo)
@@ -222,7 +222,7 @@ func (e *e2Connection) E2ConnectionUpdate(ctx context.Context, request *e2appduc
 		log.Debugf("Removing connections: %+v", ies46)
 		connectionUpdateRemoveItems := ies46.GetValue()
 		for _, connectionUpdateRemoveItem := range connectionUpdateRemoveItems {
-			tnlInfo := connectionUpdateRemoveItem.GetValue().GetE2Curi().GetTnlInformation()
+			tnlInfo := connectionUpdateRemoveItem.GetValue().GetE2ConnectionUpdateRemoveItem().GetTnlInformation()
 			ricAddress = e.getRICAddress(tnlInfo)
 			if ricAddress.IPAddress == nil {
 				cause := &e2apies.Cause{
@@ -470,7 +470,7 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 	for _, v := range request.GetProtocolIes() {
 		if v.Id == int32(v2.ProtocolIeIDRanfunctionID) {
 			// E2 Connection To Add list IE
-			ranFunctionID = v.GetValue().GetRfId().GetValue()
+			ranFunctionID = v.GetValue().GetRanfunctionId().GetValue()
 		}
 	}
 
@@ -701,8 +701,8 @@ func (e *e2Connection) setup() error {
 			Id:          int32(v2.ProtocolIeIDE2nodeComponentConfigAdditionItem),
 			Criticality: int32(e2apcommondatatypes.Criticality_CRITICALITY_REJECT),
 			Value: &e2appducontents.E2NodeComponentConfigAdditionItemIe{
-				E2NodeComponentConfigAdditionItemIe: &e2appducontents.E2NodeComponentConfigAdditionItemIe_E2Nccui{
-					E2Nccui: &e2appducontents.E2NodeComponentConfigAdditionItem{
+				E2NodeComponentConfigAdditionItemIe: &e2appducontents.E2NodeComponentConfigAdditionItemIe_E2NodeComponentConfigAdditionItem{
+					E2NodeComponentConfigAdditionItem: &e2appducontents.E2NodeComponentConfigAdditionItem{
 						E2NodeComponentInterfaceType: configAdditionItem.E2NodeComponentType,
 						E2NodeComponentId:            configAdditionItem.E2NodeComponentID,
 						E2NodeComponentConfiguration: &configAdditionItem.E2NodeComponentConfiguration,

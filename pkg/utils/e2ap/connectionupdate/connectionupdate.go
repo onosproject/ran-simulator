@@ -83,8 +83,8 @@ func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E
 			Id:          int32(v2.ProtocolIeIDE2connectionSetup),
 			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 			Value: &e2appducontents.E2ConnectionUpdateAckIe{
-				E2ConnectionUpdateAckIe: &e2appducontents.E2ConnectionUpdateAckIe_E2Cul{
-					E2Cul: e2cul,
+				E2ConnectionUpdateAckIe: &e2appducontents.E2ConnectionUpdateAckIe_E2ConnectionSetup{
+					E2ConnectionSetup: e2cul,
 				},
 			},
 		}
@@ -101,8 +101,8 @@ func (c *ConnectionUpdate) BuildConnectionUpdateAcknowledge() *e2appducontents.E
 			Id:          int32(v2.ProtocolIeIDE2connectionSetupFailed),
 			Criticality: int32(e2ap_commondatatypes.Criticality_CRITICALITY_REJECT),
 			Value: &e2appducontents.E2ConnectionUpdateAckIe{
-				E2ConnectionUpdateAckIe: &e2appducontents.E2ConnectionUpdateAckIe_E2Csfl{
-					E2Csfl: e2csfl,
+				E2ConnectionUpdateAckIe: &e2appducontents.E2ConnectionUpdateAckIe_E2ConnectionSetupFailed{
+					E2ConnectionSetupFailed: e2csfl,
 				},
 			},
 		}

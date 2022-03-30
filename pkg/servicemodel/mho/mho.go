@@ -166,8 +166,8 @@ func (m *Mho) RICSubscription(ctx context.Context, request *e2appducontents.Rics
 
 	for _, action := range actionList {
 		log.Debugf("MHO subscription action: %v", action)
-		actionID := e2aptypes.RicActionID(action.GetValue().GetRatbsi().GetRicActionId().GetValue())
-		actionType := action.GetValue().GetRatbsi().GetRicActionType()
+		actionID := e2aptypes.RicActionID(action.GetValue().GetRicactionToBeSetupItem().GetRicActionId().GetValue())
+		actionType := action.GetValue().GetRicactionToBeSetupItem().GetRicActionType()
 		// mho service model supports report and insert action and should be added to the
 		// list of accepted actions
 		if actionType == e2apies.RicactionType_RICACTION_TYPE_REPORT ||
