@@ -27,6 +27,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
+	rcv1 "github.com/onosproject/ran-simulator/pkg/servicemodel/rc/v1"
 
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 
@@ -64,7 +65,7 @@ type e2Agent struct {
 func NewE2Agent(node model.Node, model *model.Model,
 	nodeStore nodes.Store, ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
 	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (E2Agent, error) {
-	log.Info("Creating New E2 Agent for node with eNbID:", node.GnbID)
+	log.Info("Creating New E2 Agent for node with e2 Node ID:", node.GnbID)
 	reg := registry.NewServiceModelRegistry()
 
 	// Each new e2 agent has its own subscription store
@@ -77,44 +78,57 @@ func NewE2Agent(node model.Node, model *model.Model,
 		}
 		switch registry.RanFunctionID(serviceModel.ID) {
 		case registry.Rcpre2:
+			log.Infof("Registering RC PRE service model for node with e2 Node ID: %v", node.GnbID)
 			rcSm, err := rc.NewServiceModel(node, model,
 				subStore, nodeStore, ueStore, cellStore, metricStore)
 			if err != nil {
+				log.Errorf("Failure creating RC PRE service model for e2 node ID: %v, %s", node.GnbID, err.Error())
 				return nil, err
 			}
 			err = reg.RegisterServiceModel(rcSm)
 			if err != nil {
-				log.Error(err)
+				log.Errorf("Failure registering RC PRE service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
 				return nil, err
 			}
 		case registry.Kpm2:
-			log.Info("KPM2 service model for node with eNbID:", node.GnbID)
+			log.Infof("Registering KPM2 service model for node with e2 Node ID: %v", node.GnbID)
 			kpm2Sm, err := kpm2.NewServiceModel(node, model,
 				subStore, nodeStore, ueStore)
 			if err != nil {
-				log.Info("Failure creating KPM2 service model for eNbID:", node.GnbID)
+				log.Errorf("Failure creating KPM2 service model for e2 node ID: %v, %s", node.GnbID, err.Error())
 				return nil, err
 			}
 			err = reg.RegisterServiceModel(kpm2Sm)
 			if err != nil {
-				log.Info("Failure registering KPM2 service model for eNbID:", node.GnbID)
-				log.Error(err)
+				log.Errorf("Failure registering KPM2 service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
 				return nil, err
 			}
 		case registry.Mho:
-			log.Info("MHO service model for node with eNbID:", node.GnbID)
+			log.Infof("Registering MHO service model for node with e2 Node ID: %v", node.GnbID)
 			mhoSm, err := mho.NewServiceModel(node, model, subStore, nodeStore, ueStore, cellStore,
 				metricStore, a3Chan, mobilityDriver)
 			if err != nil {
-				log.Info("Failure creating MHO service model for eNbID:", node.GnbID)
+				log.Errorf("Failure creating MHO service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
 				return nil, err
 			}
 			err = reg.RegisterServiceModel(mhoSm)
 			if err != nil {
-				log.Info("Failure registering MHO service model for eNbID:", node.GnbID)
-				log.Error(err)
+				log.Errorf("Failure registering MHO service model for e2 Node ID: %s, %s", node.GnbID, err.Error())
 				return nil, err
 			}
+		case registry.Rc:
+			log.Infof("Registering RC service model for e2 node ID:%v", node.GnbID)
+			rcv1Sm, err := rcv1.NewServiceModel(node, model, subStore, nodeStore, ueStore, cellStore, metricStore)
+			if err != nil {
+				log.Errorf("Failure creating RC service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
+				return nil, err
+			}
+			err = reg.RegisterServiceModel(rcv1Sm)
+			if err != nil {
+				log.Errorf("Failure registering RC service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
+				return nil, err
+			}
+
 		}
 	}
 	return &e2Agent{

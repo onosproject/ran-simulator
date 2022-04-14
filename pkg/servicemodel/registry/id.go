@@ -21,8 +21,10 @@ const (
 	Ni
 	// Rcpre2
 	Rcpre2
-	// Kpm2
+	// ORAN-E2SM-KPM version 2
 	Kpm2
 	// MHO
 	Mho
+	// O-RAN-E2SM-RC
+	Rc
 )
