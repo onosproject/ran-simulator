@@ -58,24 +58,28 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 }
 
+// E2ConnectionUpdate implements connection update handler
 func (c Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontents.E2ConnectionUpdate) (response *e2appducontents.E2ConnectionUpdateAcknowledge, failure *e2appducontents.E2ConnectionUpdateFailure, err error) {
 	//TODO implement me
 	log.Info("implement me")
 	return nil, nil, nil
 }
 
+// RICControl implements control handler for RC service model
 func (c Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
 	//TODO implement me
 	log.Info("implement me")
 	return nil, nil, nil
 }
 
+// RICSubscription implements subscription handler for RC service model
 func (c Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
 	//TODO implement me
 	log.Info("implement me")
 	return nil, nil, nil
 }
 
+// RICSubscriptionDelete implements subscription delete handler for RC service model
 func (c Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
 	//TODO implement me
 	log.Info("implement me")
