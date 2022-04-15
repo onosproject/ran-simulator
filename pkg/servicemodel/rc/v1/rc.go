@@ -22,6 +22,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
+	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 )
 
@@ -82,9 +83,45 @@ func (c *Client) E2ConnectionUpdate(ctx context.Context, request *e2appducontent
 
 // RICControl implements control handler for RC service model
 func (c *Client) RICControl(ctx context.Context, request *e2appducontents.RiccontrolRequest) (response *e2appducontents.RiccontrolAcknowledge, failure *e2appducontents.RiccontrolFailure, err error) {
-	//TODO implement me
-	log.Info("implement me")
-	return nil, nil, nil
+	log.Infof("Control Request is received for service model %v and e2 node ID: %d", c.ServiceModel.ModelName, c.ServiceModel.Node.GnbID)
+	reqID, err := controlutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := controlutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := controlutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	controlMessage, err := getControlMessage(request)
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+
+	controlHeader, err := getControlHeader(request)
+	if err != nil {
+		log.Error(err)
+		return nil, nil, err
+	}
+
+	log.Debugf("RC control header: %v", controlHeader)
+	log.Debugf("RC control message: %v", controlMessage)
+
+	// TODO Add control outcome if needed
+	response, err = controlutils.NewControl(
+		controlutils.WithRanFuncID(*ranFuncID),
+		controlutils.WithRequestID(*reqID),
+		controlutils.WithRicInstanceID(*ricInstanceID),
+		controlutils.WithRicControlOutcome(nil)).BuildControlAcknowledge()
+	if err != nil {
+		return nil, nil, err
+	}
+	return response, nil, nil
 }
 
 // RICSubscription implements subscription handler for RC service model
