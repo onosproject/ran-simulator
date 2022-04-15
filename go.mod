@@ -9,12 +9,13 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/onosproject/helmit v0.6.19
-	github.com/onosproject/onos-api/go v0.9.7
+	github.com/onosproject/onos-api/go v0.9.8
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_kpm_v2_go v0.8.7
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_mho_go v0.8.7
+	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc v0.8.10
 	github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc_pre_go v0.8.7
 	github.com/onosproject/onos-e2t v0.11.0
-	github.com/onosproject/onos-lib-go v0.8.13
+	github.com/onosproject/onos-lib-go v0.8.15
 	github.com/onosproject/onos-ric-sdk-go v0.8.8
 	github.com/onosproject/onos-test v0.6.4
 	github.com/onosproject/rrm-son-lib v0.0.2
@@ -23,7 +24,7 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
 	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
+	google.golang.org/protobuf v1.28.0
 	googlemaps.github.io/maps v1.3.2
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
