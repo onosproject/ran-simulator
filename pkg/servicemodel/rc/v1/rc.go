@@ -39,6 +39,7 @@ type Client struct {
 func NewServiceModel(node model.Node, model *model.Model,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
 	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
+	var rcsm e2smrc.RCServiceModel
 	modelName := e2smtypes.ShortName(modelFullName)
 	rcSm := registry.ServiceModel{
 		RanFunctionID: registry.Rc,
@@ -60,7 +61,6 @@ func NewServiceModel(node model.Node, model *model.Model,
 	}
 
 	rcSm.Client = rcClient
-	var rcsm e2smrc.RCServiceModel
 
 	// TODO form the proto bytes for ran function description
 	ranFuncDescBytes, err := rcsm.RanFuncDescriptionProtoToASN1(nil)
@@ -154,6 +154,7 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 			ricActionsAccepted = append(ricActionsAccepted, &actionID)
 		}
 	}
+	
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		cause := &e2apies.Cause{
@@ -193,6 +194,29 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 		}
 		return nil, subscriptionFailure, nil
 	}
+
+	// Process RC action Definitions to create a map of action ID and action definition
+	actionDefinitionsMaps, err := getActionDefinitionMap(actionList, ricActionsAccepted)
+	if err != nil {
+		log.Warn(err)
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_INCONSISTENT_ACTION_SUBSEQUENT_ACTION_SEQUENCE,
+			},
+		}
+		subscription := subutils.NewSubscription(
+			subutils.WithRequestID(*reqID),
+			subutils.WithRanFuncID(*ranFuncID),
+			subutils.WithRicInstanceID(*ricInstanceID),
+			subutils.WithCause(cause))
+		subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+		if err != nil {
+			return nil, subscriptionFailure, nil
+		}
+		return nil, subscriptionFailure, nil
+
+	}
+	log.Debugf("Action Definitions map: %+v", actionDefinitionsMaps)
 
 	eventTriggerFormats := eventTriggers.GetRicEventTriggerFormats()
 	switch eventTriggerFormats.RicEventTriggerFormats.(type) {

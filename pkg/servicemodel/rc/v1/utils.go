@@ -9,8 +9,34 @@ import (
 	e2smrcies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-rc-ies"
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
+	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"google.golang.org/protobuf/proto"
 )
+
+func getActionDefinitionMap(actionList []*e2appducontents.RicactionToBeSetupItemIes, ricActionsAccepted []*e2aptypes.RicActionID) (map[*e2aptypes.RicActionID]*e2smrcies.E2SmRcActionDefinition, error) {
+	actionDefinitionsMap := make(map[*e2aptypes.RicActionID]*e2smrcies.E2SmRcActionDefinition)
+	for _, action := range actionList {
+		for _, actionID := range ricActionsAccepted {
+			if action.GetValue().GetRicactionToBeSetupItem().GetRicActionId().GetValue() == int32(*actionID) {
+				actionDefinitionBytes := action.GetValue().GetRicactionToBeSetupItem().GetRicActionDefinition().GetValue()
+				var rcServiceModel e2smrc.RCServiceModel
+
+				actionDefinitionProtoBytes, err := rcServiceModel.ActionDefinitionASN1toProto(actionDefinitionBytes)
+				if err != nil {
+					return nil, err
+				}
+
+				actionDefinition := &e2smrcies.E2SmRcActionDefinition{}
+				err = proto.Unmarshal(actionDefinitionProtoBytes, actionDefinition)
+				if err != nil {
+					return nil, err
+				}
+				actionDefinitionsMap[actionID] = actionDefinition
+			}
+		}
+	}
+	return actionDefinitionsMap, nil
+}
 
 func getEventTrigger(request *e2appducontents.RicsubscriptionRequest) (*e2smrcies.E2SmRcEventTrigger, error) {
 	var eventTriggerAsnBytes []byte
