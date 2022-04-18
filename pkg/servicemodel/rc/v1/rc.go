@@ -154,7 +154,7 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 			ricActionsAccepted = append(ricActionsAccepted, &actionID)
 		}
 	}
-	
+
 	// At least one required action must be accepted otherwise sends a subscription failure response
 	if len(ricActionsAccepted) == 0 {
 		cause := &e2apies.Cause{
