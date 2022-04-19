@@ -6,7 +6,9 @@ package v1
 
 import (
 	"context"
+	"github.com/gogo/protobuf/proto"
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
 	e2smrc "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/servicemodel"
 	e2smrcies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-rc-ies"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
@@ -62,15 +64,26 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	rcSm.Client = rcClient
 
-	// TODO form the proto bytes for ran function description
-	ranFuncDescBytes, err := rcsm.RanFuncDescriptionProtoToASN1(nil)
+	rcRANFuncDescPDU, err := pdubuilder.CreateE2SmRcRanfunctionDefinition(modelFullName, modelOID, "RAN Control")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	// TODO add event trigger style list, report style list, policy style list, control style list, etc
+
+	protoBytes, err := proto.Marshal(rcRANFuncDescPDU)
+	if err != nil {
+		log.Error(err)
+		return registry.ServiceModel{}, err
+	}
+
+	ranFuncDescBytes, err := rcsm.RanFuncDescriptionProtoToASN1(protoBytes)
 	if err != nil {
 		log.Error(err)
 		return registry.ServiceModel{}, err
 	}
 
 	rcSm.Description = ranFuncDescBytes
-
 	return rcSm, nil
 
 }
