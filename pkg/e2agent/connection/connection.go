@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: 2022-present Intel Corporation
 // SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -37,6 +38,7 @@ import (
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
+	rcv1 "github.com/onosproject/ran-simulator/pkg/servicemodel/rc/v1"
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
@@ -323,6 +325,9 @@ func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.
 	case registry.Mho:
 		client := sm.Client.(*mho.Mho)
 		response, failure, err = client.RICControl(ctx, request)
+	case registry.Rc:
+		client := sm.Client.(*rcv1.Client)
+		response, failure, err = client.RICControl(ctx, request)
 	}
 	if err != nil {
 		return nil, nil, err
@@ -439,6 +444,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 		response, failure, err = client.RICSubscription(ctx, request)
 	case registry.Mho:
 		client := sm.Client.(*mho.Mho)
+		response, failure, err = client.RICSubscription(ctx, request)
+	case registry.Rc:
+		client := sm.Client.(*rcv1.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
 
 	}
@@ -577,6 +585,9 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	case registry.Mho:
 		client := sm.Client.(*mho.Mho)
+		response, failure, err = client.RICSubscriptionDelete(ctx, request)
+	case registry.Rc:
+		client := sm.Client.(*rcv1.Client)
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 
 	}
