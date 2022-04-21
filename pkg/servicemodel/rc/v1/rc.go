@@ -70,7 +70,64 @@ func NewServiceModel(node model.Node, model *model.Model,
 		return registry.ServiceModel{}, err
 	}
 
-	// TODO add event trigger style list, report style list, policy style list, control style list, etc
+	// Event Trigger style 2: Call Process Breakpoint
+	ricEventTriggerStyle2, err := pdubuilder.CreateRanfunctionDefinitionEventTriggerStyleItem(2, eventTriggerStyle2, 2)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	// Create event trigger style list
+	ricEventTriggerStyleList := make([]*e2smrcies.RanfunctionDefinitionEventTriggerStyleItem, 0)
+	ricEventTriggerStyleList = append(ricEventTriggerStyleList, ricEventTriggerStyle2)
+	ranFunctionDefinitionEventTrigger, err := pdubuilder.CreateRanfunctionDefinitionEventTrigger(ricEventTriggerStyleList)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	// Create Ran function Report Style lists
+	// RAN Parameters for Report Style 2
+	reportParametersStyle2List := make([]*e2smrcies.ReportRanparameterItem, 0)
+	ranParameter1, err := pdubuilder.CreateReportRanparameterItem(1, "Current UE ID")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter1)
+	ranParameter2, err := pdubuilder.CreateReportRanparameterItem(21001, "S-NSSAI")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter2)
+
+	ranParameter3, err := pdubuilder.CreateReportRanparameterItem(21002, "SST")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter3)
+
+	ranParameter4, err := pdubuilder.CreateReportRanparameterItem(21003, "SD")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter4)
+
+	// Create Report Style 2: Call Process Outcome, this style is used to report the outcome of an ongoing call process.
+	reportStyle2, err := pdubuilder.CreateRanfunctionDefinitionReportItem(2, "Call Process Outcome", 2, 1, 1, 2)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	reportStyle2.SetRanReportParametersList(reportParametersStyle2List)
+
+	// Add report styles to report style list
+	reportStyleList := make([]*e2smrcies.RanfunctionDefinitionReportItem, 0)
+	reportStyleList = append(reportStyleList, reportStyle2)
+	ranFunctionDefinitionReport, err := pdubuilder.CreateRanfunctionDefinitionReport(reportStyleList)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	// Sets RAN function Definition report
+	rcRANFuncDescPDU.SetRanFunctionDefinitionReport(ranFunctionDefinitionReport)
+	// Sets Ran Function Definition event trigger
+	rcRANFuncDescPDU.SetRanFunctionDefinitionEventTrigger(ranFunctionDefinitionEventTrigger)
 
 	protoBytes, err := proto.Marshal(rcRANFuncDescPDU)
 	if err != nil {

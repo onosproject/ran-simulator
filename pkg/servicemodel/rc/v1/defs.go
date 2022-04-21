@@ -10,3 +10,7 @@ const (
 	version       = "v1"
 	modelOID      = "1.3.6.1.4.1.53148.1.1.2.3"
 )
+
+const (
+	eventTriggerStyle2 = "Call Process Breakpoint"
+)
