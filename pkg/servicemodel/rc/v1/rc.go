@@ -1,5 +1,4 @@
 // SPDX-FileCopyrightText: 2022-present Intel Corporation
-// SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -83,51 +82,58 @@ func NewServiceModel(node model.Node, model *model.Model,
 		return registry.ServiceModel{}, err
 	}
 
-	// Create Ran function Report Style lists
-	// RAN Parameters for Report Style 2
-	reportParametersStyle2List := make([]*e2smrcies.ReportRanparameterItem, 0)
-	ranParameter1, err := pdubuilder.CreateReportRanparameterItem(1, "Current UE ID")
-	if err != nil {
-		return registry.ServiceModel{}, err
-	}
-	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter1)
-	ranParameter2, err := pdubuilder.CreateReportRanparameterItem(21001, "S-NSSAI")
-	if err != nil {
-		return registry.ServiceModel{}, err
-	}
-	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter2)
-
-	ranParameter3, err := pdubuilder.CreateReportRanparameterItem(21002, "SST")
-	if err != nil {
-		return registry.ServiceModel{}, err
-	}
-	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter3)
-
-	ranParameter4, err := pdubuilder.CreateReportRanparameterItem(21003, "SD")
-	if err != nil {
-		return registry.ServiceModel{}, err
-	}
-	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter4)
-
 	// Create Report Style 2: Call Process Outcome, this style is used to report the outcome of an ongoing call process.
-	reportStyle2, err := pdubuilder.CreateRanfunctionDefinitionReportItem(2, "Call Process Outcome", 2, 1, 1, 2)
+	reportStyleItem2, err := pdubuilder.CreateRanfunctionDefinitionReportItem(2, "Call Process Outcome", 2, 1, 1, 2)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
-	reportStyle2.SetRanReportParametersList(reportParametersStyle2List)
+	reportParametersReportStyle2List, err := createRANParametersReportStyle2List()
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	reportStyleItem2.SetRanReportParametersList(reportParametersReportStyle2List)
 
 	// Add report styles to report style list
 	reportStyleList := make([]*e2smrcies.RanfunctionDefinitionReportItem, 0)
-	reportStyleList = append(reportStyleList, reportStyle2)
+	reportStyleList = append(reportStyleList, reportStyleItem2)
 	ranFunctionDefinitionReport, err := pdubuilder.CreateRanfunctionDefinitionReport(reportStyleList)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	
+	// Create RAN Function Definition Insert Indication item (RIC Indication 1 for Handover Control Request)
+	ranFunctionDefinitionInsertItem, err := pdubuilder.CreateRanfunctionDefinitionInsertIndicationItem(1, "Handover Control Request")
+	// Create List of RAN parameters for RIC Indication 1
+	insertParametersInsertStyle3List, err := createRANParametersInsertStyle3List()
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	ranFunctionDefinitionInsertItem.SetRanInsertIndicationParametersList(insertParametersInsertStyle3List)
+
+	// Create Insert Style 3: Connected Mode Mobility Control Request
+	insertStyleItem3, err := pdubuilder.CreateRanfunctionDefinitionInsertItem(3, "Connected Mode Mobility Control Request", 2, 3, 2, 5, 1)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	insertIndicationList := make([]*e2smrcies.RanfunctionDefinitionInsertIndicationItem, 0)
+	insertIndicationList = append(insertIndicationList, ranFunctionDefinitionInsertItem)
+	insertStyleItem3.SetRicInsertIndicationList(insertIndicationList)
+
+	//  Add insert styles to insert style list
+	insertStyleList := make([]*e2smrcies.RanfunctionDefinitionInsertItem, 0)
+	insertStyleList = append(insertStyleList, insertStyleItem3)
+	ranFunctionDefinitionInsert, err := pdubuilder.CreateRanfunctionDefinitionInsert(insertStyleList)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
 
 	// Sets RAN function Definition report
 	rcRANFuncDescPDU.SetRanFunctionDefinitionReport(ranFunctionDefinitionReport)
-	// Sets Ran Function Definition event trigger
+	// Sets RAN Function Definition event trigger
 	rcRANFuncDescPDU.SetRanFunctionDefinitionEventTrigger(ranFunctionDefinitionEventTrigger)
+	// Sets RAN Function Definition insert
+	rcRANFuncDescPDU.SetRanFunctionDefinitionInsert(ranFunctionDefinitionInsert)
 
 	protoBytes, err := proto.Marshal(rcRANFuncDescPDU)
 	if err != nil {
