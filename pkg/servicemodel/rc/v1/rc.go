@@ -127,7 +127,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
-	
+
 	// Create List of RAN parameters for RIC Indication 1
 	insertParametersInsertStyle3List, err := createRANParametersInsertStyle3List()
 	if err != nil {
