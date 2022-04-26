@@ -148,6 +148,13 @@ func createRANParametersInsertStyle3List() ([]*e2smrcies.InsertIndicationRanpara
 
 }
 
+func createRANParametersReportStyle3List() ([]*e2smrcies.ReportRanparameterItem, error) {
+	// RAN Parameters for Report Style 3
+	reportParametersStyle3List := make([]*e2smrcies.ReportRanparameterItem, 0)
+
+	return reportParametersStyle3List, nil
+}
+
 func createRANParametersReportStyle2List() ([]*e2smrcies.ReportRanparameterItem, error) {
 	// RAN Parameters for Report Style 2
 	reportParametersStyle2List := make([]*e2smrcies.ReportRanparameterItem, 0)

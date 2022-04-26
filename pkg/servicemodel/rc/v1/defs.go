@@ -12,4 +12,5 @@ const (
 
 const (
 	eventTriggerStyle2 = "Call Process Breakpoint"
+	eventTriggerStyle3 = "E2 Node Information"
 )
