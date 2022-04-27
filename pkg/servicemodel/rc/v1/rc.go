@@ -102,7 +102,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	reportStyleItem2.SetRanReportParametersList(reportParametersReportStyle2List)
 
 	// Create Report Style 3:  E2 Node Information. This style is used to report E2 Node information, Serving Cell Configuration and Neighbour Relation related information.
-	reportStyleItem3, err := pdubuilder.CreateRanfunctionDefinitionReportItem(3, "E2 Node information", 3, 1, 1, 4)
+	reportStyleItem3, err := pdubuilder.CreateRanfunctionDefinitionReportItem(3, "E2 Node information", 3, 1, 1, 3)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
