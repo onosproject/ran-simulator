@@ -153,12 +153,29 @@ func NewServiceModel(node model.Node, model *model.Model,
 		return registry.ServiceModel{}, err
 	}
 
-	// Sets RAN function Definition report
+	// Creates RAN function definition policy list
+	ranFunctionDefinitionPolicyList := make([]*e2smrcies.RanfunctionDefinitionPolicyItem, 0)
+	// Creates policy items
+	ranFunctionPolicyItem1, err := pdubuilder.CreateRanfunctionDefinitionPolicyItem(3, "Connected Mobile Mobility", 2)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	ranFunctionDefinitionPolicyList = append(ranFunctionDefinitionPolicyList, ranFunctionPolicyItem1)
+	ranFunctionDefinitionPolicy, err := pdubuilder.CreateRanfunctionDefinitionPolicy(ranFunctionDefinitionPolicyList)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	// Sets RAN function report definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionReport(ranFunctionDefinitionReport)
-	// Sets RAN Function Definition event trigger
+	// Sets RAN function event trigger definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionEventTrigger(ranFunctionDefinitionEventTrigger)
-	// Sets RAN Function Definition insert
+	// Sets RAN function insert definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionInsert(ranFunctionDefinitionInsert)
+
+	// Sets RAN function policy definition
+	rcRANFuncDescPDU.SetRanFunctionDefinitionPolicy(ranFunctionDefinitionPolicy)
 
 	protoBytes, err := proto.Marshal(rcRANFuncDescPDU)
 	if err != nil {
