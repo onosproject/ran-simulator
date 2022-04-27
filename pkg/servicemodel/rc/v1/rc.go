@@ -167,15 +167,51 @@ func NewServiceModel(node model.Node, model *model.Model,
 		return registry.ServiceModel{}, err
 	}
 
+	// Creates RAN function definition control list
+	controlItemList := make([]*e2smrcies.RanfunctionDefinitionControlItem, 0)
+	// Creates control action list
+	controlActionList := make([]*e2smrcies.RanfunctionDefinitionControlActionItem, 0)
+	controlActionItem1, err := pdubuilder.CreateRanfunctionDefinitionControlActionItem(1, "PCI Control")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	ranControlActionParametersList1 := make([]*e2smrcies.ControlActionRanparameterItem, 0)
+	controlActionRANParameterItem1 := &e2smrcies.ControlActionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: 1,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: "Serving Cell NR PCI",
+		},
+	}
+	ranControlActionParametersList1 = append(ranControlActionParametersList1, controlActionRANParameterItem1)
+
+	controlActionItem1.SetRanControlActionParametersList(ranControlActionParametersList1)
+	controlActionList = append(controlActionList, controlActionItem1)
+	controlItem1, err := pdubuilder.CreateRanfunctionDefinitionControlItem(9, "PCI Control", 1, 1, 1)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	controlItem1.SetRicControlActionList(controlActionList)
+	controlItemList = append(controlItemList, controlItem1)
+
+	ranFunctionDefinitionControl, err := pdubuilder.CreateRanfunctionDefinitionControl(controlItemList)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
 	// Sets RAN function report definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionReport(ranFunctionDefinitionReport)
 	// Sets RAN function event trigger definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionEventTrigger(ranFunctionDefinitionEventTrigger)
 	// Sets RAN function insert definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionInsert(ranFunctionDefinitionInsert)
-
 	// Sets RAN function policy definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionPolicy(ranFunctionDefinitionPolicy)
+
+	// Sets RAN function control definition
+	rcRANFuncDescPDU.SetRanFunctionDefinitionControl(ranFunctionDefinitionControl)
 
 	protoBytes, err := proto.Marshal(rcRANFuncDescPDU)
 	if err != nil {
