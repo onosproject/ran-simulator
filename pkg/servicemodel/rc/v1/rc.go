@@ -102,7 +102,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	reportStyleItem2.SetRanReportParametersList(reportParametersReportStyle2List)
 
 	// Create Report Style 3:  E2 Node Information. This style is used to report E2 Node information, Serving Cell Configuration and Neighbour Relation related information.
-	reportStyleItem3, err := pdubuilder.CreateRanfunctionDefinitionReportItem(3, "E2 Node information", 3, 1, 1, 4)
+	reportStyleItem3, err := pdubuilder.CreateRanfunctionDefinitionReportItem(3, "E2 Node information", 3, 1, 1, 3)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
@@ -153,12 +153,65 @@ func NewServiceModel(node model.Node, model *model.Model,
 		return registry.ServiceModel{}, err
 	}
 
-	// Sets RAN function Definition report
+	// Creates RAN function definition policy list
+	ranFunctionDefinitionPolicyList := make([]*e2smrcies.RanfunctionDefinitionPolicyItem, 0)
+	// Creates policy items
+	ranFunctionPolicyItem1, err := pdubuilder.CreateRanfunctionDefinitionPolicyItem(3, "Connected Mobile Mobility", 2)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	ranFunctionDefinitionPolicyList = append(ranFunctionDefinitionPolicyList, ranFunctionPolicyItem1)
+	ranFunctionDefinitionPolicy, err := pdubuilder.CreateRanfunctionDefinitionPolicy(ranFunctionDefinitionPolicyList)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	// Creates RAN function definition control list
+	controlItemList := make([]*e2smrcies.RanfunctionDefinitionControlItem, 0)
+	// Creates control action list
+	controlActionList := make([]*e2smrcies.RanfunctionDefinitionControlActionItem, 0)
+	controlActionItem1, err := pdubuilder.CreateRanfunctionDefinitionControlActionItem(1, "PCI Control")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	ranControlActionParametersList1 := make([]*e2smrcies.ControlActionRanparameterItem, 0)
+	controlActionRANParameterItem1 := &e2smrcies.ControlActionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: 1,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: "Serving Cell NR PCI",
+		},
+	}
+	ranControlActionParametersList1 = append(ranControlActionParametersList1, controlActionRANParameterItem1)
+
+	controlActionItem1.SetRanControlActionParametersList(ranControlActionParametersList1)
+	controlActionList = append(controlActionList, controlActionItem1)
+	controlItem1, err := pdubuilder.CreateRanfunctionDefinitionControlItem(9, "PCI Control", 1, 1, 1)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	controlItem1.SetRicControlActionList(controlActionList)
+	controlItemList = append(controlItemList, controlItem1)
+
+	ranFunctionDefinitionControl, err := pdubuilder.CreateRanfunctionDefinitionControl(controlItemList)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	// Sets RAN function report definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionReport(ranFunctionDefinitionReport)
-	// Sets RAN Function Definition event trigger
+	// Sets RAN function event trigger definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionEventTrigger(ranFunctionDefinitionEventTrigger)
-	// Sets RAN Function Definition insert
+	// Sets RAN function insert definition
 	rcRANFuncDescPDU.SetRanFunctionDefinitionInsert(ranFunctionDefinitionInsert)
+	// Sets RAN function policy definition
+	rcRANFuncDescPDU.SetRanFunctionDefinitionPolicy(ranFunctionDefinitionPolicy)
+
+	// Sets RAN function control definition
+	rcRANFuncDescPDU.SetRanFunctionDefinitionControl(ranFunctionDefinitionControl)
 
 	protoBytes, err := proto.Marshal(rcRANFuncDescPDU)
 	if err != nil {
