@@ -5,12 +5,18 @@
 package v1
 
 import (
+	"context"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
 	e2smrc "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/servicemodel"
 	e2smrcies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-rc-ies"
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
+	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/headers/format1"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/messages/format3"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -225,4 +231,51 @@ func createRANParametersReportStyle2List() ([]*e2smrcies.ReportRanparameterItem,
 	}
 	reportParametersStyle2List = append(reportParametersStyle2List, ranParameter11)
 	return reportParametersStyle2List, nil
+}
+
+func (c *Client) getCellPCI(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
+	cell, err := c.ServiceModel.CellStore.Get(ctx, ncgi)
+	if err != nil {
+		return 0, err
+	}
+
+	return int32(cell.PCI), nil
+}
+
+func (c *Client) getEARFCN(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
+	cell, err := c.ServiceModel.CellStore.Get(ctx, ncgi)
+	if err != nil {
+		return 0, err
+	}
+
+	return int32(cell.Earfcn), nil
+}
+
+func (c *Client) createRICIndicationFormat3(ctx context.Context, cells []ransimtypes.NCGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
+	headerFormat1 := format1.NewIndicationHeader()
+	indicationHeaderAsn1Bytes, err := headerFormat1.ToAsn1Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	messageFormat3 := format3.NewIndicationMessage(format3.WithMessageItems(nil))
+
+	indicationMessageAsn1Bytes, err := messageFormat3.ToAsn1Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	// Creates e2 indication
+	indication := indicationutils.NewIndication(
+		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
+		indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
+		indicationutils.WithRequestID(subscription.GetReqID()),
+		indicationutils.WithIndicationHeader(indicationHeaderAsn1Bytes),
+		indicationutils.WithIndicationMessage(indicationMessageAsn1Bytes))
+
+	ricIndication, err := indication.Build()
+	if err != nil {
+		return nil, err
+	}
+	return ricIndication, nil
 }

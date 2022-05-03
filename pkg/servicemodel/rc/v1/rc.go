@@ -8,6 +8,7 @@ import (
 	"context"
 	"github.com/gogo/protobuf/proto"
 	e2smtypes "github.com/onosproject/onos-api/go/onos/e2t/e2sm"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
 	e2smrc "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/servicemodel"
 	e2smrcies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-rc-ies"
@@ -373,19 +374,6 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 	}
 	log.Debugf("Action Definitions map: %+v", actionDefinitionsMaps)
 
-	eventTriggerFormats := eventTriggers.GetRicEventTriggerFormats()
-	switch eventTriggerFormats.RicEventTriggerFormats.(type) {
-	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat1:
-		// TODO Process RIC Event trigger definition IE style 1: Message Event
-	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat2:
-		// TODO Process RIC Event trigger definition IE style 2: Call Process Breakpoint
-	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat3:
-		// TODO Process RIC Event trigger definition IE style 3: E2 Node Information Change
-	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat4:
-		// TODO Process RIC Event trigger definition IE style 4: UE Information Change
-
-	}
-
 	subscription := subutils.NewSubscription(
 		subutils.WithRequestID(*reqID),
 		subutils.WithRanFuncID(*ranFuncID),
@@ -413,6 +401,13 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 		return nil, subscriptionFailure, nil
 	}
 
+	for _, action := range actionList {
+		if action.GetValue().GetRicactionToBeSetupItem().GetRicActionType() == e2apies.RicactionType_RICACTION_TYPE_REPORT {
+			log.Debugf("Processing Report Action for e2 Node %v", c.ServiceModel.Node.GnbID)
+			c.processReportAction(ctx, subscription, eventTriggers)
+		}
+	}
+
 	return response, nil, nil
 
 }
@@ -422,4 +417,72 @@ func (c *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducont
 	//TODO implement me
 	log.Info("implement me")
 	return nil, nil, nil
+}
+
+func (c *Client) processReportAction(ctx context.Context, subscription *subutils.Subscription, eventTriggers *e2smrcies.E2SmRcEventTrigger) {
+	eventTriggerFormats := eventTriggers.GetRicEventTriggerFormats()
+	switch eventTrigger := eventTriggerFormats.RicEventTriggerFormats.(type) {
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat1:
+		// TODO Process RIC Event trigger definition IE style 1: Message Event
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat2:
+		// TODO Process RIC Event trigger definition IE style 2: Call Process Breakpoint
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat3:
+		// Process RIC Event trigger definition IE style 3: E2 Node Information Change
+		e2NodeInfoChangeList := eventTrigger.EventTriggerFormat3.GetE2NodeInfoChangeList()
+		for _, e2NodeChange := range e2NodeInfoChangeList {
+			e2NodeInfoChangeID := e2NodeChange.E2NodeInfoChangeId
+			if e2NodeInfoChangeID == 1 {
+				log.Debugf("Processing event trigger format 3: cell configuration change for e2 Node %v", c.ServiceModel.Node.GnbID)
+
+			} else if e2NodeInfoChangeID == 2 {
+				log.Debug("Processing event trigger format 3: cell neighbor relation change for e2 node %v", c.ServiceModel.Node.GnbID)
+				go func() {
+					err := c.reportOnCellNeighborRelationChange(ctx, subscription, e2NodeChange)
+					if err != nil {
+						return
+					}
+				}()
+
+			} else if e2NodeInfoChangeID == 3 {
+				log.Debug("Processing event trigger format 3: slice configuration change %v", c.ServiceModel.Node.GnbID)
+
+			}
+		}
+
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat4:
+		// TODO Process RIC Event trigger definition IE style 4: UE Information Change
+
+	}
+
+}
+
+func (c *Client) reportOnCellNeighborRelationChange(ctx context.Context, subscription *subutils.Subscription, e2NodeChange *e2smrcies.E2SmRcEventTriggerFormat3Item) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := c.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
+
+	node := c.ServiceModel.Node
+
+	cellInfoList := e2NodeChange.AssociatedCellInfo.GetCellInfoList()
+	cellList := make([]ransimtypes.NCGI, 0)
+	if len(cellInfoList) == 0 {
+		cellList = node.Cells
+	}
+
+	// Report all Cell changes using Indication message format 3
+	// Creates and sends an indication message for each cell in the node
+	ricIndication, err := c.createRICIndicationFormat3(ctx, cellList, subscription)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	err = sub.E2Channel.RICIndication(ctx, ricIndication)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	return nil
 }
