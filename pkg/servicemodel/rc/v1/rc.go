@@ -21,6 +21,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
 	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"github.com/onosproject/ran-simulator/pkg/store/event"
 	"github.com/onosproject/ran-simulator/pkg/store/metrics"
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
@@ -439,6 +440,7 @@ func (c *Client) processReportAction(ctx context.Context, subscription *subutils
 				go func() {
 					err := c.reportOnCellNeighborRelationChange(ctx, subscription, e2NodeChange)
 					if err != nil {
+						log.Warn(err)
 						return
 					}
 				}()
@@ -464,16 +466,53 @@ func (c *Client) reportOnCellNeighborRelationChange(ctx context.Context, subscri
 	}
 
 	node := c.ServiceModel.Node
-
 	cellInfoList := e2NodeChange.AssociatedCellInfo.GetCellInfoList()
 	cellList := make([]ransimtypes.NCGI, 0)
 	if len(cellInfoList) == 0 {
 		cellList = node.Cells
+	} // TODO else create a list of cells based on cell info list to report cell changes just for those requested cells
+	cellEventCh := make(chan event.Event)
+	err = c.ServiceModel.CellStore.Watch(context.Background(), cellEventCh)
+	if err != nil {
+		return err
 	}
 
+	// Sends an initial indication message
+	err = c.sendRICIndicationFormat3(ctx, cellList, subscription, e2NodeChange.GetE2NodeInfoChangeId())
+	if err != nil {
+		return err
+	}
+
+	for {
+		select {
+		case cellEvent := <-cellEventCh:
+			log.Debugf("A Cell change event is occurred %v", cellEvent)
+			cellEventType := cellEvent.Type.(cells.CellEvent)
+			if cellEventType == cells.UpdatedNeighbors {
+				err = c.sendRICIndicationFormat3(ctx, cellList, subscription, e2NodeChange.GetE2NodeInfoChangeId())
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+			}
+		case <-sub.E2Channel.Context().Done():
+			log.Debugf("E2 channel is closed for subscription: %v", subID)
+			return nil
+
+		}
+	}
+}
+
+func (c *Client) sendRICIndicationFormat3(ctx context.Context, cells []ransimtypes.NCGI, subscription *subutils.Subscription, e2NodeInfoChangeID int32) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := c.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
 	// Report all Cell changes using Indication message format 3
 	// Creates and sends an indication message for each cell in the node
-	ricIndication, err := c.createRICIndicationFormat3(ctx, cellList, subscription)
+	ricIndication, err := c.createRICIndicationFormat3(ctx, cells, subscription, e2NodeInfoChangeID)
 	if err != nil {
 		log.Error(err)
 		return err

@@ -9,10 +9,13 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
 	e2smrc "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/servicemodel"
+	e2smcommonies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-common-ies"
 	e2smrcies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-rc-ies"
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/headers/format1"
@@ -242,7 +245,7 @@ func (c *Client) getCellPCI(ctx context.Context, ncgi ransimtypes.NCGI) (int32, 
 	return int32(cell.PCI), nil
 }
 
-func (c *Client) getEARFCN(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
+func (c *Client) getARFCN(ctx context.Context, ncgi ransimtypes.NCGI) (int32, error) {
 	cell, err := c.ServiceModel.CellStore.Get(ctx, ncgi)
 	if err != nil {
 		return 0, err
@@ -251,15 +254,131 @@ func (c *Client) getEARFCN(ctx context.Context, ncgi ransimtypes.NCGI) (int32, e
 	return int32(cell.Earfcn), nil
 }
 
-func (c *Client) createRICIndicationFormat3(ctx context.Context, cells []ransimtypes.NCGI, subscription *subutils.Subscription) (*e2appducontents.Ricindication, error) {
-	headerFormat1 := format1.NewIndicationHeader()
+func (c *Client) createRICIndicationFormat3(ctx context.Context, cells []ransimtypes.NCGI, subscription *subutils.Subscription, e2NodeInfoChangeID int32) (*e2appducontents.Ricindication, error) {
+	headerFormat1 := format1.NewIndicationHeader(format1.WithEventConditionID(e2NodeInfoChangeID))
 	indicationHeaderAsn1Bytes, err := headerFormat1.ToAsn1Bytes()
 	if err != nil {
 		return nil, err
 	}
+	plmnID := c.getPlmnID()
 
-	messageFormat3 := format3.NewIndicationMessage(format3.WithMessageItems(nil))
+	cellInfoList := make([]*e2smrcies.E2SmRcIndicationMessageFormat3Item, 0)
+	for _, ncgi := range cells {
+		cell, err := c.ServiceModel.CellStore.Get(ctx, ncgi)
+		if err != nil {
+			return nil, err
+		}
 
+		nci := ransimtypes.GetNCI(ncgi)
+		nrCGI, err := pdubuilder.CreateNrCgi(plmnID.Value().ToBytes(), &asn1.BitString{
+			Value: utils.Uint64ToBitString(uint64(nci), 36),
+			Len:   36,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		cgi, err := pdubuilder.CreateCgiNRCgi(nrCGI)
+		if err != nil {
+			return nil, err
+		}
+
+		pci, err := c.getCellPCI(ctx, ncgi)
+		if err != nil {
+			return nil, err
+		}
+		cellPCI, err := pdubuilder.CreateServingCellPciNR(pci)
+		if err != nil {
+			return nil, err
+		}
+
+		earfcn, err := c.getARFCN(ctx, ncgi)
+		if err != nil {
+			return nil, err
+		}
+		cellArfcn, err := pdubuilder.CreateServingCellArfcnNR(earfcn)
+		if err != nil {
+			return nil, err
+		}
+
+		neighborCellList := make([]*e2smrcies.NeighborCellItem, 0)
+		for _, neighborNCGI := range cell.Neighbors {
+			neighborNci := ransimtypes.GetNCI(neighborNCGI)
+			neighborNrCGI, err := pdubuilder.CreateNrCgi(plmnID.Value().ToBytes(), &asn1.BitString{
+				Value: utils.Uint64ToBitString(uint64(neighborNci), 36),
+				Len:   36,
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			neighborPci, err := c.getCellPCI(ctx, neighborNCGI)
+			if err != nil {
+				return nil, err
+			}
+
+			neighborEarfcn, err := c.getARFCN(ctx, neighborNCGI)
+			if err != nil {
+				return nil, err
+			}
+
+			neighborNrArfcn, err := pdubuilder.CreateNrArfcn(neighborEarfcn)
+			if err != nil {
+				return nil, err
+			}
+
+			nrFrequencyBandList := &e2smcommonies.NrfrequencyBandList{
+				Value: make([]*e2smcommonies.NrfrequencyBandItem, 0),
+			}
+
+			supportedSulbandList := make([]*e2smcommonies.SupportedSulfreqBandItem, 0)
+			supportedSulbandItem, err := pdubuilder.CreateSupportedSulfreqBandItem(1024)
+			if err != nil {
+				return nil, err
+			}
+			supportedSulbandList = append(supportedSulbandList, supportedSulbandItem)
+
+			frequencyBandItem, err := pdubuilder.CreateNrfrequencyBandItem(1, &e2smcommonies.SupportedSulbandList{
+				Value: supportedSulbandList,
+			})
+			if err != nil {
+				return nil, err
+			}
+
+			nrFrequencyBandList.Value = append(nrFrequencyBandList.Value, frequencyBandItem)
+
+			nrFrequencyInfo, err := pdubuilder.CreateNrfrequencyInfo(neighborNrArfcn, nrFrequencyBandList)
+			if err != nil {
+				return nil, err
+			}
+			nrFrequencyInfo.SetFrequencyShift7P5Khz(pdubuilder.CreateNrfrequencyShift7P5KhzTrue())
+
+			neighborCellItem, err := pdubuilder.CreateNeighborCellItemRanTypeChoiceNr(neighborNrCGI, neighborPci, []byte{0xFF, 0xFF, 0xFF}, pdubuilder.CreateNRModeInfoFDD(),
+				nrFrequencyInfo, pdubuilder.CreateX2XNEstablishedTrue(), pdubuilder.CreateHOValidatedTrue(), 1)
+			if err != nil {
+				return nil, err
+			}
+			neighborCellList = append(neighborCellList, neighborCellItem)
+
+		}
+
+		neighborRelationTable, err := pdubuilder.CreateNeighborRelationInfo(cellPCI, cellArfcn, &e2smrcies.NeighborCellList{
+			Value: neighborCellList,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		item, err := pdubuilder.CreateE2SmRcIndicationMessageFormat3Item(cgi)
+		if err != nil {
+			return nil, err
+		}
+		item.SetNeighborRelationTable(neighborRelationTable).SetCellDeleted(false)
+		cellInfoList = append(cellInfoList, item)
+
+	}
+
+	messageFormat3 := format3.NewIndicationMessage(format3.WithMessageItems(cellInfoList))
 	indicationMessageAsn1Bytes, err := messageFormat3.ToAsn1Bytes()
 	if err != nil {
 		return nil, err
@@ -278,4 +397,10 @@ func (c *Client) createRICIndicationFormat3(ctx context.Context, cells []ransimt
 		return nil, err
 	}
 	return ricIndication, nil
+}
+
+func (c *Client) getPlmnID() ransimtypes.Uint24 {
+	plmnIDUint24 := ransimtypes.Uint24{}
+	plmnIDUint24.Set(uint32(c.ServiceModel.Model.PlmnID))
+	return plmnIDUint24
 }

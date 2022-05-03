@@ -11,13 +11,14 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// HeaderFormat1 indication header format 1
-type HeaderFormat1 struct {
+// Header indication header format 1
+type Header struct {
+	eventTriggerConditionID int32
 }
 
 // NewIndicationHeader creates a new indication header
-func NewIndicationHeader(options ...func(header *HeaderFormat1)) *HeaderFormat1 {
-	header := &HeaderFormat1{}
+func NewIndicationHeader(options ...func(header *Header)) *Header {
+	header := &Header{}
 	for _, option := range options {
 		option(header)
 	}
@@ -25,17 +26,29 @@ func NewIndicationHeader(options ...func(header *HeaderFormat1)) *HeaderFormat1 
 	return header
 }
 
-func (h *HeaderFormat1) Build() (*e2smrcies.E2SmRcIndicationHeader, error) {
+// WithEventConditionID sets event condition ID
+func WithEventConditionID(eventConditionID int32) func(header *Header) {
+	return func(header *Header) {
+		header.eventTriggerConditionID = eventConditionID
+	}
+}
+
+// Build builds indication header format 1
+func (h *Header) Build() (*e2smrcies.E2SmRcIndicationHeader, error) {
 	header, err := pdubuilder.CreateE2SmRcIndicationHeaderFormat1()
 	if err != nil {
 		return nil, err
 	}
+	if h.eventTriggerConditionID != 0 {
+		header.GetRicIndicationHeaderFormats().GetIndicationHeaderFormat1().SetRicEventTriggerConditionID(h.eventTriggerConditionID)
+	}
+
 	return header, nil
 
 }
 
 // ToAsn1Bytes converts header to asn1 bytes
-func (h *HeaderFormat1) ToAsn1Bytes() ([]byte, error) {
+func (h *Header) ToAsn1Bytes() ([]byte, error) {
 	// Creating an indication header
 	indicationHeader, err := h.Build()
 	if err != nil {
