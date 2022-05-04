@@ -405,7 +405,26 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 	for _, action := range actionList {
 		if action.GetValue().GetRicactionToBeSetupItem().GetRicActionType() == e2apies.RicactionType_RICACTION_TYPE_REPORT {
 			log.Debugf("Processing Report Action for e2 Node %v", c.ServiceModel.Node.GnbID)
-			c.processReportAction(ctx, subscription, eventTriggers)
+			err := c.processReportAction(ctx, subscription, eventTriggers)
+			if err != nil {
+				log.Warn(err)
+				cause := &e2apies.Cause{
+					Cause: &e2apies.Cause_RicRequest{
+						RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
+					},
+				}
+				subscription := subutils.NewSubscription(
+					subutils.WithRequestID(*reqID),
+					subutils.WithRanFuncID(*ranFuncID),
+					subutils.WithRicInstanceID(*ricInstanceID),
+					subutils.WithCause(cause))
+				subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+				if err != nil {
+					return nil, subscriptionFailure, nil
+				}
+				return nil, subscriptionFailure, nil
+
+			}
 		}
 	}
 
@@ -420,7 +439,7 @@ func (c *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducont
 	return nil, nil, nil
 }
 
-func (c *Client) processReportAction(ctx context.Context, subscription *subutils.Subscription, eventTriggers *e2smrcies.E2SmRcEventTrigger) {
+func (c *Client) processReportAction(ctx context.Context, subscription *subutils.Subscription, eventTriggers *e2smrcies.E2SmRcEventTrigger) error {
 	eventTriggerFormats := eventTriggers.GetRicEventTriggerFormats()
 	switch eventTrigger := eventTriggerFormats.RicEventTriggerFormats.(type) {
 	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat1:
@@ -434,6 +453,14 @@ func (c *Client) processReportAction(ctx context.Context, subscription *subutils
 			e2NodeInfoChangeID := e2NodeChange.E2NodeInfoChangeId
 			if e2NodeInfoChangeID == 1 {
 				log.Debugf("Processing event trigger format 3: cell configuration change for e2 Node %v", c.ServiceModel.Node.GnbID)
+				go func() {
+					err := c.reportOnCellConfigurationChange(ctx, subscription, e2NodeChange)
+					if err != nil {
+						log.Warn(err)
+						// TODO we should propagate this error back
+						return
+					}
+				}()
 
 			} else if e2NodeInfoChangeID == 2 {
 				log.Debug("Processing event trigger format 3: cell neighbor relation change for e2 node %v", c.ServiceModel.Node.GnbID)
@@ -441,13 +468,13 @@ func (c *Client) processReportAction(ctx context.Context, subscription *subutils
 					err := c.reportOnCellNeighborRelationChange(ctx, subscription, e2NodeChange)
 					if err != nil {
 						log.Warn(err)
+						// TODO we should propagate this error back
 						return
 					}
 				}()
 
-			} else if e2NodeInfoChangeID == 3 {
-				log.Debug("Processing event trigger format 3: slice configuration change %v", c.ServiceModel.Node.GnbID)
-
+			} else {
+				return errors.NewNotSupported("E2 node information change ID %d is not supported", e2NodeInfoChangeID)
 			}
 		}
 
@@ -456,6 +483,54 @@ func (c *Client) processReportAction(ctx context.Context, subscription *subutils
 
 	}
 
+	return nil
+
+}
+
+func (c *Client) reportOnCellConfigurationChange(ctx context.Context, subscription *subutils.Subscription, e2NodeChange *e2smrcies.E2SmRcEventTriggerFormat3Item) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := c.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
+
+	node := c.ServiceModel.Node
+	cellInfoList := e2NodeChange.AssociatedCellInfo.GetCellInfoList()
+	cellList := make([]ransimtypes.NCGI, 0)
+	if len(cellInfoList) == 0 {
+		cellList = node.Cells
+	} // TODO else create a list of cells based on cell info list to report cell changes just for those requested cells
+	cellEventCh := make(chan event.Event)
+	err = c.ServiceModel.CellStore.Watch(context.Background(), cellEventCh)
+	if err != nil {
+		return err
+	}
+
+	// Sends an initial indication message
+	err = c.sendRICIndicationFormat3(ctx, cellList, subscription, e2NodeChange.GetE2NodeInfoChangeId())
+	if err != nil {
+		return err
+	}
+
+	for {
+		select {
+		case cellEvent := <-cellEventCh:
+			log.Debugf("A Cell change event is occurred %v", cellEvent)
+			cellEventType := cellEvent.Type.(cells.CellEvent)
+			if cellEventType == cells.Updated {
+				err = c.sendRICIndicationFormat3(ctx, cellList, subscription, e2NodeChange.GetE2NodeInfoChangeId())
+				if err != nil {
+					log.Error(err)
+					continue
+				}
+
+			}
+		case <-sub.E2Channel.Context().Done():
+			log.Debugf("E2 channel is closed for subscription: %v", subID)
+			return nil
+
+		}
+	}
 }
 
 func (c *Client) reportOnCellNeighborRelationChange(ctx context.Context, subscription *subutils.Subscription, e2NodeChange *e2smrcies.E2SmRcEventTriggerFormat3Item) error {
