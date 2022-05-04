@@ -187,7 +187,17 @@ func NewServiceModel(node model.Node, model *model.Model,
 			Value: "Serving Cell NR PCI",
 		},
 	}
+	controlActionRANParameterItem2 := &e2smrcies.ControlActionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: 2,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: "Serving Cell CGI",
+		},
+	}
+
 	ranControlActionParametersList1 = append(ranControlActionParametersList1, controlActionRANParameterItem1)
+	ranControlActionParametersList1 = append(ranControlActionParametersList1, controlActionRANParameterItem2)
 
 	controlActionItem1.SetRanControlActionParametersList(ranControlActionParametersList1)
 	controlActionList = append(controlActionList, controlActionItem1)
