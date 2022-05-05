@@ -332,12 +332,6 @@ func (c *Client) createRICIndicationFormat3(ctx context.Context, cells []ransimt
 			}
 
 			supportedSulbandList := make([]*e2smcommonies.SupportedSulfreqBandItem, 0)
-			supportedSulbandItem, err := pdubuilder.CreateSupportedSulfreqBandItem(1024)
-			if err != nil {
-				return nil, err
-			}
-			supportedSulbandList = append(supportedSulbandList, supportedSulbandItem)
-
 			frequencyBandItem, err := pdubuilder.CreateNrfrequencyBandItem(1, &e2smcommonies.SupportedSulbandList{
 				Value: supportedSulbandList,
 			})
