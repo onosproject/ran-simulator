@@ -267,17 +267,65 @@ func (c *Client) RICControl(ctx context.Context, request *e2appducontents.Riccon
 	controlMessage, err := getControlMessage(request)
 	if err != nil {
 		log.Error(err)
-		return nil, nil, err
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_CONTROL_MESSAGE_INVALID,
+			},
+		}
+		failure, err = controlutils.NewControl(
+			controlutils.WithRanFuncID(*ranFuncID),
+			controlutils.WithRequestID(*reqID),
+			controlutils.WithRicInstanceID(*ricInstanceID),
+			controlutils.WithCause(cause),
+			controlutils.WithRicControlOutcome(nil)).BuildControlFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 	}
 
 	controlHeader, err := getControlHeader(request)
 	if err != nil {
 		log.Error(err)
-		return nil, nil, err
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
+			},
+		}
+		failure, err = controlutils.NewControl(
+			controlutils.WithRanFuncID(*ranFuncID),
+			controlutils.WithRequestID(*reqID),
+			controlutils.WithRicInstanceID(*ricInstanceID),
+			controlutils.WithCause(cause),
+			controlutils.WithRicControlOutcome(nil)).BuildControlFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
 	}
 
 	log.Debugf("RC control header: %v", controlHeader)
 	log.Debugf("RC control message: %v", controlMessage)
+
+	// Check if the control request is for changing the PCI value to change it PCI
+	err = c.checkAndSetPCI(ctx, controlHeader, controlMessage)
+	if err != nil {
+		cause := &e2apies.Cause{
+			Cause: &e2apies.Cause_RicRequest{
+				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_CONTROL_MESSAGE_INVALID,
+			},
+		}
+		failure, err = controlutils.NewControl(
+			controlutils.WithRanFuncID(*ranFuncID),
+			controlutils.WithRequestID(*reqID),
+			controlutils.WithRicInstanceID(*ricInstanceID),
+			controlutils.WithCause(cause),
+			controlutils.WithRicControlOutcome(nil)).BuildControlFailure()
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, failure, nil
+	}
 
 	// TODO Add control outcome if needed
 	response, err = controlutils.NewControl(

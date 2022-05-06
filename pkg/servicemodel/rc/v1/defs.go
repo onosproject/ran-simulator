@@ -13,4 +13,14 @@ const (
 const (
 	eventTriggerStyle2 = "Call Process Breakpoint"
 	eventTriggerStyle3 = "E2 Node Information"
+	controlStyleType9  = 9
+	controlActionID1   = 1
+)
+
+// RAN parameter IDs
+const (
+	// PCIRANParameterID PCI RAN parameter ID
+	PCIRANParameterID = 1
+	// NCGIRANParameterID NCGI RAN parameter ID
+	NCGIRANParameterID = 2
 )
