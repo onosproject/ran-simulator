@@ -33,8 +33,7 @@ jenkins-test: build deps license linters
 
 integration-tests: # @HELP run helmit integration tests
 	@kubectl delete ns test; kubectl create ns test
-	helmit test -n test ./cmd/ransim-tests --timeout 30m --no-teardown \
-		--secret sd-ran-username=${repo_user} --secret sd-ran-password=${repo_password}
+	helmit test -n test ./cmd/ransim-tests --timeout 30m --no-teardown
 
 model-files: # @HELP generate various model and model-topo YAML files in sdran-helm-charts/ran-simulator
 	go run cmd/honeycomb/honeycomb.go topo --plmnid 314628 --towers 2  --ue-count 10 --controller-yaml ../sdran-helm-charts/ran-simulator/files/topo/model-topo.yaml ../sdran-helm-charts/ran-simulator/files/model/model.yaml
