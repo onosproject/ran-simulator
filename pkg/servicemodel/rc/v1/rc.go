@@ -310,6 +310,7 @@ func (c *Client) RICControl(ctx context.Context, request *e2appducontents.Riccon
 	// Check if the control request is for changing the PCI value to change it PCI
 	err = c.checkAndSetPCI(ctx, controlHeader, controlMessage)
 	if err != nil {
+		log.Error(err)
 		cause := &e2apies.Cause{
 			Cause: &e2apies.Cause_RicRequest{
 				RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_CONTROL_MESSAGE_INVALID,

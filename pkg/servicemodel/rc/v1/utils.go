@@ -410,13 +410,13 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 			messageFormat1 := controlMessage.GetRicControlMessageFormats().GetControlMessageFormat1()
 
 			if messageFormat1 != nil {
+				var pciValue int64
 				for _, ranParameter := range messageFormat1.GetRanPList() {
-					var pciValue int64
 					var ncgi ransimtypes.NCGI
 					// Extracts NR PCI ran parameter
 					ranParameterID := ranParameter.GetRanParameterId().Value
 					if ranParameterID == PCIRANParameterID {
-						ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceElementFalse()
+						ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceElementFalse()
 						if ranParameterValue != nil {
 							pciValue = ranParameterValue.GetRanParameterValue().GetValueInt()
 						} else {
@@ -425,7 +425,7 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 					}
 					// Extracts NCGI ran parameter
 					if ranParameterID == NCGIRANParameterID {
-						ncgiStruct := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure()
+						ncgiStruct := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceStructure()
 						if ncgiStruct != nil {
 							ncgiFields := ncgiStruct.GetRanParameterStructure().GetSequenceOfRanParameters()
 							if len(ncgiFields) == 2 {
@@ -433,8 +433,8 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 								var plmnID ransimtypes.PlmnID
 								var nci ransimtypes.NCI
 								if plmnIDField != nil {
-									plmnIDBitString := plmnIDField.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueBitS()
-									plmnID = ransimtypes.PlmnID(ransimtypes.Uint24ToUint32(plmnIDBitString.Value))
+									plmnIDBitString := plmnIDField.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueOctS()
+									plmnID = ransimtypes.PlmnID(ransimtypes.Uint24ToUint32(plmnIDBitString))
 
 								} else {
 									return errors.NewInvalid("plmn ID ran parameter is not set")
@@ -442,7 +442,7 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 								nciField := ncgiFields[1]
 								if nciField != nil {
 									nciBitString := nciField.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueBitS()
-									nci = ransimtypes.NCI(utils.BitStringToUint64(nciBitString.Value, 36))
+									nci = ransimtypes.NCI(utils.BitStringToUint64(nciBitString.GetValue(), int(nciBitString.GetLen())))
 								} else {
 									return errors.NewInvalid("NCI ran parameter is not set")
 								}
