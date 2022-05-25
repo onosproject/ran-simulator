@@ -11,7 +11,6 @@ import (
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/store/event"
-	"github.com/onosproject/ran-simulator/pkg/store/routes"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
 
 	modelapi "github.com/onosproject/onos-api/go/onos/ransim/model"
@@ -123,12 +122,12 @@ func (s *Server) DeleteUE(ctx context.Context, request *modelapi.DeleteUERequest
 	return &modelapi.DeleteUEResponse{}, err
 }
 
-func eventType(routeEvent routes.RouteEvent) modelapi.EventType {
-	if routeEvent == routes.Created {
+func eventType(ueEvent ues.UeEvent) modelapi.EventType {
+	if ueEvent == ues.Created {
 		return modelapi.EventType_CREATED
-	} else if routeEvent == routes.Updated {
+	} else if ueEvent == ues.Updated {
 		return modelapi.EventType_UPDATED
-	} else if routeEvent == routes.Deleted {
+	} else if ueEvent == ues.Deleted {
 		return modelapi.EventType_DELETED
 	} else {
 		return modelapi.EventType_NONE
@@ -148,7 +147,7 @@ func (s *Server) WatchUEs(request *modelapi.WatchUEsRequest, server modelapi.UEM
 	for ueEvent := range ch {
 		response := &modelapi.WatchUEsResponse{
 			Ue:   ueToAPI(ueEvent.Value.(*model.UE)),
-			Type: eventType(ueEvent.Type.(routes.RouteEvent)),
+			Type: eventType(ueEvent.Type.(ues.UeEvent)),
 		}
 		err := server.Send(response)
 		if err != nil {
