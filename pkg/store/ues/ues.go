@@ -235,10 +235,11 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 			}
 		}
 		ue := &model.UE{
-			IMSI:     imsi,
-			Type:     "phone",
-			Location: model.Coordinate{Lat: 0, Lng: 0},
-			Heading:  0,
+			IMSI:        imsi,
+			AmfUeNgapID: types.AmfUENgapID(i * 1000),
+			Type:        "phone",
+			Location:    model.Coordinate{Lat: 0, Lng: 0},
+			Heading:     0,
 			Cell: &model.UECell{
 				ID:       types.GnbID(ncgi), // placeholder
 				NCGI:     ncgi,

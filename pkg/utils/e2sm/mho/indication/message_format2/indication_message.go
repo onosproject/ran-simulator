@@ -15,8 +15,12 @@ import (
 
 // Message indication message fields for MHO service model
 type Message struct {
-	ueID      int64
-	RrcStatus mho.Rrcstatus
+	ueID        int64
+	RrcStatus   mho.Rrcstatus
+	plmnID      *e2smv2ies.PlmnIdentity
+	amfRegionID *e2smv2ies.AmfregionId
+	amfSetID    *e2smv2ies.AmfsetId
+	amfPointer  *e2smv2ies.Amfpointer
 }
 
 // NewIndicationMessage creates a new indication message
@@ -43,6 +47,36 @@ func WithRrcStatus(rrcStatus mho.Rrcstatus) func(message *Message) {
 	}
 }
 
+// WithGuami sets GUAMI
+func WithGuami(plmnid uint64, amfRegionID uint32, amfSetID uint32, amfPointer uint32) func(message *Message) {
+	return func(message *Message) {
+		message.plmnID = &e2smv2ies.PlmnIdentity{
+			Value: []byte{byte(plmnid & 0xFF0000 >> 16), byte(plmnid & 0xFF00 >> 8), byte(plmnid & 0xFF)},
+		}
+
+		message.amfRegionID = &e2smv2ies.AmfregionId{
+			Value: &asn1.BitString{
+				Len:   8,
+				Value: []byte{byte(amfRegionID & 0xFF)},
+			},
+		}
+
+		message.amfSetID = &e2smv2ies.AmfsetId{
+			Value: &asn1.BitString{
+				Len:   10,
+				Value: []byte{byte((amfSetID << 6) & 0xFF00 >> 8), byte((amfSetID << 6) & 0xFF)},
+			},
+		}
+
+		message.amfPointer = &e2smv2ies.Amfpointer{
+			Value: &asn1.BitString{
+				Len:   6,
+				Value: []byte{byte((amfPointer << 2) & 0xFF)},
+			},
+		}
+	}
+}
+
 // Build builds indication message for MHO service model
 func (message *Message) Build() (*mho.E2SmMhoIndicationMessage, error) {
 	e2SmIndicationMsg := mho.E2SmMhoIndicationMessage_IndicationMessageFormat2{
@@ -55,27 +89,10 @@ func (message *Message) Build() (*mho.E2SmMhoIndicationMessage, error) {
 						},
 						// ToDo - move out GUAMI hardcoding
 						Guami: &e2smv2ies.Guami{
-							PLmnidentity: &e2smv2ies.PlmnIdentity{
-								Value: []byte{0xAA, 0xBB, 0xCC},
-							},
-							AMfregionId: &e2smv2ies.AmfregionId{
-								Value: &asn1.BitString{
-									Value: []byte{0xDD},
-									Len:   8,
-								},
-							},
-							AMfsetId: &e2smv2ies.AmfsetId{
-								Value: &asn1.BitString{
-									Value: []byte{0xCC, 0xC0},
-									Len:   10,
-								},
-							},
-							AMfpointer: &e2smv2ies.Amfpointer{
-								Value: &asn1.BitString{
-									Value: []byte{0xFC},
-									Len:   6,
-								},
-							},
+							PLmnidentity: message.plmnID,
+							AMfregionId:  message.amfRegionID,
+							AMfsetId:     message.amfSetID,
+							AMfpointer:   message.amfPointer,
 						},
 					},
 				},

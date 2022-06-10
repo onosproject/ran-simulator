@@ -226,13 +226,17 @@ func (m *Mho) createIndicationMsgFormat1(ue *model.UE) ([]byte, error) {
 func (m *Mho) createIndicationMsgFormat2(ue *model.UE) ([]byte, error) {
 	log.Debugf("Create MHO RRC indication message ueID: %d", ue.IMSI)
 
-	ueID := int64(ue.IMSI)
+	ueID := int64(ue.AmfUeNgapID)
 
 	indicationMessage := indMsgFmt2.NewIndicationMessage(
 		indMsgFmt2.WithUeID(ueID),
-		indMsgFmt2.WithRrcStatus(ue.RrcState))
+		indMsgFmt2.WithRrcStatus(ue.RrcState),
+		indMsgFmt2.WithGuami(uint64(m.ServiceModel.Model.PlmnID), m.ServiceModel.Model.Guami.AmfRegionID,
+			m.ServiceModel.Model.Guami.AmfSetID, m.ServiceModel.Model.Guami.AmfPointer))
 
-	log.Debugf("MHO RRC state indication message for ueID %s: %v", ueID, indicationMessage)
+	log.Debugf("MHO RRC state indication message for ueID amf ue ngap id - %v, plmnid - %v, amf region id - %v,"+
+		"amf set id - %v, amf pointer - %v: %v", ueID, uint64(m.ServiceModel.Model.PlmnID), m.ServiceModel.Model.Guami.AmfRegionID, m.ServiceModel.Model.Guami.AmfSetID, m.ServiceModel.Model.Guami.AmfPointer,
+		indicationMessage)
 
 	indicationMessageBytes, err := indicationMessage.ToAsn1Bytes()
 	if err != nil {
