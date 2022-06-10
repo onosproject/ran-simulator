@@ -27,6 +27,7 @@ type Model struct {
 	Plmn                    string                  `mapstructure:"plmnID" yaml:"plmnID"`
 	PlmnID                  types.PlmnID            `mapstructure:"plmnNumber" yaml:"plmnNumber"` // overridden and derived post-load from "Plmn" field
 	APIKey                  string                  `mapstructure:"apiKey" yaml:"apiKey"`         // Google Maps API key (optional)
+	Guami                   Guami                   `mapstructure:"guami" yaml:"guami"`
 }
 
 // Coordinate represents a geographical location
@@ -93,6 +94,13 @@ type EventA3Params struct {
 	ReportOnLeave bool  `mapstructure:"reportOnLeave"`
 }
 
+// Guami is AMF ID
+type Guami struct {
+	AmfRegionID uint32 `mapstructure:"amfregionid"`
+	AmfSetID    uint32 `mapstructure:"amfsetid"`
+	AmfPointer  uint32 `mapstructure:"amfpointer"`
+}
+
 // Cell represents a section of coverage
 type Cell struct {
 	NCGI              types.NCGI        `mapstructure:"ncgi"`
@@ -121,12 +129,13 @@ type UECell struct {
 
 // UE represents user-equipment, i.e. phone, IoT device, etc.
 type UE struct {
-	IMSI     types.IMSI
-	Type     UEType
-	RrcState e2sm_mho.Rrcstatus
-	Location Coordinate
-	Heading  uint32
-	FiveQi   int
+	IMSI        types.IMSI
+	AmfUeNgapID types.AmfUENgapID
+	Type        UEType
+	RrcState    e2sm_mho.Rrcstatus
+	Location    Coordinate
+	Heading     uint32
+	FiveQi      int
 
 	Cell  *UECell
 	CRNTI types.CRNTI
