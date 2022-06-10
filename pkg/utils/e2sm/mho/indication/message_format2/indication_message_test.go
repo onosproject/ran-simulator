@@ -14,7 +14,8 @@ import (
 
 func TestCreateIndicationMessage(t *testing.T) {
 
-	indicationMessage := NewIndicationMessage(WithUeID(1), WithRrcStatus(pdubuilder.CreateRrcStatusConnected()))
+	indicationMessage := NewIndicationMessage(WithUeID(1), WithRrcStatus(pdubuilder.CreateRrcStatusConnected()), WithGuami(uint64(12345), 10,
+		11, 12))
 	assert.NotNil(t, indicationMessage)
 	assert.Equal(t, indicationMessage.ueID, int64(1))
 	assert.Equal(t, indicationMessage.RrcStatus.Number(), pdubuilder.CreateRrcStatusConnected().Number())
