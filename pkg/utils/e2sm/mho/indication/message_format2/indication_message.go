@@ -47,6 +47,7 @@ func WithRrcStatus(rrcStatus mho.Rrcstatus) func(message *Message) {
 	}
 }
 
+// WithGuami sets GUAMI
 func WithGuami(plmnid uint64, amfRegionID uint32, amfSetID uint32, amfPointer uint32) func(message *Message) {
 	return func(message *Message) {
 		message.plmnID = &e2smv2ies.PlmnIdentity{
