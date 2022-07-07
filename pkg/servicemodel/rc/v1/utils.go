@@ -405,7 +405,7 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 	headerFormat1 := controlHeader.GetRicControlHeaderFormats().GetControlHeaderFormat1()
 	if headerFormat1 != nil {
 		// Process Control Style 9, Control Action ID 1 (i.e. PCI assignment)
-		if headerFormat1.GetRicStyleType().Value == controlStyleType9 &&
+		if headerFormat1.GetRicStyleType().Value == controlStyleType200 &&
 			headerFormat1.GetRicControlActionId().Value == controlActionID1 {
 			messageFormat1 := controlMessage.GetRicControlMessageFormats().GetControlMessageFormat1()
 
