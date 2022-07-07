@@ -201,7 +201,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	controlActionItem1.SetRanControlActionParametersList(ranControlActionParametersList1)
 	controlActionList = append(controlActionList, controlActionItem1)
-	controlItem1, err := pdubuilder.CreateRanfunctionDefinitionControlItem(9, "PCI Control", 1, 1, 1)
+	controlItem1, err := pdubuilder.CreateRanfunctionDefinitionControlItem(controlStyleType200, "PCI Control", 1, 1, 1)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
