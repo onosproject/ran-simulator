@@ -11,10 +11,10 @@ const (
 )
 
 const (
-	eventTriggerStyle2 = "Call Process Breakpoint"
-	eventTriggerStyle3 = "E2 Node Information"
-	controlStyleType9  = 9
-	controlActionID1   = 1
+	eventTriggerStyle2  = "Call Process Breakpoint"
+	eventTriggerStyle3  = "E2 Node Information"
+	controlStyleType200 = 200 // for PCI use-case: since there is no style for PCI use-case, define a new style
+	controlActionID1    = 1
 )
 
 // RAN parameter IDs
