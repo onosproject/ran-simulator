@@ -59,6 +59,7 @@ func (h *Header) Build() (*e2smrcies.E2SmRcIndicationHeader, error) {
 	return header, nil
 }
 
+// ToAsn1Bytes converts Header to ASN.1 bytes
 func (h *Header) ToAsn1Bytes() ([]byte, error) {
 	indicationHeader, err := h.Build()
 	if err != nil {

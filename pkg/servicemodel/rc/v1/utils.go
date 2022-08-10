@@ -525,6 +525,7 @@ func (c *Client) handleControlMessage(ctx context.Context, controlHeader *e2smrc
 		}
 	} else if headerFormat2 != nil {
 		// TODO write handler for header format2
+		log.Error("header format 2 handler is not implemented yet")
 	}
 
 	return nil
