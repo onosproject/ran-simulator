@@ -11,10 +11,15 @@ const (
 )
 
 const (
+	eventTriggerStyle1  = "Message Event"
 	eventTriggerStyle2  = "Call Process Breakpoint"
 	eventTriggerStyle3  = "E2 Node Information"
+	controlStyleType3   = 3
 	controlStyleType200 = 200 // for PCI use-case: since there is no style for PCI use-case, define a new style
 	controlActionID1    = 1
+
+	ricInsertIndicationIDForMHO = 1
+	ricInsertStyleType3         = 3
 )
 
 // RAN parameter IDs
@@ -23,4 +28,22 @@ const (
 	PCIRANParameterID = 1
 	// NCGIRANParameterID NCGI RAN parameter ID
 	NCGIRANParameterID = 2
+
+	// TargetPrimaryCellIDRANParameterID Target Primary Cell ID RAN parameter ID
+	TargetPrimaryCellIDRANParameterID = 1
+	// TargetCellRANParameterID Choice of Target Cell RAN parameter ID
+	TargetCellRANParameterID = 2
+	// NRCellRANParameterID NR Cell RAN parameter ID
+	NRCellRANParameterID = 3
+	// NRCGIRANParameterID NR CGI RAN parameter ID
+	NRCGIRANParameterID = 4
+	// EUTRACellRANParameterID E-UTRA Cell RAN parameter ID
+	EUTRACellRANParameterID = 5
+	// EUTRACGIRANParameterID E-UTRA CGI RAN parameter ID
+	EUTRACGIRANParameterID = 6
+)
+
+// UE Event IDs
+const (
+	A3MeasurementReportUEEventID = 2
 )

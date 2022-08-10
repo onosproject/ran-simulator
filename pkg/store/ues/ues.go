@@ -6,6 +6,8 @@ package ues
 
 import (
 	"context"
+	"fmt"
+	e2smcommonies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-common-ies"
 	"math/rand"
 	"sync"
 
@@ -55,6 +57,9 @@ type Store interface {
 
 	// Get retrieves the UE with the specified IMSI
 	Get(ctx context.Context, imsi types.IMSI) (*model.UE, error)
+
+	// GetWithGNbUeID retrieves the UE with the gNB UE ID
+	GetWithGNbUeID(ctx context.Context, gNBUeID *e2smcommonies.UeidGnb) (*model.UE, error)
 
 	// Delete destroy the specified UE
 	Delete(ctx context.Context, imsi types.IMSI) (*model.UE, error)
@@ -236,7 +241,7 @@ func (s *store) CreateUEs(ctx context.Context, count uint) {
 		}
 		ue := &model.UE{
 			IMSI:        imsi,
-			AmfUeNgapID: types.AmfUENgapID(i * 1000),
+			AmfUeNgapID: types.AmfUENgapID(i + 1000),
 			Type:        "phone",
 			Location:    model.Coordinate{Lat: 0, Lng: 0},
 			Heading:     0,
@@ -265,6 +270,20 @@ func (s *store) Get(ctx context.Context, imsi types.IMSI) (*model.UE, error) {
 	}
 
 	return nil, errors.New(errors.NotFound, "UE not found")
+}
+
+func (s *store) GetWithGNbUeID(ctx context.Context, gNBUeID *e2smcommonies.UeidGnb) (*model.UE, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	amfUeNgapID := gNBUeID.AmfUeNgapId.GetValue()
+	for _, ue := range s.ues {
+		// TODO add GUAMI - currently RAN simulator only supports single AMF, it should be fine
+		// TODO for the future, GUAMI should be considered here
+		if int64(ue.AmfUeNgapID) == amfUeNgapID {
+			return ue, nil
+		}
+	}
+	return nil, errors.NewNotFound(fmt.Sprintf("the UE having gNB UE ID %v Not found", gNBUeID))
 }
 
 // Delete deletes a UE based on a given imsi

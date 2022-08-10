@@ -6,6 +6,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
 	e2smrc "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/servicemodel"
@@ -16,12 +17,16 @@ import (
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
+	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	indicationutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/indication"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/headers/format1"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/headers/format2"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/messages/format3"
+	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/messages/format5"
 	"google.golang.org/protobuf/proto"
+	"strconv"
 )
 
 func getActionDefinitionMap(actionList []*e2appducontents.RicactionToBeSetupItemIes, ricActionsAccepted []*e2aptypes.RicActionID) (map[*e2aptypes.RicActionID]*e2smrcies.E2SmRcActionDefinition, error) {
@@ -400,72 +405,216 @@ func (c *Client) getPlmnID() ransimtypes.Uint24 {
 	return plmnIDUint24
 }
 
-// checkAndSetPCI check if the control header and message including the required info for changing the PCI value for a specific cell
-func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2SmRcControlHeader, controlMessage *e2smrcies.E2SmRcControlMessage) error {
+//List of RAN Parameters
+//> RAN Parameter ID: 1
+//> Target Primary Cell ID structure
+// >> RAN Parameter ID: 2
+// >> Choice Target Cell structure
+//  >>> [Choice 1] RAN Parameter ID: 3
+//  >>> [Choice 1] NR Cell structure
+//   >>>> RAN Parameter ID: 4
+//   >>>> NR CGI Element with key flag false
+//  >>> [Choice 2] RAN Parameter ID: 5
+//  >>> [Choice 2] E-UTRA Cell structure
+//   >>>> RAN Parameter ID: 6
+//   >>>> E-UTRA CGI Element with key flag false
+func (c *Client) createRICIndicationFormat5Header2(ctx context.Context, subscription *subutils.Subscription, ueID *e2smcommonies.Ueid, ricInsertStyleType int32, insertIndicationID int32, targetNCGI ransimtypes.NCGI) (*e2appducontents.Ricindication, error) {
+	headerFormat2 := format2.NewIndicationHeader(format2.WithUEID(ueID),
+		format2.WithRICInsertStyleType(ricInsertStyleType),
+		format2.WithInsertIndicationID(insertIndicationID))
+	indicationHeaderAsn1Byte, err := headerFormat2.ToAsn1Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	nrcgiRanParamValuePrint, err := pdubuilder.CreateRanparameterValuePrintableString(fmt.Sprintf("%x", targetNCGI))
+	if err != nil {
+		return nil, err
+	}
+	nrCgiRanParamValue, err := pdubuilder.CreateRanparameterValueTypeChoiceElementFalse(nrcgiRanParamValuePrint)
+	if err != nil {
+		return nil, err
+	}
+	nrCgiRanParamValueItem, err := pdubuilder.CreateRanparameterStructureItem(NRCGIRANParameterID, nrCgiRanParamValue)
+	if err != nil {
+		return nil, err
+	}
+	nrCellRanParamValue, err := pdubuilder.CreateRanParameterStructure([]*e2smrcies.RanparameterStructureItem{nrCgiRanParamValueItem})
+	if err != nil {
+		return nil, err
+	}
+	nrCellRanParamValueType, err := pdubuilder.CreateRanparameterValueTypeChoiceStructure(nrCellRanParamValue)
+	if err != nil {
+		return nil, err
+	}
+	nrCellRanParamValueItem, err := pdubuilder.CreateRanparameterStructureItem(NRCellRANParameterID, nrCellRanParamValueType)
+	if err != nil {
+		return nil, err
+	}
+	targetCellRanParamValue, err := pdubuilder.CreateRanParameterStructure([]*e2smrcies.RanparameterStructureItem{nrCellRanParamValueItem})
+	if err != nil {
+		return nil, err
+	}
+	targetCellRanParamValueType, err := pdubuilder.CreateRanparameterValueTypeChoiceStructure(targetCellRanParamValue)
+	if err != nil {
+		return nil, err
+	}
+	targetCellRanParamValueItem, err := pdubuilder.CreateRanparameterStructureItem(TargetCellRANParameterID, targetCellRanParamValueType)
+	if err != nil {
+		return nil, err
+	}
+	targetPrimaryCellIDRanParamValue, err := pdubuilder.CreateRanParameterStructure([]*e2smrcies.RanparameterStructureItem{targetCellRanParamValueItem})
+	if err != nil {
+		return nil, err
+	}
+	targetPrimaryCellIDRanParamValueType, err := pdubuilder.CreateRanparameterValueTypeChoiceStructure(targetPrimaryCellIDRanParamValue)
+	if err != nil {
+		return nil, err
+	}
+	targetPrimaryCellIDRanParamValueItem, err := pdubuilder.CreateE2SmRcIndicationMessageFormat5Item(TargetPrimaryCellIDRANParameterID, targetPrimaryCellIDRanParamValueType)
+	if err != nil {
+		return nil, err
+	}
+
+	rpl := []*e2smrcies.E2SmRcIndicationMessageFormat5Item{targetPrimaryCellIDRanParamValueItem}
+	messageFormat5 := format5.NewIndicationMessage(format5.WithMessageItems(rpl))
+
+	indicationMessageAsn1Byte, err := messageFormat5.ToAsn1Bytes()
+	if err != nil {
+		return nil, err
+	}
+
+	indication := indicationutils.NewIndication(
+		indicationutils.WithRicInstanceID(subscription.GetRicInstanceID()),
+		indicationutils.WithRanFuncID(subscription.GetRanFuncID()),
+		indicationutils.WithRequestID(subscription.GetReqID()),
+		indicationutils.WithIndicationHeader(indicationHeaderAsn1Byte),
+		indicationutils.WithIndicationMessage(indicationMessageAsn1Byte))
+	// TODO add indicationutils.WithRicCallProcessID([]byte(0)))
+
+	ricIndication, err := indication.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	return ricIndication, nil
+}
+
+func (c *Client) handleControlMessage(ctx context.Context, controlHeader *e2smrcies.E2SmRcControlHeader, controlMessage *e2smrcies.E2SmRcControlMessage) error {
 	headerFormat1 := controlHeader.GetRicControlHeaderFormats().GetControlHeaderFormat1()
+	headerFormat2 := controlHeader.GetRicControlHeaderFormats().GetControlHeaderFormat2()
+	messageFormat1 := controlMessage.GetRicControlMessageFormats().GetControlMessageFormat1()
+
 	if headerFormat1 != nil {
-		// Process Control Style 9, Control Action ID 1 (i.e. PCI assignment)
-		if headerFormat1.GetRicStyleType().Value == controlStyleType200 &&
-			headerFormat1.GetRicControlActionId().Value == controlActionID1 {
-			messageFormat1 := controlMessage.GetRicControlMessageFormats().GetControlMessageFormat1()
-
-			if messageFormat1 != nil {
-				var pciValue int64
-				for _, ranParameter := range messageFormat1.GetRanPList() {
-					var ncgi ransimtypes.NCGI
-					// Extracts NR PCI ran parameter
-					ranParameterID := ranParameter.GetRanParameterId().Value
-					if ranParameterID == PCIRANParameterID {
-						ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceElementFalse()
-						if ranParameterValue != nil {
-							pciValue = ranParameterValue.GetRanParameterValue().GetValueInt()
-						} else {
-							return errors.NewInvalid("PCI ran parameter is not set")
-						}
-					}
-					// Extracts NCGI ran parameter
-					if ranParameterID == NCGIRANParameterID {
-						ncgiStruct := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceStructure()
-						if ncgiStruct != nil {
-							ncgiFields := ncgiStruct.GetRanParameterStructure().GetSequenceOfRanParameters()
-							if len(ncgiFields) == 2 {
-								plmnIDField := ncgiFields[0]
-								var plmnID ransimtypes.PlmnID
-								var nci ransimtypes.NCI
-								if plmnIDField != nil {
-									plmnIDBitString := plmnIDField.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueOctS()
-									plmnID = ransimtypes.PlmnID(ransimtypes.Uint24ToUint32(plmnIDBitString))
-
-								} else {
-									return errors.NewInvalid("plmn ID ran parameter is not set")
-								}
-								nciField := ncgiFields[1]
-								if nciField != nil {
-									nciBitString := nciField.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueBitS()
-									nci = ransimtypes.NCI(utils.BitStringToUint64(nciBitString.GetValue(), int(nciBitString.GetLen())))
-								} else {
-									return errors.NewInvalid("NCI ran parameter is not set")
-								}
-								ncgi = ransimtypes.ToNCGI(plmnID, nci)
-								cell, err := c.ServiceModel.CellStore.Get(ctx, ncgi)
-								if err != nil {
-									return err
-								}
-								cell.PCI = uint32(pciValue)
-								err = c.ServiceModel.CellStore.Update(ctx, cell)
-								if err != nil {
-									return err
-								}
-							}
-						} else {
-							return errors.NewInvalid("NCGI ran parameter is not set")
-						}
-					}
+		// handler for header format 1
+		// handler for message format 1
+		if messageFormat1 != nil {
+			if headerFormat1.GetRicStyleType().Value == controlStyleType200 && headerFormat1.GetRicControlActionId().Value == controlActionID1 {
+				// for PCI change
+				err := c.checkAndSetPCI(ctx, messageFormat1)
+				if err != nil {
+					return err
+				}
+			} else if headerFormat1.GetRicStyleType().Value == controlStyleType3 && headerFormat1.GetRicControlActionId().Value == controlActionID1 {
+				// for MHO
+				err := c.runHandover(ctx, headerFormat1, messageFormat1)
+				if err != nil {
+					return err
 				}
 			}
 		}
+	} else if headerFormat2 != nil {
+		// TODO write handler for header format2
+		log.Error("header format 2 handler is not implemented yet")
 	}
 
 	return nil
+}
 
+func (c *Client) runHandover(ctx context.Context, controlHeader *e2smrcies.E2SmRcControlHeaderFormat1, controlMessage *e2smrcies.E2SmRcControlMessageFormat1) error {
+	ueID := controlHeader.GetUeId()
+	ue, err := c.ServiceModel.UEs.GetWithGNbUeID(ctx, ueID.GetGNbUeid())
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	for _, ranParameter := range controlMessage.GetRanPList() {
+		ranParameterID := ranParameter.GetRanParameterId().Value
+		if ranParameterID == TargetPrimaryCellIDRANParameterID {
+			targetPrimaryCellIDString := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].
+				GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].
+				GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].
+				GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValuePrintableString()
+			targetPrimaryCellID, err := strconv.ParseUint(targetPrimaryCellIDString, 16, 64)
+			if err != nil {
+				log.Error(err)
+				return err
+			}
+			ncgi := ransimtypes.NCGI(targetPrimaryCellID)
+			tCell := &model.UECell{
+				ID:   ransimtypes.GnbID(ncgi),
+				NCGI: ncgi,
+			}
+			c.mobilityDriver.Handover(ctx, ue.IMSI, tCell)
+		}
+	}
+	return nil
+}
+
+// checkAndSetPCI check if the control header and message including the required info for changing the PCI value for a specific cell
+func (c *Client) checkAndSetPCI(ctx context.Context, controlMessage *e2smrcies.E2SmRcControlMessageFormat1) error {
+	var pciValue int64
+	for _, ranParameter := range controlMessage.GetRanPList() {
+		var ncgi ransimtypes.NCGI
+		// Extracts NR PCI ran parameter
+		ranParameterID := ranParameter.GetRanParameterId().Value
+		if ranParameterID == PCIRANParameterID {
+			ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceElementFalse()
+			if ranParameterValue != nil {
+				pciValue = ranParameterValue.GetRanParameterValue().GetValueInt()
+			} else {
+				return errors.NewInvalid("PCI ran parameter is not set")
+			}
+		}
+		// Extracts NCGI ran parameter
+		if ranParameterID == NCGIRANParameterID {
+			ncgiStruct := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceStructure()
+			if ncgiStruct != nil {
+				ncgiFields := ncgiStruct.GetRanParameterStructure().GetSequenceOfRanParameters()
+				if len(ncgiFields) == 2 {
+					plmnIDField := ncgiFields[0]
+					var plmnID ransimtypes.PlmnID
+					var nci ransimtypes.NCI
+					if plmnIDField != nil {
+						plmnIDBitString := plmnIDField.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueOctS()
+						plmnID = ransimtypes.PlmnID(ransimtypes.Uint24ToUint32(plmnIDBitString))
+
+					} else {
+						return errors.NewInvalid("plmn ID ran parameter is not set")
+					}
+					nciField := ncgiFields[1]
+					if nciField != nil {
+						nciBitString := nciField.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueBitS()
+						nci = ransimtypes.NCI(utils.BitStringToUint64(nciBitString.GetValue(), int(nciBitString.GetLen())))
+					} else {
+						return errors.NewInvalid("NCI ran parameter is not set")
+					}
+					ncgi = ransimtypes.ToNCGI(plmnID, nci)
+					cell, err := c.ServiceModel.CellStore.Get(ctx, ncgi)
+					if err != nil {
+						return err
+					}
+					cell.PCI = uint32(pciValue)
+					err = c.ServiceModel.CellStore.Update(ctx, cell)
+					if err != nil {
+						return err
+					}
+				}
+			} else {
+				return errors.NewInvalid("NCGI ran parameter is not set")
+			}
+		}
+	}
+	return nil
 }
