@@ -11,12 +11,15 @@ import (
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
 	e2smrc "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/servicemodel"
+	e2smcommonies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-common-ies"
 	e2smrcies "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/v1/e2sm-rc-ies"
 	e2apies "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-ies"
 	e2appducontents "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-pdu-contents"
 	e2aptypes "github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/onos-lib-go/pkg/logging"
+	"github.com/onosproject/ran-simulator/pkg/mobility"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
@@ -26,8 +29,11 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
+	"github.com/onosproject/ran-simulator/pkg/utils"
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
+	"github.com/onosproject/rrm-son-lib/pkg/handover"
+	"github.com/onosproject/rrm-son-lib/pkg/model/id"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -36,13 +42,15 @@ var log = logging.GetLogger()
 
 // Client rc service model client
 type Client struct {
-	ServiceModel *registry.ServiceModel
+	ServiceModel   *registry.ServiceModel
+	mobilityDriver mobility.Driver
 }
 
 // NewServiceModel creates a new service model
 func NewServiceModel(node model.Node, model *model.Model,
 	subStore *subscriptions.Subscriptions, nodeStore nodes.Store,
-	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store) (registry.ServiceModel, error) {
+	ueStore ues.Store, cellStore cells.Store, metricStore metrics.Store,
+	a3Chan chan handover.A3HandoverDecision, mobilityDriver mobility.Driver) (registry.ServiceModel, error) {
 	var rcsm e2smrc.RCServiceModel
 	modelName := e2smtypes.ShortName(modelFullName)
 	rcSm := registry.ServiceModel{
@@ -58,15 +66,23 @@ func NewServiceModel(node model.Node, model *model.Model,
 		UEs:           ueStore,
 		CellStore:     cellStore,
 		MetricStore:   metricStore,
+		A3Chan:        a3Chan,
 	}
 
 	rcClient := &Client{
-		ServiceModel: &rcSm,
+		ServiceModel:   &rcSm,
+		mobilityDriver: mobilityDriver,
 	}
 
 	rcSm.Client = rcClient
 
 	rcRANFuncDescPDU, err := pdubuilder.CreateE2SmRcRanfunctionDefinition(modelFullName, modelOID, "RAN Control")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	// Event Trigger style 1: Message Event
+	ricEventTriggerStyle1, err := pdubuilder.CreateRanfunctionDefinitionEventTriggerStyleItem(1, eventTriggerStyle1, 1)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
@@ -85,6 +101,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	// Create event trigger style list
 	ricEventTriggerStyleList := make([]*e2smrcies.RanfunctionDefinitionEventTriggerStyleItem, 0)
+	ricEventTriggerStyleList = append(ricEventTriggerStyleList, ricEventTriggerStyle1)
 	ricEventTriggerStyleList = append(ricEventTriggerStyleList, ricEventTriggerStyle2)
 	ricEventTriggerStyleList = append(ricEventTriggerStyleList, ricEventTriggerStyle3)
 	ranFunctionDefinitionEventTrigger, err := pdubuilder.CreateRanfunctionDefinitionEventTrigger(ricEventTriggerStyleList)
@@ -125,7 +142,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	}
 
 	// Create RAN Function Definition Insert Indication item (RIC Indication 1 for Handover Control Request)
-	ranFunctionDefinitionInsertItem, err := pdubuilder.CreateRanfunctionDefinitionInsertIndicationItem(1, "Handover Control Request")
+	ranFunctionDefinitionInsertItem, err := pdubuilder.CreateRanfunctionDefinitionInsertIndicationItem(ricInsertIndicationIDForMHO, "Handover Control Request")
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
@@ -138,7 +155,7 @@ func NewServiceModel(node model.Node, model *model.Model,
 	ranFunctionDefinitionInsertItem.SetRanInsertIndicationParametersList(insertParametersInsertStyle3List)
 
 	// Create Insert Style 3: Connected Mode Mobility Control Request
-	insertStyleItem3, err := pdubuilder.CreateRanfunctionDefinitionInsertItem(3, "Connected Mode Mobility Control Request", 2, 3, 2, 5, 1)
+	insertStyleItem3, err := pdubuilder.CreateRanfunctionDefinitionInsertItem(3, "Connected Mode Mobility Control Request", 1, 3, 2, 5, 1)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
@@ -171,8 +188,9 @@ func NewServiceModel(node model.Node, model *model.Model,
 
 	// Creates RAN function definition control list
 	controlItemList := make([]*e2smrcies.RanfunctionDefinitionControlItem, 0)
+	// for PCI
 	// Creates control action list
-	controlActionList := make([]*e2smrcies.RanfunctionDefinitionControlActionItem, 0)
+	controlActionList1 := make([]*e2smrcies.RanfunctionDefinitionControlActionItem, 0)
 	controlActionItem1, err := pdubuilder.CreateRanfunctionDefinitionControlActionItem(1, "PCI Control")
 	if err != nil {
 		return registry.ServiceModel{}, err
@@ -200,13 +218,45 @@ func NewServiceModel(node model.Node, model *model.Model,
 	ranControlActionParametersList1 = append(ranControlActionParametersList1, controlActionRANParameterItem2)
 
 	controlActionItem1.SetRanControlActionParametersList(ranControlActionParametersList1)
-	controlActionList = append(controlActionList, controlActionItem1)
+	controlActionList1 = append(controlActionList1, controlActionItem1)
+
 	controlItem1, err := pdubuilder.CreateRanfunctionDefinitionControlItem(controlStyleType200, "PCI Control", 1, 1, 1)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
-	controlItem1.SetRicControlActionList(controlActionList)
+	controlItem1.SetRicControlActionList(controlActionList1)
+
+	// For MHO
+	// Creates control action list
+	controlActionList2 := make([]*e2smrcies.RanfunctionDefinitionControlActionItem, 0)
+
+	controlActionItem2, err := pdubuilder.CreateRanfunctionDefinitionControlActionItem(1, "Handover Control")
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	ranControlActionParametersList2 := make([]*e2smrcies.ControlActionRanparameterItem, 0)
+	controlActionRANParameterItem3 := &e2smrcies.ControlActionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: 1,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: "Target Primary Cell ID",
+		},
+	}
+	ranControlActionParametersList2 = append(ranControlActionParametersList2, controlActionRANParameterItem3)
+
+	controlActionItem2.SetRanControlActionParametersList(ranControlActionParametersList2)
+	controlActionList2 = append(controlActionList2, controlActionItem2)
+
+	controlItem2, err := pdubuilder.CreateRanfunctionDefinitionControlItem(controlStyleType3, "Connected Mode Mobility", 1, 1, 1)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+	controlItem2.SetRicControlActionList(controlActionList2)
+
 	controlItemList = append(controlItemList, controlItem1)
+	controlItemList = append(controlItemList, controlItem2)
 
 	ranFunctionDefinitionControl, err := pdubuilder.CreateRanfunctionDefinitionControl(controlItemList)
 	if err != nil {
@@ -308,7 +358,7 @@ func (c *Client) RICControl(ctx context.Context, request *e2appducontents.Riccon
 	log.Debugf("RC control message: %v", controlMessage)
 
 	// Check if the control request is for changing the PCI value to change it PCI
-	err = c.checkAndSetPCI(ctx, controlHeader, controlMessage)
+	err = c.handleControlMessage(ctx, controlHeader, controlMessage)
 	if err != nil {
 		log.Error(err)
 		cause := &e2apies.Cause{
@@ -482,7 +532,27 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 					return nil, subscriptionFailure, nil
 				}
 				return nil, subscriptionFailure, nil
-
+			}
+		} else if action.GetValue().GetRicactionToBeSetupItem().GetRicActionType() == e2apies.RicactionType_RICACTION_TYPE_INSERT {
+			log.Debugf("Processing Insert Action for e2 Node %v", c.ServiceModel.Node.GnbID)
+			err := c.processInsertAction(ctx, subscription, eventTriggers)
+			if err != nil {
+				log.Warn(err)
+				cause := &e2apies.Cause{
+					Cause: &e2apies.Cause_RicRequest{
+						RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
+					},
+				}
+				subscription := subutils.NewSubscription(
+					subutils.WithRequestID(*reqID),
+					subutils.WithRanFuncID(*ranFuncID),
+					subutils.WithRicInstanceID(*ricInstanceID),
+					subutils.WithCause(cause))
+				subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+				if err != nil {
+					return nil, subscriptionFailure, nil
+				}
+				return nil, subscriptionFailure, nil
 			}
 		}
 	}
@@ -496,6 +566,41 @@ func (c *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducont
 	//TODO implement me
 	log.Info("implement me")
 	return nil, nil, nil
+}
+
+func (c *Client) processInsertAction(ctx context.Context, subscription *subutils.Subscription, eventTriggers *e2smrcies.E2SmRcEventTrigger) error {
+	eventTriggerFormats := eventTriggers.GetRicEventTriggerFormats()
+	switch eventTrigger := eventTriggerFormats.RicEventTriggerFormats.(type) {
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat1:
+		// Process RIC Event trigger definition IE style 1: Message Event
+		messageList := eventTrigger.EventTriggerFormat1.GetMessageList()
+		for _, m := range messageList {
+			ueEventList := m.GetAssociatedUeevent().GetUeEventList()
+			for _, e := range ueEventList {
+				if e.GetUeEventId().Value == A3MeasurementReportUEEventID {
+					log.Debugf("Processing event trigger format 1: Message Event - A3 measurement report received (UE Event ID: %d)", A3MeasurementReportUEEventID)
+					go func() {
+						err := c.insertOnA3MeasurementReceived(ctx, subscription)
+						if err != nil {
+							log.Warn(err)
+							// TODO we should propagate this error back
+							return
+						}
+					}()
+				}
+			}
+		}
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat2:
+		// TODO Process RIC Event trigger definition IE style 2: Call Process Breakpoint
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat3:
+		// TODO Process RIC Event trigger definition IE style 3
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat4:
+		// TODO Process RIC Event trigger definition IE style 4
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat5:
+		// TODO Process RIC Event trigger definition IE style 5
+	}
+
+	return nil
 }
 
 func (c *Client) processReportAction(ctx context.Context, subscription *subutils.Subscription, eventTriggers *e2smrcies.E2SmRcEventTrigger) error {
@@ -657,5 +762,113 @@ func (c *Client) sendRICIndicationFormat3(ctx context.Context, cells []ransimtyp
 		return err
 	}
 
+	return nil
+}
+
+func (c *Client) insertOnA3MeasurementReceived(ctx context.Context, subscription *subutils.Subscription) error {
+	if c.mobilityDriver.GetHoLogic() == "local" {
+		c.mobilityDriver.SetHoLogic("mho")
+	}
+
+	log.Info("Start RC insert service for A3 measurement report received")
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := c.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	for {
+		select {
+		case <-sub.E2Channel.Context().Done():
+			log.Debugf("E2 channel is closed for subscription: %v", subID)
+			return nil
+		case report := <-c.ServiceModel.A3Chan:
+			log.Debugf("received event a3 measurement report: %v", report)
+			log.Debugf("Send upon-rcv-meas-report indication for cell ecgi:%d, IMSI:%s",
+				report.UE.GetSCell().GetID().GetID().(id.ECGI), report.UE.GetID().String())
+			imsi := report.UE.GetID().GetID().(id.UEID).IMSI
+			ue, err := c.ServiceModel.UEs.Get(ctx, ransimtypes.IMSI(imsi))
+			gNbID := utils.NewGNbID(uint64(ransimtypes.GetGnbID(uint64(ue.Cell.NCGI))), 22)
+
+			if err != nil {
+				log.Warn(err)
+				continue
+			}
+
+			ueID := &e2smcommonies.Ueid{
+				Ueid: &e2smcommonies.Ueid_GNbUeid{
+					GNbUeid: &e2smcommonies.UeidGnb{
+						AmfUeNgapId: &e2smcommonies.AmfUeNgapId{
+							Value: int64(ue.AmfUeNgapID),
+						},
+						// ToDo - move out GUAMI hardcoding
+						Guami: &e2smcommonies.Guami{
+							PLmnidentity: &e2smcommonies.Plmnidentity{
+								Value: c.getPlmnID().ToBytes(),
+							},
+							AMfregionId: &e2smcommonies.AmfregionId{
+								Value: &asn1.BitString{
+									Value: []byte{0xDD},
+									Len:   8,
+								},
+							},
+							AMfsetId: &e2smcommonies.AmfsetId{
+								Value: &asn1.BitString{
+									Value: []byte{0xCC, 0xC0},
+									Len:   10,
+								},
+							},
+							AMfpointer: &e2smcommonies.Amfpointer{
+								Value: &asn1.BitString{
+									Value: []byte{0xFC},
+									Len:   6,
+								},
+							},
+						},
+						GNbCuUeF1ApIdList:   &e2smcommonies.UeidGnbCuF1ApIdList{Value: []*e2smcommonies.UeidGnbCuCpF1ApIdItem{{GNbCuUeF1ApId: &e2smcommonies.GnbCuUeF1ApId{Value: 0}}}},
+						GNbCuCpUeE1ApIdList: &e2smcommonies.UeidGnbCuCpE1ApIdList{Value: []*e2smcommonies.UeidGnbCuCpE1ApIdItem{{GNbCuCpUeE1ApId: &e2smcommonies.GnbCuCpUeE1ApId{Value: 0}}}},
+						RanUeid:             &e2smcommonies.Ranueid{Value: []byte{0, 0, 0, 0, 0, 0, 0, 0}}, // TODO update it with C-RNTI
+						MNgRanUeXnApId:      &e2smcommonies.NgRannodeUexnApid{Value: 0},
+						GlobalGnbId: &e2smcommonies.GlobalGnbId{
+							PLmnidentity: &e2smcommonies.Plmnidentity{Value: c.getPlmnID().ToBytes()},
+							GNbId:        &e2smcommonies.GnbId{GnbId: &e2smcommonies.GnbId_GNbId{GNbId: &asn1.BitString{Value: gNbID.IDByte.Bytes(gNbID.Length), Len: uint32(gNbID.Length)}}},
+						},
+						GlobalNgRannodeId: &e2smcommonies.GlobalNgrannodeId{
+							GlobalNgrannodeId: &e2smcommonies.GlobalNgrannodeId_GNb{
+								GNb: &e2smcommonies.GlobalGnbId{
+									PLmnidentity: &e2smcommonies.Plmnidentity{Value: c.getPlmnID().ToBytes()},
+									GNbId:        &e2smcommonies.GnbId{GnbId: &e2smcommonies.GnbId_GNbId{GNbId: &asn1.BitString{Value: gNbID.IDByte.Bytes(gNbID.Length), Len: uint32(gNbID.Length)}}},
+								},
+							},
+						},
+					},
+				},
+			}
+
+			err = c.sendRICIndicationFormat5Header2(ctx, subscription, ueID, ricInsertStyleType3, ricInsertIndicationIDForMHO, ransimtypes.NCGI(report.TargetCell.GetID().GetID().(id.ECGI)))
+			if err != nil {
+				log.Warn(err)
+				continue
+			}
+		}
+	}
+}
+
+func (c *Client) sendRICIndicationFormat5Header2(ctx context.Context, subscription *subutils.Subscription, ueID *e2smcommonies.Ueid, ricInsertStyleType int32, insertIndicationID int32, targetNCGI ransimtypes.NCGI) error {
+	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
+	sub, err := c.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return err
+	}
+	ricIndication, err := c.createRICIndicationFormat5Header2(ctx, subscription, ueID, ricInsertStyleType, insertIndicationID, targetNCGI)
+	if err != nil {
+		return err
+	}
+	err = sub.E2Channel.RICIndication(ctx, ricIndication)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	return nil
 }
