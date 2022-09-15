@@ -20,6 +20,13 @@ const (
 
 	ricInsertIndicationIDForMHO = 1
 	ricInsertStyleType3         = 3
+
+	ricPolicyStyleType3 = 3
+	ricPolicyStyleName  = "Connected Mode Mobility Control"
+
+	ricPolicyActionIDForMLB             = 1
+	ricPolicyActionNameForMLB           = "Policy for Handover Control"
+	ricActionDefinitionFormatTypeForMLB = 2
 )
 
 // RAN parameter IDs
@@ -31,6 +38,8 @@ const (
 
 	// TargetPrimaryCellIDRANParameterID Target Primary Cell ID RAN parameter ID
 	TargetPrimaryCellIDRANParameterID = 1
+	// TargetPrimaryCellIDRANParameterName Target Primary Cell ID RAN parameter Name
+	TargetPrimaryCellIDRANParameterName = "Target Primary Cell ID"
 	// TargetCellRANParameterID Choice of Target Cell RAN parameter ID
 	TargetCellRANParameterID = 2
 	// NRCellRANParameterID NR Cell RAN parameter ID
@@ -41,6 +50,11 @@ const (
 	EUTRACellRANParameterID = 5
 	// EUTRACGIRANParameterID E-UTRA CGI RAN parameter ID
 	EUTRACGIRANParameterID = 6
+
+	// CellSpecificOffsetRANParameterID Ocn RAN parameter ID
+	CellSpecificOffsetRANParameterID = 10201
+	// CellSpecificOffsetRANParameterName Ocn RAN parameter name
+	CellSpecificOffsetRANParameterName = "Cell Specific Offset"
 )
 
 // UE Event IDs

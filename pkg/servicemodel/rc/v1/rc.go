@@ -32,8 +32,10 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils"
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
+	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 	"github.com/onosproject/rrm-son-lib/pkg/handover"
 	"github.com/onosproject/rrm-son-lib/pkg/model/id"
+	meastype "github.com/onosproject/rrm-son-lib/pkg/model/measurement/type"
 )
 
 var _ servicemodel.Client = &Client{}
@@ -172,20 +174,76 @@ func NewServiceModel(node model.Node, model *model.Model,
 		return registry.ServiceModel{}, err
 	}
 
-	// Creates RAN function definition policy list
+	// Create Policy List
 	ranFunctionDefinitionPolicyList := make([]*e2smrcies.RanfunctionDefinitionPolicyItem, 0)
-	// Creates policy items
-	ranFunctionPolicyItem1, err := pdubuilder.CreateRanfunctionDefinitionPolicyItem(3, "Connected Mobile Mobility", 2)
+
+	// policy item
+	ranFunctionDefinitionPolicyItem, err := pdubuilder.CreateRanfunctionDefinitionPolicyItem(ricPolicyStyleType3, ricPolicyStyleName, 1)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
 
-	ranFunctionDefinitionPolicyList = append(ranFunctionDefinitionPolicyList, ranFunctionPolicyItem1)
+	// policy actions
+	ranFunctionDefinitionPolicyActionItem, err := pdubuilder.CreateRanfunctionDefinitionPolicyActionItem(ricPolicyActionIDForMLB, ricPolicyActionNameForMLB, ricActionDefinitionFormatTypeForMLB)
+	if err != nil {
+		return registry.ServiceModel{}, err
+	}
+
+	//associated ran parameters for policy action
+	policyActionRANParameterItem1 := &e2smrcies.PolicyActionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: TargetPrimaryCellIDRANParameterID,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: TargetPrimaryCellIDRANParameterName,
+		},
+	}
+	policyActionRANParameterItem2 := &e2smrcies.PolicyActionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: CellSpecificOffsetRANParameterID,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: CellSpecificOffsetRANParameterName,
+		},
+	}
+	policyActionRANParameterList := make([]*e2smrcies.PolicyActionRanparameterItem, 0)
+	policyActionRANParameterList = append(policyActionRANParameterList, policyActionRANParameterItem1)
+	policyActionRANParameterList = append(policyActionRANParameterList, policyActionRANParameterItem2)
+
+	//associated ran parameters for policy condition
+	policyConditionRANParameterItem1 := &e2smrcies.PolicyConditionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: TargetPrimaryCellIDRANParameterID,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: TargetPrimaryCellIDRANParameterName,
+		},
+	}
+	policyConditionRANParameterItem2 := &e2smrcies.PolicyConditionRanparameterItem{
+		RanParameterId: &e2smrcies.RanparameterId{
+			Value: CellSpecificOffsetRANParameterID,
+		},
+		RanParameterName: &e2smrcies.RanparameterName{
+			Value: CellSpecificOffsetRANParameterName,
+		},
+	}
+	policyConditionRANParameterList := make([]*e2smrcies.PolicyConditionRanparameterItem, 0)
+	policyConditionRANParameterList = append(policyConditionRANParameterList, policyConditionRANParameterItem1)
+	policyConditionRANParameterList = append(policyConditionRANParameterList, policyConditionRANParameterItem2)
+
+	ranFunctionDefinitionPolicyActionItem.SetRanPolicyActionParametersList(policyActionRANParameterList)
+	ranFunctionDefinitionPolicyActionItem.SetRanPolicyConditionParametersList(policyConditionRANParameterList)
+
+	ranFunctionDefinitionPolicyActionList := make([]*e2smrcies.RanfunctionDefinitionPolicyActionItem, 0)
+	ranFunctionDefinitionPolicyActionList = append(ranFunctionDefinitionPolicyActionList, ranFunctionDefinitionPolicyActionItem)
+
+	ranFunctionDefinitionPolicyItem.SetRicPolicyActionList(ranFunctionDefinitionPolicyActionList)
+
+	ranFunctionDefinitionPolicyList = append(ranFunctionDefinitionPolicyList, ranFunctionDefinitionPolicyItem)
 	ranFunctionDefinitionPolicy, err := pdubuilder.CreateRanfunctionDefinitionPolicy(ranFunctionDefinitionPolicyList)
 	if err != nil {
 		return registry.ServiceModel{}, err
 	}
-
 	// Creates RAN function definition control list
 	controlItemList := make([]*e2smrcies.RanfunctionDefinitionControlItem, 0)
 	// for PCI
@@ -392,6 +450,7 @@ func (c *Client) RICControl(ctx context.Context, request *e2appducontents.Riccon
 
 // RICSubscription implements subscription handler for RC service model
 func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.RicsubscriptionRequest) (response *e2appducontents.RicsubscriptionResponse, failure *e2appducontents.RicsubscriptionFailure, err error) {
+	log.Debugf("Received subscription request message %+v", request.ProtocolIes)
 	log.Infof("Ric Subscription Request is received for service model %v and e2 node with ID: %v", c.ServiceModel.ModelName, c.ServiceModel.Node.GnbID)
 	var ricActionsAccepted []*e2aptypes.RicActionID
 	actionList := subutils.GetRicActionToBeSetupList(request)
@@ -482,7 +541,7 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 		return nil, subscriptionFailure, nil
 
 	}
-	log.Debugf("Action Definitions map: %+v", actionDefinitionsMaps)
+	log.Infof("Action Definitions map: %+v", actionDefinitionsMaps)
 
 	subscription := subutils.NewSubscription(
 		subutils.WithRequestID(*reqID),
@@ -554,6 +613,27 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 				}
 				return nil, subscriptionFailure, nil
 			}
+		} else if action.GetValue().GetRicactionToBeSetupItem().GetRicActionType() == e2apies.RicactionType_RICACTION_TYPE_POLICY {
+			log.Debugf("Processing Policy Action for e2 Node %v", c.ServiceModel.Node.GnbID)
+			err := c.processPolicyAction(ctx, subscription, eventTriggers, actionDefinitionsMaps)
+			if err != nil {
+				log.Warn(err)
+				cause := &e2apies.Cause{
+					Cause: &e2apies.Cause_RicRequest{
+						RicRequest: e2apies.CauseRicrequest_CAUSE_RICREQUEST_UNSPECIFIED,
+					},
+				}
+				subscription := subutils.NewSubscription(
+					subutils.WithRequestID(*reqID),
+					subutils.WithRanFuncID(*ranFuncID),
+					subutils.WithRicInstanceID(*ricInstanceID),
+					subutils.WithCause(cause))
+				subscriptionFailure, err := subscription.BuildSubscriptionFailure()
+				if err != nil {
+					return nil, subscriptionFailure, nil
+				}
+				return nil, subscriptionFailure, nil
+			}
 		}
 	}
 
@@ -563,9 +643,108 @@ func (c *Client) RICSubscription(ctx context.Context, request *e2appducontents.R
 
 // RICSubscriptionDelete implements subscription delete handler for RC service model
 func (c *Client) RICSubscriptionDelete(ctx context.Context, request *e2appducontents.RicsubscriptionDeleteRequest) (response *e2appducontents.RicsubscriptionDeleteResponse, failure *e2appducontents.RicsubscriptionDeleteFailure, err error) {
-	//TODO implement me
-	log.Info("implement me")
-	return nil, nil, nil
+	log.Debugf("Received delete subscription request message %+v", request.ProtocolIes)
+	log.Infof("RIC subscription delete request is received for e2 node %d and service model %s", c.ServiceModel.Node.GnbID, c.ServiceModel.ModelName)
+	reqID, err := subdeleteutils.GetRequesterID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ranFuncID, err := subdeleteutils.GetRanFunctionID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	ricInstanceID, err := subdeleteutils.GetRicInstanceID(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	subID := subscriptions.NewID(*ricInstanceID, *reqID, *ranFuncID)
+	sub, err := c.ServiceModel.Subscriptions.Get(subID)
+	if err != nil {
+		return nil, nil, err
+	}
+	subscriptionDelete := subdeleteutils.NewSubscriptionDelete(
+		subdeleteutils.WithRequestID(*reqID),
+		subdeleteutils.WithRanFuncID(*ranFuncID),
+		subdeleteutils.WithRicInstanceID(*ricInstanceID))
+	subDeleteResponse, err := subscriptionDelete.BuildSubscriptionDeleteResponse()
+	if err != nil {
+		return nil, nil, err
+	}
+	// Stops the goroutine sending the indication messages
+	if sub.Ticker != nil {
+		sub.Ticker.Stop()
+	}
+	return subDeleteResponse, nil, nil
+}
+
+func (c *Client) processMLBLogic(ctx context.Context, adFormat2List []*e2smrcies.E2SmRcActionDefinitionFormat2Item) error {
+	for _, pc := range adFormat2List {
+		ncgi, err := c.extractNCGIFromPrintableNCGI(pc.GetRicPolicyAction())
+		if err != nil {
+			return err
+		}
+		ocnInt, err := c.extractOcn(pc.GetRicPolicyAction())
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
+		ocn := meastype.QOffsetRange(ocnInt)
+
+		for _, id := range c.ServiceModel.Node.Cells {
+			// id: serving cell ID
+			log.Debugf("MLB: sCell NCGI: %v / NCGI: %v / Ocn: %d", id, ncgi, ocnInt)
+
+			sCell, err := c.ServiceModel.CellStore.Get(ctx, id)
+			if err != nil {
+				log.Errorf("NCGI (%v) is not in cell store", id)
+				continue
+			}
+			if _, ok := sCell.MeasurementParams.NCellIndividualOffsets[ncgi]; !ok {
+				log.Errorf("the cell NCGI (%v) is not a neighbor of the cell NCGI (%v)", ncgi, id)
+				continue
+			}
+			log.Infof("Cell (%v) Ocn in the cell (%v) is set from %v to %v", ncgi, id, sCell.MeasurementParams.NCellIndividualOffsets[ncgi], ocn.GetValue().(int))
+			sCell.MeasurementParams.NCellIndividualOffsets[ncgi] = int32(ocn.GetValue().(int))
+		}
+	}
+	return nil
+}
+
+func (c *Client) processPolicyAction(ctx context.Context, subscription *subutils.Subscription, eventTriggers *e2smrcies.E2SmRcEventTrigger, actionDefinitionsMaps map[*e2aptypes.RicActionID]*e2smrcies.E2SmRcActionDefinition) error {
+	eventTriggerFormats := eventTriggers.GetRicEventTriggerFormats()
+	switch eventTrigger := eventTriggerFormats.RicEventTriggerFormats.(type) {
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat1:
+		// Process RIC Event trigger definition IE style 1: Message Event
+		messageList := eventTrigger.EventTriggerFormat1.GetMessageList()
+		for _, m := range messageList {
+			ueEventList := m.GetAssociatedUeevent().GetUeEventList()
+			for _, e := range ueEventList {
+				if e.GetUeEventId().Value == A3MeasurementReportUEEventID {
+					log.Debugf("Processing event trigger format 1: Message Event - A3 measurement report received (UE Event ID: %d)", A3MeasurementReportUEEventID)
+					log.Debugf("Action definition maps: %+v", actionDefinitionsMaps)
+					for _, ad := range actionDefinitionsMaps {
+						if adFormat2 := ad.GetRicActionDefinitionFormats().GetActionDefinitionFormat2(); adFormat2 != nil {
+							err := c.processMLBLogic(ctx, adFormat2.GetRicPolicyConditionsList())
+							if err != nil {
+								log.Warn(err)
+							}
+						}
+					}
+				}
+			}
+		}
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat2:
+		// TODO Process RIC Event trigger definition IE style 2: Call Process Breakpoint
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat3:
+		// TODO Process RIC Event trigger definition IE style 3
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat4:
+		// TODO Process RIC Event trigger definition IE style 4
+	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat5:
+		// TODO Process RIC Event trigger definition IE style 5
+
+	}
+	return nil
 }
 
 func (c *Client) processInsertAction(ctx context.Context, subscription *subutils.Subscription, eventTriggers *e2smrcies.E2SmRcEventTrigger) error {
