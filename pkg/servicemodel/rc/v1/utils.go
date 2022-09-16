@@ -562,6 +562,36 @@ func (c *Client) runHandover(ctx context.Context, controlHeader *e2smrcies.E2SmR
 	return nil
 }
 
+func (c *Client) extractNCGIFromPrintableNCGI(pa *e2smrcies.RicPolicyAction) (ransimtypes.NCGI, error) {
+	for _, rp := range pa.GetRanParametersList() {
+		if rp.GetRanParameterId().Value == 1 {
+			targetPrimaryCellIDString := rp.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].
+				GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].
+				GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].
+				GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValuePrintableString()
+			log.Debugf("targetPrimaryCellIDString %+v", targetPrimaryCellIDString)
+			log.Debugf("RAN Parameter %+v", rp)
+			targetPrimaryCellID, err := strconv.ParseUint(targetPrimaryCellIDString, 16, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			return ransimtypes.NCGI(targetPrimaryCellID), nil
+		}
+	}
+	return 0, errors.NewNotFound("RanParameter 1 for target primary cell ID not found")
+}
+
+func (c *Client) extractOcn(pa *e2smrcies.RicPolicyAction) (int, error) {
+	for _, rp := range pa.GetRanParametersList() {
+		if rp.GetRanParameterId().Value == 10201 {
+			log.Debugf("extracted Ocn %+v", rp.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
+			return int(rp.GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt()), nil
+		}
+	}
+	return 0, errors.NewNotFound("RanParameter 10201 for Ocn not found")
+}
+
 // checkAndSetPCI check if the control header and message including the required info for changing the PCI value for a specific cell
 func (c *Client) checkAndSetPCI(ctx context.Context, controlMessage *e2smrcies.E2SmRcControlMessageFormat1) error {
 	var pciValue int64
