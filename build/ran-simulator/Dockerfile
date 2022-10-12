@@ -22,6 +22,7 @@ FROM frolvlad/alpine-glibc:alpine-3.12
 USER nobody
 
 COPY --from=build /go/src/github.com/onosproject/ran-simulator/build/_output/ransim /usr/local/bin/ransim
+COPY --from=build /go/src/github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2/datasets /usr/local/datasets
 # COPY pkg/config/*.yaml /etc/onos/config/
 
 ENTRYPOINT ["ransim"]

@@ -7,6 +7,9 @@ package kpm2
 import (
 	"context"
 	"encoding/binary"
+	"encoding/csv"
+	"math"
+	"os"
 	"strconv"
 	"time"
 
@@ -216,9 +219,19 @@ func NewServiceModel(node model.Node, model *model.Model,
 	return kpmSm, nil
 }
 
+func float_encoder(data float32) int64 {
+	var buf [4]byte
+	binary.BigEndian.PutUint32(buf[:], math.Float32bits(data))
+	int_data := int64(binary.BigEndian.Uint32(buf[:]))
+	log.Debugf("data : %+v", data)
+	log.Debugf("int_data : %+v", int_data)
+	return int_data
+}
+
 func (sm *Client) collect(ctx context.Context,
 	actionDefinition *e2smkpmv2.E2SmKpmActionDefinition,
-	cellNCGI ransimtypes.NCGI) (*e2smkpmv2.MeasurementDataItem, error) {
+	cellNCGI ransimtypes.NCGI, data []string) (*e2smkpmv2.MeasurementDataItem, error) {
+	log.Debugf("The actionDefinition is : %v", actionDefinition)
 	measInfoList := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1().GetMeasInfoList()
 	measRecord := e2smkpmv2.MeasurementRecord{
 		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
@@ -226,8 +239,42 @@ func (sm *Client) collect(ctx context.Context,
 
 	for _, measInfo := range measInfoList.Value {
 		for _, measType := range measTypes {
+			log.Debugf("The current measType: %s", measType.measTypeName.String())
 			if measType.measTypeName.String() == measInfo.MeasType.GetMeasName().Value {
 				switch measType.measTypeName {
+				case PrbUsedDL:
+					utilization, err := strconv.ParseFloat(data[4], 64)
+					if err != nil {
+						log.Error("can't parse to float")
+					}
+					log.Debugf("utilization per slice for Cell %v set for value: %+v",
+						cellNCGI, utilization)
+					measRecordReal := measurments.NewMeasurementRecordItemInteger(
+						measurments.WithIntegerValue(float_encoder(float32(utilization))),
+					).Build()
+					measRecord.Value = append(measRecord.Value, measRecordReal)
+				case PdcpPduVolumeDL:
+					volume, err := strconv.ParseFloat(data[5], 64)
+					if err != nil {
+						log.Error("can't parse to float")
+					}
+					log.Debugf("volume for Cell %v set for value: %+v",
+						cellNCGI, volume)
+					measRecordReal := measurments.NewMeasurementRecordItemInteger(
+						measurments.WithIntegerValue(float_encoder(float32(volume))),
+					).Build()
+					measRecord.Value = append(measRecord.Value, measRecordReal)
+				case PdcpRatePerPRBDL:
+					pdcp_rate, err := strconv.ParseFloat(data[3], 64)
+					if err != nil {
+						log.Error("can't parse to float")
+					}
+					log.Debugf("pdcp rate for Cell %v set for value: %+v",
+						cellNCGI, pdcp_rate)
+					measRecordReal := measurments.NewMeasurementRecordItemInteger(
+						measurments.WithIntegerValue(float_encoder(float32(pdcp_rate))),
+					).Build()
+					measRecord.Value = append(measRecord.Value, measRecordReal)
 				case RRCConnMax:
 					log.Debugf("Max number of UEs for Cell %v set for RRC Con Max: %v",
 						cellNCGI, int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellNCGI))))
@@ -260,7 +307,7 @@ func (sm *Client) collect(ctx context.Context,
 }
 
 func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
-	cellNCGI ransimtypes.NCGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval int64) ([]byte, error) {
+	cellNCGI ransimtypes.NCGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval int64, data []string) ([]byte, error) {
 	log.Debug("Create Indication message format 1 based on action defs for cell:", cellNCGI)
 	format1 := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1()
 	measInfoList := format1.GetMeasInfoList()
@@ -271,7 +318,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 	numDataItems := int(interval / granularity)
 
 	for i := 0; i < numDataItems; i++ {
-		measDataItem, err := sm.collect(ctx, actionDefinition, cellNCGI)
+		measDataItem, err := sm.collect(ctx, actionDefinition, cellNCGI, data)
 		if err != nil {
 			log.Warn(err)
 			return nil, err
@@ -279,6 +326,8 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 
 		measData.Value = append(measData.Value, measDataItem)
 	}
+	log.Infof("measInfoList: %v", measInfoList)
+	log.Infof("measData: %v", measData)
 	subID := format1.SubscriptId.GetValue()
 
 	// Creating an indication message format 1
@@ -337,7 +386,8 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI,
 	subscription *subutils.Subscription,
 	actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition,
-	interval int64) error {
+	interval int64,
+	data []string) error {
 	// Creates and sends indication message format 1
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -357,7 +407,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 			cellObjectID := format1.GetCellObjId().Value
 			if cellObjectID == strconv.FormatUint(uint64(ncgi), 16) {
 				log.Debug("Sending indication message for Cell with ID:", cellObjectID)
-				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ncgi, actionDefinition, interval)
+				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ncgi, actionDefinition, interval, data)
 				if err != nil {
 					return err
 				}
@@ -387,11 +437,11 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 }
 
 func (sm *Client) sendRicIndication(ctx context.Context,
-	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int64) error {
+	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int64, data []string) error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
 	for _, ncgi := range node.Cells {
-		err := sm.sendRicIndicationFormat1(ctx, ncgi, subscription, actionDefinitions, interval)
+		err := sm.sendRicIndicationFormat1(ctx, ncgi, subscription, actionDefinitions, interval, data)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -411,14 +461,49 @@ func (sm *Client) reportIndication(ctx context.Context, interval int64, subscrip
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
 
+	file, err := os.Open("/usr/local/datasets/cell.csv")
+	if err != nil {
+		log.Error("can't open the file")
+	}
+
+	csv_reader := csv.NewReader(file)
+
+	data, err := csv_reader.Read()
+	if err != nil {
+		log.Error("can't read the file")
+	}
+
+	log.Debugf("data is : %+v", data)
+
+	defer file.Close()
+
+	node_cell := sm.ServiceModel.Node.Cells
+	var index int = 0
+	var node_cell_length int = len(node_cell)
+
 	for {
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending Indication Report for subscription:", sub.ID)
-			err = sm.sendRicIndication(ctx, subscription, actionDefinitions, interval)
+			data, err := csv_reader.Read()
 			if err != nil {
-				log.Error("creating indication message is failed", err)
+				log.Error("at the end of the file")
+				continue
+			}
+			log.Debugf("data : %+v", data)
+			// err = sm.sendRicIndication(ctx, subscription, actionDefinitions, interval, data)
+			// if err != nil {
+			// 	log.Error("creating indication message is failed", err)
+			// 	return err
+			// }
+			err = sm.sendRicIndicationFormat1(ctx, node_cell[index], subscription, actionDefinitions, interval, data)
+			if err != nil {
+				log.Error(err)
 				return err
+			}
+			index++
+			if index >= node_cell_length {
+				index = 0
 			}
 
 		case <-sub.E2Channel.Context().Done():

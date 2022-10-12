@@ -24,17 +24,45 @@ const (
 	RRCConnAvg
 	// RRCConnMax  the max number of users in RRC connected mode during each granularity period.
 	RRCConnMax
+
+	PDUSessionSetupReq 
+
+	PDUSessionSetupSucc
+
+	PDUSessionSetupFail
+
+	PrbUsedDL
+
+	PrbUsedUL
+
+	PdcpPduVolumeDL
+
+	PdcpPduVolumeUL
+
+	PdcpRatePerPRBDL
+
+	PdcpRatePerPRBUL
 )
 
 func (m MeasTypeName) String() string {
-	return [...]string{"RRC.ConnEstabAtt.Sum",
-		"RRC.ConnEstabSucc.Sum",
-		"RRC.ConnReEstabAtt.Sum",
-		"RRC.ConnReEstabAtt.reconfigFail",
-		"RRC.ConnReEstabAtt.HOFail",
-		"RRC.ConnReEstabAtt.Other",
-		"RRC.Conn.Avg",
-		"RRC.Conn.Max"}[m]
+	return [...]string{
+		"RRCConnEstabAttSum",
+		"RRCConnEstabSuccSum",
+		"RRCConnReEstabAttSum",
+		"RRCConnReEstabAttreconfigFail",
+		"RRCConnReEstabAttHOFail",
+		"RRCConnReEstabAttOther",
+		"RRCConnAvg",
+		"RRCConnMax",
+		"PDUSessionSetupReq",
+		"PDUSessionSetupSucc",
+		"PDUSessionSetupFail",
+		"PrbUsedDL",
+		"PrbUsedUL",
+		"PdcpPduVolumeDL",
+		"PdcpPduVolumeUL",
+		"PdcpRatePerPRBDL",
+		"PdcpRatePerPRBUL"}[m]
 }
 
 // MeasType meas type
@@ -75,5 +103,41 @@ var measTypes = []MeasType{
 	{
 		measTypeName: RRCConnMax,
 		measTypeID:   8,
+	},
+	{
+		measTypeName: PDUSessionSetupReq,
+		measTypeID:   9,
+	},
+	{
+		measTypeName: PDUSessionSetupSucc,
+		measTypeID:   10,
+	},
+	{
+		measTypeName: PDUSessionSetupFail,
+		measTypeID:   11,
+	},
+	{
+		measTypeName: PrbUsedDL,
+		measTypeID:   12,
+	},
+	{
+		measTypeName: PrbUsedUL,
+		measTypeID:   13,
+	},
+	{
+		measTypeName: PdcpPduVolumeDL,
+		measTypeID:   14,
+	},
+	{
+		measTypeName: PdcpPduVolumeUL,
+		measTypeID:   15,
+	},
+	{
+		measTypeName: PdcpRatePerPRBDL,
+		measTypeID:   16,
+	},
+	{
+		measTypeName: PdcpRatePerPRBUL,
+		measTypeID:   17,
 	},
 }
