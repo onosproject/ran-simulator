@@ -5,6 +5,9 @@
 package v1
 
 import (
+	"bytes"
+	"encoding/binary"
+	"math"
 	"context"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
@@ -400,6 +403,16 @@ func (c *Client) getPlmnID() ransimtypes.Uint24 {
 	return plmnIDUint24
 }
 
+func float_decoder(data int32) float32 {
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, data)
+	bits := binary.LittleEndian.Uint32(buf.Bytes())
+	res := math.Float32frombits(bits)
+	log.Infof("data : %v", data)
+	log.Infof("res : %v", res)
+	return res
+}
+
 // checkAndSetPCI check if the control header and message including the required info for changing the PCI value for a specific cell
 func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2SmRcControlHeader, controlMessage *e2smrcies.E2SmRcControlMessage) error {
 	headerFormat1 := controlHeader.GetRicControlHeaderFormats().GetControlHeaderFormat1()
@@ -415,13 +428,25 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 					var ncgi ransimtypes.NCGI
 					// Extracts NR PCI ran parameter
 					ranParameterID := ranParameter.GetRanParameterId().Value
+					var control_values []float32
 					if ranParameterID == PCIRANParameterID {
-						ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceElementFalse()
-						if ranParameterValue != nil {
-							pciValue = ranParameterValue.GetRanParameterValue().GetValueInt()
+						// ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceElementFalse()
+						// if ranParameterValue != nil {
+						// 	pciValue = ranParameterValue.GetRanParameterValue().GetValueInt()
+						// } else {
+						// 	return errors.NewInvalid("PCI ran parameter is not set")
+						// }
+						ranParameter := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()
+						if ranParameter != nil {
+							for index := 0; index < len(ranParameter); index++ {
+								control_value := int32(ranParameter[index].GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
+								convert_control_value := float_decoder(control_value)
+								control_values = append(control_values, convert_control_value)
+							}
 						} else {
-							return errors.NewInvalid("PCI ran parameter is not set")
+							return errors.NewInvalid("Can not get control values")
 						}
+						log.Infof("control values : %v", control_values)
 					}
 					// Extracts NCGI ran parameter
 					if ranParameterID == NCGIRANParameterID {
