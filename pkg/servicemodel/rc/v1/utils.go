@@ -408,8 +408,8 @@ func float_decoder(data int32) float32 {
 	binary.Write(buf, binary.LittleEndian, data)
 	bits := binary.LittleEndian.Uint32(buf.Bytes())
 	res := math.Float32frombits(bits)
-	log.Infof("data : %v", data)
-	log.Infof("res : %v", res)
+	log.Debugf("data : %v", data)
+	log.Debugf("res : %v", res)
 	return res
 }
 
@@ -430,23 +430,12 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 					ranParameterID := ranParameter.GetRanParameterId().Value
 					var control_values []float32
 					if ranParameterID == PCIRANParameterID {
-						// ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceElementFalse()
-						// if ranParameterValue != nil {
-						// 	pciValue = ranParameterValue.GetRanParameterValue().GetValueInt()
-						// } else {
-						// 	return errors.NewInvalid("PCI ran parameter is not set")
-						// }
-						ranParameter := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()
-						if ranParameter != nil {
-							for index := 0; index < len(ranParameter); index++ {
-								control_value := int32(ranParameter[index].GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
-								convert_control_value := float_decoder(control_value)
-								control_values = append(control_values, convert_control_value)
-							}
+						ranParameterValue := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()[0].GetRanParameterValueType().GetRanPChoiceElementFalse()
+						if ranParameterValue != nil {
+							pciValue = ranParameterValue.GetRanParameterValue().GetValueInt()
 						} else {
-							return errors.NewInvalid("Can not get control values")
+							return errors.NewInvalid("PCI ran parameter is not set")
 						}
-						log.Infof("control values : %v", control_values)
 					}
 					// Extracts NCGI ran parameter
 					if ranParameterID == NCGIRANParameterID {
@@ -485,6 +474,19 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlHeader *e2smrcies.E2
 						} else {
 							return errors.NewInvalid("NCGI ran parameter is not set")
 						}
+					}
+					if ranParameterID == NSRANParameterID {
+						ranParameter := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()
+						if ranParameter != nil {
+							for index := 0; index < len(ranParameter); index++ {
+								control_value := int32(ranParameter[index].GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
+								convert_control_value := float_decoder(control_value)
+								control_values = append(control_values, convert_control_value)
+							}
+						} else {
+							return errors.NewInvalid("Can not get control values")
+						}
+						log.Infof("control values : %v", control_values)
 					}
 				}
 			}
