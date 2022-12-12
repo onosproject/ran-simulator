@@ -79,6 +79,11 @@ const (
 	vendorName         string = "ONF"
 )
 
+var (
+	nsDataFile         *os.File
+	nsDataReader       *csv.Reader
+)
+
 // Client kpm service model client
 type Client struct {
 	ServiceModel *registry.ServiceModel
@@ -231,10 +236,15 @@ func float_encoder(data float32) int64 {
 
 func (sm *Client) collect(ctx context.Context,
 	actionDefinition *e2smkpmv2.E2SmKpmActionDefinition,
-	cellNCGI ransimtypes.NCGI, data []string) (*e2smkpmv2.MeasurementDataItem, error) {
+	cellNCGI ransimtypes.NCGI) (*e2smkpmv2.MeasurementDataItem, error) {
 	measInfoList := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1().GetMeasInfoList()
 	measRecord := e2smkpmv2.MeasurementRecord{
 		Value: make([]*e2smkpmv2.MeasurementRecordItem, 0),
+	}
+
+	nsData, err := nsDataReader.Read()
+	if err != nil {
+		log.Debugf("can't get ns data from file")
 	}
 
 	for _, measInfo := range measInfoList.Value {
@@ -242,41 +252,47 @@ func (sm *Client) collect(ctx context.Context,
 			if measType.measTypeName.String() == measInfo.MeasType.GetMeasName().Value {
 				switch measType.measTypeName {
 				case PrbUsedDL:
-					log.Debugf("utilization : %v", data[4])
-					utilization, err := strconv.ParseFloat(strings.TrimSpace(data[4]), 64)
-					if err != nil {
-						log.Errorf("%v", err)
+					if len(nsData) != 0 {
+						log.Debugf("utilization : %v", nsData[4])
+						utilization, err := strconv.ParseFloat(strings.TrimSpace(nsData[4]), 64)
+						if err != nil {
+							log.Errorf("%v", err)
+						}
+						log.Debugf("utilization per slice for Cell %v set for value: %+v",
+							cellNCGI, utilization)
+						measRecordReal := measurments.NewMeasurementRecordItemInteger(
+							measurments.WithIntegerValue(float_encoder(float32(utilization))),
+						).Build()
+						measRecord.Value = append(measRecord.Value, measRecordReal)
 					}
-					log.Debugf("utilization per slice for Cell %v set for value: %+v",
-						cellNCGI, utilization)
-					measRecordReal := measurments.NewMeasurementRecordItemInteger(
-						measurments.WithIntegerValue(float_encoder(float32(utilization))),
-					).Build()
-					measRecord.Value = append(measRecord.Value, measRecordReal)
 				case PdcpPduVolumeDL:
-					log.Debugf("volume : %v", data[5])
-					volume, err := strconv.ParseFloat(strings.TrimSpace(data[5]), 64)
-					if err != nil {
-						log.Errorf("%v", err)
+					if len(nsData) != 0 {
+						log.Debugf("volume : %v", nsData[5])
+						volume, err := strconv.ParseFloat(strings.TrimSpace(nsData[5]), 64)
+						if err != nil {
+							log.Errorf("%v", err)
+						}
+						log.Debugf("volume for Cell %v set for value: %+v",
+							cellNCGI, volume)
+						measRecordReal := measurments.NewMeasurementRecordItemInteger(
+							measurments.WithIntegerValue(float_encoder(float32(volume))),
+						).Build()
+						measRecord.Value = append(measRecord.Value, measRecordReal)
 					}
-					log.Debugf("volume for Cell %v set for value: %+v",
-						cellNCGI, volume)
-					measRecordReal := measurments.NewMeasurementRecordItemInteger(
-						measurments.WithIntegerValue(float_encoder(float32(volume))),
-					).Build()
-					measRecord.Value = append(measRecord.Value, measRecordReal)
 				case PdcpRatePerPRBDL:
-					log.Debugf("pdcp_rate : %+v", data[3])
-					pdcp_rate, err := strconv.ParseFloat(strings.TrimSpace(data[3]), 64)
-					if err != nil {
-						log.Errorf("%v", err)
+					if len(nsData) != 0 {
+						log.Debugf("pdcp_rate : %+v", nsData[3])
+						pdcp_rate, err := strconv.ParseFloat(strings.TrimSpace(nsData[3]), 64)
+						if err != nil {
+							log.Errorf("%v", err)
+						}
+						log.Debugf("pdcp rate for Cell %v set for value: %+v",
+							cellNCGI, pdcp_rate)
+						measRecordReal := measurments.NewMeasurementRecordItemInteger(
+							measurments.WithIntegerValue(float_encoder(float32(pdcp_rate))),
+						).Build()
+						measRecord.Value = append(measRecord.Value, measRecordReal)
 					}
-					log.Debugf("pdcp rate for Cell %v set for value: %+v",
-						cellNCGI, pdcp_rate)
-					measRecordReal := measurments.NewMeasurementRecordItemInteger(
-						measurments.WithIntegerValue(float_encoder(float32(pdcp_rate))),
-					).Build()
-					measRecord.Value = append(measRecord.Value, measRecordReal)
 				case RRCConnMax:
 					log.Debugf("Max number of UEs for Cell %v set for RRC Con Max: %v",
 						cellNCGI, int64(sm.ServiceModel.UEs.MaxUEsPerCell(ctx, uint64(cellNCGI))))
@@ -309,7 +325,7 @@ func (sm *Client) collect(ctx context.Context,
 }
 
 func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
-	cellNCGI ransimtypes.NCGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval int64, data []string) ([]byte, error) {
+	cellNCGI ransimtypes.NCGI, actionDefinition *e2smkpmv2.E2SmKpmActionDefinition, interval int64) ([]byte, error) {
 	log.Debug("Create Indication message format 1 based on action defs for cell:", cellNCGI)
 	format1 := actionDefinition.GetActionDefinitionFormats().GetActionDefinitionFormat1()
 	measInfoList := format1.GetMeasInfoList()
@@ -320,7 +336,7 @@ func (sm *Client) createIndicationMsgFormat1(ctx context.Context,
 	numDataItems := int(interval / granularity)
 
 	for i := 0; i < numDataItems; i++ {
-		measDataItem, err := sm.collect(ctx, actionDefinition, cellNCGI, data)
+		measDataItem, err := sm.collect(ctx, actionDefinition, cellNCGI)
 		if err != nil {
 			log.Warn(err)
 			return nil, err
@@ -386,8 +402,7 @@ func (sm *Client) createIndicationHeaderBytes(fileFormatVersion string) ([]byte,
 func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes.NCGI,
 	subscription *subutils.Subscription,
 	actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition,
-	interval int64,
-	data []string) error {
+	interval int64) error {
 	// Creates and sends indication message format 1
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
 	sub, err := sm.ServiceModel.Subscriptions.Get(subID)
@@ -407,7 +422,7 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 			cellObjectID := format1.GetCellObjId().Value
 			if cellObjectID == strconv.FormatUint(uint64(ncgi), 16) {
 				log.Debug("Sending indication message for Cell with ID:", cellObjectID)
-				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ncgi, actionDefinition, interval, data)
+				indicationMessageBytes, err := sm.createIndicationMsgFormat1(ctx, ncgi, actionDefinition, interval)
 				if err != nil {
 					return err
 				}
@@ -437,11 +452,11 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 }
 
 func (sm *Client) sendRicIndication(ctx context.Context,
-	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int64, data []string) error {
+	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int64) error {
 	node := sm.ServiceModel.Node
 	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
 	for _, ncgi := range node.Cells {
-		err := sm.sendRicIndicationFormat1(ctx, ncgi, subscription, actionDefinitions, interval, data)
+		err := sm.sendRicIndicationFormat1(ctx, ncgi, subscription, actionDefinitions, interval)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -461,21 +476,14 @@ func (sm *Client) reportIndication(ctx context.Context, interval int64, subscrip
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
 
-	file, err := os.Open("/usr/local/datasets/cell.csv")
+	nsDataFile, err := os.Open("/usr/local/datasets/cell.csv")
 	if err != nil {
 		log.Error("can't open the file")
 	}
 
-	csv_reader := csv.NewReader(file)
+	nsDataReader = csv.NewReader(nsDataFile)
 
-	data, err := csv_reader.Read()
-	if err != nil {
-		log.Error("can't read the file")
-	}
-
-	log.Infof("data is : %+v", data)
-
-	defer file.Close()
+	defer nsDataFile.Close()
 
 	node_cell := sm.ServiceModel.Node.Cells
 	var index int = 0
@@ -485,18 +493,12 @@ func (sm *Client) reportIndication(ctx context.Context, interval int64, subscrip
 		select {
 		case <-sub.Ticker.C:
 			log.Debug("Sending Indication Report for subscription:", sub.ID)
-			data, err := csv_reader.Read()
-			if err != nil {
-				log.Error("at the end of the file")
-				continue
-			}
-			log.Debugf("data : %v", data)
-			// err = sm.sendRicIndication(ctx, subscription, actionDefinitions, interval, data)
+			// err = sm.sendRicIndication(ctx, subscription, actionDefinitions, interval)
 			// if err != nil {
 			// 	log.Error("creating indication message is failed", err)
 			// 	return err
 			// }
-			err = sm.sendRicIndicationFormat1(ctx, node_cell[index], subscription, actionDefinitions, interval, data)
+			err = sm.sendRicIndicationFormat1(ctx, node_cell[index], subscription, actionDefinitions, interval)
 			if err != nil {
 				log.Error(err)
 				return err
