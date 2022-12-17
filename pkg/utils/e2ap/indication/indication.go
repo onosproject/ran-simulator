@@ -1,3 +1,4 @@
+// SPDX-FileCopyrightText: 2022-present Intel Corporation
 // SPDX-FileCopyrightText: 2020-present Open Networking Foundation <info@opennetworking.org>
 //
 // SPDX-License-Identifier: Apache-2.0
@@ -65,6 +66,13 @@ func WithIndicationHeader(indicationHeader []byte) func(*Indication) {
 func WithIndicationMessage(indicationMessage []byte) func(*Indication) {
 	return func(indication *Indication) {
 		indication.indicationMessage = indicationMessage
+	}
+}
+
+// WithRicCallProcessID sets RIC call process ID
+func WithRicCallProcessID(ricCallProcessID []byte) func(*Indication) {
+	return func(indication *Indication) {
+		indication.ricCallProcessID = ricCallProcessID
 	}
 }
 

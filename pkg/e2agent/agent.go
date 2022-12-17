@@ -119,7 +119,8 @@ func NewE2Agent(node model.Node, model *model.Model,
 			}
 		case registry.Rc:
 			log.Infof("Registering RC service model for e2 node ID:%v", node.GnbID)
-			rcv1Sm, err := rcv1.NewServiceModel(node, model, subStore, nodeStore, ueStore, cellStore, metricStore)
+			rcv1Sm, err := rcv1.NewServiceModel(node, model, subStore, nodeStore, ueStore, cellStore, metricStore,
+				a3Chan, mobilityDriver)
 			if err != nil {
 				log.Errorf("Failure creating RC service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
 				return nil, err

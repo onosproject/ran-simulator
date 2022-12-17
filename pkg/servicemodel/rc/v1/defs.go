@@ -11,10 +11,22 @@ const (
 )
 
 const (
-	eventTriggerStyle2 = "Call Process Breakpoint"
-	eventTriggerStyle3 = "E2 Node Information"
-	controlStyleType9  = 9
-	controlActionID1   = 1
+	eventTriggerStyle1  = "Message Event"
+	eventTriggerStyle2  = "Call Process Breakpoint"
+	eventTriggerStyle3  = "E2 Node Information"
+	controlStyleType3   = 3
+	controlStyleType200 = 200 // for PCI use-case: since there is no style for PCI use-case, define a new style
+	controlActionID1    = 1
+
+	ricInsertIndicationIDForMHO = 1
+	ricInsertStyleType3         = 3
+
+	ricPolicyStyleType3 = 3
+	ricPolicyStyleName  = "Connected Mode Mobility Control"
+
+	ricPolicyActionIDForMLB             = 1
+	ricPolicyActionNameForMLB           = "Policy for Handover Control"
+	ricActionDefinitionFormatTypeForMLB = 2
 )
 
 // RAN parameter IDs
@@ -25,4 +37,29 @@ const (
 	NCGIRANParameterID = 2
 	// NS xApp Id
 	NSRANParameterID = 3
+
+	// TargetPrimaryCellIDRANParameterID Target Primary Cell ID RAN parameter ID
+	TargetPrimaryCellIDRANParameterID = 1
+	// TargetPrimaryCellIDRANParameterName Target Primary Cell ID RAN parameter Name
+	TargetPrimaryCellIDRANParameterName = "Target Primary Cell ID"
+	// TargetCellRANParameterID Choice of Target Cell RAN parameter ID
+	TargetCellRANParameterID = 2
+	// NRCellRANParameterID NR Cell RAN parameter ID
+	NRCellRANParameterID = 3
+	// NRCGIRANParameterID NR CGI RAN parameter ID
+	NRCGIRANParameterID = 4
+	// EUTRACellRANParameterID E-UTRA Cell RAN parameter ID
+	EUTRACellRANParameterID = 5
+	// EUTRACGIRANParameterID E-UTRA CGI RAN parameter ID
+	EUTRACGIRANParameterID = 6
+
+	// CellSpecificOffsetRANParameterID Ocn RAN parameter ID
+	CellSpecificOffsetRANParameterID = 10201
+	// CellSpecificOffsetRANParameterName Ocn RAN parameter name
+	CellSpecificOffsetRANParameterName = "Cell Specific Offset"
+)
+
+// UE Event IDs
+const (
+	A3MeasurementReportUEEventID = 2
 )
