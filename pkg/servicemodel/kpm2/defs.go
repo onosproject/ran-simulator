@@ -8,8 +8,25 @@ package kpm2
 type MeasTypeName int
 
 const (
+	PDUSessionSetupReq MeasTypeName = iota
+
+	PDUSessionSetupSucc
+
+	PDUSessionSetupFail
+
+	PrbUsedDL
+
+	PrbUsedUL
+
+	PdcpPduVolumeDL
+
+	PdcpPduVolumeUL
+
+	PdcpRatePerPRBDL
+
+	PdcpRatePerPRBUL
 	// RRCConnEstabAttSum total number of RRC connection establishment attempts
-	RRCConnEstabAttSum MeasTypeName = iota
+	RRCConnEstabAttSum 
 	// RRCConnEstabSuccSum  total number of successful RRC Connection establishments
 	RRCConnEstabSuccSum
 	// RRCConnReEstabAttSum total number of RRC connection re-establishment attempts
@@ -27,7 +44,17 @@ const (
 )
 
 func (m MeasTypeName) String() string {
-	return [...]string{"RRC.ConnEstabAtt.Sum",
+	return [...]string{
+		"PDUSessionSetupReq",
+		"PDUSessionSetupSucc",
+		"PDUSessionSetupFail",
+		"PrbUsedDL",
+		"PrbUsedUL",
+		"PdcpPduVolumeDL",
+		"PdcpPduVolumeUL",
+		"PdcpRatePerPRBDL",
+		"PdcpRatePerPRBUL",
+		"RRC.ConnEstabAtt.Sum",
 		"RRC.ConnEstabSucc.Sum",
 		"RRC.ConnReEstabAtt.Sum",
 		"RRC.ConnReEstabAtt.reconfigFail",
@@ -45,35 +72,71 @@ type MeasType struct {
 
 var measTypes = []MeasType{
 	{
-		measTypeName: RRCConnEstabAttSum,
+		measTypeName: PDUSessionSetupReq,
 		measTypeID:   1,
 	},
 	{
-		measTypeName: RRCConnEstabSuccSum,
+		measTypeName: PDUSessionSetupSucc,
 		measTypeID:   2,
 	},
 	{
-		measTypeName: RRCConnReEstabAttSum,
+		measTypeName: PDUSessionSetupFail,
 		measTypeID:   3,
 	},
 	{
-		measTypeName: RRCConnReEstabAttreconfigFail,
+		measTypeName: PrbUsedDL,
 		measTypeID:   4,
 	},
 	{
-		measTypeName: RRCConnReEstabAttHOFail,
+		measTypeName: PrbUsedUL,
 		measTypeID:   5,
 	},
 	{
-		measTypeName: RRCConnReEstabAttOther,
+		measTypeName: PdcpPduVolumeDL,
 		measTypeID:   6,
 	},
 	{
-		measTypeName: RRCConnAvg,
+		measTypeName: PdcpPduVolumeUL,
 		measTypeID:   7,
 	},
 	{
-		measTypeName: RRCConnMax,
+		measTypeName: PdcpRatePerPRBDL,
 		measTypeID:   8,
+	},
+	{
+		measTypeName: PdcpRatePerPRBUL,
+		measTypeID:   9,
+	},
+	{
+		measTypeName: RRCConnEstabAttSum,
+		measTypeID:   10,
+	},
+	{
+		measTypeName: RRCConnEstabSuccSum,
+		measTypeID:   11,
+	},
+	{
+		measTypeName: RRCConnReEstabAttSum,
+		measTypeID:   12,
+	},
+	{
+		measTypeName: RRCConnReEstabAttreconfigFail,
+		measTypeID:   13,
+	},
+	{
+		measTypeName: RRCConnReEstabAttHOFail,
+		measTypeID:   14,
+	},
+	{
+		measTypeName: RRCConnReEstabAttOther,
+		measTypeID:   15,
+	},
+	{
+		measTypeName: RRCConnAvg,
+		measTypeID:   16,
+	},
+	{
+		measTypeName: RRCConnMax,
+		measTypeID:   17,
 	},
 }

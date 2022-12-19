@@ -5,6 +5,9 @@
 package v1
 
 import (
+	"bytes"
+	"encoding/binary"
+	"math"
 	"context"
 	"fmt"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -405,6 +408,16 @@ func (c *Client) getPlmnID() ransimtypes.Uint24 {
 	return plmnIDUint24
 }
 
+func float_decoder(data int32) float32 {
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, data)
+	bits := binary.LittleEndian.Uint32(buf.Bytes())
+	res := math.Float32frombits(bits) 
+	log.Debugf("data : %v", data)
+	log.Debugf("res : %v", res)
+	return res
+}
+
 //List of RAN Parameters
 //> RAN Parameter ID: 1
 //> Target Primary Cell ID structure
@@ -644,6 +657,20 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlMessage *e2smrcies.E
 			} else {
 				return errors.NewInvalid("NCGI ran parameter is not set")
 			}
+		}
+		if ranParameterID == NSRANParameterID {
+			var control_values []float32
+			ranParameter := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()
+			if ranParameter != nil {
+				for index := 0; index < len(ranParameter); index++ {
+				control_value := int32(ranParameter[index].GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
+				convert_control_value := float_decoder(control_value)
+				control_values = append(control_values, convert_control_value)
+				}
+			} else {
+				return errors.NewInvalid("Can not get control values")
+			}
+			log.Infof("control values : %v", control_values)
 		}
 	}
 	return nil

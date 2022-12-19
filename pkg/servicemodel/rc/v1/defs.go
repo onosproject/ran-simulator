@@ -35,6 +35,8 @@ const (
 	PCIRANParameterID = 1
 	// NCGIRANParameterID NCGI RAN parameter ID
 	NCGIRANParameterID = 2
+	// NS xApp Id
+	NSRANParameterID = 3
 
 	// TargetPrimaryCellIDRANParameterID Target Primary Cell ID RAN parameter ID
 	TargetPrimaryCellIDRANParameterID = 1
