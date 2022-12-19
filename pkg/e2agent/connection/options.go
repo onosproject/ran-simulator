@@ -9,6 +9,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 	"github.com/onosproject/ran-simulator/pkg/model"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/registry"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"github.com/onosproject/ran-simulator/pkg/store/connections"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 )
@@ -22,6 +23,7 @@ type InstanceOptions struct {
 	registry        *registry.ServiceModelRegistry
 	subStore        *subscriptions.Subscriptions
 	connectionStore connections.Store
+	cellStore       cells.Store
 }
 
 // InstanceOption instance option
@@ -73,5 +75,12 @@ func WithSubStore(subStore *subscriptions.Subscriptions) func(options *InstanceO
 func WithConnectionStore(connectionStore connections.Store) func(options *InstanceOptions) {
 	return func(options *InstanceOptions) {
 		options.connectionStore = connectionStore
+	}
+}
+
+// WithCellStore sets cell store
+func WithCellStore(cellStore cells.Store) func(options *InstanceOptions) {
+	return func(options *InstanceOptions) {
+		options.cellStore = cellStore
 	}
 }

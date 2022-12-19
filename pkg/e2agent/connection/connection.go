@@ -8,12 +8,17 @@ package connection
 import (
 	"context"
 	"fmt"
+	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
+	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
+	asn1libgo "github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
+	"github.com/onosproject/ran-simulator/pkg/utils"
+	"github.com/onosproject/ran-simulator/pkg/utils/f1ap"
+	"github.com/onosproject/ran-simulator/pkg/utils/xnap"
 	"net"
 	"sync/atomic"
 	"time"
-
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/pdubuilder"
-	"github.com/onosproject/onos-e2t/pkg/southbound/e2ap/types"
 
 	v2 "github.com/onosproject/onos-e2t/api/e2ap/v2"
 	e2apcommondatatypes "github.com/onosproject/onos-e2t/api/e2ap/v2/e2ap-commondatatypes"
@@ -43,7 +48,6 @@ import (
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
 
-	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-lib-go/pkg/errors"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2ap/setup"
 
@@ -80,6 +84,7 @@ type e2Connection struct {
 	connectionStore connections.Store
 	ricAddress      addressing.RICAddress
 	transactionID   uint64
+	cellStore       cells.Store
 }
 
 // SetClient sets E2 client
@@ -107,6 +112,7 @@ func NewE2Connection(opts ...InstanceOption) E2Connection {
 		ricAddress:      instanceOptions.ricAddress,
 		connectionStore: instanceOptions.connectionStore,
 		client:          instanceOptions.e2Client,
+		cellStore:       instanceOptions.cellStore,
 	}
 
 }
@@ -626,11 +632,11 @@ func (e *e2Connection) connectAndSetup() error {
 	count = 0
 	setupNotify := func(err error, t time.Duration) {
 		count++
-		log.Infof("E2 node %d failed setup procedure; retry after %v; attempt %d", e.node.GnbID, b.GetElapsedTime(), count)
+		log.Infof("E2 node %d failed setup procedure; retry after %v; attempt %d: %+v", e.node.GnbID, b.GetElapsedTime(), count, err)
 	}
 
 	err = backoff.RetryNotify(e.setup, b, setupNotify)
-	log.Infof("E2 node %d completed connection setup", e.node.GnbID)
+	log.Infof("E2 node %d completed connection setup: %+v", e.node.GnbID, err)
 	return err
 
 }
@@ -688,6 +694,22 @@ func (e *e2Connection) connect() error {
 	return nil
 }
 
+var (
+	defaultGnBDUID                         = int64(21)
+	defaultRRCVerBytes                     = []byte{0xE0}
+	defaultRRCVerLen                       = uint32(3)
+	defaultNrCellIDLen                     = uint32(36)
+	defaultSulFreqBandIndicationNr         = int32(32)
+	defaultFreqBandIndicatorNr             = int32(1)
+	defaultMeasureTimingConfigurationBytes = []byte{0xF1, 0xF1, 0xF1}
+	defaultRANAC                           = int32(255)
+	defaultTacBytes                        = []byte{0x01, 0x01, 0x01}
+	defaultSD                              = []byte{0x01, 0x23, 0x45}
+	defaultSST                             = []byte{0x01}
+	defaultAMFRegionValue                  = []byte{0xdd} // todo need to be changed
+	defaultAMFRegionLen                    = uint32(8)
+)
+
 func (e *e2Connection) setup() error {
 	plmnID := ransimtypes.NewUint24(uint32(e.model.PlmnID))
 
@@ -697,15 +719,98 @@ func (e *e2Connection) setup() error {
 
 	// TODO initialize component interfaces properly. It is just initialized with some default values
 	// 	to avoid encoding error.
-	e2ncID1 := pdubuilder.CreateE2NodeComponentIDF1(21)
+	e2ncIDF1 := pdubuilder.CreateE2NodeComponentIDF1(21)
+	e2ncIDXn := pdubuilder.CreateE2NodeComponentIDXn(&e2apies.GlobalNgRannodeId{
+		GlobalNgRannodeId: &e2apies.GlobalNgRannodeId_GNb{
+			GNb: &e2apies.GlobalgNbId{
+				PlmnId: &e2apcommondatatypes.PlmnIdentity{
+					Value: plmnID.ToBytes(),
+				},
+				GnbId: &e2apies.GnbIdChoice{
+					GnbIdChoice: &e2apies.GnbIdChoice_GnbId{
+						GnbId: &asn1libgo.BitString{
+							Value: utils.Uint64ToBitString(uint64(e.node.GnbID), 22),
+							Len:   22,
+						},
+					},
+				},
+			},
+		},
+	})
+
+	sCellItemListF1 := make([]f1ap.SCellItemInfo, 0)
+	sCellItemListXn := make([]xnap.XnItemCellInfo, 0)
+	nCellItemMapXn := make(map[ransimtypes.NCGI][]xnap.XnItemCellInfo)
+	e2NodePlmn := plmnID.ToBytes()
+	for _, m := range e.model.Cells {
+		nci := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(m.NCGI)))
+		sCellItem := f1ap.SCellItemInfo{
+			PlmnIDBytes:                     e2NodePlmn,
+			NrCellIDBytes:                   nci.Bytes(),
+			NrCellIDLen:                     defaultNrCellIDLen,
+			NrPCI:                           int32(m.PCI),
+			SulFreqBandIndicationNr:         defaultSulFreqBandIndicationNr,
+			FreqBandIndicatorNr:             defaultFreqBandIndicatorNr,
+			NrArfcn:                         int32(m.Earfcn),
+			MeasureTimingConfigurationBytes: defaultMeasureTimingConfigurationBytes,
+		}
+		sCellItemListF1 = append(sCellItemListF1, sCellItem)
+		xnSCellItem := xnap.XnItemCellInfo{
+			NCGIKey:                         m.NCGI,
+			NrCellIDBytes:                   nci.Bytes(),
+			NrCellIDLen:                     defaultNrCellIDLen,
+			NrPCI:                           int32(m.PCI),
+			NrArfcn:                         int32(m.Earfcn),
+			SulFreqBand:                     defaultSulFreqBandIndicationNr,
+			FreqBand:                        defaultFreqBandIndicatorNr,
+			MeasureTimingConfigurationBytes: defaultMeasureTimingConfigurationBytes,
+			RanAC:                           defaultRANAC,
+		}
+		sCellItemListXn = append(sCellItemListXn, xnSCellItem)
+
+		nCellItemListXn := make([]xnap.XnItemCellInfo, 0)
+		for _, n := range m.Neighbors {
+			nCell, err := e.cellStore.Get(context.Background(), n)
+			if err != nil {
+				log.Warnf("faile to fetch neighbor cell %+v, err: %+v", nCell, err)
+				continue
+			}
+			xnNCellitem := xnap.XnItemCellInfo{}
+			nCellItemListXn = append(nCellItemListXn, xnNCellitem)
+		}
+		nCellItemMapXn[m.NCGI] = nCellItemListXn
+	}
+
+	f1SetupRequestBytes, err := f1ap.CreateF1SetupRequest(defaultGnBDUID, defaultRRCVerBytes, defaultRRCVerLen, sCellItemListF1)
+	if err != nil {
+		return err
+	}
+	xnSetupRequestBytes, err := xnap.CreateXnSetupRequest(e2NodePlmn, utils.Uint64ToBitString(uint64(e.node.GnbID), 22), defaultTacBytes, []xnap.XnItemSlice{
+		{
+			Sst: defaultSST,
+			Sd:  defaultSD,
+		},
+	}, xnap.XnItemAMFRegion{AmfRegionID: defaultAMFRegionValue, AmfRegionIDLen: defaultAMFRegionLen}, sCellItemListXn, nCellItemMapXn)
+	if err != nil {
+		return err
+	}
 	configComponentAdditionItems := []*types.E2NodeComponentConfigAdditionItem{
 		{
 			E2NodeComponentType: e2apies.E2NodeComponentInterfaceType_E2NODE_COMPONENT_INTERFACE_TYPE_F1,
-			E2NodeComponentID:   e2ncID1,
+			E2NodeComponentID:   e2ncIDF1,
 			E2NodeComponentConfiguration: e2apies.E2NodeComponentConfiguration{
-				E2NodeComponentResponsePart: []byte{0x01, 0x02, 0x03},
-				E2NodeComponentRequestPart:  []byte{0x04, 0x05, 0x06},
-			}},
+				E2NodeComponentRequestPart:  f1SetupRequestBytes,
+				E2NodeComponentResponsePart: []byte{0x04, 0x05, 0x06},
+			},
+		},
+		{
+			E2NodeComponentType: e2apies.E2NodeComponentInterfaceType_E2NODE_COMPONENT_INTERFACE_TYPE_XN,
+			E2NodeComponentID:   e2ncIDXn,
+			E2NodeComponentConfiguration: e2apies.E2NodeComponentConfiguration{
+				E2NodeComponentRequestPart:  xnSetupRequestBytes,
+				E2NodeComponentResponsePart: []byte{0x04, 0x05, 0x06},
+			},
+		},
 	}
 	for _, configAdditionItem := range configComponentAdditionItems {
 		cui := &e2appducontents.E2NodeComponentConfigAdditionItemIes{

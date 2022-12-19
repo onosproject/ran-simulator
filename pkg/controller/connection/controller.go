@@ -6,6 +6,7 @@ package connection
 
 import (
 	"context"
+	"github.com/onosproject/ran-simulator/pkg/store/cells"
 	"sync/atomic"
 
 	"github.com/onosproject/onos-lib-go/pkg/errors"
@@ -39,7 +40,7 @@ const queueSize = 100
 // NewController returns a new connection controller. This controller is responsible to open and close
 // E2 connections that are the result of the E2 Connection Update procedure or E2 Configuration update procedure
 func NewController(connections connections.Store, node model.Node, model *model.Model,
-	registry *registry.ServiceModelRegistry, subStore *subscriptions.Subscriptions) *controller.Controller {
+	registry *registry.ServiceModelRegistry, subStore *subscriptions.Subscriptions, cellStore cells.Store) *controller.Controller {
 	c := controller.NewController("E2Connections")
 	c.Watch(&Watcher{
 		connections: connections,
@@ -51,6 +52,7 @@ func NewController(connections connections.Store, node model.Node, model *model.
 		model:       model,
 		registry:    registry,
 		subStore:    subStore,
+		cellStore:   cellStore,
 	})
 	return c
 }
@@ -63,6 +65,7 @@ type Reconciler struct {
 	registry      *registry.ServiceModelRegistry
 	subStore      *subscriptions.Subscriptions
 	transactionID uint64
+	cellStore     cells.Store
 }
 
 // Reconcile reconciles the state of a device change
@@ -161,7 +164,8 @@ func (r *Reconciler) reconcileOpenConnection(connection *connections.Connection)
 			e2connection.WithModel(r.model),
 			e2connection.WithSMRegistry(r.registry),
 			e2connection.WithSubStore(r.subStore),
-			e2connection.WithConnectionStore(r.connections))
+			e2connection.WithConnectionStore(r.connections),
+			e2connection.WithCellStore(r.cellStore))
 
 		client, err := e2.Connect(ctx, addr, func(channel e2.ClientConn) e2.ClientInterface {
 			return e2Connection
