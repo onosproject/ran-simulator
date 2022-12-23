@@ -26,7 +26,7 @@ const (
 
 	PdcpRatePerPRBUL
 	// RRCConnEstabAttSum total number of RRC connection establishment attempts
-	RRCConnEstabAttSum 
+	RRCConnEstabAttSum
 	// RRCConnEstabSuccSum  total number of successful RRC Connection establishments
 	RRCConnEstabSuccSum
 	// RRCConnReEstabAttSum total number of RRC connection re-establishment attempts

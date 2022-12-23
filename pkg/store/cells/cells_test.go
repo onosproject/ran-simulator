@@ -6,7 +6,7 @@ package cells
 
 import (
 	"context"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -21,7 +21,7 @@ import (
 
 func TestCells(t *testing.T) {
 	m := model.Model{}
-	bytes, err := ioutil.ReadFile("../../model/test.yaml")
+	bytes, err := os.ReadFile("../../model/test.yaml")
 	assert.NoError(t, err)
 	err = yaml.Unmarshal(bytes, &m)
 	assert.NoError(t, err)

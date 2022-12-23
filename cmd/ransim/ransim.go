@@ -6,14 +6,13 @@
 /*
 Package trafficsim is the main entry point to the ONOS TrafficSim application.
 
-Arguments
+# Arguments
 
 -caPath <the location of a CA certificate>
 
 -keyPath <the location of a client private key>
 
 -certPath <the location of a client certificate>
-
 
 See ../../docs/run.md for how to run the application.
 */

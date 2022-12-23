@@ -7,7 +7,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 
@@ -127,5 +126,5 @@ func runHoneycombTopoCommand(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	}
-	return ioutil.WriteFile(args[0], d, 0644)
+	return os.WriteFile(args[0], d, 0644)
 }

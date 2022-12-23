@@ -6,7 +6,6 @@ linters:
   enable:
     - gofmt
     - gocyclo
-    - revive
     - misspell
     - typecheck
     - errcheck

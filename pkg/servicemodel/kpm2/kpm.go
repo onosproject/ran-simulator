@@ -7,12 +7,12 @@ package kpm2
 import (
 	"context"
 	"encoding/binary"
-	"strconv"
-	"time"
-	"math"
-	"strings"
-	"os"
 	"encoding/csv"
+	"math"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
@@ -80,8 +80,8 @@ const (
 )
 
 var (
-	nsDataFile         *os.File
-	nsDataReader       *csv.Reader
+	nsDataFile   *os.File
+	nsDataReader *csv.Reader
 )
 
 // Client kpm service model client
@@ -451,19 +451,19 @@ func (sm *Client) sendRicIndicationFormat1(ctx context.Context, ncgi ransimtypes
 	return nil
 }
 
-func (sm *Client) sendRicIndication(ctx context.Context,
-	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int64) error {
-	node := sm.ServiceModel.Node
-	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
-	for _, ncgi := range node.Cells {
-		err := sm.sendRicIndicationFormat1(ctx, ncgi, subscription, actionDefinitions, interval)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-	}
-	return nil
-}
+//func (sm *Client) sendRicIndication(ctx context.Context,
+//	subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition, interval int64) error {
+//	node := sm.ServiceModel.Node
+//	// Creates and sends an indication message for each cell in the node that are also specified in Action Definition
+//	for _, ncgi := range node.Cells {
+//		err := sm.sendRicIndicationFormat1(ctx, ncgi, subscription, actionDefinitions, interval)
+//		if err != nil {
+//			log.Error(err)
+//			return err
+//		}
+//	}
+//	return nil
+//}
 
 func (sm *Client) reportIndication(ctx context.Context, interval int64, subscription *subutils.Subscription, actionDefinitions []*e2smkpmv2.E2SmKpmActionDefinition) error {
 	subID := subscriptions.NewID(subscription.GetRicInstanceID(), subscription.GetReqID(), subscription.GetRanFuncID())
@@ -476,7 +476,7 @@ func (sm *Client) reportIndication(ctx context.Context, interval int64, subscrip
 	}
 	sub.Ticker = time.NewTicker(intervalDuration * time.Millisecond)
 
-	nsDataFile, err := os.Open("/usr/local/datasets/cell.csv")
+	nsDataFile, err = os.Open("/usr/local/datasets/cell.csv")
 	if err != nil {
 		log.Error("can't open the file")
 	}

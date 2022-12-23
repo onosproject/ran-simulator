@@ -6,9 +6,8 @@ package v1
 
 import (
 	"bytes"
-	"encoding/binary"
-	"math"
 	"context"
+	"encoding/binary"
 	"fmt"
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
@@ -29,6 +28,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/messages/format3"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/messages/format5"
 	"google.golang.org/protobuf/proto"
+	"math"
 	"strconv"
 )
 
@@ -412,25 +412,26 @@ func float_decoder(data int32) float32 {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, data)
 	bits := binary.LittleEndian.Uint32(buf.Bytes())
-	res := math.Float32frombits(bits) 
+	res := math.Float32frombits(bits)
 	log.Debugf("data : %v", data)
 	log.Debugf("res : %v", res)
 	return res
 }
 
-//List of RAN Parameters
-//> RAN Parameter ID: 1
-//> Target Primary Cell ID structure
+// List of RAN Parameters
+// > RAN Parameter ID: 1
+// > Target Primary Cell ID structure
 // >> RAN Parameter ID: 2
 // >> Choice Target Cell structure
-//  >>> [Choice 1] RAN Parameter ID: 3
-//  >>> [Choice 1] NR Cell structure
-//   >>>> RAN Parameter ID: 4
-//   >>>> NR CGI Element with key flag false
-//  >>> [Choice 2] RAN Parameter ID: 5
-//  >>> [Choice 2] E-UTRA Cell structure
-//   >>>> RAN Parameter ID: 6
-//   >>>> E-UTRA CGI Element with key flag false
+//
+//	>>> [Choice 1] RAN Parameter ID: 3
+//	>>> [Choice 1] NR Cell structure
+//	 >>>> RAN Parameter ID: 4
+//	 >>>> NR CGI Element with key flag false
+//	>>> [Choice 2] RAN Parameter ID: 5
+//	>>> [Choice 2] E-UTRA Cell structure
+//	 >>>> RAN Parameter ID: 6
+//	 >>>> E-UTRA CGI Element with key flag false
 func (c *Client) createRICIndicationFormat5Header2(ctx context.Context, subscription *subutils.Subscription, ueID *e2smcommonies.Ueid, ricInsertStyleType int32, insertIndicationID int32, targetNCGI ransimtypes.NCGI) (*e2appducontents.Ricindication, error) {
 	headerFormat2 := format2.NewIndicationHeader(format2.WithUEID(ueID),
 		format2.WithRICInsertStyleType(ricInsertStyleType),
@@ -663,9 +664,9 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlMessage *e2smrcies.E
 			ranParameter := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()
 			if ranParameter != nil {
 				for index := 0; index < len(ranParameter); index++ {
-				control_value := int32(ranParameter[index].GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
-				convert_control_value := float_decoder(control_value)
-				control_values = append(control_values, convert_control_value)
+					control_value := int32(ranParameter[index].GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
+					convert_control_value := float_decoder(control_value)
+					control_values = append(control_values, convert_control_value)
 				}
 			} else {
 				return errors.NewInvalid("Can not get control values")

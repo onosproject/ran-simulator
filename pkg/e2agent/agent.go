@@ -164,7 +164,7 @@ func (a *e2Agent) Start() error {
 	connectionStore := connections.NewStore()
 	a.connectionStore = connectionStore
 
-	c := connectionController.NewController(connectionStore, a.node, a.model, a.registry, a.subStore)
+	c := connectionController.NewController(connectionStore, a.node, a.model, a.registry, a.subStore, a.cellStore)
 	err = c.Start()
 	if err != nil {
 		return err
@@ -175,7 +175,8 @@ func (a *e2Agent) Start() error {
 		connection.WithSMRegistry(a.registry),
 		connection.WithSubStore(a.subStore),
 		connection.WithRICAddress(ricAddress),
-		connection.WithConnectionStore(connectionStore))
+		connection.WithConnectionStore(connectionStore),
+		connection.WithCellStore(a.cellStore))
 
 	err = e2Connection.Setup()
 	if err != nil {

@@ -6,8 +6,8 @@ package ues
 
 import (
 	"context"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"testing"
 
 	"github.com/onosproject/onos-api/go/onos/ransim/types"
@@ -21,7 +21,7 @@ import (
 
 func cellStore(t *testing.T) cells.Store {
 	m := model.Model{}
-	bytes, err := ioutil.ReadFile("../../model/test.yaml")
+	bytes, err := os.ReadFile("../../model/test.yaml")
 	assert.NoError(t, err)
 	err = yaml.Unmarshal(bytes, &m)
 	assert.NoError(t, err)
