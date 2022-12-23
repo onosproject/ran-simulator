@@ -261,14 +261,14 @@ func CreateXnSetupRequest(plmnIDByte []byte, gnbIDByte []byte, tacBytes []byte, 
 				MeasurementTimingConfiguration: nCell.MeasureTimingConfigurationBytes,
 				ConnectivitySupport:            connSupport,
 			})
-			nrItem := &xnapiesv1.ServedCellsNRItem{
-				ServedCellInfoNr: servedCellInfoNr,
-				NeighbourInfoNr: &xnapiesv1.NeighbourInformationNR{
-					Value: neighbourInfoNrList,
-				},
-			}
-			servedCellsNRList = append(servedCellsNRList, nrItem)
 		}
+		nrItem := &xnapiesv1.ServedCellsNRItem{
+			ServedCellInfoNr: servedCellInfoNr,
+			NeighbourInfoNr: &xnapiesv1.NeighbourInformationNR{
+				Value: neighbourInfoNrList,
+			},
+		}
+		servedCellsNRList = append(servedCellsNRList, nrItem)
 	}
 
 	val4, err := pdubuilder.CreateXnSetupRequestIEsValueIDListOfServedCellsNr(&xnapiesv1.ServedCellsNR{
