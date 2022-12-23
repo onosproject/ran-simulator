@@ -7,12 +7,12 @@ package kpm2
 import (
 	"context"
 	"encoding/binary"
-	"strconv"
-	"time"
-	"math"
-	"strings"
-	"os"
 	"encoding/csv"
+	"math"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/onosproject/onos-lib-go/api/asn1/v1/asn1"
 
@@ -80,8 +80,8 @@ const (
 )
 
 var (
-	nsDataFile         *os.File
-	nsDataReader       *csv.Reader
+	nsDataFile   *os.File
+	nsDataReader *csv.Reader
 )
 
 // Client kpm service model client

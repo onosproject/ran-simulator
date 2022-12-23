@@ -448,7 +448,7 @@ func (d *driver) sortUECells(ueCells []*model.UECell, numAdjCells int) []*model.
 	return ueCells
 }
 
-//GetHoLogic returns the HO Logic ("local" or "mho")
+// GetHoLogic returns the HO Logic ("local" or "mho")
 func (d *driver) GetHoLogic() string {
 	return d.hoLogic
 }
