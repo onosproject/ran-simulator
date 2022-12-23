@@ -96,6 +96,9 @@ func CreateF1SetupRequest(gnbDUID int64, rrcVerBytes []byte, rrcVerLen uint32, f
 			Value: sCell.NrCellIDBytes,
 			Len:   sCell.NrCellIDLen,
 		})
+		if err != nil {
+			return nil, err
+		}
 		nrcgi, err := pdubuilder.CreateNrcgi(plmnID, nrCellID)
 		if err != nil {
 			log.Warnf("%+v plmnID and %+v nrcgi is not valid to create ncgi, err: %+v", plmnID, nrCellID, err)

@@ -111,6 +111,9 @@ func CreateXnSetupRequest(plmnIDByte []byte, gnbIDByte []byte, tacBytes []byte, 
 		return nil, err
 	}
 	broadcastPlmnItem, err := pdubuilder.CreateBroadcastPlmninTaisupportItem(broadcastPlmn, taiSliceSupportList)
+	if err != nil {
+		return nil, err
+	}
 	broadcastPlmns = append(broadcastPlmns, broadcastPlmnItem)
 
 	taiItem, err := pdubuilder.CreateTaisupportItem(tac, broadcastPlmns)
