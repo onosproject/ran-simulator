@@ -166,7 +166,6 @@ func CreateXnSetupRequest(plmnIDByte []byte, gnbIDByte []byte, tacBytes []byte, 
 			Value: servCell.NrCellIDBytes,
 			Len:   servCell.NrCellIDLen,
 		})
-		log.Warnf("WK1 %+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", servCell.NrCellIDBytes, servCell.NrCellIDLen, err)
 		if err != nil {
 			log.Warnf("%+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", servCell.NrCellIDBytes, servCell.NrCellIDLen, err)
 			continue
@@ -247,7 +246,6 @@ func CreateXnSetupRequest(plmnIDByte []byte, gnbIDByte []byte, tacBytes []byte, 
 				Value: nCell.NrCellIDBytes,
 				Len:   nCell.NrCellIDLen,
 			})
-			log.Warnf("WK2 %+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", nCell.NrCellIDBytes, nCell.NrCellIDBytes, err)
 			if err != nil {
 				log.Warnf("%+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", nCell.NrCellIDBytes, nCell.NrCellIDBytes, err)
 				continue
@@ -257,7 +255,6 @@ func CreateXnSetupRequest(plmnIDByte []byte, gnbIDByte []byte, tacBytes []byte, 
 				log.Warnf("failed to create nrcgi: %v", err)
 				return nil, err
 			}
-			log.Warnf("WK3 %+v / %+v", ncgi, neighborNcgi)
 
 			freqBandList := make([]*xnapiesv1.NrfrequencyBandItem, 0)
 			freqBand, err := pdubuilder.CreateNrfrequencyBand(nCell.FreqBand)

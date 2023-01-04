@@ -742,7 +742,11 @@ func (e *e2Connection) setup() error {
 	sCellItemListXn := make([]xnap.XnItemCellInfo, 0)
 	nCellItemMapXn := make(map[ransimtypes.NCGI][]xnap.XnItemCellInfo)
 	e2NodePlmn := plmnID.ToBytes()
-	for _, m := range e.model.Cells {
+	for _, c := range e.node.Cells {
+		m, err := e.cellStore.Get(context.Background(), c)
+		if err != nil {
+			log.Warnf("failed to fetch cell %+v: %+v", m, err)
+		}
 		nci := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(m.NCGI)))
 		sCellItem := f1ap.SCellItemInfo{
 			PlmnIDBytes:                     e2NodePlmn,
