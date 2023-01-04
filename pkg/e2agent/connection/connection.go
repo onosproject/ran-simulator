@@ -772,10 +772,21 @@ func (e *e2Connection) setup() error {
 		for _, n := range m.Neighbors {
 			nCell, err := e.cellStore.Get(context.Background(), n)
 			if err != nil {
-				log.Warnf("faile to fetch neighbor cell %+v, err: %+v", nCell, err)
+				log.Warnf("failed to fetch neighbor cell %+v, err: %+v", nCell, err)
 				continue
 			}
-			xnNCellitem := xnap.XnItemCellInfo{}
+			neighborNci := utils.NewNCellIDWithUint64(uint64(ransimtypes.GetNCI(nCell.NCGI)))
+			xnNCellitem := xnap.XnItemCellInfo{
+				NCGIKey:                         nCell.NCGI,
+				NrCellIDBytes:                   neighborNci.Bytes(),
+				NrCellIDLen:                     defaultNrCellIDLen,
+				NrPCI:                           int32(nCell.PCI),
+				NrArfcn:                         int32(nCell.Earfcn),
+				SulFreqBand:                     defaultSulFreqBandIndicationNr,
+				FreqBand:                        defaultFreqBandIndicatorNr,
+				MeasureTimingConfigurationBytes: defaultMeasureTimingConfigurationBytes,
+				RanAC:                           defaultRANAC,
+			}
 			nCellItemListXn = append(nCellItemListXn, xnNCellitem)
 		}
 		nCellItemMapXn[m.NCGI] = nCellItemListXn

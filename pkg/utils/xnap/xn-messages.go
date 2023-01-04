@@ -166,6 +166,7 @@ func CreateXnSetupRequest(plmnIDByte []byte, gnbIDByte []byte, tacBytes []byte, 
 			Value: servCell.NrCellIDBytes,
 			Len:   servCell.NrCellIDLen,
 		})
+		log.Warnf("WK1 %+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", servCell.NrCellIDBytes, servCell.NrCellIDLen, err)
 		if err != nil {
 			log.Warnf("%+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", servCell.NrCellIDBytes, servCell.NrCellIDLen, err)
 			continue
@@ -242,11 +243,59 @@ func CreateXnSetupRequest(plmnIDByte []byte, gnbIDByte []byte, tacBytes []byte, 
 
 		neighbourInfoNrList := make([]*xnapiesv1.NeighbourInformationNRItem, 0)
 		for _, nCell := range xnNeighborCells[servCell.NCGIKey] {
+			neighborNrCellidentity, err := pdubuilder.CreateNrCellIdentity(&asn1.BitString{
+				Value: nCell.NrCellIDBytes,
+				Len:   nCell.NrCellIDLen,
+			})
+			log.Warnf("WK2 %+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", nCell.NrCellIDBytes, nCell.NrCellIDBytes, err)
+			if err != nil {
+				log.Warnf("%+v NrCellIDBytes and/or %+v NrCellIDLen is not valid, err: %+v", nCell.NrCellIDBytes, nCell.NrCellIDBytes, err)
+				continue
+			}
+			neighborNcgi, err := pdubuilder.CreateNrCGi(plmnID, neighborNrCellidentity)
+			if err != nil {
+				log.Warnf("failed to create nrcgi: %v", err)
+				return nil, err
+			}
+			log.Warnf("WK3 %+v / %+v", ncgi, neighborNcgi)
+
+			freqBandList := make([]*xnapiesv1.NrfrequencyBandItem, 0)
+			freqBand, err := pdubuilder.CreateNrfrequencyBand(nCell.FreqBand)
+			if err != nil {
+				return nil, err
+			}
+			supportedSulBandList := make([]*xnapiesv1.SupportedSulbandItem, 0)
+			sulBandItem := &xnapiesv1.SupportedSulbandItem{
+				SulBandItem: &xnapiesv1.SulFrequencyBand{
+					Value: nCell.SulFreqBand,
+				},
+			}
+			supportedSulBandList = append(supportedSulBandList, sulBandItem)
+			freqBandItem := &xnapiesv1.NrfrequencyBandItem{
+				NrFrequencyBand: freqBand,
+				SupportedSulBandList: &xnapiesv1.SupportedSulbandList{
+					Value: supportedSulBandList,
+				},
+			}
+			freqBandList = append(freqBandList, freqBandItem)
+			nrfreqInfo := &xnapiesv1.NrfrequencyInfo{
+				NrArfcn: &xnapiesv1.Nrarfcn{
+					Value: nCell.NrArfcn,
+				},
+				FrequencyBandList: &xnapiesv1.NrfrequencyBandList{
+					Value: freqBandList,
+				},
+			}
+			connSupport, err := pdubuilder.CreateConnectivitySupport(pdubuilder.CreateENdcsupportConnectivitySupportNotSupported())
+			if err != nil {
+				return nil, err
+			}
+
 			neighbourInfoNrList = append(neighbourInfoNrList, &xnapiesv1.NeighbourInformationNRItem{
 				NrPci: &xnapiesv1.Nrpci{
 					Value: nCell.NrPCI,
 				},
-				NrCgi: ncgi,
+				NrCgi: neighborNcgi,
 				Tac: &xnapiesv1.Tac{
 					Value: tacBytes,
 				},
