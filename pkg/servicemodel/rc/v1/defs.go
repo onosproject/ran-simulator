@@ -63,3 +63,9 @@ const (
 const (
 	A3MeasurementReportUEEventID = 2
 )
+
+// Call Process Breakpoint
+const (
+	CallProcessTypeIDMobilityManagement = 3
+	CallBreakpointIDHandoverPreparation = 1
+)
