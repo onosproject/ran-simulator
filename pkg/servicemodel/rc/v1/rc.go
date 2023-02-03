@@ -751,26 +751,25 @@ func (c *Client) processInsertAction(ctx context.Context, subscription *subutils
 	eventTriggerFormats := eventTriggers.GetRicEventTriggerFormats()
 	switch eventTrigger := eventTriggerFormats.RicEventTriggerFormats.(type) {
 	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat1:
-		// Process RIC Event trigger definition IE style 1: Message Event
-		messageList := eventTrigger.EventTriggerFormat1.GetMessageList()
-		for _, m := range messageList {
-			ueEventList := m.GetAssociatedUeevent().GetUeEventList()
-			for _, e := range ueEventList {
-				if e.GetUeEventId().Value == A3MeasurementReportUEEventID {
-					log.Debugf("Processing event trigger format 1: Message Event - A3 measurement report received (UE Event ID: %d)", A3MeasurementReportUEEventID)
-					go func() {
-						err := c.insertOnA3MeasurementReceived(ctx, subscription)
-						if err != nil {
-							log.Warn(err)
-							// TODO we should propagate this error back
-							return
-						}
-					}()
-				}
-			}
-		}
+		// TODO: Process RIC Event trigger definition IE style 1: Message Event
 	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat2:
-		// TODO Process RIC Event trigger definition IE style 2: Call Process Breakpoint
+		// Process RIC Event trigger definition IE style 2: Call Process Breakpoint
+		callProcessTypeID := eventTrigger.EventTriggerFormat2.GetRicCallProcessTypeId().Value
+		callBreakPointID := eventTrigger.EventTriggerFormat2.GetRicCallProcessBreakpointId().Value
+
+		// handover
+		if callProcessTypeID == CallProcessTypeIDMobilityManagement && callBreakPointID == CallBreakpointIDHandoverPreparation {
+			log.Debug("Processing event trigger format 2: Call Process Breakpoint - Mobility Management / Handover Preparation")
+			go func() {
+				err := c.insertOnA3MeasurementReceived(ctx, subscription)
+				if err != nil {
+					log.Warn(err)
+					// TODO we should propagate this error back
+					return
+				}
+			}()
+		}
+
 	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat3:
 		// TODO Process RIC Event trigger definition IE style 3
 	case *e2smrcies.RicEventTriggerFormats_EventTriggerFormat4:
