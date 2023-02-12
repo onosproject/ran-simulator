@@ -535,7 +535,14 @@ func (c *Client) handleControlMessage(ctx context.Context, controlHeader *e2smrc
 				if err != nil {
 					return err
 				}
+			} else if headerFormat1.GetRicStyleType().Value == controlStyleType100 && headerFormat1.GetRicControlActionId().Value == controlActionID6 {
+				// for NS xApp
+				err := c.getNSValue(ctx, messageFormat1)
+				if err != nil {
+					return err
+				}
 			}
+			
 		}
 	} else if headerFormat2 != nil {
 		// TODO write handler for header format2
@@ -659,6 +666,14 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlMessage *e2smrcies.E
 				return errors.NewInvalid("NCGI ran parameter is not set")
 			}
 		}
+	}
+	return nil
+}
+
+func (c *Client) getNSValue(ctx context.Context, controlMessage *e2smrcies.E2SmRcControlMessageFormat1) error {
+	for _, ranParameter := range controlMessage.GetRanPList() {
+		// Extracts NR PCI ran parameter
+		ranParameterID := ranParameter.GetRanParameterId().Value
 		if ranParameterID == NSRANParameterID {
 			var control_values []float32
 			ranParameter := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()
