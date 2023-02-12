@@ -16,7 +16,9 @@ const (
 	eventTriggerStyle3  = "E2 Node Information"
 	controlStyleType3   = 3
 	controlStyleType200 = 200 // for PCI use-case: since there is no style for PCI use-case, define a new style
+	controlStyleType100 = 100 // for NS xApp use-case
 	controlActionID1    = 1
+	controlActionID6    = 6 // for NS xApp use-case
 
 	ricInsertIndicationIDForMHO = 1
 	ricInsertStyleType3         = 3
@@ -36,7 +38,7 @@ const (
 	// NCGIRANParameterID NCGI RAN parameter ID
 	NCGIRANParameterID = 2
 	// NS xApp Id
-	NSRANParameterID = 3
+	NSRANParameterID = 1
 
 	// TargetPrimaryCellIDRANParameterID Target Primary Cell ID RAN parameter ID
 	TargetPrimaryCellIDRANParameterID = 1
