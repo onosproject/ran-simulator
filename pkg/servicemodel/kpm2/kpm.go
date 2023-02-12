@@ -229,8 +229,8 @@ func float_encoder(data float32) int64 {
 	var buf [4]byte
 	binary.BigEndian.PutUint32(buf[:], math.Float32bits(data))
 	int_data := int64(binary.BigEndian.Uint32(buf[:]))
-	log.Infof("data : %+v", data)
-	log.Infof("int_data : %+v", int_data)
+	log.Debugf("data : %+v", data)
+	log.Debugf("int_data : %+v", int_data)
 	return int_data
 }
 
@@ -482,6 +482,11 @@ func (sm *Client) reportIndication(ctx context.Context, interval int64, subscrip
 	}
 
 	nsDataReader = csv.NewReader(nsDataFile)
+
+	_, err = nsDataReader.Read()
+	if err != nil {
+		log.Error("can't open the file")
+	}
 
 	defer nsDataFile.Close()
 

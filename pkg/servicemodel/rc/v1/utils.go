@@ -9,6 +9,9 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"math"
+	"strconv"
+
 	ransimtypes "github.com/onosproject/onos-api/go/onos/ransim/types"
 	"github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/pdubuilder"
 	e2smrc "github.com/onosproject/onos-e2-sm/servicemodels/e2sm_rc/servicemodel"
@@ -28,8 +31,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/messages/format3"
 	"github.com/onosproject/ran-simulator/pkg/utils/e2sm/rc/v1/indication/messages/format5"
 	"google.golang.org/protobuf/proto"
-	"math"
-	"strconv"
 )
 
 func getActionDefinitionMap(actionList []*e2appducontents.RicactionToBeSetupItemIes, ricActionsAccepted []*e2aptypes.RicActionID) (map[*e2aptypes.RicActionID]*e2smrcies.E2SmRcActionDefinition, error) {
@@ -542,7 +543,7 @@ func (c *Client) handleControlMessage(ctx context.Context, controlHeader *e2smrc
 					return err
 				}
 			}
-			
+
 		}
 	} else if headerFormat2 != nil {
 		// TODO write handler for header format2
@@ -672,16 +673,18 @@ func (c *Client) checkAndSetPCI(ctx context.Context, controlMessage *e2smrcies.E
 
 func (c *Client) getNSValue(ctx context.Context, controlMessage *e2smrcies.E2SmRcControlMessageFormat1) error {
 	for _, ranParameter := range controlMessage.GetRanPList() {
-		// Extracts NR PCI ran parameter
+		// Extracts NS ran parameter
 		ranParameterID := ranParameter.GetRanParameterId().Value
 		if ranParameterID == NSRANParameterID {
 			var control_values []float32
 			ranParameter := ranParameter.GetRanParameterValueType().GetRanPChoiceStructure().GetRanParameterStructure().GetSequenceOfRanParameters()
 			if ranParameter != nil {
 				for index := 0; index < len(ranParameter); index++ {
+					slice_id := ranParameter[index].GetRanParameterId().GetValue()
 					control_value := int32(ranParameter[index].GetRanParameterValueType().GetRanPChoiceElementFalse().GetRanParameterValue().GetValueInt())
 					convert_control_value := float_decoder(control_value)
 					control_values = append(control_values, convert_control_value)
+					log.Infof("slice id : %v, control value : %v", slice_id, control_value)
 				}
 			} else {
 				return errors.NewInvalid("Can not get control values")
