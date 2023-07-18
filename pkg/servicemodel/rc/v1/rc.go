@@ -29,7 +29,6 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/store/nodes"
 	"github.com/onosproject/ran-simulator/pkg/store/subscriptions"
 	"github.com/onosproject/ran-simulator/pkg/store/ues"
-	"github.com/onosproject/ran-simulator/pkg/utils"
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
@@ -967,7 +966,7 @@ func (c *Client) insertOnA3MeasurementReceived(ctx context.Context, subscription
 				report.UE.GetSCell().GetID().GetID().(id.ECGI), report.UE.GetID().String())
 			imsi := report.UE.GetID().GetID().(id.UEID).IMSI
 			ue, err := c.ServiceModel.UEs.Get(ctx, ransimtypes.IMSI(imsi))
-			gNbID := utils.NewGNbID(uint64(ransimtypes.GetGnbID(uint64(ue.Cell.NCGI))), 22)
+			//gNbID := utils.NewGNbID(uint64(ransimtypes.GetGnbID(uint64(ue.Cell.NCGI))), 22)
 
 			if err != nil {
 				log.Warn(err)
@@ -1004,22 +1003,23 @@ func (c *Client) insertOnA3MeasurementReceived(ctx context.Context, subscription
 								},
 							},
 						},
-						GNbCuUeF1ApIdList:   &e2smcommonies.UeidGnbCuF1ApIdList{Value: []*e2smcommonies.UeidGnbCuCpF1ApIdItem{{GNbCuUeF1ApId: &e2smcommonies.GnbCuUeF1ApId{Value: 0}}}},
-						GNbCuCpUeE1ApIdList: &e2smcommonies.UeidGnbCuCpE1ApIdList{Value: []*e2smcommonies.UeidGnbCuCpE1ApIdItem{{GNbCuCpUeE1ApId: &e2smcommonies.GnbCuCpUeE1ApId{Value: 0}}}},
-						RanUeid:             &e2smcommonies.Ranueid{Value: []byte{0, 0, 0, 0, 0, 0, 0, 0}}, // TODO update it with C-RNTI
-						MNgRanUeXnApId:      &e2smcommonies.NgRannodeUexnApid{Value: 0},
-						GlobalGnbId: &e2smcommonies.GlobalGnbId{
-							PLmnidentity: &e2smcommonies.Plmnidentity{Value: c.getPlmnID().ToBytes()},
-							GNbId:        &e2smcommonies.GnbId{GnbId: &e2smcommonies.GnbId_GNbId{GNbId: &asn1.BitString{Value: gNbID.IDByte.Bytes(gNbID.Length), Len: uint32(gNbID.Length)}}},
-						},
-						GlobalNgRannodeId: &e2smcommonies.GlobalNgrannodeId{
-							GlobalNgrannodeId: &e2smcommonies.GlobalNgrannodeId_GNb{
-								GNb: &e2smcommonies.GlobalGnbId{
-									PLmnidentity: &e2smcommonies.Plmnidentity{Value: c.getPlmnID().ToBytes()},
-									GNbId:        &e2smcommonies.GnbId{GnbId: &e2smcommonies.GnbId_GNbId{GNbId: &asn1.BitString{Value: gNbID.IDByte.Bytes(gNbID.Length), Len: uint32(gNbID.Length)}}},
-								},
-							},
-						},
+						// remain below as comments. all those are optional fields but raising errors - todo: need to check later
+						//GNbCuUeF1ApIdList:   &e2smcommonies.UeidGnbCuF1ApIdList{Value: []*e2smcommonies.UeidGnbCuCpF1ApIdItem{{GNbCuUeF1ApId: &e2smcommonies.GnbCuUeF1ApId{Value: 0}}}},
+						//GNbCuCpUeE1ApIdList: &e2smcommonies.UeidGnbCuCpE1ApIdList{Value: []*e2smcommonies.UeidGnbCuCpE1ApIdItem{{GNbCuCpUeE1ApId: &e2smcommonies.GnbCuCpUeE1ApId{Value: 0}}}},
+						//RanUeid:             &e2smcommonies.Ranueid{Value: []byte{0, 0, 0, 0, 0, 0, 0, 0}}, // TODO update it with C-RNTI
+						//MNgRanUeXnApId:      &e2smcommonies.NgRannodeUexnApid{Value: 0},
+						//GlobalGnbId: &e2smcommonies.GlobalGnbId{
+						//	PLmnidentity: &e2smcommonies.Plmnidentity{Value: c.getPlmnID().ToBytes()},
+						//	GNbId:        &e2smcommonies.GnbId{GnbId: &e2smcommonies.GnbId_GNbId{GNbId: &asn1.BitString{Value: gNbID.IDByte.Bytes(gNbID.Length), Len: uint32(gNbID.Length)}}},
+						//},
+						//GlobalNgRannodeId: &e2smcommonies.GlobalNgrannodeId{
+						//	GlobalNgrannodeId: &e2smcommonies.GlobalNgrannodeId_GNb{
+						//		GNb: &e2smcommonies.GlobalGnbId{
+						//			PLmnidentity: &e2smcommonies.Plmnidentity{Value: c.getPlmnID().ToBytes()},
+						//			GNbId:        &e2smcommonies.GnbId{GnbId: &e2smcommonies.GnbId_GNbId{GNbId: &asn1.BitString{Value: gNbID.IDByte.Bytes(gNbID.Length), Len: uint32(gNbID.Length)}}},
+						//		},
+						//	},
+						//},
 					},
 				},
 			}
