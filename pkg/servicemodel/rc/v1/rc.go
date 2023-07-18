@@ -795,25 +795,25 @@ func (c *Client) processReportAction(ctx context.Context, subscription *subutils
 			e2NodeInfoChangeID := e2NodeChange.E2NodeInfoChangeId
 			if e2NodeInfoChangeID == 1 {
 				log.Debugf("Processing event trigger format 3: cell configuration change for e2 Node %v", c.ServiceModel.Node.GnbID)
-				go func() {
-					err := c.reportOnCellConfigurationChange(ctx, subscription, e2NodeChange)
+				go func(e *e2smrcies.E2SmRcEventTriggerFormat3Item) {
+					err := c.reportOnCellConfigurationChange(ctx, subscription, e)
 					if err != nil {
 						log.Warn(err)
 						// TODO we should propagate this error back
 						return
 					}
-				}()
+				}(e2NodeChange)
 
 			} else if e2NodeInfoChangeID == 2 {
 				log.Debug("Processing event trigger format 3: cell neighbor relation change for e2 node %v", c.ServiceModel.Node.GnbID)
-				go func() {
-					err := c.reportOnCellNeighborRelationChange(ctx, subscription, e2NodeChange)
+				go func(e *e2smrcies.E2SmRcEventTriggerFormat3Item) {
+					err := c.reportOnCellNeighborRelationChange(ctx, subscription, e)
 					if err != nil {
 						log.Warn(err)
 						// TODO we should propagate this error back
 						return
 					}
-				}()
+				}(e2NodeChange)
 
 			} else {
 				return errors.NewNotSupported("E2 node information change ID %d is not supported", e2NodeInfoChangeID)
