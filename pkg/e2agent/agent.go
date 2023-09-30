@@ -10,6 +10,7 @@ import (
 	"net"
 
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/kpm2"
+	"github.com/onosproject/ran-simulator/pkg/servicemodel/ccc"
 
 	"github.com/onosproject/ran-simulator/pkg/e2agent/addressing"
 
@@ -130,7 +131,18 @@ func NewE2Agent(node model.Node, model *model.Model,
 				log.Errorf("Failure registering RC service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
 				return nil, err
 			}
-
+		case registry.Ccc:
+			log.Warnf("Registering CCC service model for node with e2 Node ID: %v", node.GnbID)
+			cccSm, err := ccc.NewServiceModel(node, model, subStore, nodeStore)
+			if err != nil {
+				log.Errorf("Failure creating CCC service model for e2 node ID: %v, %s", node.GnbID, err.Error())
+				return nil, err
+			}
+			err = reg.RegisterServiceModel(cccSm)
+			if err != nil {
+				log.Errorf("Failure registering CCC service model for e2 Node ID: %v, %s", node.GnbID, err.Error())
+				return nil, err
+			}
 		}
 	}
 	return &e2Agent{
