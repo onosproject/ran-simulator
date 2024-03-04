@@ -4,7 +4,7 @@
 
 ARG ONOS_BUILD_VERSION=undefined
 
-FROM onosproject/golang-build:v1.3.0 as build
+FROM onosproject/golang-build:v1.3.1 as build
 
 ENV GO111MODULE=on
 ARG ONOS_MAKE_TARGET=build
