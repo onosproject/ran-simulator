@@ -44,6 +44,7 @@ import (
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/mho"
 	"github.com/onosproject/ran-simulator/pkg/servicemodel/rc"
 	rcv1 "github.com/onosproject/ran-simulator/pkg/servicemodel/rc/v1"
+	ccc "github.com/onosproject/ran-simulator/pkg/servicemodel/ccc"
 	controlutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/control"
 	subutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscription"
 	subdeleteutils "github.com/onosproject/ran-simulator/pkg/utils/e2ap/subscriptiondelete"
@@ -334,6 +335,9 @@ func (e *e2Connection) RICControl(ctx context.Context, request *e2appducontents.
 	case registry.Rc:
 		client := sm.Client.(*rcv1.Client)
 		response, failure, err = client.RICControl(ctx, request)
+	case registry.Ccc:
+		client := sm.Client.(*ccc.Client)
+		response, failure, err = client.RICControl(ctx, request)
 	}
 	if err != nil {
 		return nil, nil, err
@@ -454,7 +458,9 @@ func (e *e2Connection) RICSubscription(ctx context.Context, request *e2appducont
 	case registry.Rc:
 		client := sm.Client.(*rcv1.Client)
 		response, failure, err = client.RICSubscription(ctx, request)
-
+	case registry.Ccc:
+		client := sm.Client.(*ccc.Client)
+		response, failure, err = client.RICSubscription(ctx, request)
 	}
 	// Ric subscription is failed
 	if err != nil {
@@ -595,7 +601,9 @@ func (e *e2Connection) RICSubscriptionDelete(ctx context.Context, request *e2app
 	case registry.Rc:
 		client := sm.Client.(*rcv1.Client)
 		response, failure, err = client.RICSubscriptionDelete(ctx, request)
-
+	case registry.Ccc:
+		client := sm.Client.(*ccc.Client)
+		response, failure, err = client.RICSubscriptionDelete(ctx, request)
 	}
 	// Ric subscription delete procedure is failed so we are not going to update subscriptions store
 	if err != nil {

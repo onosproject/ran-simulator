@@ -20,6 +20,8 @@ const (
 	Kpm
 	// Ni
 	Ni
+	// O-RAN-E2SM-CCC
+	Ccc
 	// Rcpre2
 	Rcpre2
 	// ORAN-E2SM-KPM version 2

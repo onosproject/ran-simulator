@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "required": [],
+  "properties": {
+    "rrmPolicyRatio": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [],
+        "properties": {
+          "sST": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "sD_flag": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "sD": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 16777215
+          },
+          "min_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "max_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "dedicated_ratio": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        }
+      }
+    }
+  }
+}
