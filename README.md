@@ -37,7 +37,7 @@ The following figure outlines the RAN simulator architecture:
   about E2-nodes, E2-agents, UEs, RAN metrics, E2 subscriptions, etc.
 
 * **RAN simulator APIs**: RAN simulator provides a variety of gRPC APIs that can be used for controlling E2 nodes and RAN environment.
-  You can find more details about RAN simulator APIs here: [RAN simulator APIs](api.md)
+  You can find more details about RAN simulator APIs here: [RAN simulator APIs](docs/api.md)
 
 * **RAN simulator CLI**: RAN simulator is equipped with a command line interface which is integrated with
   [onos-cli](https://github.com/onosproject/onos-cli) that allows to interact with RAN simulator to retrieve required information from data stores,
